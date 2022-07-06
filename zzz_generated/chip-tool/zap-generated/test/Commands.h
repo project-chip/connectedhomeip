@@ -31,7 +31,7 @@
 class TestList : public Command
 {
 public:
-    TestList() : Command("list"){};
+    TestList() : Command("list") {};
     CHIP_ERROR Run() override
     {
         printf("TestAccessControlCluster\n");
@@ -234,7 +234,7 @@ public:
 class ManualTestList : public Command
 {
 public:
-    ManualTestList() : Command("list-manual"){};
+    ManualTestList() : Command("list-manual") {};
     CHIP_ERROR Run() override
     {
         printf("Test_TC_DD_1_5\n");
@@ -575,7 +575,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -598,7 +600,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -610,21 +612,21 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_3, 0));
+                                           "acl[0].targets.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
                             CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 0U));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_3, 1));
+                                           "acl[0].targets.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 1UL));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_3, 2));
+                                           "acl[0].targets.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 2UL));
@@ -643,39 +645,39 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 0));
+                                           "acl[1].subjects.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_3.GetValue(), 4ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 1));
+                                           "acl[1].subjects.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_3.GetValue(), 5ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 2));
+                                           "acl[1].subjects.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_3.GetValue(), 6ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 3));
+                                           "acl[1].subjects.Value()", iter_3, 3));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_3.GetValue(), 7ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()",
-                                                                                                          iter_3, 4));
+                                       iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
                     {
                         auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_3, 0));
+                                           "acl[1].targets.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
                             CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 8U));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_3, 1));
+                                           "acl[1].targets.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 9UL));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_3, 2));
+                                           "acl[1].targets.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 10UL));
@@ -694,39 +696,39 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 0));
+                                           "acl[2].subjects.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_3.GetValue(), 12ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 1));
+                                           "acl[2].subjects.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_3.GetValue(), 13ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 2));
+                                           "acl[2].subjects.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_3.GetValue(), 14ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 3));
+                                           "acl[2].subjects.Value()", iter_3, 3));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_3.GetValue(), 15ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()",
-                                                                                                          iter_3, 4));
+                                       iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[2].targets", iter_0.GetValue().targets));
                     {
                         auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_3, 0));
+                                           "acl[2].targets.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
                             CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 16U));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_3, 1));
+                                           "acl[2].targets.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 17UL));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_3, 2));
+                                           "acl[2].targets.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 18UL));
@@ -749,7 +751,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -776,7 +778,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -797,7 +799,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -818,7 +820,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -839,7 +841,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -860,7 +862,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -881,7 +883,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -902,7 +904,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -914,21 +916,21 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_3, 0));
+                                           "acl[0].targets.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
                             CheckValue("acl[0].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 0U));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_3, 1));
+                                           "acl[0].targets.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[0].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 1UL));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(CheckValueNull("acl[0].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[0].targets.Value()", iter_3, 2));
+                                           "acl[0].targets.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValueNonNull("acl[0].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[0].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 2UL));
@@ -947,39 +949,39 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 0));
+                                           "acl[1].subjects.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[0]", iter_3.GetValue(), 4ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 1));
+                                           "acl[1].subjects.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[1]", iter_3.GetValue(), 5ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 2));
+                                           "acl[1].subjects.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[2]", iter_3.GetValue(), 6ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[1].subjects.Value()", iter_3, 3));
+                                           "acl[1].subjects.Value()", iter_3, 3));
                         VerifyOrReturn(CheckValue("acl[1].subjects.Value()[3]", iter_3.GetValue(), 7ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[1].subjects.Value()",
-                                                                                                          iter_3, 4));
+                                       iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[1].targets", iter_0.GetValue().targets));
                     {
                         auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_3, 0));
+                                           "acl[1].targets.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
                             CheckValue("acl[1].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 8U));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_3, 1));
+                                           "acl[1].targets.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[1].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 9UL));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(CheckValueNull("acl[1].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[1].targets.Value()", iter_3, 2));
+                                           "acl[1].targets.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValueNonNull("acl[1].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[1].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 10UL));
@@ -998,39 +1000,39 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().subjects.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 0));
+                                           "acl[2].subjects.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[0]", iter_3.GetValue(), 12ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 1));
+                                           "acl[2].subjects.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[1]", iter_3.GetValue(), 13ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 2));
+                                           "acl[2].subjects.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[2]", iter_3.GetValue(), 14ULL));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().subjects.Value())>(
-                            "acl[2].subjects.Value()", iter_3, 3));
+                                           "acl[2].subjects.Value()", iter_3, 3));
                         VerifyOrReturn(CheckValue("acl[2].subjects.Value()[3]", iter_3.GetValue(), 15ULL));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().subjects.Value())>("acl[2].subjects.Value()",
-                                                                                                          iter_3, 4));
+                                       iter_3, 4));
                     }
                     VerifyOrReturn(CheckValueNonNull("acl[2].targets", iter_0.GetValue().targets));
                     {
                         auto iter_3 = iter_0.GetValue().targets.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_3, 0));
+                                           "acl[2].targets.Value()", iter_3, 0));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[0].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(
                             CheckValue("acl[2].targets.Value()[0].endpoint.Value()", iter_3.GetValue().endpoint.Value(), 16U));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[0].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_3, 1));
+                                           "acl[2].targets.Value()", iter_3, 1));
                         VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[1].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[2].targets.Value()[1].cluster.Value()", iter_3.GetValue().cluster.Value(), 17UL));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].endpoint", iter_3.GetValue().endpoint));
                         VerifyOrReturn(CheckValueNull("acl[2].targets.Value()[1].deviceType", iter_3.GetValue().deviceType));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().targets.Value())>(
-                            "acl[2].targets.Value()", iter_3, 2));
+                                           "acl[2].targets.Value()", iter_3, 2));
                         VerifyOrReturn(CheckValueNonNull("acl[2].targets.Value()[2].cluster", iter_3.GetValue().cluster));
                         VerifyOrReturn(
                             CheckValue("acl[2].targets.Value()[2].cluster.Value()", iter_3.GetValue().cluster.Value(), 18UL));
@@ -1053,7 +1055,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -1149,7 +1151,7 @@ private:
 
                     listHolder_0->mList[0].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[0].fabricIndex = 0U;
 
@@ -1190,7 +1192,7 @@ private:
 
                     listHolder_0->mList[1].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[1].fabricIndex = 0U;
 
@@ -1231,12 +1233,12 @@ private:
 
                     listHolder_0->mList[2].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[2].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 3);
+                            listHolder_0->mList, 3);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1273,7 +1275,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1305,7 +1307,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1337,7 +1339,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1376,7 +1378,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1416,12 +1418,12 @@ private:
 
                     listHolder_0->mList[1].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              1);
+                                1);
                 }
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1479,7 +1481,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1615,12 +1617,12 @@ private:
 
                     listHolder_0->mList[1].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              20);
+                                20);
                 }
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1666,7 +1668,7 @@ private:
 
                     listHolder_0->mList[0].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[0].fabricIndex = 0U;
 
@@ -1707,7 +1709,7 @@ private:
 
                     listHolder_0->mList[1].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[1].fabricIndex = 0U;
 
@@ -1748,7 +1750,7 @@ private:
 
                     listHolder_0->mList[2].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[2].fabricIndex = 0U;
 
@@ -1789,12 +1791,12 @@ private:
 
                     listHolder_0->mList[3].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              3);
+                                3);
                 }
                 listHolder_0->mList[3].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 4);
+                            listHolder_0->mList, 4);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1820,7 +1822,7 @@ private:
                 listHolder_0->mList[0].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 1);
+                            listHolder_0->mList, 1);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -1874,7 +1876,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -2037,7 +2041,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -2118,7 +2124,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -2263,7 +2271,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -2441,7 +2451,9 @@ private:
 
     uint32_t FeatureMapValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -3422,7 +3434,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -3678,7 +3692,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -3703,7 +3717,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 290ms");
@@ -3757,7 +3771,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Wait 290ms");
@@ -3811,7 +3825,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Wait 290ms");
@@ -3865,7 +3879,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Wait 290ms");
@@ -3912,7 +3926,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 33: {
             LogStep(33, "Check on/off attribute value is false after off command");
@@ -3947,7 +3961,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -4203,7 +4219,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -4227,7 +4243,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 140ms");
@@ -4280,7 +4296,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Wait 140ms");
@@ -4333,7 +4349,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Wait 140ms");
@@ -4386,7 +4402,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Wait 140ms");
@@ -4433,7 +4449,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 33: {
             LogStep(33, "Check on/off attribute value is false after off command");
@@ -4468,7 +4484,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -4578,7 +4596,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -4603,7 +4621,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 25ms");
@@ -4631,7 +4649,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Wait 25ms");
@@ -4652,7 +4670,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Check on/off attribute value is false after off command");
@@ -4687,7 +4705,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -4808,7 +4828,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -4832,7 +4852,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToSaturation::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 6ms");
@@ -4879,7 +4899,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Check on/off attribute value is false after off command");
@@ -4914,7 +4934,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -5260,7 +5282,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -5284,7 +5306,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 40ms");
@@ -5337,7 +5359,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Wait 40ms");
@@ -5390,7 +5412,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Wait 40ms");
@@ -5443,7 +5465,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Wait 40ms");
@@ -5496,7 +5518,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 33: {
             LogStep(33, "Wait 40ms");
@@ -5549,7 +5571,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 40: {
             LogStep(40, "Wait 40ms");
@@ -5596,7 +5618,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 47: {
             LogStep(47, "Check on/off attribute value is false after off command");
@@ -5631,7 +5653,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -5741,7 +5765,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -5766,7 +5790,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 10ms");
@@ -5794,7 +5818,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Wait 10ms");
@@ -5815,7 +5839,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Check on/off attribute value is false after off command");
@@ -5850,7 +5874,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -5963,7 +5989,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -5994,7 +6020,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHueAndSaturation::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Wait 10ms");
@@ -6021,7 +6047,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Check on/off attribute value is false after off command");
@@ -6056,7 +6082,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -6169,7 +6197,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -6200,7 +6228,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColor::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Wait 20ms");
@@ -6227,7 +6255,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Check on/off attribute value is false after off command");
@@ -6262,7 +6290,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -6398,7 +6428,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -6428,7 +6458,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Wait 150ms");
@@ -6459,7 +6489,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Check current x attribute value matched the value sent by the last command");
@@ -6479,7 +6509,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Check on/off attribute value is false after off command");
@@ -6514,7 +6544,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -6627,7 +6659,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -6658,7 +6690,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColor::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Wait 50ms");
@@ -6685,7 +6717,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Check on/off attribute value is false after off command");
@@ -6720,7 +6752,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -6813,7 +6847,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -6837,7 +6871,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 10ms");
@@ -6858,7 +6892,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Check on/off attribute value is false after off command");
@@ -6893,7 +6927,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -7155,7 +7191,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -7181,7 +7217,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 90ms");
@@ -7236,7 +7272,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Wait 190ms");
@@ -7291,7 +7327,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Stop Color Temperature command");
@@ -7307,7 +7343,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "Wait 90ms");
@@ -7362,7 +7398,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Stop Color Temperature command");
@@ -7378,7 +7414,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 28: {
             LogStep(28, "Wait 140ms");
@@ -7425,7 +7461,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 35: {
             LogStep(35, "Check on/off attribute value is false after off command");
@@ -7460,7 +7496,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -7626,7 +7664,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -7653,7 +7691,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 40ms");
@@ -7709,7 +7747,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Wait 40ms");
@@ -7756,7 +7794,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Check on/off attribute value is false after off command");
@@ -7791,7 +7829,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -8050,7 +8090,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -8069,7 +8109,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
@@ -8090,7 +8130,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Wait 290ms");
@@ -8144,7 +8184,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Wait 290ms");
@@ -8198,7 +8238,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "Wait 290ms");
@@ -8252,7 +8292,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Wait 290ms");
@@ -8299,7 +8339,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 34: {
             LogStep(34, "Check on/off attribute value is false after off command");
@@ -8334,7 +8374,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -8526,7 +8568,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -8550,7 +8592,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 290ms");
@@ -8603,7 +8645,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
@@ -8623,7 +8665,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Wait 40ms");
@@ -8676,7 +8718,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 21: {
             LogStep(21, "Check EnhancedCurrentHue attribute value matched the value sent by the last command");
@@ -8690,7 +8732,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 23: {
             LogStep(23, "Check on/off attribute value is false after off command");
@@ -8725,7 +8767,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -8835,7 +8879,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -8860,7 +8904,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedStepHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 10ms");
@@ -8888,7 +8932,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedStepHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Wait 10ms");
@@ -8909,7 +8953,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Check on/off attribute value is false after off command");
@@ -8944,7 +8988,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -9037,7 +9083,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -9062,7 +9108,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 10ms");
@@ -9083,7 +9129,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Check on/off attribute value is false after off command");
@@ -9118,7 +9164,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -9414,7 +9462,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is true after on command");
@@ -9432,7 +9480,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Reads CurrentHue attribute from DUT");
@@ -9450,7 +9498,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Reads CurrentHue attribute from DUT");
@@ -9483,7 +9531,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Check Saturation attribute value matched the value sent by the last command");
@@ -9501,7 +9549,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Reads CurrentSaturation attribute from DUT.");
@@ -9534,7 +9582,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Reads CurrentX attribute from DUT");
@@ -9558,7 +9606,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Reads CurrentX attribute from DUT");
@@ -9605,7 +9653,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 25: {
             LogStep(25, "Reads current color temprature from DUT");
@@ -9623,7 +9671,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Reads current color temprature from DUT");
@@ -9656,7 +9704,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 31: {
             LogStep(31, "Reads EnhancedCurrentHue attribute value from DUT");
@@ -9674,7 +9722,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 33: {
             LogStep(33, "Reads EnhancedCurrentHue attribute value from DUT");
@@ -9701,7 +9749,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 37: {
             LogStep(37, "Check on/off attribute value is false after off command");
@@ -9736,7 +9784,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -10075,7 +10125,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -10241,7 +10293,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -10533,7 +10587,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -10622,7 +10678,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
                                EthernetNetworkDiagnostics::Commands::ResetCounts::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Read the PacketRxCount attribute");
@@ -10683,7 +10739,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -10885,7 +10943,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -11010,7 +11070,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -11189,7 +11251,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -11371,7 +11435,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -11522,7 +11588,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -11542,8 +11610,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>
-                    value;
+                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -11805,7 +11873,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -11973,7 +12043,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -12068,7 +12140,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -12175,7 +12249,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::Identify::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH reads immediately IdentifyTime attribute from DUT1");
@@ -12217,7 +12291,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::Identify::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "TH reads immediately IdentifyTime attribute from DUT2");
@@ -12286,7 +12360,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -12406,7 +12482,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "DUT executes a blink effect");
@@ -12430,7 +12506,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "DUT executes a breathe effect");
@@ -12454,7 +12530,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "DUT executes an okay effect");
@@ -12478,7 +12554,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "DUT executes a channel change effect");
@@ -12502,7 +12578,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "DUT executes a breathe effect");
@@ -12526,7 +12602,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "DUT stops the breathe effect after the current effect sequence");
@@ -12550,7 +12626,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "DUT executes a breathe effect");
@@ -12574,7 +12650,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "DUT stops the breathe effect as soon as possible.");
@@ -12598,7 +12674,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Check DUT executes a blink effect.");
@@ -12622,7 +12698,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Commands::TriggerEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "DUT stops any effect that may be still running as soon as possible");
@@ -12663,7 +12739,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -12828,7 +12906,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -12970,7 +13050,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -13143,7 +13225,9 @@ private:
     uint16_t MinFrequencyValue;
     uint16_t MaxFrequencyValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -13390,7 +13474,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Wait 100ms");
@@ -13541,7 +13625,9 @@ private:
     chip::app::DataModel::Nullable<uint16_t> OffTransitionTimeValue;
     chip::app::DataModel::Nullable<uint8_t> StartUpCurrentLevelValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -13868,7 +13954,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -14026,7 +14114,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Wait 100ms");
@@ -14051,7 +14139,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Wait 100 second");
@@ -14081,7 +14169,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Wait 11000ms");
@@ -14111,7 +14199,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Wait 1000ms");
@@ -14136,7 +14224,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Wait 100ms");
@@ -14178,7 +14266,9 @@ private:
     uint8_t MaxlevelValue;
     chip::app::DataModel::Nullable<uint8_t> DefaultMoveRateValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -14320,7 +14410,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "reads max level attribute from DUT");
@@ -14338,7 +14428,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5,
@@ -14374,7 +14464,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveWithOnOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9,
@@ -14417,7 +14507,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Wait 100ms");
@@ -14449,7 +14539,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "Wait 100ms");
@@ -14490,7 +14580,9 @@ private:
     uint8_t MinlevelValue;
     uint8_t CurrentlevelValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -14601,7 +14693,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevelWithOnOff::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Reads current level attribute from DUT");
@@ -14620,7 +14712,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Step::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 4000ms");
@@ -14644,7 +14736,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::StepWithOnOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Wait 4000ms");
@@ -14669,7 +14761,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Wait 100ms");
@@ -14710,7 +14802,9 @@ private:
     uint8_t MinlevelValue;
     uint8_t CurrentLevelValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -14839,7 +14933,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevelWithOnOff::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Reads CurrentLevel attribute from DUT");
@@ -14857,7 +14951,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Wait 5000ms");
@@ -14875,7 +14969,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Physically verify that the device has stopped transitioning");
@@ -14903,7 +14997,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Move::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Wait 5000ms");
@@ -14921,7 +15015,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Physically verify that the device has stopped transitioning");
@@ -14949,7 +15043,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Wait 100ms");
@@ -14987,7 +15081,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -15160,7 +15256,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -15338,7 +15436,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -15511,7 +15611,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -15684,7 +15786,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -15846,7 +15950,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -16014,7 +16120,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -16181,7 +16289,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -16342,7 +16452,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -16552,7 +16664,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -16721,7 +16835,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -16888,7 +17004,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17067,7 +17185,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17116,7 +17236,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -17147,7 +17267,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17208,7 +17330,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH sends CEC Home Keys(0x09) to DUT");
@@ -17219,7 +17341,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -17250,7 +17372,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17360,7 +17484,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Send Numbers2");
@@ -17371,7 +17495,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Send Numbers3");
@@ -17382,7 +17506,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Send Numbers4");
@@ -17393,7 +17517,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Send Numbers5");
@@ -17404,7 +17528,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Send Numbers6");
@@ -17415,7 +17539,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Send Numbers7");
@@ -17426,7 +17550,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Send Numbers8");
@@ -17437,7 +17561,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Send Numbers9");
@@ -17448,7 +17572,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -17479,7 +17603,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17562,7 +17688,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17650,7 +17778,9 @@ private:
     chip::Optional<chip::CharSpan> mApplicationId;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17719,7 +17849,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                ApplicationLauncher::Commands::LaunchApp::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH sends a LaunchApp command to DUT to launch an app which is not available");
@@ -17735,7 +17865,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                ApplicationLauncher::Commands::LaunchApp::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -17770,7 +17900,9 @@ private:
     chip::Optional<chip::CharSpan> mApplicationId;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17837,7 +17969,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id, ApplicationLauncher::Commands::StopApp::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads the Status attribute");
@@ -17877,7 +18009,9 @@ private:
     chip::Optional<chip::CharSpan> mApplicationId;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -17943,7 +18077,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id, ApplicationLauncher::Commands::HideApp::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads the Status attribute");
@@ -17979,7 +18113,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18060,7 +18196,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18132,7 +18270,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::SelectInput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Read current input list");
@@ -18169,7 +18307,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18235,7 +18375,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Show Input Status Command");
@@ -18245,7 +18385,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -18276,7 +18416,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18345,7 +18487,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::RenameInput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "TH reads the InputList attribute from the DUT to show list of Inputs available");
@@ -18386,7 +18528,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18473,7 +18617,9 @@ private:
     chip::Optional<uint16_t> mMinornumber;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18550,7 +18696,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::ChangeChannelByNumber::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Verify that the channel has changed on the device");
@@ -18558,7 +18704,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if channel has changed on the devicegarbage: not in length on purpose", 53);
+                                "Please enter 'y' if channel has changed on the devicegarbage: not in length on purpose", 53);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -18602,7 +18748,9 @@ private:
     chip::Optional<uint16_t> mMinornumber;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18707,7 +18855,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::SkipChannel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Verify that the channel has changed on the device");
@@ -18715,7 +18863,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if channel has changed on the devicegarbage: not in length on purpose", 53);
+                                "Please enter 'y' if channel has changed on the devicegarbage: not in length on purpose", 53);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -18755,7 +18903,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -18877,7 +19027,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute");
@@ -18893,7 +19043,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Verify that the media state is playing");
@@ -18920,7 +19070,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Verify that the media is paused");
@@ -18946,7 +19096,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StopPlayback::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Verify that the media is stoped");
@@ -18994,7 +19144,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -19152,7 +19304,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute from the DUT");
@@ -19168,7 +19320,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Verify that the media state is playing");
@@ -19195,7 +19347,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StartOver::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Verify that the media is started over");
@@ -19216,7 +19368,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Next::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Verify that the next media item in the queue has been loaded");
@@ -19224,7 +19376,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if media item in the queue has been loadedgarbage: not in length on purpose", 59);
+                                "Please enter 'y' if media item in the queue has been loadedgarbage: not in length on purpose", 59);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -19237,7 +19389,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Previous::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Verify that the previous media item in the queue has been loaded");
@@ -19245,7 +19397,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if previous media item in the queue has been loadedgarbage: not in length on purpose", 68);
+                                "Please enter 'y' if previous media item in the queue has been loadedgarbage: not in length on purpose", 68);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -19259,7 +19411,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::SkipForward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Verify that the media has skipped forward 10 seconds");
@@ -19267,7 +19419,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if media has skipped forward 10 secondsgarbage: not in length on purpose", 56);
+                                "Please enter 'y' if media has skipped forward 10 secondsgarbage: not in length on purpose", 56);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -19287,7 +19439,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::SkipBackward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Verify that the media has skipped backward 10 seconds");
@@ -19295,7 +19447,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if media has skipped backward 10 secondsgarbage: not in length on purpose", 57);
+                                "Please enter 'y' if media has skipped backward 10 secondsgarbage: not in length on purpose", 57);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -19337,7 +19489,9 @@ private:
     chip::Optional<uint64_t> mSeekPosition;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -19435,7 +19589,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Sends a Seek command");
@@ -19446,7 +19600,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Seek::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Verify that the media has moved to 10 seconds from the starting point");
@@ -19454,7 +19608,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if media has moved to 10 seconds from the starting pointgarbage: not in length on purpose", 73);
+                                "Please enter 'y' if media has moved to 10 seconds from the starting pointgarbage: not in length on purpose", 73);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -19514,7 +19668,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Seek::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -19545,7 +19699,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -19711,7 +19867,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute from the DUT");
@@ -19733,7 +19889,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Reads the CurrentState attribute");
@@ -19755,7 +19911,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Reads the PlaybackSpeed attribute from the DUT");
@@ -19771,7 +19927,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Reads the CurrentState attribute");
@@ -19798,7 +19954,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Reads the PlaybackSpeed attribute from the DUT");
@@ -19819,7 +19975,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Reads the PlaybackSpeed attribute from the DUT");
@@ -19876,7 +20032,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -19948,7 +20106,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Reads the CurrentOutput attribute");
@@ -19987,7 +20145,9 @@ private:
 
     chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> audioOutputListValues;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20057,7 +20217,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::RenameOutput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3,
@@ -20106,7 +20266,9 @@ private:
 
     chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> TargetListValues;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20197,7 +20359,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Reads the CurrentTarget attribute");
@@ -20234,7 +20396,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20417,7 +20581,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20512,7 +20678,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20684,7 +20852,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20728,8 +20898,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -20744,8 +20914,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -20812,11 +20982,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -20824,7 +20994,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
@@ -20923,7 +21093,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -20966,8 +21138,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -20982,8 +21154,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -21049,7 +21221,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory attribute of DUT_CE");
@@ -21161,7 +21333,9 @@ private:
     chip::Optional<chip::CharSpan> mDownloadImageFilePath;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -21314,12 +21488,12 @@ private:
 
                     listHolder_0->mList[1].targets.Value() =
                         chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::Target::Type>(listHolder_3->mList,
-                                                                                                              1);
+                                1);
                 }
                 listHolder_0->mList[1].fabricIndex = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -21336,7 +21510,7 @@ private:
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.otaDownloadPath.Emplace();
             value.otaDownloadPath.Value() = mDownloadImageFilePath.HasValue() ? mDownloadImageFilePath.Value()
-                                                                              : chip::Span<const char>("/tmp/downloadedImage", 20);
+                                            : chip::Span<const char>("/tmp/downloadedImage", 20);
             return Start(kIdentityAlpha, value);
         }
         case 7: {
@@ -21357,7 +21531,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OtaSoftwareUpdateRequestor::Id,
                                OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Wait for transfer complete message");
@@ -21374,7 +21548,7 @@ private:
             chip::app::Clusters::SystemCommands::Commands::CompareFiles::Type value;
             value.file1 = mRawImageFilePath.HasValue() ? mRawImageFilePath.Value() : chip::Span<const char>("/tmp/rawImage", 13);
             value.file2 = mDownloadImageFilePath.HasValue() ? mDownloadImageFilePath.Value()
-                                                            : chip::Span<const char>("/tmp/downloadedImage", 20);
+                          : chip::Span<const char>("/tmp/downloadedImage", 20);
             return CompareFiles(kIdentityAlpha, value);
         }
         }
@@ -21406,7 +21580,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -21570,7 +21746,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -21830,7 +22008,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -22011,7 +22191,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -22158,7 +22340,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -22322,7 +22506,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Check on/off attribute value is false after off command");
@@ -22334,7 +22518,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Check on/off attribute value is true after on command");
@@ -22346,7 +22530,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Check on/off attribute value is true after on command");
@@ -22358,7 +22542,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Check on/off attribute value is false after off command");
@@ -22370,7 +22554,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Check on/off attribute value is false after off command");
@@ -22382,7 +22566,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Toggle::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Wait 1000ms");
@@ -22401,7 +22585,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Toggle::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Wait 1000ms");
@@ -22450,7 +22634,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 22: {
             LogStep(22, "Check on/off attribute value is false after off command");
@@ -22485,7 +22669,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -22667,7 +22853,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH writes a value of 0 to StartUpOnOff attribute of DUT");
@@ -22855,7 +23041,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Reboot target device");
@@ -22915,7 +23101,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -23083,7 +23271,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -23601,7 +23791,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -23767,7 +23959,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -23978,7 +24172,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -24146,7 +24342,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -24645,7 +24843,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -24793,7 +24993,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -25049,7 +25251,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -25290,7 +25494,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -25449,7 +25655,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -25614,7 +25822,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -25763,7 +25973,9 @@ private:
     char * deviceInstanceNameBeforeReboot1Buffer = nullptr;
     chip::CharSpan deviceInstanceNameBeforeReboot1;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -26270,7 +26482,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Check Instance Name");
@@ -26434,7 +26646,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Check Instance Name");
@@ -26574,8 +26786,8 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>(
-                "Please enter 'y' if TH adds an unknown key/value pair in the advertised datagarbage: not in length on purpose",
-                76);
+                                "Please enter 'y' if TH adds an unknown key/value pair in the advertised datagarbage: not in length on purpose",
+                                76);
             value.expectedValue.Emplace();
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
@@ -26619,7 +26831,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -26732,7 +26946,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -26894,7 +27110,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -27023,7 +27241,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -27183,7 +27403,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -28043,7 +28265,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -29174,7 +29398,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Commands::SetpointRaiseLower::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 61: {
             LogStep(61, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
@@ -29194,7 +29418,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Commands::SetpointRaiseLower::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 63: {
             LogStep(63, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
@@ -29224,7 +29448,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Commands::SetpointRaiseLower::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 66: {
             LogStep(66, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
@@ -29254,7 +29478,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Commands::SetpointRaiseLower::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 69: {
             LogStep(69, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
@@ -29284,7 +29508,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Commands::SetpointRaiseLower::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 72: {
             LogStep(72, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
@@ -29320,7 +29544,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Commands::SetpointRaiseLower::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 76: {
             LogStep(76, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
@@ -29365,7 +29589,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -29532,7 +29758,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -29649,7 +29877,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -30213,7 +30443,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -31179,7 +31411,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -31468,7 +31702,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -31758,7 +31994,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -31814,7 +32052,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), ThreadNetworkDiagnostics::Id,
                                ThreadNetworkDiagnostics::Commands::ResetCounts::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Read the Overruncount attribute");
@@ -31850,7 +32088,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32013,7 +32253,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32144,7 +32386,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32257,7 +32501,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32404,7 +32650,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32484,7 +32732,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32504,8 +32754,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>
-                    value;
+                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -32733,7 +32983,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -32830,7 +33082,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                WiFiNetworkDiagnostics::Commands::ResetCounts::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads BeaconLostCount attribute from DUT");
@@ -32897,7 +33149,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -33070,7 +33324,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -33501,7 +33757,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -33603,7 +33861,9 @@ private:
     chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> configStatusValA;
     chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> configStatusValB;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -33789,7 +34049,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "2d: TH clear the Mode Attribute bit1 of the DUT");
@@ -33820,7 +34080,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "3a: TH set the Mode Attribute bit2 of the DUT");
@@ -33839,7 +34099,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "3c: TH reads ConfigStatus attribute from DUT");
@@ -33864,7 +34124,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "3f: TH reads ConfigStatus attribute from DUT");
@@ -33901,7 +34161,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -33982,7 +34244,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -34065,7 +34329,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -34289,7 +34555,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 10 seconds movement(s) on the device");
@@ -34336,7 +34602,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "2b: DUT updates its attributes");
@@ -34408,7 +34674,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "4b: TH waits for 3 seconds the end of inertial movement(s) on the device");
@@ -34471,7 +34737,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -34695,7 +34963,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 10 seconds movement(s) on the device");
@@ -34742,7 +35010,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "2b: DUT updates its attributes");
@@ -34814,7 +35082,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "4b: TH waits for 3 seconds the end of inertial movement(s) on the device");
@@ -34880,7 +35148,9 @@ private:
     chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionLift;
     chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionTilt;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -35030,7 +35300,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH Waits for 6-8 seconds movement(s) on the device");
@@ -35047,7 +35317,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "1d: TH Waits for 2 seconds movement(s) on the device");
@@ -35070,7 +35340,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "2b: TH waits for 3 seconds the end of inertial movement(s) on the device");
@@ -35160,7 +35430,9 @@ private:
     chip::Optional<uint16_t> mFullMotionDuration;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -35264,7 +35536,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH Waits for fastMotionDuration seconds movement(s) on the device");
@@ -35281,7 +35553,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "2b: TH Waits for fullMotionDuration seconds movement(s) on the device");
@@ -35353,7 +35625,9 @@ private:
     chip::Optional<uint16_t> mFullMotionDuration;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -35457,7 +35731,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH Waits for fastMotionDuration seconds movement(s) on the device");
@@ -35474,7 +35748,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "2b: TH Waits for fullMotionDuration seconds movement(s) on the device");
@@ -35544,7 +35818,9 @@ private:
     chip::Optional<uint16_t> mFullMotionDuration;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -35697,7 +35973,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH waits for x seconds movement(s) on the DUT");
@@ -35721,7 +35997,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "2b: DUT updates its attributes");
@@ -35770,7 +36046,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "4b: DUT updates its attributes");
@@ -35841,7 +36117,9 @@ private:
     chip::Optional<uint16_t> mFullMotionDuration;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -35994,7 +36272,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1b: TH waits for x seconds movement(s) on the DUT");
@@ -36018,7 +36296,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "2b: DUT updates its attributes");
@@ -36067,7 +36345,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "4b: DUT updates its attributes");
@@ -36138,7 +36416,9 @@ private:
 
     chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionLiftPercent100ths;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -36232,7 +36512,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "3a: TH sends GoToLiftPercentage command with 10001 to DUT");
@@ -36244,7 +36524,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT");
@@ -36256,7 +36536,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -36289,7 +36569,9 @@ private:
 
     chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionTiltPercent100ths;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -36383,7 +36665,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "3a: TH sends GoToTiltPercentage command with 10001 to DUT");
@@ -36395,7 +36677,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT");
@@ -36407,7 +36689,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -36441,7 +36723,9 @@ private:
     chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionLiftPercent100ths;
     chip::app::DataModel::Nullable<chip::Percent100ths> attrCurrentPositionTiltPercent100ths;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -36583,7 +36867,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "1a: If (PA_LF & LF) TH sends GoToLiftPercentage command with 90%% to DUT");
@@ -36594,7 +36878,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "1b: TH Waits for 100ms-1s");
@@ -36611,7 +36895,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "1d: TH Waits for 100ms-1s");
@@ -36629,7 +36913,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "2b: TH Waits for 100ms-1s");
@@ -36646,7 +36930,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "2d: TH Waits for 100ms-1s");
@@ -36734,7 +37018,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -36830,7 +37116,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Commands::NavigateTarget::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -36862,7 +37148,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -36979,7 +37267,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::SelectOutput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Rename Output Command");
@@ -36990,7 +37278,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Commands::RenameOutput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Read attribute Audio Output list");
@@ -37027,7 +37315,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -37062,7 +37352,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNull("currentApp", value));
             }
@@ -37142,7 +37432,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                ApplicationLauncher::Commands::LaunchApp::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Stop App Command");
@@ -37155,7 +37445,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id, ApplicationLauncher::Commands::StopApp::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Hide App Command");
@@ -37168,7 +37458,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id, ApplicationLauncher::Commands::HideApp::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -37200,7 +37490,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -37254,7 +37546,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Commands::SendKey::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -37286,7 +37578,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -37346,7 +37640,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Commands::GetSetupPIN::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Login Command");
@@ -37357,7 +37651,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Commands::Login::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Logout Command");
@@ -37366,7 +37660,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Commands::Logout::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -37398,7 +37692,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -37479,7 +37775,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -37660,7 +37958,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -37957,7 +38257,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Media Playback Pause Command");
@@ -37966,7 +38266,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Media Playback Stop Command");
@@ -37975,7 +38275,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::StopPlayback::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Media Playback Start Over Command");
@@ -37984,7 +38284,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::StartOver::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Media Playback Previous Command");
@@ -37993,7 +38293,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Previous::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Media Playback Next Command");
@@ -38002,7 +38302,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Next::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Media Playback Rewind Command");
@@ -38011,7 +38311,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Media Playback Fast Forward Command");
@@ -38020,7 +38320,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Media Playback Skip Forward Command");
@@ -38030,7 +38330,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::SkipForward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "Read attribute position after skip forward");
@@ -38045,7 +38345,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::SkipBackward::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Read attribute position after skip backward");
@@ -38060,7 +38360,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(3), MediaPlayback::Id, MediaPlayback::Commands::Seek::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 21: {
             LogStep(21, "Read attribute position after seek");
@@ -38096,7 +38396,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -38269,7 +38571,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::ChangeChannel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Change Channel By Number Command");
@@ -38280,7 +38582,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::ChangeChannelByNumber::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Skip Channel Command");
@@ -38290,7 +38592,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Commands::SkipChannel::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -38321,7 +38623,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -38369,7 +38673,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -38401,7 +38705,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -38521,7 +38827,7 @@ private:
 
                 value.search.parameterList =
                     chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Parameter::Type>(listHolder_1->mList,
-                                                                                                               1);
+                            1);
             }
 
             value.autoPlay = true;
@@ -38530,7 +38836,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id, ContentLauncher::Commands::LaunchContent::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Launch URL Command");
@@ -38621,7 +38927,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id, ContentLauncher::Commands::LaunchURL::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -38653,7 +38959,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -38775,7 +39083,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::SelectInput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Hide Input Status Command");
@@ -38784,7 +39092,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Show Input Status Command");
@@ -38793,7 +39101,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Rename Input Command");
@@ -38804,7 +39112,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::RenameInput::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Read attribute media input list");
@@ -38860,7 +39168,9 @@ private:
     char * nullableCharStringSaveBuffer = nullptr;
     chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringSave;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -39587,13 +39897,13 @@ private:
                 chip::ByteSpan value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueAsString(
-                    "longOctetString", value,
-                    chip::ByteSpan(
-                        chip::Uint8::from_const_char(
-                            "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                            "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                            "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"),
-                        300)));
+                                   "longOctetString", value,
+                                   chip::ByteSpan(
+                                       chip::Uint8::from_const_char(
+                                           "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                           "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                           "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"),
+                                       300)));
             }
             break;
         case 122:
@@ -39649,12 +39959,12 @@ private:
                 chip::CharSpan value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueAsString(
-                    "longCharString", value,
-                    chip::CharSpan(
-                        "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                        "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                        "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
-                        900)));
+                                   "longCharString", value,
+                                   chip::CharSpan(
+                                       "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                                       "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                                       "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉",
+                                       900)));
             }
             break;
         case 132:
@@ -39669,48 +39979,48 @@ private:
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 0));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[0]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[0]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 1));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[1]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[1]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 2));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[2]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[2]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 3));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[3]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[3]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listLongOctetString", iter_0, 4));
                 }
             }
@@ -39727,59 +40037,59 @@ private:
                     auto iter_0 = value.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 0));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[0]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[0]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 1));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[1]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[1]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 2));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[2]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[2]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 3));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[3]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[3]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("listLongOctetString", iter_0, 4));
                     VerifyOrReturn(CheckValueAsString(
-                        "listLongOctetString[4]", iter_0.GetValue(),
-                        chip::ByteSpan(chip::Uint8::from_const_char(
-                                           "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
-                                           "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                                           "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
-                                           "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
-                                           "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
-                                           "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
-                                       512)));
+                                       "listLongOctetString[4]", iter_0.GetValue(),
+                                       chip::ByteSpan(chip::Uint8::from_const_char(
+                                                          "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456"
+                                                          "789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                          "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234"
+                                                          "56789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789ab"
+                                                          "cdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef012"
+                                                          "3456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"),
+                                                      512)));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listLongOctetString", iter_0, 5));
                 }
             }
@@ -40108,7 +40418,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -40162,8 +40472,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType>
-                    value;
+                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -40186,8 +40496,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType>
-                    value;
+                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -40202,15 +40512,15 @@ private:
                     {
                         auto iter_3 = iter_0.GetValue().nullableList.Value().begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().nullableList.Value())>(
-                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 0));
+                                           "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 0));
                         VerifyOrReturn(
                             CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[0]", iter_3.GetValue(), 1U));
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().nullableList.Value())>(
-                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 1));
+                                           "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 1));
                         VerifyOrReturn(
                             CheckValue("listNullablesAndOptionalsStruct[0].nullableList.Value()[1]", iter_3.GetValue(), 2U));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().nullableList.Value())>(
-                            "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 2));
+                                           "listNullablesAndOptionalsStruct[0].nullableList.Value()", iter_3, 2));
                     }
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("listNullablesAndOptionalsStruct", iter_0, 1));
                 }
@@ -42194,7 +42504,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Send Test Not Handled Command");
@@ -42203,7 +42513,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestNotHandled::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Send Test Specific Command");
@@ -42212,7 +42522,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestSpecific::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Send Test Add Arguments Command");
@@ -42223,7 +42533,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Send failing Test Add Arguments Command");
@@ -42234,7 +42544,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Read attribute BOOLEAN Default Value");
@@ -42955,11 +43265,11 @@ private:
             ListFreer listFreer;
             chip::ByteSpan value;
             value = chip::ByteSpan(
-                chip::Uint8::from_const_char("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                                             "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                                             "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
-                                             "111111111111111111111111111111111111111111111garbage: not in length on purpose"),
-                300);
+                        chip::Uint8::from_const_char("1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+                                "111111111111111111111111111111111111111111111garbage: not in length on purpose"),
+                        300);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::LongOctetString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -43025,10 +43335,10 @@ private:
             ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>(
-                "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
-                "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉garbage: not in length on purpose",
-                900);
+                        "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                        "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉"
+                        "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉garbage: not in length on purpose",
+                        900);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::LongCharString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
@@ -43059,50 +43369,50 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::ByteSpan>(5);
                 listFreer.add(listHolder_0);
                 listHolder_0->mList[0] = chip::ByteSpan(
-                    chip::Uint8::from_const_char(
-                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
-                        "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
-                        "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                        "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
-                        "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
-                        "length on purpose"),
-                    512);
+                                             chip::Uint8::from_const_char(
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                                                 "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                                 "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                 "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                                 "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
+                                                 "length on purpose"),
+                                             512);
                 listHolder_0->mList[1] = chip::ByteSpan(
-                    chip::Uint8::from_const_char(
-                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
-                        "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
-                        "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                        "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
-                        "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
-                        "length on purpose"),
-                    512);
+                                             chip::Uint8::from_const_char(
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                                                 "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                                 "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                 "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                                 "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
+                                                 "length on purpose"),
+                                             512);
                 listHolder_0->mList[2] = chip::ByteSpan(
-                    chip::Uint8::from_const_char(
-                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
-                        "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
-                        "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                        "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
-                        "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
-                        "length on purpose"),
-                    512);
+                                             chip::Uint8::from_const_char(
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                                                 "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                                 "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                 "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                                 "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
+                                                 "length on purpose"),
+                                             512);
                 listHolder_0->mList[3] = chip::ByteSpan(
-                    chip::Uint8::from_const_char(
-                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
-                        "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
-                        "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                        "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
-                        "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
-                        "length on purpose"),
-                    512);
+                                             chip::Uint8::from_const_char(
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                                                 "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                                 "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                 "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                                 "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
+                                                 "length on purpose"),
+                                             512);
                 listHolder_0->mList[4] = chip::ByteSpan(
-                    chip::Uint8::from_const_char(
-                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
-                        "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
-                        "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
-                        "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
-                        "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
-                        "length on purpose"),
-                    512);
+                                             chip::Uint8::from_const_char(
+                                                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                                                 "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123"
+                                                 "456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd"
+                                                 "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef01234567"
+                                                 "89abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefgarbage: not in "
+                                                 "length on purpose"),
+                                             512);
                 value = chip::app::DataModel::List<chip::ByteSpan>(listHolder_0->mList, 5);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListLongOctetString::Id,
@@ -43195,7 +43505,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(200), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 149: {
             LogStep(149, "Send Test Command to unsupported cluster");
@@ -43204,7 +43514,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 150: {
             LogStep(150, "Read attribute vendor_id Default Value");
@@ -43241,7 +43551,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEnumsRequest::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 155: {
             LogStep(155, "Send Test Command With Struct Argument and arg1.b is true");
@@ -43260,7 +43570,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestStructArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 156: {
             LogStep(156, "Send Test Command With Struct Argument and arg1.b is false");
@@ -43279,7 +43589,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestStructArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 157: {
             LogStep(157, "Send Test Command With Nested Struct Argument and arg1.c.b is true");
@@ -43301,7 +43611,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNestedStructArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 158: {
             LogStep(158, "Send Test Command With Nested Struct Argument arg1.c.b is false");
@@ -43323,7 +43633,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNestedStructArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 159: {
             LogStep(159, "Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true");
@@ -43367,7 +43677,7 @@ private:
                 listHolder_1->mList[1].h = 0;
 
                 value.arg1.d = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(
-                    listHolder_1->mList, 2);
+                                   listHolder_1->mList, 2);
             }
 
             {
@@ -43402,7 +43712,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNestedStructListArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 160: {
             LogStep(160, "Send Test Command With Nested Struct List Argument and some fields b of arg1.d are false");
@@ -43446,7 +43756,7 @@ private:
                 listHolder_1->mList[1].h = 0;
 
                 value.arg1.d = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(
-                    listHolder_1->mList, 2);
+                                   listHolder_1->mList, 2);
             }
 
             {
@@ -43481,7 +43791,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNestedStructListArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 161: {
             LogStep(161, "Send Test Command With Struct Argument and see what we get back");
@@ -43500,7 +43810,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::SimpleStructEchoRequest::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 162: {
             LogStep(162, "Send Test Command With List of INT8U and none of them is set to 0");
@@ -43524,7 +43834,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListInt8UArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 163: {
             LogStep(163, "Send Test Command With List of INT8U and one of them is set to 0");
@@ -43549,7 +43859,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListInt8UArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 164: {
             LogStep(164, "Send Test Command With List of INT8U and get it reversed");
@@ -43573,7 +43883,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListInt8UReverseRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 165: {
             LogStep(165, "Send Test Command With empty List of INT8U and get an empty list back");
@@ -43584,7 +43894,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListInt8UReverseRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 166: {
             LogStep(166, "Send Test Command With List of Struct Argument and arg1.b of first item is true");
@@ -43616,12 +43926,12 @@ private:
                 listHolder_0->mList[1].h = 0;
 
                 value.arg1 = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(
-                    listHolder_0->mList, 2);
+                                 listHolder_0->mList, 2);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListStructArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 167: {
             LogStep(167, "Send Test Command With List of Struct Argument and arg1.b of first item is false");
@@ -43653,12 +43963,12 @@ private:
                 listHolder_0->mList[1].h = 0;
 
                 value.arg1 = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>(
-                    listHolder_0->mList, 2);
+                                 listHolder_0->mList, 2);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListStructArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 168: {
             LogStep(168,
@@ -43742,12 +44052,12 @@ private:
                 }
 
                 value.arg1 = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>(
-                    listHolder_0->mList, 1);
+                                 listHolder_0->mList, 1);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListNestedStructListArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 169: {
             LogStep(169, "Send Test Command With Nested Struct List Argument and some fields b of elements of arg1.d are false");
@@ -43830,12 +44140,12 @@ private:
                 }
 
                 value.arg1 = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>(
-                    listHolder_0->mList, 1);
+                                 listHolder_0->mList, 1);
             }
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestListNestedStructListArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 170: {
             LogStep(170, "Write attribute LIST With List of INT8U and none of them is set to 0");
@@ -43907,7 +44217,7 @@ private:
                     chip::ByteSpan(chip::Uint8::from_const_char("Test3garbage: not in length on purpose"), 5);
 
                 value = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>(
-                    listHolder_0->mList, 4);
+                            listHolder_0->mList, 4);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::ListStructOctetString::Id, value, chip::NullOptional,
@@ -43928,7 +44238,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNullableOptionalRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 177: {
             LogStep(177, "Send Test Command without its optional arg.");
@@ -43937,7 +44247,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNullableOptionalRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 178: {
             LogStep(178, "Read list of structs containing nullables and optionals");
@@ -43969,7 +44279,7 @@ private:
                 }
 
                 value = chip::app::DataModel::List<chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>(
-                    listHolder_0->mList, 1);
+                            listHolder_0->mList, 1);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::ListNullablesAndOptionalsStruct::Id, value, chip::NullOptional,
@@ -45234,7 +45544,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestSimpleOptionalArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 373: {
             LogStep(373, "Send a command that takes an optional parameter but do not set it.");
@@ -45245,7 +45555,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestSimpleOptionalArgumentRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 374: {
             LogStep(374, "Subscribe to list attribute");
@@ -46135,7 +46445,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -46288,7 +46600,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                TestCluster::Commands::TestNullableOptionalRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Send command that needs timed invoke without a timeout value");
@@ -46297,7 +46609,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TimedInvokeRequest::Id,
                                value, chip::NullOptional, chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Send command that needs timed invoke with a long timeout value");
@@ -46306,7 +46618,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TimedInvokeRequest::Id,
                                value, chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Send command that needs timed invoke with a too-short timeout value");
@@ -46316,7 +46628,7 @@ private:
                                              TestCluster::Commands::TimedInvokeRequest::Id, value, chip::Optional<uint16_t>(1),
                                              chip::NullOptional
 
-                                             ));
+                                            ));
 
             using namespace chip::System::Clock::Literals;
             return BusyWaitFor(100_ms);
@@ -46328,7 +46640,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::Test::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Send command that does not need timed invoke with a too-short timeout value");
@@ -46337,7 +46649,7 @@ private:
             ReturnErrorOnFailure(SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::Test::Id,
                                              value, chip::Optional<uint16_t>(1), chip::NullOptional
 
-                                             ));
+                                            ));
 
             using namespace chip::System::Clock::Literals;
             return BusyWaitFor(100_ms);
@@ -46470,7 +46782,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -46856,7 +47170,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -46936,7 +47252,9 @@ private:
 
     uint64_t eventNumber;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -47163,7 +47481,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Read the event back");
@@ -47193,7 +47511,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Read the event back");
@@ -47217,7 +47535,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Check for event report");
@@ -47269,7 +47587,9 @@ private:
     char * deviceInstanceNameBeforeRebootBuffer = nullptr;
     chip::CharSpan deviceInstanceNameBeforeReboot;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -47554,7 +47874,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Open Commissioning Window with too-long timeout");
@@ -47565,7 +47885,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Open Commissioning Window");
@@ -47576,7 +47896,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Check Instance Name");
@@ -47716,7 +48036,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Check Instance Name");
@@ -47753,7 +48073,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -47892,7 +48214,9 @@ private:
     uint8_t * readAttributeOctetStringNotDefaultValueBuffer = nullptr;
     chip::ByteSpan readAttributeOctetStringNotDefaultValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -48678,7 +49002,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Send Test Add Arguments Command");
@@ -48689,7 +49013,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Send Test Add Arguments Command");
@@ -48700,7 +49024,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Read attribute BOOLEAN Default Value");
@@ -49394,7 +49718,9 @@ private:
 
     uint8_t TestAddArgumentDefaultValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -49460,7 +49786,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Send Test Add Arguments Command");
@@ -49471,7 +49797,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestAddArguments::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -49503,7 +49829,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -49696,7 +50024,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -50025,7 +50355,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -50326,7 +50658,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::CommissioningComplete::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Check Breadcrumb was not touched by invalid CommissioningComplete");
@@ -50342,7 +50674,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Try to arm fail-safe");
@@ -50353,7 +50685,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::ArmFailSafe::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Check Breadcrumb was not touched by ArmFailSafe with commissioning window open");
@@ -50392,7 +50724,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::ArmFailSafe::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Check Breadcrumb was properly set by ArmFailSafe");
@@ -50408,7 +50740,7 @@ private:
             return SendCommand(kIdentityBeta, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::ArmFailSafe::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 21: {
             LogStep(21, "Check Breadcrumb was not touched by ArmFailSafe with existing fail-safe armed");
@@ -50422,7 +50754,7 @@ private:
             return SendCommand(kIdentityBeta, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::CommissioningComplete::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 23: {
             LogStep(23, "Check Breadcrumb was not touched by CommissioningComplete from wrong fabric");
@@ -50436,7 +50768,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::CommissioningComplete::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 25: {
             LogStep(25, "Check Breadcrumb was reset to 0 by CommissioningComplete");
@@ -50452,7 +50784,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::ArmFailSafe::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Check Breadcrumb was set by arming fail-safe again");
@@ -50468,7 +50800,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::ArmFailSafe::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 29: {
             LogStep(29, "Check Breadcrumb was reset by expiring the fail-safe");
@@ -50510,7 +50842,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -50559,7 +50893,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), Identify::Id, Identify::Commands::Identify::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -50593,7 +50927,9 @@ private:
 
     chip::FabricIndex ourFabricIndex;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -50649,8 +50985,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -50676,8 +51012,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -50733,7 +51069,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::RemoveFabric::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Read fabric list before setting label");
@@ -50748,7 +51084,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::UpdateFabricLabel::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Read fabric list after setting label");
@@ -50788,7 +51124,9 @@ private:
     uint8_t currentModeBeforeToggle;
     chip::app::DataModel::Nullable<uint8_t> OnModeValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -50825,7 +51163,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -50836,9 +51174,9 @@ private:
                     {
                         auto iter_2 = iter_0.GetValue().semanticTags.begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
-                            "supportedModes[0].semanticTags", iter_2, 0));
+                                           "supportedModes[0].semanticTags", iter_2, 0));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().semanticTags)>(
-                            "supportedModes[0].semanticTags", iter_2, 1));
+                                           "supportedModes[0].semanticTags", iter_2, 1));
                     }
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 1));
                     VerifyOrReturn(
@@ -50847,9 +51185,9 @@ private:
                     {
                         auto iter_2 = iter_0.GetValue().semanticTags.begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
-                            "supportedModes[1].semanticTags", iter_2, 0));
+                                           "supportedModes[1].semanticTags", iter_2, 0));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().semanticTags)>(
-                            "supportedModes[1].semanticTags", iter_2, 1));
+                                           "supportedModes[1].semanticTags", iter_2, 1));
                     }
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("supportedModes", iter_0, 2));
                     VerifyOrReturn(
@@ -50858,9 +51196,9 @@ private:
                     {
                         auto iter_2 = iter_0.GetValue().semanticTags.begin();
                         VerifyOrReturn(CheckNextListItemDecodes<decltype(iter_0.GetValue().semanticTags)>(
-                            "supportedModes[2].semanticTags", iter_2, 0));
+                                           "supportedModes[2].semanticTags", iter_2, 0));
                         VerifyOrReturn(CheckNoMoreListItems<decltype(iter_0.GetValue().semanticTags)>(
-                            "supportedModes[2].semanticTags", iter_2, 1));
+                                           "supportedModes[2].semanticTags", iter_2, 1));
                     }
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("supportedModes", iter_0, 3));
                 }
@@ -51071,7 +51409,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Verify Current Mode Change");
@@ -51086,7 +51424,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Toggle OnOff");
@@ -51094,7 +51432,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Toggle OnOff");
@@ -51102,7 +51440,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Verify Current Mode does not change when OnMode is null");
@@ -51138,7 +51476,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "Toggle OnOff");
@@ -51146,7 +51484,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Verify Current Mode Changes if OnMode is not null");
@@ -51184,7 +51522,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Commands::ChangeToMode::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 23: {
             LogStep(23, "Change On Mode");
@@ -51280,7 +51618,9 @@ private:
 
     chip::FabricIndex ourFabricIndex;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -51362,7 +51702,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::RemoveFabric::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -51395,7 +51735,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -51721,7 +52063,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -51997,7 +52341,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -52172,7 +52518,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -52196,8 +52544,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -52278,7 +52626,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                GeneralCommissioning::Commands::ArmFailSafe::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Reads NodeLabel mandatory attribute of target device");
@@ -52293,7 +52641,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::AddTrustedRootCertificate::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Invoke AddNOC without fail-safe");
@@ -52301,15 +52649,15 @@ private:
             chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type value;
             value.NOCValue = chip::ByteSpan(chip::Uint8::from_const_char("00112233garbage: not in length on purpose"), 8);
             value.IPKValue = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\000\001\002\003\004\005\006\007\000\001\002\003\004\005\006\007garbage: not in length on purpose"),
-                16);
+                                 chip::Uint8::from_const_char(
+                                     "\000\001\002\003\004\005\006\007\000\001\002\003\004\005\006\007garbage: not in length on purpose"),
+                                 16);
             value.caseAdminSubject = 1234ULL;
             value.adminVendorId    = static_cast<chip::VendorId>(65521);
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::AddNOC::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Invoke UpdateNOC without fail-safe");
@@ -52319,20 +52667,20 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::UpdateNOC::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Invoke CSRRequest without fail-safe");
             ListFreer listFreer;
             chip::app::Clusters::OperationalCredentials::Commands::CSRRequest::Type value;
             value.CSRNonce = chip::ByteSpan(
-                chip::Uint8::from_const_char("\000\001\002\003\004\005\006\007\000\001\002\003\004\005\006\007\000\001\002\003\004"
-                                             "\005\006\007\000\001\002\003\004\005\006\007garbage: not in length on purpose"),
-                32);
+                                 chip::Uint8::from_const_char("\000\001\002\003\004\005\006\007\000\001\002\003\004\005\006\007\000\001\002\003\004"
+                                         "\005\006\007\000\001\002\003\004\005\006\007garbage: not in length on purpose"),
+                                 32);
             return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
                                OperationalCredentials::Commands::CSRRequest::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -52363,7 +52711,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -52754,7 +53104,9 @@ private:
     char * readFromAlphaBuffer = nullptr;
     chip::CharSpan readFromAlpha;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -52795,8 +53147,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -52913,7 +53265,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Commission from alpha again");
@@ -52936,7 +53288,7 @@ private:
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Open Commissioning Window from alpha again");
@@ -52947,7 +53299,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Commission from beta");
@@ -52973,7 +53325,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Commission from gamma");
@@ -53045,7 +53397,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -53065,7 +53419,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -53169,7 +53523,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -53241,7 +53597,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -53264,7 +53622,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>
-                    value;
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -53315,7 +53673,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                SoftwareDiagnostics::Commands::ResetWatermarks::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Reads a list of ThreadMetrics struct attribute from DUT.");
@@ -53365,7 +53723,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -53444,7 +53804,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Subscribe OnOff Attribute");
@@ -53457,7 +53817,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Check for attribute report");
@@ -53469,7 +53829,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Check for attribute report");
@@ -53509,7 +53869,9 @@ private:
     uint16_t NumberOfPINUsersSupported;
     uint16_t NumberOfRFIDUsersSupported;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -55274,7 +55636,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Get number of supported users and verify default value");
@@ -55289,7 +55651,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Read fails for user with index greater than Number Of Users Supported");
@@ -55299,7 +55661,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Create new user with default parameters");
@@ -55315,7 +55677,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Read the user back and verify its fields");
@@ -55325,7 +55687,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Set user at the occupied index fails with appropriate response");
@@ -55341,7 +55703,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Modify userName for existing user");
@@ -55358,7 +55720,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Read the modified user back and verify its fields");
@@ -55368,7 +55730,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Modify userUniqueId for existing user");
@@ -55385,7 +55747,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Read the modified user back and verify its fields");
@@ -55395,7 +55757,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Modify userStatus for existing user");
@@ -55412,7 +55774,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Read the modified user back and verify its fields");
@@ -55422,7 +55784,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Modify userType for existing user");
@@ -55439,7 +55801,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Read the modified user back and verify its fields");
@@ -55449,7 +55811,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Modify credentialRule for existing user");
@@ -55466,7 +55828,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "Read the modified user back and verify its fields");
@@ -55476,7 +55838,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Modify all fields for existing user");
@@ -55497,7 +55859,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Read the modified user back and verify its fields");
@@ -55507,7 +55869,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "Add another user with non-default fields");
@@ -55528,7 +55890,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 21: {
             LogStep(21, "Read the new user back and verify its fields");
@@ -55538,7 +55900,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 22: {
             LogStep(22, "Create user in the last slot");
@@ -55555,7 +55917,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 23: {
             LogStep(23, "Read the last user back and verify its fields");
@@ -55565,7 +55927,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 24: {
             LogStep(24, "User creation in the 0 slot fails");
@@ -55581,7 +55943,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 25: {
             LogStep(25, "User creation in the out-of-bounds slot fails");
@@ -55597,7 +55959,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Clear first user");
@@ -55607,7 +55969,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Read cleared user and verify it is available");
@@ -55617,7 +55979,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 28: {
             LogStep(28, "Create new user in the cleared slot");
@@ -55633,7 +55995,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 29: {
             LogStep(29, "Read the user in the previously cleared slot and verify its fields");
@@ -55643,7 +56005,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 30: {
             LogStep(30, "Clear user with index 0 fails");
@@ -55653,7 +56015,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 31: {
             LogStep(31, "Clear user with out-of-bounds index fails");
@@ -55663,7 +56025,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 32: {
             LogStep(32, "Clear all users");
@@ -55673,7 +56035,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 33: {
             LogStep(33, "Read first cleared user and verify it is available");
@@ -55683,7 +56045,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 34: {
             LogStep(34, "Read last cleared user and verify it is available");
@@ -55693,7 +56055,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 35: {
             LogStep(35, "Get number of supported PIN credentials and verify default value");
@@ -55711,7 +56073,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 37: {
             LogStep(37, "Reading PIN credential with index 0 fails");
@@ -55724,7 +56086,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 38: {
             LogStep(38, "Reading PIN credential with out-of-bounds index fails");
@@ -55737,7 +56099,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 39: {
             LogStep(39, "Create new PIN credential and user");
@@ -55755,7 +56117,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 40: {
             LogStep(40, "Verify created user");
@@ -55765,7 +56127,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 41: {
             LogStep(41, "Verify created PIN credential");
@@ -55778,7 +56140,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 42: {
             LogStep(42, "Create new PIN credential and user with index 0 fails");
@@ -55796,7 +56158,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 43: {
             LogStep(43, "Create new PIN credential and user with out-of-bounds index fails");
@@ -55814,7 +56176,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 44: {
             LogStep(44, "Get number of supported RFID credentials and verify default value");
@@ -55832,7 +56194,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 46: {
             LogStep(46, "Reading RFID credential with out-of-bounds index fails");
@@ -55845,7 +56207,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 47: {
             LogStep(47, "Check that RFID credential does not exist");
@@ -55858,7 +56220,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 48: {
             LogStep(48, "Create new RFID credential and add it to existing user");
@@ -55878,7 +56240,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 49: {
             LogStep(49, "Verify modified user");
@@ -55888,7 +56250,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 50: {
             LogStep(50, "Verify created credential");
@@ -55901,7 +56263,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 51: {
             LogStep(51, "Create new RFID credential and user with index 0 fails");
@@ -55920,7 +56282,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 52: {
             LogStep(52, "Create new RFID credential and user with out-of-bounds index fails");
@@ -55939,7 +56301,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 53: {
             LogStep(53, "Create new credential and try to add it to 0 user");
@@ -55958,7 +56320,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 54: {
             LogStep(54, "Create new credential and try to add it to out-of-bounds user");
@@ -55977,7 +56339,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 55: {
             LogStep(55, "Create new PIN with too short data");
@@ -55996,7 +56358,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 56: {
             LogStep(56, "Create new PIN with too long data");
@@ -56015,7 +56377,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 57: {
             LogStep(57, "Create new RFID with too short data");
@@ -56034,7 +56396,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 58: {
             LogStep(58, "Create new PIN with Programming user type fails");
@@ -56054,7 +56416,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 59: {
             LogStep(59, "Create new RFID with too short data");
@@ -56066,7 +56428,7 @@ private:
             value.credential.credentialIndex = 3U;
 
             value.credentialData = chip::ByteSpan(
-                chip::Uint8::from_const_char("very_long_rfid_data_to_test_boundariesgarbage: not in length on purpose"), 38);
+                                       chip::Uint8::from_const_char("very_long_rfid_data_to_test_boundariesgarbage: not in length on purpose"), 38);
             value.userIndex.SetNonNull();
             value.userIndex.Value() = 0U;
             value.userStatus.SetNull();
@@ -56074,7 +56436,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 60: {
             LogStep(60, "Create new PIN credential with data the would cause duplicate");
@@ -56092,7 +56454,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 61: {
             LogStep(61, "Create new RFID credential with data the would cause duplicate");
@@ -56111,7 +56473,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 62: {
             LogStep(62, "Modify credentialData of existing PIN credential");
@@ -56130,7 +56492,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 63: {
             LogStep(63, "Verify that credential was changed by creating new credential with old data");
@@ -56148,7 +56510,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 64: {
             LogStep(64, "Verify that credential was changed by creating new credential with new data");
@@ -56166,7 +56528,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 65: {
             LogStep(65, "Create new RFID credential and add it to existing user");
@@ -56186,7 +56548,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 66: {
             LogStep(66, "Verify modified user");
@@ -56196,7 +56558,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 67: {
             LogStep(67, "Create new RFID credential and add it to existing user");
@@ -56215,7 +56577,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 68: {
             LogStep(68, "Verify modified user");
@@ -56225,7 +56587,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 69: {
             LogStep(69, "Clear first PIN credential");
@@ -56239,7 +56601,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 70: {
             LogStep(70, "Read back the credential and make sure it is deleted");
@@ -56252,7 +56614,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 71: {
             LogStep(71, "Read the user back and make sure PIN credential is deleted");
@@ -56262,7 +56624,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 72: {
             LogStep(72, "Clear the second PIN credential");
@@ -56276,7 +56638,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 73: {
             LogStep(73, "Read back the credential and make sure it is deleted");
@@ -56289,7 +56651,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 74: {
             LogStep(74, "Read the user back and make sure related user is deleted");
@@ -56299,7 +56661,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 75: {
             LogStep(75, "Create new RFID credential with user");
@@ -56318,7 +56680,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 76: {
             LogStep(76, "Clear all the RFID credentials");
@@ -56332,7 +56694,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 77: {
             LogStep(77, "Read back the fist RFID credential and make sure it is deleted");
@@ -56345,7 +56707,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 78: {
             LogStep(78, "Read back the second RFID credential and make sure it is deleted");
@@ -56358,7 +56720,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 79: {
             LogStep(79, "Read back the third RFID credential and make sure it is deleted");
@@ -56371,7 +56733,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 80: {
             LogStep(80, "Read the user related with first RFID back and make sure it has only PIN credential");
@@ -56381,7 +56743,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 81: {
             LogStep(81, "Read the user related with second RFID back and make sure it is deleted");
@@ -56391,7 +56753,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 82: {
             LogStep(82, "Create new PIN credential with user");
@@ -56409,7 +56771,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 83: {
             LogStep(83, "Create new RFID credential with user");
@@ -56428,7 +56790,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 84: {
             LogStep(84, "Create another RFID credential with user");
@@ -56447,7 +56809,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 85: {
             LogStep(85, "Clear all the credentials");
@@ -56457,7 +56819,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 86: {
             LogStep(86, "Read back the first PIN credential and make sure it is deleted");
@@ -56470,7 +56832,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 87: {
             LogStep(87, "Read back the first RFID credential and make sure it is deleted");
@@ -56483,7 +56845,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 88: {
             LogStep(88, "Read back the second PIN credential and make sure it is deleted");
@@ -56496,7 +56858,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 89: {
             LogStep(89, "Read the user related with first PIN back and make sure it is deleted");
@@ -56506,7 +56868,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 90: {
             LogStep(90, "Read the user related with first RFID back and make sure it is deleted");
@@ -56516,7 +56878,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 91: {
             LogStep(91, "Read the user related with second PIN back and make sure it is deleted");
@@ -56526,7 +56888,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 92: {
             LogStep(92, "Read the user related with last RFID back and make sure it is deleted");
@@ -56536,7 +56898,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 93: {
             LogStep(93, "Create new Programming PIN credential with invalid index");
@@ -56554,7 +56916,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 94: {
             LogStep(94, "Create new Programming PIN credential with valid index");
@@ -56572,7 +56934,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 95: {
             LogStep(95, "Verify created user");
@@ -56582,7 +56944,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 96: {
             LogStep(96, "Verify created programming PIN credential");
@@ -56595,7 +56957,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 97: {
             LogStep(97, "Modify the Programming PIN credential");
@@ -56613,7 +56975,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 98: {
             LogStep(98, "Clearing Programming PIN fails");
@@ -56627,7 +56989,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 99: {
             LogStep(99, "Clearing Programming PIN with invalid index fails");
@@ -56641,7 +57003,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 100: {
             LogStep(100, "Clearing PIN credential with zero index fails");
@@ -56655,7 +57017,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 101: {
             LogStep(101, "Clearing PIN credential with out-of-bound index fails");
@@ -56669,7 +57031,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 102: {
             LogStep(102, "Clearing RFID credential with zero index fails");
@@ -56683,7 +57045,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 103: {
             LogStep(103, "Clearing RFID credential with out-of-bound index fails");
@@ -56697,7 +57059,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 104: {
             LogStep(104, "Clear the Programming PIN user");
@@ -56707,7 +57069,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 105: {
             LogStep(105, "Make sure Programming PIN user is deleted");
@@ -56717,7 +57079,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 106: {
             LogStep(106, "Make sure programming PIN credential is deleted");
@@ -56730,7 +57092,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 107: {
             LogStep(107, "Create new PIN credential and user");
@@ -56748,7 +57110,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 108: {
             LogStep(108, "Create second PIN credential and add it to existing user");
@@ -56767,7 +57129,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 109: {
             LogStep(109, "Create third PIN credential and add it to existing user");
@@ -56786,7 +57148,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 110: {
             LogStep(110, "Create fourth PIN credential and add it to existing user");
@@ -56805,7 +57167,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 111: {
             LogStep(111, "Create fifth PIN credential and add it to existing user");
@@ -56824,7 +57186,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 112: {
             LogStep(112, "Try to create sixth PIN credential and make sure it fails");
@@ -56843,7 +57205,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 113: {
             LogStep(113, "Final clean-up");
@@ -56853,7 +57215,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -56884,7 +57246,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -57027,7 +57391,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::UnlockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Verify that lock state attribute value is set to Unlocked");
@@ -57041,7 +57405,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Verify that lock state attribute value is set to Locked");
@@ -57064,7 +57428,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Try to unlock the door with invalid PIN");
@@ -57075,7 +57439,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::UnlockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Verify that lock state attribute value is set to Locked");
@@ -57091,7 +57455,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::UnlockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Verify that lock state attribute value is set to Unlocked");
@@ -57107,7 +57471,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Verify that lock state attribute value is set to Unlocked");
@@ -57123,7 +57487,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Verify that lock state attribute value is set to Locked");
@@ -57145,7 +57509,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Set OperatingMode to Normal");
@@ -57167,7 +57531,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -57203,7 +57567,9 @@ private:
     uint8_t NumberOfYearDaySchedulesSupportedPerUser;
     uint8_t NumberOfHolidaySchedulesSupported;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -58514,7 +58880,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Get number of supported users");
@@ -58550,7 +58916,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Create Week Day schedule with out-of-bounds index");
@@ -58566,7 +58932,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Create Week Day schedule with 0 user index");
@@ -58582,7 +58948,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Create Week Day schedule with out-of-bounds user index");
@@ -58598,7 +58964,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Create Week Day schedule for non-existing user");
@@ -58614,7 +58980,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Create Week Day schedule with 0 days mask");
@@ -58630,7 +58996,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Create Week Day schedule for Sunday and Monday");
@@ -58646,7 +59012,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Create Week Day schedule for Sunday Wednesday and Saturday");
@@ -58662,7 +59028,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Create Week Day schedule with invalid start hour");
@@ -58678,7 +59044,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Create Week Day schedule with invalid start minute");
@@ -58694,7 +59060,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Create Week Day schedule with invalid end hour");
@@ -58710,7 +59076,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "Create Week Day schedule with invalid end minute");
@@ -58726,7 +59092,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Create Week Day schedule with start hour later that end hour");
@@ -58742,7 +59108,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Create Week Day schedule with start minute later that end minute when hours are equal");
@@ -58758,7 +59124,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "Make sure that previous operations did not create a schedule");
@@ -58769,7 +59135,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 21: {
             LogStep(21, "Get Week Day schedule with 0 index");
@@ -58780,7 +59146,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 22: {
             LogStep(22, "Get Week Day schedule with out-of-bounds index");
@@ -58791,7 +59157,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 23: {
             LogStep(23, "Get Week Day schedule with 0 user index");
@@ -58802,7 +59168,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 24: {
             LogStep(24, "Get Week Day schedule with out-of-bounds user index");
@@ -58813,7 +59179,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 25: {
             LogStep(25, "Get Week Day schedule with non-existing user index");
@@ -58824,7 +59190,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Create Year Day schedule with 0 index");
@@ -58837,7 +59203,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Create Year Day schedule with out-of-bounds index");
@@ -58850,7 +59216,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 28: {
             LogStep(28, "Create Year Day schedule with 0 user index");
@@ -58863,7 +59229,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 29: {
             LogStep(29, "Create Year Day schedule with out-of-bounds user index");
@@ -58876,7 +59242,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 30: {
             LogStep(30, "Create Year Day schedule for non-existing user");
@@ -58889,7 +59255,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 31: {
             LogStep(31, "Create Year Day schedule with start hour later that end hour");
@@ -58902,7 +59268,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 32: {
             LogStep(32, "Make sure that previous operations did not create a schedule");
@@ -58913,7 +59279,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 33: {
             LogStep(33, "Get Year Day schedule with 0 index");
@@ -58924,7 +59290,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 34: {
             LogStep(34, "Get Year Day schedule with out-of-bounds index");
@@ -58935,7 +59301,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 35: {
             LogStep(35, "Get Year Day schedule with 0 user index");
@@ -58946,7 +59312,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 36: {
             LogStep(36, "Get Year Day schedule with out-of-bounds user index");
@@ -58957,7 +59323,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 37: {
             LogStep(37, "Get Year Day schedule with non-existing user index");
@@ -58968,7 +59334,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 38: {
             LogStep(38, "Create Holiday schedule with 0 index");
@@ -58981,7 +59347,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 39: {
             LogStep(39, "Create Holiday schedule with out-of-bounds index");
@@ -58994,7 +59360,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 40: {
             LogStep(40, "Create Holiday schedule with start hour later that end hour");
@@ -59007,7 +59373,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 41: {
             LogStep(41, "Create Holiday schedule with invalid operating mode");
@@ -59020,7 +59386,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 42: {
             LogStep(42, "Make sure that previous operations did not create a schedule");
@@ -59030,7 +59396,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 43: {
             LogStep(43, "Get Holiday schedule with 0 index");
@@ -59040,7 +59406,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 44: {
             LogStep(44, "Get Holiday schedule with out-of-bounds index");
@@ -59050,7 +59416,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 45: {
             LogStep(45, "Create Holiday schedule with valid parameters");
@@ -59063,7 +59429,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 46: {
             LogStep(46, "Verify created schedule");
@@ -59073,7 +59439,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 47: {
             LogStep(47, "Create Week Day schedule with valid parameters");
@@ -59089,7 +59455,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 48: {
             LogStep(48, "Verify created schedule");
@@ -59100,7 +59466,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 49: {
             LogStep(49, "Create Year Day schedule with valid parameters");
@@ -59113,7 +59479,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 50: {
             LogStep(50, "Verify created schedule");
@@ -59124,7 +59490,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 51: {
             LogStep(51, "Clear Week Day schedule with 0 index");
@@ -59135,7 +59501,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 52: {
             LogStep(52, "Clear Week Day schedule with out-of-bounds index");
@@ -59146,7 +59512,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 53: {
             LogStep(53, "Clear Week Day schedule with 0 user index");
@@ -59157,7 +59523,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 54: {
             LogStep(54, "Clear Week Day schedule with out-of-bounds user index");
@@ -59168,7 +59534,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 55: {
             LogStep(55, "Clear Week Day schedule with non-existing user");
@@ -59179,7 +59545,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 56: {
             LogStep(56, "Make sure that week day schedule was not deleted");
@@ -59190,7 +59556,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 57: {
             LogStep(57, "Make sure that year day schedule was not deleted");
@@ -59201,7 +59567,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 58: {
             LogStep(58, "Make sure that holiday schedule was not deleted");
@@ -59211,7 +59577,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 59: {
             LogStep(59, "Clear Year Day schedule with 0 index");
@@ -59222,7 +59588,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 60: {
             LogStep(60, "Clear Year Day schedule with out-of-bounds index");
@@ -59233,7 +59599,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 61: {
             LogStep(61, "Clear Year Day schedule with 0 user index");
@@ -59244,7 +59610,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 62: {
             LogStep(62, "Clear Year Day schedule with out-of-bounds user index");
@@ -59255,7 +59621,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 63: {
             LogStep(63, "Clear Year Day schedule with non-existing user");
@@ -59266,7 +59632,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 64: {
             LogStep(64, "Make sure that week day schedule was not deleted");
@@ -59277,7 +59643,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 65: {
             LogStep(65, "Make sure that year day schedule was not deleted");
@@ -59288,7 +59654,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 66: {
             LogStep(66, "Make sure that holiday schedule was not deleted");
@@ -59298,7 +59664,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 67: {
             LogStep(67, "Clear Holiday schedule with 0 index");
@@ -59308,7 +59674,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 68: {
             LogStep(68, "Clear Holiday schedule with out-of-bounds index");
@@ -59318,7 +59684,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 69: {
             LogStep(69, "Make sure that week day schedule was not deleted");
@@ -59329,7 +59695,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 70: {
             LogStep(70, "Make sure that year day schedule was not deleted");
@@ -59340,7 +59706,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 71: {
             LogStep(71, "Make sure that holiday schedule was not deleted");
@@ -59350,7 +59716,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 72: {
             LogStep(72, "Create another Week Day schedule with valid parameters");
@@ -59366,7 +59732,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 73: {
             LogStep(73, "Verify created week day schedule");
@@ -59377,7 +59743,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 74: {
             LogStep(74, "Create another Year Day schedule with valid parameters");
@@ -59390,7 +59756,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 75: {
             LogStep(75, "Verify created year day schedule");
@@ -59401,7 +59767,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 76: {
             LogStep(76, "Create another Holiday schedule with valid parameters");
@@ -59414,7 +59780,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 77: {
             LogStep(77, "Verify created holiday schedule");
@@ -59424,7 +59790,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 78: {
             LogStep(78, "Clear a single week day schedule for the first user");
@@ -59435,7 +59801,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 79: {
             LogStep(79, "Verify cleared week day schedule");
@@ -59446,7 +59812,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 80: {
             LogStep(80, "Clear all remaining week day schedules for the first user");
@@ -59457,7 +59823,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 81: {
             LogStep(81, "Verify cleared week schedule");
@@ -59468,7 +59834,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 82: {
             LogStep(82, "Make sure that first year day schedule was not deleted");
@@ -59479,7 +59845,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 83: {
             LogStep(83, "Make sure that second year day schedule was not deleted");
@@ -59490,7 +59856,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 84: {
             LogStep(84, "Make sure that first holiday schedule was not deleted");
@@ -59500,7 +59866,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 85: {
             LogStep(85, "Make sure that second holiday schedule was not deleted");
@@ -59510,7 +59876,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 86: {
             LogStep(86, "Create another Week Day schedule with valid parameters");
@@ -59526,7 +59892,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 87: {
             LogStep(87, "Clear a single year day schedule for the first user");
@@ -59537,7 +59903,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 88: {
             LogStep(88, "Verify cleared year day schedule");
@@ -59548,7 +59914,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 89: {
             LogStep(89, "Clear all remaining year schedules for the first user");
@@ -59559,7 +59925,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 90: {
             LogStep(90, "Verify that second year day schedule was cleared");
@@ -59570,7 +59936,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 91: {
             LogStep(91, "Verify created week day schedule");
@@ -59581,7 +59947,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 92: {
             LogStep(92, "Clear all remaining week day schedules for the first user");
@@ -59592,7 +59958,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 93: {
             LogStep(93, "Create new user without credential so we can add more schedules to it");
@@ -59608,7 +59974,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 94: {
             LogStep(94, "Create Week Day schedule with valid parameters for first user");
@@ -59624,7 +59990,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 95: {
             LogStep(95, "Verify created week day schedule for first user");
@@ -59635,7 +60001,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 96: {
             LogStep(96, "Create Year Day schedule for first user");
@@ -59648,7 +60014,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 97: {
             LogStep(97, "Verify created year day schedule for first");
@@ -59659,7 +60025,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 98: {
             LogStep(98, "Create Week Day schedule with valid parameters for second user");
@@ -59675,7 +60041,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 99: {
             LogStep(99, "Verify created week day schedule for first user");
@@ -59686,7 +60052,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 100: {
             LogStep(100, "Create Year Day schedule for second user");
@@ -59699,7 +60065,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 101: {
             LogStep(101, "Verify created year day schedule for first");
@@ -59710,7 +60076,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 102: {
             LogStep(102, "Cleanup the user");
@@ -59720,7 +60086,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 103: {
             LogStep(103, "Make sure clearing first user also cleared week day schedules");
@@ -59731,7 +60097,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 104: {
             LogStep(104, "Make sure clearing first user also cleared year day schedules");
@@ -59742,7 +60108,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 105: {
             LogStep(105, "Make sure clearing second user also cleared week day schedules");
@@ -59753,7 +60119,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 106: {
             LogStep(106, "Make sure clearing second user also cleared year day schedules");
@@ -59764,7 +60130,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 107: {
             LogStep(107, "Make sure that first holiday schedule was not deleted");
@@ -59774,7 +60140,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 108: {
             LogStep(108, "Make sure that second holiday schedule was not deleted");
@@ -59784,7 +60150,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 109: {
             LogStep(109, "Create another Holiday schedule at the last slot");
@@ -59797,7 +60163,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 110: {
             LogStep(110, "Verify Created Holiday Schedule");
@@ -59807,7 +60173,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 111: {
             LogStep(111, "Create new PIN credential and schedule user");
@@ -59825,7 +60191,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 112: {
             LogStep(112, "Create Week Day schedule for first user");
@@ -59841,7 +60207,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 113: {
             LogStep(113, "Create Year Day schedule for first user");
@@ -59854,7 +60220,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 114: {
             LogStep(114, "Clear a single holiday schedule");
@@ -59864,7 +60230,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 115: {
             LogStep(115, "Make sure that first holiday schedule was not deleted");
@@ -59874,7 +60240,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 116: {
             LogStep(116, "Make sure that second holiday schedule was deleted");
@@ -59884,7 +60250,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 117: {
             LogStep(117, "Make sure that third holiday schedule was not deleted");
@@ -59894,7 +60260,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 118: {
             LogStep(118, "Make sure clearing holiday schedule did not clear week day schedule");
@@ -59905,7 +60271,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 119: {
             LogStep(119, "Make sure clearing holiday schedule did not clear year day schedule");
@@ -59916,7 +60282,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 120: {
             LogStep(120, "Clear all remaining holiday schedules");
@@ -59926,7 +60292,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 121: {
             LogStep(121, "Make sure that first holiday is still deleted");
@@ -59936,7 +60302,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 122: {
             LogStep(122, "Make sure that second holiday schedule was deleted");
@@ -59946,7 +60312,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 123: {
             LogStep(123, "Make sure that third holiday schedule was not deleted");
@@ -59956,7 +60322,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetHolidaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 124: {
             LogStep(124, "Make sure clearing holiday schedule did not clear week day schedule");
@@ -59967,7 +60333,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 125: {
             LogStep(125, "Make sure clearing holiday schedule did not clear year day schedule");
@@ -59978,7 +60344,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 126: {
             LogStep(126, "Final Cleanup");
@@ -59988,7 +60354,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -60019,7 +60385,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -60136,7 +60504,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "TH writes the RequirePINforRemoteOperation attribute value as True on the DUT");
@@ -60163,7 +60531,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "TH sends Lock Door Command to the DUT with valid PINCode");
@@ -60174,7 +60542,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "TH sends Lock Door Command to the DUT without any argument PINCode");
@@ -60185,7 +60553,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT");
@@ -60213,7 +60581,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "TH sends Lock Door Command to the DUT with invalid PINCode");
@@ -60224,7 +60592,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "TH sends Lock Door Command to the DUT with invalid PINCode");
@@ -60235,7 +60603,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "TH sends Lock Door Command to the DUT with invalid PINCode");
@@ -60246,7 +60614,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "TH reads UserCodeTemporaryDisableTime attribute from DUT");
@@ -60262,7 +60630,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Clean the created credential");
@@ -60276,7 +60644,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -60307,7 +60675,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -60408,7 +60778,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Precondition: Door is in locked state");
@@ -60419,7 +60789,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "TH writes AutoRelockTime attribute value as 10 seconds on the DUT");
@@ -60438,7 +60808,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::UnlockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "TH reads AutoRelockTime attribute from DUT");
@@ -60469,7 +60839,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -60500,7 +60870,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -60598,7 +60970,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Precondition: Door is in locked state");
@@ -60609,7 +60981,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "TH writes AutoRelockTime attribute value as 10 seconds on the DUT");
@@ -60629,7 +61001,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::UnlockWithTimeout::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "TH reads AutoRelockTime attribute from DUT");
@@ -60680,7 +61052,9 @@ private:
     uint8_t NumberOfWeekDaySchedulesSupportedPerUser;
     uint16_t NumberOfTotalUsersSupported;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -60847,7 +61221,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Get Max number of Week Day schedules for user");
@@ -60873,7 +61247,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "send GetWeekDay Schedule Command ");
@@ -60884,7 +61258,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND response");
@@ -60900,7 +61274,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND response");
@@ -60911,7 +61285,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Clear all week day schedules for the first user");
@@ -60922,7 +61296,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "send GetWeekDay Schedule Command ");
@@ -60933,7 +61307,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetWeekDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -60967,7 +61341,9 @@ private:
     uint8_t NumberOfYearDaySchedulesSupportedPerUser;
     uint16_t NumberOfTotalUsersSupported;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -61159,7 +61535,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Create new PIN credential and lock/unlock for second user");
@@ -61177,7 +61553,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Get Max number of year Day schedules for user");
@@ -61200,7 +61576,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "send Get Year Day Schedule Command");
@@ -61211,7 +61587,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "Send Set Year Day Schedule Command to DUT and verify INVALID_COMMAND response");
@@ -61224,7 +61600,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "send Get Year Day Schedule Command to DUT and Verify INVALID_FIELD response");
@@ -61235,7 +61611,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "send Get Year Day Schedule Command to DUT and verify NOT_FOUND response");
@@ -61246,7 +61622,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "send Get Year Day Schedule Command  to DUT and verify NOT_FOUND response ");
@@ -61257,7 +61633,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Send Set Year Day Schedule Command to DUT");
@@ -61270,7 +61646,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "send Get Year Day Schedule Command ");
@@ -61281,7 +61657,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -61314,7 +61690,9 @@ private:
 
     uint16_t NumberOfTotalUsersSupported;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -61479,7 +61857,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "TH sends Get Credential Status Command");
@@ -61492,7 +61870,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "TH sends Set Credential Command to DUT");
@@ -61513,7 +61891,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "TH sends Set Credential Command to DUT");
@@ -61534,7 +61912,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "TH sends Set Credential Command to DUT");
@@ -61555,7 +61933,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "TH sends Set Credential Command to DUT");
@@ -61576,7 +61954,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "TH sends Set Credential Command to DUT");
@@ -61597,7 +61975,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "TH sends Clear Credential Command to DUT");
@@ -61611,7 +61989,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "TH sends Set Credential Command to DUT");
@@ -61632,7 +62010,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "TH sends Clear Credential Command to DUT");
@@ -61646,7 +62024,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "TH sends Set Credential Command to DUT");
@@ -61667,7 +62045,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "TH sends Clear Credential Command to DUT");
@@ -61681,7 +62059,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "TH sends Get Credential Status Command");
@@ -61694,7 +62072,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "TH sends Set Credential Command to DUT");
@@ -61715,7 +62093,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "TH sends Clear Credential Command to DUT");
@@ -61729,7 +62107,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -61766,7 +62144,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -62018,7 +62398,7 @@ private:
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Add Group 2 (endpoint 0)");
@@ -62028,7 +62408,7 @@ private:
             value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(0), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "KeySet Write 1");
@@ -62040,30 +62420,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 1110000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 1110001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 1110002ULL;
 
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "KeySet Write 2");
@@ -62075,30 +62455,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 2220000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 2220001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 2220002ULL;
 
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Write Group Keys");
@@ -62118,7 +62498,7 @@ private:
                 listHolder_0->mList[1].fabricIndex   = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
@@ -62145,7 +62525,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -62220,7 +62600,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Cleanup ACLs");
@@ -62238,7 +62618,7 @@ private:
                 listHolder_0->mList[0].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 1);
+                            listHolder_0->mList, 1);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -62252,7 +62632,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 21: {
             LogStep(21, "Commission from gamma");
@@ -62277,7 +62657,7 @@ private:
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
             return SendCommand(kIdentityGamma, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 24: {
             LogStep(24, "Add Group 2 (endpoint 0) for gamma");
@@ -62287,7 +62667,7 @@ private:
             value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
             return SendCommand(kIdentityGamma, GetEndpoint(0), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 25: {
             LogStep(25, "KeySet Write 1 for gamma");
@@ -62299,30 +62679,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 1110000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 1110001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 1110002ULL;
 
             return SendCommand(kIdentityGamma, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "KeySet Write 2 for gamma");
@@ -62334,30 +62714,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 2220000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 2220001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 2220002ULL;
 
             return SendCommand(kIdentityGamma, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 27: {
             LogStep(27, "Write Group Keys for gamma");
@@ -62377,7 +62757,7 @@ private:
                 listHolder_0->mList[1].fabricIndex   = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityGamma, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
@@ -62404,7 +62784,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityGamma, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -62489,7 +62869,7 @@ private:
                 listHolder_0->mList[0].fabricIndex = 0U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 1);
+                            listHolder_0->mList, 1);
             }
             return WriteAttribute(kIdentityGamma, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -62523,7 +62903,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -62761,7 +63143,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "View First Group (not found)");
@@ -62771,7 +63153,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Add First Group (new)");
@@ -62781,7 +63163,7 @@ private:
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "View First Group (new)");
@@ -62791,7 +63173,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "View Second Group (not found)");
@@ -62801,7 +63183,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Get Group Membership 1 (all)");
@@ -62812,7 +63194,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::GetGroupMembership::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "View Group 3 (not found)");
@@ -62822,7 +63204,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "View First Group (existing)");
@@ -62832,7 +63214,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "Remove Group 0 (invalid)");
@@ -62842,7 +63224,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Remove Group 4 (not found)");
@@ -62852,7 +63234,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "View First Group (not removed)");
@@ -62862,7 +63244,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "View Second Group (removed)");
@@ -62872,7 +63254,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "Get Group Membership 3");
@@ -62891,7 +63273,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::GetGroupMembership::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Remove All");
@@ -62900,7 +63282,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveAllGroups::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "View First Group (removed)");
@@ -62910,7 +63292,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "View Second Group (still removed)");
@@ -62920,7 +63302,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 17: {
             LogStep(17, "View Group 3 (removed)");
@@ -62930,7 +63312,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Get Group Membership 4");
@@ -62950,7 +63332,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::GetGroupMembership::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -62982,7 +63364,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63071,8 +63455,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType>
-                    value;
+                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -63092,8 +63476,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
-                    value;
+                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -63154,8 +63538,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
-                    value;
+                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -63176,8 +63560,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
-                    value;
+                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -63231,7 +63615,7 @@ private:
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Add Group 2");
@@ -63241,7 +63625,7 @@ private:
             value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "KeySet Write 1");
@@ -63253,30 +63637,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 1110000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 1110001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 1110002ULL;
 
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "KeySet Write 2");
@@ -63288,30 +63672,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(1);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\320\321\322\323\324\325\326\327\330\331\332\333\334\335\336\337garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 2110000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\340\341\342\343\344\345\346\347\350\351\352\353\354\355\356\357garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 2110001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\360\361\362\363\364\365\366\367\370\371\372\373\374\375\376\377garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 2110002ULL;
 
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "KeySet Read");
@@ -63321,7 +63705,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Write Group Keys (invalid)");
@@ -63337,7 +63721,7 @@ private:
                 listHolder_0->mList[0].fabricIndex   = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
-                    listHolder_0->mList, 1);
+                            listHolder_0->mList, 1);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
@@ -63360,7 +63744,7 @@ private:
                 listHolder_0->mList[1].fabricIndex   = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
@@ -63383,7 +63767,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetRemove::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "KeySet Read (removed)");
@@ -63393,7 +63777,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "KeySet Read (not removed)");
@@ -63403,7 +63787,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 15: {
             LogStep(15, "Remove Group 1");
@@ -63413,7 +63797,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "Read GroupTable 2");
@@ -63427,7 +63811,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveAllGroups::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Read GroupTable 3");
@@ -63442,7 +63826,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetRemove::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 20: {
             LogStep(20, "KeySet Read (also removed)");
@@ -63452,7 +63836,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id, GroupKeyManagement::Commands::KeySetRead::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -63483,7 +63867,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63539,7 +63925,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63595,7 +63983,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63651,7 +64041,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63707,7 +64099,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63763,7 +64157,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63819,7 +64215,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63875,7 +64273,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63931,7 +64331,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -63987,7 +64389,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64043,7 +64447,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64099,7 +64505,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64155,7 +64563,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64211,7 +64621,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64267,7 +64679,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64323,7 +64737,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64379,7 +64795,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64435,7 +64853,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64491,7 +64911,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64547,7 +64969,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64603,7 +65027,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64659,7 +65085,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64715,7 +65143,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64771,7 +65201,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64827,7 +65259,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64883,7 +65317,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64939,7 +65375,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -64995,7 +65433,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65051,7 +65491,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65107,7 +65549,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65163,7 +65607,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65219,7 +65665,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65275,7 +65723,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65332,7 +65782,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65600,7 +66052,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65665,7 +66119,7 @@ private:
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "KeySet Write 1");
@@ -65677,30 +66131,30 @@ private:
                 static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
             value.groupKeySet.epochKey0.SetNonNull();
             value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime0.SetNonNull();
             value.groupKeySet.epochStartTime0.Value() = 1110000ULL;
             value.groupKeySet.epochKey1.SetNonNull();
             value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime1.SetNonNull();
             value.groupKeySet.epochStartTime1.Value() = 1110001ULL;
             value.groupKeySet.epochKey2.SetNonNull();
             value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
-                chip::Uint8::from_const_char(
-                    "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
-                16);
+                    chip::Uint8::from_const_char(
+                        "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
+                    16);
             value.groupKeySet.epochStartTime2.SetNonNull();
             value.groupKeySet.epochStartTime2.Value() = 1110002ULL;
 
             return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 3: {
             LogStep(3, "Map Group Key Set to group ID on a given fabric");
@@ -65716,7 +66170,7 @@ private:
                 listHolder_0->mList[0].fabricIndex   = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
-                    listHolder_0->mList, 1);
+                            listHolder_0->mList, 1);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
@@ -65750,7 +66204,7 @@ private:
                 listHolder_0->mList[1].fabricIndex = 1U;
 
                 value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
+                            listHolder_0->mList, 2);
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
@@ -65784,7 +66238,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65840,7 +66296,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65896,7 +66354,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -65952,7 +66412,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66008,7 +66470,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66064,7 +66528,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66120,7 +66586,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66176,7 +66644,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66232,7 +66702,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66288,7 +66760,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66344,7 +66818,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66400,7 +66876,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66456,7 +66934,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66512,7 +66992,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66568,7 +67050,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66624,7 +67108,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66680,7 +67166,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66736,7 +67224,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66792,7 +67282,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66848,7 +67340,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66904,7 +67398,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -66960,7 +67456,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67016,7 +67514,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67072,7 +67572,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67128,7 +67630,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67184,7 +67688,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67240,7 +67746,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67297,7 +67805,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67353,7 +67863,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67411,7 +67923,9 @@ private:
 
     uint32_t SoftwareVersionValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67663,7 +68177,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67720,7 +68236,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67777,7 +68295,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67834,7 +68354,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67891,7 +68413,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -67947,7 +68471,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68003,7 +68529,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68059,7 +68587,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68115,7 +68645,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68171,7 +68703,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68227,7 +68761,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68283,7 +68819,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68339,7 +68877,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68395,7 +68935,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68451,7 +68993,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68507,7 +69051,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68563,7 +69109,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68619,7 +69167,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68675,7 +69225,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68731,7 +69283,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68787,7 +69341,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68843,7 +69399,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68899,7 +69457,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -68955,7 +69515,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69011,7 +69573,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69067,7 +69631,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69123,7 +69689,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69179,7 +69747,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69235,7 +69805,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69291,7 +69863,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69347,7 +69921,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69403,7 +69979,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69459,7 +70037,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69515,7 +70095,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69571,7 +70153,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69627,7 +70211,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69683,7 +70269,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69739,7 +70327,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69795,7 +70385,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69851,7 +70443,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69907,7 +70501,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -69963,7 +70559,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70019,7 +70617,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70075,7 +70675,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70131,7 +70733,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70187,7 +70791,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70243,7 +70849,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70299,7 +70907,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70355,7 +70965,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70411,7 +71023,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70467,7 +71081,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70523,7 +71139,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70579,7 +71197,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70635,7 +71255,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70691,7 +71313,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70747,7 +71371,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70803,7 +71429,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70859,7 +71487,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70915,7 +71545,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -70971,7 +71603,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71027,7 +71661,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71083,7 +71719,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71139,7 +71777,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71195,7 +71835,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71251,7 +71893,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71307,7 +71951,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71363,7 +72009,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71419,7 +72067,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71475,7 +72125,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71531,7 +72183,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71587,7 +72241,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71643,7 +72299,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71699,7 +72357,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71755,7 +72415,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71811,7 +72473,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71867,7 +72531,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71923,7 +72589,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -71979,7 +72647,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72035,7 +72705,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72091,7 +72763,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72147,7 +72821,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72203,7 +72879,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72259,7 +72937,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72315,7 +72995,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72371,7 +73053,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72427,7 +73111,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72483,7 +73169,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72539,7 +73227,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72595,7 +73285,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72651,7 +73343,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72707,7 +73401,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72763,7 +73459,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72819,7 +73517,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72875,7 +73575,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72931,7 +73633,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -72987,7 +73691,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73043,7 +73749,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73099,7 +73807,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73155,7 +73865,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73211,7 +73923,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73267,7 +73981,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73323,7 +74039,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73379,7 +74097,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73435,7 +74155,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73491,7 +74213,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73535,14 +74259,18 @@ public:
 
     ~Test_TC_MF_1_27Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(330)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(330));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73641,7 +74369,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Wait for commissioning Window to 301 seconds");
@@ -73664,7 +74392,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
@@ -73688,14 +74416,18 @@ public:
 
     ~Test_TC_MF_1_28Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(330)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(330));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73790,11 +74522,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -73802,7 +74534,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Wait for commissioning Window to 301 seconds");
@@ -73822,11 +74554,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 179U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -73834,7 +74566,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 7: {
             LogStep(7, "TH_CR1 reads the window status to verify the DUT_CE window is closed");
@@ -73863,7 +74595,9 @@ public:
 
     ~Test_TC_MF_1_5Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(300)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(300));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -73875,7 +74609,9 @@ private:
     chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<chip::CharSpan> mPayload;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -73965,11 +74701,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -73977,7 +74713,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Wait for PIXIT_COMM_WIN(180) + 10 seconds");
@@ -74000,11 +74736,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -74012,7 +74748,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "TH_CR1 revokes the commissioning window on DUT_CE");
@@ -74022,7 +74758,7 @@ private:
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "TH_CR2 starts a commissioning process with DUT_CE");
@@ -74040,7 +74776,7 @@ private:
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE");
@@ -74061,11 +74797,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -74073,7 +74809,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "TH_CR2 starts a commissioning process with DUT_CE");
@@ -74114,7 +74850,9 @@ public:
 
     ~Test_TC_MF_1_6Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(300)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(300));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -74126,7 +74864,9 @@ private:
     chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<chip::CharSpan> mPayload;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -74223,7 +74963,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Wait for PIXIT_COMM_WIN(180) + 10");
@@ -74249,7 +74989,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "TH_CR1 revokes the commissioning window on DUT_CE");
@@ -74259,7 +74999,7 @@ private:
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Commission from beta");
@@ -74277,7 +75017,7 @@ private:
                                AdministratorCommissioning::Commands::RevokeCommissioning::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "TH_CR1 writes the mandatory attribute NodeLabel of DUT_CE");
@@ -74301,7 +75041,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Commission from beta");
@@ -74349,7 +75089,9 @@ public:
 
     ~Test_TC_MF_1_9Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(700)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(700));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -74362,7 +75104,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<chip::CharSpan> mPayload2;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -74497,11 +75241,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 900U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -74509,7 +75253,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup code");
@@ -74710,7 +75454,9 @@ public:
 
     ~Test_TC_MF_1_10Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(700)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(700));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -74723,7 +75469,9 @@ private:
     chip::Optional<chip::CharSpan> mPayload;
     chip::Optional<chip::CharSpan> mPayload2;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -74861,7 +75609,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup code");
@@ -75061,7 +75809,9 @@ public:
 
     ~Test_TC_MF_1_15Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(500)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(500));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -75073,7 +75823,9 @@ private:
     chip::Optional<uint16_t> mDiscriminator;
     chip::Optional<chip::CharSpan> mPayload;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75121,8 +75873,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -75151,8 +75903,8 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
-                    value;
+                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
@@ -75208,7 +75960,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Commission from gamma");
@@ -75234,7 +75986,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 5: {
             LogStep(5, "Commission from beta");
@@ -75260,7 +76012,7 @@ private:
                                AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "TH_CR1 opens a new commissioning window on DUT_CE");
@@ -75268,11 +76020,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75280,7 +76032,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 9: {
             LogStep(9, "TH_CR1 reads the list of Fabrics on DUT_CE");
@@ -75300,11 +76052,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75312,7 +76064,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "TH_CR3 opens a new commissioning window on DUT_CE");
@@ -75320,11 +76072,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75332,7 +76084,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 13: {
             LogStep(13, "TH_CR1 reads the list of Fabrics on DUT_CE");
@@ -75352,11 +76104,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75364,7 +76116,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         case 16: {
             LogStep(16, "TH_CR2 opens a new commissioning window on DUT_CE");
@@ -75372,11 +76124,11 @@ private:
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
             value.PAKEVerifier         = chip::ByteSpan(
-                chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
-                                             "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
-                                             "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
-                                             "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
-                97);
+                                             chip::Uint8::from_const_char("\006\307V\337\374\327\042e4R\241-\315\224]\214T\332+\017<\275\033M\303\361\255\262#"
+                                                     "\256\262k\004|\322L\226\206o\227\233\035\203\354P\342\264\2560\315\362\375\263+"
+                                                     "\330\242\021\2707\334\224\355\315V\364\321Cw\031\020v\277\305\235\231\267\3350S\357"
+                                                     "\326\360,D4\362\275\322z\244\371\316\247\015s\216Lgarbage: not in length on purpose"),
+                                             97);
             value.discriminator = 3840U;
             value.iterations    = 1000UL;
             value.salt = chip::ByteSpan(chip::Uint8::from_const_char("SPAKE2P Key Saltgarbage: not in length on purpose"), 16);
@@ -75384,7 +76136,7 @@ private:
                                AdministratorCommissioning::Commands::OpenCommissioningWindow::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -75415,7 +76167,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75471,7 +76225,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75527,7 +76283,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75583,7 +76341,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75639,7 +76399,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75695,7 +76457,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75751,7 +76515,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75807,7 +76573,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75863,7 +76631,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75919,7 +76689,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -75975,7 +76747,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76031,7 +76805,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76087,7 +76863,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76143,7 +76921,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76199,7 +76979,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76255,7 +77037,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76311,7 +77095,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76367,7 +77153,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76423,7 +77211,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76479,7 +77269,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76535,7 +77327,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76591,7 +77385,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76647,7 +77443,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76703,7 +77501,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76759,7 +77559,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76815,7 +77617,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76871,7 +77675,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76927,7 +77733,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -76983,7 +77791,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77039,7 +77849,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77095,7 +77907,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77151,7 +77965,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77207,7 +78023,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77263,7 +78081,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77319,7 +78139,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77375,7 +78197,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77431,7 +78255,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77487,7 +78313,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77543,7 +78371,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77599,7 +78429,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77655,7 +78487,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77711,7 +78545,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77767,7 +78603,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77823,7 +78661,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77879,7 +78719,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77935,7 +78777,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -77991,7 +78835,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78047,7 +78893,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78103,7 +78951,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78159,7 +79009,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78215,7 +79067,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78271,7 +79125,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78327,7 +79183,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78383,7 +79241,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78439,7 +79299,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78495,7 +79357,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78553,7 +79417,9 @@ private:
 
     chip::app::DataModel::Nullable<uint16_t> ValueBeforeChange;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78664,7 +79530,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78720,7 +79588,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78776,7 +79646,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78834,7 +79706,9 @@ private:
 
     uint8_t OccupancyValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78943,7 +79817,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -78999,7 +79875,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79055,7 +79933,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79111,7 +79991,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79167,7 +80049,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79223,7 +80107,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79279,7 +80165,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79335,7 +80223,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79391,7 +80281,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79447,7 +80339,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79503,7 +80397,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79559,7 +80455,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79615,7 +80513,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79671,7 +80571,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -79716,7 +80618,9 @@ public:
 
     ~Test_TC_CC_9_1Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(400)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(400));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -79733,7 +80637,9 @@ private:
     uint16_t ColorLoopStartEnhancedHue4;
     uint16_t ColorLoopStoredEnhancedHue4;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -80234,7 +81140,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Precondition : Check on/off attribute value is true after on command");
@@ -80253,7 +81159,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Wait for 1000ms");
@@ -80277,7 +81183,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Read ColorLoopActive attribute from DUT");
@@ -80300,7 +81206,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 8: {
             LogStep(8, "Read ColorLoopDirection attribute from DUT");
@@ -80323,7 +81229,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Read ColorLoopTime attribute from DUT");
@@ -80346,7 +81252,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 12: {
             LogStep(12, "Read ColorLoopStartEnhancedHue attribute from DUT");
@@ -80369,7 +81275,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Read ColorLoopActive attribute from DUT");
@@ -80430,7 +81336,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 22: {
             LogStep(22, "Read ColorLoopActive attribute from DUT");
@@ -80465,7 +81371,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Read ColorLoopDirection attribute from DUT");
@@ -80488,7 +81394,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 28: {
             LogStep(28, "Read ColorLoopActive attribute from DUT");
@@ -80549,7 +81455,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 36: {
             LogStep(36, "Read ColorLoopActive attribute from DUT");
@@ -80582,7 +81488,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 40: {
             LogStep(40, "Wait 1000ms");
@@ -80612,7 +81518,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 43: {
             LogStep(43, "Read ColorLoopDirection attribute from DUT");
@@ -80635,7 +81541,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 45: {
             LogStep(45, "Read ColorLoopActive attribute from DUT");
@@ -80696,7 +81602,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 53: {
             LogStep(53, "Read ColorLoopActive attribute from DUT");
@@ -80731,7 +81637,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 57: {
             LogStep(57, "Read ColorLoopDirection attribute from DUT");
@@ -80754,7 +81660,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 59: {
             LogStep(59, "Read ColorLoopActive attribute from DUT");
@@ -80815,7 +81721,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 67: {
             LogStep(67, "Read ColorLoopActive attribute from DUT");
@@ -80841,7 +81747,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 71: {
             LogStep(71, "Check on/off attribute value is false after off command");
@@ -80865,7 +81771,9 @@ public:
 
     ~Test_TC_CC_9_2Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(400)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(400));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -80877,7 +81785,9 @@ private:
     uint16_t ColorLoopStartEnhancedHue1;
     uint16_t ColorLoopStoredEnhancedHueValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -81117,7 +82027,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Precondition: Check on/off attribute value is true after on command");
@@ -81136,7 +82046,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Wait for 1000ms");
@@ -81160,7 +82070,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Read ColorLoopActive attribute from DUT");
@@ -81201,7 +82111,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Read ColorLoopActive attribute from DUT.");
@@ -81262,7 +82172,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Read ColorLoopDirection attribute from DUT.");
@@ -81317,7 +82227,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Read ColorLoopActive attribute from DUT");
@@ -81343,7 +82253,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 30: {
             LogStep(30, "Check on/off attribute value is false after off command");
@@ -81367,7 +82277,9 @@ public:
 
     ~Test_TC_CC_9_3Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(400)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(400));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -81378,7 +82290,9 @@ private:
     uint16_t ColorLoopStartEnhancedHueValue;
     uint16_t ColorLoopStoredEnhancedHueValue;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -81609,7 +82523,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Precondition: Check on/off attribute value is true after on command");
@@ -81628,7 +82542,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id,
                                value, chip::NullOptional
 
-            );
+                              );
         }
         case 4: {
             LogStep(4, "Wait for 1000ms");
@@ -81652,7 +82566,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Read ColorLoopActive attribute from DUT");
@@ -81693,7 +82607,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 11: {
             LogStep(11, "Read ColorLoopActive attribute from DUT.");
@@ -81754,7 +82668,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 19: {
             LogStep(19, "Read ColorLoopTime attribute from DUT.");
@@ -81803,7 +82717,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 25: {
             LogStep(25, "Read ColorLoopActive attribute from DUT");
@@ -81829,7 +82743,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 29: {
             LogStep(29, "Check on/off attribute value is false after off command");
@@ -81864,7 +82778,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -81920,7 +82836,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -81976,7 +82894,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82032,7 +82952,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82088,7 +83010,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82144,7 +83068,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82200,7 +83126,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82256,7 +83184,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82312,7 +83242,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82368,7 +83300,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -82413,7 +83347,9 @@ public:
 
     ~Test_TC_OO_2_3Suite() {}
 
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(350)); }
+    chip::System::Clock::Timeout GetWaitDuration() const override {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(350));
+    }
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -82421,7 +83357,9 @@ private:
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<chip::EndpointId> mEndpoint;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -83270,7 +84208,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 2: {
             LogStep(2, "Wait 1000ms");
@@ -83300,7 +84238,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 6: {
             LogStep(6, "Wait 1000ms");
@@ -83328,7 +84266,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 10: {
             LogStep(10, "Wait 1000ms");
@@ -83358,7 +84296,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 14: {
             LogStep(14, "Wait 1000ms");
@@ -83385,7 +84323,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 18: {
             LogStep(18, "Wait 1000ms");
@@ -83415,7 +84353,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 22: {
             LogStep(22, "Wait 1000ms");
@@ -83442,7 +84380,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 26: {
             LogStep(26, "Wait 1000ms");
@@ -83470,7 +84408,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 30: {
             LogStep(30, "Wait 1000ms");
@@ -83512,7 +84450,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 36: {
             LogStep(36, "9b:Reads OnTime attribute from DUT");
@@ -83537,7 +84475,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 39: {
             LogStep(39, "Wait 10000ms");
@@ -83557,7 +84495,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 41: {
             LogStep(41, "Wait 10000ms");
@@ -83577,7 +84515,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 43: {
             LogStep(43, "Wait 10000ms");
@@ -83597,7 +84535,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 45: {
             LogStep(45, "10e:Reads OnOff attribute from DUT");
@@ -83633,7 +84571,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 50: {
             LogStep(50, "11b:Reads OnOff attribute from DUT");
@@ -83670,7 +84608,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 55: {
             LogStep(55, "12b:Reads OnOff attribute from DUT");
@@ -83703,7 +84641,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 60: {
             LogStep(60, "13b:Reads OnOff attribute from DUT");
@@ -83740,7 +84678,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 65: {
             LogStep(65, "Wait 10000ms");
@@ -83756,7 +84694,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 67: {
             LogStep(67, "14c:Reads OnOff attribute from DUT");
@@ -83817,7 +84755,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 76: {
             LogStep(76, "16b:Reads OnOff attribute from DUT");
@@ -83843,7 +84781,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 80: {
             LogStep(80, "Wait 10000ms");
@@ -83863,7 +84801,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 82: {
             LogStep(82, "17c:Reads OnOff attribute from DUT");
@@ -83924,7 +84862,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 91: {
             LogStep(91, "18b:Reads OnOff attribute from DUT");
@@ -83954,7 +84892,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 95: {
             LogStep(95, "Wait 10000ms");
@@ -83974,7 +84912,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 97: {
             LogStep(97, "Wait 10000ms");
@@ -84007,7 +84945,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 102: {
             LogStep(102, "20b:Reads OnOff attribute from DUT");
@@ -84037,7 +84975,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 106: {
             LogStep(106, "21b:Reads OnOff attribute from DUT");
@@ -84063,7 +85001,7 @@ private:
             chip::app::Clusters::OnOff::Commands::On::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 110: {
             LogStep(110, "22b:Reads OnOff attribute from DUT");
@@ -84100,7 +85038,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 115: {
             LogStep(115, "23b:Send Off Command");
@@ -84109,7 +85047,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         case 116: {
             LogStep(116, "23c:Reads OnOff attribute from DUT");
@@ -84163,7 +85101,7 @@ private:
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id, value,
                                chip::NullOptional
 
-            );
+                              );
         }
         case 124: {
             LogStep(124, "24b:Reads OnOff attribute from DUT");
@@ -84213,7 +85151,7 @@ private:
             chip::app::Clusters::OnOff::Commands::Off::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id, value, chip::NullOptional
 
-            );
+                              );
         }
         }
         return CHIP_NO_ERROR;
@@ -84244,7 +85182,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84300,7 +85240,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84358,7 +85300,9 @@ private:
 
     chip::app::DataModel::Nullable<uint16_t> ValueBeforeChange;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84502,7 +85446,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84558,7 +85504,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84614,7 +85562,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84670,7 +85620,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84726,7 +85678,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84784,7 +85738,9 @@ private:
 
     chip::app::DataModel::Nullable<int16_t> valueBeforeChange;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84925,7 +85881,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -84981,7 +85939,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85037,7 +85997,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85093,7 +86055,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85150,7 +86114,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85207,7 +86173,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85264,7 +86232,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85321,7 +86291,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85378,7 +86350,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85435,7 +86409,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85492,7 +86468,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85548,7 +86526,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85604,7 +86584,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85660,7 +86642,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85716,7 +86700,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85772,7 +86758,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85828,7 +86816,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85884,7 +86874,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85940,7 +86932,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -85996,7 +86990,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86052,7 +87048,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86108,7 +87106,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86164,7 +87164,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86220,7 +87222,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86276,7 +87280,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86332,7 +87338,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86388,7 +87396,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86444,7 +87454,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86500,7 +87512,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86556,7 +87570,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86612,7 +87628,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86668,7 +87686,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
@@ -86724,7 +87744,9 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) {
+        return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint;
+    }
 
     //
     // Tests methods
