@@ -140,12 +140,12 @@ static MTRDeviceController * sController = nil;
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
     [controller getDevice:nodeId
-                queue:dispatch_get_main_queue()
-               completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-                   XCTAssertEqual(error.code, 0);
-        [connectionExpectation fulfill];
-        connectionExpectation = nil;
-    }];
+                    queue:dispatch_get_main_queue()
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+            XCTAssertEqual(error.code, 0);
+            [connectionExpectation fulfill];
+            connectionExpectation = nil;
+        }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 }
 
@@ -169,13 +169,13 @@ static MTRDeviceController * sController = nil;
     __block MTRBaseDevice * device;
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
     [controller getDevice:nodeId
-                queue:dispatch_get_main_queue()
-               completionHandler:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
-                   XCTAssertEqual(error.code, 0);
-        [connectionExpectation fulfill];
-        connectionExpectation = nil;
-        device = retrievedDevice;
-    }];
+                    queue:dispatch_get_main_queue()
+        completionHandler:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
+            XCTAssertEqual(error.code, 0);
+            [connectionExpectation fulfill];
+            connectionExpectation = nil;
+            device = retrievedDevice;
+        }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
@@ -185,8 +185,8 @@ static MTRDeviceController * sController = nil;
     XCTAssertNotNil(cluster);
 
     [cluster testWithCompletionHandler:^(NSError * err) {
-                NSLog(@"ReuseMTRClusterObject test Error: %@", err);
-                XCTAssertEqual(err.code, 0);
+        NSLog(@"ReuseMTRClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
 
@@ -197,8 +197,8 @@ static MTRDeviceController * sController = nil;
     // Reuse the MTRCluster Object for multiple times.
 
     [cluster testWithCompletionHandler:^(NSError * err) {
-                NSLog(@"ReuseMTRClusterObject test Error: %@", err);
-                XCTAssertEqual(err.code, 0);
+        NSLog(@"ReuseMTRClusterObject test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
 

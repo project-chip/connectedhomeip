@@ -40,13 +40,13 @@ public:
         mCookie = [NSString stringWithFormat:@"Response Time: %s+%u", typeid(T).name(), arc4random()];
         ChipLogDetail(Controller, "%s", mCookie.UTF8String);
         __block CHIP_ERROR err = CHIP_NO_ERROR;
-        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^ {
+        dispatch_sync(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
             err = action(mSuccess.Cancel(), mFailure.Cancel());
         });
 
         if (CHIP_NO_ERROR != err) {
             NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
-                  chip::ErrorStr(err));
+                chip::ErrorStr(err));
 
             // Take the normal async error-reporting codepath.  This will also
             // handle cleaning us up properly.
@@ -56,17 +56,11 @@ public:
 
     virtual ~MTRCallbackBridge() {};
 
-    static void OnFailureFn(void * context, CHIP_ERROR error) {
-        DispatchFailure(context, [MTRError errorForCHIPErrorCode:error]);
-    }
+    static void OnFailureFn(void * context, CHIP_ERROR error) { DispatchFailure(context, [MTRError errorForCHIPErrorCode:error]); }
 
-    static void DispatchSuccess(void * context, id value) {
-        DispatchCallbackResult(context, nil, value);
-    }
+    static void DispatchSuccess(void * context, id value) { DispatchCallbackResult(context, nil, value); }
 
-    static void DispatchFailure(void * context, NSError * error) {
-        DispatchCallbackResult(context, error, nil);
-    }
+    static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
 protected:
     dispatch_queue_t mQueue;
@@ -89,9 +83,9 @@ private:
             callbackBridge->mKeepAlive = false;
         }
 
-        dispatch_async(callbackBridge->mQueue, ^ {
+        dispatch_async(callbackBridge->mQueue, ^{
             ChipLogDetail(Controller, "%s %f seconds", callbackBridge->mCookie.UTF8String,
-                          -[callbackBridge->mRequestTime timeIntervalSinceNow]);
+                -[callbackBridge->mRequestTime timeIntervalSinceNow]);
             callbackBridge->mHandler(value, error);
 
             if (!callbackBridge->mKeepAlive) {
