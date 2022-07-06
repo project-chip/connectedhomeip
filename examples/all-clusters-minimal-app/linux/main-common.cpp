@@ -107,9 +107,11 @@ NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
 Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
                                                                            &sLinuxWiFiDriver);
 #endif
+#if CHIP_DEVICE_ENABLE_NETWORK_COMMISSIONING
 NetworkCommissioning::LinuxEthernetDriver sLinuxEthernetDriver;
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
                                                                                &sLinuxEthernetDriver);
+#endif
 #else  // CHIP_DEVICE_LAYER_TARGET_LINUX
 Clusters::NetworkCommissioning::NullNetworkDriver sNullNetworkDriver;
 Clusters::NetworkCommissioning::Instance sNullNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sNullNetworkDriver);
@@ -169,11 +171,13 @@ void ApplicationInit()
     else
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     {
+#if CHIP_DEVICE_ENABLE_NETWORK_COMMISSIONING
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
         sEthernetNetworkCommissioningInstance.Init();
 #else
         // Use NullNetworkCommissioningInstance to disable the network commissioning functions.
         sNullNetworkCommissioningInstance.Init();
+#endif
 #endif
     }
 }

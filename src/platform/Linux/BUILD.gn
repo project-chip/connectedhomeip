@@ -80,6 +80,13 @@ static_library("Linux") {
     sources += [ "NetworkCommissioningThreadDriver.cpp" ]
   }
 
+  if (chip_enable_network_commissioning) {
+    sources += [
+      "NetworkCommissioningDriver.h",
+      "NetworkCommissioningEthernetDriver.cpp",
+    ]
+  }
+
   if (chip_enable_ble) {
     sources += [
       "bluez/AdapterIterator.cpp",

@@ -36,8 +36,6 @@ static_library("qpg") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
@@ -60,6 +58,13 @@ static_library("qpg") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
   ]
+
+  if (chip_enable_network_commissioning) {
+    sources += [
+      "DeviceNetworkProvisioningDelegateImpl.cpp",
+      "DeviceNetworkProvisioningDelegateImpl.h",
+    ]
+  }
 
   if (chip_enable_openthread) {
     if (chip_openthread_ftd) {

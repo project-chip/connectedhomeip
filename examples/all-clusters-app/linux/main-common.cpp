@@ -405,7 +405,10 @@ NetworkCommissioning::LinuxThreadDriver sThreadDriver;
 NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#if CHIP_DEVICE_ENABLE_NETWORK_COMMISSIONING
 NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_ENABLE_NETWORK_COMMISSIONING
+
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -413,7 +416,9 @@ NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
 NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_COMMISSIONING
 NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_COMMISSIONING
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -424,7 +429,9 @@ Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNe
 Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary, &sWiFiDriver);
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_COMMISSIONING
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_NETWORK_COMMISSIONING
 } // namespace
 
 void ApplicationInit()
@@ -482,7 +489,9 @@ void ApplicationInit()
     }
     else
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_COMMISSIONING
         sEthernetNetworkCommissioningInstance.Init();
+#endif
     }
 }
 
