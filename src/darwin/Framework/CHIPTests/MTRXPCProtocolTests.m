@@ -100,7 +100,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     };
     [deviceController getDevice:deviceId
                           queue:workQueue
-              completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+              completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                   if (error) {
                       NSLog(@"Error: Failed to get connected device (%llu) for attribute cache: %@", deviceId, error);
                       completionHandler(error);
@@ -365,7 +365,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Reading...");
@@ -427,7 +427,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Reading...");
@@ -480,7 +480,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Reading...");
@@ -539,7 +539,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Writing...");
@@ -602,7 +602,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Writing...");
@@ -658,7 +658,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Writing...");
@@ -718,7 +718,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Invoking command...");
@@ -781,7 +781,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Invoking command...");
@@ -840,7 +840,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Invoking command...");
@@ -906,7 +906,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -969,7 +969,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1026,7 +1026,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1089,7 +1089,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1141,7 +1141,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1202,7 +1202,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     _xpcDisconnectExpectation.inverted = NO;
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1255,7 +1255,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1318,7 +1318,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1371,7 +1371,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1434,7 +1434,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1487,7 +1487,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1550,7 +1550,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1603,7 +1603,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1666,7 +1666,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1718,7 +1718,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1781,7 +1781,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1833,7 +1833,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -1896,7 +1896,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -1948,7 +1948,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     [_remoteDeviceController
                 getDevice:myNodeId
                     queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             XCTAssertNotNil(device);
             XCTAssertNil(error);
             NSLog(@"Device acquired. Subscribing...");
@@ -2011,7 +2011,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     // Deregister report handler
     [_remoteDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -2074,7 +2074,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
         [_remoteDeviceController
                     getDevice:myNodeId
                         queue:dispatch_get_main_queue()
-            completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                 XCTAssertNotNil(device);
                 XCTAssertNil(error);
                 NSLog(@"Device acquired. Subscribing...");
@@ -2148,7 +2148,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __auto_type deregisterExpectation = [self expectationWithDescription:@"First subscriber deregistered"];
     [_remoteDeviceController getDevice:nodeToStop
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -2206,7 +2206,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __auto_type secondDeregisterExpectation = [self expectationWithDescription:@"Second subscriber deregistered"];
     [_remoteDeviceController getDevice:nodeToStop
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          NSLog(@"Device acquired. Deregistering...");
                          [device deregisterReportHandlersWithClientQueue:dispatch_get_main_queue()
                                                               completion:^{
@@ -2276,7 +2276,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     __auto_type deviceAcquired = [self expectationWithDescription:@"Connected device was acquired"];
     [unspecifiedRemoteDeviceController getDevice:myNodeId
                                            queue:dispatch_get_main_queue()
-                               completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                               completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                                    XCTAssertNotNil(device);
                                    XCTAssertNil(error);
                                    [deviceAcquired fulfill];
@@ -2536,7 +2536,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     [failingDeviceController getDevice:myNodeId
                                  queue:dispatch_get_main_queue()
-                     completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                     completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
                          XCTAssertNotNil(device);
                          XCTAssertNil(error);
                          NSLog(@"Device acquired. Reading...");
