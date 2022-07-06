@@ -15,15 +15,14 @@
  *    limitations under the License.
  */
 
-function disable(testName)
-{
-  const index = this.indexOf(testName);
-  if (index == -1) {
-    const errStr = `Test ${testName}  does not exists.`;
-    throw new Error(errStr);
-  }
+function disable(testName) {
+    const index = this.indexOf(testName);
+    if (index == -1) {
+        const errStr = `Test ${testName}  does not exists.`;
+        throw new Error(errStr);
+    }
 
-  this.splice(index, 1);
+    this.splice(index, 1);
 }
 
 // clang-format off
@@ -792,5 +791,5 @@ function getTests() {
 //
 // Module exports
 //
-exports.getTests       = getTests;
+exports.getTests = getTests;
 exports.getManualTests = getManualTests;
