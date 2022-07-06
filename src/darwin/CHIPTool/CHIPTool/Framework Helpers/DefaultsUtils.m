@@ -52,7 +52,7 @@ uint64_t MTRGetNextAvailableDeviceID(void)
     NSNumber * value = MTRGetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey);
     if (!value) {
         MTRSetDomainValueForKey(MTRToolDefaultsDomain, MTRNextAvailableDeviceIDKey,
-            [NSNumber numberWithUnsignedLongLong:nextAvailableDeviceIdentifier]);
+                                [NSNumber numberWithUnsignedLongLong:nextAvailableDeviceIdentifier]);
     } else {
         nextAvailableDeviceIdentifier = [value unsignedLongLongValue];
     }
@@ -74,7 +74,7 @@ static MTRDeviceController * sController = nil;
 MTRDeviceController * InitializeMTR(void)
 {
     static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
+    dispatch_once(&onceToken, ^ {
         CHIPToolPersistentStorageDelegate * storage = [[CHIPToolPersistentStorageDelegate alloc] init];
         __auto_type * factory = [MTRControllerFactory sharedInstance];
         __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
@@ -168,7 +168,9 @@ void MTRSetDevicePaired(uint64_t deviceId, BOOL paired)
     MTRSetDomainValueForKey(MTRToolDefaultsDomain, KeyForPairedDevice(deviceId), paired ? @"YES" : @"NO");
 }
 
-NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId]; }
+NSString * KeyForPairedDevice(uint64_t deviceId) {
+    return [NSString stringWithFormat:@"%@%llu", kDevicePairedKey, deviceId];
+}
 
 void MTRUnpairDeviceWithID(uint64_t deviceId)
 {
@@ -182,25 +184,25 @@ void MTRUnpairDeviceWithID(uint64_t deviceId)
         MTRBaseClusterOperationalCredentials * opCredsCluster =
             [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
         [opCredsCluster
-            readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                if (error) {
-                    NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
-                    return;
-                }
-                MTROperationalCredentialsClusterRemoveFabricParams * params =
-                    [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
-                params.fabricIndex = value;
-                [opCredsCluster removeFabricWithParams:params
-                                     completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                         NSError * _Nullable error) {
-                                         if (error) {
-                                             NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
-                                                 params.fabricIndex, deviceId, error);
-                                             return;
-                                         }
-                                         NSLog(@"Successfully unpaired deviceId %llu", deviceId);
-                                     }];
+        readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"Failed to get current fabric index for device %llu still removing from CHIPTool. %@", deviceId, error);
+                return;
+            }
+            MTROperationalCredentialsClusterRemoveFabricParams * params =
+                [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
+            params.fabricIndex = value;
+            [opCredsCluster removeFabricWithParams:params
+                            completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                           NSError * _Nullable error) {
+                               if (error) {
+                                   NSLog(@"Failed to remove current fabric index %@ for device %llu. %@",
+                                         params.fabricIndex, deviceId, error);
+                                   return;
+                               }
+                               NSLog(@"Successfully unpaired deviceId %llu", deviceId);
             }];
+        }];
     });
 }
 
