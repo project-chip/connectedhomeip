@@ -129,7 +129,6 @@ Identify gIdentify = {
 /**********************************************************
  * OffWithEffect Callbacks
  *********************************************************/
-
 void OnTriggerOffWithEffect(OnOffEffect * effect)
 {
     chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
