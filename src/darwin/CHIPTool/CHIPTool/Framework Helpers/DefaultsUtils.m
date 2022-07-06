@@ -138,11 +138,11 @@ BOOL MTRGetConnectedDevice(MTRDeviceConnectionCallback completionHandler)
     return [controller getDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
 }
 
-MTRDevice * MTRGetDeviceBeingCommissioned(void)
+MTRBaseDevice * MTRGetDeviceBeingCommissioned(void)
 {
     NSError * error;
     MTRDeviceController * controller = InitializeMTR();
-    MTRDevice * device = [controller getDeviceBeingCommissioned:MTRGetLastPairedDeviceId() error:&error];
+    MTRBaseDevice * device = [controller getDeviceBeingCommissioned:MTRGetLastPairedDeviceId() error:&error];
     if (error) {
         NSLog(@"Error retrieving device being commissioned for deviceId %llu", MTRGetLastPairedDeviceId());
         return nil;
@@ -173,15 +173,14 @@ NSString * KeyForPairedDevice(uint64_t deviceId) { return [NSString stringWithFo
 void MTRUnpairDeviceWithID(uint64_t deviceId)
 {
     MTRSetDevicePaired(deviceId, NO);
-    MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+    MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
         if (error) {
             NSLog(@"Failed to unpair device %llu still removing from CHIPTool. %@", deviceId, error);
             return;
         }
         NSLog(@"Attempting to unpair device %llu", deviceId);
-        MTROperationalCredentials * opCredsCluster = [[MTROperationalCredentials alloc] initWithDevice:device
-                                                                                              endpoint:0
-                                                                                                 queue:dispatch_get_main_queue()];
+        MTRBaseClusterOperationalCredentials * opCredsCluster =
+            [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpoint:0 queue:dispatch_get_main_queue()];
         [opCredsCluster
             readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                 if (error) {

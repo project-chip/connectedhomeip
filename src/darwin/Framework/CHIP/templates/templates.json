@@ -53,19 +53,19 @@
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.mm"
         },
         {
-            "path": "MTRClustersObjc_internal.zapt",
+            "path": "MTRBaseClusters_internal.zapt",
             "name": "Objc ZCL API Internal Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc_internal.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters_internal.h"
         },
         {
-            "path": "MTRClustersObjc.zapt",
+            "path": "MTRBaseClusters.zapt",
             "name": "Objc ZCL API Header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc.h"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.h"
         },
         {
-            "path": "MTRClustersObjc-src.zapt",
+            "path": "MTRBaseClusters-src.zapt",
             "name": "Objc ZCL API",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc.mm"
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm"
         },
         {
             "path": "MTRStructsObjc.zapt",

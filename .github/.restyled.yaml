@@ -72,7 +72,7 @@ exclude:
     - "scripts/idl/tests/outputs/**/*" # Matches generated output 1:1
     - "examples/chef/sample_app_util/test_files/*.yaml"
     - "examples/chef/zzz_generated/**/*"
-    - "src/darwin/Framework/CHIP/zap-generated/MTRClustersObjc.mm" # https://github.com/project-chip/connectedhomeip/issues/20236
+    - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # https://github.com/project-chip/connectedhomeip/issues/20236
 
 
 changed_paths:
