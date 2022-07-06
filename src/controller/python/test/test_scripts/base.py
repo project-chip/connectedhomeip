@@ -369,7 +369,7 @@ class BaseTestHelper:
         self.logger.info("Waiting for attribute read for CommissionedFabrics")
         startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
 
-        tempFabric = chip.FabricAdmin.FabricAdmin(fabricId=3, fabricIndex=3)
+        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1, fabricId=3, fabricIndex=3)
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
         self.logger.info("Setting failsafe on CASE connection")
