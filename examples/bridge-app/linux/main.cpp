@@ -436,7 +436,7 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
     {
         uint8_t batChargeLevel = dev->GetBatChargeLevel();
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id,
-                                               PowerSource::Attributes::BatteryChargeLevel::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
+                                               PowerSource::Attributes::BatChargeLevel::Id, ZCL_INT8U_ATTRIBUTE_TYPE,
                                                &batChargeLevel);
     }
 
@@ -549,7 +549,7 @@ EmberAfStatus HandleReadPowerSourceAttribute(DevicePowerSource * dev, chip::Attr
                                              uint16_t maxReadLength)
 {
     using namespace app::Clusters;
-    if ((attributeId == PowerSource::Attributes::BatteryChargeLevel::Id) && (maxReadLength == 1))
+    if ((attributeId == PowerSource::Attributes::BatChargeLevel::Id) && (maxReadLength == 1))
     {
         *buffer = dev->GetBatChargeLevel();
     }
