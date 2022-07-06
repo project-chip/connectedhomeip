@@ -148,7 +148,7 @@ using namespace chip::app::Clusters;
       timedWriteTimeout.SetValue(10000);
     }
     {{/if}}
-    
+
     new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
@@ -165,7 +165,7 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall, timedWriteTimeout);
     });
-    
+
 }
 
 {{/if}}

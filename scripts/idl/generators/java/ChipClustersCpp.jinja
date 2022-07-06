@@ -120,7 +120,7 @@ JNI_METHOD(jlong, {{cluster.name | capitalcase}}Cluster, initWithDevice)(JNIEnv 
 
 {% for command in cluster.commands -%}
 
-JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, 
+JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
   {{command.name | lowercaseFirst}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback,
   {%- if command.input_param -%}
   {%-    for field in (cluster.structs | named(command.input_param)).fields -%}
@@ -132,7 +132,7 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{cluster.name | capitalcase}}Cluster * cppCluster;
-    
+
     ListFreer listFreer;
     chip::app::Clusters::{{cluster.name | capitalcase}}::Commands::{{command.name | capitalcase}}::Type request;
 
@@ -142,8 +142,8 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster,
   {%-   for field in (cluster.structs | named(command.input_param)).fields -%}
     {{ encode_value(
         "request." + (field.name | lowercaseFirst),
-        (field.name | lowercaseFirst), 
-        0, 
+        (field.name | lowercaseFirst),
+        0,
         field | asEncodable(typeLookup)
     )}}
   {%-   endfor -%}
