@@ -121,7 +121,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     UILabel * minIntervalInSecondsLabel = [UILabel new];
     [minIntervalInSecondsLabel setText:@"Min. interval (sec):"];
     UIView * minIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:minIntervalInSecondsLabel
-                                                         textField:_minIntervalInSecondsTextField];
+                                                             textField:_minIntervalInSecondsTextField];
     [stackView addArrangedSubview:minIntervalInSecondsView];
 
     minIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
@@ -133,7 +133,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     UILabel * maxIntervalInSecondsLabel = [UILabel new];
     [maxIntervalInSecondsLabel setText:@"Max. interval (sec):"];
     UIView * maxIntervalInSecondsView = [CHIPUIViewUtils viewWithLabel:maxIntervalInSecondsLabel
-                                                         textField:_maxIntervalInSecondsTextField];
+                                                             textField:_maxIntervalInSecondsTextField];
     [stackView addArrangedSubview:maxIntervalInSecondsView];
 
     maxIntervalInSecondsView.translatesAutoresizingMaskIntoConstraints = false;
@@ -166,8 +166,8 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
 
     // Refresh button
     UIBarButtonItem * button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                        target:self
-                                                        action:@selector(refreshTemperatureMeasurement:)];
+                                                                             target:self
+                                                                             action:@selector(refreshTemperatureMeasurement:)];
     self.navigationItem.rightBarButtonItem = button;
 }
 
@@ -189,21 +189,21 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
 - (void)readCurrentTemperature
 {
     if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-    if (chipDevice) {
-            MTRBaseClusterTemperatureMeasurement * cluster =
-                [[MTRBaseClusterTemperatureMeasurement alloc] initWithDevice:chipDevice
-                                                              endpoint:1
-                                                              queue:dispatch_get_main_queue()];
+            if (chipDevice) {
+                MTRBaseClusterTemperatureMeasurement * cluster =
+                    [[MTRBaseClusterTemperatureMeasurement alloc] initWithDevice:chipDevice
+                                                                        endpoint:1
+                                                                           queue:dispatch_get_main_queue()];
 
-            [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                        if (error != nil)
+                [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                    if (error != nil)
                         return;
-                [self updateTempInUI:value.shortValue];
-            }];
-        } else {
-            NSLog(@"Status: Failed to establish a connection with the device");
-        }
-    })) {
+                    [self updateTempInUI:value.shortValue];
+                }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
+            }
+        })) {
         NSLog(@"Status: Waiting for connection with the device");
     } else {
         NSLog(@"Status: Failed to trigger the connection with the device");
@@ -220,42 +220,42 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
         @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
     if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-    if (chipDevice) {
-            // Use a wildcard subscription
-            [chipDevice subscribeWithQueue:dispatch_get_main_queue()
-                        minInterval:minIntervalSeconds
-                        maxInterval:maxIntervalSeconds
-                        params:nil
-                        cacheContainer:nil
-                       attributeReportHandler:^(NSArray * _Nullable reports) {
-                           if (!reports)
-                           return;
-                           for (MTRAttributeReport * report in reports) {
-                    // These should be exposed by the SDK
-                    if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
-                            [report.path.attribute
-                             isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
-                        if (report.error != nil) {
-                            NSLog(@"Error reading temperature: %@", report.error);
-                        } else {
-                            __auto_type controller = [TemperatureSensorViewController currentController];
-                            if (controller != nil) {
-                                [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+            if (chipDevice) {
+                // Use a wildcard subscription
+                [chipDevice subscribeWithQueue:dispatch_get_main_queue()
+                    minInterval:minIntervalSeconds
+                    maxInterval:maxIntervalSeconds
+                    params:nil
+                    cacheContainer:nil
+                    attributeReportHandler:^(NSArray * _Nullable reports) {
+                        if (!reports)
+                            return;
+                        for (MTRAttributeReport * report in reports) {
+                            // These should be exposed by the SDK
+                            if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
+                                [report.path.attribute
+                                    isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                if (report.error != nil) {
+                                    NSLog(@"Error reading temperature: %@", report.error);
+                                } else {
+                                    __auto_type controller = [TemperatureSensorViewController currentController];
+                                    if (controller != nil) {
+                                        [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                    eventReportHandler:nil
+                    errorHandler:^(NSError * error) {
+                        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+                    }
+                    subscriptionEstablished:^ {
+                    }];
+            } else {
+                NSLog(@"Status: Failed to establish a connection with the device");
             }
-            eventReportHandler:nil
-            errorHandler:^(NSError * error) {
-                NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
-            }
-            subscriptionEstablished:^ {
-            }];
-        } else {
-            NSLog(@"Status: Failed to establish a connection with the device");
-        }
-    })) {
+        })) {
         NSLog(@"Status: Waiting for connection with the device");
     } else {
         NSLog(@"Status: Failed to trigger the connection with the device");
