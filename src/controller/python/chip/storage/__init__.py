@@ -33,12 +33,10 @@ import chip.native
 import ipdb
 from rich.pretty import pprint
 
-_SyncSetKeyValueCbFunct = CFUNCTYPE(
-    None, py_object, c_char_p, POINTER(c_char), c_uint16
-)
-_SyncGetKeyValueCbFunct = CFUNCTYPE(
-    None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16), POINTER(c_bool)
-)
+_SyncSetKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char),
+                                    c_uint16)
+_SyncGetKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char),
+                                    POINTER(c_uint16), POINTER(c_bool))
 _SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p)
 
 
@@ -89,6 +87,7 @@ def _OnSyncDeleteKeyValueCb(storageObj, key):
 
 
 class PersistentStorage:
+
     def __init__(self, path: str):
         self._path = path
         self._handle = chip.native.GetLibraryHandle()
@@ -164,7 +163,8 @@ class PersistentStorage:
         if value is None:
             raise ValueError("value is not expected to be None")
         else:
-            self.jsonData["sdk-config"][key] = base64.b64encode(value).decode("utf-8")
+            self.jsonData["sdk-config"][key] = base64.b64encode(value).decode(
+                "utf-8")
 
         self.Sync()
 
@@ -178,4 +178,5 @@ class PersistentStorage:
         return self._storageAdapterObj
 
     def __del__(self):
-        builtins.chipStack.Call(lambda: self._handle.pychip_Storage_ShutdownAdapter())
+        builtins.chipStack.Call(
+            lambda: self._handle.pychip_Storage_ShutdownAdapter())
