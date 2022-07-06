@@ -397,7 +397,7 @@ MC_TGTNAV.S.C0000=1
 
 PRS.S.A0003=0
 
-#Level Control Cluster 
+#Level Control Cluster
 LVL.S.F01=1
 LVL.S.F02=1
 LVL.S.A0000=1
