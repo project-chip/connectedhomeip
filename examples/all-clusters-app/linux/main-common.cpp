@@ -32,10 +32,10 @@
 #include <new>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <signal.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
-#include <signal.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/NetworkCommissioningDriver.h>
