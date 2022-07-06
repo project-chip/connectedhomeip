@@ -76,9 +76,9 @@ for relInstallDir in relChipPackageInstallDirs:
         sys.path.insert(0, absInstallDir)
 
 
-if platform.system() == 'Darwin':
+if platform.system() == "Darwin":
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
-elif sys.platform.startswith('linux'):
+elif sys.platform.startswith("linux"):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
 # The exceptions for CHIP Device Controller CLI
@@ -100,8 +100,7 @@ def DecodeBase64Option(option, opt, value):
     try:
         return base64.standard_b64decode(value)
     except TypeError:
-        raise OptionValueError(
-            "option %s: invalid base64 value: %r" % (opt, value))
+        raise OptionValueError("option %s: invalid base64 value: %r" % (opt, value))
 
 
 def DecodeHexIntOption(option, opt, value):
@@ -113,27 +112,26 @@ def DecodeHexIntOption(option, opt, value):
 
 def ParseEncodedString(value):
     if value.find(":") < 0:
-        raise ParsingError(
-            "value should be encoded in encoding:encodedvalue format")
+        raise ParsingError("value should be encoded in encoding:encodedvalue format")
     enc, encValue = value.split(":", 1)
     if enc == "str":
-        return encValue.encode("utf-8") + b'\x00'
+        return encValue.encode("utf-8") + b"\x00"
     elif enc == "hex":
         return bytes.fromhex(encValue)
     raise ParsingError("only str and hex encoding is supported")
 
 
 def ParseValueWithType(value, type):
-    if type == 'int':
+    if type == "int":
         return int(value)
-    elif type == 'str':
+    elif type == "str":
         return value
-    elif type == 'bytes':
+    elif type == "bytes":
         return ParseEncodedString(value)
-    elif type == 'bool':
-        return (value.upper() not in ['F', 'FALSE', '0'])
+    elif type == "bool":
+        return value.upper() not in ["F", "FALSE", "0"]
     else:
-        raise ParsingError('cannot recognize type: {}'.format(type))
+        raise ParsingError("cannot recognize type: {}".format(type))
 
 
 def FormatZCLArguments(args, command):
@@ -148,8 +146,7 @@ def FormatZCLArguments(args, command):
 
 
 def ShowColoredWarnings(message, category, filename, lineno, file=None, line=None):
-    logging.warning(' %s:%s: %s:%s' %
-                    (filename, lineno, category.__name__, message))
+    logging.warning(" %s:%s: %s:%s" % (filename, lineno, category.__name__, message))
     return
 
 
@@ -159,7 +156,7 @@ class DeviceMgrCmd(Cmd):
 
         pretty.install(indent_guides=True, expand_all=True)
 
-        coloredlogs.install(level='DEBUG')
+        coloredlogs.install(level="DEBUG")
         chip.logging.RedirectToPythonLogging()
 
         logging.getLogger().setLevel(logging.DEBUG)
@@ -180,28 +177,31 @@ class DeviceMgrCmd(Cmd):
         self.bleMgr = None
 
         self.chipStack = ChipStack.ChipStack(
-            bluetoothAdapter=bluetoothAdapter, persistentStoragePath='/tmp/chip-device-ctrl-storage.json')
+            bluetoothAdapter=bluetoothAdapter,
+            persistentStoragePath="/tmp/chip-device-ctrl-storage.json",
+        )
         self.fabricAdmin = FabricAdmin.FabricAdmin()
         self.devCtrl = self.fabricAdmin.NewController(
-            nodeId=controllerNodeId, useTestCommissioner=True)
+            nodeId=controllerNodeId, useTestCommissioner=True
+        )
 
-        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController(
-            self.chipStack)
+        self.commissionableNodeCtrl = (
+            ChipCommissionableNodeCtrl.ChipCommissionableNodeController(self.chipStack)
+        )
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
             try:
                 self.bleMgr = BleManager(self.devCtrl)
-                self.bleMgr.ble_adapter_select(
-                    "hci{}".format(bluetoothAdapter))
+                self.bleMgr.ble_adapter_select("hci{}".format(bluetoothAdapter))
             except Exception as ex:
                 traceback.print_exc()
                 print(
-                    "Failed to initialize BLE, if you don't have BLE, run chip-device-ctrl with --no-ble")
+                    "Failed to initialize BLE, if you don't have BLE, run chip-device-ctrl with --no-ble"
+                )
                 raise ex
 
-        self.historyFileName = os.path.expanduser(
-            "~/.chip-device-ctrl-history")
+        self.historyFileName = os.path.expanduser("~/.chip-device-ctrl-history")
 
         try:
             import readline
@@ -218,12 +218,10 @@ class DeviceMgrCmd(Cmd):
 
     command_names = [
         "setup-payload",
-
         "ble-scan",
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
-
         "connect",
         "close-ble",
         "close-session",
@@ -233,14 +231,10 @@ class DeviceMgrCmd(Cmd):
         "zcl",
         "zclread",
         "zclsubscribe",
-
         "discover",
-
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
-
         "open-commissioning-window",
-
         "get-fabricid",
     ]
 
@@ -309,7 +303,9 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL",
+            DeprecationWarning,
+        )
 
         args = shlex.split(line)
 
@@ -331,7 +327,9 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. Please use the DeviceController.SetLogFilter method directly in the REPL",
+            DeprecationWarning,
+        )
 
         args = shlex.split(line)
 
@@ -367,7 +365,7 @@ class DeviceMgrCmd(Cmd):
         setup-payload generate [options]
 
         Options:
-          -vr  Version        
+          -vr  Version
           -vi  Vendor ID
           -pi  Product ID
           -cf  Custom Flow [Standard = 0, UserActionRequired = 1, Custom = 2]
@@ -380,7 +378,9 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
+            "This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly",
+            DeprecationWarning,
+        )
 
         try:
             arglist = shlex.split(line)
@@ -390,22 +390,24 @@ class DeviceMgrCmd(Cmd):
 
             if arglist[0] == "generate":
                 parser = argparse.ArgumentParser()
-                parser.add_argument("-vr", type=int, default=0, dest='version')
-                parser.add_argument(
-                    "-pi", type=int, default=0, dest='productId')
-                parser.add_argument(
-                    "-vi", type=int, default=0, dest='vendorId')
-                parser.add_argument(
-                    '-cf', type=int, default=0, dest='customFlow')
-                parser.add_argument(
-                    "-dc", type=int, default=0, dest='capabilities')
-                parser.add_argument(
-                    "-dv", type=int, default=0, dest='discriminator')
-                parser.add_argument("-ps", type=int, dest='passcode')
+                parser.add_argument("-vr", type=int, default=0, dest="version")
+                parser.add_argument("-pi", type=int, default=0, dest="productId")
+                parser.add_argument("-vi", type=int, default=0, dest="vendorId")
+                parser.add_argument("-cf", type=int, default=0, dest="customFlow")
+                parser.add_argument("-dc", type=int, default=0, dest="capabilities")
+                parser.add_argument("-dv", type=int, default=0, dest="discriminator")
+                parser.add_argument("-ps", type=int, dest="passcode")
                 args = parser.parse_args(arglist[1:])
 
-                SetupPayload().PrintOnboardingCodes(args.passcode, args.vendorId, args.productId,
-                                                    args.discriminator, args.customFlow, args.capabilities, args.version)
+                SetupPayload().PrintOnboardingCodes(
+                    args.passcode,
+                    args.vendorId,
+                    args.productId,
+                    args.discriminator,
+                    args.customFlow,
+                    args.capabilities,
+                    args.version,
+                )
 
             if arglist[0] == "parse-manual":
                 SetupPayload().ParseManualPairingCode(arglist[1]).Print()
@@ -430,8 +432,8 @@ class DeviceMgrCmd(Cmd):
             self.bleMgr.ble_adapter_select(line)
             print(
                 "This change only applies to ble-scan\n"
-                "Please run device controller with --bluetooth-adapter=<adapter-name> to select adapter\n" +
-                "e.g. chip-device-ctrl --bluetooth-adapter hci0"
+                "Please run device controller with --bluetooth-adapter=<adapter-name> to select adapter\n"
+                + "e.g. chip-device-ctrl --bluetooth-adapter hci0"
             )
         else:
             print(
@@ -493,21 +495,19 @@ class DeviceMgrCmd(Cmd):
         # pairing, so look first on the network regardless of the QR code contents.
         print("Attempting to find device on Network")
         longDiscriminator = ctypes.c_uint16(
-            int(setupPayload.attributes['Discriminator']))
-        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-            longDiscriminator)
+            int(setupPayload.attributes["Discriminator"])
+        )
+        self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(longDiscriminator)
         print("Waiting for device responses...")
         strlen = 100
         addrStrStorage = ctypes.create_string_buffer(strlen)
         # If this device is on the network and we're looking specifically for 1 device,
         # expect a quick response.
         if self.wait_for_one_discovered_device():
-            self.devCtrl.GetIPForDiscoveredDevice(
-                0, addrStrStorage, strlen)
-            addrStr = addrStrStorage.value.decode('utf-8')
+            self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
+            addrStr = addrStrStorage.value.decode("utf-8")
             print("Connecting to device at " + addrStr)
-            pincode = ctypes.c_uint32(
-                int(setupPayload.attributes['SetUpPINCode']))
+            pincode = ctypes.c_uint32(int(setupPayload.attributes["SetUpPINCode"]))
             try:
                 self.devCtrl.CommissionIP(addrStrStorage, pincode, nodeid)
                 print("Connected")
@@ -520,9 +520,9 @@ class DeviceMgrCmd(Cmd):
         if int(setupPayload.attributes["RendezvousInformation"]) & ble:
             print("Attempting to connect via BLE")
             longDiscriminator = ctypes.c_uint16(
-                int(setupPayload.attributes['Discriminator']))
-            pincode = ctypes.c_uint32(
-                int(setupPayload.attributes['SetUpPINCode']))
+                int(setupPayload.attributes["Discriminator"])
+            )
+            pincode = ctypes.c_uint32(int(setupPayload.attributes["SetUpPINCode"]))
             try:
                 self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid)
                 print("Connected")
@@ -558,7 +558,10 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("paseonly")
                 return
             print(
-                "Device temporary node id (**this does not match spec**): {}".format(nodeid))
+                "Device temporary node id (**this does not match spec**): {}".format(
+                    nodeid
+                )
+            )
         except Exception as ex:
             print(str(ex))
             return
@@ -598,7 +601,9 @@ class DeviceMgrCmd(Cmd):
         """
 
         warnings.warn(
-            "This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL", DeprecationWarning)
+            "This method is being deprecated. Please use the DeviceController.[ConnectBLE|CommissionIP] methods directly in the REPL",
+            DeprecationWarning,
+        )
 
         try:
             args = shlex.split(line)
@@ -616,17 +621,16 @@ class DeviceMgrCmd(Cmd):
                 self.devCtrl.CommissionIP(args[1], int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
-            elif args[0] in ['-qr', '-code'] and len(args) >= 2:
+            elif args[0] in ["-qr", "-code"] and len(args) >= 2:
                 if len(args) == 3:
                     nodeid = int(args[2])
                 print("Parsing QR code {}".format(args[1]))
 
                 setupPayload = None
-                if args[0] == '-qr':
+                if args[0] == "-qr":
                     setupPayload = SetupPayload().ParseQrCode(args[1])
-                elif args[0] == '-code':
-                    setupPayload = SetupPayload(
-                    ).ParseManualPairingCode(args[1])
+                elif args[0] == "-code":
+                    setupPayload = SetupPayload().ParseManualPairingCode(args[1])
 
                 if not int(setupPayload.attributes.get("RendezvousInformation", 0)):
                     print("No rendezvous information provided, default to all.")
@@ -638,7 +642,10 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("connect SetupPinCode")
                 return
             print(
-                "Device temporary node id (**this does not match spec**): {}".format(nodeid))
+                "Device temporary node id (**this does not match spec**): {}".format(
+                    nodeid
+                )
+            )
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
@@ -651,7 +658,7 @@ class DeviceMgrCmd(Cmd):
         """
         try:
             parser = argparse.ArgumentParser()
-            parser.add_argument('nodeid', type=int, help='Peer node ID')
+            parser.add_argument("nodeid", type=int, help="Peer node ID")
             args = parser.parse_args(shlex.split(line))
 
             self.devCtrl.CloseSession(args.nodeid)
@@ -673,8 +680,7 @@ class DeviceMgrCmd(Cmd):
                 try:
                     self.devCtrl.ResolveNode(int(args[0]))
                     address = self.devCtrl.GetAddressAndPort(int(args[0]))
-                    address = "{}:{}".format(
-                        *address) if address else "unknown"
+                    address = "{}:{}".format(*address) if address else "unknown"
                     print("Current address: " + address)
                 except exceptions.ChipStackException as ex:
                     print(str(ex))
@@ -690,7 +696,10 @@ class DeviceMgrCmd(Cmd):
         addrStrStorage = ctypes.create_string_buffer(strlen)
         count = 0
         maxWaitTime = 2
-        while (not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen) and count < maxWaitTime):
+        while (
+            not self.devCtrl.GetIPForDiscoveredDevice(0, addrStrStorage, strlen)
+            and count < maxWaitTime
+        ):
             time.sleep(0.2)
             count = count + 0.2
         return count < maxWaitTime
@@ -723,19 +732,40 @@ class DeviceMgrCmd(Cmd):
             parser = argparse.ArgumentParser()
             group = parser.add_mutually_exclusive_group()
             group.add_argument(
-                '-all', help='discover all commissionable nodes and commissioners', action='store_true')
+                "-all",
+                help="discover all commissionable nodes and commissioners",
+                action="store_true",
+            )
             group.add_argument(
-                '-qr', help='discover commissionable nodes matching provided QR code', type=str)
+                "-qr",
+                help="discover commissionable nodes matching provided QR code",
+                type=str,
+            )
             group.add_argument(
-                '-l', help='discover commissionable nodes with given long discriminator', type=int)
+                "-l",
+                help="discover commissionable nodes with given long discriminator",
+                type=int,
+            )
             group.add_argument(
-                '-s', help='discover commissionable nodes with given short discriminator', type=int)
+                "-s",
+                help="discover commissionable nodes with given short discriminator",
+                type=int,
+            )
             group.add_argument(
-                '-v', help='discover commissionable nodes with given vendor ID', type=int)
+                "-v",
+                help="discover commissionable nodes with given vendor ID",
+                type=int,
+            )
             group.add_argument(
-                '-t', help='discover commissionable nodes with given device type', type=int)
+                "-t",
+                help="discover commissionable nodes with given device type",
+                type=int,
+            )
             group.add_argument(
-                '-c', help='discover commissionable nodes in commissioning mode', action='store_true')
+                "-c",
+                help="discover commissionable nodes in commissioning mode",
+                action="store_true",
+            )
             args = parser.parse_args(arglist)
             if args.all:
                 self.commissionableNodeCtrl.DiscoverCommissioners()
@@ -746,25 +776,29 @@ class DeviceMgrCmd(Cmd):
             elif args.qr is not None:
                 setupPayload = SetupPayload().ParseQrCode(args.qr)
                 longDiscriminator = ctypes.c_uint16(
-                    int(setupPayload.attributes['Discriminator']))
+                    int(setupPayload.attributes["Discriminator"])
+                )
                 self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-                    longDiscriminator)
+                    longDiscriminator
+                )
                 self.wait_for_one_discovered_device()
             elif args.l is not None:
                 self.devCtrl.DiscoverCommissionableNodesLongDiscriminator(
-                    ctypes.c_uint16(args.l))
+                    ctypes.c_uint16(args.l)
+                )
                 self.wait_for_one_discovered_device()
             elif args.s is not None:
                 self.devCtrl.DiscoverCommissionableNodesShortDiscriminator(
-                    ctypes.c_uint16(args.s))
+                    ctypes.c_uint16(args.s)
+                )
                 self.wait_for_one_discovered_device()
             elif args.v is not None:
-                self.devCtrl.DiscoverCommissionableNodesVendor(
-                    ctypes.c_uint16(args.v))
+                self.devCtrl.DiscoverCommissionableNodesVendor(ctypes.c_uint16(args.v))
                 self.wait_for_many_discovered_devices()
             elif args.t is not None:
                 self.devCtrl.DiscoverCommissionableNodesDeviceType(
-                    ctypes.c_uint16(args.t))
+                    ctypes.c_uint16(args.t)
+                )
                 self.wait_for_many_discovered_devices()
             elif args.c is not None:
                 self.devCtrl.DiscoverCommissionableNodesCommissioningEnabled()
@@ -774,7 +808,7 @@ class DeviceMgrCmd(Cmd):
                 return
             self.devCtrl.PrintDiscoveredDevices()
         except exceptions.ChipStackException as ex:
-            print('exception')
+            print("exception")
             print(str(ex))
             return
         except:
@@ -795,14 +829,18 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             all_commands = self.devCtrl.ZCLCommandList()
-            if len(args) == 1 and args[0] == '?':
-                print('\n'.join(all_commands.keys()))
-            elif len(args) == 2 and args[0] == '?':
+            if len(args) == 1 and args[0] == "?":
+                print("\n".join(all_commands.keys()))
+            elif len(args) == 2 and args[0] == "?":
                 if args[1] not in all_commands:
                     raise exceptions.UnknownCluster(args[1])
                 for commands in all_commands.get(args[1]).items():
-                    args = ", ".join(["{}: {}".format(argName, argType)
-                                      for argName, argType in commands[1].items()])
+                    args = ", ".join(
+                        [
+                            "{}: {}".format(argName, argType)
+                            for argName, argType in commands[1].items()
+                        ]
+                    )
                     print(commands[0])
                     if commands[1]:
                         print("  ", args)
@@ -815,8 +853,15 @@ class DeviceMgrCmd(Cmd):
                 # When command takes no arguments, (not command) is True
                 if command is None:
                     raise exceptions.UnknownCommand(args[0], args[1])
-                err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
+                err, res = self.devCtrl.ZCLSend(
+                    args[0],
+                    args[1],
+                    int(args[2]),
+                    int(args[3]),
+                    int(args[4]),
+                    FormatZCLArguments(args[5:], command),
+                    blocking=True,
+                )
                 if err != 0:
                     print("Failed to receive command response: {}".format(res))
                 elif res != None:
@@ -842,17 +887,18 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             all_attrs = self.devCtrl.ZCLAttributeList()
-            if len(args) == 1 and args[0] == '?':
-                print('\n'.join(all_attrs.keys()))
-            elif len(args) == 2 and args[0] == '?':
+            if len(args) == 1 and args[0] == "?":
+                print("\n".join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == "?":
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
-                print('\n'.join(all_attrs.get(args[1]).keys()))
+                print("\n".join(all_attrs.get(args[1]).keys()))
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                res = self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]))
+                res = self.devCtrl.ZCLReadAttribute(
+                    args[0], args[1], int(args[2]), int(args[3]), int(args[4])
+                )
                 if res != None:
                     print(repr(res))
             else:
@@ -872,21 +918,35 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             all_attrs = self.devCtrl.ZCLAttributeList()
-            if len(args) == 1 and args[0] == '?':
-                print('\n'.join(all_attrs.keys()))
-            elif len(args) == 2 and args[0] == '?':
+            if len(args) == 1 and args[0] == "?":
+                print("\n".join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == "?":
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
                 cluster_attrs = all_attrs.get(args[1], {})
-                print('\n'.join(["{}: {}".format(key, cluster_attrs[key]["type"])
-                      for key in cluster_attrs.keys() if cluster_attrs[key].get("writable", False)]))
+                print(
+                    "\n".join(
+                        [
+                            "{}: {}".format(key, cluster_attrs[key]["type"])
+                            for key in cluster_attrs.keys()
+                            if cluster_attrs[key].get("writable", False)
+                        ]
+                    )
+                )
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                attribute_type = all_attrs.get(args[0], {}).get(
-                    args[1], {}).get("type", None)
-                res = self.devCtrl.ZCLWriteAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), ParseValueWithType(args[5], attribute_type))
+                attribute_type = (
+                    all_attrs.get(args[0], {}).get(args[1], {}).get("type", None)
+                )
+                res = self.devCtrl.ZCLWriteAttribute(
+                    args[0],
+                    args[1],
+                    int(args[2]),
+                    int(args[3]),
+                    int(args[4]),
+                    ParseValueWithType(args[5], attribute_type),
+                )
                 print(repr(res))
             else:
                 self.do_help("zclwrite")
@@ -908,28 +968,43 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             all_attrs = self.devCtrl.ZCLAttributeList()
-            if len(args) == 1 and args[0] == '?':
-                print('\n'.join(all_attrs.keys()))
-            elif len(args) == 2 and args[0] == '?':
+            if len(args) == 1 and args[0] == "?":
+                print("\n".join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == "?":
                 if args[1] not in all_attrs:
                     raise exceptions.UnknownCluster(args[1])
                 cluster_attrs = all_attrs.get(args[1], {})
-                print('\n'.join([key for key in cluster_attrs.keys(
-                ) if cluster_attrs[key].get("reportable", False)]))
+                print(
+                    "\n".join(
+                        [
+                            key
+                            for key in cluster_attrs.keys()
+                            if cluster_attrs[key].get("reportable", False)
+                        ]
+                    )
+                )
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                res = self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), int(args[5]))
+                res = self.devCtrl.ZCLSubscribeAttribute(
+                    args[0],
+                    args[1],
+                    int(args[2]),
+                    int(args[3]),
+                    int(args[4]),
+                    int(args[5]),
+                )
                 print(res.GetAllValues())
                 print(f"Subscription Established: {res}")
-            elif len(args) == 2 and args[0] == '-shutdown':
+            elif len(args) == 2 and args[0] == "-shutdown":
                 subscriptionId = int(args[1], base=0)
                 self.devCtrl.ZCLShutdownSubscription(subscriptionId)
             else:
                 self.do_help("zclsubscribe")
         except exceptions.ChipStackException as ex:
-            print("An exception occurred during configuring reporting of ZCL attribute:")
+            print(
+                "An exception occurred during configuring reporting of ZCL attribute:"
+            )
             print(str(ex))
         except Exception as ex:
             print("An exception occurred during processing input:")
@@ -945,8 +1020,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-wifi-credential")
                 return
-            self.devCtrl.SetWiFiCredentials(
-                args[0], args[1])
+            self.devCtrl.SetWiFiCredentials(args[0], args[1])
         except Exception as ex:
             print(str(ex))
             return
@@ -971,7 +1045,7 @@ class DeviceMgrCmd(Cmd):
         open-commissioning-window <nodeid> [options]
 
         Options:
-          -t  Timeout (in seconds)     
+          -t  Timeout (in seconds)
           -o  Option  [TokenWithRandomPIN = 1, TokenWithProvidedPIN = 2]
           -d  Discriminator Value
           -i  Iteration
@@ -986,14 +1060,10 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("open-commissioning-window")
                 return
             parser = argparse.ArgumentParser()
-            parser.add_argument(
-                "-t", type=int, default=0, dest='timeout')
-            parser.add_argument(
-                "-o", type=int, default=1, dest='option')
-            parser.add_argument(
-                "-i", type=int, default=0, dest='iteration')
-            parser.add_argument(
-                "-d", type=int, default=0, dest='discriminator')
+            parser.add_argument("-t", type=int, default=0, dest="timeout")
+            parser.add_argument("-o", type=int, default=1, dest="option")
+            parser.add_argument("-i", type=int, default=0, dest="iteration")
+            parser.add_argument("-d", type=int, default=0, dest="discriminator")
             args = parser.parse_args(arglist[1:])
 
             if args.option < 1 or args.option > 2:
@@ -1001,7 +1071,12 @@ class DeviceMgrCmd(Cmd):
                 raise ValueError("Invalid option specified")
 
             self.devCtrl.OpenCommissioningWindow(
-                int(arglist[0]), args.timeout, args.iteration, args.discriminator, args.option)
+                int(arglist[0]),
+                args.timeout,
+                args.iteration,
+                args.discriminator,
+                args.option,
+            )
 
         except exceptions.ChipStackException as ex:
             print(str(ex))
@@ -1012,14 +1087,14 @@ class DeviceMgrCmd(Cmd):
 
     def do_getfabricid(self, line):
         """
-          get-fabricid
+        get-fabricid
 
-          Read the current Compressed Fabric Id of the controller device, return 0 if not available.
+        Read the current Compressed Fabric Id of the controller device, return 0 if not available.
         """
         try:
             args = shlex.split(line)
 
-            if (len(args) > 0):
+            if len(args) > 0:
                 print("Unexpected argument: " + args[1])
                 return
 
@@ -1032,11 +1107,19 @@ class DeviceMgrCmd(Cmd):
 
         print("Get fabric ID complete")
 
-        print("Raw Fabric ID: 0x{:016x}".format(raw_fabricid)
-              + " (" + str(raw_fabricid) + ")")
+        print(
+            "Raw Fabric ID: 0x{:016x}".format(raw_fabricid)
+            + " ("
+            + str(raw_fabricid)
+            + ")"
+        )
 
-        print("Compressed Fabric ID: 0x{:016x}".format(compressed_fabricid)
-              + " (" + str(compressed_fabricid) + ")")
+        print(
+            "Compressed Fabric ID: 0x{:016x}".format(compressed_fabricid)
+            + " ("
+            + str(compressed_fabricid)
+            + ")"
+        )
 
     def do_history(self, line):
         """
@@ -1090,7 +1173,7 @@ def main():
         action="store",
         dest="controllerNodeId",
         default=1,
-        type='int',
+        type="int",
         help="Controller node ID",
         metavar="<nodeid>",
     )
@@ -1124,19 +1207,24 @@ def main():
             adapterId = None
         elif not options.bluetoothAdapter.startswith("hci"):
             print(
-                "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+                "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc."
+            )
             sys.exit(-1)
         else:
             try:
                 adapterId = int(options.bluetoothAdapter[3:])
             except:
                 print(
-                    "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+                    "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc."
+                )
                 sys.exit(-1)
 
     try:
-        devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
-                                 controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
+        devMgrCmd = DeviceMgrCmd(
+            rendezvousAddr=options.rendezvousAddr,
+            controllerNodeId=options.controllerNodeId,
+            bluetoothAdapter=adapterId,
+        )
     except Exception as ex:
         print(ex)
         print("Failed to bringup CHIPDeviceController CLI")
