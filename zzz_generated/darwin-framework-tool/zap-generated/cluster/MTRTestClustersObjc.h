@@ -346,50 +346,45 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOrderWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeDescriptionWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeWiredAssessedInputVoltageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeWiredAssessedInputVoltageWithValue:(NSNumber * _Nullable)value
                                        completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeWiredAssessedInputFrequencyWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeWiredAssessedInputFrequencyWithValue:(NSNumber * _Nullable)value
                                          completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeWiredCurrentTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeWiredAssessedCurrentWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeWiredAssessedCurrentWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeWiredNominalVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeWiredMaximumCurrentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeWiredPresentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActiveWiredFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryVoltageWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryPercentRemainingWithValue:(NSNumber * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryTimeRemainingWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeBatVoltageWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatPercentRemainingWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatTimeRemainingWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatChargeLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatReplacementNeededWithValue:(NSNumber * _Nonnull)value
                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryChargeLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryReplacementNeededWithValue:(NSNumber * _Nonnull)value
-                                      completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryReplaceabilityWithValue:(NSNumber * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryPresentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeActiveBatteryFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryReplacementDescriptionWithValue:(NSString * _Nonnull)value
-                                           completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryCommonDesignationWithValue:(NSNumber * _Nonnull)value
-                                      completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryANSIDesignationWithValue:(NSString * _Nonnull)value
-                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryIECDesignationWithValue:(NSString * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryApprovedChemistryWithValue:(NSNumber * _Nonnull)value
-                                      completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryCapacityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryQuantityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryChargeStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryTimeToFullChargeWithValue:(NSNumber * _Nonnull)value
-                                     completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryFunctionalWhileChargingWithValue:(NSNumber * _Nonnull)value
-                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeBatteryChargingCurrentWithValue:(NSNumber * _Nonnull)value
-                                    completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeActiveBatteryChargeFaultsWithValue:(NSArray * _Nonnull)value
+- (void)writeAttributeBatReplaceabilityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatPresentWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeActiveBatFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatReplacementDescriptionWithValue:(NSString * _Nonnull)value
                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatCommonDesignationWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatANSIDesignationWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatIECDesignationWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatApprovedChemistryWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatCapacityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatQuantityWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatChargeStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatTimeToFullChargeWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatFunctionalWhileChargingWithValue:(NSNumber * _Nonnull)value
+                                        completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeBatChargingCurrentWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeActiveBatChargeFaultsWithValue:(NSArray * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeGeneratedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAcceptedCommandListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
