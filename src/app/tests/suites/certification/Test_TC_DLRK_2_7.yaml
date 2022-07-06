@@ -181,8 +181,7 @@ tests:
                     hasValue: false
 
     - label:
-          "send Get Year Day Schedule Command to DUT and verify FAILURE
-          response"
+          "send Get Year Day Schedule Command to DUT and verify FAILURE response"
       command: "GetYearDaySchedule"
       arguments:
           values:
