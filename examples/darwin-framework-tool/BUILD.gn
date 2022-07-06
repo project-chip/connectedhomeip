@@ -73,6 +73,7 @@ executable("darwin-framework-tool") {
     "commands/pairing/OpenCommissioningWindowCommand.mm",
     "commands/pairing/PairingCommandBridge.mm",
     "commands/pairing/PairingDelegateBridge.mm",
+    "commands/payload/SetupPayloadParseCommand.mm",
     "commands/storage/Commands.h",
     "commands/storage/StorageManagementCommand.mm",
     "main.mm",
