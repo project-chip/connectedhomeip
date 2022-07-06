@@ -338,7 +338,6 @@ function getManualTests() {
   ];
 
   const OccupancySensing = [
-    'Test_TC_OCC_2_2',
     'Test_TC_OCC_2_3',
     'Test_TC_OCC_2_4',
     'Test_TC_OCC_3_1',
