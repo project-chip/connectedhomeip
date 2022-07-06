@@ -1,0 +1,328 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/target_types.gni")
+}
+
+assert(current_os == "freertos")
+
+efr32_project_dir = "${chip_root}/silabs_examples/sl-newLight/efr32"
+examples_plat_dir = "${chip_root}/examples/platform/efr32"
+
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+
+  # PIN code for PASE session establishment.
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
+
+  # Monitor & log memory usage at runtime.
+  enable_heap_monitoring = false
+
+  # Enable Sleepy end device
+  enable_sleepy_device = false
+
+  # OTA timeout in seconds
+  OTA_periodic_query_timeout = 86400
+
+  # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
+  use_wf200 = false
+  use_rs911x = false
+  use_rs911x_sockets = false
+  sl_wfx_config_softap = false
+  sl_wfx_config_scan = true
+
+  # Enables LCD Qr Code on supported devices
+  show_qr_code = true
+}
+
+# Sanity check
+assert(!(chip_enable_wifi && chip_enable_openthread))
+assert(!(use_rs911x && chip_enable_openthread))
+assert(!(use_wf200 && chip_enable_openthread))
+if (chip_enable_wifi) {
+  assert(use_rs911x || use_wf200)
+}
+
+# BRD4166A --> ThunderBoard Sense 2 (No LCD)
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
+  show_qr_code = false
+}
+
+# Enables LCD on supported devices
+lcd_on = show_qr_code
+
+# WiFi settings
+if (chip_enable_wifi) {
+  wifi_sdk_dir = "${chip_root}/third_party/efr32_sdk/repo/matter/wifi"
+  efr32_lwip_defs = [ "LWIP_NETIF_API=1" ]
+  efr32_lwip_defs += [
+    "LWIP_IPV4=1",
+    "LWIP_ARP=1",
+    "LWIP_ICMP=1",
+    "LWIP_DHCP=1",
+    "LWIP_IPV6_ND=1",
+    "LWIP_IGMP=1",
+  ]
+
+  if (use_rs911x) {
+    wiseconnect_sdk_root =
+        "${chip_root}/third_party/efr32_sdk/wiseconnect-wifi-bt-sdk"
+    import("${wifi_sdk_dir}/rs911x/rs911x.gni")
+  } else {
+    import("${wifi_sdk_dir}/wf200/wf200.gni")
+  }
+}
+
+efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${examples_plat_dir}/FreeRTOSConfig.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/platform/EFR32",
+    "${efr32_project_dir}/include",
+    "${examples_plat_dir}",
+    "${chip_root}/src/lib",
+  ]
+
+  defines = [
+    "BOARD_ID=${efr32_board}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
+  ]
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      defines += rs911x_defs
+      include_dirs += rs911x_plat_incs
+    } else if (use_wf200) {
+      defines += wf200_defs
+      include_dirs += wf200_plat_incs
+    }
+
+    if (use_rs911x_sockets) {
+      include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
+      defines += rs911x_sock_defs
+    } else {
+      # Using LWIP instead of the native TCP/IP stack
+      defines += efr32_lwip_defs
+    }
+
+    if (sl_wfx_config_softap) {
+      defines += [ "SL_WFX_CONFIG_SOFTAP" ]
+    }
+    if (sl_wfx_config_scan) {
+      defines += [ "SL_WFX_CONFIG_SCAN" ]
+    }
+  }
+}
+
+efr32_executable("newLight_app") {
+  output_name = "chip-efr32-lighting-example.out"
+  include_dirs = [ "include" ]
+  defines = []
+
+  sources = [
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/efr32_utils.cpp",
+    "${examples_plat_dir}/heap_4_silabs.c",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/matter_config.cpp",
+    "src/AppTask.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
+    sources += [ "${examples_plat_dir}/uart.cpp" ]
+  }
+
+  deps = [
+    ":sdk",
+    "${chip_root}/silabs_examples/sl-newLight/newLight_DataModel_config",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
+
+  # OpenThread Settings
+  if (chip_enable_openthread) {
+    deps += [
+      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+      "${examples_plat_dir}:efr-matter-shell",
+    ]
+    if (chip_openthread_ftd) {
+      deps += [
+        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      ]
+    } else {
+      deps += [
+        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      ]
+    }
+  }
+
+  if (chip_enable_ota_requestor) {
+    defines += [ "EFR32_OTA_ENABLED" ]
+    sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    if (use_rs911x) {
+      sources += rs911x_src_plat
+
+      # All the stuff from wiseconnect
+      sources += rs911x_src_sapi
+
+      # Apparently - the rsi library needs this (though we may not use use it)
+      sources += rs911x_src_sock
+      include_dirs += rs911x_inc_plat
+
+      if (use_rs911x_sockets) {
+        #
+        # Using native sockets inside RS911x
+        #
+        include_dirs += rs911x_sock_inc
+      } else {
+        #
+        # We use LWIP - not built-in sockets
+        #
+        sources += rs911x_src_lwip
+      }
+    } else if (use_wf200) {
+      sources += wf200_plat_src
+      include_dirs += wf200_plat_incs
+    }
+  }
+
+  if (lcd_on) {
+    sources += [ "${examples_plat_dir}/display/lcd.c" ]
+    defines += [ "DISPLAY_ENABLED" ]
+    if (show_qr_code) {
+      defines += [ "QR_CODE_ENABLED" ]
+
+      deps += [ "${chip_root}/examples/common/QRCode" ]
+    }
+  }
+
+  if (chip_enable_pw_rpc) {
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+      "PW_RPC_OTCLI_SERVICE=1",
+      "PW_RPC_THREAD_SERVICE=1",
+      "PW_RPC_TRACING_SERVICE=1",
+    ]
+
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_plat_dir}/PigweedLogger.cpp",
+      "${examples_plat_dir}/Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_trace",
+      "$dir_pw_trace_tokenized",
+      "$dir_pw_trace_tokenized:trace_rpc_service",
+      "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
+      "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+    ]
+
+    deps += pw_build_LINK_DEPS
+
+    include_dirs += [
+      "${chip_root}/examples/common",
+      "${chip_root}/examples/common/pigweed/efr32",
+    ]
+  }
+
+  if (enable_heap_monitoring) {
+    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING" ]
+  }
+
+  ldscript = "${examples_plat_dir}/ldscripts/${efr32_family}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
+
+  # WiFi Settings
+  if (chip_enable_wifi) {
+    ldflags += [
+      "-Wl,--defsym",
+      "-Wl,SILABS_WIFI=1",
+    ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("efr32") {
+  deps = [ ":newLight_app" ]
+}
+
+group("default") {
+  deps = [ ":efr32" ]
+}
