@@ -194,7 +194,7 @@ class BaseTestHelper:
             time.sleep(0.2)
         if time.time() > timeout:
             return None
-        return ctypes.string_at(addrStrStorage)
+        return ctypes.string_at(addrStrStorage).decode("utf-8")
 
     def TestDiscovery(self, discriminator: int):
         self.logger.info(
@@ -213,7 +213,7 @@ class BaseTestHelper:
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         if self.devCtrl.EstablishPASESessionIP(
-                ip.encode("utf-8"), setuppin, nodeid) is not None:
+                ip, setuppin, nodeid) is not None:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
             return False
@@ -267,7 +267,7 @@ class BaseTestHelper:
 
     def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
-        if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(ip))
             return False
@@ -597,7 +597,7 @@ class BaseTestHelper:
         self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not self.devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl2.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False

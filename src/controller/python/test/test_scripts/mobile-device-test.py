@@ -67,8 +67,6 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
 
     if address_override:
         address = address_override
-    else:
-        address = address.decode("utf-8")
 
     logger.info("Testing commissioning")
     FailIfNot(test.TestCommissioning(ip=address,
