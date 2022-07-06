@@ -87,7 +87,7 @@ JNI_METHOD(void, MyClusterCluster, foo)
     }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
+                           CHIP_ERROR_INCORRECT_STATE));
 
     onSuccess.release();
     onFailure.release();

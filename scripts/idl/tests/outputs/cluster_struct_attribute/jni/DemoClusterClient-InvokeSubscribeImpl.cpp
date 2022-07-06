@@ -38,8 +38,8 @@ JNI_METHOD(void, DemoClusterCluster, subscribeArmFailsafesAttribute)
 {
     chip::DeviceLayer::StackLock lock;
     std::unique_ptr<CHIPDemoClusterArmFailsafesAttributeCallback, void (*)(CHIPDemoClusterArmFailsafesAttributeCallback *)>
-        onSuccess(Platform::New<CHIPDemoClusterArmFailsafesAttributeCallback>(callback, true),
-                  chip::Platform::Delete<CHIPDemoClusterArmFailsafesAttributeCallback>);
+    onSuccess(Platform::New<CHIPDemoClusterArmFailsafesAttributeCallback>(callback, true),
+              chip::Platform::Delete<CHIPDemoClusterArmFailsafesAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -62,8 +62,8 @@ JNI_METHOD(void, DemoClusterCluster, subscribeArmFailsafesAttribute)
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPDemoClusterArmFailsafesAttributeCallback::OnSubscriptionEstablished);
+            static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+            CHIPDemoClusterArmFailsafesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

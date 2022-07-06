@@ -45,11 +45,11 @@
 
 @interface MTRDeviceController (ToDoRemove)
 
-/**
- * TODO: Temporary until PairingDelegate is fixed to clearly communicate this
- * information to consumers.
- * This should be migrated over to the proper pairing delegate path
- */
+    /**
+     * TODO: Temporary until PairingDelegate is fixed to clearly communicate this
+     * information to consumers.
+     * This should be migrated over to the proper pairing delegate path
+     */
 - (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
 
 @end
@@ -113,16 +113,16 @@
 - (void)changeNavBarButtonToCamera
 {
     UIBarButtonItem * camera = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                                                                             target:self
-                                                                             action:@selector(startScanningQRCode:)];
+                                                        target:self
+                                                        action:@selector(startScanningQRCode:)];
     self.navigationItem.rightBarButtonItem = camera;
 }
 
 - (void)changeNavBarButtonToCancel
 {
     UIBarButtonItem * cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                                                             target:self
-                                                                             action:@selector(stopScanningQRCode:)];
+                                                        target:self
+                                                        action:@selector(stopScanningQRCode:)];
     self.navigationItem.rightBarButtonItem = cancel;
 }
 
@@ -356,13 +356,13 @@
 - (void)addResultsUIToStackView:(UIStackView *)stackView
 {
     NSArray<NSString *> * resultLabelTexts = @[
-        @"Version", @"Vendor ID", @"Product ID", @"Discriminator", @"Setup PIN Code", @"Rendez Vous Information", @"Serial #",
-        @"Commissioning Flow"
-    ];
+             @"Version", @"Vendor ID", @"Product ID", @"Discriminator", @"Setup PIN Code", @"Rendez Vous Information", @"Serial #",
+             @"Commissioning Flow"
+         ];
     NSArray<UILabel *> * resultLabels = @[
-        _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber,
-        _commissioningFlowLabel
-    ];
+                                            _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber,
+                                            _commissioningFlowLabel
+                                        ];
     [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
 }
 
@@ -374,8 +374,8 @@
 }
 
 - (void)addItemToStackView:(UIStackView *)stackView
-              resultLabels:(NSArray<UILabel *> *)resultLabels
-          resultLabelTexts:(NSArray<NSString *> *)resultLabelTexts
+    resultLabels:(NSArray<UILabel *> *)resultLabels
+    resultLabelTexts:(NSArray<NSString *> *)resultLabelTexts
 {
     for (int i = 0; i < resultLabels.count && i < resultLabelTexts.count; i++) {
         UILabel * label = [UILabel new];
@@ -460,9 +460,9 @@
     }
     if ([errorMessage length] > 0) {
         NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.nfctagscanning"
-                                                     code:1
-                                                 userInfo:@{ NSLocalizedDescriptionKey : errorMessage }];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+                                           code:1
+                                           userInfo:@ { NSLocalizedDescriptionKey : errorMessage }];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^ {
             [self showError:error];
         });
     }
@@ -479,10 +479,10 @@
 {
     NSLog(@"Call to setVendorIDOnAccessory");
     if (MTRGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-            if (!device) {
-                NSLog(@"Status: Failed to establish a connection with the device");
-            }
-        })) {
+    if (!device) {
+            NSLog(@"Status: Failed to establish a connection with the device");
+        }
+    })) {
         NSLog(@"Status: Waiting for connection with the device");
     } else {
         NSLog(@"Status: Failed to trigger the connection with the device");
@@ -498,8 +498,8 @@
         MTRDeviceController * controller = InitializeMTR();
         uint64_t deviceId = MTRGetLastPairedDeviceId();
         if ([controller respondsToSelector:@selector(_deviceBeingCommissionedOverBLE:)] &&
-            [controller _deviceBeingCommissionedOverBLE:deviceId]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
+                [controller _deviceBeingCommissionedOverBLE:deviceId]) {
+            dispatch_async(dispatch_get_main_queue(), ^ {
                 [self->_deviceList refreshDeviceList];
                 [self retrieveAndSendWiFiCredentials];
             });
@@ -584,7 +584,7 @@
 
     self->_errorLabel.text = error.localizedDescription;
     self->_errorLabel.hidden = NO;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ERROR_DISPLAY_TIME), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, ERROR_DISPLAY_TIME), dispatch_get_main_queue(), ^ {
         self->_errorLabel.hidden = YES;
     });
 }
@@ -607,59 +607,59 @@
 {
     UIAlertController * alertController =
         [UIAlertController alertControllerWithTitle:@"WiFi Configuration"
-                                            message:@"Input network SSID and password that your phone is connected to."
-                                     preferredStyle:UIAlertControllerStyleAlert];
+                           message:@"Input network SSID and password that your phone is connected to."
+                           preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
-        textField.placeholder = @"Network SSID";
-        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
-        textField.borderStyle = UITextBorderStyleRoundedRect;
+                        textField.placeholder = @"Network SSID";
+                        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+                        textField.borderStyle = UITextBorderStyleRoundedRect;
 
-        NSString * networkSSID = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+                        NSString * networkSSID = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         if ([networkSSID length] > 0) {
             textField.text = networkSSID;
         }
     }];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
-        [textField setSecureTextEntry:YES];
-        textField.placeholder = @"Password";
-        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
-        textField.borderStyle = UITextBorderStyleRoundedRect;
-        textField.secureTextEntry = YES;
+                        [textField setSecureTextEntry:YES];
+                        textField.placeholder = @"Password";
+                        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+                        textField.borderStyle = UITextBorderStyleRoundedRect;
+                        textField.secureTextEntry = YES;
 
-        NSString * networkPassword = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
+                        NSString * networkPassword = MTRGetDomainValueForKey(MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey);
         if ([networkPassword length] > 0) {
             textField.text = networkPassword;
         }
     }];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
-                                                        style:UIAlertActionStyleDefault
-                                                      handler:^(UIAlertAction * action) {
-                                                      }]];
+                                style:UIAlertActionStyleDefault
+                    handler:^(UIAlertAction * action) {
+                    }]];
 
     __weak typeof(self) weakSelf = self;
     [alertController
-        addAction:[UIAlertAction actionWithTitle:@"Send"
-                                           style:UIAlertActionStyleDefault
-                                         handler:^(UIAlertAction * action) {
-                                             typeof(self) strongSelf = weakSelf;
-                                             if (strongSelf) {
-                                                 NSArray * textfields = alertController.textFields;
-                                                 UITextField * networkSSID = textfields[0];
-                                                 UITextField * networkPassword = textfields[1];
-                                                 if ([networkSSID.text length] > 0) {
-                                                     MTRSetDomainValueForKey(
-                                                         MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
-                                                 }
+     addAction:[UIAlertAction actionWithTitle:@"Send"
+                style:UIAlertActionStyleDefault
+    handler:^(UIAlertAction * action) {
+        typeof(self) strongSelf = weakSelf;
+        if (strongSelf) {
+            NSArray * textfields = alertController.textFields;
+            UITextField * networkSSID = textfields[0];
+            UITextField * networkPassword = textfields[1];
+            if ([networkSSID.text length] > 0) {
+                MTRSetDomainValueForKey(
+                    MTRToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+            }
 
-                                                 if ([networkPassword.text length] > 0) {
-                                                     MTRSetDomainValueForKey(
-                                                         MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
-                                                 }
-                                                 NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
+            if ([networkPassword.text length] > 0) {
+                MTRSetDomainValueForKey(
+                    MTRToolDefaultsDomain, kNetworkPasswordDefaultsKey, networkPassword.text);
+            }
+            NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 [strongSelf commissionWithSSID:networkSSID.text password:networkPassword.text];
-                                             }
-                                         }]];
+            [strongSelf commissionWithSSID:networkSSID.text password:networkPassword.text];
+        }
+    }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
@@ -810,8 +810,8 @@
 {
     NSString * message = [NSString stringWithFormat:@"SSID: %@\n\nUse WiFi Settings to connect to it.", name];
     UIAlertController * alert = [UIAlertController alertControllerWithTitle:@"SoftAP Detected"
-                                                                    message:message
-                                                             preferredStyle:UIAlertControllerStyleActionSheet];
+                                                   message:message
+                                                   preferredStyle:UIAlertControllerStyleActionSheet];
     UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Dismiss" style:UIAlertActionStyleCancel handler:nil];
     [alert addAction:cancelAction];
     [self presentViewController:alert animated:YES completion:nil];
@@ -864,14 +864,14 @@
 
 - (void)scannedQRCode:(NSString *)qrCode
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^ {
         [self->_captureSession stopRunning];
         [self->_session invalidateSession];
     });
     MTRQRCodeSetupPayloadParser * parser = [[MTRQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^ {
         [self postScanningQRCodeState];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
@@ -882,7 +882,7 @@
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput
     didOutputMetadataObjects:(NSArray *)metadataObjects
-              fromConnection:(AVCaptureConnection *)connection
+    fromConnection:(AVCaptureConnection *)connection
 {
     if (metadataObjects != nil && [metadataObjects count] > 0) {
         AVMetadataMachineReadableCodeObject * metadataObj = [metadataObjects objectAtIndex:0];
@@ -894,8 +894,8 @@
 
 // MARK: Manual Code
 - (void)displayManualCodeInSetupPayloadView:(MTRSetupPayload *)payload
-                              decimalString:(NSString *)decimalString
-                                  withError:(NSError *)error
+    decimalString:(NSString *)decimalString
+    withError:(NSError *)error
 {
     [self->_activityIndicator stopAnimating];
     self->_activityIndicator.hidden = YES;
@@ -930,8 +930,8 @@
 {
     if (!_session) {
         _session = [[NFCNDEFReaderSession alloc] initWithDelegate:self
-                                                            queue:dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT)
-                                         invalidateAfterFirstRead:NO];
+                                                 queue:dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT)
+                                                 invalidateAfterFirstRead:NO];
     }
     [_session beginSession];
 }
@@ -944,7 +944,7 @@
     MTRManualSetupPayloadParser * parser = [[MTRManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^ {
         [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
     [_manualCodeTextField resignFirstResponder];
@@ -970,17 +970,17 @@
     NSLog(@"Validating Vender Id and Product Id...");
     if ([_vendorID.text isEqual:@"N/A"] || [_productID.text isEqual:@"N/A"]) {
         NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.customflow"
-                                                     code:1
-                                                 userInfo:@{ NSLocalizedDescriptionKey : @"Vendor ID or Product Id is invalid." }];
+                                           code:1
+                                           userInfo:@ { NSLocalizedDescriptionKey : @"Vendor ID or Product Id is invalid." }];
         [self showError:error];
         return;
     }
     // make API call
     NSLog(@"Making API call...");
     [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"]
-                         objectForKey:@"CommissioningCustomFlowLedgerUrl"]
-            vendorId:self->_vendorID.text
-           productId:self->_productID.text];
+                      objectForKey:@"CommissioningCustomFlowLedgerUrl"]
+          vendorId:self->_vendorID.text
+          productId:self->_productID.text];
 }
 
 - (void)getRequest:(NSString *)url vendorId:(NSString *)vendorId productId:(NSString *)productId
@@ -993,42 +993,55 @@
     [request setURL:[NSURL URLWithString:targetUrl]];
 
     [[[NSURLSession sharedSession]
-        dataTaskWithRequest:request
-          completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-              NSString * myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-              NSLog(@"Data received: %@", myString);
-              self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-              [self getRequestCallback];
-          }] resume];
+      dataTaskWithRequest:request
+    completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        NSString * myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        NSLog(@"Data received: %@", myString);
+        self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        [self getRequestCallback];
+    }] resume];
 }
 
 - (void)getRequestCallback
 {
     BOOL commissioningCustomFlowUseMockFlag = (BOOL)
-        [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
+            [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
     // use mock respond if useMockFlag is TRUE
     if (commissioningCustomFlowUseMockFlag) {
         NSLog(@"Using mock respond");
-        _ledgerRespond = @{
-            @"height" : @"mockHeight",
-            @"result" : @ {
-                @"vid" : @1,
-                @"pid" : @1,
-                @"cid" : @1,
-                @"name" : @"mockName",
-                @"owner" : @"mockOwner",
-                @"description" : @"mockDescription",
-                @"sku" : @"mockSku",
-                @"firmware_version" : @"mockFirmware",
-                @"hardware_version" : @"mockHardware",
-                @"tis_or_trp_testing_completed" : @TRUE,
-                @"CommissioningCustomFlowUrl" : @"https://lijusankar.github.io/commissioning-react-app/"
+        _ledgerRespond = @ {
+@"height" :
+            @"mockHeight",
+@"result" :
+            @ {
+@"vid" :
+                @1,
+@"pid" :
+                @1,
+@"cid" :
+                @1,
+@"name" :
+                @"mockName",
+@"owner" :
+                @"mockOwner",
+@"description" :
+                @"mockDescription",
+@"sku" :
+                @"mockSku",
+@"firmware_version" :
+                @"mockFirmware",
+@"hardware_version" :
+                @"mockHardware",
+@"tis_or_trp_testing_completed" :
+                @TRUE,
+@"CommissioningCustomFlowUrl" :
+                @"https://lijusankar.github.io/commissioning-react-app/"
             }
         };
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^ {
         self->_commissioningCustomFlowUrl.text =
-            [[self->_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
+        [[self->_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
         [self->_activityIndicator stopAnimating];
         self->_activityIndicator.hidden = YES;
         self->_deviceModelInfoView.hidden = NO;
@@ -1044,23 +1057,23 @@
 
 - (void)redirectToUrl
 {
-    NSArray * redirectPayload = @[ @{
-        @"version" : _versionLabel.text,
-        @"vendorID" : _vendorID.text,
-        @"productID" : _productID.text,
-        @"commissioingFlow" : _commissioningFlowLabel.text,
-        @"discriminator" : _discriminatorLabel.text,
-        @"setupPinCode" : _setupPinCodeLabel.text,
-        @"serialNumber" : _serialNumber.text,
-        @"rendezvousInformation" : _rendezVousInformation.text
-    } ];
+    NSArray * redirectPayload = @[ @ {
+  @"version" : _versionLabel.text,
+  @"vendorID" : _vendorID.text,
+  @"productID" : _productID.text,
+  @"commissioingFlow" : _commissioningFlowLabel.text,
+  @"discriminator" : _discriminatorLabel.text,
+  @"setupPinCode" : _setupPinCodeLabel.text,
+  @"serialNumber" : _serialNumber.text,
+  @"rendezvousInformation" : _rendezVousInformation.text
+      } ];
     NSString * returnUrl =
         [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowReturnUrl"];
     NSString * base64EncodedString = [self encodeStringTo64:redirectPayload];
     NSString * urlString =
         [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningCustomFlowUrl.text, base64EncodedString, returnUrl];
     NSURL * url = [NSURL URLWithString:urlString];
-    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:url options:@ {} completionHandler:nil];
 }
 
 - (NSString *)encodeStringTo64:(NSArray *)fromArray
@@ -1086,29 +1099,29 @@
 
 - (void)deviceAttestation:(MTRDeviceController *)controller failedForDevice:(void *)device error:(NSError * _Nonnull)error
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^ {
         UIAlertController * alertController = [UIAlertController
-            alertControllerWithTitle:@"Device Attestation"
-                             message:@"Device Attestation failed for device under commissioning. Do you wish to continue pairing?"
-                      preferredStyle:UIAlertControllerStyleAlert];
+                                               alertControllerWithTitle:@"Device Attestation"
+                                               message:@"Device Attestation failed for device under commissioning. Do you wish to continue pairing?"
+                                               preferredStyle:UIAlertControllerStyleAlert];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"No"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * action) {
-                                                              NSError * err;
-                                                              [controller continueCommissioningDevice:device
-                                                                             ignoreAttestationFailure:NO
-                                                                                                error:&err];
-                                                          }]];
+                                    style:UIAlertActionStyleDefault
+                        handler:^(UIAlertAction * action) {
+                            NSError * err;
+            [controller continueCommissioningDevice:device
+                        ignoreAttestationFailure:NO
+                        error:&err];
+        }]];
 
         [alertController addAction:[UIAlertAction actionWithTitle:@"Continue"
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction * action) {
-                                                              NSError * err;
-                                                              [controller continueCommissioningDevice:device
-                                                                             ignoreAttestationFailure:YES
-                                                                                                error:&err];
-                                                          }]];
+                                    style:UIAlertActionStyleDefault
+                        handler:^(UIAlertAction * action) {
+                            NSError * err;
+            [controller continueCommissioningDevice:device
+                        ignoreAttestationFailure:YES
+                        error:&err];
+        }]];
 
         [self.viewController presentViewController:alertController animated:YES completion:nil];
     });

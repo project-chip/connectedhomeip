@@ -73,10 +73,14 @@ public:
     CHIP_ERROR GetUpdateStateAttribute(EndpointId endpointId, OTAUpdateStateEnum & state) override;
 
     // Get the current state of the OTA update
-    OTAUpdateStateEnum GetCurrentUpdateState() override { return mCurrentUpdateState; }
+    OTAUpdateStateEnum GetCurrentUpdateState() override {
+        return mCurrentUpdateState;
+    }
 
     // Get the target version of the OTA update
-    uint32_t GetTargetVersion() override { return mTargetVersion; }
+    uint32_t GetTargetVersion() override {
+        return mTargetVersion;
+    }
 
     // Application directs the Requestor to cancel image update in progress. All the Requestor state is
     // cleared, UpdateState is reset to Idle
@@ -90,13 +94,17 @@ public:
         mProviderLocation.SetValue(providerLocation);
     }
 
-    void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override { providerLocation = mProviderLocation; }
+    void GetProviderLocation(Optional<ProviderLocationType> & providerLocation) override {
+        providerLocation = mProviderLocation;
+    }
 
     // Add a default OTA provider to the cached list
     CHIP_ERROR AddDefaultOtaProvider(const ProviderLocationType & providerLocation) override;
 
     // Retrieve an iterator to the cached default OTA provider list
-    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override { return mDefaultOtaProviderList.Begin(); }
+    ProviderLocationList::Iterator GetDefaultOTAProviderListIterator(void) override {
+        return mDefaultOtaProviderList.Begin();
+    }
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state,
@@ -132,12 +140,12 @@ private:
 
             chip::Messaging::SendFlags sendFlags;
             if (!event.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF) &&
-                !event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+                    !event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
                 sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
             }
             ReturnErrorOnFailure(mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
-                                                           event.MsgData.Retain(), sendFlags));
+                                 event.MsgData.Retain(), sendFlags));
             return CHIP_NO_ERROR;
         }
 

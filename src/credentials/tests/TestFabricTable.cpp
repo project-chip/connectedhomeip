@@ -75,7 +75,9 @@ public:
         return mFabricTable.Init(initParams);
     }
 
-    FabricTable & GetFabricTable() { return mFabricTable; }
+    FabricTable & GetFabricTable() {
+        return mFabricTable;
+    }
 
 private:
     chip::FabricTable mFabricTable;
@@ -100,13 +102,13 @@ static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & 
 
     NL_TEST_ASSERT(inSuite,
                    opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_01_PublicKey_Len +
-                                              TestCerts::sTestCert_Node01_01_PrivateKey_Len) == CHIP_NO_ERROR);
+                           TestCerts::sTestCert_Node01_01_PrivateKey_Len) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gFabric1OpKey.Deserialize(opKeysSerialized) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
 
     CHIP_ERROR err = fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &gFabric1OpKey,
-                                                                      /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex);
+                     /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     if (doCommit)
@@ -135,13 +137,13 @@ static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & 
 
     NL_TEST_ASSERT(inSuite,
                    opKeysSerialized.SetLength(TestCerts::sTestCert_Node02_01_PublicKey_Len +
-                                              TestCerts::sTestCert_Node02_01_PrivateKey_Len) == CHIP_NO_ERROR);
+                           TestCerts::sTestCert_Node02_01_PrivateKey_Len) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gFabric2OpKey.Deserialize(opKeysSerialized) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
 
     CHIP_ERROR err = fabricTable.AddNewPendingFabricWithProvidedOpKey(nocSpan, icacSpan, VendorId::TestVendor1, &gFabric2OpKey,
-                                                                      /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex);
+                     /*isExistingOpKeyExternallyOwned =*/true, &fabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     if (doCommit)
@@ -184,7 +186,8 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     // do not advance Last Known Good Time.
     System::Clock::Seconds32 afterNotBeforeBuildTimes[] = { System::Clock::Seconds32(testCertNotBeforeTime.count() + 1),
                                                             System::Clock::Seconds32(testCertNotBeforeTime.count() + 1000),
-                                                            System::Clock::Seconds32(testCertNotBeforeTime.count() + 1000000) };
+                                                            System::Clock::Seconds32(testCertNotBeforeTime.count() + 1000000)
+                                                          };
     for (auto buildTime : afterNotBeforeBuildTimes)
     {
         // Set build time to the desired value.
@@ -254,7 +257,8 @@ void TestUpdateLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
     System::Clock::Seconds32 beforeNotBeforeBuildTimes[] = { testCertNotBeforeTime,
                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1),
                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000),
-                                                             System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000000) };
+                                                             System::Clock::Seconds32(testCertNotBeforeTime.count() - 1000000)
+                                                           };
     // Test that certificate NotBefore times that are at or after the Firmware
     // build time do result in Last Known Good Times set to these.
     // Verify behavior both for fail-safe roll back and commit scenarios.
@@ -345,7 +349,8 @@ void TestSetLastKnownGoodTime(nlTestSuite * inSuite, void * inContext)
 
     // Iterate over two cases: one with build time prior to our certificates' NotBefore, one with build time after.
     System::Clock::Seconds32 testCaseFirmwareBuildTimes[] = { System::Clock::Seconds32(testCertNotBeforeTime.count() - 100000),
-                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() + 100000) };
+                                                              System::Clock::Seconds32(testCertNotBeforeTime.count() + 100000)
+                                                            };
 
     for (auto buildTime : testCaseFirmwareBuildTimes)
     {
@@ -456,8 +461,8 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         NodeId nodeId     = 55;
         NL_TEST_ASSERT_SUCCESS(inSuite,
                                fabric11CertAuthority.SetIncludeIcac(false)
-                                   .GenerateNocChain(fabricId, nodeId, fabric11Node55Keypair.Pubkey())
-                                   .GetStatus());
+                               .GenerateNocChain(fabricId, nodeId, fabric11Node55Keypair.Pubkey())
+                               .GetStatus());
         ByteSpan rcac = fabric11CertAuthority.GetRcac();
         ByteSpan noc  = fabric11CertAuthority.GetNoc();
 
@@ -485,7 +490,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
         NL_TEST_ASSERT_SUCCESS(inSuite,
                                fabricTable.AddNewPendingFabricWithProvidedOpKey(noc, ByteSpan{}, kVendorId, &fabric11Node55Keypair,
-                                                                                keyIsExternallyOwned, &newFabricIndex));
+                                       keyIsExternallyOwned, &newFabricIndex));
         NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
 
@@ -1196,7 +1201,7 @@ void TestPersistence(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SignWithOpKeypair(2, ByteSpan{ message }, sig));
                 NL_TEST_ASSERT(inSuite,
                                fIdx1PublicKey.ECDSA_validate_msg_signature(&message[0], sizeof(message), sig) ==
-                                   CHIP_ERROR_INVALID_SIGNATURE);
+                               CHIP_ERROR_INVALID_SIGNATURE);
             }
         }
     }

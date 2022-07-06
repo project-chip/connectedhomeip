@@ -60,9 +60,13 @@ public:
 
     // Temporary function to set command timeout before we move over to InvokeCommand
     // TODO: remove when we start using InvokeCommand everywhere
-    void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
+    void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) {
+        mTimeout = timeout;
+    }
 
-    ClusterId GetClusterId() const { return mClusterId; }
+    ClusterId GetClusterId() const {
+        return mClusterId;
+    }
 
     /*
      * This function permits sending an invoke request using cluster objects that represent the request and response data payloads.
@@ -76,11 +80,13 @@ public:
                              CommandResponseFailureCallback failureCb, const Optional<uint16_t> & timedInvokeTimeoutMs)
     {
         auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                                const typename RequestDataT::ResponseType & responseData) {
+        const typename RequestDataT::ResponseType & responseData) {
             successCb(context, responseData);
         };
 
-        auto onFailureCb = [context, failureCb](CHIP_ERROR aError) { failureCb(context, aError); };
+        auto onFailureCb = [context, failureCb](CHIP_ERROR aError) {
+            failureCb(context, aError);
+        };
 
         return InvokeCommandRequest(&mExchangeManager, mSession.Get().Value(), mEndpoint, requestData, onSuccessCb, onFailureCb,
                                     timedInvokeTimeoutMs, mTimeout);
@@ -137,7 +143,7 @@ public:
         };
 
         return chip::Controller::WriteAttribute<AttrType>(mSession.Get().Value(), mEndpoint, clusterId, attributeId, requestData,
-                                                          onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
+                onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb, aDataVersion);
     }
 
     template <typename AttrType>
@@ -170,8 +176,8 @@ public:
 
         Transport::OutgoingGroupSession groupSession(groupId, fabricIndex);
         return chip::Controller::WriteAttribute<AttrType>(SessionHandle(groupSession), 0 /*Unused for Group*/, clusterId,
-                                                          attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs,
-                                                          onDoneCb, aDataVersion);
+                attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs,
+                onDoneCb, aDataVersion);
     }
 
     template <typename AttributeInfo>
@@ -220,7 +226,7 @@ public:
                              ReadResponseFailureCallback failureCb, bool aIsFabricFiltered = true)
     {
         return ReadAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
-            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aIsFabricFiltered);
+                   context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb, failureCb, aIsFabricFiltered);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -243,7 +249,7 @@ public:
         };
 
         return Controller::ReadAttribute<DecodableType>(&mExchangeManager, mSession.Get().Value(), mEndpoint, clusterId,
-                                                        attributeId, onSuccessCb, onFailureCb, aIsFabricFiltered);
+                attributeId, onSuccessCb, onFailureCb, aIsFabricFiltered);
     }
 
     /**
@@ -259,9 +265,9 @@ public:
                        bool aKeepPreviousSubscriptions = false, const Optional<DataVersion> & aDataVersion = NullOptional)
     {
         return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
-            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
-            maxIntervalCeilingSeconds, subscriptionEstablishedCb, resubscriptionAttemptCb, aIsFabricFiltered,
-            aKeepPreviousSubscriptions, aDataVersion);
+                   context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
+                   maxIntervalCeilingSeconds, subscriptionEstablishedCb, resubscriptionAttemptCb, aIsFabricFiltered,
+                   aKeepPreviousSubscriptions, aDataVersion);
     }
 
     template <typename DecodableType, typename DecodableArgType>
@@ -295,7 +301,7 @@ public:
         };
 
         auto onResubscriptionAttemptCb = [context, resubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
-                                                                            uint32_t aNextResubscribeIntervalMsec) {
+        uint32_t aNextResubscribeIntervalMsec) {
             if (resubscriptionAttemptCb != nullptr)
             {
                 resubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
@@ -303,9 +309,9 @@ public:
         };
 
         return Controller::SubscribeAttribute<DecodableType>(
-            &mExchangeManager, mSession.Get().Value(), mEndpoint, clusterId, attributeId, onReportCb, onFailureCb,
-            minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-            aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
+                   &mExchangeManager, mSession.Get().Value(), mEndpoint, clusterId, attributeId, onReportCb, onFailureCb,
+                   minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
+                   aIsFabricFiltered, aKeepPreviousSubscriptions, aDataVersion);
     }
 
     /**
@@ -341,7 +347,7 @@ public:
             }
         };
         return Controller::ReadEvent<DecodableType>(&mExchangeManager, mSession.Get().Value(), mEndpoint, onSuccessCb, onFailureCb,
-                                                    onDoneCb);
+                onDoneCb);
     }
 
     template <typename DecodableType>
@@ -374,7 +380,7 @@ public:
         };
 
         auto onResubscriptionAttemptCb = [context, resubscriptionAttemptCb](const app::ReadClient & readClient, CHIP_ERROR aError,
-                                                                            uint32_t aNextResubscribeIntervalMsec) {
+        uint32_t aNextResubscribeIntervalMsec) {
             if (resubscriptionAttemptCb != nullptr)
             {
                 resubscriptionAttemptCb(context, aError, aNextResubscribeIntervalMsec);
@@ -382,9 +388,9 @@ public:
         };
 
         return Controller::SubscribeEvent<DecodableType>(&mExchangeManager, mSession.Get().Value(), mEndpoint, onReportCb,
-                                                         onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds,
-                                                         onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
-                                                         aKeepPreviousSubscriptions, aIsUrgentEvent);
+                onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds,
+                onSubscriptionEstablishedCb, onResubscriptionAttemptCb,
+                aKeepPreviousSubscriptions, aIsUrgentEvent);
     }
 
 protected:

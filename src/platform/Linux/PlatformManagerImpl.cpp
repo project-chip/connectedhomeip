@@ -95,8 +95,8 @@ void PlatformManagerImpl::WiFIIPChangeListener()
     for (struct nlmsghdr * header = reinterpret_cast<struct nlmsghdr *>(buffer); (len = recv(sock, header, sizeof(buffer), 0)) > 0;)
     {
         for (struct nlmsghdr * messageHeader = header;
-             (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
-             messageHeader = NLMSG_NEXT(messageHeader, len))
+                (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
+                messageHeader = NLMSG_NEXT(messageHeader, len))
         {
             if (header->nlmsg_type == RTM_NEWADDR)
             {
