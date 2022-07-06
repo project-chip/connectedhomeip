@@ -150,6 +150,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {ou
 # Generating linux-x64-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
 
+# Generating linux-x64-all-clusters-app-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false' {out}/linux-x64-all-clusters-app-nodeps
+
 # Generating linux-x64-all-clusters-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
 
@@ -176,6 +179,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-chip-tool-no-interactive-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false config_use_interactive_mode=false' {out}/linux-x64-chip-tool-no-interactive-ipv6only
+
+# Generating linux-x64-chip-tool-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false' {out}/linux-x64-chip-tool-nodeps
 
 # Generating linux-x64-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux {out}/linux-x64-light
@@ -345,6 +351,9 @@ ninja -C {out}/linux-x64-address-resolve-tool src/lib/address_resolve:address-re
 # Building linux-x64-all-clusters
 ninja -C {out}/linux-x64-all-clusters
 
+# Building linux-x64-all-clusters-app-nodeps
+ninja -C {out}/linux-x64-all-clusters-app-nodeps
+
 # Building linux-x64-all-clusters-ipv6only
 ninja -C {out}/linux-x64-all-clusters-ipv6only
 
@@ -371,6 +380,9 @@ ninja -C {out}/linux-x64-chip-tool-ipv6only
 
 # Building linux-x64-chip-tool-no-interactive-ipv6only
 ninja -C {out}/linux-x64-chip-tool-no-interactive-ipv6only
+
+# Building linux-x64-chip-tool-nodeps
+ninja -C {out}/linux-x64-chip-tool-nodeps
 
 # Building linux-x64-light
 ninja -C {out}/linux-x64-light

@@ -270,6 +270,7 @@ def HostTargets():
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
+    builder.AppendVariant(name="no-thread", enable_thread=False),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
@@ -304,6 +305,10 @@ def HostTargets():
                                use_platform_mdns=True).GlobBlacklist("Reduce default build variants")
     yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
                                use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
+
+    nodeps_args = dict(enable_ipv4=False, enable_ble=False, enable_wifi=False, enable_thread=False)
+    yield target_native.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args)
+    yield target_native.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args)
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests', board=HostBoard.NATIVE, app=HostApp.TESTS)
