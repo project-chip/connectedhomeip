@@ -7,7 +7,9 @@
 {{#chip_client_clusters includeAll=true}}
 
 @interface MTR{{asUpperCamelCase name}} ()
-@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster * cppCluster;
+- (chip::Controller::{{asUpperCamelCase name}}Cluster **) cppClusterSlot;
 @end
 
 {{/chip_client_clusters}}

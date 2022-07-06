@@ -33,42 +33,57 @@ namespace Controller {
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
-    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    BindingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Binding::Id, endpoint)
+    {}
     ~BindingCluster() {}
 };
 
 class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
+    OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint)
+    {}
     ~OtaSoftwareUpdateProviderCluster() {}
 };
 
 class DLL_EXPORT FanControlCluster : public ClusterBase
 {
 public:
-    FanControlCluster() : ClusterBase(app::Clusters::FanControl::Id) {}
+    FanControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::FanControl::Id, endpoint)
+    {}
     ~FanControlCluster() {}
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
+    TemperatureMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::TemperatureMeasurement::Id, endpoint)
+    {}
     ~TemperatureMeasurementCluster() {}
 };
 
 class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
 {
 public:
-    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
+    RelativeHumidityMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                       EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::RelativeHumidityMeasurement::Id, endpoint)
+    {}
     ~RelativeHumidityMeasurementCluster() {}
 };
 
 class DLL_EXPORT OccupancySensingCluster : public ClusterBase
 {
 public:
-    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
+    OccupancySensingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OccupancySensing::Id, endpoint)
+    {}
     ~OccupancySensingCluster() {}
 };
 

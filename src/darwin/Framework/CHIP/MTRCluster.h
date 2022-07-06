@@ -26,9 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
  *    This is the base class for clusters.
  */
 @interface MTRCluster : NSObject
-- (nullable instancetype)initWithDevice:(MTRDevice *)device
-                               endpoint:(uint16_t)endpoint
-                                  queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 @end

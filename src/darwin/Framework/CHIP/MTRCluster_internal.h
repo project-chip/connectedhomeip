@@ -24,11 +24,13 @@
 #import "zap-generated/CHIPClusters.h"
 #import "zap-generated/MTRClustersObjc.h"
 
-using namespace chip::app::Clusters;
+NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-- (chip::Controller::ClusterBase *)getCluster;
+- (nullable instancetype)initWithQueue:(dispatch_queue_t)queue;
 - (chip::ByteSpan)asByteSpan:(NSData *)value;
 - (chip::CharSpan)asCharSpan:(NSString *)value;
 @end
+
+NS_ASSUME_NONNULL_END

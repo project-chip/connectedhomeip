@@ -26,12 +26,13 @@ using namespace chip::app::Clusters;
 {{#chip_client_clusters includeAll=true}}
 
 @interface MTRTest{{asUpperCamelCase name}} ()
-@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster cppCluster;
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster * cppCluster;
 @end
 
 @implementation MTRTest{{asUpperCamelCase name}}
 
-- (chip::Controller::ClusterBase *)getCluster
+- (chip::Controller::{{asUpperCamelCase name}}Cluster **) cppClusterSlot
 {
     return &_cppCluster;
 }
@@ -56,7 +57,7 @@ using namespace chip::app::Clusters;
         {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
         auto successFn = Callback<{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<DefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        return self.cppCluster->WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
