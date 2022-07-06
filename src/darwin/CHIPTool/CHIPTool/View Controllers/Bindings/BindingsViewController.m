@@ -135,13 +135,13 @@
 
     // TODO Binding Support was removed from ObjC Clusters.h
     if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-            if (chipDevice) {
-                NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
-                NSLog(resultString, nil);
-            } else {
-                NSLog(@"Status: Failed to establish a connection with the device");
-            }
-        })) {
+    if (chipDevice) {
+            NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
+            NSLog(resultString, nil);
+        } else {
+            NSLog(@"Status: Failed to establish a connection with the device");
+        }
+    })) {
         NSLog(@"Status: Waiting for connection with the device");
     } else {
         NSLog(@"Status: Failed to trigger the connection with the device");
@@ -151,13 +151,13 @@
 - (IBAction)unbind:(id)sender
 {
     if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
-            if (chipDevice) {
-                NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
-                NSLog(resultString, nil);
-            } else {
-                NSLog(@"Status: Failed to establish a connection with the device");
-            }
-        })) {
+    if (chipDevice) {
+            NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
+            NSLog(resultString, nil);
+        } else {
+            NSLog(@"Status: Failed to establish a connection with the device");
+        }
+    })) {
         NSLog(@"Status: Waiting for connection with the device");
     } else {
         NSLog(@"Status: Failed to trigger the connection with the device");
