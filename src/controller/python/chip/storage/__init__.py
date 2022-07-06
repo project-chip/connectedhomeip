@@ -18,19 +18,20 @@
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
+import base64
+import builtins
+import copy
 import ctypes
-from dataclasses import dataclass, field
-from typing import *
-from ctypes import *
-from rich.pretty import pprint
-import ipdb
 import json
 import logging
-import base64
+from ctypes import *
+from dataclasses import dataclass, field
+from typing import *
+
 import chip.exceptions
-import copy
 import chip.native
-import builtins
+import ipdb
+from rich.pretty import pprint
 
 _SyncSetKeyValueCbFunct = CFUNCTYPE(
     None, py_object, c_char_p, POINTER(c_char), c_uint16

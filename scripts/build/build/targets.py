@@ -18,11 +18,13 @@ from typing import List
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
 from builders.host import HostApp, HostBoard, HostBuilder
+from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
@@ -30,8 +32,6 @@ from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.bl602 import Bl602App, Bl602Board, Bl602Builder
-from builders.imx import IMXApp, IMXBuilder
 
 
 class Target:

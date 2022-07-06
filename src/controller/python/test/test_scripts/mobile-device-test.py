@@ -17,27 +17,21 @@
 #    limitations under the License.
 #
 
-# Commissioning test.
-from logging import disable
+import asyncio
+import logging
 import os
 import sys
+# Commissioning test.
+from logging import disable
+
+import base
+import chip.logging
 import click
 import coloredlogs
-import chip.logging
-import logging
-from base import (
-    TestFail,
-    TestTimeout,
-    BaseTestHelper,
-    FailIfNot,
-    logger,
-    TestIsEnabled,
-    SetTestSet,
-)
-import base
+from base import (BaseTestHelper, FailIfNot, SetTestSet, TestFail,
+                  TestIsEnabled, TestTimeout, logger)
 from cluster_objects import NODE_ID, ClusterObjectTests
 from network_commissioning import NetworkCommissioningTests
-import asyncio
 
 # The thread network dataset tlv for testing, splited into T-L-V.
 
