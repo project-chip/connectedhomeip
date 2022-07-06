@@ -678,7 +678,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return YES;
 }
 
-- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId
+- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId
 {
     CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
