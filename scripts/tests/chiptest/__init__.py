@@ -21,32 +21,34 @@ from .test_definition import ApplicationPaths, TestDefinition, TestTarget
 
 
 def target_for_name(name: str):
-    if name.startswith('TV_') or name.startswith('Test_TC_MC_'):
+    if name.startswith("TV_") or name.startswith("Test_TC_MC_"):
         return TestTarget.TV
-    if name.startswith('DL_') or name.startswith('Test_TC_DL_'):
+    if name.startswith("DL_") or name.startswith("Test_TC_DLRK_"):
         return TestTarget.LOCK
-    if name.startswith('OTA_'):
+    if name.startswith("OTA_"):
         return TestTarget.OTA
     return TestTarget.ALL_CLUSTERS
 
 
 def tests_with_command(chip_tool: str, is_manual: bool):
     """Executes `chip_tool` binary to see what tests are available, using cmd
-       to get the list.
+    to get the list.
     """
-    cmd = 'list'
+    cmd = "list"
     if is_manual:
-        cmd += '-manual'
+        cmd += "-manual"
 
-    result = subprocess.run([chip_tool, 'tests', cmd], capture_output=True)
+    result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
 
-    for name in result.stdout.decode('utf8').split('\n'):
+    for name in result.stdout.decode("utf8").split("\n"):
         if not name:
             continue
 
         target = target_for_name(name)
 
-        yield TestDefinition(run_name=name, name=name, target=target, is_manual=is_manual)
+        yield TestDefinition(
+            run_name=name, name=name, target=target, is_manual=is_manual
+        )
 
 
 def AllTests(chip_tool: str):
@@ -58,6 +60,10 @@ def AllTests(chip_tool: str):
 
 
 __all__ = [
-    'TestTarget', 'TestDefinition', 'AllTests', 'ApplicationPaths',
-    'linux', 'runner',
+    "TestTarget",
+    "TestDefinition",
+    "AllTests",
+    "ApplicationPaths",
+    "linux",
+    "runner",
 ]
