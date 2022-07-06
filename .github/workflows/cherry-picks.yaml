@@ -1,7 +1,7 @@
 name: Cherry-Pick Merges
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
     types: ["closed"]
@@ -29,6 +29,7 @@ jobs:
       - name: Cherry-Pick into sve branch
         uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
         with:
+          token: ${{ secrets.MATTER_PAT }}
           branch: sve
           reviewers: |
             woody-apple
