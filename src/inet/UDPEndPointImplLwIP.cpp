@@ -47,7 +47,7 @@ static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
 #else
 #define HAVE_LWIP_MULTICAST_LOOP 1
 #endif // !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||
-       // !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
+// !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
 
 // unusual define check for LWIP_IPV6_ND is because espressif fork
 // of LWIP does not define the _ND constant.
@@ -63,7 +63,7 @@ namespace chip {
 namespace Inet {
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
-                                         InterfaceId interfaceId)
+        InterfaceId interfaceId)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -262,7 +262,7 @@ void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg)
         if (pktInfo != nullptr)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
-                                                       // PacketBuffer without affecting access to address info.
+            // PacketBuffer without affecting access to address info.
             OnMessageReceived(this, std::move(msg), &pktInfoCopy);
         }
         else
@@ -337,7 +337,7 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 }
 
 void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
-                                                u16_t port)
+        u16_t port)
 {
     UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
     IPPacketInfo * pktInfo         = nullptr;
