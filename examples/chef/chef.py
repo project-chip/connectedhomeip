@@ -513,6 +513,7 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_build:
         sw_ver_string = ""
+
         if options.do_automated_test_stamp:
             branch = ""
             for branch_text in shell.run_cmd("git branch", return_cmd_output=True).split("\n"):
