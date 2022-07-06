@@ -235,6 +235,8 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('is_clang=true')
 
             if self.board == HostBoard.FAKE:
+                # Fake uses "//build/toolchain/fake:fake_x64_gcc"
+                # so setting clang is not correct
                 raise Exception('Fake host board is always gcc (not clang)')
 
         if use_platform_mdns:
