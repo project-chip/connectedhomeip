@@ -70,7 +70,6 @@ static_library("Linux") {
     "Logging.cpp",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningEthernetDriver.cpp",
-    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -140,7 +139,10 @@ static_library("Linux") {
   }
 
   if (chip_enable_wifi) {
-    sources += [ "GlibTypeDeleter.h" ]
+    sources += [
+      "GlibTypeDeleter.h",
+      "NetworkCommissioningWiFiDriver.cpp",
+    ]
 
     public_deps += [ "dbus/wpa" ]
   }
