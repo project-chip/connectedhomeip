@@ -3576,7 +3576,7 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
         break;
 
     default:
-        res = emberAfPluginDoorLockOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
+        res = emberAfPluginDoorLockOnUnhandledAttributeChange(attributePath.mEndpointId, attributePath, attributeType, size, value);
         break;
     }
 
@@ -3666,8 +3666,8 @@ emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId Endpo
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, EmberAfAttributeType attrType, uint16_t attrSize,
-                                                uint8_t * attrValue)
+emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, const chip::app::ConcreteAttributePath & attributePath,
+                                                EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue)
 {
     return chip::Protocols::InteractionModel::Status::Success;
 }
