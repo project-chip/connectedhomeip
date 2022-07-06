@@ -25,7 +25,8 @@
 #include "sl_system_kernel.h"
 #include <matter_config.h>
 
-#define BLE_DEV_NAME "SiLabs-Template"
+// The name must not be longer than 13 characters
+#define BLE_DEV_NAME "SL-Template"      
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
