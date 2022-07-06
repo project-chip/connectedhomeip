@@ -149,7 +149,9 @@ public:
     /**
      * @brief Initializes the driver, this function will be called when initializing the network commissioning cluster.
      */
-    virtual CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) {
+        return CHIP_NO_ERROR;
+    }
 
     /**
      * @brief Shuts down the driver, this function will be called when shutting down the network commissioning cluster.
@@ -170,13 +172,17 @@ public:
     /**
      * @brief Sets the status of the interface, this is an optional feature of a network driver.
      */
-    virtual CHIP_ERROR SetEnabled(bool enabled) { return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE; }
+    virtual CHIP_ERROR SetEnabled(bool enabled) {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
 
     /**
      * @brief Returns the status of the interface, this is an optional feature of a network driver the driver will be enabled by
      * default.
      */
-    virtual bool GetEnabled() { return true; };
+    virtual bool GetEnabled() {
+        return true;
+    };
 
     virtual ~BaseDriver() = default;
 };
