@@ -39,7 +39,7 @@ tests:
           contains a lineup info object"
       PICS: MC_CHANNEL.S.A0001 && PICS_USER_PROMPT
       verification: |
-          ./chip-tool channel read lineup 1 1 
+          ./chip-tool channel read lineup 1 1
           [1653999659095] [94964:7676726] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0504 Attribute 0x0000_0001 DataVersion: 3623945891
           [1653999659097] [94964:7676726] CHIP: [TOO]   Lineup: {
           [1653999659097] [94964:7676726] CHIP: [TOO]     OperatorName: Comcast
