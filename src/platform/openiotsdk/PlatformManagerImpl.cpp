@@ -107,25 +107,17 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * eventPtr)
 
 void PlatformManagerImpl::HandlePostEvent()
 {
-    /* Check the event queue. */
-    if (!osMessageQueueGetCount(mQueue))
+    /* handle all events */
+    while (osMessageQueueGetCount(mQueue))
     {
-        return;
-    }
-
-    ChipDeviceEvent event;
-    osStatus_t status = osMessageQueueGet(mQueue, &event, nullptr, osWaitForever);
-    if (status == osOK)
-    {
-        LockChipStack();
-        DispatchEvent(&event);
-        UnlockChipStack();
-    }
-
-    /* Set another post event if the queue is not empty. */
-    if (osMessageQueueGetCount(mQueue))
-    {
-        osEventFlagsSet(mPlatformFlags, kPostEventFlag);
+        ChipDeviceEvent event;
+        osStatus_t status = osMessageQueueGet(mQueue, &event, nullptr, 0);
+        if (status == osOK)
+        {
+            LockChipStack();
+            DispatchEvent(&event);
+            UnlockChipStack();
+        }
     }
 }
 
