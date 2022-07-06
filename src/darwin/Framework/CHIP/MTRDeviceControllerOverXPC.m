@@ -91,7 +91,7 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-- (nullable MTRDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_ERROR("MTRDevice doesn't support getDeviceBeingCommissioned over XPC");
     return nil;

@@ -17,8 +17,8 @@
 
 #import "MTRDeviceController+XPC.h"
 
+#import "MTRBaseDevice.h"
 #import "MTRCluster.h"
-#import "MTRDevice.h"
 #import "MTRDeviceControllerOverXPC.h"
 
 NS_ASSUME_NONNULL_BEGIN
