@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 # Needed to use types in type hints before they are fully defined.
 from __future__ import annotations
 
@@ -25,7 +24,8 @@ import ctypes
 import json
 import logging
 from ctypes import *
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
 from typing import *
 
 import chip.exceptions
