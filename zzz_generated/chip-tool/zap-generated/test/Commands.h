@@ -46502,7 +46502,7 @@ private:
 class TestConstraintsSuite : public TestCommand
 {
 public:
-    TestConstraintsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestConstraints", 26, credsIssuerConfig)
+    TestConstraintsSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestConstraints", 32, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -46566,8 +46566,56 @@ private:
             break;
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("bitmap32", value, 0UL));
+            }
             break;
         case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("bitmap32", value, 5UL));
+                VerifyOrReturn(CheckConstraintHasMasksClear("value", value, 2UL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("bitmap32", value, 5UL));
+                VerifyOrReturn(CheckConstraintHasMasksSet("value", value, 1UL));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("bitmap32", value, 5UL));
+                VerifyOrReturn(CheckConstraintHasMasksSet("value", value, 4UL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("bitmap32", value, 5UL));
+                VerifyOrReturn(CheckConstraintHasMasksSet("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintHasMasksSet("value", value, 4UL));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint32_t value;
@@ -46575,7 +46623,7 @@ private:
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 5UL));
             }
             break;
-        case 7:
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint32_t value;
@@ -46583,7 +46631,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 5UL));
             }
             break;
-        case 8:
+        case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint32_t value;
@@ -46591,13 +46639,13 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 6UL));
             }
             break;
-        case 9:
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 10:
+        case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 11:
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::CharSpan value;
@@ -46605,7 +46653,7 @@ private:
                 VerifyOrReturn(CheckConstraintMinLength("value", value.size(), 5));
             }
             break;
-        case 12:
+        case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::CharSpan value;
@@ -46613,7 +46661,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxLength("value", value.size(), 20));
             }
             break;
-        case 13:
+        case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::CharSpan value;
@@ -46621,48 +46669,12 @@ private:
                 VerifyOrReturn(CheckConstraintStartsWith("value", value, "**"));
             }
             break;
-        case 14:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::CharSpan value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintEndsWith("value", value, "**"));
-            }
-            break;
-        case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 16:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::CharSpan value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintIsUpperCase("value", value, false));
-                VerifyOrReturn(CheckConstraintIsLowerCase("value", value, true));
-            }
-            break;
-        case 17:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 18:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::CharSpan value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintIsUpperCase("value", value, true));
-                VerifyOrReturn(CheckConstraintIsLowerCase("value", value, false));
-            }
-            break;
-        case 19:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::CharSpan value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintIsUpperCase("value", value, false));
-                VerifyOrReturn(CheckConstraintIsLowerCase("value", value, false));
+                VerifyOrReturn(CheckConstraintEndsWith("value", value, "**"));
             }
             break;
         case 21:
@@ -46673,7 +46685,8 @@ private:
             {
                 chip::CharSpan value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintIsHexString("value", value, false));
+                VerifyOrReturn(CheckConstraintIsUpperCase("value", value, false));
+                VerifyOrReturn(CheckConstraintIsLowerCase("value", value, true));
             }
             break;
         case 23:
@@ -46684,10 +46697,45 @@ private:
             {
                 chip::CharSpan value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintIsHexString("value", value, true));
+                VerifyOrReturn(CheckConstraintIsUpperCase("value", value, true));
+                VerifyOrReturn(CheckConstraintIsLowerCase("value", value, false));
             }
             break;
         case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::CharSpan value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintIsUpperCase("value", value, false));
+                VerifyOrReturn(CheckConstraintIsLowerCase("value", value, false));
+            }
+            break;
+        case 27:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::CharSpan value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintIsHexString("value", value, false));
+            }
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 30:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::CharSpan value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintIsHexString("value", value, true));
+            }
+            break;
+        case 31:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
@@ -46749,100 +46797,94 @@ private:
                                   chip::NullOptional, chip::NullOptional);
         }
         case 5: {
-            LogStep(5, "Write attribute INT32U Value");
+            LogStep(5, "Read attribute BITMAP32 Default Value");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Write attribute BITMAP32 with MaskVal1 and MaskVal3");
+            ListFreer listFreer;
+            chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value;
+            value = static_cast<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>(5UL);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure MaskVal2 is not set");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, true,
+                                 chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure MaskVal1 is set");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, true,
+                                 chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure MaskVal3 is set");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, true,
+                                 chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Read attribute BITMAP32 with MaskVal1 and MaskVal3 and ensure Maskval1 and MaskVal3 are set");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Bitmap32::Id, true,
+                                 chip::NullOptional);
+        }
+        case 11: {
+            LogStep(11, "Write attribute INT32U Value");
             ListFreer listFreer;
             uint32_t value;
             value = 5UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6, "Read attribute INT32U Value MinValue Constraints");
+        case 12: {
+            LogStep(12, "Read attribute INT32U Value MinValue Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, true,
                                  chip::NullOptional);
         }
-        case 7: {
-            LogStep(7, "Read attribute INT32U Value MaxValue Constraints");
+        case 13: {
+            LogStep(13, "Read attribute INT32U Value MaxValue Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, true,
                                  chip::NullOptional);
         }
-        case 8: {
-            LogStep(8, "Read attribute INT32U Value NotValue Constraints");
+        case 14: {
+            LogStep(14, "Read attribute INT32U Value NotValue Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, true,
                                  chip::NullOptional);
         }
-        case 9: {
-            LogStep(9, "Write attribute INT32U Value Back to Default Value");
+        case 15: {
+            LogStep(15, "Write attribute INT32U Value Back to Default Value");
             ListFreer listFreer;
             uint32_t value;
             value = 0UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::Int32u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 10: {
-            LogStep(10, "Write attribute CHAR_STRING Value");
+        case 16: {
+            LogStep(16, "Write attribute CHAR_STRING Value");
             ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("** Test **garbage: not in length on purpose", 10);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 11: {
-            LogStep(11, "Read attribute CHAR_STRING Value MinLength Constraints");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
-                                 chip::NullOptional);
-        }
-        case 12: {
-            LogStep(12, "Read attribute CHAR_STRING Value MaxLength Constraints");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
-                                 chip::NullOptional);
-        }
-        case 13: {
-            LogStep(13, "Read attribute CHAR_STRING Value StartsWith Constraints");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
-                                 chip::NullOptional);
-        }
-        case 14: {
-            LogStep(14, "Read attribute CHAR_STRING Value EndsWith Constraints");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
-                                 chip::NullOptional);
-        }
-        case 15: {
-            LogStep(15, "Write attribute CHAR_STRING Value");
-            ListFreer listFreer;
-            chip::CharSpan value;
-            value = chip::Span<const char>("lowercasegarbage: not in length on purpose", 9);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
-                                  chip::NullOptional, chip::NullOptional);
-        }
-        case 16: {
-            LogStep(16, "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
-                                 chip::NullOptional);
-        }
         case 17: {
-            LogStep(17, "Write attribute CHAR_STRING Value");
-            ListFreer listFreer;
-            chip::CharSpan value;
-            value = chip::Span<const char>("UPPERCASEgarbage: not in length on purpose", 9);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
-                                  chip::NullOptional, chip::NullOptional);
+            LogStep(17, "Read attribute CHAR_STRING Value MinLength Constraints");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
+                                 chip::NullOptional);
         }
         case 18: {
-            LogStep(18, "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints");
+            LogStep(18, "Read attribute CHAR_STRING Value MaxLength Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
                                  chip::NullOptional);
         }
         case 19: {
-            LogStep(19, "Write attribute CHAR_STRING Value");
-            ListFreer listFreer;
-            chip::CharSpan value;
-            value = chip::Span<const char>("lowUPPERgarbage: not in length on purpose", 8);
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
-                                  chip::NullOptional, chip::NullOptional);
+            LogStep(19, "Read attribute CHAR_STRING Value StartsWith Constraints");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
+                                 chip::NullOptional);
         }
         case 20: {
-            LogStep(20, "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints");
+            LogStep(20, "Read attribute CHAR_STRING Value EndsWith Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
                                  chip::NullOptional);
         }
@@ -46850,12 +46892,12 @@ private:
             LogStep(21, "Write attribute CHAR_STRING Value");
             ListFreer listFreer;
             chip::CharSpan value;
-            value = chip::Span<const char>("ABCDEF012Vgarbage: not in length on purpose", 10);
+            value = chip::Span<const char>("lowercasegarbage: not in length on purpose", 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
         case 22: {
-            LogStep(22, "Read attribute CHAR_STRING Value isHexString Constraints");
+            LogStep(22, "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
                                  chip::NullOptional);
         }
@@ -46863,17 +46905,56 @@ private:
             LogStep(23, "Write attribute CHAR_STRING Value");
             ListFreer listFreer;
             chip::CharSpan value;
-            value = chip::Span<const char>("ABCDEF0123garbage: not in length on purpose", 10);
+            value = chip::Span<const char>("UPPERCASEgarbage: not in length on purpose", 9);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
         case 24: {
-            LogStep(24, "Read attribute CHAR_STRING Value isHexString Constraints");
+            LogStep(24, "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
                                  chip::NullOptional);
         }
         case 25: {
-            LogStep(25, "Write attribute CHAR_STRING Value Back to Default Value");
+            LogStep(25, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
+            chip::CharSpan value;
+            value = chip::Span<const char>("lowUPPERgarbage: not in length on purpose", 8);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 26: {
+            LogStep(26, "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
+                                 chip::NullOptional);
+        }
+        case 27: {
+            LogStep(27, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
+            chip::CharSpan value;
+            value = chip::Span<const char>("ABCDEF012Vgarbage: not in length on purpose", 10);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 28: {
+            LogStep(28, "Read attribute CHAR_STRING Value isHexString Constraints");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
+                                 chip::NullOptional);
+        }
+        case 29: {
+            LogStep(29, "Write attribute CHAR_STRING Value");
+            ListFreer listFreer;
+            chip::CharSpan value;
+            value = chip::Span<const char>("ABCDEF0123garbage: not in length on purpose", 10);
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 30: {
+            LogStep(30, "Read attribute CHAR_STRING Value isHexString Constraints");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::CharString::Id, true,
+                                 chip::NullOptional);
+        }
+        case 31: {
+            LogStep(31, "Write attribute CHAR_STRING Value Back to Default Value");
             ListFreer listFreer;
             chip::CharSpan value;
             value = chip::Span<const char>("garbage: not in length on purpose", 0);
