@@ -516,7 +516,7 @@ def main(argv: Sequence[str]) -> None:
 
         # Newer GIT fixes CVE-2022-24765 by using a `safe directory` setting. 
         # Allow git commands to be used on CHIP_ROOT
-        sell.run_cmd(f'git config --global --add safe.directory {_REPO_BASE_PATH}')
+        shell.run_cmd(f'git config --global --add safe.directory {_REPO_BASE_PATH}')
 
         if options.do_automated_test_stamp:
             branch = ""
