@@ -905,7 +905,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     size_t attestationElementsLen = 0;
     MutableByteSpan attestationElementsSpan;
     uint8_t certDeclBuf[Credentials::kMaxCMSSignedCDMessage]; // Sized to hold the example certificate declaration with 100 PIDs.
-                                                              // See DeviceAttestationCredsExample
+    // See DeviceAttestationCredsExample
     MutableByteSpan certDeclSpan(certDeclBuf);
 
     // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.

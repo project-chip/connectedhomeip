@@ -75,20 +75,20 @@ _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerIm
 
 struct bt_gatt_attr sChipoBleAttributes[] = {
     BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
-        BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
-                               BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
-                               BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-                               nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
-        BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
-                               BT_GATT_CHRC_INDICATE,
-                               BT_GATT_PERM_NONE,
-                               nullptr, nullptr, nullptr),
-        BT_GATT_CCC_MANAGED(&CHIPoBLEChar_TX_CCC, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
+    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
+                           BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+                           BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+                           nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
+    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
+                           BT_GATT_CHRC_INDICATE,
+                           BT_GATT_PERM_NONE,
+                           nullptr, nullptr, nullptr),
+    BT_GATT_CCC_MANAGED(&CHIPoBLEChar_TX_CCC, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE),
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-        BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_C3.uuid,
-                               BT_GATT_CHRC_READ,
-                               BT_GATT_PERM_READ,
-                               BLEManagerImpl::HandleC3Read, nullptr, nullptr),
+    BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_C3.uuid,
+                           BT_GATT_CHRC_READ,
+                           BT_GATT_PERM_READ,
+                           BLEManagerImpl::HandleC3Read, nullptr, nullptr),
 #endif
 };
 

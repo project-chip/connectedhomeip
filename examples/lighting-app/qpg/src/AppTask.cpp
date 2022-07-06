@@ -594,7 +594,7 @@ void AppTask::UpdateClusterState(void)
 
     newValue = LightingMgr().GetLevel();
     status   = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                                   ZCL_INT8U_ATTRIBUTE_TYPE);
+                                     ZCL_INT8U_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
