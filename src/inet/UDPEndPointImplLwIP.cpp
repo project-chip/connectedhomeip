@@ -133,7 +133,7 @@ CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, Interfa
 InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
 #if HAVE_LWIP_UDP_BIND_NETIF
-    return InterfaceId(netif_get_by_index(++(mUDP->netif_idx)));
+    return InterfaceId(netif_get_by_index(mUDP->netif_idx));
 #else
     return InterfaceId(mUDP->intf_filter);
 #endif
@@ -431,13 +431,20 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
 CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #ifdef HAVE_IPV6_MULTICAST
-    const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
-
-    struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
     const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
-    const err_t lStatus           = method(lNetif, &lIPv6Address);
+    err_t lStatus;
+    if (aInterfaceId.IsPresent())
+    {
+        struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+        VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+        const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
+        lStatus           = method(lNetif, &lIPv6Address);
+    }
+    else
+    {
+        const auto method = join ? mld6_joingroup : mld6_leavegroup;
+        lStatus           = method(IP6_ADDR_ANY6, &lIPv6Address);
+    }
     if (lStatus == ERR_MEM)
     {
         return CHIP_ERROR_NO_MEMORY;
