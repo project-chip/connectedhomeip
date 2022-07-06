@@ -13,11 +13,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 import subprocess
 
-from . import linux, runner
-from .test_definition import ApplicationPaths, TestDefinition, TestTarget
+from . import linux
+from . import runner
+from .test_definition import ApplicationPaths
+from .test_definition import TestDefinition
+from .test_definition import TestTarget
 
 
 def target_for_name(name: str):
