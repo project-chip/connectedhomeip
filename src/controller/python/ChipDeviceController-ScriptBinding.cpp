@@ -40,12 +40,6 @@
 #include <inttypes.h>
 #include <net/if.h>
 
-#include "ChipDeviceController-ScriptDevicePairingDelegate.h"
-#include "ChipDeviceController-StorageDelegate.h"
-
-#include "chip/interaction_model/Delegate.h"
-
-#include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
@@ -55,6 +49,12 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+
+#include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
+#include <controller/python/ChipDeviceController-StorageDelegate.h>
+#include <controller/python/CommonStackInit.h>
+#include <controller/python/chip/interaction_model/Delegate.h>
+
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -110,7 +110,7 @@ chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
-ChipError::StorageType pychip_DeviceController_StackInit();
+ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId);
 ChipError::StorageType pychip_DeviceController_StackShutdown();
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
@@ -190,8 +190,6 @@ ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::Devic
 ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          CommissioneeDeviceProxy ** proxy);
 uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
-// CHIP Stack objects
-ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 
 chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(SubscriptionId subscriptionId);
 
@@ -223,18 +221,18 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
     return sStorageAdapter;
 }
 
-ChipError::StorageType pychip_DeviceController_StackInit()
+ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId)
 {
-    ReturnErrorOnFailure(chip::Platform::MemoryInit().AsInteger());
-
-    auto err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-        return err.AsInteger();
-    }
+    ReturnErrorOnFailure(chip::Controller::Python::CommonStackInit().AsInteger());
 
     VerifyOrDie(sStorageAdapter != nullptr);
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+    CHIP_ERROR err =
+        chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+#endif
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
@@ -278,6 +276,8 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
 ChipError::StorageType pychip_DeviceController_StackShutdown()
 {
+    ChipLogError(Controller, "Shutting down the stack...");
+
     //
     // Let's stop the Matter thread, and wait till the event loop has stopped.
     //
@@ -289,7 +289,9 @@ ChipError::StorageType pychip_DeviceController_StackShutdown()
     //
     DeviceControllerFactory::GetInstance().ReleaseSystemState();
 
-    chip::DeviceLayer::PlatformMgr().Shutdown();
+    DeviceControllerFactory::GetInstance().Shutdown();
+
+    chip::Controller::Python::CommonStackShutdown();
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -353,18 +355,6 @@ void pychip_DeviceController_SetLogFilter(uint8_t category)
 #if _CHIP_USE_LOGGING
     chip::Logging::SetLogFilter(category);
 #endif
-}
-
-ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId)
-{
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    CHIP_ERROR err =
-        chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-#endif
-
-    return CHIP_NO_ERROR.AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,

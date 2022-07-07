@@ -44,6 +44,8 @@ shared_library("ChipDeviceCtrl") {
     "chip/setup_payload/Parser.cpp",
   ]
 
+  sources += [ "CommonStackInit.cpp" ]
+
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",

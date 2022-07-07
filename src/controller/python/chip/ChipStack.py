@@ -253,16 +253,11 @@ class ChipStack(object):
         #
         self._persistentStorage = PersistentStorage(persistentStoragePath)
 
-        # Initialize the chip stack.
-        res = self._ChipStackLib.pychip_DeviceController_StackInit()
-        if res != 0:
-            raise self.ErrorToException(res)
-
         if (bluetoothAdapter is None):
             bluetoothAdapter = 0
 
-        res = self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle(
-            bluetoothAdapter)
+        # Initialize the chip stack.
+        res = self._ChipStackLib.pychip_DeviceController_StackInit(bluetoothAdapter)
         if res != 0:
             raise self.ErrorToException(res)
 
@@ -459,7 +454,7 @@ class ChipStack(object):
     def _loadLib(self):
         if self._ChipStackLib is None:
             self._ChipStackLib = CDLL(self.LocateChipDLL())
-            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = []
+            self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_uint32]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []
             self._ChipStackLib.pychip_DeviceController_StackShutdown.restype = c_uint32
@@ -473,10 +468,6 @@ class ChipStack(object):
             self._ChipStackLib.pychip_Stack_SetLogFunct.argtypes = [
                 _LogMessageFunct]
             self._ChipStackLib.pychip_Stack_SetLogFunct.restype = c_uint32
-
-            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.argtypes = [
-                c_uint32]
-            self._ChipStackLib.pychip_BLEMgrImpl_ConfigureBle.restype = c_uint32
 
             self._ChipStackLib.pychip_DeviceController_PostTaskOnChipThread.argtypes = [
                 _ChipThreadTaskRunnerFunct, py_object]
