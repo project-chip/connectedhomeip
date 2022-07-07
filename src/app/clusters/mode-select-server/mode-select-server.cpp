@@ -127,7 +127,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
     ChipLogError(Zcl, "//is: emberAfModeSelectClusterServerInitCallback");
 
     BootReasonType bootReason = BootReasonType::kUnspecified;
-    CHIP_ERROR error = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+    CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
 
     if (error != CHIP_NO_ERROR)
     {
@@ -175,7 +175,8 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                 }
             }
 #endif // EMBER_AF_PLUGIN_ON_OFF
-            if ((bootReason != BootReasonType::kSoftwareUpdateCompleted) && (status == EMBER_ZCL_STATUS_SUCCESS) && (startUpMode.Value() != currentMode))
+            if ((bootReason != BootReasonType::kSoftwareUpdateCompleted) && (status == EMBER_ZCL_STATUS_SUCCESS) &&
+                (startUpMode.Value() != currentMode))
             {
                 status = Attributes::CurrentMode::Set(endpointId, startUpMode.Value());
                 if (status != EMBER_ZCL_STATUS_SUCCESS)

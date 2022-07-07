@@ -340,7 +340,7 @@ void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExcha
  */
 void EventManagement::DestroyEventManagement()
 {
-    sInstance.mState        = EventManagementStates::Shutdown;
+    sInstance.mState = EventManagementStates::Shutdown;
     ChipLogError(Zcl, "//is: EventManagement::DestroyEventManagement mState=EventManagementStates::Shutdown");
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
