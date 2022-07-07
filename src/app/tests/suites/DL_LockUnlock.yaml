@@ -38,7 +38,7 @@ tests:
       response:
           value: 2
 
-    - label: "Try to unlock the door without a PIN"
+    - label: "Try to lock the door without a PIN"
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
 
