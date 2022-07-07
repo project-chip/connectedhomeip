@@ -1293,7 +1293,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
     Compatibility::SetupEmberAfCommandHandler(apCommandObj, aCommandPath);
-    MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
+
     switch (aCommandPath.mClusterId)
     {
     case Clusters::AccountLogin::Id:
