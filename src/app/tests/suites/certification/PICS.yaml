@@ -3769,7 +3769,7 @@ PICS:
       id: DRLK.C.C23.Rsp
 
     - label: "Does the DUT-client support the GetCredentialResponse command?"
-      id: DDRLK.C.C25.Rsp
+      id: DRLK.C.C25.Rsp
 
     #Device Management
     #Server Attributes
