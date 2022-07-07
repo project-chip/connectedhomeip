@@ -17,24 +17,24 @@
  */
 
 #include "PairingDelegateBridge.h"
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 
 @interface CHIPToolPairingDelegate ()
 @end
 
 @implementation CHIPToolPairingDelegate
-- (void)onStatusUpdate:(CHIPPairingStatus)status
+- (void)onStatusUpdate:(MTRPairingStatus)status
 {
     NSLog(@"Pairing Status Update: %lu", status);
     switch (status) {
-    case kSecurePairingSuccess:
+    case MTRPairingStatusSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         ChipLogProgress(chipTool, "CASE establishment successful");
         break;
-    case kSecurePairingFailed:
+    case MTRPairingStatusFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
-    case kUnknownStatus:
+    case MTRPairingStatusUnknown:
         ChipLogError(chipTool, "Uknown Pairing Status");
         break;
     }

@@ -50,8 +50,8 @@ public:
     const char * FabricMetadata(FabricIndex fabric) { return Format("f/%x/m", fabric); }
     const char * FabricOpKey(FabricIndex fabric) { return Format("f/%x/o", fabric); }
 
-    // FailSafeContext
-    const char * FailSafeContextKey() { return Format("g/fs/c"); }
+    // Fail-safe handling
+    const char * FailSafeCommitMarkerKey() { return Format("g/fs/c"); }
     static const char * FailSafeNetworkConfig() { return "g/fs/n"; }
 
     // LastKnownGoodTime
@@ -114,7 +114,7 @@ public:
     // Event number counter.
     const char * IMEventNumber() { return Format("g/im/ec"); }
 
-private:
+protected:
     // The ENFORCE_FORMAT args are "off by one" because this is a class method,
     // with an implicit "this" as first arg.
     const char * ENFORCE_FORMAT(2, 3) Format(const char * format, ...)
@@ -126,6 +126,7 @@ private:
         return mKeyName;
     }
 
+private:
     char mKeyName[PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
 };
 

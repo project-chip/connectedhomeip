@@ -965,11 +965,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Finish() override
-    {
-        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish");
-        return CHIP_NO_ERROR;
-    }
+    void Finish() override { ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish"); }
 
     CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const override
     {

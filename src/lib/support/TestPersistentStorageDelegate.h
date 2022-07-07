@@ -197,10 +197,7 @@ public:
 protected:
     virtual CHIP_ERROR SyncGetKeyValueInternal(const char * key, void * buffer, uint16_t & size)
     {
-        if ((buffer == nullptr) && (size != 0))
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        ReturnErrorCodeIf(((buffer == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
 
         // Making sure poison keys are not accessed
         if (mPoisonKeys.find(std::string(key)) != mPoisonKeys.end())
@@ -213,15 +210,20 @@ protected:
 
         std::vector<uint8_t> & value = mStorage[key];
         size_t valueSize             = value.size();
-        if (size < valueSize)
+        if (!CanCastTo<uint16_t>(valueSize))
         {
-            size = CanCastTo<uint16_t>(valueSize) ? static_cast<uint16_t>(valueSize) : 0;
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
+            return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
         }
 
-        size = static_cast<uint16_t>(valueSize);
+        uint16_t valueSizeUint16 = static_cast<uint16_t>(valueSize);
+        ReturnErrorCodeIf(size == 0 && valueSizeUint16 == 0, CHIP_NO_ERROR);
+        ReturnErrorCodeIf(buffer == nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        uint16_t sizeToCopy = std::min(size, valueSizeUint16);
+
+        size = sizeToCopy;
         memcpy(buffer, value.data(), size);
-        return CHIP_NO_ERROR;
+        return size < valueSizeUint16 ? CHIP_ERROR_BUFFER_TOO_SMALL : CHIP_NO_ERROR;
     }
 
     virtual CHIP_ERROR SyncSetKeyValueInternal(const char * key, const void * value, uint16_t size)

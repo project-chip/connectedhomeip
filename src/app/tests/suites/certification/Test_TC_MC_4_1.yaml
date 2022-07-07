@@ -22,6 +22,7 @@ config:
 
 tests:
     - label: "TH reads the MACAddress attribute from the DUT"
+      PICS: MC_WAKEONLAN.S.A0000
       verification: |
           ./chip-tool wakeonlan read macaddress 1 1
 
@@ -30,6 +31,7 @@ tests:
       disabled: true
 
     - label: "TH sends a Sleep command to DUT"
+      PICS: PICS_LP
       verification: |
           ./chip-tool lowpower sleep 1 1
           [1646101689.826629][3009:3014] CHIP:DMG: InvokeResponseMessage =
@@ -67,6 +69,7 @@ tests:
     - label:
           "TH sends Wake-On LAN magic packet containing the MAC address from
           step 1"
+      PICS: MC_LOWPOWER.S
       verification: |
           Send a magic packet using the method of your choice
       disabled: true

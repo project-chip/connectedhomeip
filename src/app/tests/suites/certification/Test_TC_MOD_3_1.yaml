@@ -27,7 +27,6 @@ tests:
 
           [1649678983.679893][10871:10876] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065073
           [1649678983.680002][10871:10876] CHIP:TOO:   OnMode: null
-
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"

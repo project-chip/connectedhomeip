@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    19.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH [DUT - Controller]
+name: 21.1.1. [TC-IDM-1.1] Invoke Request Action from DUT to TH - [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -29,7 +28,37 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          sudo ./chip-tool identify  identify 0 1 1
+          ./chip-tool onoff on 1 1
+
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
+          On TH
+          [1655717373.046081][10909:10909] CHIP:DMG: InvokeRequestMessage =
+          [1655717373.046137][10909:10909] CHIP:DMG: {
+          [1655717373.046185][10909:10909] CHIP:DMG:         suppressResponse = false,
+          [1655717373.046240][10909:10909] CHIP:DMG:         timedRequest = false,
+          [1655717373.046291][10909:10909] CHIP:DMG:         InvokeRequests =
+          [1655717373.046356][10909:10909] CHIP:DMG:         [
+          [1655717373.046407][10909:10909] CHIP:DMG:                 CommandDataIB =
+          [1655717373.046464][10909:10909] CHIP:DMG:                 {
+          [1655717373.046518][10909:10909] CHIP:DMG:                         CommandPathIB =
+          [1655717373.046583][10909:10909] CHIP:DMG:                         {
+          [1655717373.046649][10909:10909] CHIP:DMG:                                 EndpointId = 0x1,
+          [1655717373.046720][10909:10909] CHIP:DMG:                                 ClusterId = 0x6,
+          [1655717373.046782][10909:10909] CHIP:DMG:                                 CommandId = 0x1,
+          [1655717373.046885][10909:10909] CHIP:DMG:                         },
+          [1655717373.046961][10909:10909] CHIP:DMG:
+          [1655717373.047017][10909:10909] CHIP:DMG:                         CommandFields =
+          [1655717373.047080][10909:10909] CHIP:DMG:                         {
+          [1655717373.047143][10909:10909] CHIP:DMG:                         },
+          [1655717373.047211][10909:10909] CHIP:DMG:                 },
+          [1655717373.047272][10909:10909] CHIP:DMG:
+          [1655717373.047322][10909:10909] CHIP:DMG:         ],
+          [1655717373.047383][10909:10909] CHIP:DMG:
+          [1655717373.047433][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
+          [1655717373.047482][10909:10909] CHIP:DMG: },
+          [1655717373.047599][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1655717373.047665][10909:10909] CHIP:DMG: AccessControl: allowed
       disabled: true
 
     - label:
@@ -56,15 +85,41 @@ tests:
           Messages to the TH."
       verification: |
           In case of chip tool, here is an example command to use
-          sudo ./chip-tool  identify identify 10 1 1
-          sudo ./chip-tool  identify identify 10 1 1
-      disabled: true
+          ./chip-tool onoff off 1 1
 
-    - label:
-          "DUT sends the Invoke Request Message to the TH. The message should
-          contain a command that will return a data type of list as a response."
-      verification: |
-          In case of chip tool, here is an example command to use
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
 
-          sudo ./chip-tool modeselect read  supported-modes 1 1
+          [1655717456.105815][10909:10909] CHIP:DMG: InvokeRequestMessage =
+          [1655717456.105853][10909:10909] CHIP:DMG: {
+          [1655717456.105887][10909:10909] CHIP:DMG:         suppressResponse = false,
+          [1655717456.105933][10909:10909] CHIP:DMG:         timedRequest = false,
+          [1655717456.105970][10909:10909] CHIP:DMG:         InvokeRequests =
+          [1655717456.106015][10909:10909] CHIP:DMG:         [
+          [1655717456.106051][10909:10909] CHIP:DMG:                 CommandDataIB =
+          [1655717456.106091][10909:10909] CHIP:DMG:                 {
+          [1655717456.106129][10909:10909] CHIP:DMG:                         CommandPathIB =
+          [1655717456.106173][10909:10909] CHIP:DMG:                         {
+          [1655717456.106220][10909:10909] CHIP:DMG:                                 EndpointId = 0x1,
+          [1655717456.106274][10909:10909] CHIP:DMG:                                 ClusterId = 0x6,
+          [1655717456.106327][10909:10909] CHIP:DMG:                                 CommandId = 0x0,
+          [1655717456.106373][10909:10909] CHIP:DMG:                         },
+          [1655717456.106420][10909:10909] CHIP:DMG:
+          [1655717456.106462][10909:10909] CHIP:DMG:                         CommandFields =
+          [1655717456.106507][10909:10909] CHIP:DMG:                         {
+          [1655717456.106551][10909:10909] CHIP:DMG:                         },
+          [1655717456.106594][10909:10909] CHIP:DMG:                 },
+          [1655717456.106636][10909:10909] CHIP:DMG:
+          [1655717456.106671][10909:10909] CHIP:DMG:         ],
+          [1655717456.106714][10909:10909] CHIP:DMG:
+          [1655717456.106749][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
+          [1655717456.106783][10909:10909] CHIP:DMG: },
+          [1655717456.106904][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+          [1655717456.106954][10909:10909] CHIP:DMG: AccessControl: allowed
+
+
+          ./chip-tool onoff off 1 1
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
+          ./chip-tool onoff off 1 1
+          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
       disabled: true

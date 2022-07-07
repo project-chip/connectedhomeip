@@ -141,13 +141,6 @@ enum PublicEventTypes
     kServiceProvisioningChange,
 
     /**
-     * Account Pairing Change
-     *
-     * Signals a change to the device's state with respect to being paired to a user account.
-     */
-    kAccountPairingChange,
-
-    /**
      * Time Sync Change
      *
      * Signals a change to the device's real time clock synchronization state.
@@ -160,13 +153,6 @@ enum PublicEventTypes
      * Signals a change to the sleepy end device interval.
      */
     kSEDIntervalChange,
-
-    /**
-     * Security Session Established
-     *
-     * Signals that an external entity has established a new security session with the device.
-     */
-    kSessionEstablished,
 
     /**
      * CHIPoBLE Connection Established

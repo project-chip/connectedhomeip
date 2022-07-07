@@ -65,6 +65,8 @@ _configurable_test_sets = set()
 _enabled_tests = []
 _disabled_tests = []
 
+_UINT16_MAX = 65535
+
 
 class TestCaseResultEnum(enum.Enum):
     SKIPPED = "SKIP"
@@ -273,6 +275,10 @@ class BaseTestHelper:
         self.paaTrustStorePath = paaTrustStorePath
         logging.getLogger().setLevel(logging.DEBUG)
 
+    async def _GetCommissonedFabricCount(self, nodeid: int):
+        data = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CommissionedFabrics)])
+        return data[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CommissionedFabrics]
+
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
         strlen = 100
@@ -282,7 +288,7 @@ class BaseTestHelper:
             time.sleep(0.2)
         if time.time() > timeout:
             return None
-        return ctypes.string_at(addrStrStorage)
+        return ctypes.string_at(addrStrStorage).decode("utf-8")
 
     @test_case
     def TestDiscovery(self, discriminator: int):
@@ -303,7 +309,7 @@ class BaseTestHelper:
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         if self.devCtrl.EstablishPASESessionIP(
-                ip.encode("utf-8"), setuppin, nodeid) is not None:
+                ip, setuppin, nodeid) is not None:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
             return False
@@ -362,7 +368,7 @@ class BaseTestHelper:
     @test_case
     def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
-        if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(ip))
             return False
@@ -460,6 +466,115 @@ class BaseTestHelper:
         if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
             return True
         return False
+
+    @test_case
+    async def TestAddUpdateRemoveFabric(self, nodeid: int):
+        logger.info("Testing AddNOC, UpdateNOC and RemoveFabric")
+
+        self.logger.info("Waiting for attribute read for CommissionedFabrics")
+        startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
+
+        tempFabric = chip.FabricAdmin.FabricAdmin(fabricId=3, fabricIndex=3)
+        tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
+
+        self.logger.info("Setting failsafe on CASE connection")
+        resp = await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+            self.logger.error(
+                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+            return False
+
+        csrForAddNOC = await self.devCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32))
+
+        chainForAddNOC = tempDevCtrl.IssueNOCChain(csrForAddNOC, nodeid)
+        if chainForAddNOC.rcacBytes is None or chainForAddNOC.icacBytes is None or chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None:
+            self.logger.error("IssueNOCChain failed to generate valid cert chain for AddNOC")
+            return False
+
+        self.logger.info("Starting AddNOC portion of test")
+        # TODO error check on the commands below
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, tempDevCtrl.GetNodeId(), 0xFFF1))
+        await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
+
+        afterAddNocFabricCount = await self._GetCommissonedFabricCount(nodeid)
+        if startOfTestFabricCount == afterAddNocFabricCount:
+            self.logger.error("Expected commissioned fabric count to change after AddNOC")
+            return False
+
+        resp = await tempDevCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+        clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
+        if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
+            self.logger.error(
+                "Failed to read valid cluster revision on newly added fabric {}".format(resp))
+            return False
+
+        self.logger.info("Starting UpdateNOC using same node ID")
+        resp = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+            self.logger.error(
+                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+            return False
+        csrForUpdateNOC = await tempDevCtrl.SendCommand(
+            nodeid, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32, isForUpdateNOC=True))
+        chainForUpdateNOC = tempDevCtrl.IssueNOCChain(csrForUpdateNOC, nodeid)
+        if chainForUpdateNOC.rcacBytes is None or chainForUpdateNOC.icacBytes is None or chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None:
+            self.logger.error("IssueNOCChain failed to generate valid cert chain for UpdateNOC")
+            return False
+
+        await tempDevCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
+        await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
+        afterUpdateNocFabricCount = await self._GetCommissonedFabricCount(nodeid)
+        if afterUpdateNocFabricCount != afterAddNocFabricCount:
+            self.logger.error("Expected commissioned fabric count to remain unchanged after UpdateNOC")
+            return False
+
+        resp = await tempDevCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+        clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
+        if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
+            self.logger.error(
+                "Failed to read valid cluster revision on after UpdateNOC {}".format(resp))
+            return False
+
+        self.logger.info("Starting UpdateNOC using different node ID")
+        resp = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
+        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+            self.logger.error(
+                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+            return False
+        csrForUpdateNOC = await tempDevCtrl.SendCommand(
+            nodeid, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32, isForUpdateNOC=True))
+
+        newNodeIdForUpdateNoc = nodeid + 1
+        chainForSecondUpdateNOC = tempDevCtrl.IssueNOCChain(csrForUpdateNOC, newNodeIdForUpdateNoc)
+        if chainForSecondUpdateNOC.rcacBytes is None or chainForSecondUpdateNOC.icacBytes is None or chainForSecondUpdateNOC.nocBytes is None or chainForSecondUpdateNOC.ipkBytes is None:
+            self.logger.error("IssueNOCChain failed to generate valid cert chain for UpdateNOC with new node ID")
+            return False
+        updateNocResponse = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForSecondUpdateNOC.nocBytes, chainForSecondUpdateNOC.icacBytes))
+        await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
+        afterUpdateNocWithNewNodeIdFabricCount = await self._GetCommissonedFabricCount(nodeid)
+        if afterUpdateNocFabricCount != afterUpdateNocWithNewNodeIdFabricCount:
+            self.logger.error("Expected commissioned fabric count to remain unchanged after UpdateNOC with new node ID")
+            return False
+
+        # TODO Read using old node ID and expect that it fails.
+        resp = await tempDevCtrl.ReadAttribute(newNodeIdForUpdateNoc, [(Clusters.Basic.Attributes.ClusterRevision)])
+        clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
+        if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
+            self.logger.error(
+                "Failed to read valid cluster revision on after UpdateNOC with new node ID {}".format(resp))
+            return False
+
+        removeFabricResponse = await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(updateNocResponse.fabricIndex))
+
+        endOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
+        if endOfTestFabricCount != startOfTestFabricCount:
+            self.logger.error("Expected fabric count to be the same at the end of test as when it started")
+            return False
+
+        tempDevCtrl.Shutdown()
+        tempFabric.Shutdown()
+        return True
 
     @test_case
     async def TestCaseEviction(self, nodeid: int):
@@ -589,7 +704,7 @@ class BaseTestHelper:
         self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not self.devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl2.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False

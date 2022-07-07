@@ -61,13 +61,24 @@ private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
                     const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
 
-    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mOnError(aError); }
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override
+    {
+        if (mCalledCallback)
+        {
+            return;
+        }
+        mCalledCallback = true;
+
+        mOnError(aError);
+    }
 
     void OnDone(app::CommandSender * apCommandSender) override { mOnDone(apCommandSender); }
 
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+
+    bool mCalledCallback = false;
 };
 
 /*
@@ -80,6 +91,12 @@ void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender
                                                               const app::ConcreteCommandPath & aCommandPath,
                                                               const app::StatusIB & aStatus, TLV::TLVReader * aReader)
 {
+    if (mCalledCallback)
+    {
+        return;
+    }
+    mCalledCallback = true;
+
     CommandResponseObjectT response;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -120,6 +137,12 @@ inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app
                                                                              const app::StatusIB & aStatus,
                                                                              TLV::TLVReader * aReader)
 {
+    if (mCalledCallback)
+    {
+        return;
+    }
+    mCalledCallback = true;
+
     //
     // If we got a valid reader, it means we received response data that we were not expecting to receive.
     //

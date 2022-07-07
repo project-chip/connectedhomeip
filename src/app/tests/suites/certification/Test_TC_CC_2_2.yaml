@@ -22,56 +22,569 @@ config:
 
 tests:
     - label:
-          "DUT reads all supported mandatory attributes from TH once at a time
-          in a manufacturer specific order"
+          "DUT reads from the TH the (0x0000) CurrentHue attribute if
+          CC.S.F00(HS) is true"
+      PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
-          ./chip-tool colorcontrol read current-saturation 1 1
-          ./chip-tool colorcontrol read current-x 1 1
-          ./chip-tool colorcontrol read current-y 1 1
-          ./chip-tool colorcontrol read color-temperature 1 1
-          ./chip-tool colorcontrol read color-mode 1 1
-          ./chip-tool colorcontrol read color-control-options 1 1
-          ./chip-tool colorcontrol read enhanced-current-hue 1 1
-          ./chip-tool colorcontrol read enhanced-color-mode 1 1
-          ./chip-tool colorcontrol read color-loop-active 1 1
-          ./chip-tool colorcontrol read color-loop-direction 1 1
-          ./chip-tool colorcontrol read color-loop-time 1 1
-          ./chip-tool colorcontrol read color-loop-start-enhanced-hue 1 1
-          ./chip-tool colorcontrol read color-loop-stored-enhanced-hue 1 1
-          ./chip-tool colorcontrol read color-capabilities 1 1
-          ./chip-tool colorcontrol read color-temp-physical-min 1 1
-          ./chip-tool colorcontrol read color-temp-physical-max 1 1
-          ./chip-tool colorcontrol read couple-color-temp-to-level-min-mireds 1 1
-          ./chip-tool colorcontrol read start-up-color-temperature-mireds 1 1
-          ./chip-tool colorcontrol read number-of-primaries 1 1
-
-          depending on the value of number-of-primaries, primary#x, primary#y, primary#intensity are mandatory (not all devices implemented this)
+          [1649661322.115302][7976:7981] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274515
+          [1649661322.115376][7976:7981] CHIP:TOO:   current hue: 0
+          [1649661322.115473][7976:7981] CHIP:EM: Sending Standalone Ack for MessageCounter:14511861 on exchange 26516i
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH once at a time in
-          a manufacturer specific order"
+          "DUT reads from the TH the (0x0001) CurrentSaturation attribute if
+          CC.S.F00(HS) is true"
+      PICS: CC.C.A0001
+      verification: |
+          ./chip-tool colorcontrol read current-saturation 1 1
+          [1649661322.558054][7982:7987] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0001 DataVersion: 4087274515
+          [1649661322.558128][7982:7987] CHIP:TOO:   current saturation: 0
+          [1649661322.558225][7982:7987] CHIP:EM: Sending Standalone Ack for MessageCounter:13666860 on exchange 22550i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0002) RemainingTime attribute"
+      PICS: CC.C.A0002
       verification: |
           ./chip-tool colorcontrol read remaining-time 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0002 DataVersion: 540305990
+          [1651485342.420726][3496:3501] CHIP:TOO:   remaining time: 0
+          [1651485342.420816][3496:3501] CHIP:EM: Sending Standalone Ack for MessageCounter:6536290 on exchange 31520i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x0003) CurrentX attribute if CC.S.F03(XY)
+          is true"
+      PICS: CC.C.A0003
+      verification: |
+          ./chip-tool colorcontrol read current-x 1 1
+          [1649661322.994696][7988:7993] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0003 DataVersion: 4087274515
+          [1649661322.994764][7988:7993] CHIP:TOO:   current x: 24939
+          [1649661322.994850][7988:7993] CHIP:EM: Sending Standalone Ack for MessageCounter:15274073 on exchange 48270i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x0004) CurrentY attribute if CC.S.F03(XY)
+          is true"
+      PICS: CC.C.A0004
+      verification: |
+          ./chip-tool colorcontrol read current-y 1 1
+          [1649661323.433317][7994:7999] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0004 DataVersion: 4087274515
+          [1649661323.433391][7994:7999] CHIP:TOO:   current y: 24701
+          [1649661323.433490][7994:7999] CHIP:EM: Sending Standalone Ack for MessageCounter:12384629 on exchange 18947i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0005) DriftCompensation
+          attribute"
+      PICS: CC.C.A0005
+      verification: |
           ./chip-tool colorcontrol read drift-compensation 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0005 DataVersion: 540305990
+          [1651485386.691700][3506:3511] CHIP:TOO:   drift compensation: 0
+          [1651485386.691805][3506:3511] CHIP:EM: Sending Standalone Ack for MessageCounter:12144117 on exchange 57338i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0006) CompensationText
+          attribute"
+      PICS: CC.C.A0006
+      verification: |
           ./chip-tool colorcontrol read compensation-text 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0006 DataVersion: 540305990
+          [1651485417.552058][3512:3517] CHIP:TOO:   compensation text:
+          [1651485417.552171][3512:3517] CHIP:EM: Sending Standalone Ack for MessageCounter:354764 on exchange 31359i
       disabled: true
 
     - label:
-          "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
+          "DUT reads from the TH the (0x0007) ColorTemperatureMireds attribute
+          if CC.S.F04(CT) is true"
+      PICS: CC.C.A0007
       verification: |
-          Expect pass:
-          ./chip-tool colorcontrol write color-control-options 12 1 1
-          ./chip-tool colorcontrol write start-up-color-temperature-mireds 12 1 1
+          ./chip-tool colorcontrol read color-temperature 1 1
+          [1649661323.873246][8000:8005] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087274515
+          [1649661323.873316][8000:8005] CHIP:TOO:   color temperature: 0
+          [1649661323.873405][8000:8005] CHIP:EM: Sending Standalone Ack for MessageCounter:16436117 on exchange 33080i
+      disabled: true
 
-          All other write command to mandatory attributes expects Failures.
+    - label: "DUT reads from the TH the (0x0008) ColorMode attribute"
+      PICS: CC.C.A0008
+      verification: |
+          ./chip-tool colorcontrol read color-mode 1 1
+          [1649661324.315688][8006:8011] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0008 DataVersion: 4087274515
+          [1649661324.315767][8006:8011] CHIP:TOO:   color mode: 2
+          [1649661324.315877][8006:8011] CHIP:EM: Sending Standalone Ack for MessageCounter:15003063 on exchange 8273i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x000f) Options attribute"
+      PICS: CC.C.A000f
+      verification: |
+          ./chip-tool colorcontrol read options 1 1
+          [1649661324.748577][8012:8017] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 4087274515
+          [1649661324.748641][8012:8017] CHIP:TOO:    Options: 0
+          [1649661324.748719][8012:8017] CHIP:EM: Sending Standalone Ack for MessageCounter:4617498 on exchange 9590i
       disabled: true
 
     - label:
-          "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
+          "DUT reads from the TH the (0x4000) EnhancedCurrentHue attribute if
+          CC.S.F01(EHue) is true"
+      PICS: CC.C.A4000
       verification: |
-          write optional attributes if implemented on device
+          ./chip-tool colorcontrol read enhanced-current-hue 1 1
+          [1649661325.207404][8018:8023] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4000 DataVersion: 4087274515
+          [1649661325.207486][8018:8023] CHIP:TOO:   enhanced current hue: 0
+          [1649661325.207590][8018:8023] CHIP:EM: Sending Standalone Ack for MessageCounter:2630939 on exchange 50255i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4001) EnhancedColorMode attribute if
+          CC.S.F02(CL) is true"
+      PICS: CC.C.A4001
+      verification: |
+          ./chip-tool colorcontrol read enhanced-color-mode 1 1
+          [1649661325.650176][8024:8029] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4001 DataVersion: 4087274515
+          [1649661325.650248][8024:8029] CHIP:TOO:   enhanced color mode: 2
+          [1649661325.650343][8024:8029] CHIP:EM: Sending Standalone Ack for MessageCounter:11538460 on exchange 62879i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4002) ColorLoopActive attribute if
+          CC.S.F02(CL) is true"
+      PICS: CC.C.A4002
+      verification: |
+          ./chip-tool colorcontrol read color-loop-active 1 1
+          [1649661326.093373][8030:8035] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4002 DataVersion: 4087274515
+          [1649661326.093437][8030:8035] CHIP:TOO:   color loop active: 0
+          [1649661326.093510][8030:8035] CHIP:EM: Sending Standalone Ack for MessageCounter:16553834 on exchange 42935i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4003) ColorLoopDirection attribute if
+          CC.S.F02(CL) is true"
+      PICS: CC.C.A4003
+      verification: |
+          ./chip-tool colorcontrol read color-loop-direction 1 1
+          [1649661326.532413][8036:8041] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4003 DataVersion: 4087274515
+          [1649661326.532493][8036:8041] CHIP:TOO:   color loop direction: 0
+          [1649661326.532584][8036:8041] CHIP:EM: Sending Standalone Ack for MessageCounter:11662576 on exchange 8707i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4004) ColorLoopTime attribute if
+          CC.S.F02(CL) is true"
+      PICS: CC.C.A4004
+      verification: |
+          ./chip-tool colorcontrol read color-loop-time 1 1
+          [1649661326.969567][8042:8047] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4004 DataVersion: 4087274515
+          [1649661326.969644][8042:8047] CHIP:TOO:   color loop time: 25
+          [1649661326.969727][8042:8047] CHIP:EM: Sending Standalone Ack for MessageCounter:4589470 on exchange 61174i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4005) ColorLoopStartEnhancedHue
+          attribute if CC.S.F02(CL) is true"
+      PICS: CC.C.A4005
+      verification: |
+          ./chip-tool colorcontrol read color-loop-start-enhanced-hue 1 1
+          [1649661327.720397][8049:8054] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4005 DataVersion: 4087274515
+          [1649661327.720479][8049:8054] CHIP:TOO:   color loop start enhanced hue: 8960
+          [1649661327.720572][8049:8054] CHIP:EM: Sending Standalone Ack for MessageCounter:14858381 on exchange 47470i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4006) ColorLoopStoredEnhancedHue
+          attribute if CC.S.F02(CL) is true"
+      PICS: CC.C.A4006
+      verification: |
+          ./chip-tool colorcontrol read color-loop-stored-enhanced-hue 1 1
+          [1649661328.161450][8055:8060] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4006 DataVersion: 4087274515
+          [1649661328.161530][8055:8060] CHIP:TOO:   color loop stored enhanced hue: 0
+          [1649661328.161618][8055:8060] CHIP:EM: Sending Standalone Ack for MessageCounter:10650326 on exchange 16955i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x400a) ColorCapabilities attribute"
+      PICS: CC.C.A400a
+      verification: |
+          ./chip-tool colorcontrol read color-capabilities 1 1
+          [1649661328.603843][8061:8066] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400A DataVersion: 4087274515
+          [1649661328.603925][8061:8066] CHIP:TOO:   color capabilities: 0
+          [1649661328.604011][8061:8066] CHIP:EM: Sending Standalone Ack for MessageCounter:9437585 on exchange 42028i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x400b) ColorTempPhysicalMinMireds
+          attribute if CC.S.F04(CT) is true"
+      PICS: CC.C.A400b
+      verification: |
+          ./chip-tool colorcontrol read color-temp-physical-min-mireds  1 1
+          [1649661329.039107][8067:8072] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400B DataVersion: 4087274515
+          [1649661329.039188][8067:8072] CHIP:TOO:  ColorTempPhysicalMinMireds: 0
+
+          [1649661329.039388][8067:8072] CHIP:EM: Sending Standalone Ack for MessageCounter:511360 on exchange 35476i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x400c) ColorTempPhysicalMaxMireds
+          attribute if CC.S.F04(CT) is true"
+      PICS: CC.C.A400c
+      verification: |
+          ./chip-tool colorcontrol read color-temp-physical-max-mireds 1 1
+
+
+          [1649661329.475308][8073:8078] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400C DataVersion: 4087274515
+          [1649661329.475388][8073:8078] CHIP:TOO: ColorTempPhysicalMaxMireds: 65279
+
+          [1649661329.475476][8073:8078] CHIP:EM: Sending Standalone Ack for MessageCounter:14879622 on exchange 59016i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x400d) CoupleColorTempToLevelMinMireds
+          attribute if CC.S.F04(CT) or ColorTemperatureMireds is true"
+      PICS: CC.C.A400d
+      verification: |
+          ./chip-tool colorcontrol read couple-color-temp-to-level-min-mireds 1 1
+          [1649661329.915861][8079:8084] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400D DataVersion: 4087274515
+          [1649661329.915947][8079:8084] CHIP:TOO:   couple color temp to level min-mireds: 0
+          [1649661329.916065][8079:8084] CHIP:EM: Sending Standalone Ack for MessageCounter:1722601 on exchange 3570i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the (0x4010) StartUpColorTemperatureMireds
+          attribute if CC.S.F04(CT) or ColorTemperatureMireds is true"
+      PICS: CC.C.A4010
+      verification: |
+          ./chip-tool colorcontrol read start-up-color-temperature-mireds 1 1
+          [1649661330.348224][8085:8090] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4010 DataVersion: 4087274515
+          [1649661330.348301][8085:8090] CHIP:TOO:   start up color temperature mireds: 0
+          [1649661330.348390][8085:8090] CHIP:EM: Sending Standalone Ack for MessageCounter:15367381 on exchange 8592i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0010) NumberOfPrimaries attribute"
+      PICS: CC.C.A0010
+      verification: |
+          ./chip-tool colorcontrol read number-of-primaries 1 1
+          [1649661330.790716][8091:8096] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0010 DataVersion: 4087274515
+          [1649661330.790792][8091:8096] CHIP:TOO:   number of primaries: 0
+          [1649661330.790894][8091:8096] CHIP:EM: Sending Standalone Ack for MessageCounter:4700740 on exchange 8440i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0011) Primary1X attribute"
+      PICS: CC.C.A0011
+      verification: |
+          ./chip-tool colorcontrol read  primary1x 1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
+          [1651483665.109697][3245:3250] CHIP:TOO:   primary 1 x: 0
+          [1651483665.109797][3245:3250] CHIP:EM: Sending Standalone Ack for MessageCounter:12731123 on exchange 55053i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0012) Primary1Y attribute"
+      PICS: CC.C.A0012
+      verification: |
+          ./chip-tool colorcontrol read  primary1y 1 1
+
+           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
+          [1651483698.733322][3253:3259] CHIP:TOO:   primary 1 y: 0
+          [1651483698.733420][3253:3259] CHIP:EM: Sending Standalone Ack for MessageCounter:7863787 on exchange 13103i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0013) Primary1Intensity attribute"
+      PICS: CC.C.A0013
+      verification: |
+          ./chip-tool colorcontrol read primary1intensity 1 1
+
+
+           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
+          [1651483742.297459][3263:3268] CHIP:TOO:   primary 1 intensity: 0
+          [1651483742.297558][3263:3268] CHIP:EM: Sending Standalone Ack for MessageCounter:10210809 on exchange 7007i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0015) Primary2X attribute"
+      PICS: CC.C.A0015
+      verification: |
+          ./chip-tool colorcontrol read primary2x 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
+          [1651483777.233498][3270:3275] CHIP:TOO:   primary 2 x: 0
+          [1651483777.233614][3270:3275] CHIP:EM: Sending Standalone Ack for MessageCounter:1684573 on exchange 21377i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0016) Primary2Y attribute"
+      PICS: CC.C.A0016
+      verification: |
+          ./chip-tool colorcontrol read primary2y 1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
+          [1651483805.650796][3279:3284] CHIP:TOO:   primary 2 y: 0
+          [1651483805.650942][3279:3284] CHIP:EM: Sending Standalone Ack for MessageCounter:16277541 on exchange 10435i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0017) Primary2Intensity attribute"
+      PICS: CC.C.A0017
+      verification: |
+          ./chip-tool colorcontrol read primary2intensity 1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
+          [1651483834.596380][3285:3290] CHIP:TOO:   primary 2 intensity: 0
+          [1651483834.596470][3285:3290] CHIP:EM: Sending Standalone Ack for MessageCounter:5986355 on exchange 855i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0019) Primary3X attribute"
+      PICS: CC.C.A0019
+      verification: |
+          ./chip-tool colorcontrol read primary3x 1 1
+
+
+           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
+          [1651483937.072323][3298:3303] CHIP:TOO:   primary 3 x: 0
+          [1651483937.072405][3298:3303] CHIP:EM: Sending Standalone Ack for MessageCounter:6092298 on exchange 12519i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x001a) Primary3Y attribute"
+      PICS: CC.C.A001a
+      verification: |
+          ./chip-tool colorcontrol read primary3y 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
+          [1651483967.386334][3305:3310] CHIP:TOO:   primary 3 y: 0
+          [1651483967.386427][3305:3310] CHIP:EM: Sending Standalone Ack for MessageCounter:3329418 on exchange 11657i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x001b) Primary3Intensity attribute"
+      PICS: CC.C.A001b
+      verification: |
+          ./chip-tool colorcontrol read primary3intensity 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
+          [1651484113.812178][3316:3321] CHIP:TOO:   primary 3 intensity: 0
+          [1651484113.812270][3316:3321] CHIP:EM: Sending Standalone Ack for MessageCounter:41658 on exchange 9618i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0020) Primary4X attribute"
+      PICS: CC.C.A0020
+      verification: |
+          ./chip-tool colorcontrol read primary4x 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
+          [1651484143.778301][3324:3329] CHIP:TOO:   primary 4 x: 0
+          [1651484143.778392][3324:3329] CHIP:EM: Sending Standalone Ack for MessageCounter:2094184 on exchange 50270i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0021) Primary4Y attribute"
+      PICS: CC.C.A0021
+      verification: |
+          ./chip-tool colorcontrol read primary4y 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
+          [1651484171.921901][3334:3339] CHIP:TOO:   primary 4 y: 0
+          [1651484171.921984][3334:3339] CHIP:EM: Sending Standalone Ack for MessageCounter:3701827 on exchange 16726i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0022) Primary4Intensity attribute"
+      PICS: CC.C.A0022
+      verification: |
+          ./chip-tool colorcontrol read primary4intensity 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
+          [1651484198.443415][3341:3346] CHIP:TOO:   primary 4 intensity: 0
+          [1651484198.443528][3341:3346] CHIP:EM: Sending Standalone Ack for MessageCounter:1740063 on exchange 36245i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0024) Primary5X attribute"
+      PICS: CC.C.A0024
+      verification: |
+          ./chip-tool colorcontrol read primary5x 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
+          [1651484241.467661][3350:3355] CHIP:TOO:   primary 5 x: 0
+          [1651484241.467788][3350:3355] CHIP:EM: Sending Standalone Ack for MessageCounter:5350139 on exchange 63040i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0025) Primary5Y attribute"
+      PICS: CC.C.A0025
+      verification: |
+          ./chip-tool colorcontrol read primary5y 1 1
+
+
+           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
+          [1651484286.709863][3358:3363] CHIP:TOO:   primary 5 y: 0
+          [1651484286.709964][3358:3363] CHIP:EM: Sending Standalone Ack for MessageCounter:7199124 on exchange 47604i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0026) Primary5Intensity attribute"
+      PICS: CC.C.A0026
+      verification: |
+          ./chip-tool colorcontrol read primary5intensity 1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
+          [1651484304.715731][3365:3370] CHIP:TOO:   primary 5 intensity: 0
+          [1651484304.715829][3365:3370] CHIP:EM: Sending Standalone Ack for MessageCounter:8654922 on exchange 29272i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0028) Primary6X attribute"
+      PICS: CC.C.A0028
+      verification: |
+          ./chip-tool colorcontrol read primary6x 1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
+          [1651484349.601181][3372:3377] CHIP:TOO:   primary 6 x: 0
+          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x0029) Primary6Y attribute"
+      PICS: CC.C.A0029
+      verification: |
+          ./chip-tool colorcontrol read primary6y 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
+          [1651484349.601181][3372:3377] CHIP:TOO:   primary 6 x: 0
+          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+      disabled: true
+
+    - label: "DUT reads from the TH the (0x002a) Primary6Intensity attribute"
+      PICS: CC.C.A002a
+      verification: |
+          ./chip-tool colorcontrol read primary6intensity 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
+          [1651484392.490974][3378:3383] CHIP:TOO:   primary 6 intensity: 0
+          [1651484392.491074][3378:3383] CHIP:EM: Sending Standalone Ack for MessageCounter:2427165 on exchange 17769i
+      disabled: true
+
+    - label: "DUT reads from the TH the Optional (0x0030) WhitePointX attribute"
+      PICS: CC.C.A0030
+      verification: |
+          ./chip-tool colorcontrol read white-point-x   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0030 DataVersion: 540305990
+          [1651484447.853097][3389:3394] CHIP:TOO:   white point x: 0
+          [1651484447.853201][3389:3394] CHIP:EM: Sending Standalone Ack for MessageCounter:2187963 on exchange 39418i
+      disabled: true
+
+    - label: "DUT reads from the TH the Optional (0x0031) WhitePointY attribute"
+      PICS: CC.C.A0031
+      verification: |
+          ./chip-tool colorcontrol read white-point-y 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0031 DataVersion: 540305990
+          [1651484493.098722][3397:3402] CHIP:TOO:   white point y: 0
+          [1651484493.098838][3397:3402] CHIP:EM: Sending Standalone Ack for MessageCounter:13416692 on exchange 58975i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0032) ColorPointRX attribute"
+      PICS: CC.C.A0032
+      verification: |
+          ./chip-tool colorcontrol read color-point-rx   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0032 DataVersion: 540305990
+          [1651484549.019811][3407:3412] CHIP:TOO:   color point r x: 0
+          [1651484549.019946][3407:3412] CHIP:EM: Sending Standalone Ack for MessageCounter:3393967 on exchange 29393i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0033) ColorPointRY attribute"
+      PICS: CC.C.A0033
+      verification: |
+          ./chip-tool colorcontrol read color-point-ry   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0033 DataVersion: 540305990
+          [1651484569.809289][3413:3418] CHIP:TOO:   color point r y: 0
+          [1651484569.809368][3413:3418] CHIP:EM: Sending Standalone Ack for MessageCounter:5190611 on exchange 55680i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0034) ColorPointRIntensity
+          attribute"
+      PICS: CC.C.A0034
+      verification: |
+          ./chip-tool colorcontrol read color-point-rintensity   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0034 DataVersion: 540305990
+          [1651484618.450366][3424:3429] CHIP:TOO:   color point r intensity: 0
+          [1651484618.450496][3424:3429] CHIP:EM: Sending Standalone Ack for MessageCounter:7795217 on exchange 46127i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0036) ColorPointGX attribute"
+      PICS: CC.C.A0036
+      verification: |
+          ./chip-tool colorcontrol read color-point-gx   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0036 DataVersion: 540305990
+          [1651484661.163449][3438:3443] CHIP:TOO:   color point g x: 0
+          [1651484661.163534][3438:3443] CHIP:EM: Sending Standalone Ack for MessageCounter:8020365 on exchange 14427i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0037) ColorPointGY attribute"
+      PICS: CC.C.A0037
+      verification: |
+          ./chip-tool colorcontrol read color-point-gy   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0037 DataVersion: 540305990
+          [1651484675.995507][3444:3449] CHIP:TOO:   color point g y: 0
+          [1651484675.995585][3444:3449] CHIP:EM: Sending Standalone Ack for MessageCounter:5358119 on exchange 45686i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x0038) ColorPointGIntensity
+          attribute"
+      PICS: CC.C.A0038
+      verification: |
+          ./chip-tool colorcontrol read color-point-gintensity   1 1
+
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0038 DataVersion: 540305990
+          [1651484700.811165][3451:3456] CHIP:TOO:   color point g intensity: 0
+          [1651484700.811283][3451:3456] CHIP:EM: Sending Standalone Ack for MessageCounter:3831934 on exchange 46053i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x003a) ColorPointBX attribute"
+      PICS: CC.C.A003a
+      verification: |
+          ./chip-tool colorcontrol read color-point-bx   1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_003A DataVersion: 540305990
+          [1651484728.014850][3459:3464] CHIP:TOO:   color point b x: 0
+          [1651484728.014978][3459:3464] CHIP:EM: Sending Standalone Ack for MessageCounter:16345213 on exchange 13i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x003b) ColorPointBY attribute"
+      PICS: CC.C.A003b
+      verification: |
+          ./chip-tool colorcontrol read color-point-by   1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_003B DataVersion: 540305990
+          [1651484766.975812][3469:3474] CHIP:TOO:   color point b y: 0
+          [1651484766.975908][3469:3474] CHIP:EM: Sending Standalone Ack for MessageCounter:13904476 on exchange 17909i
+      disabled: true
+
+    - label:
+          "DUT reads from the TH the Optional (0x003c) ColorPointBIntensity
+          attribute"
+      PICS: CC.C.A003c
+      verification: |
+          ./chip-tool colorcontrol read color-point-bintensity   1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_003B DataVersion: 540305990
+          [1651484766.975812][3469:3474] CHIP:TOO:   color point b y: 0
+          [1651484766.975908][3469:3474] CHIP:EM: Sending Standalone Ack for MessageCounter:13904476 on exchange 17909i
       disabled: true

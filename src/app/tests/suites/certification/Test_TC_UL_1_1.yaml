@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1. [TC-UL-1.1|]Global Attributes [DUT as Client]
+name: 103.1.1. [TC-UL-1.1] Global Attributes [DUT as Client]
 
 config:
     nodeId: 0x12344321
@@ -26,21 +26,21 @@ tests:
 
       disabled: true
 
-    - label: "{DUTread} (0xFFFD) ClusterRevision attribute"
+    - label: "DUT reads from the TH the(0xFFFD) ClusterRevision attribute"
       verification: |
           ./chip-tool unitlocalization read  cluster-revision 1 0
           [1651186310867] [11123:114108] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFD DataVersion: 486381485
           [1651186310867] [11123:114108] CHIP: [TOO]   ClusterRevision: 1
       disabled: true
 
-    - label: "{DUTread} (0xFFFC) FeatureMap attribute"
+    - label: "DUT reads from the TH the(0xFFFC) FeatureMap attribute"
       verification: |
           ./chip-tool unitlocalization read  feature-map 1 0
           [1651186357789] [11140:114768] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFC DataVersion: 486381485
           [1651186357789] [11140:114768] CHIP: [TOO]   FeatureMap: 1
       disabled: true
 
-    - label: "{DUTread} (0xFFFB) AttributeList attribute"
+    - label: "DUT reads from the TH the(0xFFFB) AttributeList attribute"
       verification: |
           ./chip-tool unitlocalization read attribute-list 1 0
           [1652335691.917681][3124:3129] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFB DataVersion: 3157629909
@@ -53,12 +53,12 @@ tests:
           [1652335691.917957][3124:3129] CHIP:TOO:     [6]: 65533
       disabled: true
 
-    - label: "{DUTread} (0xFFFA) EventList attribute"
+    - label: "DUT reads from the TH the(0xFFFA) EventList attribute"
       verification: |
           out of scope for V1.0
       disabled: true
 
-    - label: "{DUTread} (0xFFF9) AcceptedCommandList attribute"
+    - label: "DUT reads from the TH the(0xFFF9) AcceptedCommandList attribute"
       verification: |
           ./chip-tool unitlocalization read accepted-command-list 1 0
 
@@ -66,7 +66,7 @@ tests:
           [1651186469211] [11184:116328] CHIP: [TOO]   AcceptedCommandList: 0 entries
       disabled: true
 
-    - label: "{DUTread} (0xFFF8) GeneratedCommandList attribute"
+    - label: "DUT reads from the TH the(0xFFF8) GeneratedCommandList attribute"
       verification: |
           ./chip-tool unitlocalization read generated-command-list 1 0
           [1651191485645] [13481:177154] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF8 DataVersion: 486381492

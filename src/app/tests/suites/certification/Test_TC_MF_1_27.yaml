@@ -13,7 +13,7 @@
 # limitations under the License.
 
 name:
-    22.1.27. [TC-MF-1.27] Open commissioning window - durations min and min-1
+    24.1.27. [TC-MF-1.27] Open commissioning window - durations min and min-1
     [BCM] [DUT - Commissionee]
 
 config:
@@ -23,8 +23,22 @@ config:
 
 tests:
     - label: "Factory Reset the DUT_CE"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "FactoryReset"
+
+    - label: "Factory Reset the DUT_CE"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"

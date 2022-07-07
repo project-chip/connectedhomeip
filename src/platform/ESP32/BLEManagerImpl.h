@@ -81,7 +81,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
+    void _Shutdown() {}
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -238,6 +238,7 @@ private:
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
 
+    static CHIP_ERROR bleprph_set_random_addr(void);
     static void bleprph_host_task(void * param);
     static void bleprph_on_sync(void);
     static void bleprph_on_reset(int);

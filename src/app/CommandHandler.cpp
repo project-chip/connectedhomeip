@@ -32,6 +32,7 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <lib/core/CHIPTLVData.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -244,6 +245,18 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     return CHIP_NO_ERROR;
 }
 
+namespace {
+// We use this when the sender did not actually provide a CommandFields struct,
+// to avoid downstream consumers having to worry about cases when there is or is
+// not a struct available.  We use an empty struct with anonymous tag, since we
+// can't use a context tag at top level, and consumers should not care about the
+// tag here).
+constexpr uint8_t sNoFields[] = {
+    CHIP_TLV_STRUCTURE(CHIP_TLV_TAG_ANONYMOUS),
+    CHIP_TLV_END_OF_CONTAINER,
+};
+} // anonymous namespace
+
 CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -308,7 +321,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement,
                       "Received command without data for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        err = CHIP_NO_ERROR;
+        commandDataReader.Init(sNoFields);
+        err = commandDataReader.Next();
     }
     if (CHIP_NO_ERROR == err)
     {
@@ -365,7 +379,8 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         ChipLogDetail(DataManagement,
                       "Received command without data for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI, groupId,
                       ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
-        err = CHIP_NO_ERROR;
+        commandDataReader.Init(sNoFields);
+        err = commandDataReader.Next();
     }
     SuccessOrExit(err);
 

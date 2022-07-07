@@ -289,6 +289,251 @@ PICS:
     - label: "Does the device implement receiving the ColorLoopSet command?"
       id: CC.S.C44.Rsp
 
+    - label: "Does the DUT(server) support the Hue/Saturation feature?"
+      id: CC.S.F00
+
+    - label: "Does the DUT(server) support the Enhanced Hue feature?"
+      id: CC.S.F01
+
+    - label: "Does the DUT(server) support the Color Loop feature?"
+      id: CC.S.F02
+
+    - label: "Does the DUT(server) support the Color XY feature?"
+      id: CC.S.F03
+
+    - label: "Does the DUT(server) support the Color Temperature feature?"
+      id: CC.S.F04
+
+    - label: "Does the device implement the CurrentHue attribute?"
+      id: CC.C.A0000
+
+    - label: "Does the device implement the CurrentSaturation attribute?"
+      id: CC.C.A0001
+
+    - label: "Does the device implement the REMAININGTime attribute?"
+      id: CC.C.A0002
+
+    - label: "Does the device implement the CurrentX attribute?"
+      id: CC.C.A0003
+
+    - label: "Does the device implement the CurrentY attribute?"
+      id: CC.C.A0004
+
+    - label: "Does the device implement the DriftCompensation attribute?"
+      id: CC.C.A0005
+
+    - label: "Does the device implement the CompensationText attribute?"
+      id: CC.C.A0006
+
+    - label: "Does the device implement the ColorTemperatureMireds attribute?"
+      id: CC.C.A0007
+
+    - label: "Does the device implement the ColorMode attribute?"
+      id: CC.C.A0008
+
+    - label: "Does the device implement the Options attribute?"
+      id: CC.C.A000f
+
+    - label: "Does the device implement the EnhancedCurrentHue attribute?"
+      id: CC.C.A4000
+
+    - label: "Does the device implement the EnhancedColorMode attribute?"
+      id: CC.C.A4001
+
+    - label: "Does the device implement the ColorLoopActive attribute?"
+      id: CC.C.A4002
+
+    - label: "Does the device implement the ColorLoopDirection attribute?"
+      id: CC.C.A4003
+
+    - label: "Does the device implement the ColorLoopTime attribute?"
+      id: CC.C.A4004
+
+    - label:
+          "Does the device implement the ColorLoopStartEnhancedHue attribute?"
+      id: CC.C.A4005
+
+    - label:
+          "Does the device implement the ColorLoopStoredEnhancedHue attribute?"
+      id: CC.C.A4006
+
+    - label: "Does the device implement the ColorCapabilities attribute?"
+      id: CC.C.A400a
+
+    - label:
+          "Does the device implement the ColorTempPhysicalMinMireds attribute?"
+      id: CC.C.A400b
+
+    - label:
+          "Does the device implement the ColorTempPhysicalMaxMireds attribute?"
+      id: CC.C.A400c
+
+    - label:
+          "Does the device implement the CoupleColorTempToLevelMinMireds
+          attribute?"
+      id: CC.C.A400d
+
+    - label:
+          "Does the device implement the StartUPColorTemperatureMireds
+          attribute?"
+      id: CC.C.A4010
+
+    - label: "Does the device implement the NumberOfPrimaries attribute?"
+      id: CC.C.A0010
+
+    - label: "Does the device implement the Primary1X attribute?"
+      id: CC.C.A0011
+
+    - label: "Does the device implement the Primary1Y attribute?"
+      id: CC.C.A0012
+
+    - label: "Does the device implement the Primary1Intensity attribute?"
+      id: CC.C.A0013
+
+    - label: "Does the device implement the Primary2X attribute?"
+      id: CC.C.A0015
+
+    - label: "Does the device implement the Primary2Y attribute?"
+      id: CC.C.A0016
+
+    - label: "Does the device implement the Primary2Intensity attribute?"
+      id: CC.C.A0017
+
+    - label: "Does the device implement the Primary3X attribute?"
+      id: CC.C.A0019
+
+    - label: "Does the device implement the Primary3Y attribute?"
+      id: CC.C.A001a
+
+    - label: "Does the device implement the Primary3Intensity attribute?"
+      id: CC.C.A001b
+
+    - label: "Does the device implement the Primary4X attribute?"
+      id: CC.C.A0020
+
+    - label: "Does the device implement the Primary4Y attribute?"
+      id: CC.C.A0021
+
+    - label: "Does the device implement the PRIMAR41Intensity attribute?"
+      id: CC.C.A0022
+
+    - label: "Does the device implement the Primary5X attribute?"
+      id: CC.C.A0024
+
+    - label: "Does the device implement the Primary5Y attribute?"
+      id: CC.C.A0025
+
+    - label: "Does the device implement the Primary5Intensity attribute?"
+      id: CC.C.A0026
+
+    - label: "Does the device implement the Primary6X attribute?"
+      id: CC.C.A0028
+
+    - label: "Does the device implement the Primary6Y attribute?"
+      id: CC.C.A0029
+
+    - label: "Does the device implement the Primary6Intensity attribute?"
+      id: CC.C.A002a
+
+    - label: "Does the device implement the WhitePointX attribute?"
+      id: CC.C.A0030
+
+    - label: "Does the device implement the WhitePointY attribute?"
+      id: CC.C.A0031
+
+    - label: "Does the device implement the ColorPointRX attribute?"
+      id: CC.C.A0032
+
+    - label: "Does the device implement the ColorPointRY attribute?"
+      id: CC.C.A0033
+
+    - label: "Does the device implement the ColorPointRIntensity attribute?"
+      id: CC.C.A0034
+
+    - label: "Does the device implement the ColorPointGX attribute?"
+      id: CC.C.A0036
+
+    - label: "Does the device implement the ColorPointGY attribute?"
+      id: CC.C.A0037
+
+    - label: "Does the device implement the ColorPointGIntensity attribute?"
+      id: CC.C.A0038
+
+    - label: "Does the device implement the ColorPointBX attribute?"
+      id: CC.C.A003a
+
+    - label: "Does the device implement the ColorPointBY attribute?"
+      id: CC.C.A003b
+
+    - label: "Does the device implement the ColorPointBIntensity attribute?"
+      id: CC.C.A003c
+
+    - label: "Does the device implement receiving the MoveToHue command?"
+      id: CC.C.C00.Rsp
+
+    - label: "Does the device implement receiving the MoveHue command?"
+      id: CC.C.C01.Rsp
+
+    - label: "Does the device implement receiving the MoveToHue command?"
+      id: CC.C.C02.Rsp
+
+    - label: "Does the device implement receiving the MoveToSaturation command?"
+      id: CC.C.C03.Rsp
+
+    - label: "Does the device implement receiving the MoveSaturation command?"
+      id: CC.C.C04.Rsp
+
+    - label: "Does the device implement receiving the StepSaturation command?"
+      id: CC.C.C05.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveToHueAndSaturation
+          command?"
+      id: CC.C.C06.Rsp
+
+    - label: "Does the device implement receiving the MoveToColor command?"
+      id: CC.C.C07.Rsp
+
+    - label: "Does the device implement receiving the MoveColor command?"
+      id: CC.C.C08.Rsp
+
+    - label: "Does the device implement receiving the StopMoveStep command?"
+      id: CC.C.C47.Rsp
+
+    - label: "Does the device implement receiving the StepColor command?"
+      id: CC.C.C09.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveToColorTemperature
+          command?"
+      id: CC.C.C0A.Rsp
+
+    - label:
+          "Does the device implement receiving the MoveColorTemperature command?"
+      id: CC.C.C4B.Rsp
+
+    - label:
+          "Does the device implement receiving the StepColorTemperature command?"
+      id: CC.C.C4C.Rsp
+
+    - label:
+          "Does the device implement receiving the EnhancedMoveToHue command?"
+      id: CC.C.C40.Rsp
+
+    - label: "Does the device implement receiving the EnhancedMoveHue command?"
+      id: CC.C.C41.Rsp
+
+    - label: "Does the device implement receiving the EnhancedStepHue command?"
+      id: CC.C.C42.Rsp
+
+    - label:
+          "Does the device implement receiving the
+          EnhancedMoveToHueAndSaturation command?"
+      id: CC.C.C43.Rsp
+
+    - label: "Does the device implement receiving the ColorLoopSet command?"
+      id: CC.C.C44.Rsp
+
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"
       id: A_RELATIVEHUMIDITY
@@ -317,15 +562,16 @@ PICS:
       id: MANUAL_TEMPERATURE_CHANGE
 
       # Thermostat User Configuration cluster
-    - label: "Does the device implement the TemperatureDisplayMode attribute"
-      id: A_TEMPERATURE_DISPLAY_MODE
+    - label: "Does the device implement the TemperatureDisplayMode attribute?"
+      id: TSUIC.S.A0000
 
-    - label: "Does the device implement the KeypadLockout attribute"
-      id: A_KEYPAD_LOCKOUT
+    - label: "Does the device implement the KeypadLockout attribute?"
+      id: TSUIC.S.A0001
 
     - label:
-          "Does the device implement the ScheduleProgrammingVisibility attribute"
-      id: A_SCHEDULE_PROGRAMMING_VISIBILITY
+          "Does the device implement the ScheduleProgrammingVisibility
+          attribute?"
+      id: TSUIC.S.A0002
 
       # Software Diagnostics cluster
     - label: "Does the device implement the SoftwareFault event?"
@@ -345,19 +591,6 @@ PICS:
 
     - label: "Does the device implement the ResetWaterMarks command?"
       id: DGSW.S.C00
-
-      # Pump Configuration and Control cluster
-    - label: "Does the device implement the attribute OperationMode"
-      id: A_OPERATIONMODE
-
-    - label: "Does the device implement the attribute ControlMode"
-      id: A_CONTROLMODE
-
-    - label: "Does the device implement the attribute EffectiveOperationMode"
-      id: A_EFFECTIVEOPERATIONMODE
-
-    - label: "Does the device implement the attribute EffectiveControlMode"
-      id: A_EFFECTIVECONTROLMODE
 
       # Thermostat cluster
     - label: "Does the device implement the OccupiedCoolingSetpoint attribute"
@@ -418,126 +651,178 @@ PICS:
     - label: "Supports a System Mode of Auto"
       id: TSTAT_AUTO
 
-      # Occupency sensing cluster
-    - label: "Does the device implement the Occupancy attribute?"
-      id: A_OCCUPANCY
-
-    - label:
-          "Can the Occupancy attribute changed by physical control at the
-          device?"
-      id: MANUAL_OCCUPANCY_CHANGE
-
       # Window covering cluster
       ## WC-Features
     - label: "Does the device implement the Lift feature?"
-      id: WNCV_LF
+      id: WNCV.S.F00
 
     - label: "Does the device implement the Position Aware Lift feature?"
-      id: WNCV_PA_LF
+      id: WNCV.S.F02
 
     - label: "Does the device implement the Lift feature?"
-      id: WNCV_TL
+      id: WNCV.S.F01
 
     - label: "Does the device implement the Position Aware Lift feature?"
-      id: WNCV_PA_TL
+      id: WNCV.S.F04
 
       ## WC-Attributes
+    - label: "Does the device implement the 65533 ClusterRevision attribute?"
+      id: WNCV.S.Afffd
+
+    - label: "Does the device implement the 65532 FeatureMap attribute?"
+      id: WNCV.S.Afffc
+
+    - label: "Does the device implement the 65531 AttributeList attribute?"
+      id: WNCV.S.Afffb
+
+    - label: "Does the device implement the 65530 EventList attribute ?"
+      id: WNCV.S.Afffa
+
+    - label:
+          "Does the device implement the 65529 AcceptedCommandList attribute?"
+      id: WNCV.S.Afff9
+
+    - label:
+          "Does the device implement the 65528 GeneratedCommandList attribute?"
+      id: WNCV.S.Afff8
+
+    - label: "Does the device implement the (65532) FeatureMap attribute ?"
+      id: WNCV.C.Afffc
+
+    - label: "Does the device implement the Type attribute ?"
+      id: WNCV.C.A0000
+
+    - label: "Does the device implement the EndProductType attribute ?"
+      id: WNCV.C.A000d
+
+    - label: "Does the device implement the Mode attribute ?"
+      id: WNCV.C.A0017
+
+    - label: "Does the device implement the ConfigStatus attribute ?"
+      id: WNCV.C.A0007
+
     - label: "Does the device implement the Type attribute?"
-      id: A_TYPE
+      id: WNCV.S.A0000
 
     - label: "Does the device implement the ConfigStatus attribute?"
-      id: A_CONFIGSTATUS
+      id: WNCV.S.A0007
 
     - label: "Does the device implement the EndProductType attribute?"
-      id: A_ENDPRODUCTTYPE
+      id: WNCV.S.A000d
 
     - label: "Does the device implement the OperationalStatus attribute?"
-      id: A_OPERATIONALSTATUS
+      id: WNCV.S.A000a
 
     - label:
           "Does the device implement the TargetPositionLiftPercent100ths
           attribute?"
-      id: A_TARGETPOSITIONLIFTPERCENT100THS
+      id: WNCV.S.A000b
 
     - label:
           "Does the device implement the TargetPositionTiltPercent100ths
           attribute?"
-      id: A_TARGETPOSITIONTILTPERCENT100THS
+      id: WNCV.S.A000c
 
     - label:
           "Does the device implement the CurrentPositionLiftPercent100ths
           attribute?"
-      id: A_CURRENTPOSITIONLIFTPERCENT100THS
+      id: WNCV.S.A000e
 
     - label:
           "Does the device implement the CurrentPositionTiltPercent100ths
           attribute?"
-      id: A_CURRENTPOSITIONTILTPERCENT100THS
+      id: WNCV.S.A000f
 
     - label:
           "Does the device implement the CurrentPositionLiftPercentage
           attribute?"
-      id: A_CURRENTPOSITIONLIFTPERCENTAGE
+      id: WNCV.S.A0008
 
     - label:
           "Does the device implement the CurrentPositionTiltPercentage
           attribute?"
-      id: A_CURRENTPOSITIONTILTPERCENTAGE
+      id: WNCV.S.A0009
 
     - label: "Does the device implement the CurrentPositionLift attribute?"
-      id: A_CURRENTPOSITIONLIFT
+      id: WNCV.S.A0003
 
     - label: "Does the device implement the CurrentPositionTilt attribute?"
-      id: A_CURRENTPOSITIONTILT
+      id: WNCV.S.A0004
 
     - label: "Does the device implement the NumberOfActuationsLift attribute?"
-      id: A_NUMBEROFACTUATIONSLIFT
+      id: WNCV.S.A0005
 
     - label: "Does the device implement the NumberOfActuationsTilt attribute?"
-      id: A_NUMBEROFACTUATIONSTILT
+      id: WNCV.S.A0006
 
     - label: "Does the device implement the PhysicalClosedLimitLift attribute?"
-      id: A_PHYSICALCLOSEDLIMITLIFT
+      id: WNCV.S.A0001
 
     - label: "Does the device implement the PhysicalClosedLimitTilt attribute?"
-      id: A_PHYSICALCLOSEDLIMITTILT
+      id: WNCV.S.A0002
 
     - label: "Does the device implement the InstalledOpenLimitLift attribute?"
-      id: A_INSTALLEDOPENLIMITLIFT
+      id: WNCV.S.A0010
 
     - label: "Does the device implement the InstalledOpenLimitTilt attribute?"
-      id: A_INSTALLEDOPENLIMITTILT
+      id: WNCV.S.A0012
 
     - label: "Does the device implement the InstalledClosedLimitLift attribute?"
-      id: A_INSTALLEDCLOSEDLIMITLIFT
+      id: WNCV.S.A0011
 
     - label: "Does the device implement the InstalledClosedLimitTilt attribute?"
-      id: A_INSTALLEDCLOSEDLIMITTILT
+      id: WNCV.S.A0013
 
-    - label: "Does the device implement the Mode attribute?"
-      id: A_MODE
+    - label: "Does the device implement the Mode attribute ?"
+      id: WNCV.S.A0017
 
     - label: "Does the device implement the SafetyStatus attribute?"
-      id: A_SAFETYSTATUS
+      id: WNCV.S.A001a
 
       ## WC-Commands received
     - label:
           "Does the device implement receiving the GoToLiftPercentage command?"
-      id: CR_GOTOLIFTPERCENTAGE
+      id: WNCV.S.C05.Rsp
 
     - label:
           "Does the device implement receiving the GoToTiltPercentage command?"
-      id: CR_GOTOTILTPERCENTAGE
+      id: WNCV.S.C08.Rsp
+
+    - label: "Does the device implement receiving the DownOrClose command ?"
+      id: WNCV.S.C01.Rsp
+
+    - label: "Does the device implement receiving the UpOrOpen command ?"
+      id: WNCV.S.C00.Rsp
+
+    - label: "Does the device implement receiving the StopMotion command ?"
+      id: WNCV.S.C02.Rsp
+
+    - label: "Does the device implement sending the StopMotion command ?"
+      id: WNCV.C.C02.Tx
+
+    - label: "Does the device implement sending the UpOrOpen command ?"
+      id: WNCV.C.C00.Tx
+
+    - label: "Does the device implement sending the DownOrClose command ?"
+      id: WNCV.C.C01.Tx
+
+    - label:
+          "Does the device implement sending the GoToLiftPercentage command ?"
+      id: WNCV.C.C05.Tx
+
+    - label:
+          "Does the device implement sending the GoToTiltPercentage command ?"
+      id: WNCV.C.C08.Tx
 
       ## WC-Other features
     - label: "Does the device support reversal of lift movement?"
-      id: WNCV_REVERSAL
+      id: WNCV.S.M.Reversal
 
     - label: "Does the device support a calibration mode?"
-      id: WNCV_CALIBRATION
+      id: WNCV.S.M.Calibration
 
     - label: "Does the device support a maintenance mode?"
-      id: WNCV_MAINTENANCE
+      id: WNCV.S.M.Maintenance
 
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
@@ -614,6 +899,9 @@ PICS:
     - label: "Skip sample app"
       id: PICS_SKIP_SAMPLE_APP
 
+    - label: "Run steps in SDK and CI only"
+      id: PICS_SDK_CI_ONLY
+
     - label: "Level Control for Lighting"
       id: OO_LT
 
@@ -622,6 +910,620 @@ PICS:
           "Can the MeasuredValue attribute changed by physical control at the
           device?"
       id: MANUAL_FLOW_CHANGE
+
+    #Pressure Measurement
+    - label: "Does the device implement the MeasuredValue attribute?"
+      id: PRS.S.A0000
+
+    - label: "Does the device implement the MinMeasuredValue attribute?"
+      id: PRS.S.A0001
+
+    - label: "Does the device implement the MaxMeasuredValue attribute?"
+      id: PRS.S.A0002
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: PRS.S.A0003
+
+    - label: "Does the device implement the ScaledValue attribute?"
+      id: PRS.S.A0010
+
+    - label: "Does the device implement the MinScaledValue attribute?"
+      id: PRS.S.A0011
+
+    - label: "Does the device implement the MaxScaledValue attribute?"
+      id: PRS.S.A0012
+
+    - label: "Does the device implement the ScaledTolerance attribute?"
+      id: PRS.S.A0013
+
+    - label: "Does the device implement the Scale attribute?"
+      id: PRS.S.A0014
+
+    - label: "Does the device support extended range and resolution?"
+      id: PRS.S.F00
+
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device?"
+      id: PRS.M.PressureChange
+
+    # Occupency sensing cluster
+    - label: "Does the device implement the Occupancy attribute?"
+      id: OCC.S.A0000
+
+    - label: "Does the device implement the OccupancySensorType attribute?"
+      id: OCC.S.A0001
+
+    - label:
+          "Does the device implement the OccupancySensorTypeBitmap attribute?"
+      id: OCC.S.A0002
+
+    - label:
+          "Does the device implement the PIROccupiedToUnoccupiedDelay attribute?"
+      id: OCC.S.A0010
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.S.A0011
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.S.A0012
+
+    - label:
+          "Does the device implement the UltrasonicOccupiedToUnoccupiedDelay
+          attribute?"
+      id: OCC.S.A0020
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedDelay
+          attribute?"
+      id: OCC.S.A0021
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.S.A0022
+
+    - label:
+          "Does the device implement the
+          PhysicalContactOccupiedToUnoccupiedDelay attribute?"
+      id: OCC.S.A0030
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.S.A0031
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
+      id: OCC.S.A0032
+
+    - label:
+          "Can the Occupancy attribute changed by physical control at the
+          device?"
+      id: OCC.M.OccupancyChange
+
+    - label: "Does the device implement the Occupancy attribute?"
+      id: OCC.C.A0000
+
+    - label: "Does the device implement the OccupancySensorType attribute?"
+      id: OCC.C.A0001
+
+    - label:
+          "Does the device implement the OccupancySensorTypeBitmap attribute?"
+      id: OCC.C.A0002
+
+    - label:
+          "Does the device implement the PIROccupiedToUnoccupiedDelay attribute?"
+      id: OCC.C.A0010
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.C.A0011
+
+    - label:
+          "Does the device implement the PIRUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.C.A0012
+
+    - label:
+          "Does the device implement the UltrasonicOccupiedToUnoccupiedDelay
+          attribute?"
+      id: OCC.C.A0020
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedDelay
+          attribute?"
+      id: OCC.C.A0021
+
+    - label:
+          "Does the device implement the UltrasonicUnoccupiedToOccupiedThreshold
+          attribute?"
+      id: OCC.C.A0022
+
+    - label:
+          "Does the device implement the
+          PhysicalContactOccupiedToUnoccupiedDelay attribute?"
+      id: OCC.C.A0030
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedDelay attribute?"
+      id: OCC.C.A0031
+
+    - label:
+          "Does the device implement the
+          PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
+      id: OCC.C.A0032
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: FLW.S.A0003
+
+    - label: "Does the device support extended range and resolution?"
+      id: PRS.S.F00
+
+    #Level Control Cluster
+    - label:
+          "Does the DUT(server) support the Behavior that supports lighting
+          applications feature?"
+      id: LVL.S.F01
+
+    - label:
+          "Does the DUT(server) support the Frequency attributes and behavior
+          feature?"
+      id: LVL.S.F02
+
+    - label: "Does the DUT(server) support the CurrentLevel attribute?"
+      id: LVL.S.A0000
+
+    - label: "Does the DUT(server) support the RemainingTime attribute?"
+      id: LVL.S.A0001
+
+    - label: "Does the DUT(server) support the MinLevel attribute?"
+      id: LVL.S.A0002
+
+    - label: "Does the DUT(server) support the MaxLevel attribute?"
+      id: LVL.S.A0003
+
+    - label: "Does the DUT(server) support the CurrentFrequency attribute?"
+      id: LVL.S.A0004
+
+    - label: "Does the DUT(server) support the MinFrequency attribute?"
+      id: LVL.S.A0005
+
+    - label: "Does the DUT(server) support the MaxFrequency attribute?"
+      id: LVL.S.A0006
+
+    - label: "Does the DUT(server) support the Options attribute?"
+      id: LVL.S.A000f
+
+    - label: "Does the DUT(server) support the OnOffTransitionTime attribute?"
+      id: LVL.S.A0010
+
+    - label: "Does the DUT(server) support the OnLevel attribute?"
+      id: LVL.S.A0011
+
+    - label: "Does the DUT(server) support the OnTransitionTime attribute?"
+      id: LVL.S.A0012
+
+    - label: "Does the DUT(server) support the OffTransitionTime attribute?"
+      id: LVL.S.A0013
+
+    - label: "Does the DUT(server) support the DefaultMoveRate attribute?"
+      id: LVL.S.A0014
+
+    - label: "Does the DUT(server) support the StartUpCurrentLevel attribute?"
+      id: LVL.S.A4000
+
+    - label: "Does the DUT(server) support the MoveToLevel command?"
+      id: LVL.S.C00.Rsp
+
+    - label: "Does the DUT(server) support the Move command?"
+      id: LVL.S.C01.Rsp
+
+    - label: "Does the DUT(server) support the Step command?"
+      id: LVL.S.C02.Rsp
+
+    - label: "Does the DUT(server) support the Stop command?"
+      id: LVL.S.C03.Rsp
+
+    - label: "Does the DUT(server) support the MoveToLevel with On/Off command?"
+      id: LVL.S.C04.Rsp
+
+    - label: "Does the DUT(server) support the Move with On/Off command?"
+      id: LVL.S.C05.Rsp
+
+    - label: "Does the DUT(server) support the Step with On/Off command?"
+      id: LVL.S.C06.Rsp
+
+    - label: "Does the DUT(server) support the Stop with On/Off command?"
+      id: LVL.S.C07.Rsp
+
+    - label: "Does the DUT(server) support the MoveToClosestFrequency command?"
+      id: LVL.S.C08.Rsp
+
+    - label: "Is the DUT(server) able to move at a variable rate feature?"
+      id: LVL.S.M.VarRate
+
+    #Groups Cluster
+    - label: "Does the DUT(Server) support NameSupport attribute?"
+      id: G.S.A0000
+
+    - label: "Does the DUT(Server) support GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the DUT(server) implement receiving AddGroup Command?"
+      id: G.S.C00.Rsp
+
+    - label: "Does the DUT(server) implement receiving ViewGroup Command?"
+      id: G.S.C01.Rsp
+
+    - label:
+          "Does the DUT(server) implement receiving GetGroupMembership Command?"
+      id: G.S.C02.Rsp
+
+    - label: "Does the DUT(server) implement receiving RemoveGroup Command?"
+      id: G.S.C03.Rsp
+
+    - label: "Does the DUT(server) implement receiving RemoveAllGroups Command?"
+      id: G.S.C04.Rsp
+
+    - label:
+          "Does the DUT(server) implement receiving AddGroupIfIdentifying
+          Command?"
+      id: G.S.C05.Rsp
+
+    - label:
+          "Does the DUT(server) invoking/generating AddGroupResponse Command?"
+      id: G.S.C00.Tx
+
+    - label:
+          "Does the DUT(server) invoking/generating ViewGroupResponse Command?"
+      id: G.S.C01.Tx
+
+    - label:
+          "Does the DUT(server) invoking/generating GetGroupMembershipResponse
+          Command?"
+      id: G.S.C02.Tx
+
+    - label:
+          "Does the DUT(server) invoking/generating RemoveGroupResponse Command?"
+      id: G.S.C03.Tx
+
+    - label: "Does the DUT(client) support NameSupport attribute?"
+      id: G.C.A0000
+
+    - label: "Does the DUT(client) implement receiving AddGroup Command?"
+      id: G.C.C00.Rsp
+
+    - label: "Does the DUT(client) implement receiving ViewGroup Command?"
+      id: G.C.C01.Rsp
+
+    - label:
+          "Does the DUT(client) implement receiving GetGroupMembership Command?"
+      id: G.C.C02.Rsp
+
+    - label: "Does the DUT(client) implement receiving RemoveGroup Command?"
+      id: G.C.C03.Rsp
+
+    - label: "Does the DUT(client) implement receiving RemoveAllGroups Command?"
+      id: G.C.C04.Rsp
+
+    - label:
+          "Does the DUT(client) implement receiving AddGroupIfIdentifying
+          Command?"
+      id: G.C.C05.Rsp
+
+    #Identify Cluster
+    - label: "Does the device implement the IdentifyTime attribute?"
+      id: I.S.A0000
+
+    - label: "Does the device implement the IdentifyType attribute?"
+      id: I.S.A0001
+
+    - label: "Does the device implement receiving the Identify command?"
+      id: I.S.C00.Rsp
+
+    - label: "Does the device implement receiving the IdentifyQuery command?"
+      id: I.S.C01.Rsp
+
+    - label: "Does the device implement receiving the TriggerEffect command?"
+      id: I.S.C40.Rsp
+
+    - label:
+          "Does the device implement sending the IdentifyQueryResponse command?"
+      id: I.S.C00.Tx
+
+    - label: "Does the device implement sending the Identify command?"
+      id: I.C.C00.Tx
+
+    - label: "Does the device implement sending the IdentifyQuery command?"
+      id: I.C.C01.Tx
+
+    - label: "Does the device implement sending the TriggerEffect command?"
+      id: I.C.C40.Tx
+
+    - label:
+          "Does the device implement receiving the IdentifyQueryResponse
+          command?"
+      id: I.C.C00.Rsp
+
+    #Scenes Cluster
+    - label: "Does the device implement the SceneCount attribute?"
+      id: S.S.A0000
+
+    - label: "Does the device implement the CurrentScene attribute?"
+      id: S.S.A0001
+
+    - label: "Does the device implement the CurrentGroup attribute?"
+      id: S.S.A0002
+
+    - label: "Does the device implement the SceneValid attribute?"
+      id: S.S.A0003
+
+    - label: "Does the device implement the NameSupport attribute?"
+      id: S.S.A0004
+
+    - label: "Does the device implement the LastConfiguredBy attribute?"
+      id: S.S.A0005
+
+    - label: "Does the device implement receiving the AddScene command?"
+      id: S.S.C00.Rsp
+
+    - label: "Does the device implement receiving the ViewScene command?"
+      id: S.S.C01.Rsp
+
+    - label: "Does the device implement receiving the RemoveScene command?"
+      id: S.S.C02.Rsp
+
+    - label: "Does the device implement receiving the RemoveAllScenes command?"
+      id: S.S.C03.Rsp
+
+    - label: "Does the device implement receiving the StoreScene command?"
+      id: S.S.C04.Rsp
+
+    - label: "Does the device implement receiving the RecallScene command?"
+      id: S.S.C05.Rsp
+
+    - label:
+          "Does the device implement receiving the GetSceneMembership command?"
+      id: S.S.C06.Rsp
+
+    - label: "Does the device implement receiving the EnhancedAddScene command?"
+      id: S.S.C40.Rsp
+
+    - label:
+          "Does the device implement receiving the EnhancedViewScene command?"
+      id: S.S.C41.Rsp
+
+    - label: "Does the device implement receiving the CopyScene command?"
+      id: S.S.C42.Rsp
+
+    - label:
+          "Does the device process the TransitionTime parameter of the
+          RecallScene command?"
+      id: S.S.C05.Rsp
+
+    - label: "Does the device receive the AddGroup Command?"
+      id: G.S.C00.Rsp
+
+    - label: "Does the device receive the RemoveAllGroups Command?"
+      id: G.S.C04.Rsp
+
+    - label: "Does the device implement sending the AddScene command?"
+      id: S.C.C00.Tx
+
+    - label: "Does the device implement sending the ViewScene command?"
+      id: S.C.C01.Tx
+
+    - label: "Does the device implement sending the RemoveScene command?"
+      id: S.C.C02.Tx
+
+    - label: "Does the device implement sending the RemoveAllScenes command?"
+      id: S.C.C03.Tx
+
+    - label: "Does the device implement sending the StoreScene command?"
+      id: S.C.C04.Tx
+
+    - label: "Does the device implement sending the RecallScene command?"
+      id: S.C.C05.Tx
+
+    - label: "Does the device implement sending the GetSceneMembership command?"
+      id: S.C.C06.Tx
+
+    - label: "Does the device implement sending the EnhancedAddScene command?"
+      id: S.C.C40.Tx
+
+    - label: "Does the device implement sending the EnhancedViewScene command?"
+      id: S.C.C41.Tx
+
+    - label: "Does the device implement sending the CopyScene command?"
+      id: S.C.C42.Tx
+
+    #Switch Cluster
+    - label: "Does the device represent a Latching Switch?"
+      id: SWTCH.S.F00
+
+    - label: "Does the device implement the CurrentScene attribute?"
+      id: SWTCH.S.F01
+
+    - label: "Does the MS device support Momentary Switch Release?"
+      id: SWTCH.S.F02
+
+    - label: "Does the MS device support Momentary Switch LongPress?"
+      id: SWTCH.S.F03
+
+    - label: "Does the MS device support Momentary Switch MultiPress?"
+      id: SWTCH.S.F04
+
+    #General Commissioning Cluster
+    - label: "Does the device(Server) support Breadcrumb attribute?"
+      id: CGEN.S.A0000
+
+    - label: "Does the device(Server) support BasicCommissioningInfo attribute?"
+      id: CGEN.S.A0001
+
+    - label: "Does the device(Server) support RegulatoryConfig attribute?"
+      id: CGEN.S.A0002
+
+    - label: "Does the device(Server) support LocationCapability attribute?"
+      id: CGEN.S.A0003
+
+    - label:
+          "Does the device(Server) support SupportsConcurrentConnection
+          attribute?"
+      id: CGEN.S.A0004
+
+    - label:
+          "Does the Device(Server) implement receiving the ArmFailSafe command?"
+      id: CGEN.S.C00.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the ArmFailSafeResponse
+          command?"
+      id: CGEN.S.C01.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the SetRegulatoryConfig
+          command?"
+      id: CGEN.S.C02.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SetRegulatoryConfigResponse command?"
+      id: CGEN.S.C03.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the CommissioningComplete
+          command?"
+      id: CGEN.S.C04.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          CommissioningCompleteResponse command?"
+      id: CGEN.S.C05.Tx
+
+    #OTA Software Update
+    - label: "Does the DUT implement the OTA Requestor Device Type?"
+      id: MCORE.OTA.Requestor
+
+    - label: "Does the DUT implement the OTA Provider Device Type?"
+      id: MCORE.OTA.Provider
+
+    - label: "Does the DUT support the HTTPS Protocol for OTA image download?"
+      id: MCORE.OTA.HTTPS
+
+    - label:
+          "Does the DUT support obtaining user consent for OTA application by
+          virtue of built-in user interface capabilities?"
+      id: MCORE.OTA.RequestorConsent
+
+    - label: "Does the DUT support resumption of a transfer previously aborted?"
+      id: MCORE.OTA.Resume
+
+    - label: "Does the DUT support Vendor specific OTA implementation?"
+      id: MCORE.OTA.VendorSpecific
+
+    - label:
+          "Does the DUT have Administer privilege over the Access Control of
+          another node?"
+      id: MCORE.ACL.Administrator
+
+    - label:
+          "Does the DUT support sending the DelayedActionTime field in
+          QueryImageResponse Command?"
+      id: OTAS.S.M.DelayedActionTime
+
+    - label:
+          "Does the DUT support sending the UserConsentNeeded field in
+          QueryImageResponse Command?"
+      id: OTAS.S.M.UserConsentNeeded
+
+    - label: "Does the DUT support sending the AnnounceOTAProvider Command?"
+      id: OTAC.C.M.AnnounceOTAProvider
+
+    - label: "Does the DUT support sending the NotifyUpdateApplied Command?"
+      id: OTAC.C.M.NotifyUpdateApplied
+
+    #Time Format Localization Cluster
+    - label: "Does the DUT (Server) support HourFormat attribute?"
+      id: LTIME.S.A0000
+
+    - label: "Does the DUT (Server) support ActiveCalendarType attribute?"
+      id: LTIME.S.A0001
+
+    - label: "Does the DUT (Server) support SupportedCalendarTypes attribute?"
+      id: LTIME.S.A0002
+
+    - label: "PIXIT of the list of DUT SupportedCalendarTypes"
+      id: LTIME.S.A0002.SCT
+
+    - label: "Does the DUT (Server) support 12 Hr Hour Format"
+      id: LTIME.S.A0000.12HR
+
+    - label: "Does the DUT (Server) support 24 Hr Hour Format"
+      id: LTIME.S.A0000.24HR
+
+    - label: "Does the DUT (Client) support HourFormat attribute?"
+      id: LTIME.C.A0000
+
+    - label: "Does the DUT (Client) supportActiveCalendarType attribute?"
+      id: LTIME.C.A0001
+
+    - label: "Does the DUT (Client) support SupportedCalendarTypes attribute?"
+      id: LTIME.C.A0002
+
+    - label: "PIXIT of the list of DUT SupportedCalendarTypes"
+      id: LTIME.C.A0002.SCT
+
+    - label: "Does the DUT (Client) support 12 Hr Hour Format"
+      id: LTIME.C.A0000.12HR
+
+    - label: "Does the DUT (Client) support 24 Hr Hour Format"
+      id: LTIME.C.A0000.24HR
+
+    #Unit Localization Cluster
+    - label: "Does the DUT (Server) support TemperatureUnit attribute?"
+      id: LUNIT.S.A0000
+
+    - label: "Does the DUT (Server) support Fahrenheit TemperatureUnit?"
+      id: LUNIT.S.A0000.Fahrenheit
+
+    - label: "Does the DUT (Server) support Celsius TemperatureUnit?"
+      id: LUNIT.S.A0000.Celsius
+
+    - label: "Does the DUT (Server) support Kelvin TemperatureUnit?"
+      id: LUNIT.S.A0000.Kelvin
+
+    - label: "Does the DUT (Client) support TemperatureUnit attribute?"
+      id: LUNIT.C.A0000
+
+    - label: "Does the DUT (Client) support Fahrenheit TemperatureUnit?"
+      id: LUNIT.C.A0000.Fahrenheit
+
+    - label: "Does the DUT (Client) support Celsius TemperatureUnit?"
+      id: LUNIT.C.A0000.Celsius
+
+    - label: "Does the DUT (Client) support Kelvin TemperatureUnit?"
+      id: LUNIT.C.A0000.Kelvin
+
+    #Multiple Fabrics
+    - label: "Does the DUT support Multiple Fabrics?"
+      id: PICS_MF
+
+    - label: "Does the DUT support Basic Commissioning Method (BCM)?"
+      id: PICS_MF_BCM
+
+    #User Label cluster
+    - label: "Does the DUT Server support LabelList attribute?"
+      id: ULABEL.S.A0000
+
+    #Fixed Label cluster
+    - label: "Does the DUT Server support LabelList attribute?"
+      id: FLABEL.S.A0000
 
     #Media clusters
     - label:
@@ -754,115 +1656,1003 @@ PICS:
           SupportedStreamingProtocols attribute?"
       id: MC_CONTENTLAUNCHER.S.A0001
 
-    #Pressure Measurement
+    - label: "Does the device implement the Low Power cluster as a server?"
+      id: MC_LOWPOWER.S
+
+    - label: "Does the device implement the Low Power cluster as a client?"
+      id: MC_LOWPOWER.C
+
+    - label:
+          "Does the DUT support the Media Input server cluster SelectInput
+          command?"
+      id: MC_MEDIAINPUT.S.C0000
+
+    - label:
+          "Does the DUT support the Media Input server cluster ShowStatus
+          command?"
+      id: MC_MEDIAINPUT.S.C0001
+
+    - label:
+          "Does the DUT support the Media Input server cluster HideStatus
+          command"
+      id: MC_MEDIAINPUT.S.C0002
+
+    - label:
+          "Does the DUT support the Media Input server cluster Rename command?"
+      id: MC_MEDIAINPUT.S.C0003
+
+    - label:
+          "Does the DUT support the Media Input server cluster Name Updates
+          feature?"
+      id: MC_MEDIAINPUT.S.NU
+
+    - label:
+          "Does the DUT support the Media Input client cluster SelectInput
+          command?"
+      id: MC_MEDIAINPUT.C.C0000
+
+    - label:
+          "Does the DUT support the Media Input client cluster ShowStatus
+          command?"
+      id: MC_MEDIAINPUT.C.C0001
+
+    - label:
+          "Does the DUT support the Media Input client cluster HideStatus
+          command?"
+      id: MC_MEDIAINPUT.C.C0002
+
+    - label:
+          "Does the DUT support the Media Input server cluster Rename command?"
+      id: MC_MEDIAINPUT.C.C0003
+
+    - label:
+          "Does the DUT support the Application Launcher client cluster
+          LaunchApp command?"
+      id: MC_APPLAUNCHER.C.C0000
+
+    - label:
+          "Does the DUT support the Application Launcher client cluster StopApp
+          command?"
+      id: MC_APPLAUNCHER.C.C0001
+
+    - label:
+          "Does the DUT support the Application Launcher client cluster HideApp
+          command?"
+      id: MC_APPLAUNCHER.C.C0002
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster StopApp
+          command?"
+      id: MC_APPLAUNCHER.S.C0001
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster HideApp
+          command?"
+      id: MC_APPLAUNCHER.S.C0002
+
+    - label:
+          "Does the DUT support the Wake On LAN server cluster MACAddress
+          attribute?"
+      id: MC_WAKEONLAN.S.A0000
+
+    - label: "Does the device implement the Wake On LAN cluster as a server?"
+      id: MC_WAKEONLAN.S
+
+    - label:
+          "Does the DUT support the Channel server cluster Channel List feature?"
+      id: MC_CHANNEL.S.CL
+
+    - label:
+          "Does the DUT support the Channel server cluster ChannelList
+          attribute?"
+      id: MC_CHANNEL.S.A0000
+
+    - label: "Does the DUT support the Channel server cluster Lineup attribute?"
+      id: MC_CHANNEL.S.A0001
+
+    - label:
+          "Does the DUT support the Channel server cluster CurrentChannel
+          attribute?"
+      id: MC_CHANNEL.S.A0002
+
+    - label:
+          "Does the DUT support the Channel server cluster ChangeChannel
+          command?"
+      id: MC_CHANNEL.S.C0000
+
+    - label:
+          "Does the DUT support the Channel server cluster ChangeChannelByNumber
+          command?"
+      id: MC_CHANNEL.S.C0002
+
+    - label:
+          "Does the DUT support the Channel server cluster SkipChannel command?"
+      id: MC_CHANNEL.S.C0003
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Advanced Seek
+          feature?"
+      id: MC_MEDIAPLAYBACK.S.AS
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Variable Speed
+          feature?"
+      id: MC_MEDIAPLAYBACK.S.VS
+
+    - label:
+          "Does the DUT support the Media Playback server cluster CurrentState
+          attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0000
+
+    - label:
+          "Does the DUT support the Media Playback server cluster StartTime
+          attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0001
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Duration
+          attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0002
+
+    - label:
+          "Does the DUT support the Media Playback server cluster
+          SampledPosition attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0003
+
+    - label:
+          "Does the DUT support the Media Playback server cluster PlaybackSpeed
+          attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0004
+
+    - label:
+          "Does the DUT support the Media Playback server cluster SeekRangeEnd
+          attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0005
+
+    - label:
+          "Does the DUT support the Media Playback server cluster SeekRangeStart
+          attribute?"
+      id: MC_MEDIAPLAYBACK.S.A0006
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Play command?"
+      id: MC_MEDIAPLAYBACK.S.C0000
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Pause command?"
+      id: MC_MEDIAPLAYBACK.S.C0001
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Stop command?"
+      id: MC_MEDIAPLAYBACK.S.C0002
+
+    - label:
+          "Does the DUT support the Media Playback server cluster StartOver
+          command?"
+      id: MC_MEDIAPLAYBACK.S.C0003
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Previous
+          command?"
+      id: MC_MEDIAPLAYBACK.S.C0004
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Next command?"
+      id: MC_MEDIAPLAYBACK.S.C0005
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Rewind
+          command?"
+      id: MC_MEDIAPLAYBACK.S.C0006
+
+    - label:
+          "Does the DUT support the Media Playback server cluster FastForward
+          command?"
+      id: MC_MEDIAPLAYBACK.S.C0007
+
+    - label:
+          "Does the DUT support the Media Playback server cluster SkipForward
+          command?"
+      id: MC_MEDIAPLAYBACK.S.C0008
+
+    - label:
+          "Does the DUT support the Media Playback server cluster SkipBackward
+          command?"
+      id: MC_MEDIAPLAYBACK.S.C0009
+
+    - label:
+          "Does the DUT support the Media Playback server cluster Seek command?"
+      id: MC_MEDIAPLAYBACK.S.C000B
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Play command?"
+      id: MC_MEDIAPLAYBACK.C.C0000
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Pause command?"
+      id: MC_MEDIAPLAYBACK.C.C0001
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Stop command?"
+      id: MC_MEDIAPLAYBACK.C.C0002
+
+    - label:
+          "Does the DUT support the Media Playback client cluster StartOver
+          command?"
+      id: MC_MEDIAPLAYBACK.C.C0003
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Previous
+          command?"
+      id: MC_MEDIAPLAYBACK.C.C0004
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Next command?"
+      id: MC_MEDIAPLAYBACK.C.C0005
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Rewind
+          command?"
+      id: MC_MEDIAPLAYBACK.C.C0006
+
+    - label:
+          "Does the DUT support the Media Playback client cluster FastForward
+          command?"
+      id: MC_MEDIAPLAYBACK.C.C0007
+
+    - label:
+          "Does the DUT support the Media Playback client cluster SkipForward
+          command?"
+      id: MC_MEDIAPLAYBACK.C.C0008
+
+    - label:
+          "Does the DUT support the Media Playback client cluster SkipBackward
+          command?"
+      id: MC_MEDIAPLAYBACK.C.C0009
+
+    - label:
+          "Does the DUT support the Media Playback client cluster Seek command?"
+      id: MC_MEDIAPLAYBACK.C.C000B
+
+    - label:
+          "Does the DUT support the Audio Output server cluster OutputList
+          attribute?"
+      id: MC_AUDIOOUTPUT.S.A0000
+
+    - label:
+          "Does the DUT support the Audio Output server cluster CurrentOutput
+          attribute?"
+      id: MC_AUDIOOUTPUT.S.A0001
+
+    - label:
+          "Does the DUT support the Audio Output server cluster SelectOutput
+          command?"
+      id: MC_AUDIOOUTPUT.S.C0000
+
+    - label:
+          "Does the DUT support the Audio Output server cluster RenameOutput
+          command?"
+      id: MC_AUDIOOUTPUT.S.C0001
+
+    - label:
+          "Does the DUT support the Audio Ouput server cluster Name Updates
+          feature?"
+      id: MC_AUDIOOUTPUT.S.NU
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster TargetList
+          attribute?"
+      id: MC_TGTNAV.S.A0000
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster
+          CurrentTarget attribute?"
+      id: MC_TGTNAV.S.A0001
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster
+          NavigateTarget command?"
+      id: MC_TGTNAV.S.C0000
+
+    - label:
+          "Does the DUT support the Application Basic server cluster VendorName
+          attribute?"
+      id: MC_APBSC.S.A0000
+
+    - label:
+          "Does the DUT support the Application Basic server cluster VendorID
+          attribute?"
+      id: MC_APBSC.S.A0001
+
+    - label:
+          "Does the DUT support the Application Basic server cluster
+          ApplicationName attribute?"
+      id: MC_APBSC.S.A0002
+
+    - label:
+          "Does the DUT support the Application Basic server cluster ProductID
+          attribute?"
+      id: MC_APBSC.S.A0003
+
+    - label:
+          "Does the DUT support the Application Basic server cluster Application
+          attribute?"
+      id: MC_APBSC.S.A0004
+
+    - label:
+          "Does the DUT support the Application Basic server cluster Status
+          attribute?"
+      id: MC_APBSC.S.A0005
+
+    - label:
+          "Does the DUT support the Application Basic server cluster
+          ApplicationVersion attribute?"
+      id: MC_APBSC.S.A0006
+
+    - label:
+          "Does the DUT support the Application Basic server cluster
+          AllowedVendorList attribute?"
+      id: MC_APBSC.S.A0007
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster Content
+          Search feature?"
+      id: MC_CONTENTLAUNCHER.S.CS
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster URL Playback
+          feature?"
+      id: MC_CONTENTLAUNCHER.S.UP
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster AcceptHeader
+          attribute?"
+      id: MC_CONTENTLAUNCHER.S.A0000
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster
+          SupportedStreamingProtocols attribute?"
+      id: MC_CONTENTLAUNCHER.S.A0001
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster
+          LaunchContent command?"
+      id: MC_CONTENTLAUNCHER.C.C0000
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster LaunchURL
+          command?"
+      id: MC_CONTENTLAUNCHER.C.C0001
+
+    - label:
+          "Does the DUT support the Content Launcher server cluster and is
+          Commissionable?"
+      id: MC_ALOGIN.S.COMMISSIONABLE
+
+    - label:
+          "Does the DUT support the Account Login server cluster GetSetupPIN
+          command?"
+      id: MC_ALOGIN.S.C0000
+
+    - label:
+          "Does the DUT support the Account Login client cluster GetSetupPIN
+          command?"
+      id: MC_ALOGIN.C.C0000
+
+    - label: "Does the device implement the Keypad Input cluster as a client?"
+      id: MC_KEYPADINPUT.C
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster TargetList
+          attribute?"
+      id: MC_TGTNAV.S.A0000
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster
+          CurrentTarget attribute?"
+      id: MC_TGTNAV.S.A0001
+
+    - label:
+          "Does the DUT support the Target Navigator server cluster
+          NavigateTarget command?"
+      id: MC_TGTNAV.S.C0000
+
+    - label:
+          "Does the DUT support the commissioning procedure initiated by a
+          commissionee using User Directed Commissioning?"
+      id: MC.S.UDC
+
+    - label:
+          "Does the DUT support the commissioning procedure initiated by a
+          commissionee using User Directed Commissioning without PIN code entry?"
+      id: MC.S.UDCLOGIN
+
+    - label: "Does the DUT support the Low Power cluster"
+      id: PICS_LP
+
+    - label:
+          "Does the DUT support the Channel client cluster, ChangeChannel
+          command?"
+      id: MC_CHANNEL.C.C0000
+
+    - label:
+          "Does the DUT support the Channel client cluster,
+          ChangeChannelByNumber command?"
+      id: MC_CHANNEL.C.C0002
+
+    - label:
+          "Does the DUT support the Channel client cluster, SkipChannel command?"
+      id: MC_CHANNEL.C.C0003
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster,
+          LaunchApp command?"
+      id: MC_APPLAUNCHER.S.C0000
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster, StopApp
+          command?"
+      id: MC_APPLAUNCHER.S.C0001
+
+    - label:
+          "Does the DUT support the Application Launcher server cluster, HideApp
+          command?"
+      id: MC_APPLAUNCHER.S.C0002
+    #Bridge
+    - label: "Does the DUT implement a Bridge"
+      id: MCORE.BRIDGE
+
+    - label:
+          "Does the DUT have information on battery level of (at least some of)
+          of its bridged devices"
+      id: MCORE.BRIDGE.BatInfo
+
+    - label:
+          "Does the DUT have means to change the state of (at least some of) of
+          its bridged devices, e.g. through a manufacturer-provided app"
+      id: MCORE.BRIDGE.OtherControl
+
+    - label:
+          "Does the DUT have means to change the name of (at least some of) of
+          its bridged devices, e.g. through a manufacturer-provided app"
+      id: MCORE.BRIDGE.AllowDeviceRename
+
+    #Bulk Data Exchange Protocol
+    - label: "Does the DUT control the rate of the BDX transfer ?"
+      id: MCORE.BDX.Driver
+
+    - label: "Does the DUT support sending the BlockQueryWithSkip message?"
+      id: MCORE.BDX.BlockQueryWithSkip
+
+    #General Diagnostics Cluster
+    - label:
+          "Provides a node network interface information via NetworkInterface
+          structure."
+      id: DGGEN.S.A0000
+
+    - label:
+          "The number of times that the node has rebooted. Node low power or
+          sleep state shall not be counted and the count shall be reset by the
+          factory reset."
+      id: DGGEN.S.A0001
+
+    - label:
+          "The best effort assessment of the length of the time, in seconds,
+          since node’s last reboot. The UpTime should be incremented during
+          low-power or sleep state of the node. The UpTime shall be reset only
+          by a device reboot. The Uptime should not be subscribed."
+      id: DGGEN.S.A0002
+
+    - label:
+          "The best effort attempt to track the opeartional hours of node since
+          the node is operational. The operational hour should be incremented
+          during low-power or sleep state of the node. The TotalOperationalHours
+          shall be reset by the node factory reset."
+      id: DGGEN.S.A0003
+
+    - label: "Indicates the reason for the most recent node reboot."
+      id: DGGEN.S.A0004
+
+    - label: "Indicates a set of hardware fault detected by the node."
+      id: DGGEN.S.A0005
+
+    - label: "Indicates a set of radio fault detected by the node."
+      id: DGGEN.S.A0006
+
+    - label: "Indicates a set of network fault detected by the node."
+      id: DGGEN.S.A0007
+
+    - label: "Indicates that node is configured for test event triggers."
+      id: DGGEN.S.A0008
+
+    - label: "Indicates that node is configured for test event triggers."
+      id: DGGEN.S.C00
+
+    - label:
+          "Indicates a change in the set of hardware faults currently detected
+          by the Node."
+      id: DGGEN.S.E00
+
+    - label:
+          "Indicates a change in the set of radio faults currently detected by
+          the Node."
+      id: DGGEN.S.E01
+
+    - label:
+          "Indicates a change in the set of network faults currently detected by
+          the Node."
+      id: DGGEN.S.E02
+
+    - label: "Indicates the reason that caused the device to reboot start-up."
+      id: DGGEN.S.E03
+
+    #Flow Measurement Cluster
     - label: "Does the device implement the MeasuredValue attribute?"
-      id: PRS.S.A0000
+      id: FLW.S.A0000
 
     - label: "Does the device implement the MinMeasuredValue attribute?"
-      id: PRS.S.A0001
+      id: FLW.S.A0001
 
     - label: "Does the device implement the MaxMeasuredValue attribute?"
-      id: PRS.S.A0002
-
-    - label: "Does the device implement the Tolerance attribute?"
-      id: PRS.S.A0003
-
-    - label: "Does the device implement the ScaledValue attribute?"
-      id: PRS.S.A0010
-
-    - label: "Does the device implement the MinScaledValue attribute?"
-      id: PRS.S.A0011
-
-    - label: "Does the device implement the MaxScaledValue attribute?"
-      id: PRS.S.A0012
-
-    - label: "Does the device implement the ScaledTolerance attribute?"
-      id: PRS.S.A0013
-
-    - label: "Does the device implement the Scale attribute?"
-      id: PRS.S.A0014
-
-    - label: "Does the device implement the Occupancy attribute?"
-      id: OCC.S.A0000
-
-    - label: "Does the device implement the OccupancySensorType attribute?"
-      id: OCC.S.A0001
-
-    - label:
-          "Does the device implement the OccupancySensorTypeBitmap attribute?"
-      id: OCC.S.A0002
-
-    - label:
-          "Does the device implement the PIROccupiedToUnoccupiedDelay attribute?"
-      id: OCC.S.A0010
-
-    - label:
-          "Does the device implement the PIRUnoccupiedToOccupiedDelay attribute?"
-      id: OCC.S.A0011
-
-    - label:
-          "Does the device implement the PIRUnoccupiedToOccupiedThreshold
-          attribute?"
-      id: OCC.S.A0012
-
-    - label:
-          "Does the device implement the UltrasonicOccupiedToUnoccupiedDelay
-          attribute?"
-      id: OCC.S.A0020
-
-    - label:
-          "Does the device implement the UltrasonicUnoccupiedToOccupiedDelay
-          attribute?"
-      id: OCC.S.A0021
-
-    - label:
-          "Does the device implement the UltrasonicUnoccupiedToOccupiedThreshold
-          attribute?"
-      id: OCC.S.A0022
-
-    - label:
-          "Does the device implement the
-          PhysicalContactOccupiedToUnoccupiedDelay attribute?"
-      id: OCC.S.A0030
-
-    - label:
-          "Does the device implement the
-          PhysicalContactUnoccupiedToOccupiedDelay attribute?"
-      id: OCC.S.A0031
-
-    - label:
-          "Does the device implement the
-          PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
-      id: OCC.S.A0032
+      id: FLW.S.A0002
 
     - label: "Does the device implement the Tolerance attribute?"
       id: FLW.S.A0003
 
-    - label: "Does the DUT(server) support the Hue/Saturation feature?"
-      id: CC.S.F00
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device?"
+      id: FLW.M.FlowChange
 
-    - label: "Does the DUT(server) support the Enhanced Hue feature?"
-      id: CC.S.F01
+    # Pump Configuration and Control cluster
+    - label: "Does the device implement the MaxPressure attribute?"
+      id: PCC.S.A0000
 
-    - label: "Does the DUT(server) support the Color Loop feature?"
-      id: CC.S.F02
+    - label: "Does the device implement the MaxSpeed attribute?"
+      id: PCC.S.A0001
 
-    - label: "Does the DUT(server) support the Color XY feature?"
-      id: CC.S.F03
+    - label: "Does the device implement the MaxFlow attribute?"
+      id: PCC.S.A0002
 
-    - label: "Does the DUT(server) support the Color Temperature feature?"
-      id: CC.S.F04
+    - label: "Does the device implement the MinConstPressure attribute?"
+      id: PCC.S.A0003
 
-    - label: "Does the device support extended range and resolution?"
-      id: PRS.S.F00
+    - label: "Does the device implement the MaxConstPressure attribute?"
+      id: PCC.S.A0004
+
+    - label: "Does the device implement the MinCompPressure attribute?"
+      id: PCC.S.A0005
+
+    - label: "Does the device implement the MaxCompPressure attribute?"
+      id: PCC.S.A0006
+
+    - label: "Does the device implement the MinConstSpeed attribute?"
+      id: PCC.S.A0007
+
+    - label: "Does the device implement the MaxConstSpeed attribute?"
+      id: PCC.S.A0008
+
+    - label: "Does the device implement the MinConstFlow attribute?"
+      id: PCC.S.A0009
+
+    - label: "Does the device implement the MaxConstFlow attribute?"
+      id: PCC.S.A000a
+
+    - label: "Does the device implement the MinConstTemp attribute?"
+      id: PCC.S.A000b
+
+    - label: "Does the device implement the MaxConstTemp attribute?"
+      id: PCC.S.A000c
+
+    - label: "Does the device implement the PumpStatus attribute?"
+      id: PCC.S.A0010
+
+    - label: "Does the device implement the EffectiveOperationMode attribute?"
+      id: PCC.S.A0011
+
+    - label: "Does the device implement the EffectiveControlMode attribute?"
+      id: PCC.S.A0012
+
+    - label: "Does the device implement the Capacity attribute?"
+      id: PCC.S.A0013
+
+    - label: "Does the device implement the Speed attribute?"
+      id: PCC.S.A0014
+
+    - label: "Does the device implement the LifetimeRunningHours attribute?"
+      id: PCC.S.A0015
+
+    - label: "Does the device implement the Power attribute?"
+      id: PCC.S.A0016
+
+    - label: "Does the device implement the LifetimeEnergyConsumed attribute?"
+      id: PCC.S.A0017
+
+    - label: "Does the device implement the OperationMode attribute?"
+      id: PCC.S.A0020
+
+    - label: "Does the device implement the LifetimeEnergyConsumed attribute?"
+      id: PCC.S.A0021
+
+    #Power Source Cluster
+    - label: "Does the device implement the Status attribute?"
+      id: PS.S.A0000
+
+    - label: "Does the device implement the Order attribute?"
+      id: PS.S.A0001
+
+    - label: "Does the device implement the Description attribute?"
+      id: PS.S.A0002
 
     - label:
-          "Does the DUT(server) support the Frequency attributes and behavior
-          feature?"
-      id: LVL.S.F02
+          "Does the device implement the WiredAssessedInputVoltage attribute?"
+      id: PS.S.A0003
 
-    - label: "Does the DUT(server) support the MaxLevel attribute?"
-      id: LVL.S.A0003
+    - label:
+          "Does the device implement the WiredAssessedInputFrequency attribute?"
+      id: PS.S.A0004
 
-    - label: "Does the DUT(server) support the MinLevel attribute?"
-      id: LVL.S.A0002
+    - label: "Does the device implement the WiredCurrentType attribute?"
+      id: PS.S.A0005
+
+    - label: "Does the device implement the WiredAssessedCurrent attribute?"
+      id: PS.S.A0006
+
+    - label: "Does the device implement the WiredNominalVoltage attribute?"
+      id: PS.S.A0007
+
+    - label: "Does the device implement the WiredMaximumCurrent attribute?"
+      id: PS.S.A0008
+
+    - label: "Does the device implement the WiredPresent attribute?"
+      id: PS.S.A0009
+
+    - label: "Does the device implement the ActiveWiredFaults attribute?"
+      id: PS.S.A000a
+
+    - label: "Does the device implement the BatVoltage attribute?"
+      id: PS.S.A000b
+
+    - label: "Does the device implement the BatPercentRemaining attribute?"
+      id: PS.S.A000c
+
+    - label: "Does the device implement the BatTimeRemaining attribute?"
+      id: PS.S.A000d
+
+    - label: "Does the device implement the BatChargeLevel attribute?"
+      id: PS.S.A000e
+
+    - label: "Does the device implement the BatReplacementNeeded attribute?"
+      id: PS.S.A000f
+
+    - label: "Does the device implement the BatReplaceability attribute?"
+      id: PS.S.A0010
+
+    - label: "Does the device implement the BatPresent attribute?"
+      id: PS.S.A0011
+
+    - label: "Does the device implement the ActiveBatFaults attribute?"
+      id: PS.S.A0012
+
+    - label:
+          "Does the device implement the BatReplacementDescription attribute?"
+      id: PS.S.A0013
+
+    - label: "Does the device implement the BatCommonDesignation attribute?"
+      id: PS.S.A0014
+
+    - label: "Does the device implement the BatANSIDesignation attribute?"
+      id: PS.S.A0015
+
+    - label: "Does the device implement the BatIECDesignation attribute?"
+      id: PS.S.A0016
+
+    - label: "Does the device implement the BatApprovedChemistry attribute?"
+      id: PS.S.A0017
+
+    - label: "Does the device implement the BatCapacity attribute?"
+      id: PS.S.A0018
+
+    - label: "Does the device implement the BatQuantity attribute?"
+      id: PS.S.A0019
+
+    - label: "Does the device implement the BatChargeState attribute?"
+      id: PS.S.A001a
+
+    - label: "Does the device implement the BatTimeToFullCharge attribute?"
+      id: PS.S.A001b
+
+    - label:
+          "Does the device implement the BatFunctionalWhileCharging attribute?"
+      id: PS.S.A001c
+
+    - label: "Does the device implement the BatChargingCurrent attribute?"
+      id: PS.S.A001d
+
+    - label: "Does the device implement the ActiveBatChargeFaults attribute?"
+      id: PS.S.A001e
+
+    - label: "Does the device implement the WiredFaultChange event?"
+      id: PS.S.E00
+
+    - label: "Does the device implement the BatFaultChange event?"
+      id: PS.S.E01
+
+    - label: "Does the device implement the BatChargeFaultChange event?"
+      id: PS.S.E02
+
+    #Thermostat User Configuration Cluster
+    - label: "Does the device implement the TemperatureDisplayMode attribute?"
+      id: TSUIC.S.A0000
+
+    - label: "Does the device implement the KeypadLockout attribute?"
+      id: TSUIC.S.A0001
+
+    - label:
+          "Does the device implement the ScheduleProgrammingVisibility
+          attribute?"
+      id: TSUIC.S.A0002
+    #Binding Cluster
+    - label: "Does the DUT(server) support the Binding attribute?"
+      id: BIND.S.A0000
+
+    - label: "Does the DUT(client) implement the GroupKeyMap attribute?"
+      id: GRPKEY.C.A0000
+
+    - label: "Does the DUT(client) implement sending the Off command?"
+      id: OO.C.C00.Tx
+
+    - label: "Does the DUT(client) implement sending the On command?"
+      id: OO.C.C01.Tx
+
+    - label: "Does the DUT(Client) implement sending Keysetwrite command?"
+      id: GRPKEY.C.C00.Tx
+
+    - label: "Does the DUT(Client) implement sending AddGroup command?"
+      id: G.C.C00.Tx
+
+    #Device Discovery
+    - label:
+          "Does the device support discovery over Bluetooth Low Energy (BLE)?"
+      id: MCORE.DD.BLE
+
+    - label: "Does the device support discovery over WiFi?"
+      id: MCORE.DD.WIFI
+
+    - label: "Does the device only function within a Matter network?"
+      id: MCORE.DD.CHIP_DEV
+
+    - label: "Is the device a lock device?"
+      id: MCORE.DD.DEV_LOCK
+
+    - label: "Is the device a barrier access device?"
+      id: MCORE.DD.DEV_BARRIER
+
+    - label: "Does the device have a vendor specific information element (IE)?"
+      id: MCORE.DD.IE
+
+    - label:
+          "Does the device or device packaging have a QR code based onboarding
+          payload?"
+      id: MCORE.DD.QR
+
+    - label: "Does the device or device packaging have a Manual Pairing Code?"
+      id: MCORE.DD.MANUAL_PC
+
+    - label: "Does the packed binary data structure contain encoded TLV Data?"
+      id: MCORE.DD.TLV
+
+    - label:
+          "Does the QR code contain multiple concatenated onboarding payloads?"
+      id: MCORE.DD.CONCAT
+
+    - label: "Does the device have a NFC tag containing the onboarding payload?"
+      id: MCORE.DD.NFC
+
+    - label: "Does the device support dynamic passcodes?"
+      id: MCORE.DD.PASSCODE
+
+    - label: "Does the device support user interface?"
+      id: MCORE.DD.UI
+
+    - label: "Does the device support Commissioner Discovery?"
+      id: MCORE.DD.COMM_DISCOVERY
+
+    - label: "Is the DUT a Controller?"
+      id: MCORE.DD.CONTROLLER
+
+    - label: "Does the DUT support scanning concatenated QR codes?"
+      id: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
+
+    - label:
+          "Does the DUT support indicating to user the need to commission device
+          one by one for concatenated QR codes?"
+      id: MCORE.DD.CTRL_CONCATENATED_QR_CODE_2
+
+    - label: "Is the DUT a Commissioner?"
+      id: MCORE.DD.COMMISSIONER
+
+    - label: "Does the DUT require a custom commissioning flow?"
+      id: MCORE.DD.CUSTOM_COMM_FLOW
+
+    - label: "Does the DUT support Discovery Capability over BLE?"
+      id: MCORE.DD.DT_BLE
+
+    - label: "Is the DUT a Controller?"
+      id: MCORE.DD.CONTROLLER
+
+    - label: "Does the DUT support Discovery Capability over IP Network?"
+      id: MCORE.DD.DT_IP
+
+    - label: "Does the DUT support Discovery Capability over SoftAP?"
+      id: MCORE.DD.DT_SOFTAP
+
+    - label: "Does the DUT support Standard Commissioning Flow?"
+      id: MCORE.DD.STANDARD_COMM_FLOW
+
+    - label: "Does the DUT support User-Intent Commissioning Flow?"
+      id: MCORE.DD.USER_INTENT_COMM_FLOW
+
+    - label: "Does the DUT support Custom Commissioning Flow?"
+      id: MCORE.DD.CUSTOM_COMM_FLOW
+
+    - label:
+          "Does the DUT commissioner support accepting an 11-digit Manual
+          Pairing Code for commissioning?"
+      id: MCORE.DD.11_MANUAL_PC
+
+    - label:
+          "Does the DUT commissioner support accepting a 21-digit Manual Pairing
+          Code for commissioning?"
+      id: MCORE.DD.21_MANUAL_PC
+
+    - label:
+          "Does the device is subject to physical tampering (doorbell, camera,
+          door lock, designed for outdoor usage)?"
+      id: MCORE.DD.PHYSICAL_TAMPERING
+
+    - label:
+          "Does the device support scanning NFC tags containing the onboarding
+          payload?"
+      id: MCORE.DD.SCAN_NFC
+
+    - label:
+          "Does the DUT support scanning QR codes containing the onboarding
+          payload?"
+      id: MCORE.DD.SCAN_QR_CODE
+
+    - label: "Does the device support Thread interface?"
+      id: MCORE.DD.THREAD
+
+    - label: "Does the device support Wifi or Thread interfaces?"
+      id: MCORE.DD.WIRELESS
+
+    #Ethernet Network Diagnostics Cluster
+    - label: "Does the device implement the ResetCounts command?"
+      id: DGETH.S.C00
+
+    - label: "Does the device implement the PHYRate attribute?"
+      id: DGETH.S.A0000
+
+    - label: "Does the device implement the FullDuplex attribute?"
+      id: DGETH.S.A0001
+
+    - label: "Does the device implement the PacketRxCount attribute?"
+      id: DGETH.S.A0002
+
+    - label: "Does the device implement the PacketTxCount attribute?"
+      id: DGETH.S.A0003
+
+    - label: "Does the device implement the TxErrCount attribute?"
+      id: DGETH.S.A0004
+
+    - label: "Does the device implement the CollisionCount attribute?"
+      id: DGETH.S.A0005
+
+    - label: "Does the device implement the OverrunCount attribute?"
+      id: DGETH.S.A0006
+
+    - label: "Does the device implement the CarrierDetect attribute?"
+      id: DGETH.S.A0007
+
+    - label: "Does the device implement the CarrierDetect attribute?"
+      id: DGETH.S.A0008
+
+    #Wi-Fi Network Diagnostics Cluster
+    - label:
+          "Counts for the number of received and transmitted packets on the
+          ethernet interface."
+      id: DGWIFI.S.F00
+
+    - label:
+          "Counts for the number of errors during the reception and transmission
+          of packets on the ethernet interface."
+      id: DGWIFI.S.F01
+
+    - label:
+          "Indicates the BSSID for which the Wi-Fi network the Node is currently
+          connected. If the interface not configured, a NULL value should be
+          presented."
+      id: DGWIFI.S.A0000
+
+    - label: "The current type of WiFi security being used."
+      id: DGWIFI.S.A0001
+
+    - label: "Indicates the current 802.11 standard version in use by the Node."
+      id: DGWIFI.S.A0002
+
+    - label:
+          "Indicate the channel that Wi-Fi communication is currently operating
+          on. If the interface not configured, a NULL value should be presented"
+      id: DGWIFI.S.A0003
+
+    - label:
+          "Indicates the current RSSI of the Node 's Wi-Fi radio in dB. If the
+          interface not configured or operational, a NULL value should be
+          presented. This value should not be subscribed."
+      id: DGWIFI.S.A0004
+
+    - label:
+          "Indicates the count of the number of received beacons. This value
+          should not be subscribed."
+      id: DGWIFI.S.A0005
+
+    - label:
+          "Indicates the count of the number of received beacons. This value
+          should not be subscribed."
+      id: DGWIFI.S.A0006
+
+    - label:
+          "Indicates the number of multicast packets received by the Node. This
+          value should not be subscribed."
+      id: DGWIFI.S.A0007
+
+    - label:
+          "Indicates the number of mul5icast packets transmitted by the Node.
+          This value should not be subscribed."
+      id: DGWIFI.S.A0008
+
+    - label:
+          "Indicates the number of uicast packets received by the Node. This
+          value should not be subscribed."
+      id: DGWIFI.S.A0009
+
+    - label:
+          "Indicates the number of unicast packets transmitted by the Node. This
+          value should not be subscribed."
+      id: DGWIFI.S.A000a
+
+    - label:
+          "Indicates the current maximum PHY rate of transfer of data in
+          bytes-per-second."
+      id: DGWIFI.S.A000b
+
+    - label:
+          "Indicates the number of packets dropped either at ingress or egress,
+          due to lack of buffer memory to retain all packets on the ethernet
+          network interface. This attribute SHALL be reset to 0 upon a reboot of
+          the Node. This value should not be subscribed."
+      id: DGWIFI.S.A000c
+
+    - label:
+          "Indicates Node’s Wi-Fi connection has been disconnected as a result
+          of de-authenticated or dis-association and indicates the reason."
+      id: DGWIFI.S.E00
+
+    - label:
+          "Indicates unsuccessful connection and reconnection to WiFi access
+          point after exhaustive retries. AssociationFailure fields are to
+          indicate the cause and status. Each field set values are described in
+          11.14.6.2"
+      id: DGWIFI.S.E01
+
+    - label:
+          "Indicates that a Node’s connection status to a Wi-Fi network has
+          changed."
+      id: DGWIFI.S.E02
+
+    - label:
+          "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
+          PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
+          PacketUnicastTxCount"
+      id: DGWIFI.S.C00

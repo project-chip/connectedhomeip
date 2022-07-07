@@ -400,27 +400,30 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
-
-    /**
-     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
-     *
-     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
-     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
-     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
-     *       entries used during fail-safe.
-     *
-     * TODO(#19929): Need to make this const and private, but can't just yet.
-     *
-     * @param fabricIndex - fabric index for which to get the FabricInfo entry/
-     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
-     */
-    FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
-
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
 
     CHIP_ERROR Init(const FabricTable::InitParams & initParams);
     void Shutdown();
+
+    /**
+     * @brief If `Init()` caused a Delete due to partial commit, the fabric index at play is returned.
+     *
+     * Allows caller to schedule more clean-up. This is because at Init() time, none of the delegates
+     * are registered yet, so no other modules would learn of the removal.
+     *
+     * The value is auto-reset to `kUndefinedFabricIndex` on being returned, so that subsequent
+     * `GetDeletedFabricFromCommitMarker()` after one that has a fabric index to give will provide
+     * `kUndefinedFabricIndex`.
+     *
+     * @return the fabric index of a just-deleted fabric, or kUndefinedFabricIndex if none were deleted.
+     */
+    FabricIndex GetDeletedFabricFromCommitMarker();
+
+    /**
+     * @brief Clear the commit marker when we are sure we have proceeded with any remaining clean-up
+     */
+    void ClearCommitMarker();
 
     // Forget a fabric in memory: doesn't delete any persistent state, just
     // reverts any pending state (blindly) and then resets the fabric table
@@ -487,6 +490,19 @@ public:
     ConstFabricIterator end() const { return cend(); }
 
     /**
+     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
+     *
+     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
+     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
+     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
+     *       entries used during fail-safe.
+     *
+     * @param fabricIndex - fabric index for which to get a mutable FabricInfo entry
+     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
+     */
+    FabricInfo * GetMutableFabricByIndex(FabricIndex fabricIndex);
+
+    /**
      * @brief Get the RCAC (operational root certificate) associated with a fabric.
      *
      * If a root is pending for `fabricIndex` from `AddNewPendingTrustedRootCert`, it is returned.
@@ -546,6 +562,17 @@ public:
     CHIP_ERROR FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const;
 
     /**
+     * @brief Get the CASE Authenticated Tags from the NOC for the given `fabricIndex`.
+     *
+     * @param fabricIndex - Fabric for which to get the root public key (subject public key of RCAC)
+     * @param cats - CATValues struct to write the NOC CATs for the given fabric index
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if not found/available, or `fabricIndex` has a bad value
+     * @retval other CHIP_ERROR values on other invalid arguments or internal errors.
+     */
+    CHIP_ERROR FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const;
+
+    /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for
      *        CASE and the only way the key should be used.
      *
@@ -562,6 +589,26 @@ public:
      * @retval other CHIP_ERROR value on internal errors
      */
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
+
+    /**
+     * @brief Create an ephemeral keypair for use in session establishment.
+     *
+     * WARNING: The return value MUST be released by `ReleaseEphemeralKeypair`. This is because
+     *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
+     *          safely allow classes derived from Crypto::P256Keypair to be released properly.
+     *
+     * This delegates to the OperationalKeystore if one exists, otherwise it directly allocates a base
+     * Crypto::P256Keypair instance
+     *
+     * @return a pointer to a dynamically P256Keypair (or derived class thereof), which may evaluate to nullptr
+     *         if running out of memory.
+     */
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE();
+
+    /**
+     * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypairForCASE()`
+     */
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair);
 
     /**
      * This initializes a new keypair for the given fabric and generates a CSR for it,
@@ -820,8 +867,24 @@ public:
         return err;
     }
 
+    // For test only. See definition of `StateFlags::kAbortCommitForTest`.
+    void SetForceAbortCommitForTest(bool abortCommitForTest)
+    {
+        (void) abortCommitForTest;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        if (abortCommitForTest)
+        {
+            mStateFlags.Set(StateFlags::kAbortCommitForTest);
+        }
+        else
+        {
+            mStateFlags.Clear(StateFlags::kAbortCommitForTest);
+        }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    }
+
 private:
-    enum class StateFlags : uint8_t
+    enum class StateFlags : uint16_t
     {
         // If true, we are in the process of a fail-safe and there was at least one
         // operation that caused partial data in the fabric table.
@@ -838,17 +901,25 @@ private:
         // True if we allow more than one fabric with same root and fabricId in the fabric table
         // for test purposes. This disables a collision check.
         kAreCollidingFabricsIgnored = (1u << 6),
+
+        // If set to true (only possible on test builds), will cause `CommitPendingFabricData()` to early
+        // return during commit, skipping clean-ups, so that we can validate commit marker fabric removal.
+        kAbortCommitForTest = (1u << 7),
     };
 
-    static constexpr size_t IndexInfoTLVMaxSize()
+    // Stored to indicate a commit is in progress, so that it can be cleaned-up on next boot
+    // if stopped in the middle.
+    struct CommitMarker
     {
-        // We have a single next-available index and an array of anonymous-tagged
-        // fabric indices.
-        //
-        // The max size of the list is (1 byte control + bytes for actual value)
-        // times max number of list items, plus one byte for the list terminator.
-        return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
-    }
+        CommitMarker() = default;
+        CommitMarker(FabricIndex fabricIndex_, bool isAddition_)
+        {
+            this->fabricIndex = fabricIndex_;
+            this->isAddition  = isAddition_;
+        }
+        FabricIndex fabricIndex = kUndefinedFabricIndex;
+        bool isAddition         = false;
+    };
 
     // Load a FabricInfo metatada item from storage for a given new fabric index. Returns internal error on failure.
     CHIP_ERROR LoadFromStorage(FabricInfo * fabric, FabricIndex newFabricIndex);
@@ -955,6 +1026,10 @@ private:
     CHIP_ERROR NotifyFabricUpdated(FabricIndex fabricIndex);
     CHIP_ERROR NotifyFabricCommitted(FabricIndex fabricIndex);
 
+    // Commit management clean-up APIs
+    CHIP_ERROR StoreCommitMarker(const CommitMarker & commitMarker);
+    CHIP_ERROR GetCommitMarker(CommitMarker & outCommitMarker);
+
     FabricInfo mStates[CHIP_CONFIG_MAX_FABRICS];
     // Used for UpdateNOC pending fabric updates
     FabricInfo mPendingFabric;
@@ -969,6 +1044,9 @@ private:
     // When mStateFlags.Has(kIsPendingFabricDataPresent) is true, this holds the index of the fabric
     // for which there is currently pending data.
     FabricIndex mFabricIndexWithPendingState = kUndefinedFabricIndex;
+
+    // For when a revert occurs during init, so that more clean-up can be scheduled by caller.
+    FabricIndex mDeletedFabricIndexFromInit = kUndefinedFabricIndex;
 
     LastKnownGoodTime mLastKnownGoodTime;
 

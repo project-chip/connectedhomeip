@@ -1,5 +1,5 @@
 #import "CHIPToolKeypair.h"
-#include <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
@@ -44,7 +44,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     return out_signature;
 }
 
-- (SecKeyRef)pubkey
+- (SecKeyRef)publicKey
 {
     chip::Crypto::P256PublicKey publicKey = _mKeyPair.Pubkey();
     NSData * publicKeyNSData = [NSData dataWithBytes:publicKey.Bytes() length:publicKey.Length()];

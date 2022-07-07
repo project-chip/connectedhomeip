@@ -92,9 +92,9 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
     return err;
 }
 
-CHIP_ERROR ExchangeManager::Shutdown()
+void ExchangeManager::Shutdown()
 {
-    VerifyOrReturnError(mState == State::kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState != State::kState_NotInitialized);
 
     mReliableMessageMgr.Shutdown();
 
@@ -105,8 +105,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
     }
 
     mState = State::kState_NotInitialized;
-
-    return CHIP_NO_ERROR;
 }
 
 ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)

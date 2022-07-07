@@ -69,9 +69,20 @@ constexpr int extDiscTimeoutSecs = 20;
 /*****************************************************************************
  *                    Application Function Definitions
  *****************************************************************************/
+CHIP_ERROR CHIP_Init(void);
 
-int Application_Init(void)
+void Application_Init(void)
 {
+    CHIP_ERROR error;
+
+    /* Initialize CHIP stack */
+    error = CHIP_Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "CHIP_Init failed");
+        return;
+    }
+
     /* Launch application task */
     ChipLogProgress(NotSpecified, "============================");
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
@@ -81,10 +92,8 @@ int Application_Init(void)
     if (ret != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
-        return -1;
+        return;
     }
-
-    return 0;
 }
 
 CHIP_ERROR CHIP_Init(void)
@@ -172,32 +181,15 @@ exit:
 int main(void)
 {
     int result;
-    CHIP_ERROR error;
 
     /* Initialize Qorvo stack */
-    result = qvCHIP_init();
+    result = qvCHIP_init(Application_Init);
     if (result < 0)
     {
-        goto exit;
-    }
-
-    /* Initialize CHIP stack */
-    error = CHIP_Init();
-    if (error != CHIP_NO_ERROR)
-    {
-        goto exit;
-    }
-
-    /* Application task */
-    result = Application_Init();
-    if (result < 0)
-    {
-        goto exit;
+        return 0;
     }
 
     /* Start FreeRTOS */
     vTaskStartScheduler();
-
-exit:
     return 0;
 }

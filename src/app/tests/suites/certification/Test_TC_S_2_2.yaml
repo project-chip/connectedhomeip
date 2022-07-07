@@ -22,6 +22,7 @@ config:
 
 tests:
     - label: "TH sends a RemoveAllGroups command to DUT."
+      PICS: G.S.C04.Rsp
       verification: |
           If a status response is expected, DUT sends a response to TH with the Status field equal to 0x00 (SUCCESS).
       disabled: true
@@ -38,6 +39,7 @@ tests:
     - label:
           "TH sends a AddGroup command to DUT with the GroupID field set to
           0x0001."
+      PICS: G.S.C00.Rsp
       verification: |
           DUT sends a AddGroupResponse command to TH with the Status field set to 0x00 (SUCCESS) and the GroupID field set to 0x0001.
       disabled: true
@@ -45,6 +47,7 @@ tests:
     - label:
           "TH sends a RemoveAllScenes command to DUT with the GroupID field set
           to 0x0001."
+      PICS: S.S.C03.Rsp
       verification: |
           DUT sends a RemoveAllScenesResponse command to TH with the Status field set to 0x00 (SUCCESS) and GroupID field set to 0x0001.
       disabled: true
@@ -52,6 +55,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to the value SC0, the GroupID field set to 0x0001 and the SceneCount field set to 0x00.
       disabled: true
@@ -66,6 +70,7 @@ tests:
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
       verification: |
           DUT sends a StoreSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 0x0001 and the SceneID field set to 0x01.
       disabled: true
@@ -80,6 +85,7 @@ tests:
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C05.Rsp
       verification: |
           If a status response is expected, DUT sends a response to TH with the Status field equal to 0x00 (SUCCESS). DUT returns to AC1.
       disabled: true
@@ -87,6 +93,7 @@ tests:
     - label:
           "TH reads attributes SceneCount, CurrentScene, CurrentGroup and
           SceneValid from DUT."
+      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003
       verification: |
           DUT provides these attribute values: SceneCount attribute has the value (PIXIT.S.SceneTableEntriesOnFactoryNew + 1) CurrentScene attribute has the value 0x01 CurrentGroup attribute has the value G1 SceneValid attribute has the value TRUE.
       disabled: true
@@ -111,6 +118,7 @@ tests:
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C05.Rsp
       verification: |
           If a status response is expected, DUT sends a response to TH with the Status field equal to 0x00 (SUCCESS). DUT returns to AC1.
       disabled: true
@@ -118,6 +126,7 @@ tests:
     - label:
           "TH sends a ViewScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C01.Rsp
       verification: |
           DUT sends a ViewSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 0x0001, the SceneID field set to 0x01, the TransitionTime field set to 0x0000 and a set of extension fields appropriate to AC1.
       disabled: true
@@ -125,6 +134,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values (SC0 - 1), 0xfe or null, the GroupID field set to 0x0001, the SceneCount field set to 0x01 and the SceneList field containing only the scene ID 0x01.
       disabled: true
@@ -132,6 +142,7 @@ tests:
     - label:
           "TH sends a RemoveAllScenes command to DUT with the GroupID field set
           to 0x0001."
+      PICS: S.S.C03.Rsp
       verification: |
           DUT sends a RemoveAllScenesResponse command to TH with the Status field set to 0x00 (SUCCESS) and GroupID field set to 0x0001.
       disabled: true
@@ -139,6 +150,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values SC0, 0xfe or null, the GroupID field set to 0x0001 and the SceneCount field set to 0x00.
       disabled: true
@@ -147,6 +159,7 @@ tests:
           "TH sends a AddScene command to DUT with the GroupID field set to
           0x0001, the SceneID field set to 0x01, the TransitionTime field set to
           0x0001 and a set of extension fields appropriate to AC1."
+      PICS: S.S.C00.Rsp
       verification: |
           DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 0x0001 and the SceneID field set to 0x01.
       disabled: true
@@ -154,6 +167,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values (SC0 - 1), 0xfe or null, the GroupID field set to 0x0001, the SceneCount field set to 0x01 and the SceneList field containing only the scene ID 0x01.
       disabled: true
@@ -161,6 +175,7 @@ tests:
     - label:
           "TH sends a RemoveScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C02.Rsp
       verification: |
           DUT sends a RemoveSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 0x0001 and the SceneID field set to 0x01.
       disabled: true
@@ -168,6 +183,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values SC0, 0xfe or null, the GroupID field set to 0x0001 and the SceneCount field set to 0x00.
       disabled: true
@@ -182,6 +198,7 @@ tests:
     - label:
           "TH sends a RecallScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C05.Rsp
       verification: |
           If a status response is expected, DUT sends a response to TH with the Status field equal to 0x8b (NOT_FOUND).
       disabled: true
@@ -196,6 +213,7 @@ tests:
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
       verification: |
           DUT sends a StoreSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to 0x0001 and the SceneID field set to 0x01.
       disabled: true
@@ -210,6 +228,7 @@ tests:
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
           0x0001 and the SceneID field set to 0x02."
+      PICS: S.S.C04.Rsp
       verification: |
           DUT sends a StoreSceneResponse command to TH with the Status field set to 0x00 (SUCCESS) or 0x89 (INSUFFICIENT_SPACE). If SUCCESS, with the GroupID field set to 0x0001 and the SceneID field set to 0x02. If INSUFFICIENT_SPACE, the following steps SHALL NOT be executed.
       disabled: true
@@ -217,6 +236,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0001."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values (SC0 - 2), 0xfe or null, the GroupID field set to 0x0001, the SceneCount field set to 0x02 and the SceneList field containing the scene IDs 0x01 and 0x02.
       disabled: true
@@ -224,6 +244,7 @@ tests:
     - label:
           "If capacity allows, TH sends a AddGroup command to DUT with the
           GroupID field set to 0x0002."
+      PICS: G.S.C00.Rsp
       verification: |
           DUT sends a AddGroupResponse command to TH with the Status field set to 0x00 (SUCCESS) and the GroupID field set to 0x0002.
       disabled: true
@@ -231,6 +252,7 @@ tests:
     - label:
           "TH sends a RemoveAllScenes command to DUT with the GroupID field set
           to 0x0002."
+      PICS: S.S.C03.Rsp
       verification: |
           DUT sends a RemoveAllScenesResponse command to TH with the Status field set to 0x00 (SUCCESS) and GroupID field set to 0x0002.
       disabled: true
@@ -238,6 +260,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0002."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to the value SC1, the GroupID field set to 0x0002 and the SceneCount field set to 0x00.
       disabled: true
@@ -252,6 +275,7 @@ tests:
     - label:
           "TH sends a StoreScene command to DUT with the GroupID field set to
           0x0002 and the SceneID field set to 0x03."
+      PICS: S.S.C04.Rsp
       verification: |
           DUT sends a StoreSceneResponse command to TH with the Status field set to 0x00 (SUCCESS) or 0x89 (INSUFFICIENT_SPACE). If SUCCESS, with the GroupID field set to 0x0002 and the SceneID field set to 0x03. IF INSUFFICIENT_SPACE, the following steps SHALL NOT be executed.
       disabled: true
@@ -259,6 +283,7 @@ tests:
     - label:
           "TH sends a GetSceneMembership command to DUT with the GroupID field
           set to 0x0002."
+      PICS: S.S.C06.Rsp
       verification: |
           DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values (SC1 - 3), 0xfe or null, the GroupID field set to 0x0002, the SceneCount field set to 0x01 and the SceneList field containing only the scene ID 0x03.
       disabled: true

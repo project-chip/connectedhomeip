@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 42.3.2. [TC-TSAT-3.2] Functionality with client as DUT
+name: 41.3.2. [TC-TSTAT-3.2] Functionality with client as DUT
 
 config:
     nodeId: 0x12344321

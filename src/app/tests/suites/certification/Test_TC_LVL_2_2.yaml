@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the OnOffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "on off transition time"
       response:
@@ -37,12 +38,14 @@ tests:
               type: uint16
 
     - label: "writes the OnOffTransitionTime attribute on the DUT"
+      PICS: LVL.S.A0010
       command: "writeAttribute"
       attribute: "on off transition time"
       arguments:
           value: 10
 
     - label: "Reads the OnOffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "on off transition time"
       response:
@@ -50,8 +53,8 @@ tests:
           constraints:
               type: uint16
 
-    #Issue 13414
     - label: "Reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "on level"
       response:
@@ -60,12 +63,14 @@ tests:
               type: uint8
 
     - label: "writes the OnLevel attribute on the DUT"
+      PICS: LVL.S.A0011
       command: "writeAttribute"
       attribute: "on level"
       arguments:
           value: 254
 
     - label: "Reads the OnLevel attribute from the DUT"
+      PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "on level"
       response:
@@ -74,8 +79,8 @@ tests:
               type: uint8
               notValue: OnLevelValue
 
-    #Issue 13414
     - label: "Reads the OnTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "on transition time"
       response:
@@ -84,12 +89,14 @@ tests:
               type: uint16
 
     - label: "Writes the OnTransitionTime attribute on the DUT"
+      PICS: LVL.S.A0012
       command: "writeAttribute"
       attribute: "on transition time"
       arguments:
           value: 100
 
     - label: "Reads the OnTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "on transition time"
       response:
@@ -98,8 +105,8 @@ tests:
               type: uint16
               notValue: OnTransitionTimeValue
 
-    #Issue -13414
     - label: "Reads the OffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "off transition time"
       response:
@@ -108,12 +115,14 @@ tests:
               type: uint16
 
     - label: "Writes the OffTransitionTime attribute on the DUT"
+      PICS: LVL.S.A0013
       command: "writeAttribute"
       attribute: "off transition time"
       arguments:
           value: 100
 
     - label: "Reads the OffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "off transition time"
       response:
@@ -123,6 +132,7 @@ tests:
               notValue: OffTransitionTimeValue
 
     - label: "Reads the DefaultMoveRate attribute from the DUT"
+      PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "default move rate"
       response:
@@ -131,12 +141,14 @@ tests:
               type: uint8
 
     - label: "Writes the DefaultMoveRate attribute on the DUT"
+      PICS: LVL.S.A0014
       command: "writeAttribute"
       attribute: "default move rate"
       arguments:
           value: 100
 
     - label: "Reads the DefaultMoveRate attribute from the DUT"
+      PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "default move rate"
       response:
@@ -144,8 +156,8 @@ tests:
           constraints:
               type: uint8
 
-    #issue -13414
     - label: "Reads the StartUpCurrentLevel attribute from the DUT"
+      PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "start up current level"
       response:
@@ -154,12 +166,14 @@ tests:
               type: uint8
 
     - label: "writes the StartUpCurrentLevel attribute on the DUT"
+      PICS: LVL.S.A4000
       command: "writeAttribute"
       attribute: "start up current level"
       arguments:
           value: 254
 
     - label: "reads the StartUpCurrentLevel attribute from the DUT"
+      PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "start up current level"
       response:
@@ -169,6 +183,7 @@ tests:
               notValue: StartUpCurrentLevelValue
 
     - label: "writes back default value of OnOffTransitionTime attribute"
+      PICS: LVL.S.A0010
       command: "writeAttribute"
       attribute: "on off transition time"
       arguments:

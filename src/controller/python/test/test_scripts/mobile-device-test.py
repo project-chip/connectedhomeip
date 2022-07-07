@@ -67,8 +67,6 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
 
     if address_override:
         address = address_override
-    else:
-        address = address.decode("utf-8")
 
     logger.info("Testing commissioning")
     FailIfNot(test.TestCommissioning(ip=address,
@@ -80,6 +78,9 @@ def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: 
                                           setuppin=20202021,
                                           nodeid=1))
     FailIfNot(ok, "Failed to commission multi-fabric")
+
+    FailIfNot(asyncio.run(test.TestAddUpdateRemoveFabric(nodeid=device_nodeid)),
+              "Failed AddUpdateRemoveFabric test")
 
     logger.info("Testing CASE Eviction")
     FailIfNot(asyncio.run(test.TestCaseEviction(device_nodeid)), "Failed TestCaseEviction")

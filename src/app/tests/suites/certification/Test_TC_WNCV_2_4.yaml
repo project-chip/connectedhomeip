@@ -36,7 +36,7 @@ tests:
           [1650882457.304694][8640:8645] CHIP:TOO:   Type: enum8
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && WNCV.S.A0000
       arguments:
           values:
               - name: "message"

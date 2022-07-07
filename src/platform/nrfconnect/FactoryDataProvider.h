@@ -22,7 +22,9 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #include <drivers/flash.h>
+#include <fprotect.h>
 #include <pm_config.h>
+#include <system/SystemError.h>
 
 #include "FactoryDataParser.h"
 
@@ -36,6 +38,12 @@ struct InternalFlashFactoryData
         data     = reinterpret_cast<uint8_t *>(PM_FACTORY_DATA_ADDRESS);
         dataSize = PM_FACTORY_DATA_SIZE;
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite()
+    {
+        int ret = fprotect_area(PM_FACTORY_DATA_ADDRESS, PM_FACTORY_DATA_SIZE);
+        return System::MapErrorZephyr(ret);
     }
 };
 
@@ -56,6 +64,8 @@ struct ExternalFlashFactoryData
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
     uint8_t mFactoryDataBuffer[PM_FACTORY_DATA_SIZE];
 };
@@ -73,7 +83,7 @@ public:
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
-    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
+    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;

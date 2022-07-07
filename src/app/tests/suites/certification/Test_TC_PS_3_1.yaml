@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 60.3.1. [TC-PS-3.1] Attributes with client as DUT
+name: 62.3.1. [TC-PS-3.1] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -22,10 +22,12 @@ config:
 
 tests:
     - label:
-          "DUT reads all supported mandatory attributes from TH once at a time
-          in a manufacturer specific order"
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
       verification: |
           On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
+          ./chip-tool powersource read status 1 1
+
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
           [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
@@ -51,25 +53,159 @@ tests:
           [1646155382.979729][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
           [1646155382.979764][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002F e=1 p=v
           [1646010346.974150][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=v
+
+          ./chip-tool powersource read order 1 1
+          [1653395573.862606][19412:19412] CHIP:IM: Received Read request
+          [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395573.862739][19412:19412] CHIP:DMG: {
+          [1653395573.862779][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395573.862827][19412:19412] CHIP:DMG:         [
+          [1653395573.862872][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395573.862928][19412:19412] CHIP:DMG:                 {
+          [1653395573.862980][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653395573.863161][19412:19412] CHIP:DMG:                 }
+          [1653395573.863217][19412:19412] CHIP:DMG:
+          [1653395573.863267][19412:19412] CHIP:DMG:         ],
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395573.863456][19412:19412] CHIP:DMG: },
+          [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
+
+          ./chip-tool powersource read description 1 1
+
+          CHIP:IM: Received Read request
+          [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395620.020364][19412:19412] CHIP:DMG: {
+          [1653395620.020406][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395620.020463][19412:19412] CHIP:DMG:         [
+          [1653395620.020511][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395620.020576][19412:19412] CHIP:DMG:                 {
+          [1653395620.020635][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1653395620.020833][19412:19412] CHIP:DMG:                 }
+          [1653395620.020893][19412:19412] CHIP:DMG:
+          [1653395620.020945][19412:19412] CHIP:DMG:         ],
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395620.021153][19412:19412] CHIP:DMG: },
+          [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH once at a time in
+          "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          see above
+          No optional attribute is implemented
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
           No writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          No writable attributes
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          "On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
+          ./chip-tool powersource read status 1 1
+
+
+          [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
+          [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
+          [1646155382.978021][33190:33190] CHIP:IM: Received Read request
+          [1646155382.978109][33190:33190] CHIP:DMG: ReadRequestMessage =
+          [1646155382.978143][33190:33190] CHIP:DMG: {
+          [1646155382.978167][33190:33190] CHIP:DMG:         AttributePathIBs =
+          [1646155382.978204][33190:33190] CHIP:DMG:         [
+          [1646155382.978309][33190:33190] CHIP:DMG:                 AttributePathIB =
+          [1646155382.978369][33190:33190] CHIP:DMG:                 {
+          [1646155382.978408][33190:33190] CHIP:DMG:                         Endpoint = 0x1,
+          [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
+          [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1646155382.978545][33190:33190] CHIP:DMG:                 }
+          [1646155382.978767][33190:33190] CHIP:DMG:
+          [1646155382.978804][33190:33190] CHIP:DMG:         ],
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
+          [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
+          [1646155382.978927][33190:33190] CHIP:DMG: },
+          [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1646155382.979658][33190:33190] CHIP:DMG: <RE:Run> Cluster 2f, Attribute 0 is dirty
+          [1646155382.979729][33190:33190] CHIP:DMG: Reading attribute: Cluster=0x0000_002F Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1646155382.979764][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002F e=1 p=v
+          [1646010346.974150][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=v
+
+          ./chip-tool powersource read order 1 1
+          [1653395573.862606][19412:19412] CHIP:IM: Received Read request
+          [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395573.862739][19412:19412] CHIP:DMG: {
+          [1653395573.862779][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395573.862827][19412:19412] CHIP:DMG:         [
+          [1653395573.862872][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395573.862928][19412:19412] CHIP:DMG:                 {
+          [1653395573.862980][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653395573.863161][19412:19412] CHIP:DMG:                 }
+          [1653395573.863217][19412:19412] CHIP:DMG:
+          [1653395573.863267][19412:19412] CHIP:DMG:         ],
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395573.863456][19412:19412] CHIP:DMG: },
+          [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
+
+          ./chip-tool powersource read description 1 1
+
+          CHIP:IM: Received Read request
+          [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
+          [1653395620.020364][19412:19412] CHIP:DMG: {
+          [1653395620.020406][19412:19412] CHIP:DMG:         AttributePathIBs =
+          [1653395620.020463][19412:19412] CHIP:DMG:         [
+          [1653395620.020511][19412:19412] CHIP:DMG:                 AttributePathIB =
+          [1653395620.020576][19412:19412] CHIP:DMG:                 {
+          [1653395620.020635][19412:19412] CHIP:DMG:                         Endpoint = 0x1,
+          [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
+          [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1653395620.020833][19412:19412] CHIP:DMG:                 }
+          [1653395620.020893][19412:19412] CHIP:DMG:
+          [1653395620.020945][19412:19412] CHIP:DMG:         ],
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
+          [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
+          [1653395620.021153][19412:19412] CHIP:DMG: },
+          [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]"
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          No optional attribute is implemented
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
       verification: |
           No writable attributes
       disabled: true

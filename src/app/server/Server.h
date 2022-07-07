@@ -24,6 +24,7 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
+#include <app/FailSafeContext.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
@@ -327,6 +328,8 @@ public:
 
     PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
 
+    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+
     TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
 
     Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
@@ -367,7 +370,7 @@ private:
 
         void OnGroupAdded(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & new_group) override
         {
-            FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
@@ -383,7 +386,7 @@ private:
 
         void OnGroupRemoved(chip::FabricIndex fabric_index, const Credentials::GroupDataProvider::GroupInfo & old_group) override
         {
-            FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
+            const FabricInfo * fabric = mServer->GetFabricTable().FindFabricWithIndex(fabric_index);
             if (fabric == nullptr)
             {
                 ChipLogError(AppServer, "Group added to nonexistent fabric?");
@@ -500,6 +503,7 @@ private:
     TestEventTriggerDelegate * mTestEventTriggerDelegate;
     Crypto::OperationalKeystore * mOperationalKeystore;
     Credentials::OperationalCertificateStore * mOpCertStore;
+    app::FailSafeContext mFailSafeContext;
 
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;

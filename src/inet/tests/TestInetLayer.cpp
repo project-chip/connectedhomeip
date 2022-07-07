@@ -869,8 +869,6 @@ static void StartTest()
 
 static void CleanupTest()
 {
-    CHIP_ERROR lStatus;
-
     gSendIntervalExpired = false;
     gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
 
@@ -878,9 +876,7 @@ static void CleanupTest()
 
     if (sTCPIPEndPoint != nullptr)
     {
-        lStatus = sTCPIPEndPoint->Close();
-        INET_FAIL_ERROR(lStatus, "TCPEndPoint::Close failed");
-
+        sTCPIPEndPoint->Close();
         sTCPIPEndPoint->Free();
     }
 

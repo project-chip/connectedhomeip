@@ -44,8 +44,22 @@ tests:
               type: bool
 
     - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -63,8 +77,22 @@ tests:
 
     ##Event 11343 implementation not done
     - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -87,8 +115,22 @@ tests:
                 value: nodeId
 
     - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"

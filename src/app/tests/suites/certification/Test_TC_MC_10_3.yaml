@@ -24,6 +24,7 @@ tests:
     - label:
           "TH sends a LaunchContent command to the DUT with a search parameter
           and string, and AutoPlay flag set to false"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
           ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
 
@@ -77,6 +78,7 @@ tests:
     - label:
           "TH sends a LaunchContent command to the DUT with a search parameter
           and string, and AutoPlay flag set to true"
+      PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
           ././chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "exampleString", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
 

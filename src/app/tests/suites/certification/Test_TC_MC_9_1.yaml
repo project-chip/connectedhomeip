@@ -31,6 +31,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the VendorName attribute"
+      PICS: MC_APBSC.S.A0000
       command: "readAttribute"
       attribute: "VendorName"
       response:
@@ -39,6 +40,7 @@ tests:
               maxLength: 32
 
     - label: "Reads the VendorID attribute"
+      PICS: MC_APBSC.S.A0001
       command: "readAttribute"
       attribute: "VendorID"
       response:
@@ -47,6 +49,7 @@ tests:
               saveAs: vendorID
 
     - label: "Reads the ApplicationName attribute"
+      PICS: MC_APBSC.S.A0002
       command: "readAttribute"
       attribute: "ApplicationName"
       response:
@@ -55,6 +58,7 @@ tests:
               maxLength: 256
 
     - label: "Reads the ProductID attribute"
+      PICS: MC_APBSC.S.A0003
       command: "readAttribute"
       attribute: "ProductID"
       response:
@@ -62,6 +66,7 @@ tests:
               type: uint16
 
     - label: "Reads the Application attribute"
+      PICS: MC_APBSC.S.A0004
       command: "readAttribute"
       attribute: "Application"
       response:
@@ -69,6 +74,7 @@ tests:
               type: struct
 
     - label: "Reads the Status attribute"
+      PICS: MC_APBSC.S.A0005
       command: "readAttribute"
       attribute: "Status"
       response:
@@ -77,6 +83,7 @@ tests:
               maxValue: 3
 
     - label: "Reads the ApplicationVersion attribute"
+      PICS: MC_APBSC.S.A0006
       command: "readAttribute"
       attribute: "ApplicationVersion"
       response:
@@ -85,6 +92,7 @@ tests:
               maxLength: 32
 
     - label: "Reads the AllowedVendorList attribute"
+      PICS: MC_APBSC.S.A0007
       command: "readAttribute"
       attribute: "AllowedVendorList"
       response:

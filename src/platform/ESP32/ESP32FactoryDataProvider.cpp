@@ -130,13 +130,13 @@ CHIP_ERROR ESP32FactoryDataProvider::GetProductAttestationIntermediateCert(Mutab
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer)
+CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
     VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(digestToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t privKeyBuf[kDACPrivateKeySize];
@@ -149,10 +149,67 @@ CHIP_ERROR ESP32FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan
     ReturnErrorOnFailure(ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_DACPublicKey, pubKeyBuf, pubKeyLen, pubKeyLen));
 
     ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(privKeyBuf, privKeyLen), ByteSpan(pubKeyBuf, pubKeyLen), keypair));
-    ReturnErrorOnFailure(keypair.ECDSA_sign_hash(digestToSign.data(), digestToSign.size(), signature));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+CHIP_ERROR ESP32FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
+{
+    size_t vendorNameLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetVendorId(uint16_t & vendorId)
+{
+    ChipError err   = CHIP_NO_ERROR;
+    uint32_t valInt = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_VendorId, valInt);
+    ReturnErrorOnFailure(err);
+    vendorId = static_cast<uint16_t>(valInt);
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
+{
+    size_t productNameLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_ProductName, buf, bufSize, productNameLen);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetProductId(uint16_t & productId)
+{
+    ChipError err   = CHIP_NO_ERROR;
+    uint32_t valInt = 0;
+
+    err = ESP32Config::ReadConfigValue(ESP32Config::kConfigKey_ProductId, valInt);
+    ReturnErrorOnFailure(err);
+    productId = static_cast<uint16_t>(valInt);
+    return err;
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+{
+    size_t hardwareVersionStringLen = 0; // without counting null-terminator
+    return ESP32Config::ReadConfigValueStr(ESP32Config::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
+}
+
+CHIP_ERROR ESP32FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+{
+    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
+                  "Length of unique ID for rotating device ID is smaller than minimum.");
+
+    size_t uniqueIdLen = 0;
+    err = ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_UniqueId, uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+    ReturnErrorOnFailure(err);
+    uniqueIdSpan.reduce_size(uniqueIdLen);
+#endif
+    return err;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
 
 } // namespace DeviceLayer
 } // namespace chip

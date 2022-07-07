@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    3.2.1. [TC-SU-2.1] DUT will send a QueryImage Command to OTA-P to check for
-    software update
+name: 3.2.1. [TC-SU-2.1] QueryImage Command from DUT to OTA-P
 
 config:
     nodeId: 0x12344321
@@ -25,7 +23,7 @@ config:
 tests:
     - label: "DUT sends a QueryImage command to the TH/OTA-P"
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -44,12 +42,13 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a QueryImage command to the TH/OTA-P. Wait for 1 minute."
+          "DUT sends a QueryImage command to the TH/OTA-P. Wait for 2 minute."
       verification: |
           Run the OTA Provider App using the command:
-          chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy
 
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
+          ./chip-ota-provider-app --discriminator ${PROVIDER_LONG_DISCRIMINATOR} --secured-device-port ${PROVIDER_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --filepath ${SW_IMAGE_FILE} -q busy
+
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -59,7 +58,7 @@ tests:
     - label:
           "TH2/Administrator sends an AnnounceOTAProvider command to the DUT."
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 1 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 

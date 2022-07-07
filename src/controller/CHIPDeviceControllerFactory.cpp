@@ -422,8 +422,7 @@ void DeviceControllerSystemState::Shutdown()
     // Consumers are expected to call PlaformMgr().StopEventLoopTask() before calling
     // DeviceController::Shutdown() in the CONFIG_DEVICE_LAYER configuration
     //
-    CHIP_ERROR error = DeviceLayer::PlatformMgr().Shutdown();
-    VerifyOrDie(error == CHIP_NO_ERROR);
+    DeviceLayer::PlatformMgr().Shutdown();
 #endif
 
     if (mExchangeMgr != nullptr)

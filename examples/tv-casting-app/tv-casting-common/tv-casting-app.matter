@@ -2180,7 +2180,7 @@ endpoint 0 {
     callback attribute regulatoryConfig;
     callback attribute locationCapability;
     callback attribute supportsConcurrentConnection default = 1;
-    ram      attribute featureMap default = 6;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 

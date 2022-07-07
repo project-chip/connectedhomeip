@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    31.7.1. [TC-SU-2.6] Tests NotifyUpdateApplied Command sent to OTA-P from the
-    DUT after it has successfully updated to the new software version.
+name: 3.4.3. [TC-SU-2.6] NotifyUpdateApplied Command from DUT to OTA-P
 
 config:
     nodeId: 0x12344321
@@ -26,8 +24,11 @@ tests:
     - label:
           "DUT sends the NotifyUpdateApplied Command to the OTA-P after
           installing the software update."
+      PICS: OTAC.C.M.NotifyUpdateApplied
       verification: |
           Verify that the OTA Provider show NotifyUpdateApplied message received from DUT in the logs
+          UpdateToken - verify that it is the same as the one provided by the OTA provider in the QueryImageResponse.
+          SoftwareVersion - verify the software version on the DUT to match the version downloaded for the software update
 
           [1645743059329] [97806:20280748] CHIP: [ZCL] OTA Provider received NotifyUpdateApplied
           [1645743059329] [97806:20280748] CHIP: [ZCL]   Update Token: 32
