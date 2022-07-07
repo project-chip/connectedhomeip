@@ -37,7 +37,11 @@ def LoadFabricAdmins():
     except KeyError:
         console.print(
             "\n[purple]No previous fabric admins discovered in persistent storage - creating a new one...")
-        _fabricAdmins.append(chip.FabricAdmin.FabricAdmin())
+
+        #
+        # Initialite a FabricAdmin with a VendorID of TestVendor1 (0xfff1)
+        #
+        _fabricAdmins.append(chip.FabricAdmin.FabricAdmin(0XFFF1))
         return _fabricAdmins
 
     console.print('\n')
@@ -45,8 +49,8 @@ def LoadFabricAdmins():
     for k in adminList:
         console.print(
             f"[purple]Restoring FabricAdmin from storage to manage FabricId {adminList[k]['fabricId']}, FabricIndex {k}...")
-        _fabricAdmins.append(chip.FabricAdmin.FabricAdmin(
-            fabricId=adminList[k]['fabricId'], fabricIndex=int(k)))
+        _fabricAdmins.append(chip.FabricAdmin.FabricAdmin(vendorId=int(adminList[k]['vendorId']),
+                                                          fabricId=adminList[k]['fabricId'], fabricIndex=int(k)))
 
     console.print(
         '\n[blue]Fabric Admins have been loaded and are available at [red]fabricAdmins')

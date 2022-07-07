@@ -90,7 +90,7 @@ tests:
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
           CHIP:TOO:   NOCResponse: {
           CHIP:TOO:     statusCode: 0
-          CHIP:TOO:     fabricIndex: 2
+          CHIP:TOO:     fabricIndex: 1
           CHIP:TOO:    }
           CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
@@ -105,19 +105,19 @@ tests:
           On TH chip-tool:
           $ ./out/chip-tool/chip-tool discover commissionables
           [1651111576350] [95850:65678872] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Vendor ID: 65521
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Product ID: 32769
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Long Discriminator: 3841
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Pairing Hint: 33
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Hostname: DCA6328D2B9F0000
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Instance Name: F17CF4C2DECCDA4B
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	IP Address #1: fe80::dea6:32ff:fe8d:2ba0
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	IP Address #2: fe80::dea6:32ff:fe8d:2b9f
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	IP Address #3: 192.168.1.2
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Port: 5540
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Commissioning Mode: 1
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Mrp Interval idle: 5000 ms
-          [1651111576350] [95850:65678872] CHIP: [DIS] 	Mrp Interval active: 300 ms
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Vendor ID: 65521
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Product ID: 32769
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Long Discriminator: 3841
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Pairing Hint: 33
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Instance Name: F17CF4C2DECCDA4B
+          [1651111576350] [95850:65678872] CHIP: [DIS]         IP Address #1: fe80::dea6:32ff:fe8d:2ba0
+          [1651111576350] [95850:65678872] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2b9f
+          [1651111576350] [95850:65678872] CHIP: [DIS]         IP Address #3: 192.168.1.2
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Port: 5540
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Commissioning Mode: 1
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1651111576350] [95850:65678872] CHIP: [DIS]         Mrp Interval active: 300 ms
       disabled: true
 
     - label:

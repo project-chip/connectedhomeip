@@ -28,21 +28,23 @@
 #include <lib/support/UnitTestUtils.h>
 #include <map>
 #include <string>
-#include <zap-generated/cluster/CHIPTestClustersObjc.h>
+#include <zap-generated/cluster/MTRTestClustersObjc.h>
 
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <Matter/Matter.h>
+
+#import "MTRDevice_Externs.h"
+#import "MTRError_Utils.h"
 
 class TestCommandBridge;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface TestPairingDelegate : NSObject <CHIPDevicePairingDelegate>
+@interface TestPairingDelegate : NSObject <MTRDevicePairingDelegate>
 @property TestCommandBridge * commandBridge;
 @property chip::NodeId deviceId;
 @property BOOL active; // Whether to pass on notifications to the commandBridge
 
-- (void)onStatusUpdate:(CHIPPairingStatus)status;
+- (void)onStatusUpdate:(MTRPairingStatus)status;
 - (void)onPairingComplete:(NSError * _Nullable)error;
 - (void)onPairingDeleted:(NSError * _Nullable)error;
 - (void)onCommissioningComplete:(NSError * _Nullable)error;
@@ -112,7 +114,7 @@ public:
     CHIP_ERROR WaitForCommissionee(const char * _Nullable identity,
         const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override
     {
-        CHIPDeviceController * controller = GetCommissioner(identity);
+        MTRDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
@@ -125,17 +127,17 @@ public:
             mConnectedDevices[identity] = nil;
         }
 
-        [controller getConnectedDevice:value.nodeId
-                                 queue:mCallbackQueue
-                     completionHandler:^(CHIPDevice * _Nullable device, NSError * _Nullable error) {
-                         if (error != nil) {
-                             SetCommandExitStatus(error);
-                             return;
-                         }
+        [controller getDevice:value.nodeId
+                        queue:mCallbackQueue
+            completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+                if (error != nil) {
+                    SetCommandExitStatus(error);
+                    return;
+                }
 
-                         mConnectedDevices[identity] = device;
-                         NextTest();
-                     }];
+                mConnectedDevices[identity] = device;
+                NextTest();
+            }];
         return CHIP_NO_ERROR;
     }
 
@@ -143,7 +145,7 @@ public:
     CHIP_ERROR PairWithCode(
         const char * _Nullable identity, const chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type & value)
     {
-        CHIPDeviceController * controller = GetCommissioner(identity);
+        MTRDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
@@ -161,7 +163,7 @@ public:
             return CHIP_NO_ERROR;
         }
 
-        return [CHIPError errorToCHIPErrorCode:err];
+        return MTRErrorToCHIPErrorCode(err);
     }
 
     /////////// SystemCommands Interface /////////
@@ -177,7 +179,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIPDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -189,12 +191,12 @@ public:
 
     void PairingComplete(chip::NodeId nodeId)
     {
-        CHIPDeviceController * controller = CurrentCommissioner();
-        VerifyOrReturn(controller != nil, Exit("No current commissioner"));
+        MTRDeviceController * commissioner = CurrentCommissioner();
+        VerifyOrReturn(commissioner != nil, Exit("No current commissioner"));
 
         NSError * commissionError = nil;
-        [controller commissionDevice:nodeId commissioningParams:[[CHIPCommissioningParameters alloc] init] error:&commissionError];
-        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:commissionError];
+        [commissioner commissionDevice:nodeId commissioningParams:[[MTRCommissioningParameters alloc] init] error:&commissionError];
+        CHIP_ERROR err = MTRErrorToCHIPErrorCode(commissionError);
         if (err != CHIP_NO_ERROR) {
             Exit("Failed to kick off commissioning", err);
             return;
@@ -327,7 +329,7 @@ protected:
 
     template <typename T> bool CheckConstraintNotValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
-        NSNumber * currentValue = @([CHIPError errorToCHIPErrorCode:current].AsInteger());
+        NSNumber * currentValue = @(MTRErrorToCHIPErrorCode(current).AsInteger());
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
     }
 
@@ -459,18 +461,18 @@ private:
     TestPairingDelegate * _Nonnull mPairingDelegate;
 
     // Set of our connected devices, keyed by identity.
-    std::map<std::string, CHIPDevice *> mConnectedDevices;
+    std::map<std::string, MTRDevice *> mConnectedDevices;
 };
 
 NS_ASSUME_NONNULL_BEGIN
 
 @implementation TestPairingDelegate
-- (void)onStatusUpdate:(CHIPPairingStatus)status
+- (void)onStatusUpdate:(MTRPairingStatus)status
 {
     if (_active) {
-        if (status == kSecurePairingSuccess) {
+        if (status == MTRPairingStatusSuccess) {
             NSLog(@"Secure pairing success");
-        } else if (status == kSecurePairingFailed) {
+        } else if (status == MTRPairingStatusFailed) {
             _active = NO;
             NSLog(@"Secure pairing failed");
             _commandBridge->OnStatusUpdate(chip::app::StatusIB(chip::Protocols::InteractionModel::Status::Failure));
@@ -484,7 +486,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (error != nil) {
             _active = NO;
             NSLog(@"Pairing complete with error");
-            CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+            CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
             _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
         } else {
             _commandBridge->PairingComplete(_deviceId);
@@ -503,7 +505,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (_active) {
         _active = NO;
-        CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+        CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
         _commandBridge->OnStatusUpdate([self convertToStatusIB:err]);
     }
 }

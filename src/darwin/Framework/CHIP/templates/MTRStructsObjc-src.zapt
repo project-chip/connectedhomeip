@@ -1,0 +1,54 @@
+{{> header}}
+
+#import "MTRStructsObjc.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_struct_items}}
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+    {{/zcl_struct_items}}
+  }
+  return self;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_struct_items}}{{asStructPropertyName label}}:%@; {{/zcl_struct_items}}>", NSStringFromClass([self class]){{#zcl_struct_items}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_struct_items}}];
+  return descriptionString;
+}
+
+@end
+
+{{/zcl_structs}}
+
+{{#zcl_events}}
+@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_event_fields}}
+    {{>init_struct_member label=name type=type cluster=parent.parent.name}}
+    {{/zcl_event_fields}}
+  }
+  return self;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_event_fields}}{{asStructPropertyName name}}:%@; {{/zcl_event_fields}}>", NSStringFromClass([self class]){{#zcl_event_fields}},{{#if isArray}}_{{asStructPropertyName name}}{{else if (isOctetString type)}}[_{{asStructPropertyName name}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName name}}{{/if}}{{/zcl_event_fields}}];
+  return descriptionString;
+}
+
+@end
+
+{{/zcl_events}}
+
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

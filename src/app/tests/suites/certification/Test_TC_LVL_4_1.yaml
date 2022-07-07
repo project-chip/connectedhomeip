@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads Minlevel attribute from DUT"
+      PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -37,6 +38,7 @@ tests:
               type: uint8
 
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
@@ -50,6 +52,7 @@ tests:
                 value: 1
 
     - label: "reads max level attribute from DUT"
+      PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "max level"
       response:
@@ -58,6 +61,7 @@ tests:
               type: uint8
 
     - label: "sends a Move up command"
+      PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
@@ -70,16 +74,19 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "user prompt message"
+    - label:
+          "Physically verify that the DUT moves at a rate of 32 units per second
+          or as close as possible to this rate and completes moving to its
+          maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the DUT moves at a rate of 32 units
-                    per second or as close as possible to this rate and
-                    completes moving to its maximum level"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 9000ms"
       cluster: "DelayCommands"
@@ -90,13 +97,14 @@ tests:
                 value: 9000
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0003
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: MaxlevelValue
 
     - label: "sends a MoveWithOnOff command"
+      PICS: LVL.S.C05.Rsp
       command: "MoveWithOnOff"
       arguments:
           values:
@@ -109,16 +117,19 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "user prompt message"
+    - label:
+          "Physically verify that the DUT moves at a rate of 64 units per second
+          or as close as possible to this rate and complete moving to its
+          minimum level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the DUT moves at a rate of 64 units
-                    per second or as close as possible to this rate and complete
-                    moving to its minimum level"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 5000ms"
       cluster: "DelayCommands"
@@ -130,7 +141,7 @@ tests:
 
     # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0002
+      PICS: LVL.S.C05.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -140,6 +151,7 @@ tests:
               maxValue: 1
 
     - label: "reads default move rate attribute from DUT"
+      PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "default move rate"
       response:
@@ -148,6 +160,7 @@ tests:
               type: uint8
 
     - label: "sends a Move up command at default move rate"
+      PICS: LVL.S.C05.Rsp && LVL.S.A0014
       command: "Move"
       arguments:
           values:
@@ -168,18 +181,21 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "user prompt message"
+    - label:
+          "Physically verify that the device moves at the rate recorded in step
+          3a and completes moving to its maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
       arguments:
           values:
               - name: "message"
-                value:
-                    "Physically verify that the device moves at the rate
-                    recorded in step 3a and completes moving to its maximum
-                    level."
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reset level to 254"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:

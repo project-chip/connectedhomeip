@@ -41,10 +41,10 @@
 
 - (void)refreshDeviceList
 {
-    uint64_t nextDeviceID = CHIPGetNextAvailableDeviceID();
+    uint64_t nextDeviceID = MTRGetNextAvailableDeviceID();
     _deviceList = [NSMutableArray new];
     for (uint64_t i = 0; i < nextDeviceID; i++) {
-        if (CHIPIsDevicePaired(i)) {
+        if (MTRIsDevicePaired(i)) {
             [_deviceList addObject:[@(i) stringValue]];
         }
     }
@@ -146,7 +146,7 @@
     [self resignFirstResponder];
 }
 
-// MARK: CHIPDeviceControllerDelegate
+// MARK: MTRDeviceControllerDelegate
 - (void)deviceControllerOnConnected
 {
     NSLog(@"Status: Device connected");

@@ -576,6 +576,15 @@ CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256Pub
     return fabricInfo->FetchRootPubkey(outPublicKey);
 }
 
+CHIP_ERROR FabricTable::FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const
+{
+    uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
+    MutableByteSpan nocSpan{ nocBuf };
+    ReturnErrorOnFailure(FetchNOCCert(fabricIndex, nocSpan));
+    ReturnErrorOnFailure(ExtractCATsFromOpCert(nocSpan, cats));
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR FabricTable::StoreFabricMetadata(const FabricInfo * fabricInfo) const
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);

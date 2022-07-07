@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "read the mandatory attribute: OnOff"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
@@ -36,6 +37,7 @@ tests:
               type: bool
 
     - label: "read LT attribute: GlobalSceneControl"
+      PICS: OO.S.A4000
       optional: true
       command: "readAttribute"
       attribute: "GlobalSceneControl"
@@ -44,6 +46,7 @@ tests:
               type: bool
 
     - label: "read LT attribute: OnTime"
+      PICS: OO.S.A4001
       optional: true
       command: "readAttribute"
       attribute: "OnTime"
@@ -52,6 +55,7 @@ tests:
               type: uint16
 
     - label: "read LT attribute: OffWaitTime"
+      PICS: OO.S.A4002
       optional: true
       command: "readAttribute"
       attribute: "OffWaitTime"
@@ -60,6 +64,7 @@ tests:
               type: uint16
 
     - label: "read LT attribute: StartUpOnOff"
+      PICS: OO.S.A4003
       optional: true
       command: "readAttribute"
       attribute: "StartUpOnOff"

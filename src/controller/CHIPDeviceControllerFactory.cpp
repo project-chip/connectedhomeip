@@ -291,6 +291,8 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
+
     ReturnErrorOnFailure(InitSystemState());
 
     ControllerInitParams controllerParams;
@@ -303,9 +305,12 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
 CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, DeviceCommissioner & commissioner)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(params.controllerVendorId != VendorId::Unspecified, CHIP_ERROR_INVALID_ARGUMENT);
+
     ReturnErrorOnFailure(InitSystemState());
 
     CommissionerInitParams commissionerParams;
+
     // PopulateInitParams works against ControllerInitParams base class of CommissionerInitParams only
     PopulateInitParams(commissionerParams, params);
 

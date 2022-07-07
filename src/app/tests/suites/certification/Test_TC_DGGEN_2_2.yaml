@@ -26,7 +26,8 @@ tests:
           ENUM table 11.11.6.1. (Ex. Pull the DUT power plug off causing power
           source failure, and rejoin DUT back to previous TH fabric. Next,
           repeat power plug off and rejoining DUT back to previous TH fabric one
-          more time"
+          more time.)"
+      PICS: DGGEN.S.E00
       verification: |
           ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
 
@@ -39,6 +40,7 @@ tests:
       disabled: true
 
     - label: "TH initiates the subscription of HardwareFault event from DUT."
+      PICS: DGGEN.S.E00
       verification: |
           sudo ./chip-tool generaldiagnostics subscribe-event hardware-fault-change 100 1000 1 0
 
@@ -58,10 +60,11 @@ tests:
 
     - label:
           "Induce a DUT radio failure two times as addressed in RadioFault ENUM
-          table 11.11.6.2. Ex. Put the DUT under metalic cover causing WiFi
+          table 11.11.6.2. (Ex. Put the DUT under metalic cover causing WiFi
           failure. Uncover DUT and make DUT rejoining DUT back to previous TH
           fabric. Repeat the radio failure one more time and rejoin DUT back to
           previous TH fabric."
+      PICS: DGGEN.S.E01
       verification: |
           ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
 
@@ -74,6 +77,7 @@ tests:
       disabled: true
 
     - label: "TH initiates the subscription of RadioFault event from DUT."
+      PICS: DGGEN.S.E01
       verification: |
           sudo ./chip-tool generaldiagnostics subscribe-event radio-fault-change 100 1000 1 0
 
@@ -93,10 +97,11 @@ tests:
 
     - label:
           "Induce a DUT radio failure two times as addressed in NetworkFault
-          ENUM table 11.11.6.3. Ex. Put the DUT under metalic cover causing
+          ENUM table 11.11.6.3. (Ex. Put the DUT under metalic cover causing
           network failure. Uncover DUT and rejoin DUT back to previous TH
           fabric. Pull the DUT power plug off causing power source failure.
-          rejoining DUT back to previous TH fabric."
+          rejoining DUT back to previous TH fabric.)"
+      PICS: DGGEN.S.E02
       verification: |
           ./chip-tool generaldiagnostics read-event network-fault-change 1 0
 
@@ -109,6 +114,7 @@ tests:
       disabled: true
 
     - label: "TH initiates the subscription of NetworkFault event from DUT."
+      PICS: DGGEN.S.E02
       verification: |
           sudo ./chip-tool generaldiagnostics subscribe-event network-fault-change 100 1000 1 0
           [1653659901.757441][242605:242610] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:11933575 on exchange 20223i
@@ -128,6 +134,7 @@ tests:
     - label:
           "Reboot DUT with a normal reboot process. Rejoin DUT back to previous
           TH fabric."
+      PICS: DGGEN.S.E03
       verification: |
           ./chip-tool generaldiagnostics read-event boot-reason 1 0
 

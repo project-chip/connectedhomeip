@@ -82,6 +82,12 @@ void TestSimpleWrite(nlTestSuite * inSuite, void * inContext)
     string result;
     CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    string result2;
+    err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, result == result2);
 }
 
 void TestSimpleRead(nlTestSuite * inSuite, void * inContext)
@@ -158,6 +164,12 @@ void TestOptionalDataWriteSerial(nlTestSuite * inSuite, void * inContext)
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    string result2;
+    err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, result == result2);
 }
 
 void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
@@ -169,6 +181,12 @@ void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    string result2;
+    err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, result == result2);
 }
 
 void TestOptionalDataReadSerial(nlTestSuite * inSuite, void * inContext)

@@ -34,7 +34,7 @@
                                                                                                                                    \
         if (!(inCondition))                                                                                                        \
         {                                                                                                                          \
-            ChipLogError(Automation, "%s:%u: assertion failed: \"%s\"\n", __FILE__, __LINE__, #inCondition);                       \
+            ChipLogError(Automation, "%s:%u: assertion failed: \"%s\"", __FILE__, __LINE__, #inCondition);                         \
             (inSuite)->failedAssertions += 1;                                                                                      \
             (inSuite)->flagError = true;                                                                                           \
         }                                                                                                                          \

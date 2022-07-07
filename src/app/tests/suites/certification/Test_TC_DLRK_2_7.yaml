@@ -181,8 +181,7 @@ tests:
                     hasValue: false
 
     - label:
-          "send Get Year Day Schedule Command to DUT and verify NOT_FOUND
-          response"
+          "send Get Year Day Schedule Command to DUT and verify FAILURE response"
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -197,7 +196,7 @@ tests:
               - name: "userIndex"
                 value: 5
               - name: "status"
-                value: 0x8B
+                value: 0x01
               - name: "LocalStartTime"
                 constraints:
                     hasValue: false

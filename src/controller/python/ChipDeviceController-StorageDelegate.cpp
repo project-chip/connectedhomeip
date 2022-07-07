@@ -86,10 +86,11 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
     }
 
     uint16_t tmpSize = size;
+    bool isFound     = false;
 
-    mGetKeyCb(mContext, key, (char *) value, &tmpSize);
+    mGetKeyCb(mContext, key, (char *) value, &tmpSize, &isFound);
 
-    if (tmpSize == 0)
+    if (!isFound)
     {
         ChipLogDetail(Controller, "Key Not Found\n");
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
@@ -107,8 +108,8 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
 
 CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
+    ReturnErrorCodeIf(((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogDetail(Controller, "StorageAdapter::SetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
-    mStorage[key] = std::string(static_cast<const char *>(value), size);
     mSetKeyCb(mContext, key, value, size);
     return CHIP_NO_ERROR;
 }

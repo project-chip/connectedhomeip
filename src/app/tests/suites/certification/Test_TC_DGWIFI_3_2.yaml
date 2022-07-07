@@ -27,10 +27,11 @@ tests:
       disabled: true
 
     - label: "DUT sends ResetCounts command to TH"
+      PICS: DGWIFI.S.C00
       verification: |
           Verify Command data recieved from running the below command is a success
 
-          ./chip-tool wifinetworkdiagnostics reset-counts 1 1
+          ./chip-tool wifinetworkdiagnostics reset-counts 1 0
           CHIP:DMG: InvokeResponseMessage =
           [1649664146.639743][8173:8178] CHIP:DMG: {
           [1649664146.639789][8173:8178] CHIP:DMG:         suppressResponse = false,

@@ -30,7 +30,7 @@
         call. }}
     {{#zcl_struct_items_by_struct_name type}}
       {{#if (hasProperty ../expected label)}}
-        {{>check_test_value actual=(concat "((CHIP" (asUpperCamelCase ../cluster) "Cluster" (asUpperCamelCase ../type) " *)" ../actual ")." (asStructPropertyName label)) expected=(lookup ../expected label) cluster=../cluster}}
+        {{>check_test_value actual=(concat "((MTR" (asUpperCamelCase ../cluster) "Cluster" (asUpperCamelCase ../type) " *)" ../actual ")." (asStructPropertyName label)) expected=(lookup ../expected label) cluster=../cluster}}
       {{/if}}
     {{/zcl_struct_items_by_struct_name}}
     {{! Maybe we should add a check for properties in the expected object (other

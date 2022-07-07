@@ -27,8 +27,11 @@ import("$dir_pw_build/python.gni")
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
+import("${chip_root}/build/chip/fuzz_test.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/build/chip/tools.gni")
+
+import("${build_root}/config/compiler/compiler.gni")
 
 import("//src/crypto/crypto.gni")
 
@@ -38,6 +41,16 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
+  }
+
+  if (enable_fuzz_test_targets) {
+    group("fuzz_tests") {
+      deps = [
+        "${chip_root}/src/credentials/tests:fuzz-chip-cert",
+        "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
+        "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
+      ]
+    }
   }
 
   # Python packages for supporting specific targets.
@@ -87,6 +100,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "${nlio_root}:nlio",
       "${nlunit_test_root}:nlunit-test",
     ]
+
+    if (enable_fuzz_test_targets) {
+      deps += [ "//:fuzz_tests" ]
+    }
 
     if (chip_device_platform != "none") {
       deps += [ "${chip_root}/src/app/server" ]
@@ -210,7 +227,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   declare_args() {
     # Enable building chip with clang.
-    enable_host_clang_build = enable_default_builds && host_os != "win"
+    # Disabled on Mac arm64 but note that the "gcc" build uses Apple clang.
+    enable_host_clang_build = enable_default_builds && host_os != "win" &&
+                              (host_os != "mac" || host_cpu != "arm64")
 
     # Enable building chip with gcc.
     enable_host_gcc_build = enable_default_builds && host_os != "win"
@@ -226,9 +245,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_standalone_chip_tool_build =
         enable_default_builds && host_os != "win"
 
-    # Build the darwin-framework-tool example.
-    enable_standalone_chip_tool_darwin_build =
-        enable_default_builds && host_os == "mac"
+    # Build the darwin-framework-tool example.  By default this is off, because
+    # it requires a preceding XCode build of the framework.
+    enable_standalone_chip_tool_darwin_build = false
 
     # Build the shell example.
     enable_standalone_shell_build = enable_default_builds && host_os != "win"

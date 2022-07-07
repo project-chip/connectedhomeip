@@ -275,7 +275,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr uint16_t kMinCaseSessionsPerFabricMandatedBySpec = 3;
 
         capabilityMinima.caseSessionsPerFabric  = kMinCaseSessionsPerFabricMandatedBySpec;
-        capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinSubscriptionsPerFabric();
+        capabilityMinima.subscriptionsPerFabric = InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric();
 
         status = aEncoder.Encode(capabilityMinima);
         break;

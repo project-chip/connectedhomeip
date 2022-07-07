@@ -31,7 +31,7 @@ tests:
     - label: "TH reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
-      PICS: A_ENDPRODUCTTYPE
+      PICS: WNCV.S.A000d
       response:
           constraints:
               type: enum8

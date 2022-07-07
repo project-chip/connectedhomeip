@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # Issue 10988
+    # Issue 13029
     - label:
           "TH reads CurrentApp attribute from the DUT and Verify the in-focus
           application attributes, which should include the display Application
@@ -41,7 +41,7 @@ tests:
           [1653909423.450318][16364:16369] CHIP:EM: Sending Standalone Ack for MessageCounter:2071603 on exchange 4134i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MC_APPLAUNCHER.S.A0001
       arguments:
           values:
               - name: "message"

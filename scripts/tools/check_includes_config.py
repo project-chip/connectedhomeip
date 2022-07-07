@@ -106,6 +106,8 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients (#11705).
     'src/app/ClusterStateCache.h': {'list', 'map', 'set', 'vector', 'queue'},
     'src/app/BufferedReadCallback.h': {'vector'},
+    'src/lib/support/IniEscaping.cpp': {'string'},
+    'src/lib/support/IniEscaping.h': {'string'},
 
     # Itself in DENY.
     'src/lib/support/CHIPListUtils.h': {'set'},

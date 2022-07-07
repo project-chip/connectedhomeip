@@ -18,8 +18,7 @@
 #include "PersistentStorage.h"
 
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/Base64.h>
-#include <protocols/secure_channel/PASESession.h>
+#include <lib/support/IniEscaping.h>
 
 #include <fstream>
 #include <memory>
@@ -30,6 +29,7 @@ using Sections = std::map<String, Section>;
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+using namespace ::chip::IniEscaping;
 using namespace ::chip::Logging;
 
 constexpr const char kDefaultSectionName[]  = "Default";
@@ -48,37 +48,6 @@ std::string GetFilename(const char * name)
     return "/tmp/chip_tool_config." + std::string(name) + ".ini";
 }
 
-namespace {
-
-std::string StringToBase64(const std::string & value)
-{
-    std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value.length())]);
-
-    uint32_t len =
-        chip::Base64Encode32(reinterpret_cast<const uint8_t *>(value.data()), static_cast<uint32_t>(value.length()), buffer.get());
-    if (len == UINT32_MAX)
-    {
-        return "";
-    }
-
-    return std::string(buffer.get(), len);
-}
-
-std::string Base64ToString(const std::string & b64Value)
-{
-    std::unique_ptr<uint8_t[]> buffer(new uint8_t[BASE64_MAX_DECODED_LEN(b64Value.length())]);
-
-    uint32_t len = chip::Base64Decode32(b64Value.data(), static_cast<uint32_t>(b64Value.length()), buffer.get());
-    if (len == UINT32_MAX)
-    {
-        return "";
-    }
-
-    return std::string(reinterpret_cast<const char *>(buffer.get()), len);
-}
-
-} // namespace
-
 CHIP_ERROR PersistentStorage::Init(const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -95,6 +64,12 @@ CHIP_ERROR PersistentStorage::Init(const char * name)
     mName = name;
     mConfig.parse(ifs);
     ifs.close();
+
+    // To audit the contents at init, uncomment the following:
+#if 0
+    DumpKeys();
+#endif
+
 exit:
     return err;
 }
@@ -106,10 +81,11 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
     ReturnErrorCodeIf(((value == nullptr) && (size != 0)), CHIP_ERROR_INVALID_ARGUMENT);
 
     auto section = mConfig.sections[kDefaultSectionName];
-    auto it      = section.find(key);
-    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-    ReturnErrorCodeIf(!inipp::extract(section[key], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    std::string escapedKey = EscapeKey(key);
+    ReturnErrorCodeIf(!inipp::extract(section[escapedKey], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
 
     iniValue = Base64ToString(iniValue);
 
@@ -126,8 +102,19 @@ CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, ui
 
 CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
+    ReturnErrorCodeIf((value == nullptr) && (size != 0), CHIP_ERROR_INVALID_ARGUMENT);
+
     auto section = mConfig.sections[kDefaultSectionName];
-    section[key] = StringToBase64(std::string(static_cast<const char *>(value), size));
+
+    std::string escapedKey = EscapeKey(key);
+    if (value == nullptr)
+    {
+        section[escapedKey] = "";
+    }
+    else
+    {
+        section[escapedKey] = StringToBase64(std::string(static_cast<const char *>(value), size));
+    }
 
     mConfig.sections[kDefaultSectionName] = section;
     return CommitConfig(mName);
@@ -136,13 +123,40 @@ CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * val
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
-    auto it      = section.find(key);
-    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-    section.erase(key);
+    ReturnErrorCodeIf(!SyncDoesKeyExist(key), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    std::string escapedKey = EscapeKey(key);
+    section.erase(escapedKey);
 
     mConfig.sections[kDefaultSectionName] = section;
     return CommitConfig(mName);
+}
+
+bool PersistentStorage::SyncDoesKeyExist(const char * key)
+{
+    std::string escapedKey = EscapeKey(key);
+    auto section           = mConfig.sections[kDefaultSectionName];
+    auto it                = section.find(escapedKey);
+    return (it != section.end());
+}
+
+void PersistentStorage::DumpKeys() const
+{
+#if CHIP_PROGRESS_LOGGING
+    for (const auto & section : mConfig.sections)
+    {
+        const std::string & sectionName = section.first;
+        const auto & sectionContent     = section.second;
+
+        ChipLogProgress(chipTool, "[%s]", sectionName.c_str());
+        for (const auto & entry : sectionContent)
+        {
+            const std::string & keyName = entry.first;
+            ChipLogProgress(chipTool, "  => %s", UnescapeKey(keyName).c_str());
+        }
+    }
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 CHIP_ERROR PersistentStorage::SyncClearAll()

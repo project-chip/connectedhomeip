@@ -665,6 +665,12 @@ tests:
           [1654247307401] [91803:4011207] CHIP: [TOO]     [12]: 65533
 
 
+          ./chip-tool pumpconfigurationandcontrol  read feature-map  1 1
+          [1656478569086] [49565:5734437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFFC DataVersion: 1816685251
+          [1656478569086] [49565:5734437] CHIP: [TOO]   FeatureMap: 0
+
+
+
           "./chip-tool pumpconfigurationandcontrol read max-pressure 1 1
 
           [1651148412.273866][2336:2336] CHIP:IM: Received Read request
