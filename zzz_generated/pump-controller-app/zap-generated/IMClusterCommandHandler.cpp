@@ -56,7 +56,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(apCommandObj, aCommandPath,
-                             commandData);
+                                                                                                     commandData);
             }
             break;
         }
@@ -66,7 +66,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-                                 apCommandObj, aCommandPath, commandData);
+                    apCommandObj, aCommandPath, commandData);
             }
             break;
         }

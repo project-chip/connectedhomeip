@@ -238,7 +238,7 @@ void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfAppli
 
 EmberAfAttributeWritePermission __attribute__((weak))
 emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-        uint8_t type)
+                                          uint8_t type)
 {
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
 }
@@ -264,7 +264,7 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
 }
 
 bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestination & destination, EmberApsFrame * apsFrame,
-        uint16_t msgLen, uint8_t * message, EmberStatus status)
+                                                      uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
@@ -315,7 +315,7 @@ MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attrib
 }
 
 void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type,
-        uint16_t size, uint8_t * value)
+                                                             uint16_t size, uint8_t * value)
 {}
 
 void __attribute__((weak))
