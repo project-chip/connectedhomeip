@@ -645,7 +645,7 @@ ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::Devic
 ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId)
 {
     VerifyOrReturnError((devCtrl != nullptr) && (devCtrl->SessionMgr() != nullptr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-    (void)devCtrl->ReleaseOperationalDevice(nodeId);
+    (void) devCtrl->ReleaseOperationalDevice(nodeId);
     devCtrl->SessionMgr()->ExpireAllSessions(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
     return CHIP_NO_ERROR.AsInteger();
 }

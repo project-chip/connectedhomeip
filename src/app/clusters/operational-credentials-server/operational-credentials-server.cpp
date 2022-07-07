@@ -607,7 +607,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     auto nocResponse         = OperationalCertStatus::kSuccess;
     auto nonDefaultStatus    = Status::Success;
     bool needRevert          = false;
-    int line = 0;
+    int line                 = 0;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
@@ -626,11 +626,22 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
-    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
-    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
-                 {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
-    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, {
+        nonDefaultStatus = Status::InvalidCommand;
+        line             = __LINE__;
+    });
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength, {
+        nonDefaultStatus = Status::InvalidCommand;
+        line             = __LINE__;
+    });
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, {
+        nonDefaultStatus = Status::InvalidCommand;
+        line             = __LINE__;
+    });
+    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), {
+        nonDefaultStatus = Status::InvalidCommand;
+        line             = __LINE__;
+    });
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
