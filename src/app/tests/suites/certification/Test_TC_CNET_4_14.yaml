@@ -27,7 +27,7 @@ tests:
           "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to
           900"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -36,7 +36,7 @@ tests:
           entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -44,7 +44,7 @@ tests:
           "TH calculates thenumber ofremainingnetwork slots as'MaxNetworksValue'
           -'NumNetworks'r and saves as'RemainingNetworkSlots'"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 

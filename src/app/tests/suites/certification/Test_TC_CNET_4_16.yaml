@@ -29,7 +29,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 162 0
 
-          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true, 
+          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
           [1645772651.445209][3856:3861] CHIP:DMG: }
           [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
@@ -49,7 +49,7 @@ tests:
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1650392597.976539][10152:10157] CHIP:TOO:   ArmFailSafeResponse: {
           [1650392597.976665][10152:10157] CHIP:TOO:     errorCode: 0
-          [1650392597.976729][10152:10157] CHIP:TOO:     debugText: 
+          [1650392597.976729][10152:10157] CHIP:TOO:     debugText:
           [1650392597.976785][10152:10157] CHIP:TOO:    }
           [1650392597.976874][10152:10157] CHIP:DMG: ICR moving to [AwaitingDe]
           [1650392597.976987][10152:10157] CHIP:EM: Sending Standalone Ack for MessageCounter:10494017 on exchange 14665i

@@ -104,7 +104,7 @@ tests:
 
     - label: "Simulate a Factory Reset the TH"
       verification: |
-          To verify leave event follow the below commands 
+          To verify leave event follow the below commands
           1. ./chip-tool interactive start
           2. basic subscribe-event leave 1 100 1 0
           3. operationalcredentials remove-fabric 1 1 0
@@ -150,7 +150,7 @@ tests:
 
           [1655369993.433630][2377:2382] CHIP:DMG: ReportDataMessage =
           [1655369993.433667][2377:2382] CHIP:DMG: {
-          [1655369993.433699][2377:2382] CHIP:DMG: 	SuppressResponse = true, 
+          [1655369993.433699][2377:2382] CHIP:DMG: 	SuppressResponse = true,
           [1655369993.433742][2377:2382] CHIP:DMG: 	InteractionModelRevision = 1
           [1655369993.433775][2377:2382] CHIP:DMG: }
       disabled: true
