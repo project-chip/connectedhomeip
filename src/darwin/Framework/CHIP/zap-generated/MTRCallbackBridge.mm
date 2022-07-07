@@ -23,9 +23,7 @@
 
 #include <lib/support/TypeTraits.h>
 
-void MTRDefaultSuccessCallbackBridge::OnSuccessFn(void * context) {
-    DispatchSuccess(context, nil);
-};
+void MTRDefaultSuccessCallbackBridge::OnSuccessFn(void * context) { DispatchSuccess(context, nil); };
 
 void MTRCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &)
 {
@@ -739,7 +737,7 @@ void MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -778,7 +776,7 @@ void MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -817,7 +815,7 @@ void MTRIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -856,7 +854,7 @@ void MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -895,7 +893,7 @@ void MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -934,7 +932,7 @@ void MTRGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -973,7 +971,7 @@ void MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1012,7 +1010,7 @@ void MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1051,7 +1049,7 @@ void MTRScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1090,7 +1088,7 @@ void MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1129,7 +1127,7 @@ void MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1168,7 +1166,7 @@ void MTROnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1207,7 +1205,7 @@ void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge:
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1247,7 +1245,7 @@ void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1287,7 +1285,7 @@ void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1326,7 +1324,7 @@ void MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1365,7 +1363,7 @@ void MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1404,7 +1402,7 @@ void MTRLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1443,7 +1441,7 @@ void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnSucce
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1482,7 +1480,7 @@ void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1521,7 +1519,7 @@ void MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1557,10 +1555,10 @@ void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::On
 }
 
 void MTRDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1601,7 +1599,7 @@ void MTRDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1640,7 +1638,7 @@ void MTRDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1679,7 +1677,7 @@ void MTRDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1718,7 +1716,7 @@ void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1757,7 +1755,7 @@ void MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1796,7 +1794,7 @@ void MTRDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1832,10 +1830,10 @@ void MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void MTRBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1895,7 +1893,7 @@ void MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1934,7 +1932,7 @@ void MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -1973,7 +1971,7 @@ void MTRBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2009,11 +2007,11 @@ void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2025,7 +2023,7 @@ void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
             if (entry_0.subjects.IsNull()) {
                 newElement_0.subjects = nil;
             } else {
-                {   // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_3 = [NSMutableArray new];
                     auto iter_3 = entry_0.subjects.Value().begin();
                     while (iter_3.Next()) {
@@ -2045,7 +2043,7 @@ void MTRAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
             if (entry_0.targets.IsNull()) {
                 newElement_0.targets = nil;
             } else {
-                {   // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_3 = [NSMutableArray new];
                     auto iter_3 = entry_0.targets.Value().begin();
                     while (iter_3.Next()) {
@@ -2107,10 +2105,10 @@ void MTRAccessControlAclListAttributeCallbackSubscriptionBridge::OnSubscriptionE
 }
 
 void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2151,7 +2149,7 @@ void MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2190,7 +2188,7 @@ void MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2229,7 +2227,7 @@ void MTRAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2265,10 +2263,10 @@ void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTRBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2277,8 +2275,8 @@ void MTRBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * 
             newElement_0 = [MTRBridgedActionsClusterActionStruct new];
             newElement_0.actionID = [NSNumber numberWithUnsignedShort:entry_0.actionID];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                  length:entry_0.name.size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
             newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands];
@@ -2312,11 +2310,11 @@ void MTRBridgedActionsActionListListAttributeCallbackSubscriptionBridge::OnSubsc
 }
 
 void MTRBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2325,10 +2323,10 @@ void MTRBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void 
             newElement_0 = [MTRBridgedActionsClusterEndpointListStruct new];
             newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                  length:entry_0.name.size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
             newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.endpoints.begin();
                 while (iter_2.Next()) {
@@ -2376,7 +2374,7 @@ void MTRBridgedActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2415,7 +2413,7 @@ void MTRBridgedActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2454,7 +2452,7 @@ void MTRBridgedActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2519,7 +2517,7 @@ void MTRBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2558,7 +2556,7 @@ void MTRBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2597,7 +2595,7 @@ void MTRBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2636,7 +2634,7 @@ void MTROtaSoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2676,7 +2674,7 @@ void MTROtaSoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge:
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2716,7 +2714,7 @@ void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2752,11 +2750,11 @@ void MTROtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionB
 }
 
 void MTROtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<
+    const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2799,7 +2797,7 @@ void MTROtaSoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridg
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2839,7 +2837,7 @@ void MTROtaSoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2879,7 +2877,7 @@ void MTROtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2918,7 +2916,7 @@ void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2957,7 +2955,7 @@ void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -2997,7 +2995,7 @@ void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge:
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3037,7 +3035,7 @@ void MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3076,7 +3074,7 @@ void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge:
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3116,7 +3114,7 @@ void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::O
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3155,7 +3153,7 @@ void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3194,7 +3192,7 @@ void MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3233,7 +3231,7 @@ void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSucce
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3272,7 +3270,7 @@ void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3311,7 +3309,7 @@ void MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3350,7 +3348,7 @@ void MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3389,7 +3387,7 @@ void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge:
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3429,7 +3427,7 @@ void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3469,7 +3467,7 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3508,7 +3506,7 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3547,7 +3545,7 @@ void MTRPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3586,7 +3584,7 @@ void MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge::OnSucce
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3625,7 +3623,7 @@ void MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3664,7 +3662,7 @@ void MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3703,7 +3701,7 @@ void MTRPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3769,7 +3767,7 @@ void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnS
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3808,7 +3806,7 @@ void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3847,7 +3845,7 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3883,11 +3881,11 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3928,7 +3926,7 @@ void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnS
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -3967,7 +3965,7 @@ void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4006,7 +4004,7 @@ void MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4045,7 +4043,7 @@ void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4084,7 +4082,7 @@ void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4123,7 +4121,7 @@ void MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4159,11 +4157,11 @@ void MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<
+    const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4171,8 +4169,8 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
             MTRGeneralDiagnosticsClusterNetworkInterfaceType * newElement_0;
             newElement_0 = [MTRGeneralDiagnosticsClusterNetworkInterfaceType new];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                  length:entry_0.name.size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
             newElement_0.isOperational = [NSNumber numberWithBool:entry_0.isOperational];
             if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
                 newElement_0.offPremiseServicesReachableIPv4 = nil;
@@ -4187,8 +4185,8 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
                     [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
             }
             newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data()
-                                                   length:entry_0.hardwareAddress.size()];
-            {   // Scope for our temporary variables
+                                                          length:entry_0.hardwareAddress.size()];
+            { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.IPv4Addresses.begin();
                 while (iter_2.Next()) {
@@ -4204,7 +4202,7 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
                 }
                 newElement_0.iPv4Addresses = array_2;
             }
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.IPv6Addresses.begin();
                 while (iter_2.Next()) {
@@ -4253,7 +4251,7 @@ void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4292,7 +4290,7 @@ void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4331,7 +4329,7 @@ void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4370,7 +4368,7 @@ void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4409,7 +4407,7 @@ void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4448,7 +4446,7 @@ void MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4484,11 +4482,11 @@ void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::
 }
 
 void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4498,8 +4496,8 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn
             newElement_0.id = [NSNumber numberWithUnsignedLongLong:entry_0.id];
             if (entry_0.name.HasValue()) {
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                      length:entry_0.name.Value().size()
-                                                      encoding:NSUTF8StringEncoding];
+                                                             length:entry_0.name.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
             } else {
                 newElement_0.name = nil;
             }
@@ -4550,7 +4548,7 @@ void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4589,7 +4587,7 @@ void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4628,7 +4626,7 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4664,11 +4662,11 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
 }
 
 void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<
+    const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4726,11 +4724,11 @@ void MTRThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscripti
 }
 
 void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4776,7 +4774,7 @@ void MTRThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionB
 }
 
 void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
         value)
 {
     MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable objCValue;
@@ -4807,7 +4805,7 @@ void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptio
 }
 
 void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<
+    const chip::app::DataModel::Nullable<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
 {
     MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable objCValue;
@@ -4853,7 +4851,7 @@ void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBrid
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4893,7 +4891,7 @@ void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge:
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4933,7 +4931,7 @@ void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -4973,7 +4971,7 @@ void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5012,7 +5010,7 @@ void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::O
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5051,7 +5049,7 @@ void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5090,7 +5088,7 @@ void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5129,7 +5127,7 @@ void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridg
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5169,7 +5167,7 @@ void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5209,7 +5207,7 @@ void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5248,7 +5246,7 @@ void MTRBridgedDeviceBasicGeneratedCommandListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5287,7 +5285,7 @@ void MTRBridgedDeviceBasicAcceptedCommandListListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5326,7 +5324,7 @@ void MTRBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5365,7 +5363,7 @@ void MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5404,7 +5402,7 @@ void MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5443,7 +5441,7 @@ void MTRSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5482,7 +5480,7 @@ void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridg
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5522,7 +5520,7 @@ void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5562,7 +5560,7 @@ void MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5598,11 +5596,11 @@ void MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscription
 }
 
 void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5645,11 +5643,11 @@ void MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<
+    const chip::app::DataModel::DecodableList<
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5661,8 +5659,8 @@ void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(vo
             newElement_0.fabricId = [NSNumber numberWithUnsignedLongLong:entry_0.fabricId];
             newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                   length:entry_0.label.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:entry_0.label.size()
+                                                        encoding:NSUTF8StringEncoding];
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
@@ -5696,7 +5694,7 @@ void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5736,7 +5734,7 @@ void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::O
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5775,7 +5773,7 @@ void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5814,7 +5812,7 @@ void MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5850,11 +5848,11 @@ void MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBrid
 }
 
 void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5893,11 +5891,11 @@ void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::On
 }
 
 void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -5905,7 +5903,7 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(voi
             MTRGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
             newElement_0 = [MTRGroupKeyManagementClusterGroupInfoMapStruct new];
             newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.endpoints.begin();
                 while (iter_2.Next()) {
@@ -5923,8 +5921,8 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(voi
             }
             if (entry_0.groupName.HasValue()) {
                 newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
-                                                           length:entry_0.groupName.Value().size()
-                                                           encoding:NSUTF8StringEncoding];
+                                                                  length:entry_0.groupName.Value().size()
+                                                                encoding:NSUTF8StringEncoding];
             } else {
                 newElement_0.groupName = nil;
             }
@@ -5961,7 +5959,7 @@ void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6000,7 +5998,7 @@ void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnSucc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6039,7 +6037,7 @@ void MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6075,10 +6073,10 @@ void MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::
 }
 
 void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6086,11 +6084,11 @@ void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
             MTRFixedLabelClusterLabelStruct * newElement_0;
             newElement_0 = [MTRFixedLabelClusterLabelStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                   length:entry_0.label.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:entry_0.label.size()
+                                                        encoding:NSUTF8StringEncoding];
             newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                   length:entry_0.value.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:entry_0.value.size()
+                                                        encoding:NSUTF8StringEncoding];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -6123,7 +6121,7 @@ void MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6162,7 +6160,7 @@ void MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6201,7 +6199,7 @@ void MTRFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6237,10 +6235,10 @@ void MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6248,11 +6246,11 @@ void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * contex
             MTRUserLabelClusterLabelStruct * newElement_0;
             newElement_0 = [MTRUserLabelClusterLabelStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                   length:entry_0.label.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:entry_0.label.size()
+                                                        encoding:NSUTF8StringEncoding];
             newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                   length:entry_0.value.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:entry_0.value.size()
+                                                        encoding:NSUTF8StringEncoding];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -6285,7 +6283,7 @@ void MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6324,7 +6322,7 @@ void MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6363,7 +6361,7 @@ void MTRUserLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6402,7 +6400,7 @@ void MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6441,7 +6439,7 @@ void MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6480,7 +6478,7 @@ void MTRBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6516,10 +6514,10 @@ void MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
 }
 
 void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6527,10 +6525,10 @@ void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * 
             MTRModeSelectClusterModeOptionStruct * newElement_0;
             newElement_0 = [MTRModeSelectClusterModeOptionStruct new];
             newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                   length:entry_0.label.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:entry_0.label.size()
+                                                        encoding:NSUTF8StringEncoding];
             newElement_0.mode = [NSNumber numberWithUnsignedChar:entry_0.mode];
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.semanticTags.begin();
                 while (iter_2.Next()) {
@@ -6580,7 +6578,7 @@ void MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6619,7 +6617,7 @@ void MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6658,7 +6656,7 @@ void MTRModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6793,7 +6791,7 @@ void MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6832,7 +6830,7 @@ void MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -6871,7 +6869,7 @@ void MTRDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7006,7 +7004,7 @@ void MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7045,7 +7043,7 @@ void MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7084,7 +7082,7 @@ void MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7123,7 +7121,7 @@ void MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7162,7 +7160,7 @@ void MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7201,7 +7199,7 @@ void MTRBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7264,7 +7262,7 @@ void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBrid
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7304,7 +7302,7 @@ void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridg
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7344,7 +7342,7 @@ void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnS
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7383,7 +7381,7 @@ void MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7422,7 +7420,7 @@ void MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7461,7 +7459,7 @@ void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7500,7 +7498,7 @@ void MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7539,7 +7537,7 @@ void MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7578,7 +7576,7 @@ void MTRFanControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7617,7 +7615,7 @@ void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCal
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7640,7 +7638,7 @@ void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCal
     void * context)
 {
     auto * self = static_cast<MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(
-                      context);
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -7658,7 +7656,7 @@ void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCall
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7699,7 +7697,7 @@ void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBr
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7740,7 +7738,7 @@ void MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7779,7 +7777,7 @@ void MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7818,7 +7816,7 @@ void MTRColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7857,7 +7855,7 @@ void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::O
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7896,7 +7894,7 @@ void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7935,7 +7933,7 @@ void MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -7974,7 +7972,7 @@ void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::O
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8013,7 +8011,7 @@ void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8052,7 +8050,7 @@ void MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8091,7 +8089,7 @@ void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8130,7 +8128,7 @@ void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8169,7 +8167,7 @@ void MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8208,7 +8206,7 @@ void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8247,7 +8245,7 @@ void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8286,7 +8284,7 @@ void MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8325,7 +8323,7 @@ void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBrid
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8365,7 +8363,7 @@ void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridg
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8405,7 +8403,7 @@ void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnS
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8444,7 +8442,7 @@ void MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnSucce
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8483,7 +8481,7 @@ void MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8522,7 +8520,7 @@ void MTROccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8561,7 +8559,7 @@ void MTRWakeOnLanGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8600,7 +8598,7 @@ void MTRWakeOnLanAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8639,7 +8637,7 @@ void MTRWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8675,10 +8673,10 @@ void MTRWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8689,22 +8687,22 @@ void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * contex
             newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
             if (entry_0.name.HasValue()) {
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.Value().data()
-                                                      length:entry_0.name.Value().size()
-                                                      encoding:NSUTF8StringEncoding];
+                                                             length:entry_0.name.Value().size()
+                                                           encoding:NSUTF8StringEncoding];
             } else {
                 newElement_0.name = nil;
             }
             if (entry_0.callSign.HasValue()) {
                 newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.Value().data()
-                                                          length:entry_0.callSign.Value().size()
-                                                          encoding:NSUTF8StringEncoding];
+                                                                 length:entry_0.callSign.Value().size()
+                                                               encoding:NSUTF8StringEncoding];
             } else {
                 newElement_0.callSign = nil;
             }
             if (entry_0.affiliateCallSign.HasValue()) {
                 newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.Value().data()
-                                                                   length:entry_0.affiliateCallSign.Value().size()
-                                                                   encoding:NSUTF8StringEncoding];
+                                                                          length:entry_0.affiliateCallSign.Value().size()
+                                                                        encoding:NSUTF8StringEncoding];
             } else {
                 newElement_0.affiliateCallSign = nil;
             }
@@ -8745,19 +8743,19 @@ void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(
     } else {
         objCValue = [MTRChannelClusterLineupInfo new];
         objCValue.operatorName = [[NSString alloc] initWithBytes:value.Value().operatorName.data()
-                                                   length:value.Value().operatorName.size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:value.Value().operatorName.size()
+                                                        encoding:NSUTF8StringEncoding];
         if (value.Value().lineupName.HasValue()) {
             objCValue.lineupName = [[NSString alloc] initWithBytes:value.Value().lineupName.Value().data()
-                                                     length:value.Value().lineupName.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+                                                            length:value.Value().lineupName.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
         } else {
             objCValue.lineupName = nil;
         }
         if (value.Value().postalCode.HasValue()) {
             objCValue.postalCode = [[NSString alloc] initWithBytes:value.Value().postalCode.Value().data()
-                                                     length:value.Value().postalCode.Value().size()
-                                                     encoding:NSUTF8StringEncoding];
+                                                            length:value.Value().postalCode.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
         } else {
             objCValue.postalCode = nil;
         }
@@ -8794,22 +8792,22 @@ void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(
         objCValue.minorNumber = [NSNumber numberWithUnsignedShort:value.Value().minorNumber];
         if (value.Value().name.HasValue()) {
             objCValue.name = [[NSString alloc] initWithBytes:value.Value().name.Value().data()
-                                               length:value.Value().name.Value().size()
-                                               encoding:NSUTF8StringEncoding];
+                                                      length:value.Value().name.Value().size()
+                                                    encoding:NSUTF8StringEncoding];
         } else {
             objCValue.name = nil;
         }
         if (value.Value().callSign.HasValue()) {
             objCValue.callSign = [[NSString alloc] initWithBytes:value.Value().callSign.Value().data()
-                                                   length:value.Value().callSign.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:value.Value().callSign.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             objCValue.callSign = nil;
         }
         if (value.Value().affiliateCallSign.HasValue()) {
             objCValue.affiliateCallSign = [[NSString alloc] initWithBytes:value.Value().affiliateCallSign.Value().data()
-                                                            length:value.Value().affiliateCallSign.Value().size()
-                                                            encoding:NSUTF8StringEncoding];
+                                                                   length:value.Value().affiliateCallSign.Value().size()
+                                                                 encoding:NSUTF8StringEncoding];
         } else {
             objCValue.affiliateCallSign = nil;
         }
@@ -8837,7 +8835,7 @@ void MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8876,7 +8874,7 @@ void MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8915,7 +8913,7 @@ void MTRChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8951,10 +8949,10 @@ void MTRChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -8963,8 +8961,8 @@ void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void *
             newElement_0 = [MTRTargetNavigatorClusterTargetInfo new];
             newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                  length:entry_0.name.size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -8997,7 +8995,7 @@ void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9036,7 +9034,7 @@ void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9075,7 +9073,7 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9111,7 +9109,7 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType> & value)
 {
     MTRMediaPlaybackClusterPlaybackPosition * _Nullable objCValue;
     if (value.IsNull()) {
@@ -9148,7 +9146,7 @@ void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9187,7 +9185,7 @@ void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9226,7 +9224,7 @@ void MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9262,10 +9260,10 @@ void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9275,11 +9273,11 @@ void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * conte
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                  length:entry_0.name.size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
             newElement_0.descriptionString = [[NSString alloc] initWithBytes:entry_0.description.data()
-                                                               length:entry_0.description.size()
-                                                               encoding:NSUTF8StringEncoding];
+                                                                      length:entry_0.description.size()
+                                                                    encoding:NSUTF8StringEncoding];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9312,7 +9310,7 @@ void MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9351,7 +9349,7 @@ void MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9390,7 +9388,7 @@ void MTRMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9429,7 +9427,7 @@ void MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9468,7 +9466,7 @@ void MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9507,7 +9505,7 @@ void MTRLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9546,7 +9544,7 @@ void MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9585,7 +9583,7 @@ void MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9624,7 +9622,7 @@ void MTRKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9663,7 +9661,7 @@ void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9702,7 +9700,7 @@ void MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9741,7 +9739,7 @@ void MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9780,7 +9778,7 @@ void MTRContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9816,10 +9814,10 @@ void MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9829,8 +9827,8 @@ void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * con
             newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
             newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
             newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                  length:entry_0.name.size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:entry_0.name.size()
+                                                       encoding:NSUTF8StringEncoding];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -9863,7 +9861,7 @@ void MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9902,7 +9900,7 @@ void MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9941,7 +9939,7 @@ void MTRAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -9980,7 +9978,7 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10016,7 +10014,7 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::O
 }
 
 void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType> & value)
 {
     MTRApplicationLauncherClusterApplicationEP * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10026,8 +10024,8 @@ void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(
         objCValue.application = [MTRApplicationLauncherClusterApplication new];
         objCValue.application.catalogVendorId = [NSNumber numberWithUnsignedShort:value.Value().application.catalogVendorId];
         objCValue.application.applicationId = [[NSString alloc] initWithBytes:value.Value().application.applicationId.data()
-                                                                length:value.Value().application.applicationId.size()
-                                                                encoding:NSUTF8StringEncoding];
+                                                                       length:value.Value().application.applicationId.size()
+                                                                     encoding:NSUTF8StringEncoding];
         if (value.Value().endpoint.HasValue()) {
             objCValue.endpoint = [NSNumber numberWithUnsignedShort:value.Value().endpoint.Value()];
         } else {
@@ -10057,7 +10055,7 @@ void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnSu
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10096,7 +10094,7 @@ void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuc
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10135,7 +10133,7 @@ void MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10177,8 +10175,8 @@ void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
     objCValue = [MTRApplicationBasicClusterApplicationBasicApplication new];
     objCValue.catalogVendorId = [NSNumber numberWithUnsignedShort:value.catalogVendorId];
     objCValue.applicationId = [[NSString alloc] initWithBytes:value.applicationId.data()
-                                                length:value.applicationId.size()
-                                                encoding:NSUTF8StringEncoding];
+                                                       length:value.applicationId.size()
+                                                     encoding:NSUTF8StringEncoding];
     DispatchSuccess(context, objCValue);
 };
 
@@ -10202,7 +10200,7 @@ void MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessF
     void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10241,7 +10239,7 @@ void MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnSucce
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10280,7 +10278,7 @@ void MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnSucces
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10319,7 +10317,7 @@ void MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10358,7 +10356,7 @@ void MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10397,7 +10395,7 @@ void MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10436,7 +10434,7 @@ void MTRAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10475,7 +10473,7 @@ void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::On
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10514,7 +10512,7 @@ void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnS
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10553,7 +10551,7 @@ void MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSuccess
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10688,7 +10686,7 @@ void MTRTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10727,7 +10725,7 @@ void MTRTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10763,11 +10761,11 @@ void MTRTestClusterListOctetStringListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTRTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
         value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10805,11 +10803,11 @@ void MTRTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge:
 }
 
 void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<
+    const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -10840,13 +10838,13 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.nullableString = nil;
             } else {
                 newElement_0.nullableString = [[NSString alloc] initWithBytes:entry_0.nullableString.Value().data()
-                                                                length:entry_0.nullableString.Value().size()
-                                                                encoding:NSUTF8StringEncoding];
+                                                                       length:entry_0.nullableString.Value().size()
+                                                                     encoding:NSUTF8StringEncoding];
             }
             if (entry_0.optionalString.HasValue()) {
                 newElement_0.optionalString = [[NSString alloc] initWithBytes:entry_0.optionalString.Value().data()
-                                                                length:entry_0.optionalString.Value().size()
-                                                                encoding:NSUTF8StringEncoding];
+                                                                       length:entry_0.optionalString.Value().size()
+                                                                     encoding:NSUTF8StringEncoding];
             } else {
                 newElement_0.optionalString = nil;
             }
@@ -10856,8 +10854,8 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 } else {
                     newElement_0.nullableOptionalString =
                         [[NSString alloc] initWithBytes:entry_0.nullableOptionalString.Value().Value().data()
-                                          length:entry_0.nullableOptionalString.Value().Value().size()
-                                          encoding:NSUTF8StringEncoding];
+                                                 length:entry_0.nullableOptionalString.Value().Value().size()
+                                               encoding:NSUTF8StringEncoding];
                 }
             } else {
                 newElement_0.nullableOptionalString = nil;
@@ -10871,10 +10869,10 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.nullableStruct.c =
                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
                 newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
-                                                        length:entry_0.nullableStruct.Value().d.size()];
+                                                               length:entry_0.nullableStruct.Value().d.size()];
                 newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
-                                                                  length:entry_0.nullableStruct.Value().e.size()
-                                                                  encoding:NSUTF8StringEncoding];
+                                                                         length:entry_0.nullableStruct.Value().e.size()
+                                                                       encoding:NSUTF8StringEncoding];
                 newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
                 newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
                 newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
@@ -10886,10 +10884,10 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.optionalStruct.c =
                     [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
                 newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
-                                                        length:entry_0.optionalStruct.Value().d.size()];
+                                                               length:entry_0.optionalStruct.Value().d.size()];
                 newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
-                                                                  length:entry_0.optionalStruct.Value().e.size()
-                                                                  encoding:NSUTF8StringEncoding];
+                                                                         length:entry_0.optionalStruct.Value().e.size()
+                                                                       encoding:NSUTF8StringEncoding];
                 newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
                 newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
                 newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
@@ -10909,11 +10907,11 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                         [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
                     newElement_0.nullableOptionalStruct.d =
                         [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
-                                length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
+                                       length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
                     newElement_0.nullableOptionalStruct.e =
                         [[NSString alloc] initWithBytes:entry_0.nullableOptionalStruct.Value().Value().e.data()
-                                          length:entry_0.nullableOptionalStruct.Value().Value().e.size()
-                                          encoding:NSUTF8StringEncoding];
+                                                 length:entry_0.nullableOptionalStruct.Value().Value().e.size()
+                                               encoding:NSUTF8StringEncoding];
                     newElement_0.nullableOptionalStruct.f =
                         [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
                     newElement_0.nullableOptionalStruct.g =
@@ -10927,7 +10925,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
             if (entry_0.nullableList.IsNull()) {
                 newElement_0.nullableList = nil;
             } else {
-                {   // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_3 = [NSMutableArray new];
                     auto iter_3 = entry_0.nullableList.Value().begin();
                     while (iter_3.Next()) {
@@ -10945,7 +10943,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 }
             }
             if (entry_0.optionalList.HasValue()) {
-                {   // Scope for our temporary variables
+                { // Scope for our temporary variables
                     auto * array_3 = [NSMutableArray new];
                     auto iter_3 = entry_0.optionalList.Value().begin();
                     while (iter_3.Next()) {
@@ -10968,7 +10966,7 @@ void MTRTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 if (entry_0.nullableOptionalList.Value().IsNull()) {
                     newElement_0.nullableOptionalList = nil;
                 } else {
-                    {   // Scope for our temporary variables
+                    { // Scope for our temporary variables
                         auto * array_4 = [NSMutableArray new];
                         auto iter_4 = entry_0.nullableOptionalList.Value().Value().begin();
                         while (iter_4.Next()) {
@@ -11052,7 +11050,7 @@ void MTRTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -11088,10 +11086,10 @@ void MTRTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::O
 }
 
 void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -11122,22 +11120,22 @@ void MTRTestClusterListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
                 newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
             }
             newElement_0.fabricSensitiveCharString = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveCharString.data()
-                                     length:entry_0.fabricSensitiveCharString.size()
-                                     encoding:NSUTF8StringEncoding];
+                                                                              length:entry_0.fabricSensitiveCharString.size()
+                                                                            encoding:NSUTF8StringEncoding];
             newElement_0.fabricSensitiveStruct = [MTRTestClusterClusterSimpleStruct new];
             newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
             newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
             newElement_0.fabricSensitiveStruct.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
             newElement_0.fabricSensitiveStruct.d = [NSData dataWithBytes:entry_0.fabricSensitiveStruct.d.data()
-                                                           length:entry_0.fabricSensitiveStruct.d.size()];
+                                                                  length:entry_0.fabricSensitiveStruct.d.size()];
             newElement_0.fabricSensitiveStruct.e = [[NSString alloc] initWithBytes:entry_0.fabricSensitiveStruct.e.data()
-                                                                     length:entry_0.fabricSensitiveStruct.e.size()
-                                                                     encoding:NSUTF8StringEncoding];
+                                                                            length:entry_0.fabricSensitiveStruct.e.size()
+                                                                          encoding:NSUTF8StringEncoding];
             newElement_0.fabricSensitiveStruct.f = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.f.Raw()];
             newElement_0.fabricSensitiveStruct.g = [NSNumber numberWithFloat:entry_0.fabricSensitiveStruct.g];
             newElement_0.fabricSensitiveStruct.h = [NSNumber numberWithDouble:entry_0.fabricSensitiveStruct.h];
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.fabricSensitiveInt8uList.begin();
                 while (iter_2.Next()) {
@@ -11295,7 +11293,7 @@ void MTRTestClusterNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscr
 }
 
 void MTRTestClusterNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> & value)
 {
     MTRTestClusterClusterSimpleStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11307,8 +11305,8 @@ void MTRTestClusterNullableStructStructAttributeCallbackBridge::OnSuccessFn(void
         objCValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value().c)];
         objCValue.d = [NSData dataWithBytes:value.Value().d.data() length:value.Value().d.size()];
         objCValue.e = [[NSString alloc] initWithBytes:value.Value().e.data()
-                                        length:value.Value().e.size()
-                                        encoding:NSUTF8StringEncoding];
+                                               length:value.Value().e.size()
+                                             encoding:NSUTF8StringEncoding];
         objCValue.f = [NSNumber numberWithUnsignedChar:value.Value().f.Raw()];
         objCValue.g = [NSNumber numberWithFloat:value.Value().g];
         objCValue.h = [NSNumber numberWithDouble:value.Value().h];
@@ -11336,7 +11334,7 @@ void MTRTestClusterGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -11375,7 +11373,7 @@ void MTRTestClusterAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -11414,7 +11412,7 @@ void MTRTestClusterAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
-    {   // Scope for our temporary variables
+    { // Scope for our temporary variables
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = value.begin();
         while (iter_0.Next()) {
@@ -11474,8 +11472,8 @@ void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
     }
     {
         response.groupName = [[NSString alloc] initWithBytes:data.groupName.data()
-                                               length:data.groupName.size()
-                                               encoding:NSUTF8StringEncoding];
+                                                      length:data.groupName.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -11492,7 +11490,7 @@ void MTRGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
         }
     }
     {
-        {   // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = data.groupList.begin();
             while (iter_0.Next()) {
@@ -11564,15 +11562,15 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
     {
         if (data.sceneName.HasValue()) {
             response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                   length:data.sceneName.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:data.sceneName.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             response.sceneName = nil;
         }
     }
     {
         if (data.extensionFieldSets.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.extensionFieldSets.Value().begin();
                 while (iter_1.Next()) {
@@ -11580,7 +11578,7 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
                     MTRScenesClusterExtensionFieldSet * newElement_1;
                     newElement_1 = [MTRScenesClusterExtensionFieldSet new];
                     newElement_1.clusterId = [NSNumber numberWithUnsignedInt:entry_1.clusterId];
-                    {   // Scope for our temporary variables
+                    { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
                         while (iter_3.Next()) {
@@ -11592,7 +11590,7 @@ void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
                             } else {
                                 newElement_3.attributeId = nil;
                             }
-                            {   // Scope for our temporary variables
+                            { // Scope for our temporary variables
                                 auto * array_5 = [NSMutableArray new];
                                 auto iter_5 = entry_3.attributeValue.begin();
                                 while (iter_5.Next()) {
@@ -11697,7 +11695,7 @@ void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
     }
     {
         if (data.sceneList.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.sceneList.Value().begin();
                 while (iter_1.Next()) {
@@ -11759,15 +11757,15 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
     {
         if (data.sceneName.HasValue()) {
             response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.Value().data()
-                                                   length:data.sceneName.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:data.sceneName.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             response.sceneName = nil;
         }
     }
     {
         if (data.extensionFieldSets.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.extensionFieldSets.Value().begin();
                 while (iter_1.Next()) {
@@ -11775,7 +11773,7 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
                     MTRScenesClusterExtensionFieldSet * newElement_1;
                     newElement_1 = [MTRScenesClusterExtensionFieldSet new];
                     newElement_1.clusterId = [NSNumber numberWithUnsignedInt:entry_1.clusterId];
-                    {   // Scope for our temporary variables
+                    { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
                         while (iter_3.Next()) {
@@ -11787,7 +11785,7 @@ void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
                             } else {
                                 newElement_3.attributeId = nil;
                             }
-                            {   // Scope for our temporary variables
+                            { // Scope for our temporary variables
                                 auto * array_5 = [NSMutableArray new];
                                 auto iter_5 = entry_3.attributeValue.begin();
                                 while (iter_5.Next()) {
@@ -11861,8 +11859,8 @@ void MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
     {
         if (data.imageURI.HasValue()) {
             response.imageURI = [[NSString alloc] initWithBytes:data.imageURI.Value().data()
-                                                  length:data.imageURI.Value().size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:data.imageURI.Value().size()
+                                                       encoding:NSUTF8StringEncoding];
         } else {
             response.imageURI = nil;
         }
@@ -11877,8 +11875,8 @@ void MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
     {
         if (data.softwareVersionString.HasValue()) {
             response.softwareVersionString = [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
-                                                               length:data.softwareVersionString.Value().size()
-                                                               encoding:NSUTF8StringEncoding];
+                                                                      length:data.softwareVersionString.Value().size()
+                                                                    encoding:NSUTF8StringEncoding];
         } else {
             response.softwareVersionString = nil;
         }
@@ -11900,7 +11898,7 @@ void MTROtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSucc
     {
         if (data.metadataForRequestor.HasValue()) {
             response.metadataForRequestor = [NSData dataWithBytes:data.metadataForRequestor.Value().data()
-                                                    length:data.metadataForRequestor.Value().size()];
+                                                           length:data.metadataForRequestor.Value().size()];
         } else {
             response.metadataForRequestor = nil;
         }
@@ -11930,8 +11928,8 @@ void MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessF
     }
     {
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                               length:data.debugText.size()
-                                               encoding:NSUTF8StringEncoding];
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -11945,8 +11943,8 @@ void MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::On
     }
     {
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                               length:data.debugText.size()
-                                               encoding:NSUTF8StringEncoding];
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -11960,8 +11958,8 @@ void MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::
     }
     {
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                               length:data.debugText.size()
-                                               encoding:NSUTF8StringEncoding];
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -11976,15 +11974,15 @@ void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccess
     {
         if (data.debugText.HasValue()) {
             response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                   length:data.debugText.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             response.debugText = nil;
         }
     }
     {
         if (data.wiFiScanResults.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.wiFiScanResults.Value().begin();
                 while (iter_1.Next()) {
@@ -12012,7 +12010,7 @@ void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccess
     }
     {
         if (data.threadScanResults.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.threadScanResults.Value().begin();
                 while (iter_1.Next()) {
@@ -12022,12 +12020,12 @@ void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccess
                     newElement_1.panId = [NSNumber numberWithUnsignedShort:entry_1.panId];
                     newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
                     newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
-                                                                 length:entry_1.networkName.size()
-                                                                 encoding:NSUTF8StringEncoding];
+                                                                        length:entry_1.networkName.size()
+                                                                      encoding:NSUTF8StringEncoding];
                     newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
                     newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
                     newElement_1.extendedAddress = [NSData dataWithBytes:entry_1.extendedAddress.data()
-                                                           length:entry_1.extendedAddress.size()];
+                                                                  length:entry_1.extendedAddress.size()];
                     newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
                     newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
                     [array_1 addObject:newElement_1];
@@ -12056,8 +12054,8 @@ void MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSucces
     {
         if (data.debugText.HasValue()) {
             response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                   length:data.debugText.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             response.debugText = nil;
         }
@@ -12082,8 +12080,8 @@ void MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSucce
     {
         if (data.debugText.HasValue()) {
             response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                   length:data.debugText.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             response.debugText = nil;
         }
@@ -12123,7 +12121,7 @@ void MTROperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucces
     auto * response = [MTROperationalCredentialsClusterAttestationResponseParams new];
     {
         response.attestationElements = [NSData dataWithBytes:data.attestationElements.data()
-                                               length:data.attestationElements.size()];
+                                                      length:data.attestationElements.size()];
     }
     {
         response.signature = [NSData dataWithBytes:data.signature.data() length:data.signature.size()];
@@ -12150,7 +12148,7 @@ void MTROperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
     }
     {
         response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
-                                                length:data.attestationSignature.size()];
+                                                       length:data.attestationSignature.size()];
     }
     DispatchSuccess(context, response);
 };
@@ -12172,8 +12170,8 @@ void MTROperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
     {
         if (data.debugText.HasValue()) {
             response.debugText = [[NSString alloc] initWithBytes:data.debugText.Value().data()
-                                                   length:data.debugText.Value().size()
-                                                   encoding:NSUTF8StringEncoding];
+                                                          length:data.debugText.Value().size()
+                                                        encoding:NSUTF8StringEncoding];
         } else {
             response.debugText = nil;
         }
@@ -12194,7 +12192,7 @@ void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
             response.groupKeySet.epochKey0 = nil;
         } else {
             response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.Value().data()
-                                                     length:data.groupKeySet.epochKey0.Value().size()];
+                                                            length:data.groupKeySet.epochKey0.Value().size()];
         }
         if (data.groupKeySet.epochStartTime0.IsNull()) {
             response.groupKeySet.epochStartTime0 = nil;
@@ -12205,7 +12203,7 @@ void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
             response.groupKeySet.epochKey1 = nil;
         } else {
             response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.Value().data()
-                                                     length:data.groupKeySet.epochKey1.Value().size()];
+                                                            length:data.groupKeySet.epochKey1.Value().size()];
         }
         if (data.groupKeySet.epochStartTime1.IsNull()) {
             response.groupKeySet.epochStartTime1 = nil;
@@ -12216,7 +12214,7 @@ void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
             response.groupKeySet.epochKey2 = nil;
         } else {
             response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.Value().data()
-                                                     length:data.groupKeySet.epochKey2.Value().size()];
+                                                            length:data.groupKeySet.epochKey2.Value().size()];
         }
         if (data.groupKeySet.epochStartTime2.IsNull()) {
             response.groupKeySet.epochStartTime2 = nil;
@@ -12232,7 +12230,7 @@ void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnS
 {
     auto * response = [MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
     {
-        {   // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = data.groupKeySetIDs.begin();
             while (iter_0.Next()) {
@@ -12379,8 +12377,8 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
             response.userName = nil;
         } else {
             response.userName = [[NSString alloc] initWithBytes:data.userName.Value().data()
-                                                  length:data.userName.Value().size()
-                                                  encoding:NSUTF8StringEncoding];
+                                                         length:data.userName.Value().size()
+                                                       encoding:NSUTF8StringEncoding];
         }
     }
     {
@@ -12415,7 +12413,7 @@ void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
         if (data.credentials.IsNull()) {
             response.credentials = nil;
         } else {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.credentials.Value().begin();
                 while (iter_1.Next()) {
@@ -12535,7 +12533,7 @@ void MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
         response.modeForSequence = [NSNumber numberWithUnsignedChar:data.modeForSequence.Raw()];
     }
     {
-        {   // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = data.transitions.begin();
             while (iter_0.Next()) {
@@ -12576,8 +12574,8 @@ void MTRChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     {
         if (data.data.HasValue()) {
             response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                              length:data.data.Value().size()
-                                              encoding:NSUTF8StringEncoding];
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
         } else {
             response.data = nil;
         }
@@ -12595,8 +12593,8 @@ void MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
     {
         if (data.data.HasValue()) {
             response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                              length:data.data.Value().size()
-                                              encoding:NSUTF8StringEncoding];
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
         } else {
             response.data = nil;
         }
@@ -12614,8 +12612,8 @@ void MTRMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
     {
         if (data.data.HasValue()) {
             response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                              length:data.data.Value().size()
-                                              encoding:NSUTF8StringEncoding];
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
         } else {
             response.data = nil;
         }
@@ -12643,8 +12641,8 @@ void MTRContentLauncherClusterLaunchResponseCallbackBridge::OnSuccessFn(
     {
         if (data.data.HasValue()) {
             response.data = [[NSString alloc] initWithBytes:data.data.Value().data()
-                                              length:data.data.Value().size()
-                                              encoding:NSUTF8StringEncoding];
+                                                     length:data.data.Value().size()
+                                                   encoding:NSUTF8StringEncoding];
         } else {
             response.data = nil;
         }
@@ -12671,8 +12669,8 @@ void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     auto * response = [MTRAccountLoginClusterGetSetupPINResponseParams new];
     {
         response.setupPIN = [[NSString alloc] initWithBytes:data.setupPIN.data()
-                                              length:data.setupPIN.size()
-                                              encoding:NSUTF8StringEncoding];
+                                                     length:data.setupPIN.size()
+                                                   encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -12711,190 +12709,185 @@ void MTRTestClusterClusterTestStructArrayArgumentResponseCallbackBridge::OnSucce
     void * context, const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType & data)
 {
     auto * response = [MTRTestClusterClusterTestStructArrayArgumentResponseParams new];
-    {
-        {   // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.arg1.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                MTRTestClusterClusterNestedStructList * newElement_0;
-                newElement_0 = [MTRTestClusterClusterNestedStructList new];
-                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-                newElement_0.c = [MTRTestClusterClusterSimpleStruct new];
-                newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
-                newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
-                newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
-                newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
-                newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
-                                                     length:entry_0.c.e.size()
-                                                     encoding:NSUTF8StringEncoding];
-                newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
-                newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
-                newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
-                {   // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.d.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        MTRTestClusterClusterSimpleStruct * newElement_2;
-                        newElement_2 = [MTRTestClusterClusterSimpleStruct new];
-                        newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
-                        newElement_2.b = [NSNumber numberWithBool:entry_2.b];
-                        newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
-                        newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
-                        newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
-                                                           length:entry_2.e.size()
-                                                           encoding:NSUTF8StringEncoding];
-                        newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
-                        newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
-                        newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
-                        [array_2 addObject:newElement_2];
-                    }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        OnFailureFn(context, err);
-                        return;
-                    }
-                    newElement_0.d = array_2;
-                }
-                {   // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.e.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        NSNumber * newElement_2;
-                        newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
-                        [array_2 addObject:newElement_2];
-                    }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        OnFailureFn(context, err);
-                        return;
-                    }
-                    newElement_0.e = array_2;
-                }
-                {   // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.f.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        NSData * newElement_2;
-                        newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
-                        [array_2 addObject:newElement_2];
-                    }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        OnFailureFn(context, err);
-                        return;
-                    }
-                    newElement_0.f = array_2;
-                }
-                {   // Scope for our temporary variables
-                    auto * array_2 = [NSMutableArray new];
-                    auto iter_2 = entry_0.g.begin();
-                    while (iter_2.Next()) {
-                        auto & entry_2 = iter_2.GetValue();
-                        NSNumber * newElement_2;
-                        newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
-                        [array_2 addObject:newElement_2];
-                    }
-                    CHIP_ERROR err = iter_2.GetStatus();
-                    if (err != CHIP_NO_ERROR) {
-                        OnFailureFn(context, err);
-                        return;
-                    }
-                    newElement_0.g = array_2;
-                }
-                [array_0 addObject:newElement_0];
+    { { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+    auto iter_0 = data.arg1.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        MTRTestClusterClusterNestedStructList * newElement_0;
+        newElement_0 = [MTRTestClusterClusterNestedStructList new];
+        newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+        newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+        newElement_0.c = [MTRTestClusterClusterSimpleStruct new];
+        newElement_0.c.a = [NSNumber numberWithUnsignedChar:entry_0.c.a];
+        newElement_0.c.b = [NSNumber numberWithBool:entry_0.c.b];
+        newElement_0.c.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c.c)];
+        newElement_0.c.d = [NSData dataWithBytes:entry_0.c.d.data() length:entry_0.c.d.size()];
+        newElement_0.c.e = [[NSString alloc] initWithBytes:entry_0.c.e.data()
+                                                    length:entry_0.c.e.size()
+                                                  encoding:NSUTF8StringEncoding];
+        newElement_0.c.f = [NSNumber numberWithUnsignedChar:entry_0.c.f.Raw()];
+        newElement_0.c.g = [NSNumber numberWithFloat:entry_0.c.g];
+        newElement_0.c.h = [NSNumber numberWithDouble:entry_0.c.h];
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.d.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                MTRTestClusterClusterSimpleStruct * newElement_2;
+                newElement_2 = [MTRTestClusterClusterSimpleStruct new];
+                newElement_2.a = [NSNumber numberWithUnsignedChar:entry_2.a];
+                newElement_2.b = [NSNumber numberWithBool:entry_2.b];
+                newElement_2.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.c)];
+                newElement_2.d = [NSData dataWithBytes:entry_2.d.data() length:entry_2.d.size()];
+                newElement_2.e = [[NSString alloc] initWithBytes:entry_2.e.data()
+                                                          length:entry_2.e.size()
+                                                        encoding:NSUTF8StringEncoding];
+                newElement_2.f = [NSNumber numberWithUnsignedChar:entry_2.f.Raw()];
+                newElement_2.g = [NSNumber numberWithFloat:entry_2.g];
+                newElement_2.h = [NSNumber numberWithDouble:entry_2.h];
+                [array_2 addObject:newElement_2];
             }
-            CHIP_ERROR err = iter_0.GetStatus();
+            CHIP_ERROR err = iter_2.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 OnFailureFn(context, err);
                 return;
             }
-            response.arg1 = array_0;
+            newElement_0.d = array_2;
         }
-    }
-    {
-        {   // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.arg2.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                MTRTestClusterClusterSimpleStruct * newElement_0;
-                newElement_0 = [MTRTestClusterClusterSimpleStruct new];
-                newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
-                newElement_0.b = [NSNumber numberWithBool:entry_0.b];
-                newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
-                newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
-                newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data()
-                                                   length:entry_0.e.size()
-                                                   encoding:NSUTF8StringEncoding];
-                newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
-                newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
-                newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
-                [array_0 addObject:newElement_0];
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.e.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSNumber * newElement_2;
+                newElement_2 = [NSNumber numberWithUnsignedInt:entry_2];
+                [array_2 addObject:newElement_2];
             }
-            CHIP_ERROR err = iter_0.GetStatus();
+            CHIP_ERROR err = iter_2.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 OnFailureFn(context, err);
                 return;
             }
-            response.arg2 = array_0;
+            newElement_0.e = array_2;
         }
-    }
-    {
-        {   // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.arg3.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-                [array_0 addObject:newElement_0];
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.f.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSData * newElement_2;
+                newElement_2 = [NSData dataWithBytes:entry_2.data() length:entry_2.size()];
+                [array_2 addObject:newElement_2];
             }
-            CHIP_ERROR err = iter_0.GetStatus();
+            CHIP_ERROR err = iter_2.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 OnFailureFn(context, err);
                 return;
             }
-            response.arg3 = array_0;
+            newElement_0.f = array_2;
         }
-    }
-    {
-        {   // Scope for our temporary variables
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = data.arg4.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithBool:entry_0];
-                [array_0 addObject:newElement_0];
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = entry_0.g.begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSNumber * newElement_2;
+                newElement_2 = [NSNumber numberWithUnsignedChar:entry_2];
+                [array_2 addObject:newElement_2];
             }
-            CHIP_ERROR err = iter_0.GetStatus();
+            CHIP_ERROR err = iter_2.GetStatus();
             if (err != CHIP_NO_ERROR) {
                 OnFailureFn(context, err);
                 return;
             }
-            response.arg4 = array_0;
+            newElement_0.g = array_2;
         }
+        [array_0 addObject:newElement_0];
     }
-    {
-        response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
+    CHIP_ERROR err = iter_0.GetStatus();
+    if (err != CHIP_NO_ERROR) {
+        OnFailureFn(context, err);
+        return;
     }
-    {
-        response.arg6 = [NSNumber numberWithBool:data.arg6];
-    }
-    DispatchSuccess(context, response);
-};
+    response.arg1 = array_0;
+}
+}
+{ { // Scope for our temporary variables
+    auto * array_0 = [NSMutableArray new];
+auto iter_0 = data.arg2.begin();
+while (iter_0.Next()) {
+    auto & entry_0 = iter_0.GetValue();
+    MTRTestClusterClusterSimpleStruct * newElement_0;
+    newElement_0 = [MTRTestClusterClusterSimpleStruct new];
+    newElement_0.a = [NSNumber numberWithUnsignedChar:entry_0.a];
+    newElement_0.b = [NSNumber numberWithBool:entry_0.b];
+    newElement_0.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.c)];
+    newElement_0.d = [NSData dataWithBytes:entry_0.d.data() length:entry_0.d.size()];
+    newElement_0.e = [[NSString alloc] initWithBytes:entry_0.e.data() length:entry_0.e.size() encoding:NSUTF8StringEncoding];
+    newElement_0.f = [NSNumber numberWithUnsignedChar:entry_0.f.Raw()];
+    newElement_0.g = [NSNumber numberWithFloat:entry_0.g];
+    newElement_0.h = [NSNumber numberWithDouble:entry_0.h];
+    [array_0 addObject:newElement_0];
+}
+CHIP_ERROR err = iter_0.GetStatus();
+if (err != CHIP_NO_ERROR) {
+    OnFailureFn(context, err);
+    return;
+}
+response.arg2 = array_0;
+}
+}
+{ { // Scope for our temporary variables
+    auto * array_0 = [NSMutableArray new];
+auto iter_0 = data.arg3.begin();
+while (iter_0.Next()) {
+    auto & entry_0 = iter_0.GetValue();
+    NSNumber * newElement_0;
+    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+    [array_0 addObject:newElement_0];
+}
+CHIP_ERROR err = iter_0.GetStatus();
+if (err != CHIP_NO_ERROR) {
+    OnFailureFn(context, err);
+    return;
+}
+response.arg3 = array_0;
+}
+}
+{ { // Scope for our temporary variables
+    auto * array_0 = [NSMutableArray new];
+auto iter_0 = data.arg4.begin();
+while (iter_0.Next()) {
+    auto & entry_0 = iter_0.GetValue();
+    NSNumber * newElement_0;
+    newElement_0 = [NSNumber numberWithBool:entry_0];
+    [array_0 addObject:newElement_0];
+}
+CHIP_ERROR err = iter_0.GetStatus();
+if (err != CHIP_NO_ERROR) {
+    OnFailureFn(context, err);
+    return;
+}
+response.arg4 = array_0;
+}
+}
+{
+    response.arg5 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg5)];
+}
+{
+    response.arg6 = [NSNumber numberWithBool:data.arg6];
+}
+DispatchSuccess(context, response);
+}
+;
 
 void MTRTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data)
 {
     auto * response = [MTRTestClusterClusterTestListInt8UReverseResponseParams new];
     {
-        {   // Scope for our temporary variables
+        { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
             auto iter_0 = data.arg1.begin();
             while (iter_0.Next()) {
@@ -13009,8 +13002,8 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     {
         if (data.nullableStringValue.HasValue()) {
             response.nullableStringValue = [[NSString alloc] initWithBytes:data.nullableStringValue.Value().data()
-                                                             length:data.nullableStringValue.Value().size()
-                                                             encoding:NSUTF8StringEncoding];
+                                                                    length:data.nullableStringValue.Value().size()
+                                                                  encoding:NSUTF8StringEncoding];
         } else {
             response.nullableStringValue = nil;
         }
@@ -13021,8 +13014,8 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     {
         if (data.optionalStringValue.HasValue()) {
             response.optionalStringValue = [[NSString alloc] initWithBytes:data.optionalStringValue.Value().data()
-                                                             length:data.optionalStringValue.Value().size()
-                                                             encoding:NSUTF8StringEncoding];
+                                                                    length:data.optionalStringValue.Value().size()
+                                                                  encoding:NSUTF8StringEncoding];
         } else {
             response.optionalStringValue = nil;
         }
@@ -13040,8 +13033,8 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     {
         if (data.nullableOptionalStringValue.HasValue()) {
             response.nullableOptionalStringValue = [[NSString alloc] initWithBytes:data.nullableOptionalStringValue.Value().data()
-                                                                     length:data.nullableOptionalStringValue.Value().size()
-                                                                     encoding:NSUTF8StringEncoding];
+                                                                            length:data.nullableOptionalStringValue.Value().size()
+                                                                          encoding:NSUTF8StringEncoding];
         } else {
             response.nullableOptionalStringValue = nil;
         }
@@ -13057,10 +13050,10 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
             response.nullableStructValue.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(data.nullableStructValue.Value().c)];
             response.nullableStructValue.d = [NSData dataWithBytes:data.nullableStructValue.Value().d.data()
-                                                     length:data.nullableStructValue.Value().d.size()];
+                                                            length:data.nullableStructValue.Value().d.size()];
             response.nullableStructValue.e = [[NSString alloc] initWithBytes:data.nullableStructValue.Value().e.data()
-                                                               length:data.nullableStructValue.Value().e.size()
-                                                               encoding:NSUTF8StringEncoding];
+                                                                      length:data.nullableStructValue.Value().e.size()
+                                                                    encoding:NSUTF8StringEncoding];
             response.nullableStructValue.f = [NSNumber numberWithUnsignedChar:data.nullableStructValue.Value().f.Raw()];
             response.nullableStructValue.g = [NSNumber numberWithFloat:data.nullableStructValue.Value().g];
             response.nullableStructValue.h = [NSNumber numberWithDouble:data.nullableStructValue.Value().h];
@@ -13079,10 +13072,10 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
             response.optionalStructValue.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(data.optionalStructValue.Value().c)];
             response.optionalStructValue.d = [NSData dataWithBytes:data.optionalStructValue.Value().d.data()
-                                                     length:data.optionalStructValue.Value().d.size()];
+                                                            length:data.optionalStructValue.Value().d.size()];
             response.optionalStructValue.e = [[NSString alloc] initWithBytes:data.optionalStructValue.Value().e.data()
-                                                               length:data.optionalStructValue.Value().e.size()
-                                                               encoding:NSUTF8StringEncoding];
+                                                                      length:data.optionalStructValue.Value().e.size()
+                                                                    encoding:NSUTF8StringEncoding];
             response.optionalStructValue.f = [NSNumber numberWithUnsignedChar:data.optionalStructValue.Value().f.Raw()];
             response.optionalStructValue.g = [NSNumber numberWithFloat:data.optionalStructValue.Value().g];
             response.optionalStructValue.h = [NSNumber numberWithDouble:data.optionalStructValue.Value().h];
@@ -13108,11 +13101,11 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
             response.nullableOptionalStructValue.c =
                 [NSNumber numberWithUnsignedChar:chip::to_underlying(data.nullableOptionalStructValue.Value().c)];
             response.nullableOptionalStructValue.d = [NSData dataWithBytes:data.nullableOptionalStructValue.Value().d.data()
-                           length:data.nullableOptionalStructValue.Value().d.size()];
+                                                                    length:data.nullableOptionalStructValue.Value().d.size()];
             response.nullableOptionalStructValue.e =
                 [[NSString alloc] initWithBytes:data.nullableOptionalStructValue.Value().e.data()
-                                  length:data.nullableOptionalStructValue.Value().e.size()
-                                  encoding:NSUTF8StringEncoding];
+                                         length:data.nullableOptionalStructValue.Value().e.size()
+                                       encoding:NSUTF8StringEncoding];
             response.nullableOptionalStructValue.f =
                 [NSNumber numberWithUnsignedChar:data.nullableOptionalStructValue.Value().f.Raw()];
             response.nullableOptionalStructValue.g = [NSNumber numberWithFloat:data.nullableOptionalStructValue.Value().g];
@@ -13126,7 +13119,7 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     }
     {
         if (data.nullableListValue.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.nullableListValue.Value().begin();
                 while (iter_1.Next()) {
@@ -13151,7 +13144,7 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     }
     {
         if (data.optionalListValue.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.optionalListValue.Value().begin();
                 while (iter_1.Next()) {
@@ -13183,7 +13176,7 @@ void MTRTestClusterClusterTestComplexNullableOptionalResponseCallbackBridge::OnS
     }
     {
         if (data.nullableOptionalListValue.HasValue()) {
-            {   // Scope for our temporary variables
+            { // Scope for our temporary variables
                 auto * array_1 = [NSMutableArray new];
                 auto iter_1 = data.nullableOptionalListValue.Value().begin();
                 while (iter_1.Next()) {
@@ -13227,8 +13220,8 @@ void MTRTestClusterClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
         response.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
         response.arg1.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
         response.arg1.e = [[NSString alloc] initWithBytes:data.arg1.e.data()
-                                            length:data.arg1.e.size()
-                                            encoding:NSUTF8StringEncoding];
+                                                   length:data.arg1.e.size()
+                                                 encoding:NSUTF8StringEncoding];
         response.arg1.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
         response.arg1.g = [NSNumber numberWithFloat:data.arg1.g];
         response.arg1.h = [NSNumber numberWithDouble:data.arg1.h];
@@ -14277,7 +14270,7 @@ void MTROtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSub
 }
 
 void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14292,7 +14285,7 @@ void MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     void * context)
 {
     auto * self = static_cast<MTRNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
-                      context);
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -14332,7 +14325,7 @@ void MTROtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubs
 }
 
 void MTRNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14442,7 +14435,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackS
 }
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14454,11 +14447,11 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
 };
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::
-OnSubscriptionEstablished(void * context)
+    OnSubscriptionEstablished(void * context)
 {
     auto * self
         = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(
-              context);
+            context);
     if (!self->mQueue) {
         return;
     }
@@ -14499,7 +14492,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSub
 }
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14514,7 +14507,7 @@ void MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     void * context)
 {
     auto * self = static_cast<MTRNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
-                      context);
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -14554,7 +14547,7 @@ void MTROtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubs
 }
 
 void MTRNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15293,7 +15286,7 @@ void MTRNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSu
 }
 
 void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15309,7 +15302,7 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCa
 {
     auto * self
         = static_cast<MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(
-              context);
+            context);
     if (!self->mQueue) {
         return;
     }
@@ -15929,7 +15922,7 @@ void MTRThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSu
 }
 
 void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15945,7 +15938,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCa
 {
     auto * self
         = static_cast<MTRNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge *>(
-              context);
+            context);
     if (!self->mQueue) {
         return;
     }
@@ -15986,7 +15979,7 @@ void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSub
 }
 
 void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16001,7 +15994,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCal
     void * context)
 {
     auto * self = static_cast<MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(
-                      context);
+        context);
     if (!self->mQueue) {
         return;
     }
@@ -16258,7 +16251,7 @@ void MTRAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallb
 }
 
 void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16270,11 +16263,11 @@ void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttrib
 };
 
 void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::
-OnSubscriptionEstablished(void * context)
+    OnSubscriptionEstablished(void * context)
 {
     auto * self
         = static_cast<MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge *>(
-              context);
+            context);
     if (!self->mQueue) {
         return;
     }
@@ -16367,7 +16360,7 @@ void MTROperationalCredentialsClusterOperationalCertStatusAttributeCallbackSubsc
 }
 
 void MTRNullableOperationalCredentialsClusterOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::OperationalCertStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17678,7 +17671,7 @@ void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubs
 }
 
 void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19148,7 +19141,7 @@ void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback
 }
 
 void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19160,11 +19153,11 @@ void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribute
 };
 
 void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::
-OnSubscriptionEstablished(void * context)
+    OnSubscriptionEstablished(void * context)
 {
     auto * self
         = static_cast<MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge *>(
-              context);
+            context);
     if (!self->mQueue) {
         return;
     }
@@ -19364,7 +19357,7 @@ void MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSub
 }
 
 void MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> & value)
+    const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19379,7 +19372,7 @@ void MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCal
     void * context)
 {
     auto * self = static_cast<MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge *>(
-                      context);
+        context);
     if (!self->mQueue) {
         return;
     }
