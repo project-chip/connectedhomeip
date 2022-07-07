@@ -144,6 +144,8 @@ pw_python_action("python") {
         "chip/clusters/TestObjects.py",
         "chip/clusters/Types.py",
         "chip/clusters/__init__.py",
+        "chip/utils/__init__.py",
+        "chip/utils/CommissioningUtils.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
