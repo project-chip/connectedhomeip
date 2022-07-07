@@ -214,7 +214,7 @@ nrf-nrf52840dk-lock
 nrf-nrf52840dk-pump
 nrf-nrf52840dk-pump-controller
 nrf-nrf52840dk-shell
-nrf-nrf52840dongle-all-clusters
+nrf-nrf52840dongle-all-clusters (NOGLOB: Out of flash when linking)
 nrf-nrf52840dongle-all-clusters-minimal
 nrf-nrf52840dongle-light
 nrf-nrf5340dk-all-clusters
