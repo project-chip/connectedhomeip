@@ -98,6 +98,11 @@ else()
     string(APPEND script_args "--spake2_verifier \"${CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER}\"\n")
 endif()
 
+if(CONFIG_CHIP_DEVICE_ENABLE_KEY)
+# Add optional EnableKey that triggers user-specific action.
+string(APPEND script_args "--enable_key \"${CONFIG_CHIP_DEVICE_ENABLE_KEY}\"\n")
+endif()
+
 # Set output JSON file and path to SCHEMA file to validate generated factory data
 string(APPEND script_args "-o \"${output_path}/${factory_data_target}.json\"\n")
 string(APPEND script_args "-s \"${schema_path}\"\n")
