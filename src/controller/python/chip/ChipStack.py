@@ -46,6 +46,8 @@ from .clusters import ClusterObjects as ClusterObjects
 from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 
+import chip.native
+
 __all__ = [
     "DeviceStatusStruct",
     "ChipStackException",
@@ -182,7 +184,10 @@ class ChipStack(object):
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
 
+        #
         # Locate and load the chip shared library.
+        # This also implictly does a minimal stack initialization (i.e call MemoryInit).
+        #
         self._loadLib()
 
         # Arrange to log output from the chip library to a python logger object with the
@@ -317,6 +322,12 @@ class ChipStack(object):
         # to avoid accessing builtins.chipStack after destruction.
         self._persistentStorage = None
         self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown())
+
+        #
+        # Stack init happens in native, but shutdown happens here unfortunately.
+        # #20437 tracks consolidating these.
+        #
+        self._ChipStackLib.pychip_CommonStackShutdown()
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None
@@ -404,42 +415,8 @@ class ChipStack(object):
             )
 
     def LocateChipDLL(self):
-        if self._chipDLLPath:
-            return self._chipDLLPath
-
-        scriptDir = os.path.dirname(os.path.abspath(__file__))
-
-        # When properly installed in the chip package, the Chip Device Manager DLL will
-        # be located in the package root directory, along side the package's
-        # modules.
-        dmDLLPath = os.path.join(scriptDir, ChipStackDLLBaseName)
-        if os.path.exists(dmDLLPath):
-            self._chipDLLPath = dmDLLPath
-            return self._chipDLLPath
-
-        # For the convenience of developers, search the list of parent paths relative to the
-        # running script looking for an CHIP build directory containing the Chip Device
-        # Manager DLL. This makes it possible to import and use the ChipDeviceMgr module
-        # directly from a built copy of the CHIP source tree.
-        buildMachineGlob = "%s-*-%s*" % (platform.machine(),
-                                         platform.system().lower())
-        relDMDLLPathGlob = os.path.join(
-            "build",
-            buildMachineGlob,
-            "src/controller/python/.libs",
-            ChipStackDLLBaseName,
-        )
-        for dir in self._AllDirsToRoot(scriptDir):
-            dmDLLPathGlob = os.path.join(dir, relDMDLLPathGlob)
-            for dmDLLPath in glob.glob(dmDLLPathGlob):
-                if os.path.exists(dmDLLPath):
-                    self._chipDLLPath = dmDLLPath
-                    return self._chipDLLPath
-
-        raise Exception(
-            "Unable to locate Chip Device Manager DLL (%s); expected location: %s"
-            % (ChipStackDLLBaseName, scriptDir)
-        )
+        self._loadLib()
+        return self._chipDLLPath
 
     # ----- Private Members -----
     def _AllDirsToRoot(self, dir):
@@ -453,7 +430,9 @@ class ChipStack(object):
 
     def _loadLib(self):
         if self._ChipStackLib is None:
-            self._ChipStackLib = CDLL(self.LocateChipDLL())
+            self._ChipStackLib = chip.native.GetLibraryHandle()
+            self._chipDLLPath = chip.native.FindNativeLibraryPath()
+
             self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_uint32]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = c_uint32
             self._ChipStackLib.pychip_DeviceController_StackShutdown.argtypes = []

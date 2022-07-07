@@ -25,8 +25,6 @@
  *
  */
 
-#include <controller/python/CommonStackInit.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,21 +37,19 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
-namespace chip {
-namespace Controller {
-namespace Python {
+static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
-CHIP_ERROR CommonStackInit()
+extern "C" {
+
+CHIP_ERROR pychip_CommonStackInit()
 {
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
     return CHIP_NO_ERROR;
 }
 
-void CommonStackShutdown()
+void pychip_CommonStackShutdown()
 {
-    chip::DeviceLayer::PlatformMgr().Shutdown();
-
 #if 0 //
       // We cannot actually call this because the destructor for the MdnsContexts singleton on Darwin only gets called
       // on termination of the program, and that unfortunately makes a bunch of Platform::MemoryFree calls.
@@ -61,7 +57,4 @@ void CommonStackShutdown()
     chip::Platform::MemoryShutdown();
 #endif
 }
-
-} // namespace Python
-} // namespace Controller
-} // namespace chip
+};

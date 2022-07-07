@@ -44,7 +44,7 @@ shared_library("ChipDeviceCtrl") {
     "chip/setup_payload/Parser.cpp",
   ]
 
-  sources += [ "CommonStackInit.cpp" ]
+  sources += [ "chip/native/CommonStackInit.cpp" ]
 
   if (chip_controller) {
     sources += [

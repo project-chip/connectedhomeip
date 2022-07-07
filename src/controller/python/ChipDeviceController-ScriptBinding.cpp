@@ -52,7 +52,6 @@
 
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-StorageDelegate.h>
-#include <controller/python/CommonStackInit.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 
 #include <credentials/GroupDataProviderImpl.h>
@@ -223,8 +222,6 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
 
 ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId)
 {
-    ReturnErrorOnFailure(chip::Controller::Python::CommonStackInit().AsInteger());
-
     VerifyOrDie(sStorageAdapter != nullptr);
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -247,7 +244,7 @@ ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapt
     factoryParams.enableServerInteractions = true;
 
     // Hack needed due to the fact that DnsSd server uses the CommissionableDataProvider even
-    // when never starting operational advertising. This will not be used but prevents
+    // when never starting commissionable advertising. This will not be used but prevents
     // null pointer dereferences.
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
@@ -290,8 +287,6 @@ ChipError::StorageType pychip_DeviceController_StackShutdown()
     DeviceControllerFactory::GetInstance().ReleaseSystemState();
 
     DeviceControllerFactory::GetInstance().Shutdown();
-
-    chip::Controller::Python::CommonStackShutdown();
 
     return CHIP_NO_ERROR.AsInteger();
 }
