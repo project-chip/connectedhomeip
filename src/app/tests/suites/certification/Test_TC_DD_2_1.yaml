@@ -13,7 +13,8 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.1. [TC-DD-2.1] Announcement by device verification
+name:
+    3.2.1. [TC-DD-2.1] Announcement by Device Verification [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -26,67 +27,131 @@ tests:
           commissioning process in any order of priority on all of the
           networking technologies that are supported by both the TH and the DUT"
       verification: |
-          sudo ./chip-all-clusters-app --wifi
+          TH selects the DUT"s capability bitmask and start the commissiong process accordingly
       disabled: true
 
     - label:
-          "If (PICS_CHIP_DEV) then If !(PICS_CHIP_DEV) then If (PICS_DEV_LOCK)
-          then If (PICS_DEV_BARRIER) then"
+          "If (MCORE.DD.CHIP_DEV) then If !(MCORE.DD.CHIP_DEV) then If
+          (MCORE.DD.DEV_LOCK) then If (MCORE.DD.DEV_BARRIER) then"
+      PICS:
+          MCORE.DD.CHIP_DEV && !(MCORE.DD.CHIP_DEV) && MCORE.DD.DEV_LOCK &&
+          MCORE.DD.DEV_BARRIER
       verification: |
+          1. Discover commissionables (example for over mDNS only)
+          ./chip-tool discover commissionables
 
+          If (PICS_CHIP_DEV) TH should discover the DUT else it should not
+          If !(PICS_CHIP_DEV) instruct DUT to start Advertising and scan again for commissionale devices using TH
+
+          Verifiy on TH:
+          [1651223092.853229][3848:3853] CHIP:DL: Avahi resolve found
+          [1651223092.853353][3848:3853] CHIP:DIS:        Vendor ID: 65521
+          [1651223092.853405][3848:3853] CHIP:DIS:        Product ID: 32769
+          [1651223092.853448][3848:3853] CHIP:DIS:        Long Discriminator: 3840
+          [1651223092.853491][3848:3853] CHIP:DIS:        Pairing Hint: 33
+          [1651223092.853532][3848:3853] CHIP:DIS:        Hostname: DCA632BAB3F60000
+          [1651223092.853573][3848:3853] CHIP:DIS:        Instance Name: 233CD1A34EA8F023
+          [1651223092.853622][3848:3853] CHIP:DIS:        IP Address #1: fe80::42:86ff:fe5f:fe7b
+          [1651223092.853664][3848:3853] CHIP:DIS:        Port: 5540
+          [1651223092.853705][3848:3853] CHIP:DIS:        Commissioning Mode: 1
+      disabled: true
+
+    - label: "TH does not respond to DUT and DUT keeps sending ADVs"
+      PICS: MCORE.DD.BLE
+      verification: |
+          [5855][P][DIS]Advertise commission parameter vendorID=65521 productID=32773 discriminator=3840/15
+      disabled: true
+
+    - label: "TH does not respond to DUT and DUT keeps sending ADVs"
+      PICS: MCORE.DD.BLE
+      verification: |
+          This step can be verified using specific tool (Try NRF Connect OR HCIDump)
+      disabled: true
+
+    - label: "TH does not respond to DUT and DUT keeps sending ADVs"
+      PICS: MCORE.DD.BLE
+      verification: |
+          This step can be verified using specific tool (Try NRF Connect OR HCIDump)
+          ->For T0 and 30s we have to get advertisement range between 20ms to 60ms
+          ->For 30s and 15mins we have to get advertisement range between 150ms to 1200ms
+
+          I: 3242 [DL]CHIPoBLE advertising started
+          I: 3279 [DL]NFC Tag emulation started
+          I: 33245 [DL]CHIPoBLE advertising mode changed to slow
+          D: 901346 [DIS]OnExpiration callback for cleared session
+          D: 901351 [DIS]Extended discovery timeout cancelled
+          I: 903097 [SVR]Closing pairing window
+          D: 903100 [IN]SecureSession Released 0x20002c00 Type:1 LSID:27704
+          I: 903106 [DIS]Updating services using commissioning mode 0
+          D: 903111 [DL]Using Thread extended MAC for hostname.
+          D: 903116 [DL]Using Thread extended MAC for hostname.
+          I: 903138 [DIS]Advertise commission parameter vendorID=65521 productID=32784 di5
+          E: 903147 [DIS]Failed to advertise extended commissionable node: Error CHIP:0x03
+
+
+          After 900s that is 15min advertisement stops
+
+          D: 903154 [DIS]Scheduling extended discovery timeout in 900s
+          E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
+          D: 903166 [DL]CHIPoBLE advertising set to off
+          I: 903171 [DL]CHIPoBLE advertising stopped
+          I: 903174 [DL]NFC Tag emulation stopped
+      disabled: true
+
+    - label: "TH does not respond to DUT. User power cycles the DUT"
+      PICS: MCORE.DD.BLE
+      verification: |
+          sudo reboot
       disabled: true
 
     - label:
-          "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs"
+          "TH does not respond to DUT and DUT keeps sending ADVs. TH waits at
+          least 15 minutes"
+      PICS: MCORE.DD.BLE
       verification: |
+          Check timestamp, ADV stop after 15 mins
 
+          D: 903154 [DIS]Scheduling extended discovery timeout in 900s
+          E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
+      disabled: true
+
+    - label: "TH scans and finds the DUT SSID"
+      PICS: MCORE.DD.WIFI
+      verification: |
+          BLOCKED: SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
     - label:
-          "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs"
+          "TH scans and finds the DUT SSID TH sends to DUT a 1st power cycle
+          command (or reset manually) TH sends to DUT a 2nd power cycle command
+          (or reset manually)"
+      PICS: MCORE.DD.WIFI
       verification: |
-
+          BLOCKED: SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
-    - label:
-          "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs"
+    - label: "TH scans and finds the DUT SSID"
+      PICS: MCORE.DD.WIFI && MCORE.DD.IE
       verification: |
-          Out of scope for TE8
-      disabled: true
-
-    - label:
-          "if (PICS_BLE) TH does not respond to DUT and sends a power cycle
-          command to DUT"
-      verification: |
-          Out of scope for TE8
-      disabled: true
-
-    - label:
-          "if (PICS_BLE) TH does not respond to DUT and DUT keeps sending ADVs.
-          TH waits at least 15 minutes"
-      verification: |
-          Out of scope for TE8
-      disabled: true
-
-    - label: "if (PICS_WIFI) TH scans and finds the DUT SSID"
-      verification: |
-          Out of scope for TE8
-      disabled: true
-
-    - label:
-          "if (PICS_WIFI) TH scans and finds the DUT SSID TH sends to DUT a 1st
-          power cycle command (or reset manually) TH sends to DUT a 2nd power
-          cycle command (or reset manually)"
-      verification: |
-          Out of scope for TE8
-      disabled: true
-
-    - label: "if (PICS_WIFI) & (PICS_IE) TH scans and finds the DUT SSID"
-      verification: |
-          Out of scope for TE8
+          BLOCKED: SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
     - label: "TH is connected to the DUT through an Ethernet connection"
       verification: |
-          Out of scope for TE8
+          $  ./out/chip-tool/chip-tool discover commissionables
+          [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
+          [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
+          [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
+          [1651256405894] [18453:593886] CHIP: [DIS]         Long Discriminator: 3840
+          [1651256405894] [18453:593886] CHIP: [DIS]         Pairing Hint: 33
+          [1651256405894] [18453:593886] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
+          [1651256405894] [18453:593886] CHIP: [DIS]         Instance Name: 8FFEE04E82830E26
+          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:dea6:32ff:fe8d:2b9f
+          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2b9f
+          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #3: fe80::dea6:32ff:fe8d:2ba0
+          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #4: 192.168.1.2
+          [1651256405894] [18453:593886] CHIP: [DIS]         Port: 5540
+          [1651256405894] [18453:593886] CHIP: [DIS]         Commissioning Mode: 1
+          [1651256405894] [18453:593886] CHIP: [DIS]         Mrp Interval idle: 5000 ms
+          [1651256405894] [18453:593886] CHIP: [DIS]         Mrp Interval active: 300 ms
       disabled: true

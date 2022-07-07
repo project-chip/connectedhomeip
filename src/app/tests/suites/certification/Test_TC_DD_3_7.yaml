@@ -40,7 +40,7 @@ tests:
           Reference : below Full log for the above commands (click on this cell if you like to see complete log)
 
 
-          controller >  ./chip-tool discover commissionables
+          connectedhomeip/examples/chip-tool/out/debug$  ./chip-tool discover commissionables
           Waiting for device responses...
           CHIP:CTL: Generating ICAC
           CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====
@@ -184,13 +184,12 @@ tests:
           CHIP:DIS:      Address 2:              192.168.1.12
 
 
-          controller> sudo ./chip-tool pairing ethernet 112233 20202021 3840 192.168.1.12 5540
-
-          Output of this command in cell number I6 and J6 due to cell constraint of maximum size.
+          connectedhomeip/examples/chip-tool/out/debug$ sudo ./chip-tool pairing ethernet 112233 20202021 3840   fe80::e65f:1ff:fe0f:2753 5540
 
 
 
-          controller> sudo ./chip-tool basic read product-name 0x000000000001B669 0
+
+          connectedhomeip/examples/chip-tool/out/debug$ sudo ./chip-tool basic read product-name 0x000000000001B669 0
 
           ,,
       disabled: true
@@ -555,10 +554,11 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
-          regulatory information in the Commissionee."
+          "Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.DD.WIRELESS
       verification: |
-          Need chip-tool implementation
+          Need test step review, potentially not a hard requirement so would not be required in test case
       disabled: true
 
     - label:
@@ -592,6 +592,9 @@ tests:
           needed"
       verification: |
           Verify the following on DUT after commissioning
+
+
+
           [1646909537.115328][3145:3150] CHIP:CTL: Sending CSR request to 0xffffac001730 device
           [1646909537.115512][3145:3150] CHIP:DMG: ICR moving to [AddingComm]
           [1646909537.115589][3145:3150] CHIP:DMG: ICR moving to [AddedComma]
