@@ -57169,7 +57169,7 @@ private:
                                  chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Try to unlock the door without a PIN");
+            LogStep(3, "Try to lock the door without a PIN");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
@@ -57420,7 +57420,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
@@ -57519,7 +57519,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
             }
             break;
         case 26:
@@ -57535,10 +57535,10 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 30:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 31:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
             break;
         case 32:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -57610,7 +57610,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
             }
             break;
         case 38:
@@ -57742,7 +57742,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 55:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 56:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -57821,7 +57821,7 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_FIELD));
             break;
         case 63:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_NOT_FOUND));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
         case 64:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -58314,7 +58314,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
             }
             break;
         case 104:
@@ -58326,7 +58326,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
             }
             break;
         case 105:
@@ -58338,7 +58338,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
             }
             break;
         case 106:
@@ -58350,7 +58350,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
             }
             break;
         case 107:
@@ -61211,7 +61211,7 @@ private:
 
                 VerifyOrReturn(CheckValue("userIndex", value.userIndex, 5U));
 
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
 
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
 
@@ -61372,7 +61372,7 @@ private:
             );
         }
         case 9: {
-            LogStep(9, "send Get Year Day Schedule Command to DUT and verify NOT_FOUND response");
+            LogStep(9, "send Get Year Day Schedule Command to DUT and verify FAILURE response");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
             value.yearDayIndex = 10U;
