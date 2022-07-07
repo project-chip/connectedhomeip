@@ -144,7 +144,8 @@ class FactoryDataGenerator:
                 # rotating device ID unique ID was not provided, so do not store it in factory data.
                 rd_uid = None
         else:
-            rd_uid = self._args.rd_uid
+            rd_uid = HEX_PREFIX + self._args.rd_uid
+
         if not self._args.spake2_verifier:
             spake_2_verifier = base64.b64decode(self._generate_spake2_verifier())
         else:
@@ -186,6 +187,7 @@ class FactoryDataGenerator:
             self._add_entry("discriminator", self._args.discriminator)
             if rd_uid:
                 self._add_entry("rd_uid", rd_uid)
+            self._add_entry("enable_key", HEX_PREFIX + self._args.enable_key)
             # add user-specific data
             self._add_entry("user", self._args.user)
 
@@ -320,13 +322,16 @@ def main():
     optional_arguments.add_argument("--pai_cert", type=str,
                                     help="[.der] Provide the path to .der file containing PAI certificate.")
     optional_arguments.add_argument("--rd_uid", type=str,
-                                    help="[hex string] Provide the rotating device unique ID. If this argument is not provided a new rotating device id unique id will be generated.")
+                                    help="[hex string] [128-bit hex-encoded] Provide the rotating device unique ID. If this argument is not provided a new rotating device id unique id will be generated.")
     optional_arguments.add_argument("--passcode", type=allow_any_int,
                                     help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2 Verifier).")
     optional_arguments.add_argument("--spake2p_path", type=str,
                                     help="[string] Provide a path to spake2p. By default You can find spake2p in connectedhomeip/src/tools/spake2p directory and build it there.")
     optional_arguments.add_argument("--spake2_verifier", type=str,
                                     help="[ascii string] Provide Spake2 Verifier without generating it.")
+    optional_arguments.add_argument("--enable_key", type=str,
+                                    help="[hex string] [128-bit hex-encoded] The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command."
+                                    "This value is used during Certification Tests, and should not be present on production devices.")
     optional_arguments.add_argument("--user", type=str,
                                     help="[string] Provide additional user-specific keys in Json format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
     args = parser.parse_args()
