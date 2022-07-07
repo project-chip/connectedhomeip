@@ -706,8 +706,8 @@ void TestCommandInteraction::TestCommandInvalidMessage1(nlTestSuite * apSuite, v
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-// Command Sender sends the malformed invoke request, handler fails to process it and send status report with invalid action, command
-// sender sends out status report with invalid action, and server sends out ack.
+// Command Sender sends the malformed invoke request, handler fails to process it and send status report with invalid action,
+// command sender sends out status report with invalid action, and server sends out ack.
 void TestCommandInteraction::TestCommandInvalidMessage2(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);

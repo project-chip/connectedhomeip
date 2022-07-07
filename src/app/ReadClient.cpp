@@ -600,7 +600,7 @@ exit:
     if (!suppressResponse && err == CHIP_NO_ERROR)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
-        CHIP_ERROR sendErr = StatusResponse::Send(Status::Success, mpExchangeCtx, !noResponseExpected);
+        CHIP_ERROR sendErr      = StatusResponse::Send(Status::Success, mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected && sendErr == CHIP_NO_ERROR)
         {

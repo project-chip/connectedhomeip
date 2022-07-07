@@ -2825,7 +2825,7 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
         rm->ClearRetransTable(readClient.mpExchangeCtx);
         ctx.GetLoopback().mSentMessageCount            = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
-        chip::Messaging::ExchangeContext * backupCtx = readClient.mpExchangeCtx;
+        chip::Messaging::ExchangeContext * backupCtx   = readClient.mpExchangeCtx;
         readClient.OnMessageReceived(readClient.mpExchangeCtx, payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
@@ -2839,7 +2839,8 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
 }
 
 // Read Client creates the subscription with server, server sends chunked reports, after the handler sends out the first chunked
-// report, client sends out invalid message, handler send out status report with invalid action and close, client sends the status report
+// report, client sends out invalid message, handler send out status report with invalid action and close, client sends the status
+// report
 //  with invalid action and close, hander would send out ack
 void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, void * apContext)
 {
@@ -3005,7 +3006,7 @@ void TestReadInteraction::TestSubscribeInvalidMessage3(nlTestSuite * apSuite, vo
         rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mpExchangeCtx);
         ctx.GetLoopback().mSentMessageCount            = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
-        chip::Messaging::ExchangeContext * backupCtx = readClient.mpExchangeCtx;
+        chip::Messaging::ExchangeContext * backupCtx   = readClient.mpExchangeCtx;
         readClient.OnMessageReceived(readClient.mpExchangeCtx, payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);

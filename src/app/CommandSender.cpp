@@ -173,8 +173,8 @@ void CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::Exchang
 {
     if (aError != CHIP_NO_ERROR && !aSuppressErrorStatusResponse)
     {
-        CHIP_ERROR err = StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
-                                              false /*aExpectResponse*/);
+        CHIP_ERROR err =
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
         if (err == CHIP_NO_ERROR)
         {
             mpExchangeCtx = nullptr;

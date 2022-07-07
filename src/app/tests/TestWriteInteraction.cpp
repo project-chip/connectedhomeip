@@ -594,7 +594,7 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
     rm->ClearRetransTable(writeClient.mpExchangeCtx);
     ctx.GetLoopback().mSentMessageCount            = 0;
     ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
-    chip::Messaging::ExchangeContext * backupCtx = writeClient.mpExchangeCtx;
+    chip::Messaging::ExchangeContext * backupCtx   = writeClient.mpExchangeCtx;
     err = writeClient.OnMessageReceived(writeClient.mpExchangeCtx, payloadHeader, std::move(payload));
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
