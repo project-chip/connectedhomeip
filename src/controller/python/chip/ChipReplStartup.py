@@ -12,6 +12,7 @@ import chip.logging
 import argparse
 import builtins
 import chip.FabricAdmin
+from chip.utils import CommissioningBuildingBlocks
 import atexit
 
 _fabricAdmins = None
