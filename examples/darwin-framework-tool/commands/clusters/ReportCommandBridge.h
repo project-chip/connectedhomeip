@@ -50,7 +50,7 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         MTRReadParams * params = [[MTRReadParams alloc] init];
@@ -125,7 +125,7 @@ public:
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
@@ -195,7 +195,7 @@ public:
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 

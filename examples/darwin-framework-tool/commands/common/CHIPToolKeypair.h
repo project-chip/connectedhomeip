@@ -4,7 +4,7 @@
 
 @interface CHIPToolKeypair : NSObject <MTRKeypair>
 - (BOOL)initialize;
-- (NSData *)ECDSA_sign_message_raw:(NSData *)message;
+- (NSData *)signMessageECDSA_RAW:(NSData *)message;
 - (SecKeyRef)publicKey;
 - (CHIP_ERROR)Serialize:(chip::Crypto::P256SerializedKeypair &)output;
 - (CHIP_ERROR)Deserialize:(chip::Crypto::P256SerializedKeypair &)input;
