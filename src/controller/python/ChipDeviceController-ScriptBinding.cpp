@@ -40,12 +40,6 @@
 #include <inttypes.h>
 #include <net/if.h>
 
-#include "ChipDeviceController-ScriptDevicePairingDelegate.h"
-#include "ChipDeviceController-StorageDelegate.h"
-
-#include "chip/interaction_model/Delegate.h"
-
-#include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
@@ -55,6 +49,11 @@
 #include <controller/CommissioningDelegate.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+
+#include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
+#include <controller/python/ChipDeviceController-StorageDelegate.h>
+#include <controller/python/chip/interaction_model/Delegate.h>
+
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -70,6 +69,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <system/SystemClock.h>
+
+#include <platform/CommissionableDataProvider.h>
+#include <platform/PlatformManager.h>
+#include <platform/TestOnlyCommissionableDataProvider.h>
 
 using namespace chip;
 using namespace chip::Ble;
@@ -106,7 +109,8 @@ chip::NodeId kDefaultLocalDeviceId = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 
 extern "C" {
-ChipError::StorageType pychip_DeviceController_StackInit();
+ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId);
+ChipError::StorageType pychip_DeviceController_StackShutdown();
 
 ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
                                                                    chip::NodeId localDeviceId, bool useTestCommissioner);
@@ -176,8 +180,6 @@ ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Contro
 uint8_t pychip_DeviceController_GetLogFilter();
 void pychip_DeviceController_SetLogFilter(uint8_t category);
 
-ChipError::StorageType pychip_Stack_Init();
-ChipError::StorageType pychip_Stack_Shutdown();
 const char * pychip_Stack_ErrorToString(ChipError::StorageType err);
 const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t statusCode);
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
@@ -187,8 +189,6 @@ ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::Devic
 ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          CommissioneeDeviceProxy ** proxy);
 uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
-// CHIP Stack objects
-ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 
 chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(SubscriptionId subscriptionId);
 
@@ -220,9 +220,16 @@ chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter()
     return sStorageAdapter;
 }
 
-ChipError::StorageType pychip_DeviceController_StackInit()
+ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId)
 {
     VerifyOrDie(sStorageAdapter != nullptr);
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+    CHIP_ERROR err =
+        chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+#endif
 
     FactoryInitParams factoryParams;
     factoryParams.fabricIndependentStorage = sStorageAdapter;
@@ -236,6 +243,12 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     factoryParams.enableServerInteractions = true;
 
+    // Hack needed due to the fact that DnsSd server uses the CommissionableDataProvider even
+    // when never starting commissionable advertising. This will not be used but prevents
+    // null pointer dereferences.
+    static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+    chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
+
     ReturnErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryParams).AsInteger());
 
     //
@@ -248,6 +261,32 @@ ChipError::StorageType pychip_DeviceController_StackInit()
     // This retain call ensures the stack doesn't get de-initialized in the REPL.
     //
     DeviceControllerFactory::GetInstance().RetainSystemState();
+
+    //
+    // Finally, start up the main Matter thread. Any further interactions with the stack
+    // will now need to happen on the Matter thread, OR protected with the stack lock.
+    //
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().StartEventLoopTask().AsInteger());
+
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+ChipError::StorageType pychip_DeviceController_StackShutdown()
+{
+    ChipLogError(Controller, "Shutting down the stack...");
+
+    //
+    // Let's stop the Matter thread, and wait till the event loop has stopped.
+    //
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().StopEventLoopTask().AsInteger());
+
+    //
+    // There is the symmetric call to match the Retain called at stack initialization
+    // time. This will release all resources (if there are no other controllers active).
+    //
+    DeviceControllerFactory::GetInstance().ReleaseSystemState();
+
+    DeviceControllerFactory::GetInstance().Shutdown();
 
     return CHIP_NO_ERROR.AsInteger();
 }
@@ -552,38 +591,6 @@ ChipError::StorageType pychip_ScriptDevicePairingDelegate_SetCommissioningStatus
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
 {
     sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
-    return CHIP_NO_ERROR.AsInteger();
-}
-
-ChipError::StorageType pychip_Stack_Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = chip::Platform::MemoryInit();
-    SuccessOrExit(err);
-
-#if !CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-    ExitNow(err = CHIP_ERROR_NOT_IMPLEMENTED);
-
-#else /* CHIP_SYSTEM_CONFIG_USE_SOCKETS */
-
-#endif /* CHIP_SYSTEM_CONFIG_USE_SOCKETS */
-
-exit:
-    if (err != CHIP_NO_ERROR)
-        pychip_Stack_Shutdown();
-
-    return err.AsInteger();
-}
-
-ChipError::StorageType pychip_Stack_Shutdown()
-{
-    //
-    // There is the symmetric call to match the Retain called at stack initialization
-    // time.
-    //
-    DeviceControllerFactory::GetInstance().ReleaseSystemState();
     return CHIP_NO_ERROR.AsInteger();
 }
 
