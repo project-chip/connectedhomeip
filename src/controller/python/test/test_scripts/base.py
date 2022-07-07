@@ -172,8 +172,8 @@ class TestResult:
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
         self.chipStack = ChipStack('/tmp/repl_storage.json')
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
-            fabricId=1, fabricIndex=1)
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
+                                                        fabricId=1, fabricIndex=1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
@@ -369,7 +369,7 @@ class BaseTestHelper:
         self.logger.info("Waiting for attribute read for CommissionedFabrics")
         startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
 
-        tempFabric = chip.FabricAdmin.FabricAdmin(fabricId=3, fabricIndex=3)
+        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1, fabricId=3, fabricIndex=3)
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
         self.logger.info("Setting failsafe on CASE connection")
@@ -590,8 +590,8 @@ class BaseTestHelper:
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
-        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(
-            fabricId=2, fabricIndex=2)
+        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
+                                                         fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
         self.devCtrl2 = self.fabricAdmin2.NewController(
@@ -613,9 +613,10 @@ class BaseTestHelper:
 
         self.logger.info("Shutdown completed, starting new controllers...")
 
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
-            fabricId=1, fabricIndex=1)
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
+                                                        fabricId=1, fabricIndex=1)
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
+                                                    fabricId=2, fabricIndex=2)
 
         self.devCtrl = self.fabricAdmin.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
