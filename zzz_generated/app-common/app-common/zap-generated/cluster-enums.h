@@ -83,6 +83,12 @@ using IdentifyIdentifyType            = EmberAfIdentifyIdentifyType;
 } // namespace Identify
 
 namespace Groups {
+
+// Bitmap for GroupClusterFeature
+enum class GroupClusterFeature : uint32_t
+{
+    kGroupNames = 0x1,
+};
 } // namespace Groups
 
 namespace Scenes {
