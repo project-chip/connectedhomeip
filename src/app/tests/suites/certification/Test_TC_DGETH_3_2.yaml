@@ -21,12 +21,13 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Commission TH to DUT"
       verification: |
 
       disabled: true
 
-    - label: "TH sends ResetCounts to DUT"
+    - label: "DUT sends ResetCounts to TH"
+      PICS: DGETH.S.C00
       verification: |
           Verify Command data recieved from running the below command is a success
 

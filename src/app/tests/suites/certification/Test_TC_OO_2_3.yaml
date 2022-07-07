@@ -30,8 +30,8 @@ tests:
                 value: nodeId
 
     - label: "2a: Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
-      PICS: CR_ON
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -42,22 +42,22 @@ tests:
                 value: 1000
 
     - label: "2b: Reads OnOff attribute from DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
       response:
           value: 1
 
     - label: "2b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 1
 
     - label: "3a:Sends OffWithEffect command to DUT"
       command: "OffWithEffect"
-      PICS: CR_OFFWITHEFFECT
+      PICS: OO.S.C40.Rsp
       arguments:
           values:
               - name: "EffectId"
@@ -76,20 +76,20 @@ tests:
     - label: "3b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "3b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 0
 
     - label: "4a:Sends OnWithRecallGlobalScene command to DUT"
       command: "OnWithRecallGlobalScene"
-      PICS: CR_ONWITHRECALL
+      PICS: OO.S.C41.Rsp
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -102,20 +102,20 @@ tests:
     - label: "4b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "4b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 1
 
     - label: "5a:Sends OffWithEffect command to DUT"
       command: "OffWithEffect"
-      PICS: CR_OFFWITHEFFECT
+      PICS: OO.S.C40.Rsp
       arguments:
           values:
               - name: "EffectId"
@@ -134,20 +134,20 @@ tests:
     - label: "5b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "5b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 0
 
     - label: "5c:Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
-      PICS: CR_ON
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -160,20 +160,20 @@ tests:
     - label: "5d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "5d:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 1
 
     - label: "6a:Sends OffWithEffect command to DUT"
       command: "OffWithEffect"
-      PICS: CR_OFFWITHEFFECT
+      PICS: OO.S.C40.Rsp
       arguments:
           values:
               - name: "EffectId"
@@ -192,20 +192,20 @@ tests:
     - label: "6b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "6b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 0
 
     - label: "7a:Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
-      PICS: CR_ON
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -218,20 +218,20 @@ tests:
     - label: "7b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "7b:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 1
 
     - label: "7c:Sends OnWithRecallGlobalScene command to DUT"
       command: "OnWithRecallGlobalScene"
-      PICS: CR_ONWITHRECALL
+      PICS: OO.S.C41.Rsp
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
@@ -244,33 +244,34 @@ tests:
     - label: "7d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "7d:Reads GlobalSceneControl attribute from DUT"
       command: "readAttribute"
       attribute: "GlobalSceneControl"
-      PICS: A_GLOBALSCENECONTROL
+      PICS: OO.S.A4000
       response:
           value: 1
 
     - label: "8:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "8:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 0
 
     - label: "9a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -283,7 +284,7 @@ tests:
     - label: "9b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           constraints:
               minValue: 295
@@ -292,13 +293,13 @@ tests:
     - label: "9b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 300
 
     - label: "10a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -318,7 +319,7 @@ tests:
 
     - label: "10b:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -338,7 +339,7 @@ tests:
 
     - label: "10c:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -358,7 +359,7 @@ tests:
 
     - label: "10d:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -371,14 +372,14 @@ tests:
     - label: "10e:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "10e:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           constraints:
               minValue: 295
@@ -387,7 +388,7 @@ tests:
     - label: "10e:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 300
 
@@ -401,7 +402,7 @@ tests:
 
     - label: "11a:Sends OffWithEffect command to DUT"
       command: "OffWithEffect"
-      PICS: CR_OFFWITHEFFECT
+      PICS: OO.S.C40.Rsp
       arguments:
           values:
               - name: "EffectId"
@@ -412,21 +413,21 @@ tests:
     - label: "11b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "11b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "11b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 295
@@ -442,7 +443,7 @@ tests:
 
     - label: "12a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -455,21 +456,21 @@ tests:
     - label: "12b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "12b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "12b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 195
@@ -484,27 +485,27 @@ tests:
                 value: 10000
 
     - label: "13a:Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
-      PICS: CR_ON
 
     - label: "13b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "13b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "13b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constarints:
               minValue: 0
@@ -520,7 +521,7 @@ tests:
 
     - label: "14a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -540,26 +541,26 @@ tests:
 
     - label: "14b:Send Off Command"
       command: "Off"
-      PICS: CR_OFF
+      PICS: OO.S.C00.Rsp
 
     - label: "14c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "14c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "14c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 295
@@ -576,21 +577,21 @@ tests:
     - label: "15:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "15:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "15:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 0
@@ -606,7 +607,7 @@ tests:
 
     - label: "16a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -619,29 +620,29 @@ tests:
     - label: "16b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "16b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "16b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 0
               maxValue: 10
 
     - label: "17a:Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
-      PICS: CR_ON
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -653,7 +654,7 @@ tests:
 
     - label: "17b:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -666,21 +667,21 @@ tests:
     - label: "17c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "17c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 300
 
     - label: "17c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 300
 
@@ -695,21 +696,21 @@ tests:
     - label: "17d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "17d:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "17d:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 0
@@ -725,7 +726,7 @@ tests:
 
     - label: "18a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -739,7 +740,7 @@ tests:
     - label: "18b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: PICS_SKIP_SAMPLE_APP && A_ONOFF
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000
       response:
           value: 1
 
@@ -747,7 +748,7 @@ tests:
     - label: "18b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: PICS_SKIP_SAMPLE_APP && A_ONTIME
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A4001
       response:
           constraints:
               minValue: 295
@@ -757,13 +758,13 @@ tests:
     - label: "18b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OFFWAITTIME
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A4002
       response:
           value: 300
 
     - label: "19a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -783,7 +784,7 @@ tests:
 
     - label: "19b:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -804,14 +805,14 @@ tests:
     - label: "19c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "19c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           constraints:
               minValue: 195
@@ -820,40 +821,40 @@ tests:
     - label: "19c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 300
 
     - label: "20a:Send Off Command"
       command: "Off"
-      PICS: CR_OFF
+      PICS: OO.S.C00.Rsp
 
     - label: "20b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "20b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "20b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 295
               maxValue: 305
 
-    - label: "21a:Sends OnWithimedOff command to DUT"
+    - label: "21a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -866,53 +867,52 @@ tests:
     - label: "21b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "21b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
-    # Issue 19159 offWaitTime value mismatch: expected 200 but got 300
     - label: "21b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A4002
       response:
           constraints:
               minValue: 195
               maxValue: 205
 
     - label: "22a:Send On Command"
+      PICS: OO.S.C01.Rsp
       command: "On"
-      PICS: CR_ON
 
     - label: "22b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "22b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "22b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 0
 
-    - label: ":Wait 10000ms"
+    - label: "Wait 10000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -922,7 +922,7 @@ tests:
 
     - label: "23a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -934,26 +934,26 @@ tests:
 
     - label: "23b:Send Off Command"
       command: "Off"
-      PICS: CR_OFF
+      PICS: OO.S.C00.Rsp
 
     - label: "23c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "23c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "23c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 295
@@ -970,21 +970,21 @@ tests:
     - label: "23d:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "23d:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "23d:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 0
@@ -992,7 +992,7 @@ tests:
 
     - label: "24a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
-      PICS: CR_ONWITHTIMEOFF
+      PICS: OO.S.C42.Rsp
       arguments:
           values:
               - name: "OnOffControl"
@@ -1005,14 +1005,14 @@ tests:
     - label: "24b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 1
 
     - label: "24b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           constraints:
               minValue: 295
@@ -1021,7 +1021,7 @@ tests:
     - label: "24b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           value: 300
 
@@ -1036,21 +1036,21 @@ tests:
     - label: "24c:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: A_ONOFF
+      PICS: OO.S.A0000
       response:
           value: 0
 
     - label: "24c:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: A_ONTIME
+      PICS: OO.S.A4001
       response:
           value: 0
 
     - label: "24c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: A_OFFWAITTIME
+      PICS: OO.S.A4002
       response:
           constraints:
               minValue: 0
@@ -1058,4 +1058,4 @@ tests:
 
     - label: "Send Off Command"
       command: "Off"
-      PICS: CR_OFF
+      PICS: OO.S.C00.Rsp

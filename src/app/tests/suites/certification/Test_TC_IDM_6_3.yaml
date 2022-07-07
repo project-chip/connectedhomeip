@@ -14,8 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    20.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH [DUT -
-    Controller]
+    21.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH. [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -27,70 +26,13 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          On TH verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
+
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
-          [1655210591.947581][2883:2883] CHIP:IM: Received Read request
-          [1655210591.947662][2883:2883] CHIP:DMG: ReadRequestMessage =
-          [1655210591.947709][2883:2883] CHIP:DMG: {
-          [1655210591.947750][2883:2883] CHIP:DMG: 	EventPathIBs =
-          [1655210591.947797][2883:2883] CHIP:DMG: 	[
-          [1655210591.947841][2883:2883] CHIP:DMG: 		EventPath =
-          [1655210591.947889][2883:2883] CHIP:DMG: 		{
-          [1655210591.947935][2883:2883] CHIP:DMG: 		},
-          [1655210591.947984][2883:2883] CHIP:DMG:
-          [1655210591.948027][2883:2883] CHIP:DMG: 	],
-          [1655210591.948076][2883:2883] CHIP:DMG:
-          [1655210591.948121][2883:2883] CHIP:DMG: 	isFabricFiltered = true,
-          [1655210591.948168][2883:2883] CHIP:DMG: 	InteractionModelRevision = 1
-          [1655210591.948211][2883:2883] CHIP:DMG: },
-          [1655210591.948313][2883:2883] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1655210591.948437][2883:2883] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1655210591.948549][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=v
-          [1655210591.948611][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.948716][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001F e=0 p=a
-          [1655210591.948744][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.948825][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
-          [1655210591.948852][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.948921][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.948948][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949032][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949061][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949123][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
-          [1655210591.949150][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949218][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
-          [1655210591.949244][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949311][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949337][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949398][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949424][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949484][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949510][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949570][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949595][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949656][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0033 e=0 p=v
-          [1655210591.949681][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949743][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949769][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949829][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949855][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949914][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.949940][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.949999][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.950025][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.950086][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0034 e=0 p=v
-          [1655210591.950112][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.950178][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.950204][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.950263][2883:2883] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_003B e=1 p=v
-          [1655210591.950289][2883:2883] CHIP:DMG: AccessControl: allowed
-          [1655210591.950334][2883:2883] CHIP:DMG: Fetched 19 events
-          [1655210591.950362][2883:2883] CHIP:DMG: <RE> Sending report (payload has 887 bytes)...
-          [1655210591.950396][2883:2883] CHIP:EM: Piggybacking Ack for MessageCounter:38120344 on exchange: 48722r
-          [1655210591.950502][2883:2883] CHIP:IN: Prepared secure message 0xaaaade6d4e40 to 0x000000000001B669 (1)  of type 0x5 and protocolId (0, 1) on exchange 48722r with MessageCounter:59542778.
-          [1655210591.950539][2883:2883] CHIP:IN: Sending encrypted msg 0xaaaade6d4e40 with MessageCounter:59542778 to 0x000000000001B669 (1) at monotonic time: 0000000001C61135 msec
-          [1655210591.950689][2883:2883] CHIP:DMG: <RE> OnReportConfirm: NumReports = 0
 
 
+          On TH
 
           [1655210591.986723][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
           [1655210591.986748][4218:4223] CHIP:TOO:          Event number: 65536

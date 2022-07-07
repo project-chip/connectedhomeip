@@ -17,12 +17,12 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MTRBaseDevice.h"
+#import "MTRBaseDevice_Internal.h"
 #import "MTRCluster.h"
-#import "MTRDevice.h"
-#import "MTRDevice_Internal.h"
 
 #import "zap-generated/CHIPClusters.h"
-#import "zap-generated/MTRClustersObjc.h"
+#import "zap-generated/MTRBaseClusters.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

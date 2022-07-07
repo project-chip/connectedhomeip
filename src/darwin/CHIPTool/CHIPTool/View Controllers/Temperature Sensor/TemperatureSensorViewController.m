@@ -184,15 +184,16 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
-// MARK: MTRTemperatureMeasurement
+// MARK: MTRBaseClusterTemperatureMeasurement
 
 - (void)readCurrentTemperature
 {
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTRTemperatureMeasurement * cluster = [[MTRTemperatureMeasurement alloc] initWithDevice:chipDevice
-                                                                                               endpoint:1
-                                                                                                  queue:dispatch_get_main_queue()];
+                MTRBaseClusterTemperatureMeasurement * cluster =
+                    [[MTRBaseClusterTemperatureMeasurement alloc] initWithDevice:chipDevice
+                                                                        endpoint:1
+                                                                           queue:dispatch_get_main_queue()];
 
                 [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                     if (error != nil)
@@ -218,7 +219,7 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     NSLog(
         @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 // Use a wildcard subscription
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()

@@ -16,12 +16,12 @@
  */
 #import "MTRDeviceController.h"
 
+#import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRControllerFactory_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevicePairingDelegateBridge.h"
-#import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging.h"
@@ -32,7 +32,7 @@
 #import "NSDataSpanConversion.h"
 #import <setup_payload/ManualSetupPayloadGenerator.h>
 #import <setup_payload/SetupPayload.h>
-#import <zap-generated/MTRClustersObjc.h>
+#import <zap-generated/MTRBaseClusters.h>
 
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
@@ -498,7 +498,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return success;
 }
 
-- (MTRDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+- (MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
@@ -514,10 +514,12 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         }
         return nil;
     }
-    return [[MTRDevice alloc] initWithDevice:deviceProxy];
+    return [[MTRBaseDevice alloc] initWithDevice:deviceProxy];
 }
 
-- (BOOL)getDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     if (![self isRunning]) {
