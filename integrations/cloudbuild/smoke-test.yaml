@@ -110,4 +110,4 @@ artifacts:
 # building instead of docker download/checkout/bootstrap)
 options:
     machineType: "E2_HIGHCPU_32"
-    diskSizeGb: 200
+    diskSizeGb: 500

@@ -1,0 +1,412 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    111.2.10. [TC-DRLK-2.10] Verification for the Door Lock Events [DUT-Server]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 0"
+      PICS: DRLK.S.E00
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 1"
+      PICS: DRLK.S.E00
+      verification: |
+          "sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }"
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 3"
+      PICS: DRLK.S.E00
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 4"
+      PICS: DRLK.S.E00
+      verification: |
+          "sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }"
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 5"
+      PICS: DRLK.S.E00
+      verification: |
+          "sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }"
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 6"
+      PICS: DRLK.S.E00
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 7"
+      PICS: DRLK.S.E00
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 8"
+      PICS: DRLK.S.E00
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
+
+          [1651216572.325926][3144:3149] CHIP:DMG: ReportDataMessage =
+          [1651216572.325964][3144:3149] CHIP:DMG: {
+          [1651216572.325998][3144:3149] CHIP:DMG:        SuppressResponse = true,
+          [1651216572.326035][3144:3149] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216572.326070][3144:3149] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorStateChange event by setting the DoorState to 0"
+      PICS: DRLK.S.F05 && DRLK.S.E01
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-state-change 1 1
+
+          [1651216905.027689][3169:3174] CHIP:DMG: ReportDataMessage =
+          [1651216905.027744][3169:3174] CHIP:DMG: {
+          [1651216905.027781][3169:3174] CHIP:DMG:        SuppressResponse = true,
+          [1651216905.027820][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216905.027868][3169:3174] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorStateChange event by setting the DoorState to 1"
+      PICS: DRLK.S.F05 && DRLK.S.E01
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-state-change 1 1
+
+          [1651216905.027689][3169:3174] CHIP:DMG: ReportDataMessage =
+          [1651216905.027744][3169:3174] CHIP:DMG: {
+          [1651216905.027781][3169:3174] CHIP:DMG:        SuppressResponse = true,
+          [1651216905.027820][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216905.027868][3169:3174] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorStateChange event by setting the DoorState to 2"
+      PICS: DRLK.S.F05 && DRLK.S.E01
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-state-change 1 1
+
+          [1651216905.027689][3169:3174] CHIP:DMG: ReportDataMessage =
+          [1651216905.027744][3169:3174] CHIP:DMG: {
+          [1651216905.027781][3169:3174] CHIP:DMG:        SuppressResponse = true,
+          [1651216905.027820][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216905.027868][3169:3174] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorStateChange event by setting the DoorState to 3"
+      PICS: DRLK.S.F05 && DRLK.S.E01
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-state-change 1 1
+
+          [1651216905.027689][3169:3174] CHIP:DMG: ReportDataMessage =
+          [1651216905.027744][3169:3174] CHIP:DMG: {
+          [1651216905.027781][3169:3174] CHIP:DMG:        SuppressResponse = true,
+          [1651216905.027820][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216905.027868][3169:3174] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorStateChange event by setting the DoorState to 4"
+      PICS: DRLK.S.F05 && DRLK.S.E01
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-state-change 1 1
+
+          [1651216905.027689][3169:3174] CHIP:DMG: ReportDataMessage =
+          [1651216905.027744][3169:3174] CHIP:DMG: {
+          [1651216905.027781][3169:3174] CHIP:DMG:        SuppressResponse = true,
+          [1651216905.027820][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216905.027868][3169:3174] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a DoorStateChange event by setting the DoorState to 5"
+      PICS: DRLK.S.F05 && DRLK.S.E01
+      verification: |
+          sudo  ./chip-tool doorlock read-event door-state-change 1 1
+
+          [1651216905.027689][3169:3174] CHIP:DMG: ReportDataMessage =
+          [1651216905.027744][3169:3174] CHIP:DMG: {
+          [1651216905.027781][3169:3174] CHIP:DMG:        SuppressResponse = true,
+          [1651216905.027820][3169:3174] CHIP:DMG:        InteractionModelRevision = 1
+          [1651216905.027868][3169:3174] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 0"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 1"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 2"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 3"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 4"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 5"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 6"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 7"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 8"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockOperation event by setting OperationSource to 9"
+      PICS: DRLK.S.E02
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-operation 1 1
+
+          [1651217002.308668][3182:3187] CHIP:DMG: ReportDataMessage =
+          [1651217002.308697][3182:3187] CHIP:DMG: {
+          [1651217002.308731][3182:3187] CHIP:DMG:        SuppressResponse = true,
+          [1651217002.308758][3182:3187] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217002.308782][3182:3187] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Initiate a LockOperationError Event by setting OperationError as 0"
+      PICS: DRLK.S.E03
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 1 1
+
+          [1651217184.203091][3201:3206] CHIP:DMG: ReportDataMessage =
+          [1651217184.203127][3201:3206] CHIP:DMG: {
+          [1651217184.203159][3201:3206] CHIP:DMG:        SuppressResponse = true,
+          [1651217184.203193][3201:3206] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217184.203225][3201:3206] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Initiate a LockOperationError Event by setting OperationError as 1"
+      PICS: DRLK.S.E03
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 1 1
+
+          [1651217184.203091][3201:3206] CHIP:DMG: ReportDataMessage =
+          [1651217184.203127][3201:3206] CHIP:DMG: {
+          [1651217184.203159][3201:3206] CHIP:DMG:        SuppressResponse = true,
+          [1651217184.203193][3201:3206] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217184.203225][3201:3206] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Initiate a LockOperationError Event by setting OperationError as 2"
+      PICS: DRLK.S.E03
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 1 1
+
+          [1651217184.203091][3201:3206] CHIP:DMG: ReportDataMessage =
+          [1651217184.203127][3201:3206] CHIP:DMG: {
+          [1651217184.203159][3201:3206] CHIP:DMG:        SuppressResponse = true,
+          [1651217184.203193][3201:3206] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217184.203225][3201:3206] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Initiate a LockOperationError Event by setting OperationError as 3"
+      PICS: DRLK.S.E03
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 1 1
+
+          [1651217184.203091][3201:3206] CHIP:DMG: ReportDataMessage =
+          [1651217184.203127][3201:3206] CHIP:DMG: {
+          [1651217184.203159][3201:3206] CHIP:DMG:        SuppressResponse = true,
+          [1651217184.203193][3201:3206] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217184.203225][3201:3206] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "Initiate a LockOperationError Event by setting OperationError as 4"
+      PICS: DRLK.S.E03
+      verification: |
+          ./chip-tool doorlock read-event lock-operation-error 1 1
+
+          [1651217184.203091][3201:3206] CHIP:DMG: ReportDataMessage =
+          [1651217184.203127][3201:3206] CHIP:DMG: {
+          [1651217184.203159][3201:3206] CHIP:DMG:        SuppressResponse = true,
+          [1651217184.203193][3201:3206] CHIP:DMG:        InteractionModelRevision = 1
+          [1651217184.203225][3201:3206] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockUserChange event by changing the Lock User"
+      PICS: DRLK.S.E03
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-user-change 1 1
+
+          [1651836874.631472][6648:6653] CHIP:DMG: ReportDataMessage =
+          [1651836874.631520][6648:6653] CHIP:DMG: {
+          [1651836874.631563][6648:6653] CHIP:DMG:        SuppressResponse = true,
+          [1651836874.631610][6648:6653] CHIP:DMG:        InteractionModelRevision = 1
+          [1651836874.631653][6648:6653] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockUserChange event by changing the Schedule"
+      PICS: DRLK.S.E03
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-user-change 1 1
+
+          [1651836874.631472][6648:6653] CHIP:DMG: ReportDataMessage =
+          [1651836874.631520][6648:6653] CHIP:DMG: {
+          [1651836874.631563][6648:6653] CHIP:DMG:        SuppressResponse = true,
+          [1651836874.631610][6648:6653] CHIP:DMG:        InteractionModelRevision = 1
+          [1651836874.631653][6648:6653] CHIP:DMG: }
+      disabled: true
+
+    - label: "Initiate a LockUserChange event by changing the Credential"
+      PICS: DRLK.S.E03
+      verification: |
+          sudo  ./chip-tool doorlock read-event lock-user-change 1 1
+
+          [1651836874.631472][6648:6653] CHIP:DMG: ReportDataMessage =
+          [1651836874.631520][6648:6653] CHIP:DMG: {
+          [1651836874.631563][6648:6653] CHIP:DMG:        SuppressResponse = true,
+          [1651836874.631610][6648:6653] CHIP:DMG:        InteractionModelRevision = 1
+          [1651836874.631653][6648:6653] CHIP:DMG: }
+      disabled: true

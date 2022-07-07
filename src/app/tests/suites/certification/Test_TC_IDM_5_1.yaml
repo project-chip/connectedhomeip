@@ -33,64 +33,83 @@ tests:
           Verify the DUT sent the invoke message to the TH after the specified timeout value for above command
 
           on the TH (reference all cluster app) you should see
+          [1655797318.624018][7331:7331] CHIP:EM: Handling via exchange: 28067r, Delegate: 0xaaaad9aed418
+          [1655797318.624129][7331:7331] CHIP:DMG: TimedRequestMessage =
+          [1655797318.624185][7331:7331] CHIP:DMG: {
+          [1655797318.624235][7331:7331] CHIP:DMG:         TimeoutMs = 0xc8,
+          [1655797318.624289][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797318.624339][7331:7331] CHIP:DMG: }
+          [1655797318.624394][7331:7331] CHIP:DMG: Got Timed Request with timeout 200: handler 0xaaaaf9f93440 exchange 28067r
 
-          [1649683321.645175][2241:2241] CHIP:DMG: TimedRequestMessage =
-          [1649683321.645225][2241:2241] CHIP:DMG: {
-          [1649683321.645269][2241:2241] CHIP:DMG:         TimeoutMs = 0xc8,
-          [1649683321.645317][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649683321.645360][2241:2241] CHIP:DMG: }
-
-          [1649683321.647287][2241:2241] CHIP:DMG: InvokeRequestMessage =
-          [1649683321.647333][2241:2241] CHIP:DMG: {
-          [1649683321.647375][2241:2241] CHIP:DMG:         suppressResponse = false,
-          [1649683321.647425][2241:2241] CHIP:DMG:         timedRequest = true,
-          [1649683321.647470][2241:2241] CHIP:DMG:         InvokeRequests =
-          [1649683321.647525][2241:2241] CHIP:DMG:         [
-          [1649683321.647571][2241:2241] CHIP:DMG:                 CommandDataIB =
-          [1649683321.647624][2241:2241] CHIP:DMG:                 {
-          [1649683321.647672][2241:2241] CHIP:DMG:                         CommandPathIB =
-          [1649683321.647719][2241:2241] CHIP:DMG:                         {
-          [1649683321.647776][2241:2241] CHIP:DMG:                                 EndpointId = 0x1,
-          [1649683321.647838][2241:2241] CHIP:DMG:                                 ClusterId = 0x6,
-          [1649683321.647899][2241:2241] CHIP:DMG:                                 CommandId = 0x1,
-          [1649683321.647957][2241:2241] CHIP:DMG:                         },
-          [1649683321.648020][2241:2241] CHIP:DMG:
-          [1649683321.648072][2241:2241] CHIP:DMG:                         CommandData =
-          [1649683321.648134][2241:2241] CHIP:DMG:                         {
-          [1649683321.648196][2241:2241] CHIP:DMG:                         },
-          [1649683321.648251][2241:2241] CHIP:DMG:                 },
-          [1649683321.648309][2241:2241] CHIP:DMG:
-          [1649683321.648353][2241:2241] CHIP:DMG:         ],
-          [1649683321.648407][2241:2241] CHIP:DMG:
-          [1649683321.648454][2241:2241] CHIP:DMG:         InteractionModelRevision = 1
-          [1649683321.648499][2241:2241] CHIP:DMG: },
+          [1655797318.626273][7331:7331] CHIP:DMG: Handing timed invoke to IM engine: handler 0xaaaaf9f93440 exchange 28067r
+          [1655797318.626358][7331:7331] CHIP:DMG: InvokeRequestMessage =
+          [1655797318.626411][7331:7331] CHIP:DMG: {
+          [1655797318.626460][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655797318.626517][7331:7331] CHIP:DMG:         timedRequest = true,
+          [1655797318.626569][7331:7331] CHIP:DMG:         InvokeRequests =
+          [1655797318.626633][7331:7331] CHIP:DMG:         [
+          [1655797318.626684][7331:7331] CHIP:DMG:                 CommandDataIB =
+          [1655797318.626742][7331:7331] CHIP:DMG:                 {
+          [1655797318.626796][7331:7331] CHIP:DMG:                         CommandPathIB =
+          [1655797318.626866][7331:7331] CHIP:DMG:                         {
+          [1655797318.626934][7331:7331] CHIP:DMG:                                 EndpointId = 0x1,
+          [1655797318.627002][7331:7331] CHIP:DMG:                                 ClusterId = 0x6,
+          [1655797318.627037][7331:7331] CHIP:DMG:                                 CommandId = 0x1,
+          [1655797318.627070][7331:7331] CHIP:DMG:                         },
+          [1655797318.627148][7331:7331] CHIP:DMG:
+          [1655797318.627179][7331:7331] CHIP:DMG:                         CommandFields =
+          [1655797318.627209][7331:7331] CHIP:DMG:                         {
+          [1655797318.627243][7331:7331] CHIP:DMG:                         },
+          [1655797318.627274][7331:7331] CHIP:DMG:                 },
+          [1655797318.627306][7331:7331] CHIP:DMG:
+          [1655797318.627330][7331:7331] CHIP:DMG:         ],
+          [1655797318.627359][7331:7331] CHIP:DMG:
+          [1655797318.627383][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797318.627406][7331:7331] CHIP:DMG: },
+          [1655797318.627467][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
 
 
-          TH receives InvokeRequestMessage
 
-          [1641535680.297385][3878:3878] CHIP:DMG: InvokeRequestMessage =
-          [1641535680.297408][3878:3878] CHIP:DMG: {
-          [1641535680.297429][3878:3878] CHIP:DMG:         suppressResponse = false,
-          [1641535680.297453][3878:3878] CHIP:DMG:         timedRequest = true,
-          [1641535680.297475][3878:3878] CHIP:DMG:         InvokeRequests =
-          [1641535680.297503][3878:3878] CHIP:DMG:         [
-          [1641535680.297525][3878:3878] CHIP:DMG:                 CommandDataIB =
-          [1641535680.297554][3878:3878] CHIP:DMG:                 {
-          [1641535680.297579][3878:3878] CHIP:DMG:                         CommandPathIB =
-          [1641535680.297610][3878:3878] CHIP:DMG:                         {
-          [1641535680.297644][3878:3878] CHIP:DMG:                                 EndpointId = 0x1,
-          [1641535680.297676][3878:3878] CHIP:DMG:                                 ClusterId = 0x6,
-          [1641535680.297706][3878:3878] CHIP:DMG:                                 CommandId = 0x1,
-          [1641535680.297738][3878:3878] CHIP:DMG:                         },
-          [1641535680.297771][3878:3878] CHIP:DMG:
-          [1641535680.297797][3878:3878] CHIP:DMG:                         CommandData =
-          [1641535680.297825][3878:3878] CHIP:DMG:                         {
-          [1641535680.297853][3878:3878] CHIP:DMG:                         },
-          [1641535680.297880][3878:3878] CHIP:DMG:                 },
-          [1641535680.297909][3878:3878] CHIP:DMG:
-          [1641535680.297931][3878:3878] CHIP:DMG:         ],
-          [1641535680.297957][3878:3878] CHIP:DMG:
-          [1641535680.297976][3878:3878] CHIP:DMG: },
+          TH receives InvokeResponseMessage from DUT
+
+          [1655797318.637938][6989:6994] CHIP:DMG: InvokeResponseMessage =
+          [1655797318.637973][6989:6994] CHIP:DMG: {
+          [1655797318.638007][6989:6994] CHIP:DMG:         suppressResponse = false,
+          [1655797318.638043][6989:6994] CHIP:DMG:         InvokeResponseIBs =
+          [1655797318.638088][6989:6994] CHIP:DMG:         [
+          [1655797318.638123][6989:6994] CHIP:DMG:                 InvokeResponseIB =
+          [1655797318.638169][6989:6994] CHIP:DMG:                 {
+          [1655797318.638207][6989:6994] CHIP:DMG:                         CommandStatusIB =
+          [1655797318.638330][6989:6994] CHIP:DMG:                         {
+          [1655797318.638377][6989:6994] CHIP:DMG:                                 CommandPathIB =
+          [1655797318.638429][6989:6994] CHIP:DMG:                                 {
+          [1655797318.638479][6989:6994] CHIP:DMG:                                         EndpointId = 0x1,
+          [1655797318.638530][6989:6994] CHIP:DMG:                                         ClusterId = 0x6,
+          [1655797318.638581][6989:6994] CHIP:DMG:                                         CommandId = 0x1,
+          [1655797318.638628][6989:6994] CHIP:DMG:                                 },
+          [1655797318.638681][6989:6994] CHIP:DMG:
+          [1655797318.638724][6989:6994] CHIP:DMG:                                 StatusIB =
+          [1655797318.638773][6989:6994] CHIP:DMG:                                 {
+          [1655797318.638822][6989:6994] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1655797318.638869][6989:6994] CHIP:DMG:                                 },
+          [1655797318.638917][6989:6994] CHIP:DMG:
+          [1655797318.638961][6989:6994] CHIP:DMG:                         },
+          [1655797318.639009][6989:6994] CHIP:DMG:
+          [1655797318.639048][6989:6994] CHIP:DMG:                 },
+          [1655797318.639092][6989:6994] CHIP:DMG:
+          [1655797318.639126][6989:6994] CHIP:DMG:         ],
+          [1655797318.639169][6989:6994] CHIP:DMG:
+          [1655797318.639204][6989:6994] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797318.639238][6989:6994] CHIP:DMG: },
+          [1655797318.639316][6989:6994] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+          [1655797318.639375][6989:6994] CHIP:DMG: ICR moving to [AwaitingDe]
+
+          [1655797318.632282][6989:6994] CHIP:DMG: StatusResponseMessage =
+          [1655797318.632321][6989:6994] CHIP:DMG: {
+          [1655797318.632357][6989:6994] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1655797318.632394][6989:6994] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797318.632429][6989:6994] CHIP:DMG: }
+          [1655797318.632465][6989:6994] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
       disabled: true
 
     - label:
@@ -103,51 +122,78 @@ tests:
           ./chip-tool levelcontrol write on-level 1 1 1 --timedInteractionTimeoutMs 200
 
           on the TH (reference all cluster app) you should see
+          [1655797580.941429][7331:7331] CHIP:DMG: TimedRequestMessage =
+          [1655797580.941479][7331:7331] CHIP:DMG: {
+          [1655797580.941561][7331:7331] CHIP:DMG:         TimeoutMs = 0xc8,
+          [1655797580.941609][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797580.941652][7331:7331] CHIP:DMG: }
+          [1655797580.941700][7331:7331] CHIP:DMG: Got Timed Request with timeout 200: handler 0xaaaaf9f94b20 exchange 47847r
 
-          [1652943666.776460][8499:8499] CHIP:DMG: TimedRequestMessage =
-          [1652943666.776504][8499:8499] CHIP:DMG: {
-          [1652943666.776542][8499:8499] CHIP:DMG:         TimeoutMs = 0x384,
-          [1652943666.776584][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
-          [1652943666.776623][8499:8499] CHIP:DMG: }
-          [1652943666.776666][8499:8499] CHIP:DMG: Got Timed Request with timeout 900: handler 0xaaaab360c2d0 exchange 2224r
+          [1655797580.943440][7331:7331] CHIP:DMG: Handing timed write to IM engine: handler 0xaaaaf9f94b20 exchange 47847r
+          [1655797580.943482][7331:7331] CHIP:IM: Received Write request
+          [1655797580.943519][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
+          [1655797580.943594][7331:7331] CHIP:DMG: WriteRequestMessage =
+          [1655797580.943641][7331:7331] CHIP:DMG: {
+          [1655797580.943684][7331:7331] CHIP:DMG:         suppressResponse = false,
+          [1655797580.943733][7331:7331] CHIP:DMG:         timedRequest = true,
+          [1655797580.943779][7331:7331] CHIP:DMG:         AttributeDataIBs =
+          [1655797580.943941][7331:7331] CHIP:DMG:         [
+          [1655797580.943990][7331:7331] CHIP:DMG:                 AttributeDataIB =
+          [1655797580.944045][7331:7331] CHIP:DMG:                 {
+          [1655797580.944093][7331:7331] CHIP:DMG:                         AttributePathIB =
+          [1655797580.944150][7331:7331] CHIP:DMG:                         {
+          [1655797580.944211][7331:7331] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655797580.944274][7331:7331] CHIP:DMG:                                 Cluster = 0x8,
+          [1655797580.944335][7331:7331] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1655797580.944392][7331:7331] CHIP:DMG:                         }
+          [1655797580.944452][7331:7331] CHIP:DMG:
+          [1655797580.944513][7331:7331] CHIP:DMG:                         Data = 1,
+          [1655797580.944567][7331:7331] CHIP:DMG:                 },
+          [1655797580.944623][7331:7331] CHIP:DMG:
+          [1655797580.944667][7331:7331] CHIP:DMG:         ],
+          [1655797580.944721][7331:7331] CHIP:DMG:
+          [1655797580.944766][7331:7331] CHIP:DMG:         moreChunkedMessages = false,
+          [1655797580.944813][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797580.944855][7331:7331] CHIP:DMG: },
+          [1655797580.944986][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
 
-
-          [1652943666.780309][8499:8499] CHIP:DMG: WriteRequestMessage =
-          [1652943666.780349][8499:8499] CHIP:DMG: {
-          [1652943666.780387][8499:8499] CHIP:DMG:         suppressResponse = false,
-          [1652943666.780430][8499:8499] CHIP:DMG:         timedRequest = true,
-          [1652943666.780470][8499:8499] CHIP:DMG:         AttributeDataIBs =
-          [1652943666.780518][8499:8499] CHIP:DMG:         [
-          [1652943666.780558][8499:8499] CHIP:DMG:                 AttributeDataIB =
-          [1652943666.780609][8499:8499] CHIP:DMG:                 {
-          [1652943666.780653][8499:8499] CHIP:DMG:                         AttributePathIB =
-          [1652943666.780710][8499:8499] CHIP:DMG:                         {
-          [1652943666.780763][8499:8499] CHIP:DMG:                                 Endpoint = 0x1,
-          [1652943666.780824][8499:8499] CHIP:DMG:                                 Cluster = 0x8,
-          [1652943666.780883][8499:8499] CHIP:DMG:                                 Attribute = 0x0000_0011,
-          [1652943666.780934][8499:8499] CHIP:DMG:                         }
-          [1652943666.780993][8499:8499] CHIP:DMG:
-          [1652943666.781046][8499:8499] CHIP:DMG:                                 Data = 1,
-          [1652943666.781101][8499:8499] CHIP:DMG:                 },
-          [1652943666.781152][8499:8499] CHIP:DMG:
-          [1652943666.781191][8499:8499] CHIP:DMG:         ],
-          [1652943666.781238][8499:8499] CHIP:DMG:
-          [1652943666.781278][8499:8499] CHIP:DMG:         moreChunkedMessages = false,
-          [1652943666.781318][8499:8499] CHIP:DMG:         InteractionModelRevision = 1
-          [1652943666.781356][8499:8499] CHIP:DMG: },
 
           On DUT---
-          [1652943666.816563][34595:34600] CHIP:DMG:                         AttributePathIB =
-          [1652943666.816581][34595:34600] CHIP:DMG:                         {
-          [1652943666.816600][34595:34600] CHIP:DMG:                                 Endpoint = 0x1,
-          [1652943666.816617][34595:34600] CHIP:DMG:                                 Cluster = 0x8,
-          [1652943666.816637][34595:34600] CHIP:DMG:                                 Attribute = 0x0000_0011,
-          [1652943666.816653][34595:34600] CHIP:DMG:                         }
-          [1652943666.816676][34595:34600] CHIP:DMG:
-          [1652943666.816692][34595:34600] CHIP:DMG:                         StatusIB =
-          [1652943666.816710][34595:34600] CHIP:DMG:                         {
-          [1652943666.816727][34595:34600] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1652943666.816744][34595:34600] CHIP:DMG:                         },
+          [1655797580.953617][7000:7005] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1655797580.953672][7000:7005] CHIP:DMG: WriteResponseMessage =
+          [1655797580.953707][7000:7005] CHIP:DMG: {
+          [1655797580.953738][7000:7005] CHIP:DMG:         AttributeStatusIBs =
+          [1655797580.953782][7000:7005] CHIP:DMG:         [
+          [1655797580.953817][7000:7005] CHIP:DMG:                 AttributeStatusIB =
+          [1655797580.953856][7000:7005] CHIP:DMG:                 {
+          [1655797580.953893][7000:7005] CHIP:DMG:                         AttributePathIB =
+          [1655797580.953938][7000:7005] CHIP:DMG:                         {
+          [1655797580.953983][7000:7005] CHIP:DMG:                                 Endpoint = 0x1,
+          [1655797580.954032][7000:7005] CHIP:DMG:                                 Cluster = 0x8,
+          [1655797580.954079][7000:7005] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1655797580.954128][7000:7005] CHIP:DMG:                         }
+          [1655797580.954177][7000:7005] CHIP:DMG:
+          [1655797580.954220][7000:7005] CHIP:DMG:                         StatusIB =
+          [1655797580.954263][7000:7005] CHIP:DMG:                         {
+          [1655797580.954306][7000:7005] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1655797580.954351][7000:7005] CHIP:DMG:                         },
+          [1655797580.954394][7000:7005] CHIP:DMG:
+          [1655797580.954431][7000:7005] CHIP:DMG:                 },
+          [1655797580.954473][7000:7005] CHIP:DMG:
+          [1655797580.954507][7000:7005] CHIP:DMG:         ],
+          [1655797580.954554][7000:7005] CHIP:DMG:
+          [1655797580.954589][7000:7005] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797580.954623][7000:7005] CHIP:DMG: }
+          [1655797580.954714][7000:7005] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+
+          [1655797580.950146][7000:7005] CHIP:EM: Removed CHIP MessageCounter:266490918 from RetransTable on exchange 47847i
+          [1655797580.950211][7000:7005] CHIP:DMG: StatusResponseMessage =
+          [1655797580.950251][7000:7005] CHIP:DMG: {
+          [1655797580.950287][7000:7005] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1655797580.950324][7000:7005] CHIP:DMG:         InteractionModelRevision = 1
+          [1655797580.950357][7000:7005] CHIP:DMG: }
+          [1655797580.950393][7000:7005] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
       disabled: true
 
     - label:

@@ -55,8 +55,8 @@ public:
         mResolverProxy.SetCommissioningDelegate(delegate);
     }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
     static DiscoveryImplPlatform & GetInstance();
 

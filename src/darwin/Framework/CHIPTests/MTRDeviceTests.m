@@ -20,8 +20,8 @@
 
 // module headers
 #import <Matter/MTRAttributeCacheContainer.h>
-#import <Matter/MTRClustersObjc.h>
-#import <Matter/MTRDevice.h>
+#import <Matter/MTRBaseClusters.h>
+#import <Matter/MTRBaseDevice.h>
 #import <Matter/Matter.h>
 
 #import "MTRErrorTestUtils.h"
@@ -50,7 +50,7 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
-static MTRDevice * mConnectedDevice;
+static MTRBaseDevice * mConnectedDevice;
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
@@ -60,23 +60,23 @@ static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    [controller getDevice:kDeviceId
-                    queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            [expectation fulfill];
-            mConnectedDevice = device;
-        }];
+    [controller getBaseDevice:kDeviceId
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [expectation fulfill];
+                mConnectedDevice = device;
+            }];
 }
 
-static MTRDevice * GetConnectedDevice(void)
+static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
 }
 
 #ifdef DEBUG
-@interface MTRDevice (Test)
+@interface MTRBaseDevice (Test)
 - (void)failSubscribers:(dispatch_queue_t)clientQueue completion:(void (^)(void))completion;
 @end
 #endif
@@ -177,13 +177,13 @@ static MTRDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:kDeviceId
-                    queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            [connectionExpectation fulfill];
-            connectionExpectation = nil;
-        }];
+    [controller getBaseDevice:kDeviceId
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [connectionExpectation fulfill];
+                connectionExpectation = nil;
+            }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 }
 
@@ -224,7 +224,7 @@ static MTRDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device readAttributeWithEndpointId:nil
@@ -264,7 +264,7 @@ static MTRDevice * GetConnectedDevice(void)
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write LevelControl Brightness attribute"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * writeValue = [NSDictionary
@@ -307,7 +307,7 @@ static MTRDevice * GetConnectedDevice(void)
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * fields = @{
@@ -355,7 +355,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self initStack];
     [self waitForCommissionee];
 #endif
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     // Subscribe
@@ -498,7 +498,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"read failed"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device
@@ -527,7 +527,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write failed"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     NSDictionary * writeValue = [NSDictionary
@@ -560,31 +560,33 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 #endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    NSDictionary * fields = @{
-        @"type" : @"Structure",
-        @"value" : @[
-            @{ @"contextTag" : @0, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @0 } },
-            @{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
+    NSDictionary * fields = @ {
+@"type" :
+        @"Structure",
+@"value" :
+        @[
+@{ @"contextTag" : @0, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @0 } },
+@{ @"contextTag" : @1, @"data" : @ { @"type" : @"UnsignedInteger", @"value" : @10 } }
         ]
     };
     [device
-        invokeCommandWithEndpointId:@1
-                          clusterId:@8
-                          commandId:@40000
-                      commandFields:fields
-                 timedInvokeTimeout:nil
-                        clientQueue:queue
-                         completion:^(id _Nullable values, NSError * _Nullable error) {
-                             NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
+     invokeCommandWithEndpointId:@1
+     clusterId:@8
+     commandId:@40000
+     commandFields:fields
+     timedInvokeTimeout:nil
+     clientQueue:queue
+    completion:^(id _Nullable values, NSError * _Nullable error) {
+        NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
-                             XCTAssertNil(values);
-                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        XCTAssertNil(values);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
 
-                             [expectation fulfill];
-                         }];
+        [expectation fulfill];
+    }];
 
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
 }
@@ -607,7 +609,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [errorReportExpectation fulfill];
     };
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
@@ -653,7 +655,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
     [device readAttributeWithEndpointId:@1
@@ -691,7 +693,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForCommissionee];
 #endif
 
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
     NSLog(@"Deregistering report handlers...");
@@ -738,7 +740,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Invoke command to set the attribute to a known state
     XCTestExpectation * commandExpectation = [self expectationWithDescription:@"Command invoked"];
-    MTROnOff * cluster = [[MTROnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterOnOff * cluster = [[MTRBaseClusterOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     NSLog(@"Invoking command...");
@@ -756,15 +758,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Read cache
     NSLog(@"Reading from cache...");
     XCTestExpectation * cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [MTROnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                          endpoint:@1
-                                             queue:queue
-                                 completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                     NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                     XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                     XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
-                                     [cacheExpectation fulfill];
-                                 }];
+    [MTRBaseClusterOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
+                                                     endpoint:@1
+                                                        queue:queue
+                                            completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                                NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                                XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:YES]]);
+                                                [cacheExpectation fulfill];
+                                            }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Add another subscriber of the attribute to verify that attribute cache still works when there are other subscribers.
@@ -821,15 +823,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Read cache
     NSLog(@"Reading from cache...");
     cacheExpectation = [self expectationWithDescription:@"Attribute cache read"];
-    [MTROnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
-                                          endpoint:@1
-                                             queue:queue
-                                 completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-                                     NSLog(@"Read attribute cache value: %@, error: %@", value, err);
-                                     XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
-                                     XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
-                                     [cacheExpectation fulfill];
-                                 }];
+    [MTRBaseClusterOnOff readAttributeOnOffWithAttributeCache:attributeCacheContainer
+                                                     endpoint:@1
+                                                        queue:queue
+                                            completionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+                                                NSLog(@"Read attribute cache value: %@, error: %@", value, err);
+                                                XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:err], 0);
+                                                XCTAssertTrue([value isEqualToNumber:[NSNumber numberWithBool:NO]]);
+                                                [cacheExpectation fulfill];
+                                            }];
     [self waitForExpectations:[NSArray arrayWithObject:cacheExpectation] timeout:kTimeoutInSeconds];
 
     // Read from cache using generic path
@@ -944,7 +946,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self initStack];
     [self waitForCommissionee];
 #endif
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
     [device deregisterReportHandlersWithClientQueue:queue
@@ -1052,7 +1054,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self initStack];
     [self waitForCommissionee];
 #endif
-    MTRDevice * device = GetConnectedDevice();
+    MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
     NSLog(@"Deregistering report handlers...");
@@ -1229,7 +1231,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 @end
 
-@interface MTRDevice (Test)
+@interface MTRBaseDevice (Test)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
@@ -1243,7 +1245,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input =
         [NSDictionary dictionaryWithObjectsAndKeys:@"SignedInteger", @"type", [NSNumber numberWithInteger:-713], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1254,7 +1256,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input = [NSDictionary
         dictionaryWithObjectsAndKeys:@"SignedInteger", @"type", [NSNumber numberWithInteger:-0x7000111122223333ll], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1265,7 +1267,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input =
         [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithInteger:1025], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1276,7 +1278,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input = [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
                                          [NSNumber numberWithUnsignedLongLong:0xCCCCDDDDEEEEFFFFull], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1287,7 +1289,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input =
         [NSDictionary dictionaryWithObjectsAndKeys:@"Boolean", @"type", [NSNumber numberWithBool:YES], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1297,7 +1299,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)testUTF8String
 {
     NSDictionary * input = [NSDictionary dictionaryWithObjectsAndKeys:@"UTF8String", @"type", @"Hello World", @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1309,7 +1311,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     const uint8_t data[] = { 0x00, 0xF2, 0x63 };
     NSDictionary * input = [NSDictionary
         dictionaryWithObjectsAndKeys:@"OctetString", @"type", [NSData dataWithBytes:data length:sizeof(data)], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1320,7 +1322,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input =
         [NSDictionary dictionaryWithObjectsAndKeys:@"Float", @"type", [NSNumber numberWithFloat:0.1245], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1332,7 +1334,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 {
     NSDictionary * input =
         [NSDictionary dictionaryWithObjectsAndKeys:@"Double", @"type", [NSNumber numberWithFloat:0.1245], @"value", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1343,7 +1345,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)testNull
 {
     NSDictionary * input = [NSDictionary dictionaryWithObjectsAndKeys:@"Null", @"type", nil];
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:input];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1364,7 +1366,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
     NSDictionary * inputValue = @{ @"type" : @"Structure", @"value" : inputFields };
 
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:inputValue];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:inputValue];
     NSLog(@"Conversion input: %@\nOutput: %@", inputValue, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
@@ -1379,7 +1381,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ];
     NSDictionary * inputValue = @{ @"type" : @"Array", @"value" : inputFields };
 
-    id output = [MTRDevice CHIPEncodeAndDecodeNSObject:inputValue];
+    id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:inputValue];
     NSLog(@"Conversion input: %@\nOutput: %@", inputValue, output);
     XCTAssertNotNil(output);
     XCTAssertTrue([output isKindOfClass:[NSDictionary class]]);
