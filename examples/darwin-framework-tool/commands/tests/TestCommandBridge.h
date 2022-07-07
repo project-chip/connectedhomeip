@@ -28,11 +28,9 @@
 #include <lib/support/UnitTestUtils.h>
 #include <map>
 #include <string>
-#include <zap-generated/cluster/MTRTestClustersObjc.h>
 
 #import <Matter/Matter.h>
 
-#import "MTRDevice_Externs.h"
 #import "MTRError_Utils.h"
 
 class TestCommandBridge;
@@ -123,21 +121,20 @@ public:
         // will just hand it right back to us without establishing a new CASE
         // session.
         if (GetDevice(identity) != nil) {
-            [GetDevice(identity) invalidateCASESession];
             mConnectedDevices[identity] = nil;
         }
 
-        [controller getDevice:value.nodeId
-                        queue:mCallbackQueue
-            completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-                if (error != nil) {
-                    SetCommandExitStatus(error);
-                    return;
-                }
+        [controller getBaseDevice:value.nodeId
+                            queue:mCallbackQueue
+                completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                    if (error != nil) {
+                        SetCommandExitStatus(error);
+                        return;
+                    }
 
-                mConnectedDevices[identity] = device;
-                NextTest();
-            }];
+                    mConnectedDevices[identity] = device;
+                    NextTest();
+                }];
         return CHIP_NO_ERROR;
     }
 
@@ -179,7 +176,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    MTRDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -461,7 +458,7 @@ private:
     TestPairingDelegate * _Nonnull mPairingDelegate;
 
     // Set of our connected devices, keyed by identity.
-    std::map<std::string, MTRDevice *> mConnectedDevices;
+    std::map<std::string, MTRBaseDevice *> mConnectedDevices;
 };
 
 NS_ASSUME_NONNULL_BEGIN
