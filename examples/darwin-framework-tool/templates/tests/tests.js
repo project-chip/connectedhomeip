@@ -45,17 +45,17 @@ function getTests() {
   // TODO: TestGroupMessaging does not work on Darwin for now.
   tests.disable('TestGroupMessaging');
 
-  // TODO: Test_TC_DIAG_TH_NW_1_1 does not work on Darwin for now.
-  tests.disable('Test_TC_DIAG_TH_NW_1_1');
-
-  // TODO: Test_TC_DIAG_TH_NW_1_2 does not work on Darwin for now.
-  tests.disable('Test_TC_DIAG_TH_NW_1_2');
+  // TODO: Test_TC_DIAG_TH_NW_2_1 does not work on Darwin for now.
+  tests.disable('Test_TC_DIAG_TH_NW_2_1');
 
   // TODO: Test_TC_DIAG_TH_NW_2_2 does not work on Darwin for now.
   tests.disable('Test_TC_DIAG_TH_NW_2_2');
 
   // TODO: Test_TC_DIAG_TH_NW_2_3 does not work on Darwin for now.
   tests.disable('Test_TC_DIAG_TH_NW_2_3');
+
+  // TODO: Test_TC_DIAG_TH_NW_2_4 does not work on Darwin for now.
+  tests.disable('Test_TC_DIAG_TH_NW_2_4');
 
   // TODO: Test_TC_CC_9_1 does not work on Darwin for now.
   // But is disabled in CI, so we can't disable it here.

@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: "[TC-IDM-2.1] Read Request Action from DUT to TH [DUT - Controller]"
+name: 20.2.1. [TC-IDM-2.1] Read Request Action from DUT to TH [DUT - Controller]
 
 config:
     nodeId: 0x12344321
@@ -23,224 +23,458 @@ config:
 tests:
     - label:
           "DUT sends the Read Request Message to the TH to read one attribute on
-          a given cluster and endpoint. The Message should contain one valid
-          CommandDataIB, which has the specific Endpoint, Specific Cluster and
-          Specific Attribute. On receipt of this message, TH should send a
-          report data action with the attribute value to the DUT."
+          a given cluster and endpoint. AttributePath = [[Endpoint = Specific
+          Endpoint, Cluster = Specific ClusterID, Attribute = Specific
+          Attribute]] On receipt of this message, TH should send a report data
+          action with the attribute value to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
-          sudo ./chip-tool identify read identify-time 1 1
+          ./chip-tool identify read identify-time 1 1
+
+          On TH
+          [1652956326.948377][12333:12333] CHIP:DMG: ReadRequestMessage =
+          [1652956326.948411][12333:12333] CHIP:DMG: {
+          [1652956326.948441][12333:12333] CHIP:DMG:         AttributePathIBs =
+          [1652956326.948476][12333:12333] CHIP:DMG:         [
+          [1652956326.948508][12333:12333] CHIP:DMG:                 AttributePathIB =
+          [1652956326.948548][12333:12333] CHIP:DMG:                 {
+          [1652956326.948585][12333:12333] CHIP:DMG:                         Endpoint = 0x1,
+          [1652956326.948628][12333:12333] CHIP:DMG:                         Cluster = 0x3,
+          [1652956326.948675][12333:12333] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1652956326.948719][12333:12333] CHIP:DMG:                 }
+          [1652956326.948760][12333:12333] CHIP:DMG:
+          [1652956326.948797][12333:12333] CHIP:DMG:         ],
+          [1652956326.948834][12333:12333] CHIP:DMG:
+          [1652956326.948869][12333:12333] CHIP:DMG:         isFabricFiltered = true,
+          [1652956326.948903][12333:12333] CHIP:DMG:         InteractionModelRevision = 1
+          [1652956326.948935][12333:12333] CHIP:DMG: },
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH. The Message should read
-          all attributes on a given cluster and Endpoint AttributePath =
-          [[Endpoint = Endpoint1, Cluster = ClusterID]] On receipt of this
-          message, TH should send a report data action with the attribute value
+          "DUT sends the Read Request Message to the TH to read all attributes
+          on a given cluster and Endpoint AttributePath = [[Endpoint = Specific
+          Endpoint, Cluster = Specific ClusterID]] On receipt of this message,
+          TH should send a report data action with the attribute value to the
+          DUT."
+      verification: |
+          ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
+
+          On TH
+          [1653564688.431433][29848:29848] CHIP:IM: Received Read request
+          [1653564688.431527][29848:29848] CHIP:DMG: ReadRequestMessage =
+          [1653564688.431582][29848:29848] CHIP:DMG: {
+          [1653564688.431628][29848:29848] CHIP:DMG:         AttributePathIBs =
+          [1653564688.431682][29848:29848] CHIP:DMG:         [
+          [1653564688.431732][29848:29848] CHIP:DMG:                 AttributePathIB =
+          [1653564688.431794][29848:29848] CHIP:DMG:                 {
+          [1653564688.431859][29848:29848] CHIP:DMG:                         Endpoint = 0x0,
+          [1653564688.431918][29848:29848] CHIP:DMG:                         Cluster = 0x3,
+          [1653564688.431984][29848:29848] CHIP:DMG:                 }
+          [1653564688.432048][29848:29848] CHIP:DMG:
+          [1653564688.432105][29848:29848] CHIP:DMG:         ],
+          [1653564688.432164][29848:29848] CHIP:DMG:
+          [1653564688.432218][29848:29848] CHIP:DMG:         isFabricFiltered = true,
+          [1653564688.432270][29848:29848] CHIP:DMG:         InteractionModelRevision = 1
+          [1653564688.432319][29848:29848] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read all attributes
+          in all clusters and all endpoints Path = [[ ]] On receipt of this
+          message, TH should send a report data action with the attribute values
           to the DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
 
-          sudo ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0
+          Verify when we send this command from DUT to TH 1st till will send Read request message then it will start to exchange messages.
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read a specific
+          attribute from all endpoints and all clusters. AttributePath = [[
+          Attribute = Specific Attribute]] On receipt of this message, TH should
+          send a report data action with the attribute value to the DUT."
+      verification: |
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0xFFFF
+
+
+          [1653564959.547874][29848:29848] CHIP:IM: Received Read request
+          [1653564959.547950][29848:29848] CHIP:DMG: ReadRequestMessage =
+          [1653564959.548001][29848:29848] CHIP:DMG: {
+          [1653564959.548042][29848:29848] CHIP:DMG:         AttributePathIBs =
+          [1653564959.548089][29848:29848] CHIP:DMG:         [
+          [1653564959.548133][29848:29848] CHIP:DMG:                 AttributePathIB =
+          [1653564959.548203][29848:29848] CHIP:DMG:                 {
+          [1653564959.548259][29848:29848] CHIP:DMG:                         Attribute = 0x0000_FFFD,
+          [1653564959.548328][29848:29848] CHIP:DMG:                 }
+          [1653564959.548379][29848:29848] CHIP:DMG:
+          [1653564959.548442][29848:29848] CHIP:DMG:         ],
+          [1653564959.548493][29848:29848] CHIP:DMG:
+          [1653564959.548559][29848:29848] CHIP:DMG:         isFabricFiltered = true,
+          [1653564959.548606][29848:29848] CHIP:DMG:         InteractionModelRevision = 1
+          [1653564959.548665][29848:29848] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read all attributes
+          from a specific cluster on all endpoints AttributePath = [[ Cluster =
+          Specific ClusterID]] On receipt of this message, TH should send a
+          report data action with the attribute value to the DUT."
+      verification: |
+          ./chip-tool any read-by-id 0x03 0xFFFFFFFF  1 0xFFFF
+
+          [1653565096.692999][29848:29848] CHIP:IM: Received Read request
+          [1653565096.693082][29848:29848] CHIP:DMG: ReadRequestMessage =
+          [1653565096.693129][29848:29848] CHIP:DMG: {
+          [1653565096.693170][29848:29848] CHIP:DMG:         AttributePathIBs =
+          [1653565096.693215][29848:29848] CHIP:DMG:         [
+          [1653565096.693258][29848:29848] CHIP:DMG:                 AttributePathIB =
+          [1653565096.693308][29848:29848] CHIP:DMG:                 {
+          [1653565096.693356][29848:29848] CHIP:DMG:                         Cluster = 0x3,
+          [1653565096.693411][29848:29848] CHIP:DMG:                 }
+          [1653565096.693461][29848:29848] CHIP:DMG:
+          [1653565096.693511][29848:29848] CHIP:DMG:         ],
+          [1653565096.693561][29848:29848] CHIP:DMG:
+          [1653565096.693610][29848:29848] CHIP:DMG:         isFabricFiltered = true,
+          [1653565096.693657][29848:29848] CHIP:DMG:         InteractionModelRevision = 1
+          [1653565096.693699][29848:29848] CHIP:DMG: },
+          [1653565096.693821][29848:29848] CHIP:DMG: IM RH moving to [GeneratingReports]
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read a specific
+          attribute from a given cluster on all endpoints. AttributePath = [[
+          Cluster = Specific Cluster, Attribute = specific attribute]] On
+          receipt of this message, TH should send a report data action with the
+          attribute value to the DUT."
+      verification: |
+          ./chip-tool any read-by-id 0x03 0x01  1 0xFFFF
+
+          [1653039253.620571][2293:2293] CHIP:IM: Received Read request
+          [1653039253.620624][2293:2293] CHIP:DMG: ReadRequestMessage =
+          [1653039253.620651][2293:2293] CHIP:DMG: {
+          [1653039253.620673][2293:2293] CHIP:DMG:         AttributePathIBs =
+          [1653039253.620699][2293:2293] CHIP:DMG:         [
+          [1653039253.620723][2293:2293] CHIP:DMG:                 AttributePathIB =
+          [1653039253.620753][2293:2293] CHIP:DMG:                 {
+          [1653039253.620781][2293:2293] CHIP:DMG:                         Cluster = 0x3,
+          [1653039253.620811][2293:2293] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653039253.620843][2293:2293] CHIP:DMG:                 }
+          [1653039253.620873][2293:2293] CHIP:DMG:
+          [1653039253.620900][2293:2293] CHIP:DMG:         ],
+          [1653039253.620928][2293:2293] CHIP:DMG:
+          [1653039253.620955][2293:2293] CHIP:DMG:         isFabricFiltered = true,
+          [1653039253.620980][2293:2293] CHIP:DMG:         InteractionModelRevision = 1
+          [1653039253.621002][2293:2293] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to read all attributes
+          from all clusters at a given endpoint. AttributePath = [[ Endpoint =
+          Specific Endpoint]] On receipt of this message, TH should send a
+          report data action with the attribute value to the DUT."
+      verification: |
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 1
+
+          [1653565163.290886][29848:29848] CHIP:IM: Received Read request
+          [1653565163.290969][29848:29848] CHIP:DMG: ReadRequestMessage =
+          [1653565163.291016][29848:29848] CHIP:DMG: {
+          [1653565163.291056][29848:29848] CHIP:DMG:         AttributePathIBs =
+          [1653565163.291144][29848:29848] CHIP:DMG:         [
+          [1653565163.291192][29848:29848] CHIP:DMG:                 AttributePathIB =
+          [1653565163.291252][29848:29848] CHIP:DMG:                 {
+          [1653565163.291306][29848:29848] CHIP:DMG:                         Endpoint = 0x1,
+          [1653565163.291358][29848:29848] CHIP:DMG:                 }
+          [1653565163.291412][29848:29848] CHIP:DMG:
+          [1653565163.291461][29848:29848] CHIP:DMG:         ],
+          [1653565163.291515][29848:29848] CHIP:DMG:
+          [1653565163.291564][29848:29848] CHIP:DMG:         isFabricFiltered = true,
+          [1653565163.291610][29848:29848] CHIP:DMG:         InteractionModelRevision = 1
+          [1653565163.291653][29848:29848] CHIP:DMG: },
+      disabled: true
+
+    - label:
+          "DUT sends the Read Request Message to the TH to a specific endpoint
+          to read a particular attribute from all the clusters at that endpoint
+          AttributePath = [[ Endpoint = Specific Endpoint, Attribute = specific
+          attribute]] On receipt of this message, TH should send a report data
+          action with the attribute value to the DUT."
+      verification: |
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
+
+          [1652958379.699028][12447:12447] CHIP:IM: Received Read request
+          [1652958379.699103][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958379.699145][12447:12447] CHIP:DMG: {
+          [1652958379.699182][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958379.699224][12447:12447] CHIP:DMG:         [
+          [1652958379.699264][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958379.699319][12447:12447] CHIP:DMG:                 {
+          [1652958379.699369][12447:12447] CHIP:DMG:                         Endpoint = 0x0,
+          [1652958379.699427][12447:12447] CHIP:DMG:                         Attribute = 0x0000_FFFD,
+          [1652958379.699477][12447:12447] CHIP:DMG:                 }
+          [1652958379.699520][12447:12447] CHIP:DMG:
+          [1652958379.699566][12447:12447] CHIP:DMG:         ],
+          [1652958379.699612][12447:12447] CHIP:DMG:
+          [1652958379.699655][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958379.699697][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958379.699734][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type bool."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool onoff read on-off 1 1
 
-          sudo ./chip-tool onoff read on-off 1 1
+          [1652958484.870200][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958484.870244][12447:12447] CHIP:DMG: {
+          [1652958484.870281][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958484.870323][12447:12447] CHIP:DMG:         [
+          [1652958484.870363][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958484.870418][12447:12447] CHIP:DMG:                 {
+          [1652958484.870465][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652958484.870516][12447:12447] CHIP:DMG:                         Cluster = 0x6,
+          [1652958484.870573][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1652958484.870616][12447:12447] CHIP:DMG:                 }
+          [1652958484.870658][12447:12447] CHIP:DMG:
+          [1652958484.870699][12447:12447] CHIP:DMG:         ],
+          [1652958484.870742][12447:12447] CHIP:DMG:
+          [1652958484.870819][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958484.870861][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958484.870899][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type string."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool modeselect read description  1 1
 
-          sudo ./chip-tool modeselect read description  1 1
+          [1652958540.740917][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958540.740976][12447:12447] CHIP:DMG: {
+          [1652958540.741048][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958540.741104][12447:12447] CHIP:DMG:         [
+          [1652958540.741171][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958540.741238][12447:12447] CHIP:DMG:                 {
+          [1652958540.741318][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652958540.741387][12447:12447] CHIP:DMG:                         Cluster = 0x50,
+          [1652958540.741472][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1652958540.741535][12447:12447] CHIP:DMG:                 }
+          [1652958540.741618][12447:12447] CHIP:DMG:
+          [1652958540.741676][12447:12447] CHIP:DMG:         ],
+          [1652958540.741753][12447:12447] CHIP:DMG:
+          [1652958540.741808][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958540.741878][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958540.741927][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type unsigned integer."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool any read-by-id 0x3 0x1 1 0
 
-          sudo ./chip-tool any read-by-id 0x3 0x1 1 0
+          [1652959133.781403][12447:12447] CHIP:IM: Received Read request
+          [1652959133.781479][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652959133.781522][12447:12447] CHIP:DMG: {
+          [1652959133.781557][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652959133.781601][12447:12447] CHIP:DMG:         [
+          [1652959133.781640][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652959133.781690][12447:12447] CHIP:DMG:                 {
+          [1652959133.781735][12447:12447] CHIP:DMG:                         Endpoint = 0x0,
+          [1652959133.781786][12447:12447] CHIP:DMG:                         Cluster = 0x3,
+          [1652959133.781843][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1652959133.781890][12447:12447] CHIP:DMG:                 }
+          [1652959133.781940][12447:12447] CHIP:DMG:
+          [1652959133.781982][12447:12447] CHIP:DMG:         ],
+          [1652959133.782028][12447:12447] CHIP:DMG:
+          [1652959133.782071][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652959133.782112][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652959133.782150][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type signed integer."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool pressuremeasurement read measured-value 1 1
 
-          sudo ./chip-tool pressuremeasurement read measured-value 1 1
+          [1652958611.986295][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958611.986360][12447:12447] CHIP:DMG: {
+          [1652958611.986400][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958611.986447][12447:12447] CHIP:DMG:         [
+          [1652958611.986511][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958611.986567][12447:12447] CHIP:DMG:                 {
+          [1652958611.986637][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652958611.986698][12447:12447] CHIP:DMG:                         Cluster = 0x403,
+          [1652958611.986963][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1652958611.987021][12447:12447] CHIP:DMG:                 }
+          [1652958611.987095][12447:12447] CHIP:DMG:
+          [1652958611.987162][12447:12447] CHIP:DMG:         ],
+          [1652958611.987216][12447:12447] CHIP:DMG:
+          [1652958611.987279][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958611.987328][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958611.987386][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type floating point."
       verification: |
-          Currently the Spec is not supporting for this data type.
+          DUT implementation required to verify read an attribute of data type Float
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type Octet String."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          sudo ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+          [1652958890.430648][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958890.430703][12447:12447] CHIP:DMG: {
+          [1652958890.430790][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958890.430850][12447:12447] CHIP:DMG:         [
+          [1652958890.430902][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958890.430960][12447:12447] CHIP:DMG:                 {
+          [1652958890.431018][12447:12447] CHIP:DMG:                         Endpoint = 0x0,
+          [1652958890.431078][12447:12447] CHIP:DMG:                         Cluster = 0x3e,
+          [1652958890.431143][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0004,
+          [1652958890.431203][12447:12447] CHIP:DMG:                 }
+          [1652958890.431267][12447:12447] CHIP:DMG:
+          [1652958890.431324][12447:12447] CHIP:DMG:         ],
+          [1652958890.431384][12447:12447] CHIP:DMG:
+          [1652958890.431439][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958890.431491][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958890.431540][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type Struct."
       verification: |
-          In case of chip tool, here is an example command to use
+          sudo ./chip-tool  generalcommissioning read  basic-commissioning-info   1 0
 
-          Currently the Spec is not supporting for this data type.
+          [1653565636.677324][29848:29848] CHIP:IM: Received Read request
+          [1653565636.677421][29848:29848] CHIP:DMG: ReadRequestMessage =
+          [1653565636.677475][29848:29848] CHIP:DMG: {
+          [1653565636.677519][29848:29848] CHIP:DMG:         AttributePathIBs =
+          [1653565636.677572][29848:29848] CHIP:DMG:         [
+          [1653565636.677621][29848:29848] CHIP:DMG:                 AttributePathIB =
+          [1653565636.677682][29848:29848] CHIP:DMG:                 {
+          [1653565636.677744][29848:29848] CHIP:DMG:                         Endpoint = 0x0,
+          [1653565636.677815][29848:29848] CHIP:DMG:                         Cluster = 0x30,
+          [1653565636.677886][29848:29848] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653565636.677946][29848:29848] CHIP:DMG:                 }
+          [1653565636.678007][29848:29848] CHIP:DMG:
+          [1653565636.678063][29848:29848] CHIP:DMG:         ],
+          [1653565636.678121][29848:29848] CHIP:DMG:
+          [1653565636.678176][29848:29848] CHIP:DMG:         isFabricFiltered = true,
+          [1653565636.678227][29848:29848] CHIP:DMG:         InteractionModelRevision = 1
+          [1653565636.678275][29848:29848] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type List."
       verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool modeselect read  supported-modes 1 1
+          ./chip-tool modeselect read  supported-modes 1 1
+          [1652958955.872707][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958955.872770][12447:12447] CHIP:DMG: {
+          [1652958955.872825][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958955.872888][12447:12447] CHIP:DMG:         [
+          [1652958955.872947][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958955.873021][12447:12447] CHIP:DMG:                 {
+          [1652958955.873095][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652958955.873182][12447:12447] CHIP:DMG:                         Cluster = 0x50,
+          [1652958955.873267][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1652958955.873346][12447:12447] CHIP:DMG:                 }
+          [1652958955.873420][12447:12447] CHIP:DMG:
+          [1652958955.873488][12447:12447] CHIP:DMG:         ],
+          [1652958955.873555][12447:12447] CHIP:DMG:
+          [1652958955.873619][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958955.873681][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958955.873738][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type enum."
       verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
+          ./chip-tool  occupancysensing read   occupancy-sensor-type 1 1
+          [1652958690.943104][12447:12447] CHIP:IM: Received Read request
+          [1652958690.943189][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958690.943236][12447:12447] CHIP:DMG: {
+          [1652958690.943278][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958690.943325][12447:12447] CHIP:DMG:         [
+          [1652958690.943370][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958690.943425][12447:12447] CHIP:DMG:                 {
+          [1652958690.943481][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652958690.943541][12447:12447] CHIP:DMG:                         Cluster = 0x406,
+          [1652958690.943600][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1652958690.943659][12447:12447] CHIP:DMG:                 }
+          [1652958690.943715][12447:12447] CHIP:DMG:
+          [1652958690.943766][12447:12447] CHIP:DMG:         ],
+          [1652958690.943817][12447:12447] CHIP:DMG:
+          [1652958690.943865][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958690.943910][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958690.943953][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "[Optional] DUT sends the Read Request Message to the TH to read an
           attribute of data type bitmap."
       verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool levelcontrol read options 1 1
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH to read any attribute TH
-          responds with the report data action with the right attribute value
-          and sets the SuppressResponse field is set to True"
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          ./chip-tool basic read vendor-name 1 0
+          ./chip-tool levelcontrol read options 1 1
+          [1652958784.685666][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652958784.685715][12447:12447] CHIP:DMG: {
+          [1652958784.685755][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652958784.685802][12447:12447] CHIP:DMG:         [
+          [1652958784.685848][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652958784.685904][12447:12447] CHIP:DMG:                 {
+          [1652958784.685960][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652958784.686020][12447:12447] CHIP:DMG:                         Cluster = 0x8,
+          [1652958784.686081][12447:12447] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1652958784.686140][12447:12447] CHIP:DMG:                 }
+          [1652958784.686196][12447:12447] CHIP:DMG:
+          [1652958784.686243][12447:12447] CHIP:DMG:         ],
+          [1652958784.686294][12447:12447] CHIP:DMG:
+          [1652958784.686341][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652958784.686387][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652958784.686431][12447:12447] CHIP:DMG: },
       disabled: true
 
     - label:
           "DUT sends the Read Request Message to the TH to read an attribute
           Repeat the above steps 3 times."
       verification: |
-          In case of chip tool, here is an example command to use
+          ./chip-tool  occupancysensing read occupancy    1 1
+          [1652959073.822787][12447:12447] CHIP:IM: Received Read request
+          [1652959073.822884][12447:12447] CHIP:DMG: ReadRequestMessage =
+          [1652959073.822938][12447:12447] CHIP:DMG: {
+          [1652959073.822985][12447:12447] CHIP:DMG:         AttributePathIBs =
+          [1652959073.823043][12447:12447] CHIP:DMG:         [
+          [1652959073.823094][12447:12447] CHIP:DMG:                 AttributePathIB =
+          [1652959073.823156][12447:12447] CHIP:DMG:                 {
+          [1652959073.823222][12447:12447] CHIP:DMG:                         Endpoint = 0x1,
+          [1652959073.823296][12447:12447] CHIP:DMG:                         Cluster = 0x406,
+          [1652959073.823370][12447:12447] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1652959073.823432][12447:12447] CHIP:DMG:                 }
+          [1652959073.823496][12447:12447] CHIP:DMG:
+          [1652959073.823553][12447:12447] CHIP:DMG:         ],
+          [1652959073.823617][12447:12447] CHIP:DMG:
+          [1652959073.823672][12447:12447] CHIP:DMG:         isFabricFiltered = true,
+          [1652959073.823725][12447:12447] CHIP:DMG:         InteractionModelRevision = 1
+          [1652959073.823773][12447:12447] CHIP:DMG: },
 
-          sudo ./chip-tool  occupancysensing read occupancy    1 1
-           sudo ./chip-tool  occupancysensing read occupancy    1 1
+           ./chip-tool  occupancysensing read occupancy    1 1
 
-
-           sudo ./chip-tool  occupancysensing read occupancy    1 1
+           ./chip-tool  occupancysensing read occupancy    1 1
       disabled: true
 
     - label:
-          "DUT sends the Read Request Message to the TH to read an attribute
-          data or event data which is large in size For every chunked data
-          message received, DUT sends a status response."
+          "DUT sends the Read Request Message to the TH to read
+          something(Attribute) which is larger than 1 MTU(1280 bytes) and per
+          spec can be chunked. For every chunked data message received, except
+          the last one, DUT sends a status response."
       verification: |
-          Add multiple admins on to the node (say 5 , if device supports) and read trusted-root-certificates  attribute
-
-          In case of chip tool, here is an example command to use
-
-          sudo ./out/debug/chip-tool operationalcredentials read trusted-root-certificates 5 0
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH to read any data which
-          is larger than 1 MTU(1280 bytes) The read can be done on any attribute
-          data or event data which is of type list and is greater than 1 MTU in
-          size or a set of attributes whose total size is greater than 1 MTU.
-          For every chunked data message received, DUT sends a status response."
-      verification: |
-          Out of Scope for TE8
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH. The Message should
-          contain one valid CommandDataIB, which has the AttributePath = [[ ]]
-          On receipt of this message, TH should send a report data action with
-          the attribute value to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool colorcontrol read current-hue  1 1
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH. The Message should
-          contain one valid CommandDataIB, which has the AttributePath = [[
-          Attribute = specific attribute]] On receipt of this message, TH should
-          send a report data action with the attribute value to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool any read-by-id 0xFFFFFFFF 0x0 1 0xFFFF
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH. The Message should
-          contain one valid CommandDataIB, which has the AttributePath = [[
-          Cluster = Specific Cluster]] On receipt of this message, TH should
-          send a report data action with the attribute value to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool any read-by-id 0x3 0xFFFFFFFF 1 0xFFFF
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH. The Message should
-          contain one valid CommandDataIB, which has the AttributePath = [[
-          Cluster = Specific Cluster, Attribute = specific attribute]] On
-          receipt of this message, TH should send a report data action with the
-          attribute value to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool any read-by-id 0x3 0x1 1 0xFFFF
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH. The Message should
-          contain one valid CommandDataIB, which has the AttributePath = [[
-          Endpoint = Specific Endpoint]] On receipt of this message, TH should
-          send a report data action with the attribute value to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0
-      disabled: true
-
-    - label:
-          "DUT sends the Read Request Message to the TH. The Message should
-          contain one valid CommandDataIB, which has the AttributePath = [[
-          Endpoint = Specific Endpoint, Attribute = specific attribute]] On
-          receipt of this message, TH should send a report data action with the
-          attribute value to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool levelcontrol read min-level   1 1
+          DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
       disabled: true

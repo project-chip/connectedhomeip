@@ -47,18 +47,8 @@ void TestTask(void * pvParameter)
     }
 }
 
-int main(void)
+void Application_Init(void)
 {
-
-    int result;
-
-    /* Initialize Qorvo stack */
-    result = qvCHIP_init();
-    if (result < 0)
-    {
-        goto exit;
-    }
-
     /* Launch application task */
     qvCHIP_Printf(LOG_MODULE_ID, "============================");
     qvCHIP_Printf(LOG_MODULE_ID, "Qorvo " APP_NAME " Launching");
@@ -66,6 +56,20 @@ int main(void)
 
     // Run tests
     xTaskCreateStatic(TestTask, APP_NAME, 2048, NULL, 1, appStack, &appTaskStruct);
+}
+
+int main(void)
+{
+
+    int result;
+
+    /* Initialize Qorvo stack */
+    result = qvCHIP_init(Application_Init);
+    if (result < 0)
+    {
+        goto exit;
+    }
+
     qvCHIP_Printf(LOG_MODULE_ID, "Starting FreeRTOS scheduler");
     vTaskStartScheduler();
 

@@ -342,7 +342,7 @@ public:
         virtual void Release() {}
 
         virtual CHIP_ERROR Init() { return CHIP_NO_ERROR; }
-        virtual CHIP_ERROR Finish() { return CHIP_NO_ERROR; }
+        virtual void Finish() {}
 
         // Capabilities
         virtual CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const
@@ -430,7 +430,7 @@ public:
     /**
      * Deinitialize the access control module. Must be called when finished.
      */
-    CHIP_ERROR Finish();
+    void Finish();
 
     // Capabilities
     CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const

@@ -2086,6 +2086,9 @@ server cluster WindowCovering = 258 {
   readonly attribute OperationalStatus operationalStatus = 10;
   readonly attribute EndProductType endProductType = 13;
   attribute access(write: manage) Mode mode = 23;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -3590,6 +3593,9 @@ endpoint 1 {
     ram      attribute operationalStatus;
     ram      attribute endProductType;
     persist  attribute mode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
   }

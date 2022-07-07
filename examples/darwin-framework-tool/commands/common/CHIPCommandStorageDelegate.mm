@@ -1,8 +1,10 @@
 #include "CHIPCommandStorageDelegate.h"
 
+#import <Matter/Matter.h>
+
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 
-id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
+id MTRGetDomainValueForKey(NSString * domain, NSString * key)
 {
     id value = (id) CFBridgingRelease(CFPreferencesCopyAppValue((CFStringRef) key, (CFStringRef) domain));
     if (value) {
@@ -11,13 +13,13 @@ id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
     return nil;
 }
 
-BOOL CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value)
+BOOL MTRSetDomainValueForKey(NSString * domain, NSString * key, id value)
 {
     CFPreferencesSetAppValue((CFStringRef) key, (__bridge CFPropertyListRef _Nullable)(value), (CFStringRef) domain);
     return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
 }
 
-BOOL CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
+BOOL MTRRemoveDomainValueForKey(NSString * domain, NSString * key)
 {
     CFPreferencesSetAppValue((CFStringRef) key, nullptr, (CFStringRef) domain);
     return CFPreferencesAppSynchronize((CFStringRef) domain) == true;
@@ -40,7 +42,7 @@ BOOL CHIPClearAllDomain(NSString * domain)
     NSLog(@"Removing keys: %@ %@", allKeys, domain);
     for (id key in allKeys) {
         NSLog(@"Removing key: %@", key);
-        if (!CHIPRemoveDomainValueForKey(domain, (NSString *) key)) {
+        if (!MTRRemoveDomainValueForKey(domain, (NSString *) key)) {
             return NO;
         }
     }
@@ -58,7 +60,7 @@ BOOL CHIPClearAllDomain(NSString * domain)
 
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {
-    NSData * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    NSData * value = MTRGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
@@ -70,10 +72,10 @@ BOOL CHIPClearAllDomain(NSString * domain)
 
 - (BOOL)removeStorageDataForKey:(NSString *)key
 {
-    if (CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key) == nil) {
+    if (MTRGetDomainValueForKey(kCHIPToolDefaultsDomain, key) == nil) {
         return NO;
     }
-    return CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    return MTRRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
 }
 
 @end

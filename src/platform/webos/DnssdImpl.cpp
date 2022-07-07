@@ -342,7 +342,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR MdnsAvahi::Shutdown()
+void MdnsAvahi::Shutdown()
 {
     if (mGroup)
     {
@@ -354,7 +354,6 @@ CHIP_ERROR MdnsAvahi::Shutdown()
         avahi_client_free(mClient);
         mClient = nullptr;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
@@ -820,9 +819,9 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
+void ChipDnssdShutdown()
 {
-    return MdnsAvahi::GetInstance().Shutdown();
+    MdnsAvahi::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)

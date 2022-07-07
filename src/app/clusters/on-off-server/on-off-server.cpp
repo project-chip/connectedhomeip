@@ -580,12 +580,8 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint)
 {
-    if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id))
-    {
-        return emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id);
-    }
-
-    return false;
+    return !emberAfIsKnownVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id) &&
+        !emberAfIsKnownVolatileAttribute(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id);
 }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 

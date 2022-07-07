@@ -32,18 +32,21 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
+      PICS: MC_MEDIAPLAYBACK.S.C0001
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Reads the CurrentState attribute"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Sends a Play command"
+      PICS: MC_MEDIAPLAYBACK.S.C0000
       command: "Play"
       response:
           values:
@@ -62,12 +65,14 @@ tests:
                 value: "y"
 
     - label: "Reads the playback state attribute"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
     - label: "sends a Pause command"
+      PICS: MC_MEDIAPLAYBACK.S.C0001
       command: "Pause"
       response:
           values:
@@ -92,6 +97,7 @@ tests:
           value: 1
 
     - label: "Sends a Stop command"
+      PICS: MC_MEDIAPLAYBACK.S.C0002
       command: "StopPlayback"
       response:
           values:
@@ -110,6 +116,7 @@ tests:
                 value: "y"
 
     - label: "Reads the playback state attribute"
+      PICS: MC_MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
       response:

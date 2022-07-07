@@ -2,7 +2,7 @@
 
 #pragma once
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 
 #include <cstdint>
 #include <string>
@@ -41,13 +41,13 @@ public:
         ClusterCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * device, chip::EndpointId endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %u", endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIP{{asUpperCamelCase clusterName}} * cluster = [[CHIP{{asUpperCamelCase clusterName}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        __auto_type * params = [[CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase name}}Params alloc] init];
+        MTR{{asUpperCamelCase clusterName}} * cluster = [[MTR{{asUpperCamelCase clusterName}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        __auto_type * params = [[MTR{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase name}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         {{#chip_cluster_command_arguments}}
         {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.clusterName type=type depth=0}}
@@ -58,7 +58,7 @@ public:
         {
             [cluster {{asLowerCamelCase name}}WithParams:params completionHandler:
             {{#if hasSpecificResponse}}
-                ^(CHIP{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
+                ^(MTR{{asUpperCamelCase clusterName}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
             {{else}}
                 ^(NSError * _Nullable error) {
@@ -106,14 +106,14 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * device, chip::EndpointId endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        MTR{{asUpperCamelCase parent.name}} * cluster = [[MTR{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
         {{#if_is_fabric_scoped_struct type}}
-        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         {{/if_is_fabric_scoped_struct}}
         [cluster readAttribute{{asUpperCamelCase name}}With
@@ -157,12 +157,12 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * device, chip::EndpointId endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPWriteParams * params = [[CHIPWriteParams alloc] init];
+        MTR{{asUpperCamelCase parent.name}} * cluster = [[MTR{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        MTRWriteParams * params = [[MTRWriteParams alloc] init];
         params.timedWriteTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         params.dataVersion = mDataVersion.HasValue() ? [NSNumber numberWithUnsignedInt:mDataVersion.Value()] : nil;
         {{#if_chip_complex}}
@@ -211,12 +211,12 @@ public:
     {
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * device, chip::EndpointId endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIP{{asUpperCamelCase parent.name}} * cluster = [[CHIP{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        MTR{{asUpperCamelCase parent.name}} * cluster = [[MTR{{asUpperCamelCase parent.name}} alloc] initWithDevice:device endpoint:endpointId queue:callbackQueue];
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [cluster subscribe{{>attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:mMinInterval] 

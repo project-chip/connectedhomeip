@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 33.2.2. [TC-PRS-2.2] Primary functionality with server as DUT
+name: 62.2.2. [TC-PS-2.2] Event reporting with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -27,11 +27,13 @@ tests:
       disabled: true
 
     - label: "Bring the DUT into a state without any wired faults."
+      PICS: PS.S.A000a
       verification: |
 
       disabled: true
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
+      PICS: PS.S.A000a
       verification: |
           ./chip-tool powersource read active-wired-faults 1 1
 
@@ -40,6 +42,7 @@ tests:
       disabled: true
 
     - label: "Set up subscription to WiredFaultChange event"
+      PICS: PS.S.E00
       verification: |
           ./chip-tool interactive start
 
@@ -68,11 +71,13 @@ tests:
       disabled: true
 
     - label: "Bring the DUT into a wired fault state."
+      PICS: PS.S.E00
       verification: |
           DUT ACTION REQUIRED
       disabled: true
 
     - label: "TH reads the ActiveWiredFaults attribute from the DUT"
+      PICS: PS.S.A000a
       verification: |
           ./chip-tool powersource read active-wired-faults 1 1
 
@@ -81,16 +86,19 @@ tests:
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
+      PICS: PS.S.E00
       verification: |
           DUT ACTION REQUIRED
       disabled: true
 
     - label: "Bring the DUT into a state without any battery faults."
+      PICS: PS.S.A0012
       verification: |
 
       disabled: true
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
+      PICS: PS.S.A0012
       verification: |
           ./apps/chip-tool powersource read active-battery-faults 12345 1
 
@@ -99,6 +107,7 @@ tests:
       disabled: true
 
     - label: "Set up subscription to BatFaultChange event"
+      PICS: PS.S.E01
       verification: |
           ./chip-tool interactive start
            powersource subscribe-event-by-id  0 100 1  1
@@ -126,11 +135,13 @@ tests:
       disabled: true
 
     - label: "Bring the DUT into a battery fault state."
+      PICS: PS.S.E01
       verification: |
           DUT ACTION REQUIRED
       disabled: true
 
     - label: "TH reads the ActiveBatFaults attribute from the DUT"
+      PICS: PS.S.A0012
       verification: |
           ./chip-tool powersource read active-battery-faults 1 1
 
@@ -138,16 +149,19 @@ tests:
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
+      PICS: PS.S.E01
       verification: |
           DUT ACTION REQUIRED
       disabled: true
 
     - label: "Bring the DUT into a state without any charge faults."
+      PICS: PS.S.A001e
       verification: |
 
       disabled: true
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
+      PICS: PS.S.A001e
       verification: |
           ./chip-tool powersource read active-battery-charge-faults 1 1
 
@@ -155,6 +169,7 @@ tests:
       disabled: true
 
     - label: "Set up subscription to BatChargeFaultChange event"
+      PICS: PS.S.E02
       verification: |
           ./chip-tool interactive start
 
@@ -184,11 +199,13 @@ tests:
       disabled: true
 
     - label: "Bring the DUT into a charge fault state."
+      PICS: PS.S.E02
       verification: |
           DUT ACTION REQUIRED
       disabled: true
 
     - label: "TH reads the ActiveBatChargeFaults attribute from the DUT"
+      PICS: PS.S.A001e
       verification: |
           ./apps/chip-tool powersource read active-battery-charge-faults 1 1
 
@@ -196,6 +213,7 @@ tests:
       disabled: true
 
     - label: "Bring the DUT back into a clean state."
+      PICS: PS.S.E02
       verification: |
           DUT ACTION REQUIRED
       disabled: true

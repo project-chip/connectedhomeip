@@ -65,10 +65,11 @@ class FabricAdmin:
     '''
 
     _handle = chip.native.GetLibraryHandle()
+    _isActive = False
     activeFabricIndexList = set()
     activeFabricIdList = set()
-
     activeAdmins = set()
+    vendorId = None
 
     def AllocateNextFabricIndex(self):
         ''' Allocate the next un-used fabric index.
@@ -87,10 +88,11 @@ class FabricAdmin:
             nextFabricId = nextFabricId + 1
         return nextFabricId
 
-    def __init__(self, rcac: bytes = None, icac: bytes = None, fabricIndex: int = None, fabricId: int = None):
+    def __init__(self, vendorId: int, rcac: bytes = None, icac: bytes = None, fabricIndex: int = None, fabricId: int = None):
         ''' Creates a valid FabricAdmin object with valid RCAC/ICAC, and registers itself as an OperationalCredentialsDelegate
             for other parts of the system (notably, DeviceController) to vend NOCs.
 
+            vendorId:       Valid operational Vendor ID associated with this fabric.
             rcac, icac:     Specify the RCAC and ICAC to be used with this fabric (not-supported). If not specified, an RCAC and ICAC will
                             be automatically generated.
 
@@ -100,6 +102,12 @@ class FabricAdmin:
         if (rcac is not None or icac is not None):
             raise ValueError(
                 "Providing valid rcac/icac values is not supported right now!")
+
+        if (vendorId is None or vendorId == 0):
+            raise ValueError(
+                f"Invalid VendorID ({vendorId}) provided!")
+
+        self.vendorId = vendorId
 
         if (fabricId is None):
             self._fabricId = self.AllocateNextFabricId()
@@ -124,7 +132,7 @@ class FabricAdmin:
         FabricAdmin.activeFabricIndexList.add(self._fabricIndex)
 
         print(
-            f"New FabricAdmin: FabricId: {self._fabricId}({self._fabricIndex})")
+            f"New FabricAdmin: FabricId: {self._fabricId}({self._fabricIndex}), VendorId = {hex(self.vendorId)}")
         self._handle.pychip_OpCreds_InitializeDelegate.restype = c_void_p
 
         self.closure = builtins.chipStack.Call(
@@ -144,7 +152,7 @@ class FabricAdmin:
             adminList = {str(self._fabricIndex): {'fabricId': self._fabricId}}
             builtins.chipStack.GetStorageManager().SetReplKey('fabricAdmins', adminList)
 
-        adminList[str(self._fabricIndex)] = {'fabricId': self._fabricId}
+        adminList[str(self._fabricIndex)] = {'fabricId': self._fabricId, 'vendorId': self.vendorId}
         builtins.chipStack.GetStorageManager().SetReplKey('fabricAdmins', adminList)
 
         self._isActive = True
@@ -166,7 +174,7 @@ class FabricAdmin:
         print(
             f"Allocating new controller with FabricId: {self._fabricId}({self._fabricIndex}), NodeId: {nodeId}")
         controller = ChipDeviceCtrl.ChipDeviceController(
-            self.closure, self._fabricId, self._fabricIndex, nodeId, paaTrustStorePath, useTestCommissioner)
+            self.closure, self._fabricId, self._fabricIndex, nodeId, self.vendorId, paaTrustStorePath, useTestCommissioner)
         return controller
 
     def ShutdownAll():

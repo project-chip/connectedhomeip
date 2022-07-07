@@ -50,8 +50,7 @@ static void TestPlatformMgr_InitShutdown(nlTestSuite * inSuite, void * inContext
     CHIP_ERROR err = PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = PlatformMgr().Shutdown();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
 }
 
 static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inContext)
@@ -65,8 +64,7 @@ static void TestPlatformMgr_BasicEventLoopTask(nlTestSuite * inSuite, void * inC
     err = PlatformMgr().StopEventLoopTask();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = PlatformMgr().Shutdown();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
 }
 
 static bool stopRan;
@@ -91,8 +89,7 @@ static void TestPlatformMgr_BasicRunEventLoop(nlTestSuite * inSuite, void * inCo
     PlatformMgr().RunEventLoop();
     NL_TEST_ASSERT(inSuite, stopRan);
 
-    err = PlatformMgr().Shutdown();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
 }
 
 static bool sleepRan;
@@ -118,8 +115,7 @@ static void TestPlatformMgr_RunEventLoopTwoTasks(nlTestSuite * inSuite, void * i
     NL_TEST_ASSERT(inSuite, stopRan);
     NL_TEST_ASSERT(inSuite, sleepRan);
 
-    err = PlatformMgr().Shutdown();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
 }
 
 void StopAndSleep(intptr_t arg)
@@ -143,8 +139,7 @@ static void TestPlatformMgr_RunEventLoopStopBeforeSleep(nlTestSuite * inSuite, v
     NL_TEST_ASSERT(inSuite, stopRan);
     NL_TEST_ASSERT(inSuite, sleepRan);
 
-    err = PlatformMgr().Shutdown();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
 }
 
 static void TestPlatformMgr_TryLockChipStack(nlTestSuite * inSuite, void * inContext)
@@ -206,8 +201,7 @@ static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inCont
         inSuite, DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::kZero, nullptr, nullptr) == CHIP_APPLICATION_ERROR(1));
     NL_TEST_ASSERT(inSuite, DeviceLayer::SystemLayer().ScheduleWork(nullptr, nullptr) == CHIP_APPLICATION_ERROR(2));
 
-    err = PlatformMgr().Shutdown();
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
 
     DeviceLayer::SetSystemLayerForTesting(nullptr);
 }

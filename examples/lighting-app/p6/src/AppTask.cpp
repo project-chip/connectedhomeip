@@ -284,19 +284,19 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::LightActionEventHandler(AppEvent * aEvent)
+void AppTask::LightActionEventHandler(AppEvent * event)
 {
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor  = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aEvent->Type == AppEvent::kEventType_Light)
+    if (event->Type == AppEvent::kEventType_Light)
     {
-        action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
-        actor  = aEvent->LightEvent.Actor;
+        action = static_cast<LightingManager::Action_t>(event->LightEvent.Action);
+        actor  = event->LightEvent.Actor;
     }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
+    else if (event->Type == AppEvent::kEventType_Button)
     {
         if (LightMgr().IsLightOn())
         {
@@ -348,18 +348,18 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     }
 }
 
-void AppTask::TimerEventHandler(TimerHandle_t xTimer)
+void AppTask::TimerEventHandler(TimerHandle_t timer)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = (void *) xTimer;
+    event.TimerEvent.Context = (void *) timer;
     event.Handler            = FunctionTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+void AppTask::FunctionTimerEventHandler(AppEvent * event)
 {
-    if (aEvent->Type != AppEvent::kEventType_Timer)
+    if (event->Type != AppEvent::kEventType_Timer)
     {
         return;
     }
@@ -392,7 +392,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::FunctionHandler(AppEvent * aEvent)
+void AppTask::FunctionHandler(AppEvent * event)
 {
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
     // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
@@ -401,7 +401,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
     // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
-    if (aEvent->ButtonEvent.Action == APP_BUTTON_RELEASED)
+    if (event->ButtonEvent.Action == APP_BUTTON_RELEASED)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
         {
@@ -464,34 +464,34 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t action, int32_t actor)
 {
     // Action initiated, update the light led
-    if (aAction == LightingManager::ON_ACTION)
+    if (action == LightingManager::ON_ACTION)
     {
         P6_LOG("Turning light ON");
         sLightLED.Set(true);
     }
-    else if (aAction == LightingManager::OFF_ACTION)
+    else if (action == LightingManager::OFF_ACTION)
     {
         P6_LOG("Turning light OFF");
         sLightLED.Set(false);
     }
 
-    if (aActor == AppEvent::kEventType_Button)
+    if (actor == AppEvent::kEventType_Button)
     {
         sAppTask.mSyncClusterToButtonAction = true;
     }
 }
 
-void AppTask::ActionCompleted(LightingManager::Action_t aAction)
+void AppTask::ActionCompleted(LightingManager::Action_t action)
 {
     // action has been completed bon the light
-    if (aAction == LightingManager::ON_ACTION)
+    if (action == LightingManager::ON_ACTION)
     {
         P6_LOG("Light ON");
     }
-    else if (aAction == LightingManager::OFF_ACTION)
+    else if (action == LightingManager::OFF_ACTION)
     {
         P6_LOG("Light OFF");
     }
@@ -503,17 +503,17 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     }
 }
 
-void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
+void AppTask::PostLightActionRequest(int32_t actor, LightingManager::Action_t action)
 {
     AppEvent event;
     event.Type              = AppEvent::kEventType_Light;
-    event.LightEvent.Actor  = aActor;
-    event.LightEvent.Action = aAction;
+    event.LightEvent.Actor  = actor;
+    event.LightEvent.Action = action;
     event.Handler           = LightActionEventHandler;
     PostEvent(&event);
 }
 
-void AppTask::PostEvent(const AppEvent * aEvent)
+void AppTask::PostEvent(const AppEvent * event)
 {
     if (sAppEventQueue != NULL)
     {
@@ -521,7 +521,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, event, &higherPrioTaskWoken);
 
 #ifdef portYIELD_FROM_ISR
             portYIELD_FROM_ISR(higherPrioTaskWoken);
@@ -533,7 +533,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         }
         else
         {
-            status = xQueueSend(sAppEventQueue, aEvent, 1);
+            status = xQueueSend(sAppEventQueue, event, 1);
         }
 
         if (!status)
@@ -545,11 +545,11 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
 }
 
-void AppTask::DispatchEvent(AppEvent * aEvent)
+void AppTask::DispatchEvent(AppEvent * event)
 {
-    if (aEvent->Handler)
+    if (event->Handler)
     {
-        aEvent->Handler(aEvent);
+        event->Handler(event);
     }
     else
     {

@@ -29,6 +29,7 @@ ALL_PLATFORMS = set([
     'android',
     'bl602',
     'cc13x2_26x2',
+    'cc32xx',
     'cyw30739',
     'darwin',
     'efr32',

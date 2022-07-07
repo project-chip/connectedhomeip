@@ -80,13 +80,16 @@ public:
     static constexpr Key kConfigKey_LockUserName       = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0d);
     static constexpr Key kConfigKey_CredentialData     = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0e);
     static constexpr Key kConfigKey_UserCredentials    = CYW30739ConfigKey(kChipConfig_KeyBase, 0x0f);
-    static constexpr Key kConfigKey_BootReason         = CYW30739ConfigKey(kChipConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_WeekDaySchedules   = CYW30739ConfigKey(kChipConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_YearDaySchedules   = CYW30739ConfigKey(kChipConfig_KeyBase, 0x11);
+    static constexpr Key kConfigKey_HolidaySchedules   = CYW30739ConfigKey(kChipConfig_KeyBase, 0x12);
+    static constexpr Key kConfigKey_BootReason         = CYW30739ConfigKey(kChipConfig_KeyBase, 0x13);
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = CYW30739ConfigKey(kChipFactory_KeyBase, 0x00);
     static constexpr Key kMaxConfigKey_ChipFactory = CYW30739ConfigKey(kChipFactory_KeyBase, 0x0a);
     static constexpr Key kMinConfigKey_ChipConfig  = CYW30739ConfigKey(kChipConfig_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_ChipConfig  = CYW30739ConfigKey(kChipConfig_KeyBase, 0x10);
+    static constexpr Key kMaxConfigKey_ChipConfig  = CYW30739ConfigKey(kChipConfig_KeyBase, 0x13);
 
     static CHIP_ERROR Init(void);
 

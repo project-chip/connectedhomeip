@@ -33,7 +33,9 @@ namespace Controller {
 class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
 {
 public:
-    DiagnosticLogsCluster() : ClusterBase(app::Clusters::DiagnosticLogs::Id) {}
+    DiagnosticLogsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::DiagnosticLogs::Id, endpoint)
+    {}
     ~DiagnosticLogsCluster() {}
 };
 

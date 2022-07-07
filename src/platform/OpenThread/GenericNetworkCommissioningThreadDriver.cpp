@@ -18,6 +18,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/NetworkCommissioning.h>
@@ -57,10 +58,9 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericThreadDriver::Shutdown()
+void GenericThreadDriver::Shutdown()
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GenericThreadDriver::CommitConfiguration()
@@ -87,6 +87,8 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     ReturnErrorCodeIf(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
     ReturnErrorOnFailure(error);
 
+    ChipLogError(NetworkProvisioning, "Found Thread configuration backup: reverting configuration");
+
     // Not all KVS implementations support zero-length values, so handle a special value representing an empty dataset.
     ByteSpan dataset(datasetBytes, datasetLength);
 
@@ -98,6 +100,7 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     ReturnErrorOnFailure(mStagingNetwork.Init(dataset));
     ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, /* callback */ nullptr));
 
+    // TODO: What happens on errors above? Why do we not remove the failsafe?
     return KeyValueStoreMgr().Delete(DefaultStorageKeyAllocator::FailSafeNetworkConfig());
 }
 

@@ -59,6 +59,12 @@ public:
     void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
                     app::StatusIB status) override
     {
+        if (mCalledCallback)
+        {
+            return;
+        }
+        mCalledCallback = true;
+
         if (status.IsSuccess())
         {
             mOnSuccess(aPath);
@@ -69,7 +75,16 @@ public:
         }
     }
 
-    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
+    {
+        if (mCalledCallback)
+        {
+            return;
+        }
+        mCalledCallback = true;
+
+        mOnError(nullptr, aError);
+    }
 
     void OnDone(app::WriteClient * apWriteClient) override
     {
@@ -87,6 +102,8 @@ private:
     OnSuccessCallbackType mOnSuccess = nullptr;
     OnErrorCallbackType mOnError     = nullptr;
     OnDoneCallbackType mOnDone       = nullptr;
+
+    bool mCalledCallback = false;
 
     app::ChunkedWriteCallback mCallback;
 };

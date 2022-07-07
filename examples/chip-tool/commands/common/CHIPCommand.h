@@ -101,7 +101,7 @@ protected:
 
     // Shut down the command.  After a Shutdown call the command object is ready
     // to be used for another command invocation.
-    virtual void Shutdown() {}
+    virtual void Shutdown() { ResetArguments(); }
 
     // Clean up any resources allocated by the command.  Some commands may hold
     // on to resources after Shutdown(), but Cleanup() will guarantee those are
@@ -139,11 +139,11 @@ protected:
 
 private:
     CHIP_ERROR MaybeSetUpStack();
-    CHIP_ERROR MaybeTearDownStack();
+    void MaybeTearDownStack();
 
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId,
                                       const chip::Credentials::AttestationTrustStore * trustStore);
-    CHIP_ERROR ShutdownCommissioner(std::string key);
+    void ShutdownCommissioner(std::string key);
     chip::FabricId CurrentCommissionerId();
     static std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     static std::set<CHIPCommand *> sDeferredCleanups;

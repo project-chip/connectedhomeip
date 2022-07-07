@@ -369,8 +369,6 @@ ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * s
 
     sCommissioningParameters.SetWiFiCredentials(
         chip::Controller::WiFiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
-    char tmp[128];
-    chip::Platform::CopyString(tmp, sCommissioningParameters.GetWiFiCredentials().Value().ssid);
     return CHIP_NO_ERROR.AsInteger();
 }
 
@@ -644,7 +642,8 @@ ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::Devic
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl)
 {
 #if CONFIG_NETWORK_LAYER_BLE
-    return devCtrl->CloseBleConnection().AsInteger();
+    devCtrl->CloseBleConnection();
+    return CHIP_NO_ERROR.AsInteger();
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.AsInteger();
 #endif

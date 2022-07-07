@@ -87,7 +87,7 @@ CHIP_ERROR WiFiDriverImpl::Init(NetworkStatusChangeCallback * networkStatusChang
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiDriverImpl::Shutdown()
+void WiFiDriverImpl::Shutdown()
 {
     Network network;
     auto networks = GetNetworks();
@@ -115,8 +115,6 @@ CHIP_ERROR WiFiDriverImpl::Shutdown()
     mStagingNetwork.credentialsLen = 0;
     mSavedNetwork.ssidLen          = 0;
     mSavedNetwork.credentialsLen   = 0;
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiDriverImpl::CommitConfiguration()

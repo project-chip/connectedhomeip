@@ -42,9 +42,10 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: map32
+              minValue: 0
+              maxValue: 7
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

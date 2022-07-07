@@ -280,9 +280,9 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::Shutdown()
+void DeviceController::Shutdown()
 {
-    VerifyOrReturnError((mState == State::Initialized) && (mSystemState != nullptr), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
@@ -312,8 +312,6 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mDNSResolver.Shutdown();
     mDeviceDiscoveryDelegate = nullptr;
-
-    return CHIP_NO_ERROR;
 }
 
 void DeviceController::ReleaseOperationalDevice(NodeId remoteNodeId)
@@ -336,7 +334,8 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 
     if (proxy->IsConnected())
     {
-        return proxy->Disconnect();
+        proxy->Disconnect();
+        return CHIP_NO_ERROR;
     }
 
     if (proxy->IsConnecting())
@@ -456,9 +455,9 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::Shutdown()
+void DeviceCommissioner::Shutdown()
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
@@ -489,7 +488,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     mCommissioneeDevicePool.ReleaseAll();
 
     DeviceController::Shutdown();
-    return CHIP_NO_ERROR;
 }
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
@@ -1195,9 +1193,10 @@ CHIP_ERROR DeviceCommissioner::IssueNOCChain(const ByteSpan & NOCSRElements, Nod
         mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(GetFabricId());
     }
 
-    // Note: attestationSignature, attestationChallenge, DAC, PAI are not used by existing OperationalCredentialsIssuer.
-    return mOperationalCredentialsDelegate->GenerateChipNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
-                                                                 ByteSpan(), callback);
+    // Note: we don't have attestationSignature, attestationChallenge, DAC, PAI so we are just providing an empty ByteSpan
+    // for those arguments.
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+                                                             ByteSpan(), callback);
 }
 
 CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements,
@@ -1379,12 +1378,12 @@ void DeviceCommissioner::ConnectBleTransportToSelf()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-CHIP_ERROR DeviceCommissioner::CloseBleConnection()
+void DeviceCommissioner::CloseBleConnection()
 {
     // It is fine since we can only commission one device at the same time.
     // We should be able to distinguish different BLE connections if we want
     // to commission multiple devices at the same time over BLE.
-    return mSystemState->BleLayer()->CloseAllBleConnections();
+    mSystemState->BleLayer()->CloseAllBleConnections();
 }
 #endif
 
@@ -1411,7 +1410,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)

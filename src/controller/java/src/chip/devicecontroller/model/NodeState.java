@@ -44,12 +44,29 @@ public final class NodeState {
 
     ClusterState clusterState = endpointState.getClusterState(clusterId);
     if (clusterState == null) {
-      clusterState = new ClusterState(new HashMap<>());
+      clusterState = new ClusterState(new HashMap<>(), new HashMap<>());
       endpointState.getClusterStates().put(clusterId, clusterState);
     }
 
     // This will overwrite previous attributes.
     clusterState.getAttributeStates().put(attributeId, attributeStateToAdd);
+  }
+
+  private void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
+    EndpointState endpointState = getEndpointState(endpointId);
+    if (endpointState == null) {
+      endpointState = new EndpointState(new HashMap<>());
+      getEndpointStates().put(endpointId, endpointState);
+    }
+
+    ClusterState clusterState = endpointState.getClusterState(clusterId);
+    if (clusterState == null) {
+      clusterState = new ClusterState(new HashMap<>(), new HashMap<>());
+      endpointState.getClusterStates().put(clusterId, clusterState);
+    }
+
+    // This will overwrite previous events.
+    clusterState.getEventStates().put(eventId, eventStateToAdd);
   }
 
   @Override

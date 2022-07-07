@@ -86,14 +86,6 @@ private:
                                                       onCompletion);
     }
 
-    CHIP_ERROR GenerateChipNOCChain(const ByteSpan & csrElements, const ByteSpan & csrNonce, const ByteSpan & attestationSignature,
-                                    const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
-                                    Callback::Callback<OnNOCChainGeneration> * onCompletion) override
-    {
-        return mExampleOpCredsIssuer.GenerateChipNOCChain(csrElements, csrNonce, attestationSignature, attestationChallenge, DAC,
-                                                          PAI, onCompletion);
-    }
-
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override { mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId); }
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mExampleOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId); }
@@ -333,8 +325,8 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 
 ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
                                                          chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
-                                                         FabricId fabricId, chip::NodeId nodeId, const char * paaTrustStorePath,
-                                                         bool useTestCommissioner)
+                                                         FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
+                                                         const char * paaTrustStorePath, bool useTestCommissioner)
 {
     ChipLogDetail(Controller, "Creating New Device Controller");
 
@@ -381,6 +373,7 @@ ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * contex
     initParams.controllerICAC                 = icacSpan;
     initParams.controllerNOC                  = nocSpan;
     initParams.enableServerInteractions       = true;
+    initParams.controllerVendorId             = adminVendorId;
 
     if (useTestCommissioner)
     {

@@ -144,10 +144,9 @@ uint32_t TCPEndPoint::PendingReceiveLength()
     return 0;
 }
 
-CHIP_ERROR TCPEndPoint::Shutdown()
+void TCPEndPoint::Shutdown()
 {
-    VerifyOrReturnError(IsConnected(), CHIP_ERROR_INCORRECT_STATE);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturn(IsConnected());
 
     // If fully connected, enter the SendShutdown state.
     if (mState == State::kConnected)
@@ -159,13 +158,11 @@ CHIP_ERROR TCPEndPoint::Shutdown()
     // Otherwise, if the peer has already closed their end of the connection,
     else if (mState == State::kReceiveShutdown)
     {
-        err = DoClose(err, false);
+        DoClose(CHIP_NO_ERROR, false);
     }
-
-    return err;
 }
 
-CHIP_ERROR TCPEndPoint::Close()
+void TCPEndPoint::Close()
 {
     // Clear the receive queue.
     mRcvQueue = nullptr;
@@ -176,7 +173,7 @@ CHIP_ERROR TCPEndPoint::Close()
     OnConnectComplete  = nullptr;
 
     // Perform a graceful close.
-    return DoClose(CHIP_NO_ERROR, true);
+    DoClose(CHIP_NO_ERROR, true);
 }
 
 void TCPEndPoint::Abort()
@@ -191,8 +188,6 @@ void TCPEndPoint::Abort()
 
 void TCPEndPoint::Free()
 {
-    CHIP_ERROR err;
-
     // Ensure no callbacks to the app after this point.
     OnAcceptError        = nullptr;
     OnConnectComplete    = nullptr;
@@ -203,11 +198,7 @@ void TCPEndPoint::Free()
     OnDataSent           = nullptr;
 
     // Ensure the end point is Closed or Closing.
-    err = Close();
-    if (err != CHIP_NO_ERROR)
-    {
-        Abort();
-    }
+    Close();
 
     // Release the Retain() that happened when the end point was allocated.
     Release();
@@ -388,7 +379,7 @@ void TCPEndPoint::HandleConnectComplete(CHIP_ERROR err)
     }
 }
 
-CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
+void TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 {
     State oldState = mState;
 
@@ -415,7 +406,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
     // If not making a state transition, return immediately.
     if (mState == oldState)
     {
-        return CHIP_NO_ERROR;
+        return;
     }
 
     DoCloseImpl(err, oldState);
@@ -456,8 +447,6 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
             Release();
         }
     }
-
-    return err;
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT

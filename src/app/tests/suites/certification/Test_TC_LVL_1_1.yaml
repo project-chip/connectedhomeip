@@ -45,22 +45,21 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 15, 17]
           constraints:
               type: list
+              contains: [0, 15, 17]
 
     - label: "Read the global attribute: AcceptedCommandList"
       PICS: LVL.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0, 1, 2, 3, 4, 5, 6, 7]
           constraints:
               type: list
+              contains: [0, 1, 2, 3, 4, 5, 6, 7]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

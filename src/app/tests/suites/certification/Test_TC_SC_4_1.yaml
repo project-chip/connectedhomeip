@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 13.4.1. [TC-SC-4.1] Commissionable Node Discovery - Commissionee Case
+name: 14.4.1. [TC-SC-4.1] Commissionable Node Discovery - Commissionee Case
 
 config:
     nodeId: 0x12344321
@@ -22,36 +22,114 @@ config:
 
 tests:
     - label:
-          "DUT is put in Commissioning Mode using Open Basic Commissioning
-          Window command and starts advertising Commissionable Node Discovery
-          service using DNS-SD"
+          "DUT is Commissioned and put in Commissioning Mode using Open Basic
+          Commissioning Window command and starts advertising Commissionable
+          Node Discovery service using DNS-SD"
       verification: |
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 10 1 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
 
+          [1652340903.034346][2874:2879] CHIP:DMG: InvokeResponseMessage =
+          [1652340903.034398][2874:2879] CHIP:DMG: {
+          [1652340903.034447][2874:2879] CHIP:DMG:         suppressResponse = false,
+          [1652340903.034499][2874:2879] CHIP:DMG:         InvokeResponseIBs =
+          [1652340903.034565][2874:2879] CHIP:DMG:         [
+          [1652340903.034615][2874:2879] CHIP:DMG:                 InvokeResponseIB =
+          [1652340903.034748][2874:2879] CHIP:DMG:                 {
+          [1652340903.034806][2874:2879] CHIP:DMG:                         CommandStatusIB =
+          [1652340903.034873][2874:2879] CHIP:DMG:                         {
+          [1652340903.034936][2874:2879] CHIP:DMG:                                 CommandPathIB =
+          [1652340903.035006][2874:2879] CHIP:DMG:                                 {
+          [1652340903.035078][2874:2879] CHIP:DMG:                                         EndpointId = 0x0,
+          [1652340903.035159][2874:2879] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1652340903.035223][2874:2879] CHIP:DMG:                                         CommandId = 0x1,
+          [1652340903.035291][2874:2879] CHIP:DMG:                                 },
+          [1652340903.035362][2874:2879] CHIP:DMG:
+          [1652340903.035423][2874:2879] CHIP:DMG:                                 StatusIB =
+          [1652340903.035495][2874:2879] CHIP:DMG:                                 {
+          [1652340903.035566][2874:2879] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1652340903.035634][2874:2879] CHIP:DMG:                                 },
+          [1652340903.035704][2874:2879] CHIP:DMG:
+          [1652340903.035763][2874:2879] CHIP:DMG:                         },
+          [1652340903.035841][2874:2879] CHIP:DMG:
+          [1652340903.035898][2874:2879] CHIP:DMG:                 },
+          [1652340903.035965][2874:2879] CHIP:DMG:
+          [1652340903.036014][2874:2879] CHIP:DMG:         ],
+          [1652340903.036077][2874:2879] CHIP:DMG:
+          [1652340903.036126][2874:2879] CHIP:DMG:         InteractionModelRevision = 1
+          [1652340903.036175][2874:2879] CHIP:DMG: },
+          [1652340903.036294][2874:2879] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1652340903.036375][2874:2879] CHIP:DMG: ICR moving to [AwaitingDe]
 
-
-          The delay timer is given 10 as an example , use whatever works for your product
+          The delay timer is given 200 as an example , use whatever works for your product
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
       verification: |
-          ~$ avahi-browse -rt _matterc._udp
+          avahi-browse -rt _matterc._udp
 
-          =   eth0 IPv6 F95E077ABDCC2B36                              _matterc._udp        local
-             hostname = [422F10CDC290A406.local]
-             address = [fd11:28::8a29:a7d0:3d31:eab9]
+
+          ubuntu@ubuntu:~$   avahi-browse -rt _matterc._udp
+
+          + vethd8d0eac IPv6 279142392CEB80C3                              _matterc._udp        local
+          + vethbbadff8 IPv6 279142392CEB80C3                              _matterc._udp        local
+          + veth15cb450 IPv6 279142392CEB80C3                              _matterc._udp        local
+          + veth811acb4 IPv6 279142392CEB80C3                              _matterc._udp        local
+          + veth588856b IPv6 279142392CEB80C3                              _matterc._udp        local
+          + br-f08e8f665bd1 IPv6 279142392CEB80C3                              _matterc._udp        local
+          + br-6fe235aff062 IPv6 279142392CEB80C3                              _matterc._udp        local
+          +   eth0 IPv6 279142392CEB80C3                              _matterc._udp        local
+          = vethd8d0eac IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::4070:50ff:fe90:759d]
              port = [5540]
-             txt = ["PI=" "PH=36" "RI=00007C5F6E176CD40F68685D100A1CF8A98B" "CM=1" "D=3840" "T=0" "CRA=300" "CRI=5000" "VP=9050+20044"]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = vethbbadff8 IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::a849:d3ff:fefa:72a3]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth15cb450 IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::5c30:4fff:fe7f:51d]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth811acb4 IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::4c41:b1ff:feb2:abfa]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth588856b IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::4003:6ff:fe78:9663]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = br-f08e8f665bd1 IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::42:4ff:fe41:2db2]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = br-6fe235aff062 IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::1]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          =   eth0 IPv6 279142392CEB80C3                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+
 
           Service Domain 422F10CDC290A406.local
           verify CM flag is 1
 
           to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterc
 
-          +;eth0;IPv6;_CM;_sub._matterc._udp;local
+          +;eth0;IPv6;_matterc;_udp;local
+          +;eth0;IPv6;_V65521;_sub._matterc._udp;local
+          +;eth0;IPv6;_S15;_sub._matterc._udp;local
           +;eth0;IPv6;_L3840;_sub._matterc._udp;local
-          +;eth0;IPv6;_S0;_sub._matterc._udp;local
-          +;eth0;IPv6;_V9050;_sub._matterc._udp;local
+          +;eth0;IPv6;_CM;_sub._matterc._udp;local
       disabled: true
 
     - label:
@@ -61,24 +139,150 @@ tests:
       verification: |
           Reboot the device
           if the device proivisioning state persists, run the chip-tool cmd in Step2
+
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 200 1 0 --timedInteractionTimeoutMs 1000
+
+          [1652341174.803430][2893:2898] CHIP:DMG: InvokeResponseMessage =
+          [1652341174.803488][2893:2898] CHIP:DMG: {
+          [1652341174.803560][2893:2898] CHIP:DMG:         suppressResponse = false,
+          [1652341174.803622][2893:2898] CHIP:DMG:         InvokeResponseIBs =
+          [1652341174.803698][2893:2898] CHIP:DMG:         [
+          [1652341174.803757][2893:2898] CHIP:DMG:                 InvokeResponseIB =
+          [1652341174.803835][2893:2898] CHIP:DMG:                 {
+          [1652341174.803897][2893:2898] CHIP:DMG:                         CommandStatusIB =
+          [1652341174.803975][2893:2898] CHIP:DMG:                         {
+          [1652341174.804047][2893:2898] CHIP:DMG:                                 CommandPathIB =
+          [1652341174.804128][2893:2898] CHIP:DMG:                                 {
+          [1652341174.804213][2893:2898] CHIP:DMG:                                         EndpointId = 0x0,
+          [1652341174.804292][2893:2898] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1652341174.804377][2893:2898] CHIP:DMG:                                         CommandId = 0x1,
+          [1652341174.804450][2893:2898] CHIP:DMG:                                 },
+          [1652341174.804539][2893:2898] CHIP:DMG:
+          [1652341174.804654][2893:2898] CHIP:DMG:                                 StatusIB =
+          [1652341174.804738][2893:2898] CHIP:DMG:                                 {
+          [1652341174.804821][2893:2898] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1652341174.804911][2893:2898] CHIP:DMG:                                 },
+          [1652341174.804993][2893:2898] CHIP:DMG:
+          [1652341174.805067][2893:2898] CHIP:DMG:                         },
+          [1652341174.805152][2893:2898] CHIP:DMG:
+          [1652341174.805220][2893:2898] CHIP:DMG:                 },
+          [1652341174.805307][2893:2898] CHIP:DMG:
+          [1652341174.805365][2893:2898] CHIP:DMG:         ],
+          [1652341174.805439][2893:2898] CHIP:DMG:
+          [1652341174.805497][2893:2898] CHIP:DMG:         InteractionModelRevision = 1
+          [1652341174.805555][2893:2898] CHIP:DMG: },
+          [1652341174.805690][2893:2898] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
+          [1652341174.805786][2893:2898] CHIP:DMG: ICR moving to [AwaitingDe]
+          The delay timer is given 200 as an example , use whatever works for your product"
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
       verification: |
-          Verify same step as Step3,
-      disabled: true
+          avahi-browse -rt _matterc._udp
 
-    - label: "Commission DUT with TH"
-      verification: |
+          + veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          +   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          = veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::d417:1eff:fe03:eb81]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::24ae:58ff:fe2f:5609]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::cca1:6aff:fe6e:f76d]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::410:b8ff:fe10:8cfe]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::1]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::42:43ff:fe99:75b3]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          =   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
 
+
+
+          Service Domain 422F10CDC290A406.local
+          verify CM flag is 1
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp | grep _matterc
+
+          +;eth0;IPv6;_matterc;_udp;local
+          +;eth0;IPv6;_V65521;_sub._matterc._udp;local
+          +;eth0;IPv6;_S15;_sub._matterc._udp;local
+          +;eth0;IPv6;_L3840;_sub._matterc._udp;local
+          +;eth0;IPv6;_CM;_sub._matterc._udp;local
       disabled: true
 
     - label:
-          "DUT is instructed to enter in commissioning mode using Open
-          Commissioning Window command"
+          "DUT is Commissioned and instructed to enter in commissioning mode
+          using Open Commissioning Window command"
       verification: |
           run chip tool command to open
-          ./chip-tool pairing open-commissioning-window 1 1 20 2000 3840
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840
+
+
+          [1652341411.383669][2929:2934] CHIP:DMG: InvokeResponseMessage =
+          [1652341411.383720][2929:2934] CHIP:DMG: {
+          [1652341411.383769][2929:2934] CHIP:DMG:         suppressResponse = false,
+          [1652341411.383821][2929:2934] CHIP:DMG:         InvokeResponseIBs =
+          [1652341411.383886][2929:2934] CHIP:DMG:         [
+          [1652341411.383936][2929:2934] CHIP:DMG:                 InvokeResponseIB =
+          [1652341411.384009][2929:2934] CHIP:DMG:                 {
+          [1652341411.384068][2929:2934] CHIP:DMG:                         CommandStatusIB =
+          [1652341411.384139][2929:2934] CHIP:DMG:                         {
+          [1652341411.384203][2929:2934] CHIP:DMG:                                 CommandPathIB =
+          [1652341411.384278][2929:2934] CHIP:DMG:                                 {
+          [1652341411.384349][2929:2934] CHIP:DMG:                                         EndpointId = 0x0,
+          [1652341411.384427][2929:2934] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1652341411.384501][2929:2934] CHIP:DMG:                                         CommandId = 0x0,
+          [1652341411.384624][2929:2934] CHIP:DMG:                                 },
+          [1652341411.384722][2929:2934] CHIP:DMG:
+          [1652341411.384795][2929:2934] CHIP:DMG:                                 StatusIB =
+          [1652341411.384877][2929:2934] CHIP:DMG:                                 {
+          [1652341411.384958][2929:2934] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1652341411.385035][2929:2934] CHIP:DMG:                                 },
+          [1652341411.385116][2929:2934] CHIP:DMG:
+          [1652341411.385188][2929:2934] CHIP:DMG:                         },
+          [1652341411.385271][2929:2934] CHIP:DMG:
+          [1652341411.385337][2929:2934] CHIP:DMG:                 },
+          [1652341411.385416][2929:2934] CHIP:DMG:
+          [1652341411.385474][2929:2934] CHIP:DMG:         ],
+          [1652341411.385547][2929:2934] CHIP:DMG:
+          [1652341411.385605][2929:2934] CHIP:DMG:         InteractionModelRevision = 1
+          [1652341411.385662][2929:2934] CHIP:DMG: },
+          [1652341411.385794][2929:2934] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1652341411.385860][2929:2934] CHIP:CTL: Successfully opened pairing window on the device
       disabled: true
 
     - label: "Check DNS-SD subtypes used by DUT"
@@ -86,19 +290,84 @@ tests:
           Same verification steps as Step 3, Except Verify CM flag to be 2
 
 
-          $avahi-browse -rt _matterc._udp
-          +   eth0 IPv6 923F5363843F26A0                              _matterc._udp        local
-          +   eth0 IPv6 8CDE894B98DF7DEF                              _matterc._udp        local
-          =   eth0 IPv6 8CDE894B98DF7DEF                              _matterc._udp        local
+          ubuntu@ubuntu:~$ avahi-browse -rt _matterc._udp
+
+          + veth721e1d9 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth961779b IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth6995c44 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth6c964b1 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + veth3222831 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + br-6fe235aff062 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          + br-f08e8f665bd1 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          + br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          +   eth0 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+          +   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+          = veth721e1d9 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth961779b IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::d417:1eff:fe03:eb81]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth6995c44 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::24ae:58ff:fe2f:5609]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth6c964b1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::cca1:6aff:fe6e:f76d]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth3222831 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::410:b8ff:fe10:8cfe]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = br-6fe235aff062 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::1]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = br-f08e8f665bd1 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::42:43ff:fe99:75b3]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          =   eth0 IPv6 19DDF06C3B5DD0C8                              _matterc._udp        local
              hostname = [E45F0149AE290000.local]
              address = [fe80::e65f:1ff:fe49:ae29]
              port = [5540]
-             txt = ["PI=" "PH=33" "CM=1" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
-          =   eth0 IPv6 923F5363843F26A0                              _matterc._udp        local
+             txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth721e1d9 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
              hostname = [E45F0149AE290000.local]
-             address = [fe80::e65f:1ff:fe49:ae29]
+             address = [fe80::28e0:95ff:fed9:3085]
              port = [5540]
-             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth961779b IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::d417:1eff:fe03:eb81]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth6c964b1 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::cca1:6aff:fe6e:f76d]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+          = veth6995c44 IPv6 9BFF1DCA106E337B                              _matterc._udp        local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::24ae:58ff:fe2f:5609]
+             port = [5540]
+             txt = ["PI=" "PH=36" "CM=2" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
       disabled: true
 
     - label: "Wait for OCW timeout to expire"
@@ -106,12 +375,24 @@ tests:
           Wait until timeout to expire
       disabled: true
 
-    - label: "If (PICS_EXTENDED_DISCOVERY) enable Extended Discovery"
+    - label: "If (MCORE.SC.EXTENDED_DISCOVERY ) enable Extended Discovery"
       verification: |
           If the device supports Discovery for extended period of time, Device should continue to advertise that duration
       disabled: true
 
     - label: "If (PICS_EXTENDED_DISCOVERY) check DNS-SD subtypes used by DUT"
       verification: |
-          same as step 8
+          avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
+          +   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
+          =   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
+             hostname = [matter-te-7.local]
+             address = [fd00::e7]
+             port = [11111]
+             txt = ["CM=0" "D=840"]
+          =   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
+             hostname = [matter-te-7.local]
+             address = [192.168.3.53]
+             port = [11111]
+             txt = ["CM=0" "D=840"]
       disabled: true

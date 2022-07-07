@@ -231,10 +231,7 @@ int PacketBufferTest::TestSetup(void * inContext)
 
 int PacketBufferTest::TestTeardown(void * inContext)
 {
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().Shutdown();
-    // RTOS shutdown is not implemented, ignore CHIP_ERROR_NOT_IMPLEMENTED
-    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_IMPLEMENTED)
-        return FAILURE;
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 
     chip::Platform::MemoryShutdown();
 

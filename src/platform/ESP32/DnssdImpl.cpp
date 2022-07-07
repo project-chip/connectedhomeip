@@ -131,10 +131,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void ChipDnssdShutdown() {}
 
 static const char * GetProtocolString(DnssdServiceProtocol protocol)
 {

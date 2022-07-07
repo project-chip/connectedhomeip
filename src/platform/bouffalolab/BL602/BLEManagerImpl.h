@@ -50,7 +50,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
+    void _Shutdown() {}
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
@@ -123,7 +123,6 @@ private:
     static void HandleTXCompleted(bt_conn * conn, void * param);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
-    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param);
     static void HandleBLEAdvertisementIntervalChange(System::Layer * layer, void * param);
 
     // ===== Members for internal use by the following friends.

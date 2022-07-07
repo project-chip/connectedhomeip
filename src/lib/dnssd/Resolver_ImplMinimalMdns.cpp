@@ -166,9 +166,19 @@ void PacketParser::ParseResource(const ResourceData & data)
         if (resolver.IsActive())
         {
             CHIP_ERROR err = resolver.OnRecord(mInterfaceId, data, mPacketRange);
+
+            //
+            // CHIP_ERROR_NO_MEMORY usually gets returned when we have no more memory available to hold the
+            // resolved data. This gets emitted fairly frequently in dense environments or when receiving records
+            // from devices with lots of interfaces. Consequently, don't log that unless we have DNS verbosity
+            // logging enabled.
+            //
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
+#if !CHIP_MINMDNS_HIGH_VERBOSITY
+                if (err != CHIP_ERROR_NO_MEMORY)
+#endif
+                    ChipLogError(Discovery, "DNSSD parse error: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }
@@ -267,8 +277,8 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
 private:
     OperationalResolveDelegate * mOperationalDelegate     = nullptr;
@@ -365,7 +375,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
             else
             {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
                 ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+#endif
             }
         }
         else if (resolver->IsActiveOperationalParse())
@@ -385,7 +397,9 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
             else
             {
+#if CHIP_MINMDNS_HIGH_VERBOSITY
                 ChipLogError(Discovery, "No delegate to report operational node discovery");
+#endif
             }
         }
         else
@@ -607,12 +621,12 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::FindCommissioners(DiscoveryFilter filter)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter)
 {
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
@@ -682,18 +696,18 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type);
 }
 
-CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+    return chip::Dnssd::Resolver::Instance().DiscoverCommissionableNodes(filter);
 }
 
-CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
 {
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
+    return chip::Dnssd::Resolver::Instance().DiscoverCommissioners(filter);
 }
 
 } // namespace Dnssd

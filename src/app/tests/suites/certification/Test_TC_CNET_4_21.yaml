@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.21. [TC-CNET-4.21] [Thread] Verification for commands check
+    11.4.19. [TC-CNET-4.21] [Thread] Verification for commands check
     [DUT-Client]
 
 config:
@@ -24,54 +24,14 @@ config:
 
 tests:
     - label: "DUT sends the ScanNetwork command to the TH"
+      PICS: CNET.C.C00.Tx
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning scan-network 62 0
+          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning scan-networks 62 0
 
-          1650389839.770815][9818:9823] CHIP:TOO:   ScanNetworksResponse: {
-          [1650389839.770903][9818:9823] CHIP:TOO:     networkingStatus: 0
-          [1650389839.771002][9818:9823] CHIP:TOO:     threadScanResults: 4 entries
-          [1650389839.771163][9818:9823] CHIP:TOO:       [1]: {
-          [1650389839.771216][9818:9823] CHIP:TOO:         PanId: 4660
-          [1650389839.771264][9818:9823] CHIP:TOO:         ExtendedPanId: 79112097568923682
-          [1650389839.771312][9818:9823] CHIP:TOO:         NetworkName: OpenhkrepiDono
-          [1650389839.771359][9818:9823] CHIP:TOO:         Channel: 16
-          [1650389839.771404][9818:9823] CHIP:TOO:         Version: 2
-          [1650389839.771454][9818:9823] CHIP:TOO:         ExtendedAddress: FEBEB579F5C349CD
-          [1650389839.771500][9818:9823] CHIP:TOO:         Rssi: -62
-          [1650389839.771546][9818:9823] CHIP:TOO:         Lqi: 132
-          [1650389839.771594][9818:9823] CHIP:TOO:        }
-          [1650389839.771665][9818:9823] CHIP:TOO:       [2]: {
-          [1650389839.771714][9818:9823] CHIP:TOO:         PanId: 64206
-          [1650389839.771760][9818:9823] CHIP:TOO:         ExtendedPanId: 3861484836749312
-          [1650389839.771806][9818:9823] CHIP:TOO:         NetworkName: GRL
-          [1650389839.771851][9818:9823] CHIP:TOO:         Channel: 20
-          [1650389839.771896][9818:9823] CHIP:TOO:         Version: 2
-          [1650389839.771942][9818:9823] CHIP:TOO:         ExtendedAddress: 166E0A0000000002
-          [1650389839.771989][9818:9823] CHIP:TOO:         Rssi: -92
-          [1650389839.772034][9818:9823] CHIP:TOO:         Lqi: 4
-          [1650389839.772079][9818:9823] CHIP:TOO:        }
-          [1650389839.772148][9818:9823] CHIP:TOO:       [3]: {
-          [1650389839.772197][9818:9823] CHIP:TOO:         PanId: 64206
-          [1650389839.772244][9818:9823] CHIP:TOO:         ExtendedPanId: 3861484836749312
-          [1650389839.772290][9818:9823] CHIP:TOO:         NetworkName: GRL
-          [1650389839.772335][9818:9823] CHIP:TOO:         Channel: 20
-          [1650389839.772380][9818:9823] CHIP:TOO:         Version: 2
-          [1650389839.772426][9818:9823] CHIP:TOO:         ExtendedAddress: 166E0A0000000008
-          [1650389839.772472][9818:9823] CHIP:TOO:         Rssi: -92
-          [1650389839.772518][9818:9823] CHIP:TOO:         Lqi: 8
-          [1650389839.772562][9818:9823] CHIP:TOO:        }
-          [1650389839.772629][9818:9823] CHIP:TOO:       [4]: {
-          [1650389839.772678][9818:9823] CHIP:TOO:         PanId: 64206
-          [1650389839.772724][9818:9823] CHIP:TOO:         ExtendedPanId: 3861484836749312
-          [1650389839.772770][9818:9823] CHIP:TOO:         NetworkName: GRL
-          [1650389839.772819][9818:9823] CHIP:TOO:         Channel: 20
-          [1650389839.772864][9818:9823] CHIP:TOO:         Version: 2
-          [1650389839.772909][9818:9823] CHIP:TOO:         ExtendedAddress: 166E0A0000000001
-          [1650389839.772955][9818:9823] CHIP:TOO:         Rssi: -91
-          [1650389839.773000][9818:9823] CHIP:TOO:         Lqi: 16
-          [1650389839.773046][9818:9823] CHIP:TOO:        }
-          [1650389839.773095][9818:9823] CHIP:TOO:    }
-          [1650389839.773244][9818:9823] CHIP:DMG: ICR moving to [AwaitingDe]
+          I: 4348550 [EM]Received message of type 0x8 with protocolId (0, 1) and MessageCounter:3714330 on exchange 35752r
+          D: 4348560 [EM]Handling via exchange: 35752r, Delegate: 0x2000766c
+          D: 4348567 [DMG]Received command for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0000
+          D: 4348576 [DMG]Decreasing reference count for CommandHandler, remaining 1
       disabled: true
 
     - label: "DUT sends the ArmFailSafe command to the TH"
@@ -89,6 +49,7 @@ tests:
       disabled: true
 
     - label: "DUT sends the AddOrUpdateThreadNetwork command to the TH"
+      PICS: CNET.C.C03.Tx
       verification: |
           Executed during the commissioning
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
@@ -106,15 +67,7 @@ tests:
       disabled: true
 
     - label: "DUT sends the ConnectNetwork command to the TH"
-      verification: |
-          Executed during the commissioning
-
-          [1650388642.195472][9682:9687] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
-          [1650388642.195553][9682:9687] CHIP:CTL: Received ConnectNetwork response
-          [1650388642.195614][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ThreadNetworkEnable'
-      disabled: true
-
-    - label: "DUT sends the ReorderNetwork command to the TH"
+      PICS: CNET.C.C06.Tx
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning reorder-network 0119100899082022 3 62 0
 
@@ -126,7 +79,8 @@ tests:
           [1650392602.379882][10158:10163] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "DUT sends the RemoveNetwork command to the TH"
+    - label: "DUT sends the ReorderNetwork command to the TH"
+      PICS: CNET.C.C08.Tx
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network 0119100899082022 62 0
 
@@ -136,4 +90,14 @@ tests:
           [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 3
           [1650391420.469812][10048:10053] CHIP:TOO:    }
           [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label: "DUT sends the RemoveNetwork command to the TH"
+      PICS: CNET.C.C04.Tx
+      verification: |
+          Executed during the commissioning
+
+          [1650388642.195472][9682:9687] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1650388642.195553][9682:9687] CHIP:CTL: Received ConnectNetwork response
+          [1650388642.195614][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ThreadNetworkEnable'
       disabled: true

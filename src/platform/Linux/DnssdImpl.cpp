@@ -328,10 +328,7 @@ CHIP_ERROR MdnsAvahi::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncRetu
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
 
-    if (Shutdown() != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Shutdown() failed, continue anyway...");
-    }
+    Shutdown();
 
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -347,7 +344,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR MdnsAvahi::Shutdown()
+void MdnsAvahi::Shutdown()
 {
     if (mGroup)
     {
@@ -359,7 +356,6 @@ CHIP_ERROR MdnsAvahi::Shutdown()
         avahi_client_free(mClient);
         mClient = nullptr;
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
@@ -826,9 +822,9 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
+void ChipDnssdShutdown()
 {
-    return MdnsAvahi::GetInstance().Shutdown();
+    MdnsAvahi::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)

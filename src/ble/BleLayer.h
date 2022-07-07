@@ -242,7 +242,7 @@ public:
                     chip::System::Layer * systemLayer);
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
                     BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator, void * appState = nullptr,
@@ -251,8 +251,8 @@ public:
     CHIP_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     CHIP_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
-    CHIP_ERROR CloseAllBleConnections();
-    CHIP_ERROR CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
+    void CloseAllBleConnections();
+    void CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
 
     /**< Platform interface functions:
 

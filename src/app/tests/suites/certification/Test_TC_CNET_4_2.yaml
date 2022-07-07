@@ -82,6 +82,7 @@ tests:
       disabled: true
 
     - label: "TH reads the MaxNetworks attribute from the DUT"
+      PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
 
@@ -102,6 +103,7 @@ tests:
       disabled: true
 
     - label: "TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 
@@ -118,6 +120,7 @@ tests:
       disabled: true
 
     - label: "TH reads ScanMaxTimeSeconds attribute from the DUT"
+      PICS: CNET.S.A0002
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read scan-max-time-seconds 162 0
 
@@ -130,6 +133,7 @@ tests:
       disabled: true
 
     - label: "TH reads ConnectMaxTimeSeconds Attribute from the DUT"
+      PICS: CNET.S.A0003
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read connect-max-time-seconds 162 0
 
@@ -142,6 +146,7 @@ tests:
       disabled: true
 
     - label: "TH reads InterfaceEnabled attribute from the DUT"
+      PICS: CNET.S.A0004
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 162 0
 
@@ -154,6 +159,7 @@ tests:
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 162 0
 
@@ -168,6 +174,7 @@ tests:
     - label:
           "TH reads the LastNetworkID attribute from the DUT TH reads the
           Networks attribute from the DUT"
+      PICS: CNET.S.A0006
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-network-id 162 0
 
@@ -180,6 +187,7 @@ tests:
       disabled: true
 
     - label: "TH reads the LastConnectErrorValue attribute from the DUT"
+      PICS: CNET.S.A0007
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-connect-error-value 162 0
 

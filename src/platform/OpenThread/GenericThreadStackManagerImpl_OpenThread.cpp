@@ -1112,6 +1112,9 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
 
     case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
+            constexpr uint16_t kFrameErrorRate100Percent   = 0xffff;
+            constexpr uint16_t kMessageErrorRate100Percent = 0xffff;
+
             otNeighborInfo neighInfo;
             otNeighborInfoIterator iterator = OT_NEIGHBOR_INFO_ITERATOR_INIT;
 
@@ -1132,8 +1135,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 neighborTable.linkFrameCounter = neighInfo.mLinkFrameCounter;
                 neighborTable.mleFrameCounter  = neighInfo.mMleFrameCounter;
                 neighborTable.lqi              = neighInfo.mLinkQualityIn;
-                neighborTable.frameErrorRate   = neighInfo.mFrameErrorRate;
-                neighborTable.messageErrorRate = neighInfo.mMessageErrorRate;
+                neighborTable.frameErrorRate =
+                    static_cast<uint8_t>((static_cast<uint32_t>(neighInfo.mFrameErrorRate) * 100) / kFrameErrorRate100Percent);
+                neighborTable.messageErrorRate =
+                    static_cast<uint8_t>((static_cast<uint32_t>(neighInfo.mMessageErrorRate) * 100) / kMessageErrorRate100Percent);
                 neighborTable.rxOnWhenIdle     = neighInfo.mRxOnWhenIdle;
                 neighborTable.fullThreadDevice = neighInfo.mFullThreadDevice;
                 neighborTable.fullNetworkData  = neighInfo.mFullNetworkData;

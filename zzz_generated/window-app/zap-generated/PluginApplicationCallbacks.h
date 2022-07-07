@@ -24,7 +24,7 @@
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterGroupsPluginServerInitCallback();                                                                                        \
-    MatterScenesPluginClientInitCallback();                                                                                        \
+    MatterScenesPluginServerInitCallback();                                                                                        \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterBasicPluginServerInitCallback();                                                                                         \

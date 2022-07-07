@@ -1,0 +1,69 @@
+{{> header}}
+
+#import "MTREventTLVValueDecoder_Internal.h"
+
+#import "MTRStructsObjc.h"
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/DecodableList.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Events.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/EventHeader.h>
+#include <app/EventLoggingTypes.h>
+#include <lib/support/TypeTraits.h>
+
+using namespace chip;
+using namespace chip::app;
+
+id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    switch (aPath.mClusterId)
+    {
+    {{#chip_client_clusters includeAll=true}}
+    case Clusters::{{asUpperCamelCase name}}::Id: {
+        using namespace Clusters::{{asUpperCamelCase name}};
+        switch (aPath.mEventId)
+        {
+        {{#zcl_events}}
+        {{#zcl_event_fields}}
+        {{/zcl_event_fields}}
+
+        case Events::{{asUpperCamelCase name}}::Id: {
+            Events::{{asUpperCamelCase name}}::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nil;
+            }
+
+            MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event *value = [MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event new];
+
+            {{#zcl_event_fields}}
+            do {
+                {{asObjectiveCType type parent.parent.name}} memberValue;
+                {{>decode_value target="memberValue" source=(concat "cppValue." (asLowerCamelCase name)) cluster=parent.parent.name errorCode="*aError = err; return nil;" depth=0}}
+                value.{{asStructPropertyName name}} = memberValue;
+            } while(0);
+            {{/zcl_event_fields}}
+
+            return value;
+        }
+
+        {{/zcl_events}}
+
+        default:
+          *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+          break;
+        }
+        break;
+    }
+    {{/chip_client_clusters}}
+    default: {
+      *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+      break;
+    }
+    }
+    return nil;
+}

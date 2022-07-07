@@ -153,11 +153,11 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCommand::MaybeTearDownStack()
+void CHIPCommand::MaybeTearDownStack()
 {
     if (IsInteractive())
     {
-        return CHIP_NO_ERROR;
+        return;
     }
 
     //
@@ -165,21 +165,19 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityNull));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
+    ShutdownCommissioner(kIdentityNull);
+    ShutdownCommissioner(kIdentityAlpha);
+    ShutdownCommissioner(kIdentityBeta);
+    ShutdownCommissioner(kIdentityGamma);
 
     std::string name        = GetIdentity();
     chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
     if (fabricId >= kIdentityOtherFabricId)
     {
-        ReturnLogErrorOnFailure(ShutdownCommissioner(name));
+        ShutdownCommissioner(name);
     }
 
     StopTracing();
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPCommand::Run()
@@ -201,7 +199,7 @@ CHIP_ERROR CHIPCommand::Run()
         Cleanup();
     }
 
-    ReturnErrorOnFailure(MaybeTearDownStack());
+    MaybeTearDownStack();
 
     return err;
 }
@@ -322,9 +320,9 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(const char *
     return *item->second;
 }
 
-CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
+void CHIPCommand::ShutdownCommissioner(std::string key)
 {
-    return mCommissioners[key].get()->Shutdown();
+    mCommissioners[key].get()->Shutdown();
 }
 
 CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId,

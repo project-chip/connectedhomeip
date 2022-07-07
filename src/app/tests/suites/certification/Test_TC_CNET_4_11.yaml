@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.11. [TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command
+    11.4.9. [TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command
     [DUT-Server]
 
 config:
@@ -25,81 +25,197 @@ config:
 tests:
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+          ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
-          [1653480530.006012][27845:27850] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1653480530.006109][27845:27850] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1653480530.006209][27845:27850] CHIP:TOO:   ArmFailSafeResponse: {
-          [1653480530.006278][27845:27850] CHIP:TOO:     errorCode: 0
-          [1653480530.006328][27845:27850] CHIP:TOO:     debugText:
-          [1653480530.006374][27845:27850] CHIP:TOO:    }
+
+          [1653479952.284160][30473:30478] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1653479952.284231][30473:30478] CHIP:TOO:   ArmFailSafeResponse: {
+          [1653479952.284273][30473:30478] CHIP:TOO:     errorCode: 0
+          [1653479952.284297][30473:30478] CHIP:TOO:     debugText:
+          [1653479952.284322][30473:30478] CHIP:TOO:    }
+          [1653479952.284361][30473:30478] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653479952.284425][30473:30478] CHIP:EM: Sending Standalone Ack for MessageCounter:9947639 on exchange 30687i
       disabled: true
 
     - label:
-          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
-          argument value as 'Userwifi_ssid', Credentials argument value as
-          'Userwifi_Credentials' and Breadcrumb argument value as 1"
+          "TH readsNetworksattribute from theDUT and saves thenumber of
+          entriesas 'NumNetworks'"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivate092010 1 0
 
-          Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1653480530.517643][27851:27856] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [165
-          3480530.517748][27851:27856] CHIP:TOO:   NetworkConfigResponse: {
-          [1653480530.517808][27851:27856] CHIP:TOO:     networkingStatus: 0
-          [1653480530.517854][27851:27856] CHIP:TOO:     networkIndex: 0
-          [1653480530.517894][27851:27856] CHIP:TOO:    }
-      disabled: true
-
-    - label: "TH1 reads Networks attribute from the DUT"
-      verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
-
-          [1653480531.027668][27857:27863] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3424382863
-          [1653480531.027835][27857:27863] CHIP:TOO:   Networks: 1 entries
-          [1653480531.027946][27857:27863] CHIP:TOO:     [1]: {
-          [1653480531.028015][27857:27863] CHIP:TOO:       NetworkID: 47524C50726976617465
-          [1653480531.028073][27857:27863] CHIP:TOO:       Connected: TRUE
-          [1653480531.028128][27857:27863] CHIP:TOO:      }
+          [1653479952.712215][30479:30484] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1653479952.712331][30479:30484] CHIP:TOO:   NetworkConfigResponse: {
+          [1653479952.712386][30479:30484] CHIP:TOO:     networkingStatus: 0
+          [1653479952.712426][30479:30484] CHIP:TOO:     networkIndex: 0
+          [1653479952.712464][30479:30484] CHIP:TOO:    }
+          [1653479952.712522][30479:30484] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653479952.712603][30479:30484] CHIP:EM: Sending Standalone Ack for MessageCounter:3047410 on exchange 13787i
       disabled: true
 
     - label:
-          "TH saves record current wall clock time with seconds resolution as
-          CT1"
+          "TH sendsRemoveNetworkCommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 1ST_ACCESSPOINT_SSID andBreadcrumb fieldset to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          TH1 saves the timestamp as CT1
+          ./chip-tool networkcommissioning read networks 1 0
+
+          [1653479953.145038][30485:30490] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
+          [1653479953.145152][30485:30490] CHIP:TOO:   Networks: 1 entries
+          [1653479953.145229][30485:30490] CHIP:TOO:     [1]: {
+          [1653479953.145272][30485:30490] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1653479953.145310][30485:30490] CHIP:TOO:       Connected: TRUE
+          [1653479953.145348][30485:30490] CHIP:TOO:      }
+          [1653479953.145487][30485:30490] CHIP:EM: Sending Standalone Ack for MessageCounter:15337587 on exchange 47183i
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as 'Userwifi_ssid1' and Breadcrumb argument value as 1"
+          "TH sendsAddOrUpdateWiFiNetworkcommand to theDUT with SSIDfield set
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID,Credentials fieldset
+          toPIXIT.CNET.WIFI_2ND_ACCESSPOINr T_CREDENTIALSand Breadcrumbfield set
+          to 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
-          [1653480537.209041][27864:27869] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
-          [1653480537.209113][27864:27869] CHIP:TOO:   ConnectNetworkResponse: {
-          [1653480537.209154][27864:27869] CHIP:TOO:     networkingStatus: 0
-          [1653480537.209179][27864:27869] CHIP:TOO:     errorValue: null
-          [1653480537.209201][27864:27869] CHIP:TOO:    }
-          [1653480537.209240][27864:27869] CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label: "TH readsNetworksattribute from theDUT"
+      PICS: CNET.S.A0001
+      verification: |
+          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+
+
+          [1653479953.633815][30491:30496] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1653479953.633986][30491:30496] CHIP:TOO:   ConnectNetworkResponse: {
+          [1653479953.634133][30491:30496] CHIP:TOO:     networkingStatus: 0
+          [1653479953.634195][30491:30496] CHIP:TOO:     errorValue: null
+          [1653479953.634275][30491:30496] CHIP:TOO:    }
+          [1653479953.634367][30491:30496] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653479953.634501][30491:30496] CHIP:EM: Sending Standalone Ack for MessageCounter:490923 on exchange 21425i
       disabled: true
 
     - label:
-          "TH saves record current wall clock time with seconds resolution as
-          CT2"
+          "TH sendsConnectNetworkcommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID andBreadcrumb fieldset to 2"
+      PICS: CNET.S.C06.Rsp
       verification: |
-          TH1 saves the timestamp as CT2
+
       disabled: true
 
-    - label: "TH reads Networks attribute from the DUT"
+    - label:
+          "TH sendsConnectNetworkcommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID andBreadcrumb fieldset to 2"
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
-          [1653481261.622658][27982:27987] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3424382863
-          [1653481261.622821][27982:27987] CHIP:TOO:   Networks: 1 entries
-          [1653481261.622927][27982:27987] CHIP:TOO:     [1]: {
-          [1653481261.622996][27982:27987] CHIP:TOO:       NetworkID: 47524C50726976617465
-          [1653481261.623056][27982:27987] CHIP:TOO:       Connected: TRUE
-          [1653481261.623112][27982:27987] CHIP:TOO:      }
+
+          [1653479954.067458][30497:30502] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
+          [1653479954.067569][30497:30502] CHIP:TOO:   Networks: 1 entries
+          [1653479954.067639][30497:30502] CHIP:TOO:     [1]: {
+          [1653479954.067678][30497:30502] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1653479954.067714][30497:30502] CHIP:TOO:       Connected: TRUE
+          [1653479954.067748][30497:30502] CHIP:TOO:      }
+          [1653479954.067886][30497:30502] CHIP:EM: Sending Standalone Ack for MessageCounter:4152736 on exchange 20582i
+      disabled: true
+
+    - label:
+          "TH discovers andconnects to DUTon
+          thePIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operationalr network"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH readsBreadcrumbattribute from theGeneralCommissioningcluster of
+          the DUT"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to
+          0. Thisr forcibly disarmsthe fail-safe and isexpected to causethe
+          changes ofconfiguration toNetworkCommissioning cluster doneso far to
+          bereverted."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH changes itsWiFi connection toPIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH discovers andconnects to DUTon
+          thePIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operationalr network"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to
+          900"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsRemoveNetworkCommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 1ST_ACCESSPOINT_SSID andBreadcrumb fieldset to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsAddOrUpdateWiFiNetworkcommand to theDUT with SSIDfield set
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID,Credentials fieldset
+          toPIXIT.CNET.WIFI_2ND_ACCESSPOINr T_CREDENTIALSand Breadcrumbfield set
+          to 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsConnectNetworkcommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID andBreadcrumb fieldset to 3"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH changes itsWiFi connection toPIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH discovers andconnects to DUTon
+          thePIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID operationalr network"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH readsBreadcrumbattribute from theGeneralCommissioningcluster of
+          the DUT"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends theCommissioningComplete commandto the DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH readsNetworksattribute from theDUT"
+      PICS: CNET.S.A0001
+      verification: |
+
       disabled: true

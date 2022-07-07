@@ -50,6 +50,11 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
+
+#if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
+#include <lib/support/PersistentStorageAudit.h>
+#endif // defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT) || defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
+
 using namespace chip::DeviceLayer;
 
 using chip::kMinValidFabricIndex;
@@ -131,6 +136,14 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mCertificateValidityPolicy = initParams.certificateValidityPolicy;
 
+#if defined(CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT)
+    VerifyOrDie(chip::audit::ExecutePersistentStorageApiAudit(*mDeviceStorage));
+#endif
+
+#if defined(CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT)
+    VerifyOrDie(chip::audit::ExecutePersistentStorageLoadTestAudit(*mDeviceStorage));
+#endif
+
     // Set up attribute persistence before we try to bring up the data model
     // handler.
     SuccessOrExit(mAttributePersister.Init(mDeviceStorage));
@@ -168,9 +181,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler(&mExchangeMgr);
-
-    // Clean-up previously standing fail-safes
-    InitFailSafe();
 
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
@@ -257,7 +267,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     else
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART
-        GetFabricTable().DeleteAllFabrics();
         SuccessOrExit(err = mCommissioningWindowManager.OpenBasicCommissioningWindow());
 #endif
     }
@@ -300,6 +309,41 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     RejoinExistingMulticastGroups();
 #endif // !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
+    // Handle deferred clean-up of a previously armed fail-safe that occurred during FabricTable commit.
+    // This is done at the very end since at the earlier time above when FabricTable::Init() is called,
+    // the delegates could not have been registered, and the other systems were not initialized. By now,
+    // everything is initialized, so we can do a deferred clean-up.
+    {
+        FabricIndex fabricIndexDeletedOnInit = GetFabricTable().GetDeletedFabricFromCommitMarker();
+        if (fabricIndexDeletedOnInit != kUndefinedFabricIndex)
+        {
+            ChipLogError(AppServer, "FabricIndex 0x%x deleted due to restart while fail-safed. Processing a clean-up!",
+                         static_cast<unsigned>(fabricIndexDeletedOnInit));
+
+            // Always pretend it was an add, since being in the middle of an update currently breaks
+            // the validity of the fabric table. This is expected to be extremely infrequent, so
+            // this "harsher" than usual clean-up is more likely to get us in a valid state for whatever
+            // remains.
+            const bool addNocCalled    = true;
+            const bool updateNocCalled = false;
+            GetFailSafeContext().ScheduleFailSafeCleanup(fabricIndexDeletedOnInit, addNocCalled, updateNocCalled);
+
+            // Schedule clearing of the commit marker to only occur after we have processed all fail-safe clean-up.
+            // Because Matter runs a single event loop for all scheduled work, it will occur after the above has
+            // taken place. If a reset occurs before we have cleaned everything up, the next boot will still
+            // see the commit marker.
+            PlatformMgr().ScheduleWork(
+                [](intptr_t arg) {
+                    Server * server = reinterpret_cast<Server *>(arg);
+                    VerifyOrReturn(server != nullptr);
+
+                    server->GetFabricTable().ClearCommitMarker();
+                    ChipLogProgress(AppServer, "Cleared FabricTable pending commit marker");
+                },
+                reinterpret_cast<intptr_t>(this));
+        }
+    }
+
     PlatformMgr().HandleServerStarted();
 
 exit:
@@ -313,39 +357,6 @@ exit:
         ChipLogProgress(AppServer, "Server Listening...");
     }
     return err;
-}
-
-void Server::InitFailSafe()
-{
-    bool failSafeArmed = false;
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // If the fail-safe was armed when the device last shutdown, initiate cleanup based on the pending Fail Safe Context with
-    // which the fail-safe timer was armed.
-    if (DeviceLayer::ConfigurationMgr().GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        FabricIndex fabricIndex;
-        bool addNocCommandInvoked;
-        bool updateNocCommandInvoked;
-
-        ChipLogProgress(AppServer, "Detected fail-safe armed on reboot");
-
-        err = DeviceLayer::FailSafeContext::LoadFromStorage(fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        if (err == CHIP_NO_ERROR)
-        {
-            DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext().ScheduleFailSafeCleanup(
-                fabricIndex, addNocCommandInvoked, updateNocCommandInvoked);
-        }
-        else
-        {
-            // This should not happen, but we should not fail system init based on it!
-            ChipLogError(DeviceLayer, "Failed to load fail-safe context from storage (err= %" CHIP_ERROR_FORMAT "), cleaning-up!",
-                         err.Format());
-            (void) DeviceLayer::ConfigurationMgr().SetFailSafeArmed(false);
-            err = CHIP_NO_ERROR;
-        }
-    }
 }
 
 void Server::RejoinExistingMulticastGroups()
@@ -407,11 +418,7 @@ void Server::Shutdown()
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mMessageCounterManager.Shutdown();
-    CHIP_ERROR err = mExchangeMgr.Shutdown();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Exchange Mgr shutdown: %" CHIP_ERROR_FORMAT, err.Format());
-    }
+    mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
     mAccessControl.Finish();

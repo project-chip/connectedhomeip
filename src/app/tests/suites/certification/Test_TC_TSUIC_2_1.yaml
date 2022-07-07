@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Read the mandatory attribute: TemperatureDisplayMode"
+      PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "temperature display mode"
       response:
@@ -38,6 +39,7 @@ tests:
               maxValue: 1
 
     - label: "Read the mandatory attribute: KeypadLockout"
+      PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "keypad lockout"
       response:
@@ -47,6 +49,7 @@ tests:
               maxValue: 5
 
     - label: "Read the optional attribute: ScheduleProgrammingVisibility"
+      PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "schedule programming visibility"
       response:

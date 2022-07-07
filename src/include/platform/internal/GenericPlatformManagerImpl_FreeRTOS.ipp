@@ -273,9 +273,8 @@ void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::PostEventFromISR(const Chip
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
+void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_Shutdown(void)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 template <class ImplClass>

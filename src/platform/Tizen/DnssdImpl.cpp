@@ -460,11 +460,11 @@ exit:
     return CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR DnssdTizen::Shutdown()
+void DnssdTizen::Shutdown()
 {
     int ret = dnssd_deinitialize();
-    VerifyOrReturnError(ret == DNSSD_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    if (ret != DNSSD_ERROR_NONE)
+        ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret);
 }
 
 CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context)
@@ -685,9 +685,9 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return DnssdTizen::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
+void ChipDnssdShutdown()
 {
-    return DnssdTizen::GetInstance().Shutdown();
+    DnssdTizen::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)

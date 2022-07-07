@@ -66,7 +66,7 @@ public:
                                                        including both successfully and failure send. */
     };
 
-    ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
+    ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
     void Init(chip::System::Layer * systemLayer);
@@ -177,7 +177,7 @@ public:
 #endif // CHIP_CONFIG_TEST
 
 private:
-    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
+    ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
 
     /* Placeholder function to run a function for all exchanges */
@@ -193,7 +193,7 @@ private:
     void TicklessDebugDumpRetransTable(const char * log);
 
     // ReliableMessageProtocol Global tables for timer context
-    BitMapObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
+    ObjectPool<RetransTableEntry, CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE> mRetransTable;
 };
 
 } // namespace Messaging

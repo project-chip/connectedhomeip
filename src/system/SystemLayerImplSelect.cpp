@@ -62,9 +62,9 @@ CHIP_ERROR LayerImplSelect::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplSelect::Shutdown()
+void LayerImplSelect::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mLayerState.SetShuttingDown());
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     TimerList::Node * timer;
@@ -85,7 +85,6 @@ CHIP_ERROR LayerImplSelect::Shutdown()
     mWakeEvent.Close(*this);
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
-    return CHIP_NO_ERROR;
 }
 
 void LayerImplSelect::Signal()

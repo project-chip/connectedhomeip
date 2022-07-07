@@ -298,13 +298,13 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplication
     return Init(platformDelegate, nullptr, appDelegate, systemLayer);
 }
 
-CHIP_ERROR BleLayer::Shutdown()
+void BleLayer::Shutdown()
 {
     mState = kState_NotInitialized;
-    return CloseAllBleConnections();
+    CloseAllBleConnections();
 }
 
-CHIP_ERROR BleLayer::CloseAllBleConnections()
+void BleLayer::CloseAllBleConnections()
 {
     // Close and free all BLE end points.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
@@ -329,10 +329,9 @@ CHIP_ERROR BleLayer::CloseAllBleConnections()
             }
         }
     }
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
+void BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
 {
     // Close and free all BLE endpoints.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
@@ -357,7 +356,6 @@ CHIP_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
             }
         }
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BleLayer::CancelBleIncompleteConnection()

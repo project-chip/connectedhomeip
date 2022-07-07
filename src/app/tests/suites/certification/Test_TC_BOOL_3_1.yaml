@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 68.3.1. [TC-BOOL-3.1] Attributes with client as DUT
+name: 67.3.1. [TC-BOOL-3.1] Attributes with Client as DUT
 
 config:
     nodeId: 0x12344321
@@ -22,46 +22,91 @@ config:
 
 tests:
     - label:
-          "DUT reads all supported mandatory attributes from TH once at a time
-          in a manufacturer specific order"
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received read of state-value (id 0) looks like this:
+          ./chip-tool booleanstate read state-value 1 1
+
+          Verify on TestHarnes (all-cluster-app) a received read of state-value printing the cluster ID endpoint used and attribute ID which is read in logs
 
           [CHIP:DMG: ReadRequestMessage =
           [1646667214.092121][11498:11498] CHIP:DMG: {
-          [1646667214.092142][11498:11498] CHIP:DMG: 	AttributePathIBs =
-          [1646667214.092179][11498:11498] CHIP:DMG: 	[
-          [1646667214.092204][11498:11498] CHIP:DMG: 		AttributePathIB =
-          [1646667214.092242][11498:11498] CHIP:DMG: 		{
-          [1646667214.092279][11498:11498] CHIP:DMG: 			Endpoint = 0x1,
-          [1646667214.092319][11498:11498] CHIP:DMG: 			Cluster = 0x45,
-          [1646667214.092359][11498:11498] CHIP:DMG: 			Attribute = 0x0000_0000,
-          [1646667214.092391][11498:11498] CHIP:DMG: 		}
+          [1646667214.092142][11498:11498] CHIP:DMG:         AttributePathIBs =
+          [1646667214.092179][11498:11498] CHIP:DMG:         [
+          [1646667214.092204][11498:11498] CHIP:DMG:                 AttributePathIB =
+          [1646667214.092242][11498:11498] CHIP:DMG:                 {
+          [1646667214.092279][11498:11498] CHIP:DMG:                         Endpoint = 0x1,
+          [1646667214.092319][11498:11498] CHIP:DMG:                         Cluster = 0x45,
+          [1646667214.092359][11498:11498] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1646667214.092391][11498:11498] CHIP:DMG:                 }
           [1646667214.092430][11498:11498] CHIP:DMG:
-          [1646667214.092456][11498:11498] CHIP:DMG: 	],
+          [1646667214.092456][11498:11498] CHIP:DMG:         ],
           [1646667214.092494][11498:11498] CHIP:DMG:
-          [1646667214.092529][11498:11498] CHIP:DMG: 	isFabricFiltered = true,
-          [1646667214.092555][11498:11498] CHIP:DMG: 	InteractionModelRevision = 1
+          [1646667214.092529][11498:11498] CHIP:DMG:         isFabricFiltered = true,
+          [1646667214.092555][11498:11498] CHIP:DMG:         InteractionModelRevision = 1
           [1646667214.092577][11498:11498] CHIP:DMG: },
+
+
+          Verify on DUT
+
+          ./chip-tool booleanstate read state-value 1 1
+
+          [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
+          [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
       disabled: true
 
     - label:
-          "DUT reads all supported optional attributes from TH once at a time in
+          "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          see above
+          No optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
           No writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
-          the TH once at a time in a manufacturer specific order"
+          the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          No optional attribute
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          ./chip-tool booleanstate read attribute-list 1 1
+          [1654244313219] [91456:3997555] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_FFFB DataVersion: 2739318439
+          [1654244313220] [91456:3997555] CHIP: [TOO]   AttributeList: 6 entries
+          [1654244313220] [91456:3997555] CHIP: [TOO]     [1]: 0
+          [1654244313220] [91456:3997555] CHIP: [TOO]     [2]: 65528
+          [1654244313220] [91456:3997555] CHIP: [TOO]     [3]: 65529
+          [1654244313220] [91456:3997555] CHIP: [TOO]     [4]: 65531
+          [1654244313220] [91456:3997555] CHIP: [TOO]     [5]: 65532
+          [1654244313220] [91456:3997555] CHIP: [TOO]     [6]: 65533
+
+           ./chip-tool booleanstate read state-value 1 1
+          [1654244423171] [91468:3998115] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000 DataVersion: 2739318439
+          [1654244423171] [91468:3998115] CHIP: [TOO]   StateValue: FALSE
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          No optional attribute
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          No optional attribute
       disabled: true

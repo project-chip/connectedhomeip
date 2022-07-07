@@ -17,6 +17,7 @@
  */
 
 #include "InteractiveCommands.h"
+#import <Matter/Matter.h>
 
 #include <iomanip>
 #include <readline/history.h>

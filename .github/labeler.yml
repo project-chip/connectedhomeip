@@ -51,6 +51,9 @@ gn:
     - "*.gn"
     - "*.gni"
 
+tests:
+    - src/app/tests/*
+
 github:
     - .github
 
@@ -126,6 +129,11 @@ setup payload:
 ############################################################
 platform:
     - src/platform/*
+    - config/tizen/chip-gn/platform/*
+    - examples/platform/*
+    - scripts/tools/memory/platform/*
+    - src/include/platform/*
+    - src/lib/dnssd/platform/*
 
 darwin:
     - src/platform/Darwin/*

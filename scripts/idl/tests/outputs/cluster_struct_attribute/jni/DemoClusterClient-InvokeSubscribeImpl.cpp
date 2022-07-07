@@ -27,9 +27,8 @@ using namespace chip::Controller;
 JNI_METHOD(jlong, DemoClusterCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
-    DemoClusterCluster * cppCluster = new DemoClusterCluster();
-
-    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    DemoClusterCluster * cppCluster = new DemoClusterCluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpointId);
     return reinterpret_cast<jlong>(cppCluster);
 }
 

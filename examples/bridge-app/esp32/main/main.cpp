@@ -26,17 +26,30 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <common/Esp32AppServer.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
 
 #include <app/server/Server.h>
 
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+} // namespace
+
 const char * TAG = "bridge-app";
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Platform;
+using namespace ::chip::Credentials;
 
 static AppDeviceCallbacks AppCallback;
 
@@ -396,6 +409,16 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(chip_err));
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
