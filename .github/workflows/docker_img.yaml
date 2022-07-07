@@ -35,7 +35,6 @@ jobs:
                     - ""
                     - "-ameba"
                     - "-android"
-                    - "-bl602"
                     - "-cirque"
                     - "-crosscompile"
                     - "-doxygen"
