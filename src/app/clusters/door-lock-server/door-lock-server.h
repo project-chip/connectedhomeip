@@ -117,45 +117,6 @@ public:
     bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
     bool GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpointId, uint8_t & numberOfHolidaySchedules);
 
-    void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                               const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
-
-    void GetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                               const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData);
-
-    void ClearUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                 const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData);
-
-    void SetCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData);
-
-    void GetCredentialStatusCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData);
-
-    void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                       const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
-
-    void SetWeekDayScheduleCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData);
-    void GetWeekDayScheduleCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData);
-    void ClearWeekDayScheduleCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData);
-
-    void SetYearDayScheduleCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData);
-    void GetYearDayScheduleCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData);
-    void ClearYearDayScheduleCommandHandler(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
-
     bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
     inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
@@ -193,7 +154,7 @@ private:
     bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex);
     bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex,
                               uint16_t & maxNumberOfCredentials);
-    bool getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize);
+    DlStatus credentialLengthWithinRange(chip::EndpointId endpointId, DlCredentialType type, const chip::ByteSpan & credentialData);
     bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t & maxNumberOfCredentials);
 
     bool findOccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
@@ -263,10 +224,12 @@ private:
     bool clearFabricFromCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, chip::FabricIndex fabricToRemove);
     bool clearFabricFromCredentials(chip::EndpointId endpointId, chip::FabricIndex fabricToRemove);
 
-    CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
-                                         uint16_t nextCredentialIndex);
+    void sendSetCredentialResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                   DlStatus status, uint16_t userIndex, uint16_t nextCredentialIndex);
 
     // TODO: Maybe use CHIP_APPLICATION_ERROR instead of boolean in class methods?
+    // OPTIMIZE: there are a lot of methods such as this that could be made static which could help reduce the stack footprint
+    // in case of multiple lock endpoints
     bool credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type);
 
     bool weekDayIndexValid(chip::EndpointId endpointId, uint8_t weekDayIndex);
@@ -304,14 +267,57 @@ private:
 
     DlLockDataType credentialTypeToLockDataType(DlCredentialType credentialType);
 
-    void setHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                            uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
+    void setUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                               const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
 
-    void getHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                            uint8_t holidayIndex);
+    void getUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                               uint16_t userIndex);
 
-    void clearHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                              uint8_t holidayIndex);
+    void clearUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                 uint16_t userIndex);
+
+    void setCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData);
+
+    void getCredentialStatusCommandHandler(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath, DlCredentialType credentialType,
+                                           uint16_t credentialIndex);
+
+    void clearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
+
+    void setWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t weekDayIndex,
+                                          uint16_t userIndex, const chip::BitMask<DlDaysMaskMap> & daysMask, uint8_t startHour,
+                                          uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+
+    void getWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t weekDayIndex,
+                                          uint16_t userIndex);
+
+    void clearWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath, uint8_t weekDayIndex,
+                                            uint16_t userIndex);
+
+    void setYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                          uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime);
+    void getYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                          uint16_t userIndex);
+    void clearYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                            uint16_t userIndex);
+
+    void setHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex,
+                                          uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode);
+
+    void getHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex);
+
+    void clearHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex);
 
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
 
@@ -323,8 +329,8 @@ private:
      * @param opType        remote operation type (lock, unlock)
      * @param opHandler     plugin handler for specified command
      * @param pinCode       pin code passed by client
-     * @return true         if locking/unlocking was successfull
-     * @return false        if error happenned during lock/unlock
+     * @return true         if locking/unlocking was successful
+     * @return false        if error happened during lock/unlock
      */
     bool HandleRemoteLockOperation(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                    DlLockOperationType opType, RemoteLockOpHandler opHandler,
@@ -342,7 +348,7 @@ private:
      * @param nodeId        node id
      * @param credList      list of credentials used in lock operation (can be NULL if no credentials were used)
      * @param credListSize  size of credentials list (if 0, then no credentials were used)
-     * @param opSuccess     flags if operation was successfull or not
+     * @param opSuccess     flags if operation was successful or not
      */
     void SendLockOperationEvent(chip::EndpointId endpointId, DlLockOperationType opType, DlOperationSource opSource,
                                 DlOperationError opErr, const Nullable<uint16_t> & userId,
@@ -423,6 +429,57 @@ private:
     friend bool emberAfDoorLockClusterClearHolidayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData);
+
+    friend bool
+    emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
+
+    friend bool
+    emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandObj,
+                                          const chip::app::ConcreteCommandPath & commandPath,
+                                          const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData);
+
+    friend bool
+    emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath,
+                                            const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterSetCredentialCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterGetCredentialStatusCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterClearCredentialCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterSetWeekDayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterGetWeekDayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterClearWeekDayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterSetYearDayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterGetYearDayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterClearYearDayScheduleCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
 
     EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
 
