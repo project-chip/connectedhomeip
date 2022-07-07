@@ -80,7 +80,7 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
 
             mRequestor->NotifyUpdateApplied();
 
-            ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestorDriver::Init After IsFirstImageRun() - Calling StoreBootReason %u", 
+            ChipLogError(SoftwareUpdate, "//is: DefaultOTARequestorDriver::Init After IsFirstImageRun() - Calling StoreBootReason %u",
                     static_cast<uint32_t>(BootReasonType::kSoftwareUpdateCompleted));
             error = DeviceLayer::ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(BootReasonType::kSoftwareUpdateCompleted));
             if (error != CHIP_NO_ERROR)
