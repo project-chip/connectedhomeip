@@ -372,7 +372,7 @@ class BaseTestHelper:
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
         self.logger.info("Starting AddNOC using same node ID")
-        if not await CommissioningUtils.AddNOC(self.devCtrl, tempDevCtrl, nodeid, nodeid):
+        if not await CommissioningUtils.AddNOCForNewFabricFromExisting(self.devCtrl, tempDevCtrl, nodeid, nodeid):
             self.logger.error("AddNOC failed")
             return False
 

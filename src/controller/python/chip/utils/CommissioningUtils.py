@@ -16,54 +16,89 @@
 #
 
 import asyncio
+import logging
 import chip.clusters as Clusters
 import chip.tlv
 
 _UINT16_MAX = 65535
 
-
-async def _IsBasicAttributeReadSuccessful(devCtrl, nodeId):
-    resp = await devCtrl.ReadAttribute(nodeId, [(Clusters.Basic.Attributes.ClusterRevision)])
-    clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
-    if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
-        return False
-    return True
+logger = logging.getLogger()
 
 
-async def AddNOC(commissionedDevCtrl, newDevCtrl, existingNodeId, newNodeId):
-    resp = await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
+async def _IsNodeInFabricList(devCtrl, nodeId):
+    resp = await devCtrl.ReadAttribute(nodeId, [(Clusters.OperationalCredentials.Attributes.Fabrics)])
+    listOfFabricsDescriptor = resp[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.Fabrics]
+    for fabricDescriptor in listOfFabricsDescriptor:
+        if fabricDescriptor.nodeId == nodeId:
+            return True
+
+    return False
+
+
+async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, existingNodeId, newNodeId):
+    """ Perform sequence to commission new frabric using existing commissioned fabric.
+
+    Args:
+        commissionerDevCtrl (ChipDeviceController): Already commissioned device controller used
+            to commission a new fabric on `newFabricDevCtrl`.
+        newFabricDevCtrl (ChipDeviceController): New device controller which is used for the new
+            fabric we are establishing.
+        existingNodeId (int): Node ID of the server we are establishing a CASE session on the
+            existing fabric that we will used to perform AddNOC.
+        newNodeId (int): Node ID that we would like to server to used on the new fabric being
+            added.
+
+    Return:
+        bool: True if successful, False otherwise.
+
+    """
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
     if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
         return False
 
-    csrForAddNOC = await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32))
+    csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32))
 
-    chainForAddNOC = newDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
+    chainForAddNOC = newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
     if chainForAddNOC.rcacBytes is None or chainForAddNOC.icacBytes is None or chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    # TODO error check on the commands below
-    await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
-    resp = await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newDevCtrl.GetNodeId(), 0xFFF1))
+    await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.GetNodeId(), 0xFFF1))
     if resp.statusCode is not Clusters.OperationalCredentials.Enums.OperationalCertStatus.kSuccess:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    resp = await newDevCtrl.SendCommand(newNodeId, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
+    resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionedDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    if not await _IsBasicAttributeReadSuccessful(newDevCtrl, newNodeId):
+    if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
         return False
 
     return True
 
 
 async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
+    """ Perform sequence to generate a new NOC cert and issue updated NOC to server.
+
+    Args:
+        commissionerDevCtrl (ChipDeviceController): Already commissioned device controller used
+            which we wish to update the NOC certificate for.
+        existingNodeId (int): Node ID of the server we are establishing a CASE session to
+            perform UpdateNOC.
+        newNodeId (int): Node ID that we would like to update the server to use. This can be
+            the same as `existingNodeId` if you wish to keep the node ID unchanged, but only
+            update the NOC certificate.
+
+    Return:
+        bool: True if successful, False otherwise.
+
+    """
     resp = await devCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
     if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
         return False
@@ -86,7 +121,7 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         await devCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    if not await _IsBasicAttributeReadSuccessful(devCtrl, newNodeId):
+    if not await _IsNodeInFabricList(devCtrl, newNodeId):
         return False
 
     return True
