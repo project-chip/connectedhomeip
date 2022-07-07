@@ -39,7 +39,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         {
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
         {{> im_command_handler_cluster_commands}}
             break;
         }
@@ -72,7 +71,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
     Compatibility::SetupEmberAfCommandHandler(apCommandObj, aCommandPath);
-
+    MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
     switch (aCommandPath.mClusterId)
     {
     {{#all_user_clusters_with_incoming_commands}}

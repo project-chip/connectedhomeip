@@ -51,7 +51,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::GetSetupPIN::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::GetSetupPIN::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -61,7 +60,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Login::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Login::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -71,7 +69,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Logout::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Logout::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -109,7 +106,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::OpenCommissioningWindow::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::OpenCommissioningWindow::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -120,7 +116,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::OpenBasicCommissioningWindow::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::OpenBasicCommissioningWindow::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -131,7 +126,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::RevokeCommissioning::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::RevokeCommissioning::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -170,7 +164,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::LaunchApp::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::LaunchApp::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -180,7 +173,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::StopApp::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::StopApp::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -190,7 +182,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::HideApp::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::HideApp::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -228,7 +219,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::SelectOutput::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SelectOutput::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -238,7 +228,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::RenameOutput::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::RenameOutput::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -276,7 +265,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::ChangeChannel::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ChangeChannel::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -286,7 +274,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::ChangeChannelByNumber::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ChangeChannelByNumber::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -296,7 +283,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::SkipChannel::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SkipChannel::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -334,7 +320,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::LaunchContent::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::LaunchContent::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -344,7 +329,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::LaunchURL::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::LaunchURL::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -382,7 +366,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::RetrieveLogsRequest::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::RetrieveLogsRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -420,7 +403,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::ResetCounts::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ResetCounts::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -458,7 +440,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::ArmFailSafe::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ArmFailSafe::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -468,7 +449,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::SetRegulatoryConfig::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SetRegulatoryConfig::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -478,7 +458,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::CommissioningComplete::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::CommissioningComplete::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -517,7 +496,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::TestEventTrigger::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::TestEventTrigger::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -555,7 +533,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::KeySetWrite::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::KeySetWrite::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -565,7 +542,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::KeySetRead::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::KeySetRead::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -575,7 +551,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::KeySetRemove::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::KeySetRemove::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -585,7 +560,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::KeySetReadAllIndices::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::KeySetReadAllIndices::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -623,7 +597,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::SendKey::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SendKey::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -661,7 +634,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::MoveToLevel::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::MoveToLevel::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -671,7 +643,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Move::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Move::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -681,7 +652,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Step::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Step::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -691,7 +661,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Stop::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Stop::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -701,7 +670,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::MoveToLevelWithOnOff::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::MoveToLevelWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -711,7 +679,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::MoveWithOnOff::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::MoveWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -721,7 +688,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::StepWithOnOff::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::StepWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -731,7 +697,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::StopWithOnOff::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::StopWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -769,7 +734,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::Sleep::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Sleep::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -807,7 +771,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::SelectInput::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SelectInput::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -817,7 +780,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::ShowInputStatus::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ShowInputStatus::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -827,7 +789,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::HideInputStatus::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::HideInputStatus::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -837,7 +798,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::RenameInput::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::RenameInput::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -875,7 +835,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::Play::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Play::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -885,7 +844,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Pause::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Pause::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -895,7 +853,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::StopPlayback::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::StopPlayback::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -905,7 +862,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::StartOver::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::StartOver::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -915,7 +871,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Previous::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Previous::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -925,7 +880,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Next::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Next::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -935,7 +889,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Rewind::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Rewind::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -945,7 +898,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::FastForward::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::FastForward::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -955,7 +907,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::SkipForward::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SkipForward::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -965,7 +916,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::SkipBackward::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::SkipBackward::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -975,7 +925,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Seek::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Seek::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1013,7 +962,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::ScanNetworks::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ScanNetworks::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1023,7 +971,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::AddOrUpdateWiFiNetwork::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::AddOrUpdateWiFiNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1034,7 +981,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::AddOrUpdateThreadNetwork::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::AddOrUpdateThreadNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1045,7 +991,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::RemoveNetwork::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::RemoveNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1055,7 +1000,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::ConnectNetwork::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ConnectNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1065,7 +1009,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::ReorderNetwork::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ReorderNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1103,7 +1046,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::QueryImage::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::QueryImage::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1113,7 +1055,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::ApplyUpdateRequest::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::ApplyUpdateRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1124,7 +1065,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::NotifyUpdateApplied::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::NotifyUpdateApplied::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1163,7 +1103,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::Off::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Off::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1173,7 +1112,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::On::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::On::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1183,7 +1121,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::Toggle::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::Toggle::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1221,7 +1158,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::AttestationRequest::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::AttestationRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1232,7 +1168,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::CertificateChainRequest::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::CertificateChainRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1243,7 +1178,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::CSRRequest::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::CSRRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1253,7 +1187,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::AddNOC::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::AddNOC::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1263,7 +1196,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::UpdateNOC::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::UpdateNOC::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1273,7 +1205,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::UpdateFabricLabel::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::UpdateFabricLabel::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1283,7 +1214,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::RemoveFabric::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::RemoveFabric::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1293,7 +1223,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::AddTrustedRootCertificate::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::AddTrustedRootCertificate::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1332,7 +1261,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::NavigateTarget::Id: {
-            MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
             Commands::NavigateTarget::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -1365,7 +1293,7 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
     Compatibility::SetupEmberAfCommandHandler(apCommandObj, aCommandPath);
-
+    MatterPreExecuteCommandCallback(apCommandObj, aCommandPath);
     switch (aCommandPath.mClusterId)
     {
     case Clusters::AccountLogin::Id:
