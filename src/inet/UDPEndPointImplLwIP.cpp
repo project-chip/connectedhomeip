@@ -425,18 +425,19 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
         }
         else
         {
-            lStatus = igmp_leavegroup(lNetif, &lIPv4Address);
+            lStatus = igmp_leavegroup_netif(lNetif, &lIPv4Address);
         }
     }
     else
     {
+
         if (join)
         {
-            lStatus = igmp_joingroup(IP_ADDR_ANY, &lIPv4Address);
+            lStatus = igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address);
         }
         else
         {
-            lStatus = igmp_leavegroup(IP_ADDR_ANY, &lIPv4Address);
+            lStatus = igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
         }
     }
 
