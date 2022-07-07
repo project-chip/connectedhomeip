@@ -34,10 +34,13 @@ tests:
       arguments:
           value:
               [
-                  { label: "this is longer than sixteen characters", value: "bedroom 2" },
+                  {
+                      label: "this is longer than sixteen characters",
+                      value: "bedroom 2",
+                  },
               ]
       response:
-        error: FAILURE
+          error: FAILURE
 
     - label: "Attempt to write overly long item for value"
       command: "writeAttribute"
@@ -45,8 +48,10 @@ tests:
       arguments:
           value:
               [
-                  { label: "test", value: "this is longer than sixteen characters" },
+                  {
+                      label: "test",
+                      value: "this is longer than sixteen characters",
+                  },
               ]
       response:
-        error: FAILURE
-
+          error: FAILURE
