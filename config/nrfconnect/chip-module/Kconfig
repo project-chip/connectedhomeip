@@ -123,7 +123,7 @@ config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	  factory data.
 
 # Use default certificates without generating or providing them
-config CHIP_FACTORY_DATA_USE_DEFAULTS_CERTS
+config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
 	bool "Use default certificates located in Matter repository"
 	default y
 	help
