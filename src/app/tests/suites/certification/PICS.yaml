@@ -536,30 +536,39 @@ PICS:
 
       # Relative Humidity cluster
     - label: "Does the device implement the MeasuredValue attribute?"
-      id: A_RELATIVEHUMIDITY
+      id: RH.S.A0000
 
     - label: "Does the device implement the MinMeasuredValue attribute?"
-      id: A_RELATIVEHUMIDITY_MIN
+      id: RH.S.A0001
 
     - label: "Does the device implement the MaxMeasuredValue attribute?"
-      id: A_RELATIVEHUMIDITY_MAX
+      id: RH.S.A0002
 
     - label: "Does the device implement the Tolerance attribute?"
-      id: A_RELATIVEHUMIDITY_TOLERANCE
+      id: RH.S.A0003
 
     - label:
           "Can the MeasuredValue attribute changed by physical control at the
           device?"
-      id: MANUAL_RELATIVEHUMIDITY_CHANGE
+      id: RH.M.ManuallyControlled
 
       # Temperature Measurement cluster
-    - label: "Does the device implement the MeasuredValue attribute"
-      id: A_TEMPERATURE
+    - label: "Does the device implement the MeasuredValue attribute?"
+      id: TM.S.A0000
+
+    - label: "Does the device implement the MinMeasuredValue attribute?"
+      id: TM.S.A0001
+
+    - label: "Does the device implement the MaxMeasuredValue attribute?"
+      id: TM.S.A0002
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: TM.S.A0003
 
     - label:
           "Can the MeasuredValue attribute changed by physical control at the
-          device"
-      id: MANUAL_TEMPERATURE_CHANGE
+          device?"
+      id: TM.M.ManuallyControlled
 
       # Thermostat User Configuration cluster
     - label: "Does the device implement the TemperatureDisplayMode attribute?"
@@ -826,33 +835,63 @@ PICS:
 
       # On/Off Cluster
     - label: "Does the device implement the OnOff attribute?"
-      id: A_ONOFF
+      id: OO.S.A0000
 
     - label: "Does the device implement the GlobalSceneControl attribute?"
-      id: A_GLOBALSCENECONTROL
+      id: OO.S.A4000
 
     - label: "Does the device implement the OnTime attribute?"
-      id: A_ONTIME
+      id: OO.S.A4001
 
     - label: "Does the device implement the OffWaitTime attribute?"
-      id: A_OFFWAITTIME
+      id: OO.S.A4002
+
+    - label: "Does the device implement the StartUpOnOff attribute?"
+      id: OO.S.A4003
 
     - label: "Does the device implement receiving the Off command?"
-      id: CR_OFF
+      id: OO.S.C00.Rsp
 
-    - label: "Does the device implement sending the On command?"
-      id: CR_ON
+    - label: "Does the device implement receiving the On command?"
+      id: OO.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Toggle command?"
+      id: OO.S.C02.Rsp
 
     - label: "Does the device implement receiving the OffWithEffect command?"
-      id: CR_OFFWITHEFFECT
+      id: OO.S.C40.Rsp
 
     - label:
           "Does the device implement receiving the OnWithRecallGlobalScene
           command?"
-      id: CR_ONWITHRECALL
+      id: OO.S.C41.Rsp
 
     - label: "Does the device implement receiving the OnWithTimedOff command?"
-      id: CR_ONWITHTIMEOFF
+      id: OO.S.C42.Rsp
+
+    - label:
+          "Can the OnOff attribute changed by physical control at the device?"
+      id: OO.M.ManuallyControlled
+
+    - label: "Does the device implement sending the Off command?"
+      id: OO.C.C00.Tx
+
+    - label: "Does the device implement sending the On command?"
+      id: OO.C.C01.Tx
+
+    - label: "Does the device implement sending the Toggle command?"
+      id: OO.C.C02.Tx
+
+    - label: "Does the device implement sending the OffWithEffect command?"
+      id: OO.C.C40.Tx
+
+    - label:
+          "Does the device implement sending the OnWithRecallGlobalScene
+          command?"
+      id: OO.C.C41.Tx
+
+    - label: "Does the device implement sending the OnWithTimedOff command?"
+      id: OO.C.C42.Tx
 
     - label: "Does Dnssd advertisment broadcast Vendor ID"
       id: VENDOR_SUBTYPE
@@ -2656,3 +2695,107 @@ PICS:
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
       id: DGWIFI.S.C00
+    #Actions Cluster
+    - label: "Does the device implement the ActionList attribute?"
+      id: ACT.S.A0000
+
+    - label: "Does the device implement the EndpointLists attribute?"
+      id: ACT.S.A0001
+
+    - label: "Does the device implement the SetupURL attribute?"
+      id: ACT.S.A0002
+
+    - label: "Can the ActionList attribute be changed by some means?"
+      id: ACT.S.M.FillActionList
+
+    - label: "Can the EndpointLists attribute be changed by some means?"
+      id: ACT.S.M.FillEndpointLists
+
+    - label: "Does the DUT support sending the InstantAction command?"
+      id: ACT.C.C00.Tx
+
+    - label:
+          "Does the DUT support sending the InstantActionWithTransition command?"
+      id: ACT.C.C01.Tx
+
+    - label: "Does the DUT support sending the StartAction command?"
+      id: ACT.C.C02.Tx
+
+    - label: "Does the DUT support sending the StartActionWithDuration command?"
+      id: ACT.C.C03.Tx
+
+    - label: "Does the DUT support sending the StopAction command?"
+      id: ACT.C.C04.Tx
+
+    - label: "Does the DUT support sending the PauseAction command?"
+      id: ACT.C.C05.Tx
+
+    - label: "Does the DUT support sending the PauseActionWithDuration command?"
+      id: ACT.C.C06.Tx
+
+    - label: "Does the DUT support sending the ResumeAction command?"
+      id: ACT.C.C07.Tx
+
+    - label: "Does the DUT support sending the EnableAction command?"
+      id: ACT.C.C08.Tx
+
+    - label:
+          "Does the DUT support sending the EnableActionWithDuration command?"
+      id: ACT.C.C09.Tx
+
+    - label: "Does the DUT support sending the DisableAction command?"
+      id: ACT.C.C0a.Tx
+
+    - label:
+          "Does the DUT support sending the DisableActionWithDuration command?"
+      id: ACT.C.C0b.Tx
+
+    #Boolean State Cluster
+    - label: "Does the device implement the StateValue attribute?"
+      id: BOOL.S.A0000
+
+    - label:
+          "Can the StateValue attribute be changed by manual operation at the
+          DUT?"
+      id: BOOL.M.ManuallyControlled
+
+    - label: "Does the device implement the StateChange event?"
+      id: BOOL.S.E00
+
+    #Diagnostics Logs Cluster
+    - label:
+          "Does the Device(Server) implement receiving the RetrieveLogsRequest
+          command?"
+      id: DLOG.S.C00.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the RetrieveLogsResponse
+          command?"
+      id: DLOG.S.C01.Tx
+
+    - label:
+          "Does the Device(client) implement receiving the RetrieveLogsResponse
+          command?"
+      id: DLOG.C.C01.Rsp
+
+    - label:
+          "Does the Device(client) invoking/generating the RetrieveLogsRequeste
+          command?"
+      id: DLOG.C.C00.Tx
+
+    #Localization Configuration Cluster
+    - label: "Does the DUT(server) support the ActiveLocale attribute?"
+      id: LCFG.S.A0000
+
+    - label: "Does the DUT(server) support the SupportedLocales attribute?"
+      id: LCFG.S.A0001
+
+    - label: "Does the DUT(client) support the ActiveLocale attribute?"
+      id: LCFG.C.A0000
+
+    - label: "Does the DUT(server) support the SupportedLocales attribute?"
+      id: LCFG.C.A0001
+
+    #Power Source Configuration Cluster
+    - label: "Does the device implement the Sources attribute?"
+      id: PSCFG.S.A0000
