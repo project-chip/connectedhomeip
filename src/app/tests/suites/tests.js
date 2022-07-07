@@ -714,6 +714,7 @@ function getTests() {
         "TestSystemCommands",
         "TestBinding",
         "TestUserLabelCluster",
+        "TestUserLabelClusterConstraints",
         "TestArmFailSafe",
         "TestFanControl",
     ];
