@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class MTRDevice;
+@class MTRBaseDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 

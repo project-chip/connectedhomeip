@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#import "MTRBaseDevice.h"
 #import "MTRCluster_internal.h"
-#import "MTRDevice.h"
 #import "NSDataSpanConversion.h"
 
 using namespace ::chip;

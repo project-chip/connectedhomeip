@@ -237,11 +237,11 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"On command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
-                                                               endpoint:endpoint
-                                                                  queue:dispatch_get_main_queue()];
+                    MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
+                                                                                     endpoint:endpoint
+                                                                                        queue:dispatch_get_main_queue()];
                     [onOff onWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
@@ -266,11 +266,11 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Off command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
-                                                               endpoint:endpoint
-                                                                  queue:dispatch_get_main_queue()];
+                    MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
+                                                                                     endpoint:endpoint
+                                                                                        queue:dispatch_get_main_queue()];
                     [onOff offWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
@@ -295,11 +295,11 @@ NSString * const MTRNumLightOnOffCluster = @"OnOffViewController_NumLights";
     [self updateResult:[NSString stringWithFormat:@"Toggle command sent on endpoint %@", @(endpoint)]];
 
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
-                    MTROnOff * onOff = [[MTROnOff alloc] initWithDevice:chipDevice
-                                                               endpoint:endpoint
-                                                                  queue:dispatch_get_main_queue()];
+                    MTRBaseClusterOnOff * onOff = [[MTRBaseClusterOnOff alloc] initWithDevice:chipDevice
+                                                                                     endpoint:endpoint
+                                                                                        queue:dispatch_get_main_queue()];
                     [onOff toggleWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
