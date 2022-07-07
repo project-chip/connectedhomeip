@@ -418,6 +418,7 @@ class BaseTestHelper:
             return False
 
         await tempDevCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
+        tempDevCtrl.ExpireSessions(nodeid)
         await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
         afterUpdateNocFabricCount = await self._GetCommissonedFabricCount(nodeid)
         if afterUpdateNocFabricCount != afterAddNocFabricCount:
@@ -446,6 +447,7 @@ class BaseTestHelper:
             self.logger.error("IssueNOCChain failed to generate valid cert chain for UpdateNOC with new node ID")
             return False
         updateNocResponse = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForSecondUpdateNOC.nocBytes, chainForSecondUpdateNOC.icacBytes))
+        tempDevCtrl.ExpireSessions(nodeid)
         await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
         afterUpdateNocWithNewNodeIdFabricCount = await self._GetCommissonedFabricCount(nodeid)
         if afterUpdateNocFabricCount != afterUpdateNocWithNewNodeIdFabricCount:

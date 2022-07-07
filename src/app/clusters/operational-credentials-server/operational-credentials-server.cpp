@@ -264,7 +264,7 @@ CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 void CleanupSessionsForFabric(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
     InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
-    sessionMgr.ExpireAllPairingsForFabric(fabricIndex);
+    sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
 }
 
 void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
@@ -278,13 +278,16 @@ void FailSafeCleanup(const chip::DeviceLayer::ChipDeviceEvent * event)
     // Session Context at the Server.
     if (event->FailSafeTimerExpired.addNocCommandHasBeenInvoked || event->FailSafeTimerExpired.updateNocCommandHasBeenInvoked)
     {
-        CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
-        if (caseSessionManager)
+        // TODO(#19259): The following scope will no longer need to exist after #19259 is fixed
         {
-            const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-            VerifyOrReturn(fabricInfo != nullptr);
+            CASESessionManager * caseSessionManager = Server::GetInstance().GetCASESessionManager();
+            if (caseSessionManager)
+            {
+                const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+                VerifyOrReturn(fabricInfo != nullptr);
 
-            caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
+                caseSessionManager->ReleaseSessionsForFabric(fabricInfo->GetFabricIndex());
+            }
         }
 
         SessionManager & sessionMgr = Server::GetInstance().GetSecureSessionManager();
@@ -415,6 +418,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
+
+    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     CHIP_ERROR err = DeleteFabricFromTable(fabricBeingRemoved);
     SuccessOrExit(err);
@@ -602,6 +607,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     auto nocResponse         = OperationalCertStatus::kSuccess;
     auto nonDefaultStatus    = Status::Success;
     bool needRevert          = false;
+    int line = 0;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
@@ -620,11 +626,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
-    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
     VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
-                 nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
-    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), nonDefaultStatus = Status::InvalidCommand);
+                 {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
+    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), {nonDefaultStatus = Status::InvalidCommand; line = __LINE__; });
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
@@ -637,6 +643,9 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // Internal error that would prevent IPK from being added
     VerifyOrExit(groupDataProvider != nullptr, nonDefaultStatus = Status::Failure);
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     // TODO: Add support for calling AddNOC without a prior AddTrustedRootCertificate if
     //       the root properly matches an existing one.
@@ -758,7 +767,7 @@ exit:
     else
     {
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x, line %d", to_underlying(nonDefaultStatus), line);
     }
 
     return true;
@@ -803,6 +812,9 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
     VerifyOrExit(fabricInfo != nullptr, nocResponse = ConvertToNOCResponseStatus(CHIP_ERROR_INSUFFICIENT_PRIVILEGE));
     fabricIndex = fabricInfo->GetFabricIndex();
 
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
     err = fabricTable.UpdatePendingFabricWithOperationalKeystore(fabricIndex, NOCValue, ICACValue.ValueOr(ByteSpan{}));
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
 
@@ -830,6 +842,17 @@ exit:
         else
         {
             ChipLogProgress(Zcl, "OpCreds: UpdateNOC successful.");
+
+            // On success, revoke all CASE sessions on the fabric hosting the exchange.
+            // From spec:
+            //
+            //    All internal data reflecting the prior operational identifier of the Node within the Fabric
+            //    SHALL be revoked and removed, to an outcome equivalent to the disappearance of the prior Node,
+            //    except for the ongoing CASE session context, which SHALL temporarily remain valid until the
+            //    `NOCResponse` has been successfully delivered or until the next transport-layer error, so
+            //    that the response can be received by the Administrator invoking the command.
+
+            commandObj->GetExchangeContext()->AbortAllOtherCommunicationOnFabric();
         }
     }
     // No NOC response - Failed constraints
@@ -921,6 +944,10 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
     const ByteSpan kEmptyFirmwareInfo;
 
     ChipLogProgress(Zcl, "OpCreds: Received an AttestationRequest command");
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
+
     Credentials::DeviceAttestationCredentialsProvider * dacProvider = Credentials::GetDeviceAttestationCredentialsProvider();
 
     VerifyOrExit(attestationNonce.size() == Credentials::kExpectedAttestationNonceSize, finalStatus = Status::InvalidCommand);
@@ -1019,6 +1046,9 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()), finalStatus = Status::FailsafeRequired);
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
+
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
 
     // Prepare NOCSRElements structure
     {
@@ -1143,10 +1173,12 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     // be useful in the context.
     VerifyOrExit(!failSafeContext.NocCommandHasBeenInvoked(), finalStatus = Status::ConstraintError);
 
-    // TODO: Handle checking for byte-to-byte match with existing fabrics
-    //       before allowing the add
+    // Flush acks before really slow work
+    commandObj->FlushAcksRightAwayOnSlowCommand();
 
-    // TODO: Validate cert signature prior to setting.
+    // TODO(#17208): Handle checking for byte-to-byte match with existing fabrics before allowing the add
+
+    // TODO(#17208): Validate cert signature prior to setting.
     err = fabricTable.AddNewPendingTrustedRootCert(rootCertificate);
     VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, finalStatus = Status::ResourceExhausted);
 

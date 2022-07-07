@@ -186,6 +186,8 @@ ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::Devic
                                                          DeviceAvailableFunc callback);
 ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          CommissioneeDeviceProxy ** proxy);
+ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId);
+
 uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 // CHIP Stack objects
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
@@ -637,6 +639,15 @@ ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::Devic
                                                          CommissioneeDeviceProxy ** proxy)
 {
     return devCtrl->GetDeviceBeingCommissioned(nodeId, proxy).AsInteger();
+}
+
+// This is a method called VERY seldom, just for RemoveFabric/UpdateNOC
+ChipError::StorageType pychip_ExpireSessions(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId)
+{
+    VerifyOrReturnError((devCtrl != nullptr) && (devCtrl->SessionMgr() != nullptr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+    (void)devCtrl->ReleaseOperationalDevice(nodeId);
+    devCtrl->SessionMgr()->ExpireAllSessions(ScopedNodeId(nodeId, devCtrl->GetFabricIndex()));
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl)
