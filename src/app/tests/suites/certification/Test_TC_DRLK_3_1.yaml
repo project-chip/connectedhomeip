@@ -22,6 +22,7 @@ config:
 
 tests:
     - label: "DUT reads LockState from the TH."
+      PICS: DRLK.C.A0000
       verification: |
           ./chip-tool doorlock read  lock-state  2  1
 
@@ -31,6 +32,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LockType from the TH."
+      PICS: DRLK.C.A0001
       verification: |
           ./chip-tool doorlock read  lock-type  2 1
 
@@ -39,6 +41,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActuatorEnabled from the TH."
+      PICS: DRLK.C.A0002
       verification: |
           ./chip-tool doorlock read  actuator-enabled  2 1
 
@@ -47,6 +50,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DoorState from the TH."
+      PICS: DRLK.S.F05 && DRLK.C.A0003
       verification: |
           ./chip-tool doorlock read   door-state  2 1
 
@@ -55,6 +59,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DoorOpenEvents from the TH."
+      PICS: DRLK.S.F05 && DRLK.C.A0004
       verification: |
           ./chip-tool doorlock read door-open-events 2 1
 
@@ -76,6 +81,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DoorClosedEvents from the TH."
+      PICS: DRLK.S.F05 && DRLK.C.A0005
       verification: |
           ./chip-tool doorlock read door-closed-events 2 1
 
@@ -98,6 +104,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OpenPeriod from the TH."
+      PICS: DRLK.S.F05 && DRLK.C.A0006
       verification: |
           ./chip-tool doorlock read open-period 2 1
 
@@ -120,6 +127,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberofTotalUsers from the TH."
+      PICS: DRLK.S.F05 && DRLK.C.A0011
       verification: |
           ./chip-tool doorlock read number-of-total-users-supported 2 1
 
@@ -128,6 +136,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberofPINUsersSupported from the TH."
+      PICS: DRLK.C.F00 && DRLK.C.A0012
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 2 1
 
@@ -136,6 +145,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberofRFIDUsersSupported from the TH."
+      PICS: DRLK.C.F01 && DRLK.C.A0013
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 2 1
 
@@ -144,6 +154,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberofWeekDaysSchedulesSupported from the TH."
+      PICS: DRLK.C.F04 && DRLK.C.A0014
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 2 1
 
@@ -152,6 +163,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberofYearDaysSchedulesSupported from the TH."
+      PICS: DRLK.C.F04 && DRLK.C.A0015
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 2 1
 
@@ -160,6 +172,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberofHolidaySchedulesSupported from the TH."
+      PICS: DRLK.C.F04 && DRLK.C.A0016
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 2 1
 
@@ -180,6 +193,7 @@ tests:
       disabled: true
 
     - label: "DUT reads MaxPINCodedLength from the TH."
+      PICS: DRLK.C.F00 && DRLK.C.A0017
       verification: |
           ./chip-tool doorlock read  max-pincode-length 2 1
 
@@ -188,6 +202,7 @@ tests:
       disabled: true
 
     - label: "DUT reads MinPINCodedLength from the TH."
+      PICS: DRLK.C.F00 && DRLK.C.A0018
       verification: |
           ./chip-tool doorlock read  min-pincode-length 2 1
 
@@ -196,6 +211,7 @@ tests:
       disabled: true
 
     - label: "DUT reads MaxRFIDCodedLength from the TH."
+      PICS: DRLK.C.F01 && DRLK.C.A0019
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 2 1
 
@@ -204,6 +220,7 @@ tests:
       disabled: true
 
     - label: "DUT reads MinRFIDCodedLength from the TH."
+      PICS: DRLK.C.F01 && DRLK.C.A001a
       verification: |
           ./chip-tool doorlock read  min-rfidcode-length 2 1
 
@@ -212,6 +229,7 @@ tests:
       disabled: true
 
     - label: "DUT reads CredentialRulesSupport from the TH."
+      PICS: DRLK.S.F08 && DRLK.C.A001b
       verification: |
           ./chip-tool doorlock read  credential-rules-support 2 1
 
@@ -220,6 +238,7 @@ tests:
       disabled: true
 
     - label: "DUT reads Language from the TH."
+      PICS: DRLK.C.A0021
       verification: |
           ./chip-tool doorlock read language 2 1
 
@@ -228,6 +247,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LEDSettings from the TH."
+      PICS: DRLK.C.A0022
       verification: |
           ./chip-tool doorlock read ledsettings 2 1
 
@@ -250,6 +270,7 @@ tests:
       disabled: true
 
     - label: "DUT reads AutoRelockTime from the TH."
+      PICS: DRLK.C.A0023
       verification: |
           ./chip-tool doorlock read auto-relock-time 2 1
 
@@ -258,6 +279,7 @@ tests:
       disabled: true
 
     - label: "DUT reads SoundVolume from the TH."
+      PICS: DRLK.C.A0024
       verification: |
           ./chip-tool doorlock read sound-volume 2 1
 
@@ -266,6 +288,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OperatingMode from the TH."
+      PICS: DRLK.C.A0025
       verification: |
           ./chip-tool doorlock read  operating-mode 2 1
 
@@ -274,6 +297,7 @@ tests:
       disabled: true
 
     - label: "DUT reads SupportedOperatingModes from the TH."
+      PICS: DRLK.C.A0026
       verification: |
           ./chip-tool doorlock read supported-operating-modes 2 1
 
@@ -282,6 +306,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DefaultConfigurationRegister from the TH."
+      PICS: DRLK.C.A0027
       verification: |
           ./chip-tool doorlock read default-configuration-register 2 1
 
@@ -304,6 +329,7 @@ tests:
       disabled: true
 
     - label: "DUT reads EnableLocalProgramming from the TH."
+      PICS: DRLK.C.A0028
       verification: |
           ./chip-tool doorlock read enable-local-programming 2 1
 
@@ -325,6 +351,7 @@ tests:
       disabled: true
 
     - label: "DUT reads EnableOneTouchLocking from the TH."
+      PICS: DRLK.C.A0029
       verification: |
           ./chip-tool doorlock read enable-one-touch-locking 2 1
 
@@ -333,6 +360,7 @@ tests:
       disabled: true
 
     - label: "DUT reads EnableInsideStatusLED from the TH."
+      PICS: DRLK.C.A002a
       verification: |
           ./chip-tool doorlock read enable-inside-status-led 2 1
           [1653564760853] [97504:2810705] CHIP: [DMG] 				StatusIB =
@@ -353,6 +381,7 @@ tests:
       disabled: true
 
     - label: "DUT reads EnablePrivacyModeButton from the TH."
+      PICS: DRLK.C.A002b
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 2 1
 
@@ -361,6 +390,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LocalProgrammingFeatures from the TH."
+      PICS: DRLK.C.A002c
       verification: |
           ./chip-tool doorlock read local-programming-features 2 1
 
@@ -382,6 +412,7 @@ tests:
       disabled: true
 
     - label: "DUT reads WrongCodeEntryLimit from the TH."
+      PICS: DRLK.C.F00 && DRLK.C.F01 && DRLK.C.A0030
       verification: |
           ./chip-tool doorlock read wrong-code-entry-limit 2 1
 
@@ -390,6 +421,7 @@ tests:
       disabled: true
 
     - label: "DUT reads UserCodedTemporaryDisableTime from the TH."
+      PICS: DRLK.C.F00 && DRLK.C.F01 && DRLK.C.A0031
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 2 1
 
@@ -398,6 +430,7 @@ tests:
       disabled: true
 
     - label: "DUT reads SendPINOverTheAir from the TH."
+      PICS: DRLK.C.F00 && DRLK.C.A0032
       verification: |
           ./chip-tool doorlock read  send-pinover-the-air 2 1
 
@@ -419,6 +452,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RequirePINForRemoteOperation from the TH."
+      PICS: DRLK.C.F07 && DRLK.C.F00 && DRLK.C.A0033
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 2 1
 
@@ -427,6 +461,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ExpiringUserTimeOut from the TH."
+      PICS: DRLK.C.F08 && DRLK.C.A0035
       verification: |
           ./chip-tool doorlock read expiring-user-timeout 2 1
 

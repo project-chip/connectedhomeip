@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads TxTotalCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0017
       command: "readAttribute"
       attribute: "TxTotalCount"
       response:
@@ -36,6 +37,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxUnicastCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0018
       command: "readAttribute"
       attribute: "TxUnicastCount"
       response:
@@ -43,6 +45,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxBroadcastCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0019
       command: "readAttribute"
       attribute: "TxBroadcastCount"
       response:
@@ -50,6 +53,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxAckRequestedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001a
       command: "readAttribute"
       attribute: "TxAckRequestedCount"
       response:
@@ -57,6 +61,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxAckedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001b
       command: "readAttribute"
       attribute: "TxAckedCount"
       response:
@@ -64,6 +69,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxNoAckRequestedCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001c
       command: "readAttribute"
       attribute: "TxNoAckRequestedCount"
       response:
@@ -71,6 +77,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxDataCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001d
       command: "readAttribute"
       attribute: "TxDataCount"
       response:
@@ -78,6 +85,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxDataPollCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001e
       command: "readAttribute"
       attribute: "TxDataPollCount"
       response:
@@ -85,6 +93,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxBeaconCount attribute value from DUT"
+      PICS: DGTHREAD.S.A001f
       command: "readAttribute"
       attribute: "TxBeaconCount"
       response:
@@ -92,6 +101,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxBeaconRequestCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0020
       command: "readAttribute"
       attribute: "TxBeaconRequestCount"
       response:
@@ -99,6 +109,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxOtherCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0021
       command: "readAttribute"
       attribute: "TxOtherCount"
       response:
@@ -106,6 +117,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxRetryCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0022
       command: "readAttribute"
       attribute: "TxRetryCount"
       response:
@@ -113,6 +125,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxDirectMaxRetryExpiryCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0023
       command: "readAttribute"
       attribute: "TxDirectMaxRetryExpiryCount"
       response:
@@ -120,6 +133,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxIndirectMaxRetryExpiryCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0024
       command: "readAttribute"
       attribute: "TxIndirectMaxRetryExpiryCount"
       response:
@@ -127,6 +141,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxErrCcaCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0025
       command: "readAttribute"
       attribute: "TxErrCcaCount"
       response:
@@ -134,6 +149,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxErrAbortCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0026
       command: "readAttribute"
       attribute: "TxErrAbortCount"
       response:
@@ -141,6 +157,7 @@ tests:
               type: uint32
 
     - label: "TH reads TxErrBusyChannelCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0027
       command: "readAttribute"
       attribute: "TxErrBusyChannelCount"
       response:

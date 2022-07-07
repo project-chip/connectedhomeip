@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.17. [TC-CNET-4.17] [Wi-Fi] Verification for attributes check
+    11.4.15. [TC-CNET-4.17] [Wi-Fi] Verification for attributes check
     [DUT-Client]
 
 config:
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "DUT reads the MaxNetworks attribute from the TH"
+      PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
 
@@ -36,41 +37,41 @@ tests:
       disabled: true
 
     - label: "DUT reads the Networks attribute from the TH"
+      PICS: CNET.S.A0001
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/17106
-
-          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           [1649249212.072823][30681:30686] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 2702518944
           [1649249212.072912][30681:30686] CHIP:TOO:   Networks: 1 entries
           [1649249212.073027][30681:30686] CHIP:TOO:     [1]: {
-          [1649249212.073067][30681:30686] CHIP:TOO:       NetworkID: 47524C507269766174655F455854
+          [1649249212.073067][30681:30686] CHIP:TOO:       NetworkID: 47524C50726976617465
           [1649249212.073101][30681:30686] CHIP:TOO:       Connected: FALSE
           [1649249212.073135][30681:30686] CHIP:TOO:      }
           [1649249212.073266][30681:30686] CHIP:EM: Sending Standalone Ack for MessageCounter:8988360 on exchange 58610i
       disabled: true
 
     - label: "DUT reads ScanMaxTimeSeconds attribute from the TH"
+      PICS: CNET.S.A0002
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read scan-max-time-seconds 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
-
+          sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read scan-max-time-seconds 1 0
           [1648122894.380473][8770:8775] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0002 DataVersion: 317843604
           [1648122894.380552][8770:8775] CHIP:TOO:   ScanMaxTimeSeconds: 10
           [1648122894.380642][8770:8775] CHIP:EM: Sending Standalone Ack for MessageCounter:12629308 on exchange 33084i
       disabled: true
 
     - label: "DUT reads ConnectMaxTimeSeconds attribute from the TH"
+      PICS: CNET.S.A0003
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read connect-max-time-seconds 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
-
+          sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read connect-max-time-seconds 1 0
           [1648122935.626395][8780:8785] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0003 DataVersion: 317843604
           [1648122935.626461][8780:8785] CHIP:TOO:   ConnectMaxTimeSeconds: 20
           [1648122935.626539][8780:8785] CHIP:EM: Sending Standalone Ack for MessageCounter:11607262 on exchange 19306i
       disabled: true
 
     - label: "DUT reads InterfaceEnabled attribute from the TH"
+      PICS: CNET.S.A0004
       verification: |
-          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 1 0
+          ./chip-tool networkcommissioning read interface-enabled 1 0
 
           [1649250241.092686][30726:30731] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004 DataVersion: 2702518944
           [1649250241.092744][30726:30731] CHIP:TOO:   InterfaceEnabled: TRUE
@@ -78,27 +79,28 @@ tests:
       disabled: true
 
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
+      PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-networking-status 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
-
+          sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-networking-status 1 0
           [1648123150.266020][8807:8812] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 317843604
           [1648123150.266107][8807:8812] CHIP:TOO:   LastNetworkingStatus: 0
           [1648123150.266205][8807:8812] CHIP:EM: Sending Standalone Ack for MessageCounter:6011442 on exchange 36001i
       disabled: true
 
     - label: "DUT reads LastNetworkID attribute from the TH"
+      PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-network-id 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
+          sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-network-id 1 0
 
           [1648123296.959013][8824:8829] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 317843604
-          [1648123296.959092][8824:8829] CHIP:TOO:   LastNetworkID: 47524C507269766174655F455854
+          [1648123296.959092][8824:8829] CHIP:TOO:   LastNetworkID: 47524C50726976617465
           [1648123296.959180][8824:8829] CHIP:EM: Sending Standalone Ack for MessageCounter:7786733 on exchange 2835i
       disabled: true
 
     - label: "DUT reads LastConnectErrorValue attribute from the TH"
+      PICS: CNET.S.A0007
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip$ sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-connect-error-value 1 0  --paa-trust-store-path ./credentials/development/paa-root-certs
-
+          sudo ./examples/chip-tool/out/debug/chip-tool networkcommissioning read last-connect-error-value 1 0
           [1648123350.094356][8834:8839] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 317843604
           [1648123350.094425][8834:8839] CHIP:TOO:   LastConnectErrorValue: null
           [1648123350.094535][8834:8839] CHIP:EM: Sending Standalone Ack for MessageCounter:8991167 on exchange 59318i

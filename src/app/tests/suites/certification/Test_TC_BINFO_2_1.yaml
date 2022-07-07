@@ -30,6 +30,7 @@ tests:
                 value: nodeId
 
     - label: "Query Data Model Revision"
+      PICS: BINFO.S.A0000
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
@@ -37,6 +38,7 @@ tests:
               type: uint16
 
     - label: "Query Vendor Name"
+      PICS: BINFO.S.A0001
       command: "readAttribute"
       attribute: "VendorName"
       response:
@@ -45,6 +47,7 @@ tests:
               maxLength: 32
 
     - label: "Query VendorID"
+      PICS: BINFO.S.A0002
       command: "readAttribute"
       attribute: "VendorID"
       response:
@@ -52,6 +55,7 @@ tests:
               type: uint16
 
     - label: "Query Product Name"
+      PICS: BINFO.S.A0003
       command: "readAttribute"
       attribute: "ProductName"
       response:
@@ -60,6 +64,7 @@ tests:
               maxLength: 32
 
     - label: "Query ProductID"
+      PICS: BINFO.S.A0004
       command: "readAttribute"
       attribute: "ProductID"
       response:
@@ -67,6 +72,7 @@ tests:
               type: uint16
 
     - label: "Query Node Label"
+      PICS: BINFO.S.A0005
       command: "readAttribute"
       attribute: "NodeLabel"
       response:
@@ -75,6 +81,7 @@ tests:
               maxLength: 32
 
     - label: "Query User Location"
+      PICS: BINFO.S.A0006
       command: "readAttribute"
       attribute: "Location"
       response:
@@ -83,6 +90,7 @@ tests:
               maxLength: 16
 
     - label: "Query HardwareVersion"
+      PICS: BINFO.S.A0007
       command: "readAttribute"
       attribute: "HardwareVersion"
       response:
@@ -90,6 +98,7 @@ tests:
               type: uint16
 
     - label: "Query HardwareVersionString"
+      PICS: BINFO.S.A0008
       command: "readAttribute"
       attribute: "HardwareVersionString"
       response:
@@ -109,7 +118,7 @@ tests:
           [1654069233.033902][11164:11169] CHIP:EM: Sending Standalone Ack for MessageCounter:3270959 on exchange 29106i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && BINFO.S.A000a
       arguments:
           values:
               - name: "message"
@@ -130,7 +139,7 @@ tests:
           [1640336849.202479][14335:14340] CHIP:TOO: Basic.ManufacturingDate response: 20210614123456ZZ
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && BINFO.S.A000b
       arguments:
           values:
               - name: "message"
@@ -141,8 +150,7 @@ tests:
     - label: "Query PartNumber"
       command: "readAttribute"
       attribute: "PartNumber"
-      PICS: PART_NUM
-      optional: true
+      PICS: BINFO.S.A000c
       response:
           constraints:
               type: string
@@ -161,7 +169,7 @@ tests:
           [1640337847.187868][14399:14404] CHIP:TOO: Basic.ProductURL response:
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && BINFO.S.A000d
       arguments:
           values:
               - name: "message"
@@ -170,43 +178,43 @@ tests:
                 value: "y"
 
     - label: "Query ProductLabel"
+      PICS: BINFO.S.A000e
       command: "readAttribute"
       attribute: "ProductLabel"
-      optional: true
       response:
           constraints:
               type: string
               maxLength: 64
 
     - label: "Query SerialNumber"
+      PICS: BINFO.S.A000f
       command: "readAttribute"
       attribute: "SerialNumber"
-      optional: true
       response:
           constraints:
               type: string
               maxLength: 32
 
     - label: "Query LocalConfigDisabled"
+      PICS: BINFO.S.A0010
       command: "readAttribute"
       attribute: "LocalConfigDisabled"
-      optional: true
       response:
           constraints:
               type: boolean
 
     - label: "Query Reachable"
+      PICS: BINFO.S.A0011
       command: "readAttribute"
       attribute: "Reachable"
-      optional: true
       response:
           constraints:
               type: boolean
 
     - label: "Query UniqueID"
+      PICS: BINFO.S.A0012
       command: "readAttribute"
       attribute: "UniqueID"
-      optional: true
       response:
           constraints:
               type: string

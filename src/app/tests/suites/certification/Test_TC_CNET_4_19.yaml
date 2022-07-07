@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.19. [TC-CNET-4.19] [Ethernet] Verification for attributes check
+    11.4.17. [TC-CNET-4.19] [Ethernet] Verification for attributes check
     [DUT-Client]
 
 config:
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "DUT reads the MaxNetworks attribute from the TH"
+      PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
 
@@ -36,8 +37,9 @@ tests:
       disabled: true
 
     - label: "DUT reads the Networks attribute from the TH"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           [1653483289.382372][28210:28215] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3189790698
           [1653483289.382458][28210:28215] CHIP:TOO:   Networks: 1 entries
@@ -49,8 +51,9 @@ tests:
       disabled: true
 
     - label: "DUT reads InterfaceEnabled attribute from the TH"
+      PICS: CNET.S.A0004
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read interface-enabled 1 0
+          ./chip-tool networkcommissioning read interface-enabled 1 0
 
           [1646226615.428003][2502:2507] CHIP:DMG:
           [1646226615.428035][2502:2507] CHIP:DMG:        SuppressResponse = true,
@@ -62,8 +65,9 @@ tests:
       disabled: true
 
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
+      PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-networking-status 1 0
+          ./chip-tool networkcommissioning read last-networking-status 1 0
 
           [1646227167.614060][2533:2538] CHIP:DMG:        SuppressResponse = true,
           [1646227167.614095][2533:2538] CHIP:DMG:        InteractionModelRevision = 1
@@ -74,8 +78,9 @@ tests:
       disabled: true
 
     - label: "DUT reads LastNetworkID attribute from the TH"
+      PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1 0
+          ./chip-tool networkcommissioning read last-network-id 1 0
 
           [1646227218.543427][2545:2550] CHIP:DMG:
           [1646227218.543462][2545:2550] CHIP:DMG:        SuppressResponse = true,
@@ -87,8 +92,9 @@ tests:
       disabled: true
 
     - label: "DUT reads LastConnectErrorValue attribute from the TH"
+      PICS: CNET.S.A0007
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-connect-error-value 1 0
+          ./chip-tool networkcommissioning read last-connect-error-value 1 0
 
           [1653483224.839873][28189:28194] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 3189790698
           [1653483224.839927][28189:28194] CHIP:TOO:   LastConnectErrorValue: null
