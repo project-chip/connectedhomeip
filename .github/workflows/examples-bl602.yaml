@@ -55,7 +55,11 @@ jobs:
       - name: Build example BL602 Lighting App
         timeout-minutes: 30
         run: |
-          scripts/build/build_examples.py --target bl602-light build
+          ./scripts/run_in_build_env.sh \
+            "./scripts/build/build_examples.py --target bl602-light build"
+
+      - name: Get Lighting size stats
+        run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py bl602 bl602 lighting-app \
             out/bl602-light/chip-bl602-lighting-example.out /tmp/bloat_reports/
 
