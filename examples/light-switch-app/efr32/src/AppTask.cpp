@@ -20,10 +20,13 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #include "LEDWidget.h"
+#endif // !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #include "binding-handler.h"
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #include "sl_simple_led_instances.h"
-
+#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
@@ -67,8 +70,10 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #define SYSTEM_STATE_LED &sl_led_led0
-#define LIGHT_LED &sl_led_led1
+#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
@@ -81,24 +86,33 @@ TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 LEDWidget sStatusLED;
+#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 
 #ifdef SL_WIFI
+
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_SED
 
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #if CHIP_ENABLE_OPENTHREAD
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 #endif /* CHIP_ENABLE_OPENTHREAD */
 bool sHaveBLEConnections = false;
+#endif // !CHIP_DEVICE_CONFIG_ENABLE_SED
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
@@ -106,6 +120,7 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
@@ -153,6 +168,8 @@ Identify gIdentify = {
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnTriggerIdentifyEffect,
 };
+#endif // #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+
 } // namespace
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -216,8 +233,10 @@ CHIP_ERROR AppTask::Init()
     LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Initialize LEDs
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
+#endif
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
@@ -266,13 +285,17 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, 10);
+#else
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
-
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
         // Collect connectivity and configuration state from the CHIP stack. Because
         // the CHIP event loop is being run in a separate task, the stack must be
         // locked while these values are queried.  However we use a non-blocking
@@ -334,11 +357,18 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Blink(950, 50);
             }
-            else if (sHaveBLEConnections) { sStatusLED.Blink(100, 100); }
-            else { sStatusLED.Blink(50, 950); }
+            else if (sHaveBLEConnections)
+            {
+                sStatusLED.Blink(100, 100);
+            }
+            else
+            {
+                sStatusLED.Blink(50, 950);
+            }
         }
 
         sStatusLED.Animate();
+#endif // #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
     }
 }
 
@@ -407,8 +437,10 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
+#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
