@@ -91,13 +91,15 @@ static void SetupXPCQueue(void)
     return NO;
 }
 
-- (nullable MTRDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
 {
     MTR_LOG_ERROR("MTRDevice doesn't support getDeviceBeingCommissioned over XPC");
     return nil;
 }
 
-- (BOOL)getDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler
 {
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
