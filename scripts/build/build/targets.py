@@ -274,7 +274,6 @@ def HostTargets():
     builder.AppendVariant(name="clang", use_clang=True),
     builder.AppendVariant(name="test", extra_tests=True),
 
-    builder.WhitelistVariantNameForGlob('no-interactive-ipv6only')
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
@@ -285,12 +284,7 @@ def HostTargets():
             builder.targets.append(target)
 
     for target in builder.AllVariants():
-        if cross_compile and 'chip-tool' in target.name and 'arm64' in target.name and '-no-interactive' not in target.name:
-            # Interactive builds will not compile by default on arm cross compiles
-            # because libreadline is not part of the default sysroot
-            yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
-        else:
-            yield target
+        yield target
 
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
