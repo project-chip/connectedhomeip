@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.3. [TC-ACT-3.1] GLobal attributes with client as DUT
+name: 76.2.3. [TC-ACT-3.1] GLobal attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -56,19 +56,51 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/16851
+          ./chip-tool bridgedactions  read action-list 1 1
+          ./chip-tool bridgedactions  read endpoint-list   1 1
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/16851
+          ./chip-tool bridgedactions  read  setup-url  1 1
+
+          [1656480136859] [49753:5741500] CHIP: [DMG] ReportDataMessage =
+          [1656480136859] [49753:5741500] CHIP: [DMG] {
+          [1656480136859] [49753:5741500] CHIP: [DMG] 	AttributeReportIBs =
+          [1656480136859] [49753:5741500] CHIP: [DMG] 	[
+          [1656480136859] [49753:5741500] CHIP: [DMG] 		AttributeReportIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG] 		{
+          [1656480136859] [49753:5741500] CHIP: [DMG] 			AttributeStatusIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG] 			{
+          [1656480136859] [49753:5741500] CHIP: [DMG] 				AttributePathIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG] 				{
+          [1656480136859] [49753:5741500] CHIP: [DMG] 					Endpoint = 0x1,
+          [1656480136859] [49753:5741500] CHIP: [DMG] 					Cluster = 0x25,
+          [1656480136859] [49753:5741500] CHIP: [DMG] 					Attribute = 0x0000_0002,
+          [1656480136859] [49753:5741500] CHIP: [DMG] 				}
+          [1656480136859] [49753:5741500] CHIP: [DMG]
+          [1656480136859] [49753:5741500] CHIP: [DMG] 				StatusIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG] 				{
+          [1656480136859] [49753:5741500] CHIP: [DMG] 					status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1656480136859] [49753:5741500] CHIP: [DMG] 				},
+          [1656480136859] [49753:5741500] CHIP: [DMG]
+          [1656480136859] [49753:5741500] CHIP: [DMG] 			},
+          [1656480136859] [49753:5741500] CHIP: [DMG]
+          [1656480136859] [49753:5741500] CHIP: [DMG] 		},
+          [1656480136859] [49753:5741500] CHIP: [DMG]
+          [1656480136859] [49753:5741500] CHIP: [DMG] 	],
+          [1656480136859] [49753:5741500] CHIP: [DMG]
+          [1656480136859] [49753:5741500] CHIP: [DMG] 	SuppressResponse = true,
+          [1656480136859] [49753:5741500] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1656480136859] [49753:5741500] CHIP: [DMG] }
+          [1656480136859] [49753:5741500] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/16851
+          No writeable attribute
       disabled: true
