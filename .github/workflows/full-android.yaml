@@ -62,13 +62,13 @@ jobs:
             - name: Build Android CHIPTool and CHIPTest (ARM)
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm-chip-*' build"
+                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm-*' build"
             - name: Clean out build output
               run: rm -rf ./out
             - name: Build Android CHIPTool and CHIPTest (ARM64)
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm64-chip-*' build"
+                    "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'android-arm64-*' build"
             - name: Run Android build rule tests
               run: |
                   ./scripts/run_in_build_env.sh \
