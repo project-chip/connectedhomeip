@@ -244,12 +244,12 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
             if (i < oldCount)
             {
                 ReturnErrorOnFailure(GetAccessControl().UpdateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, i,
-                                                                    iterator.GetValue().GetEntry()));
+                                     iterator.GetValue().GetEntry()));
             }
             else
             {
                 ReturnErrorOnFailure(GetAccessControl().CreateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, nullptr,
-                                                                    iterator.GetValue().GetEntry()));
+                                     iterator.GetValue().GetEntry()));
             }
             ++i;
         }
@@ -269,7 +269,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(aDecoder.Decode(decodableEntry));
 
         ReturnErrorOnFailure(GetAccessControl().CreateEntry(&aDecoder.GetSubjectDescriptor(), accessingFabricIndex, nullptr,
-                                                            decodableEntry.GetEntry()));
+                             decodableEntry.GetEntry()));
     }
     else
     {
@@ -327,11 +327,11 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
             ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
-                                                         static_cast<uint16_t>(item.data.size())));
+                                 static_cast<uint16_t>(item.data.size())));
             ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
-                                                          errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
-                                                              ? AccessControlCluster::ChangeTypeEnum::kAdded
-                                                              : AccessControlCluster::ChangeTypeEnum::kChanged));
+                                 errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
+                                 ? AccessControlCluster::ChangeTypeEnum::kAdded
+                                 : AccessControlCluster::ChangeTypeEnum::kChanged));
         }
         else
         {
@@ -349,7 +349,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
         ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
-                                                     static_cast<uint16_t>(item.data.size())));
+                             static_cast<uint16_t>(item.data.size())));
         ReturnErrorOnFailure(
             LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
     }
@@ -362,7 +362,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 }
 
 void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDescriptor, FabricIndex fabric, size_t index,
-                                            const Entry * entry, ChangeType changeType)
+        const Entry * entry, ChangeType changeType)
 {
     // NOTE: If the entry was changed internally by the system (e.g. creating
     // entries at startup from persistent storage, or deleting entries when a
