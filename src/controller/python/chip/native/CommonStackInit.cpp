@@ -31,6 +31,7 @@
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -41,11 +42,11 @@ static_assert(std::is_same<uint32_t, chip::ChipError::StorageType>::value, "pyth
 
 extern "C" {
 
-CHIP_ERROR pychip_CommonStackInit()
+chip::ChipError::StorageType pychip_CommonStackInit()
 {
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
-    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
-    return CHIP_NO_ERROR;
+    ReturnErrorOnFailure(chip::Platform::MemoryInit().AsInteger());
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack().AsInteger());
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 void pychip_CommonStackShutdown()

@@ -76,7 +76,7 @@ def GetLibraryHandle() -> ctypes.CDLL:
     if _nativeLibraryHandle is None:
         _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-        setter.Set("pychip_CommonStackInit", None, [])
+        setter.Set("pychip_CommonStackInit", ctypes.c_uint32, [])
 
         #
         # We've a split initialization model with some init happening here and some other
