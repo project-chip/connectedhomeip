@@ -18,7 +18,7 @@
 
 #pragma once
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <commands/common/Command.h>
 
 class SetupPayloadParseCommand : public Command {
@@ -33,7 +33,7 @@ public:
 
 private:
     char * mCode;
-    CHIP_ERROR Print(CHIPSetupPayload * payload);
+    CHIP_ERROR Print(MTRSetupPayload * payload);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
