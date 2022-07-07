@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2022 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,5 +20,5 @@
 #      Provides Python APIs for CHIP.
 #
 
-"""Provides Python APIs for CHIP."""
-from . import CommissioningUtils
+"""Provides commissioning building blocks Python APIs for CHIP."""
+from . import CommissioningBuildingBlocks

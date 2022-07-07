@@ -163,7 +163,7 @@ pw_python_action("python") {
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
         "chip/tlv/__init__.py",
-        "chip/utils/CommissioningUtils.py",
+        "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
       ]
 

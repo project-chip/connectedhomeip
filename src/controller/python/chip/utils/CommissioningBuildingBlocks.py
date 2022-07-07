@@ -17,8 +17,12 @@
 
 import asyncio
 import logging
+import os
+
 import chip.clusters as Clusters
 import chip.tlv
+from chip.clusters import OperationalCredentials as opCreds
+from chip.clusters import GeneralCommissioning as generalCommissioning
 
 _UINT16_MAX = 65535
 
@@ -26,8 +30,8 @@ logger = logging.getLogger()
 
 
 async def _IsNodeInFabricList(devCtrl, nodeId):
-    resp = await devCtrl.ReadAttribute(nodeId, [(Clusters.OperationalCredentials.Attributes.Fabrics)])
-    listOfFabricsDescriptor = resp[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.Fabrics]
+    resp = await devCtrl.ReadAttribute(nodeId, [(opCreds.Attributes.Fabrics)])
+    listOfFabricsDescriptor = resp[0][opCreds][Clusters.OperationalCredentials.Attributes.Fabrics]
     for fabricDescriptor in listOfFabricsDescriptor:
         if fabricDescriptor.nodeId == nodeId:
             return True
@@ -52,29 +56,29 @@ async def AddNOCForNewFabricFromExisting(commissionerDevCtrl, newFabricDevCtrl, 
         bool: True if successful, False otherwise.
 
     """
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
-    if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         return False
 
-    csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32))
+    csrForAddNOC = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32)))
 
     chainForAddNOC = newFabricDevCtrl.IssueNOCChain(csrForAddNOC, newNodeId)
     if chainForAddNOC.rcacBytes is None or chainForAddNOC.icacBytes is None or chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
-    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.GetNodeId(), 0xFFF1))
-    if resp.statusCode is not Clusters.OperationalCredentials.Enums.OperationalCertStatus.kSuccess:
+    await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
+    resp = await commissionerDevCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, newFabricDevCtrl.GetNodeId(), 0xFFF1))
+    if resp.statusCode is not opCreds.Enums.OperationalCertStatus.kSuccess:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
-    if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+    resp = await newFabricDevCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        await commissionerDevCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await commissionerDevCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
     if not await _IsNodeInFabricList(newFabricDevCtrl, newNodeId):
@@ -99,26 +103,26 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         bool: True if successful, False otherwise.
 
     """
-    resp = await devCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
-    if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+    resp = await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         return False
     csrForUpdateNOC = await devCtrl.SendCommand(
-        existingNodeId, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32, isForUpdateNOC=True))
+        existingNodeId, 0, opCreds.Commands.CSRRequest(CSRNonce=os.urandom(32), isForUpdateNOC=True))
     chainForUpdateNOC = devCtrl.IssueNOCChain(csrForUpdateNOC, newNodeId)
     if chainForUpdateNOC.rcacBytes is None or chainForUpdateNOC.icacBytes is None or chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None:
-        await devCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    resp = await devCtrl.SendCommand(existingNodeId, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
-    if resp.statusCode is not Clusters.OperationalCredentials.Enums.OperationalCertStatus.kSuccess:
+    resp = await devCtrl.SendCommand(existingNodeId, 0, opCreds.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
+    if resp.statusCode is not opCreds.Enums.OperationalCertStatus.kSuccess:
         # Expiring the failsafe timer in an attempt to clean up.
-        await devCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
-    resp = await devCtrl.SendCommand(newNodeId, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
-    if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
+    resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
+    if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
-        await devCtrl.SendCommand(existingNodeId, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
+        await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
     if not await _IsNodeInFabricList(devCtrl, newNodeId):

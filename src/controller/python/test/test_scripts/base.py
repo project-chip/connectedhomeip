@@ -32,7 +32,7 @@ import time
 import ctypes
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
-from chip.utils import CommissioningUtils
+from chip.utils import CommissioningBuildingBlocks
 from chip.ChipStack import *
 import chip.FabricAdmin
 import copy
@@ -372,7 +372,7 @@ class BaseTestHelper:
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
         self.logger.info("Starting AddNOC using same node ID")
-        if not await CommissioningUtils.AddNOCForNewFabricFromExisting(self.devCtrl, tempDevCtrl, nodeid, nodeid):
+        if not await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(self.devCtrl, tempDevCtrl, nodeid, nodeid):
             self.logger.error("AddNOC failed")
             return False
 
@@ -382,7 +382,7 @@ class BaseTestHelper:
             return False
 
         self.logger.info("Starting UpdateNOC using same node ID")
-        if not await CommissioningUtils.UpdateNOC(tempDevCtrl, nodeid, nodeid):
+        if not await CommissioningBuildingBlocks.UpdateNOC(tempDevCtrl, nodeid, nodeid):
             self.logger.error("UpdateNOC using same node ID failed")
             return False
 
@@ -392,7 +392,7 @@ class BaseTestHelper:
 
         self.logger.info("Starting UpdateNOC using different node ID")
         newNodeIdForUpdateNoc = nodeid + 1
-        if not await CommissioningUtils.UpdateNOC(tempDevCtrl, nodeid, newNodeIdForUpdateNoc):
+        if not await CommissioningBuildingBlocks.UpdateNOC(tempDevCtrl, nodeid, newNodeIdForUpdateNoc):
             self.logger.error("UpdateNOC using different node ID failed")
             return False
 
