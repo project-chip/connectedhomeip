@@ -40,14 +40,6 @@ config:
         defaultValue: "MT:0000000000I.0648G00"
 
 tests:
-    - label: "Reboot target device"
-      cluster: "SystemCommands"
-      command: "Reboot"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
-
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -63,7 +55,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: 900
 
     - label:
           "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup

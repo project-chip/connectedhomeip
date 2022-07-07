@@ -32,6 +32,7 @@
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/tests/MessagingContext.h>
@@ -55,7 +56,9 @@ enum ResponseDirective
 {
     kSendDataResponse,
     kSendSuccessStatusCode,
+    kSendMultipleSuccessStatusCodes,
     kSendError,
+    kSendMultipleErrors,
     kSendSuccessStatusCodeWithClusterStatus,
     kSendErrorWithClusterStatus,
     kAsync,
@@ -111,9 +114,29 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         {
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
         }
+        else if (responseDirective == kSendMultipleSuccessStatusCodes)
+        {
+            // TODO: Right now all but the first AddStatus call fail, so this
+            // test is not really testing what it should.
+            for (size_t i = 0; i < 4; ++i)
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Success);
+            }
+            // And one failure on the end.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+        }
         else if (responseDirective == kSendError)
         {
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+        }
+        else if (responseDirective == kSendMultipleErrors)
+        {
+            // TODO: Right now all but the first AddStatus call fail, so this
+            // test is not really testing what it should.
+            for (size_t i = 0; i < 4; ++i)
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::Failure);
+            }
         }
         else if (responseDirective == kSendSuccessStatusCodeWithClusterStatus)
         {
@@ -158,8 +181,10 @@ public:
     TestCommandInteraction() {}
     static void TestDataResponse(nlTestSuite * apSuite, void * apContext);
     static void TestSuccessNoDataResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestMultipleSuccessNoDataResponses(nlTestSuite * apSuite, void * apContext);
     static void TestAsyncResponse(nlTestSuite * apSuite, void * apContext);
     static void TestFailure(nlTestSuite * apSuite, void * apContext);
+    static void TestMultipleFailures(nlTestSuite * apSuite, void * apContext);
     static void TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext);
     static void TestFailureWithClusterStatus(nlTestSuite * apSuite, void * apContext);
 
@@ -262,6 +287,45 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestCommandInteraction::TestMultipleSuccessNoDataResponses(nlTestSuite * apSuite, void * apContext)
+{
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    FakeRequest request;
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+    bool statusCheck    = false;
+    request.arg1        = true;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&successCalls, &statusCheck](const ConcreteCommandPath & commandPath, const StatusIB & aStatus,
+                                                     const auto & dataResponse) {
+        statusCheck = (aStatus.mStatus == InteractionModel::Status::Success);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](CHIP_ERROR aError) { ++failureCalls; };
+
+    responseDirective = kSendMultipleSuccessStatusCodes;
+
+    Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 1 && statusCheck);
+    NL_TEST_ASSERT(apSuite, failureCalls == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apContext)
 {
     struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
@@ -352,6 +416,45 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestCommandInteraction::TestMultipleFailures(nlTestSuite * apSuite, void * apContext)
+{
+    struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
+    {
+        using ResponseType = DataModel::NullObjectType;
+    };
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    FakeRequest request;
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+    bool statusCheck    = false;
+    request.arg1        = true;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&successCalls](const ConcreteCommandPath & commandPath, const StatusIB & aStatus,
+                                       const auto & dataResponse) { ++successCalls; };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls, &statusCheck](CHIP_ERROR aError) {
+        statusCheck = aError.IsIMStatus() && StatusIB(aError).mStatus == InteractionModel::Status::Failure;
+        ++failureCalls;
+    };
+
+    responseDirective = kSendMultipleErrors;
+
+    Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1 && statusCheck);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSuite * apSuite, void * apContext)
 {
     struct FakeRequest : public TestCluster::Commands::TestSimpleArgumentRequest::Type
@@ -437,8 +540,10 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestDataResponse", TestCommandInteraction::TestDataResponse),
     NL_TEST_DEF("TestSuccessNoDataResponse", TestCommandInteraction::TestSuccessNoDataResponse),
+    NL_TEST_DEF("TestMultipleSuccessNoDataResponses", TestCommandInteraction::TestMultipleSuccessNoDataResponses),
     NL_TEST_DEF("TestAsyncResponse", TestCommandInteraction::TestAsyncResponse),
     NL_TEST_DEF("TestFailure", TestCommandInteraction::TestFailure),
+    NL_TEST_DEF("TestMultipleFailures", TestCommandInteraction::TestMultipleFailures),
     NL_TEST_DEF("TestSuccessNoDataResponseWithClusterStatus", TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus),
     NL_TEST_DEF("TestFailureWithClusterStatus", TestCommandInteraction::TestFailureWithClusterStatus),
     NL_TEST_SENTINEL()
@@ -459,9 +564,7 @@ nlTestSuite sSuite =
 
 int TestCommandInteractionTest()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestCommandInteractionTest)

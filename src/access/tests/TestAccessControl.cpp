@@ -711,6 +711,9 @@ CHIP_ERROR LoadAccessControl(AccessControl & ac, const EntryData * entryData, si
     return CHIP_NO_ERROR;
 }
 
+constexpr size_t kNumFabric1EntriesInEntryData1 = 4;
+constexpr size_t kNumFabric2EntriesInEntryData1 = 5;
+
 constexpr EntryData entryData1[] = {
     {
         .fabricIndex = 1,
@@ -774,6 +777,8 @@ constexpr EntryData entryData1[] = {
 };
 
 constexpr size_t entryData1Count = ArraySize(entryData1);
+static_assert(entryData1Count == (kNumFabric1EntriesInEntryData1 + kNumFabric2EntriesInEntryData1),
+              "Must maintain both fabric counts for some tests");
 
 struct CheckData
 {
@@ -1756,6 +1761,28 @@ void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
 
             NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, ArraySize(data) - count) == CHIP_NO_ERROR);
         }
+    }
+
+    // Test fabric removal
+    {
+        memcpy(data, entryData1, sizeof(data));
+        NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
+
+        // After deleting Fabric index 1, we should have the number of entries of Fabric index 2
+        NL_TEST_ASSERT(inSuite, accessControl.DeleteAllEntriesForFabric(1) == CHIP_NO_ERROR);
+        size_t numEntriesForFabricIndex2 = 0;
+        size_t numTotalEntries           = 0;
+        NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(2, numEntriesForFabricIndex2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(numTotalEntries) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, numEntriesForFabricIndex2 == kNumFabric2EntriesInEntryData1);
+        NL_TEST_ASSERT(inSuite, numTotalEntries == kNumFabric2EntriesInEntryData1);
+
+        // Delete fabric 2 as well, we should be at zero
+        numTotalEntries = 1000;
+        NL_TEST_ASSERT(inSuite, accessControl.DeleteAllEntriesForFabric(2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, accessControl.GetEntryCount(numTotalEntries) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, numTotalEntries == 0);
     }
 }
 

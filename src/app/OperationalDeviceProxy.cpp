@@ -36,7 +36,6 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemLayer.h>
 
@@ -314,9 +313,9 @@ void OperationalDeviceProxy::OnSessionEstablished(const SessionHandle & session)
     // Do not touch this instance anymore; it might have been destroyed by a callback.
 }
 
-CHIP_ERROR OperationalDeviceProxy::Disconnect()
+void OperationalDeviceProxy::Disconnect()
 {
-    ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mState == State::SecureConnected);
 
     if (mSecureSession)
     {
@@ -332,7 +331,6 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     mSecureSession.Release();
 
     MoveToState(State::HasAddress);
-    return CHIP_NO_ERROR;
 }
 
 void OperationalDeviceProxy::CleanupCASEClient()
@@ -359,9 +357,9 @@ void OperationalDeviceProxy::OnSessionHang()
     // TODO: establish a new session
 }
 
-CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
+void OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
+    app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy()

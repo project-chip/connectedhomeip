@@ -19,6 +19,7 @@ import queue
 import re
 import subprocess
 import threading
+import typing
 
 
 class LogPipe(threading.Thread):
@@ -87,12 +88,24 @@ class LogPipe(threading.Thread):
 
 
 class RunnerWaitQueue:
-
-    def __init__(self):
+    def __init__(self, timeout_seconds: typing.Optional[int]):
         self.queue = queue.Queue()
+        self.timeout_seconds = timeout_seconds
+        self.timed_out = False
 
     def __wait(self, process, userdata):
-        process.wait()
+        if userdata is None:
+            # We're the main process for this wait queue.
+            timeout = self.timeout_seconds
+        else:
+            timeout = None
+        try:
+            process.wait(timeout)
+        except subprocess.TimeoutExpired:
+            self.timed_out = True
+            process.kill()
+            # And wait for the kill() to kill it.
+            process.wait()
         self.queue.put((process, userdata))
 
     def add_process(self, process, userdata=None):
@@ -109,7 +122,7 @@ class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, cmd, name, wait=True, dependencies=[]):
+    def RunSubprocess(self, cmd, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None):
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
             name=name + ' OUT')
@@ -127,7 +140,7 @@ class Runner:
         if not wait:
             return s, outpipe, errpipe
 
-        wait = RunnerWaitQueue()
+        wait = RunnerWaitQueue(timeout_seconds=timeout_seconds)
         wait.add_process(s)
 
         for dependency in dependencies:
@@ -143,6 +156,9 @@ class Runner:
                             (process.returncode, userdata))
 
         if s.returncode != 0:
-            raise Exception('Command %r failed: %d' % (cmd, s.returncode))
+            if wait.timed_out:
+                raise Exception("Command %r exceeded test timeout (%d seconds)" % (cmd, wait.timeout_seconds))
+            else:
+                raise Exception('Command %r failed: %d' % (cmd, s.returncode))
 
         logging.debug('Command %r completed with error code 0', cmd)

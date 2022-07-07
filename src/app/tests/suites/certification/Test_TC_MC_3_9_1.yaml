@@ -22,6 +22,7 @@ config:
 
 tests:
     - label: "DUT sends HideApp command to TH"
+      PICS: MC_APPLAUNCHER.C.C0002
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 

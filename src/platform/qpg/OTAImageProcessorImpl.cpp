@@ -17,19 +17,84 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
 #include "OTAImageProcessorImpl.h"
 
 namespace chip {
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return false;
+    }
+
+    return requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+
+    if (currentVersion != requestor->GetTargetVersion())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
 
     // Get OTA status - under what circumstances does prepared break?
     // what happens if a prepare is pending and another one is invoked
-    // Should we store the state here and wait til we receive notification
+    // Should we store the state here and wait until we receive notification
+
+    mHeaderParser.Init();
 
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
+{
+    if (mHeaderParser.IsInitialized())
+    {
+        OTAImageHeader header;
+        CHIP_ERROR error = mHeaderParser.AccumulateAndDecode(block, header);
+
+        // Needs more data to decode the header
+        ReturnErrorCodeIf(error == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(error);
+
+        mParams.totalFileBytes = header.mPayloadSize;
+        mHeaderParser.Clear();
+
+        // Load qvCHIP_Ota header structure and call application callback to validate image header
+        qvCHIP_Ota_ImageHeader_t qvCHIP_OtaImgHeader;
+        this->mSwVer                             = header.mSoftwareVersion; // Store software version in imageProcessor as well
+        qvCHIP_OtaImgHeader.vendorId             = header.mVendorId;
+        qvCHIP_OtaImgHeader.productId            = header.mProductId;
+        qvCHIP_OtaImgHeader.softwareVersion      = header.mSoftwareVersion;
+        qvCHIP_OtaImgHeader.minApplicableVersion = header.mMinApplicableVersion.ValueOr(0);
+        qvCHIP_OtaImgHeader.maxApplicableVersion = header.mMaxApplicableVersion.ValueOr(0);
+
+        if (true != qvCHIP_OtaValidateImage(qvCHIP_OtaImgHeader))
+        {
+            return CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION;
+        }
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -57,16 +122,27 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
+    CHIP_ERROR err;
+
     if ((block.data() == nullptr) || block.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    // Process block header info
+    err = ProcessHeader(block);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot process block header: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
     // Store block data for HandleProcessBlock to access
-    CHIP_ERROR err = SetBlock(block);
+    err = SetBlock(block);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
+        return err;
     }
 
     DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
@@ -109,8 +185,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "Q: HandleFinalize");
 
-    // FIXME - Versions need to be filled in
-    qvCHIP_OtaSetPendingImage(imageProcessor->mSwVer /*swVer*/, imageProcessor->mHwVer /*hwVer*/, qvCHIP_OtaGetAreaStartAddress(),
+    qvCHIP_OtaSetPendingImage(imageProcessor->mSwVer /*swVer*/, CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION /*hwVer*/, 0,
                               static_cast<std::uint32_t>(imageProcessor->mParams.downloadedBytes) /*imgSz*/);
 
     imageProcessor->ReleaseBlock();
@@ -149,11 +224,10 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     ChipLogProgress(SoftwareUpdate, "Q: HandleProcessBlock");
-    // TODO: Process block header if any
 
-    status = qvCHIP_OtaWriteChunk(qvCHIP_OtaGetAreaStartAddress() + imageProcessor->mParams.downloadedBytes,
-                                  static_cast<std::uint16_t>(imageProcessor->mBlock.size()),
-                                  reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()));
+    status =
+        qvCHIP_OtaWriteChunk(imageProcessor->mParams.downloadedBytes, static_cast<std::uint16_t>(imageProcessor->mBlock.size()),
+                             reinterpret_cast<std::uint8_t *>(imageProcessor->mBlock.data()));
 
     if (status != qvCHIP_OtaStatusSuccess)
     {

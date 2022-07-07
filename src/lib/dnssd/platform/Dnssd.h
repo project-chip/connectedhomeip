@@ -142,12 +142,8 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
 
 /**
  * This function shuts down the mdns module
- *
- * @retval CHIP_NO_ERROR  The shutdown succeeds.
- * @retval Error code     The shutdown fails
- *
  */
-CHIP_ERROR ChipDnssdShutdown();
+void ChipDnssdShutdown();
 
 /**
  * Removes or marks all services being advertised for removal.

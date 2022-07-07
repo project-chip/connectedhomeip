@@ -24,6 +24,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <messaging/ReliableMessageContext.h>
@@ -1568,6 +1569,9 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     // We now have just the received message waiting for an ack.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
+    // And receiver still has no ack pending.
+    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+
     // Reset various state so we can measure things again.
     mockReceiver.IsOnMessageReceivedCalled = false;
     mockReceiver.mReceivedPiggybackAck     = false;
@@ -1593,8 +1597,8 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
     NL_TEST_ASSERT(inSuite, mockReceiver.mReceivedPiggybackAck);
 
-    // And that receiver has no ack pending.
-    NL_TEST_ASSERT(inSuite, !receiverRc->IsAckPending());
+    // At this point all our exchanges and reliable message contexts should be
+    // dead, so we can't test anything about their state.
 
     // And that there are no un-acked messages left.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
@@ -1687,12 +1691,7 @@ nlTestSuite sSuite =
  */
 int TestReliableMessageProtocol()
 {
-    TestContext sContext;
-
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol)

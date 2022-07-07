@@ -58,6 +58,7 @@ public:
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
     static const Key kConfigKey_HardwareVersion;
+    static const Key kConfigKey_HardwareVersionString;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_ServiceConfig;
@@ -77,6 +78,10 @@ public:
     static const Key kConfigKey_DACPublicKey;
     static const Key kConfigKey_PAICert;
     static const Key kConfigKey_CertDeclaration;
+    static const Key kConfigKey_VendorId;
+    static const Key kConfigKey_VendorName;
+    static const Key kConfigKey_ProductId;
+    static const Key kConfigKey_ProductName;
 
     // CHIP Counter keys
     static const Key kCounterKey_RebootCount;

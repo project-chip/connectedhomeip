@@ -19,16 +19,17 @@
 #include "CHIPCommandBridge.h"
 
 #import "CHIPToolKeypair.h"
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPError_Internal.h>
+#import <Matter/Matter.h>
 
 #include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 
+#include "MTRError_Utils.h"
+
 const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
-std::map<std::string, CHIPDeviceController *> CHIPCommandBridge::mControllers;
+std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
@@ -47,7 +48,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     } else {
         Cleanup();
     }
-    ReturnErrorOnFailure(MaybeTearDownStack());
+    MaybeTearDownStack();
 
     return CHIP_NO_ERROR;
 }
@@ -61,13 +62,13 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
-    auto factory = [MatterControllerFactory sharedInstance];
+    auto factory = [MTRControllerFactory sharedInstance];
     if (factory == nil) {
         ChipLogError(chipTool, "Controller factory is nil");
         return CHIP_ERROR_INTERNAL;
     }
 
-    auto params = [[MatterControllerFactoryParams alloc] initWithStorage:storage];
+    auto params = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
     params.port = @(kListenPort);
     params.startServer = YES;
 
@@ -82,9 +83,9 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
     for (size_t i = 0; i < ArraySize(identities); ++i) {
-        auto controllerParams = [[CHIPDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
-                                                                                         fabricId:(i + 1)
-                                                                                              ipk:ipk];
+        auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:nocSigner
+                                                                                        fabricId:(i + 1)
+                                                                                             ipk:ipk];
 
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
@@ -105,14 +106,12 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCommandBridge::MaybeTearDownStack()
+void CHIPCommandBridge::MaybeTearDownStack()
 {
-    CHIP_ERROR err;
     if (IsInteractive()) {
-        return CHIP_NO_ERROR;
+        return;
     }
-    err = ShutdownCommissioner();
-    return err;
+    ShutdownCommissioner();
 }
 
 void CHIPCommandBridge::SetIdentity(const char * identity)
@@ -126,11 +125,11 @@ void CHIPCommandBridge::SetIdentity(const char * identity)
     mCurrentController = mControllers[name];
 }
 
-CHIPDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
+MTRDeviceController * CHIPCommandBridge::CurrentCommissioner() { return mCurrentController; }
 
-CHIPDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
+MTRDeviceController * CHIPCommandBridge::GetCommissioner(const char * identity) { return mControllers[identity]; }
 
-CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
+void CHIPCommandBridge::ShutdownCommissioner()
 {
     ChipLogProgress(chipTool, "Shutting down controller");
     for (auto & pair : mControllers) {
@@ -139,9 +138,7 @@ CHIP_ERROR CHIPCommandBridge::ShutdownCommissioner()
     mControllers.clear();
     mCurrentController = nil;
 
-    [[MatterControllerFactory sharedInstance] shutdown];
-
-    return CHIP_NO_ERROR;
+    [[MTRControllerFactory sharedInstance] shutdown];
 }
 
 CHIP_ERROR CHIPCommandBridge::StartWaiting(chip::System::Clock::Timeout duration)
@@ -171,13 +168,13 @@ void CHIPCommandBridge::SetCommandExitStatus(NSError * error, const char * logSt
     if (logString != nullptr) {
         LogNSError(logString, error);
     }
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
     SetCommandExitStatus(err);
 }
 
 void CHIPCommandBridge::LogNSError(const char * logString, NSError * error)
 {
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
     if (err == CHIP_NO_ERROR) {
         ChipLogProgress(chipTool, "%s: %s", logString, chip::ErrorStr(err));
     } else {

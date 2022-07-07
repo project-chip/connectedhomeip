@@ -46,7 +46,7 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
         mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::SystemClock().GetMonotonicTimestamp());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(BDX, "failed to handle message: %s", ErrorStr(err));
+        ChipLogError(BDX, "failed to handle message: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     // Almost every BDX message will follow up with a response on the exchange. Even messages that might signify the end of a
@@ -78,7 +78,15 @@ void TransferFacilitator::PollForOutput()
     HandleTransferSessionOutput(outEvent);
 
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    if (!mStopPolling)
+    {
+        mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
+    }
+    else
+    {
+        mSystemLayer->CancelTimer(PollTimerHandler, this);
+        mStopPolling = false;
+    }
 }
 
 void TransferFacilitator::ScheduleImmediatePoll()

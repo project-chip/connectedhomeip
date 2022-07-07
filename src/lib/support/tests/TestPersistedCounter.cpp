@@ -45,6 +45,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/PersistedCounter.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/PersistedStorage.h>
@@ -190,24 +191,9 @@ static const nlTest sTests[] = {
 
 int TestPersistedCounter()
 {
-    TestPersistedCounterContext context;
-
-    CHIP_ERROR error = chip::Platform::MemoryInit();
-    if (error != CHIP_NO_ERROR)
-    {
-        return EXIT_FAILURE;
-    }
-
     nlTestSuite theSuite = { "chip-persisted-storage", &sTests[0], TestSetup, TestTeardown };
 
-    // Run test suite against one context
-    nlTestRunner(&theSuite, &context);
-
-    int r = nlTestRunnerStats(&theSuite);
-
-    chip::Platform::MemoryShutdown();
-
-    return r;
+    return chip::ExecuteTestsWithContext<TestPersistedCounterContext>(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestPersistedCounter);

@@ -24,10 +24,13 @@
 #define CHIP_ENABLE_TEST_ENCRYPTED_BUFFER_API // Up here in case some other header
                                               // includes SessionManager.h indirectly
 
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
@@ -57,6 +60,40 @@ using TestContext = chip::Test::LoopbackTransportManager;
 const char PAYLOAD[] = "Hello!";
 
 const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
+
+// Just enough init to replace a ton of boilerplate
+class FabricTableHolder
+{
+public:
+    FabricTableHolder() {}
+    ~FabricTableHolder()
+    {
+        mFabricTable.Shutdown();
+        mOpKeyStore.Finish();
+        mOpCertStore.Finish();
+    }
+
+    CHIP_ERROR Init()
+    {
+        ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+        ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
+
+        chip::FabricTable::InitParams initParams;
+        initParams.storage             = &mStorage;
+        initParams.operationalKeystore = &mOpKeyStore;
+        initParams.opCertStore         = &mOpCertStore;
+
+        return mFabricTable.Init(initParams);
+    }
+
+    FabricTable & GetFabricTable() { return mFabricTable; }
+
+private:
+    chip::FabricTable mFabricTable;
+    chip::TestPersistentStorageDelegate mStorage;
+    chip::PersistentStorageOperationalKeystore mOpKeyStore;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+};
 
 class TestSessMgrCallback : public SessionMessageDelegate
 {
@@ -89,16 +126,16 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
+                                           &fabricTableHolder.GetFabricTable()));
 }
 
 void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
@@ -117,16 +154,19 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
+                                           &fabricTableHolder.GetFabricTable()));
 
     callback.mSuite = inSuite;
 
@@ -134,17 +174,14 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                    GetNodeA1CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+    err =
+        fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                          GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                  GetNodeA2CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+    err = fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                            GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
     SessionHolder aliceToBobSession;
     err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
@@ -225,16 +262,19 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
+                                           &fabricTableHolder.GetFabricTable()));
 
     callback.mSuite = inSuite;
 
@@ -242,17 +282,14 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                    GetNodeA1CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+    err =
+        fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                          GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                  GetNodeA2CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+    err = fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                            GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
     SessionHolder aliceToBobSession;
     err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
@@ -318,16 +355,19 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
+                                           &fabricTableHolder.GetFabricTable()));
 
     callback.mSuite = inSuite;
 
@@ -335,17 +375,14 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                    GetNodeA1CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+    err =
+        fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                          GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                  GetNodeA2CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+    err = fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                            GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
     SessionHolder aliceToBobSession;
     err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
@@ -449,16 +486,19 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
+                                           &fabricTableHolder.GetFabricTable()));
 
     callback.mSuite = inSuite;
 
@@ -466,17 +506,14 @@ void SendPacketWithOldCounterTest(nlTestSuite * inSuite, void * inContext)
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                    GetNodeA1CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+    err =
+        fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                          GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                  GetNodeA2CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+    err = fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                            GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
     SessionHolder aliceToBobSession;
     err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
@@ -556,34 +593,33 @@ void SendPacketWithTooOldCounterTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
-
+                                           &fabricTableHolder.GetFabricTable()));
     callback.mSuite = inSuite;
 
     sessionManager.SetMessageDelegate(&callback);
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                    GetNodeA1CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+    err =
+        fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                          GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                  GetNodeA2CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+    err = fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                            GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
     SessionHolder aliceToBobSession;
     err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
@@ -779,30 +815,30 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("::1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    FabricTable fabricTable;
+    FabricTableHolder fabricTableHolder;
     SessionManager sessionManager;
     secure_channel::MessageCounterManager gMessageCounterManager;
     chip::TestPersistentStorageDelegate deviceStorage;
+    FabricTable & fabricTable    = fabricTableHolder.GetFabricTable();
+    FabricIndex aliceFabricIndex = kUndefinedFabricIndex;
+    FabricIndex bobFabricIndex   = kUndefinedFabricIndex;
 
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.Init(&deviceStorage));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
                        sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &gMessageCounterManager, &deviceStorage,
-                                           &fabricTable));
+                                           &fabricTableHolder.GetFabricTable()));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    FabricIndex aliceFabricIndex;
-    FabricInfo aliceFabric;
-    aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA1CertAsset().mCert,
-                                    GetNodeA1CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(aliceFabric, &aliceFabricIndex));
+    err =
+        fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                          GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey, &aliceFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
-    FabricIndex bobFabricIndex;
-    FabricInfo bobFabric;
-    bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                  GetNodeA2CertAsset().mKey);
-    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTable.AddNewFabricForTest(bobFabric, &bobFabricIndex));
+    err = fabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                            GetNodeA2CertAsset().mCert, GetNodeA2CertAsset().mKey, &bobFabricIndex);
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == err);
 
     SessionHolder aliceToBobSession;
     err = sessionManager.InjectPaseSessionWithTestKey(aliceToBobSession, 2,
@@ -968,8 +1004,8 @@ int Initialize(void * aContext)
  */
 int Finalize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    return SUCCESS;
 }
 
 } // namespace
@@ -979,13 +1015,7 @@ int Finalize(void * aContext)
  */
 int TestSessionManager()
 {
-    TestContext sContext;
-
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    int r = (nlTestRunnerStats(&sSuite));
-    return r;
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSessionManager);

@@ -1706,10 +1706,16 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, G
     for (const gchar * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
     {
         WiFiScanResponse network;
-        if (_GetBssInfo(bssPath, network) && network.ssidLen == sInterestedSSIDLen &&
-            memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+        if (_GetBssInfo(bssPath, network))
         {
-            networkScanned->push_back(network);
+            if (sInterestedSSIDLen == 0)
+            {
+                networkScanned->push_back(network);
+            }
+            else if (network.ssidLen == sInterestedSSIDLen && memcmp(network.ssid, sInterestedSSID, sInterestedSSIDLen) == 0)
+            {
+                networkScanned->push_back(network);
+            }
         }
     }
 

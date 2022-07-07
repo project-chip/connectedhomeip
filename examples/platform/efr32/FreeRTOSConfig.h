@@ -198,7 +198,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
-#define configTOTAL_HEAP_SIZE ((size_t)(28 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(30 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(20 * 1024))
 #endif

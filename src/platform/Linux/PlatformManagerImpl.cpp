@@ -42,7 +42,6 @@
 #include <linux/rtnetlink.h>
 #include <net/if.h>
 #include <netinet/in.h>
-#include <signal.h>
 #include <unistd.h>
 
 #if __GLIBC__ == 2 && __GLIBC_MINOR__ < 30
@@ -186,7 +185,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
@@ -208,7 +207,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
 #if CHIP_WITH_GIO

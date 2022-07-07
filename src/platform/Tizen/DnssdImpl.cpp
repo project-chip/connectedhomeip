@@ -340,7 +340,12 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     dnssdService.mTextEntrySize = textEntries.size();
 
-    rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+    { // Lock the stack mutex when calling the callback function, so that the callback
+      // function could safely perform message exchange (e.g. PASE session pairing).
+        chip::DeviceLayer::StackLock lock;
+        rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+    }
+
     rCtx->mInstance->RemoveContext(rCtx);
     return;
 
@@ -455,11 +460,11 @@ exit:
     return CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR DnssdTizen::Shutdown()
+void DnssdTizen::Shutdown()
 {
     int ret = dnssd_deinitialize();
-    VerifyOrReturnError(ret == DNSSD_ERROR_NONE, CHIP_ERROR_INTERNAL);
-    return CHIP_NO_ERROR;
+    if (ret != DNSSD_ERROR_NONE)
+        ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret);
 }
 
 CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context)
@@ -680,9 +685,9 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return DnssdTizen::GetInstance().Init(initCallback, errorCallback, context);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
+void ChipDnssdShutdown()
 {
-    return DnssdTizen::GetInstance().Shutdown();
+    DnssdTizen::GetInstance().Shutdown();
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)

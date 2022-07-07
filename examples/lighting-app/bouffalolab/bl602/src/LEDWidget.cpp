@@ -27,74 +27,11 @@
 #include "AppTask.h"
 #include <platform/CHIPDeviceLayer.h>
 
-#include <hosal_pwm.h>
-
-#define IOT_DVK_3S 0
-
-#if BOARD_ID == IOT_DVK_3S
-hosal_pwm_dev_t pwmR = { .port = 0xff };
-#endif
+#include <InitPlatform.h>
 
 static void showRGB(uint8_t red, uint8_t green, uint8_t blue)
 {
-
-#if BOARD_ID == IOT_DVK_3S
-
-    uint32_t level = (red * 10000) / UINT8_MAX;
-    log_info("red level: %d\r\n", level);
-
-    if (pwmR.port == 0xff)
-    {
-        pwmR.port              = 0;
-        pwmR.config.pin        = 0;
-        pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-        pwmR.config.freq       = 1000;
-        hosal_pwm_init(&pwmR);
-        vTaskDelay(50);
-        hosal_pwm_start(&pwmR);
-    }
-    else
-    {
-        pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-        pwmR.config.freq       = 1000;
-        hosal_pwm_para_chg(&pwmR, pwmR.config);
-    }
-#else
-
-    hosal_pwm_dev_t pwmR, pwmG, pwmB;
-
-    uint32_t level = (red * 10000) / UINT8_MAX;
-    log_info("red level: %d\r\n", level);
-    pwmR.port              = 0;
-    pwmR.config.pin        = 20;
-    pwmR.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-    pwmR.config.freq       = 1000;
-    hosal_pwm_init(&pwmR);
-    // vTaskDelay(100);
-
-    level = (green * 10000) / UINT8_MAX;
-    log_info("green level: %d\r\n", level);
-    pwmG.port              = 1;
-    pwmG.config.pin        = 21;
-    pwmG.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-    pwmG.config.freq       = 1000;
-    hosal_pwm_init(&pwmG);
-    // vTaskDelay(100);
-
-    level = (blue * 10000) / UINT8_MAX;
-    log_info("blue level: %d\r\n", level);
-    pwmB.port = 2;
-    // not use debug port
-    // pwmB.config.pin        = 17;
-    pwmB.config.duty_cycle = level; // duty_cycle range is 0~10000 correspond to 0~100%
-    pwmB.config.freq       = 1000;
-    hosal_pwm_init(&pwmB);
-    vTaskDelay(50);
-
-    hosal_pwm_start(&pwmG);
-    hosal_pwm_start(&pwmR);
-    hosal_pwm_start(&pwmB);
-#endif
+    BL602_LightState_Update(red, green, blue);
 }
 
 void LEDWidget::Init(uint8_t gpioNum)
@@ -116,9 +53,13 @@ void LEDWidget::Init(uint8_t gpioNum)
 
 void LEDWidget::Set(bool state)
 {
-    log_info("state: %d\r\n", state);
+    log_info("Setting state to %d", state ? 1 : 0);
+    if (state == mState)
+        return;
+
+    mState         = state;
     mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
-    DoSet(state);
+    DoSet();
 }
 
 void LEDWidget::SetBrightness(uint8_t brightness)
@@ -129,11 +70,7 @@ void LEDWidget::SetBrightness(uint8_t brightness)
     log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
              green, blue);
     showRGB(red, green, blue);
-
-    if (brightness > 0)
-    {
-        mDefaultOnBrightness = brightness;
-    }
+    mDefaultOnBrightness = brightness;
 }
 
 void LEDWidget::Blink(uint32_t changeRateMS)
@@ -168,20 +105,39 @@ void LEDWidget::Animate()
     }
 }
 
-void LEDWidget::DoSet(bool state)
+void LEDWidget::DoSet()
 {
-    bool stateChange = (mState != state);
-    mState           = state;
-
     uint8_t red, green, blue;
-    uint8_t brightness = state ? mDefaultOnBrightness : 0;
-    log_info("state: %d, mDefaultOnBrightness: %d, brightness: %d\r\n", state, mDefaultOnBrightness, brightness);
+    uint8_t brightness = mState ? mDefaultOnBrightness : 0;
+    log_info("state: %d, mDefaultOnBrightness: %d, brightness: %d\r\n", mState, mDefaultOnBrightness, brightness);
     HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
     log_info("brightness: %d, mHue: %d, mSaturation: %d, red: %d, green: %d, blue: %d\r\n", brightness, mHue, mSaturation, red,
              green, blue);
     showRGB(red, green, blue);
 }
 
+void LEDWidget::Toggle()
+{
+    log_info("Toggling state to %d", !mState);
+    mState = !mState;
+    if (mState == 1)
+    {
+        SetBrightness(UINT8_MAX);
+    }
+    else
+    {
+        SetBrightness(0);
+    }
+}
+uint8_t LEDWidget::GetLevel()
+{
+    return this->mDefaultOnBrightness;
+}
+
+bool LEDWidget::IsTurnedOn()
+{
+    return this->mState;
+}
 void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
 {
     uint8_t red, green, blue;

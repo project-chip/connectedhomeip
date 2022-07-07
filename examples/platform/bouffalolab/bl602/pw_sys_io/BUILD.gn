@@ -17,7 +17,7 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/target_types.gni")
 
-examples_plat_dir = "${chip_root}/examples/platform/bl602"
+examples_plat_dir = "${chip_root}/examples/platform/bouffalolab/bl602"
 
 config("default_config") {
   include_dirs = [ "public" ]

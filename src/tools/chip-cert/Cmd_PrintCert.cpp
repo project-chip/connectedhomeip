@@ -49,7 +49,7 @@ const char * const gCmdOptionHelp =
     "   -o, --out\n"
     "\n"
     "       The output printed certificate file name. If not specified\n"
-    "       or if specified - then output is writen to stdout.\n"
+    "       or if specified - then output is written to stdout.\n"
     "\n"
     ;
 

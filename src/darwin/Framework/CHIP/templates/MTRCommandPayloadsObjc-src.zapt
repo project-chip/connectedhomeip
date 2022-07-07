@@ -1,0 +1,32 @@
+{{> header}}
+
+#import "MTRCommandPayloadsObjc.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+{{#zcl_clusters}}
+{{#zcl_commands}}
+@implementation MTR{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params
+- (instancetype)init
+{
+  if (self = [super init]) {
+{{#zcl_command_arguments}}
+
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+{{/zcl_command_arguments}}
+    _timedInvokeTimeoutMs = nil;
+  }
+  return self;
+}
+
+- (NSString *)description
+{
+  NSString *descriptionString = [NSString stringWithFormat:@"<%@: {{#zcl_command_arguments}}{{asStructPropertyName label}}:%@; {{/zcl_command_arguments}}>", NSStringFromClass([self class]) {{#zcl_command_arguments}},{{#if isArray}}_{{asStructPropertyName label}}{{else if (isOctetString type)}}[_{{asStructPropertyName label}} base64EncodedStringWithOptions:0]{{else}}_{{asStructPropertyName label}}{{/if}}{{/zcl_command_arguments}}];
+  return descriptionString;
+}
+
+@end
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

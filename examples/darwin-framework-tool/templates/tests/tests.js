@@ -45,11 +45,8 @@ function getTests() {
   // TODO: TestGroupMessaging does not work on Darwin for now.
   tests.disable('TestGroupMessaging');
 
-  // TODO: Test_TC_DIAG_TH_NW_1_1 does not work on Darwin for now.
-  tests.disable('Test_TC_DIAG_TH_NW_1_1');
-
-  // TODO: Test_TC_DIAG_TH_NW_1_2 does not work on Darwin for now.
-  tests.disable('Test_TC_DIAG_TH_NW_1_2');
+  // TODO: Test_TC_DIAG_TH_NW_2_1 does not work on Darwin for now.
+  tests.disable('Test_TC_DIAG_TH_NW_2_1');
 
   // TODO: Test_TC_DIAG_TH_NW_2_2 does not work on Darwin for now.
   tests.disable('Test_TC_DIAG_TH_NW_2_2');
@@ -57,14 +54,20 @@ function getTests() {
   // TODO: Test_TC_DIAG_TH_NW_2_3 does not work on Darwin for now.
   tests.disable('Test_TC_DIAG_TH_NW_2_3');
 
+  // TODO: Test_TC_DIAG_TH_NW_2_4 does not work on Darwin for now.
+  tests.disable('Test_TC_DIAG_TH_NW_2_4');
+
   // TODO: Test_TC_CC_9_1 does not work on Darwin for now.
-  tests.disable('Test_TC_CC_9_1');
+  // But is disabled in CI, so we can't disable it here.
+  //tests.disable('Test_TC_CC_9_1');
 
   // TODO: Test_TC_CC_9_2 does not work on Darwin for now.
-  tests.disable('Test_TC_CC_9_2');
+  // But is disabled in CI, so we can't disable it here.
+  //tests.disable('Test_TC_CC_9_2');
 
   // TODO: Test_TC_CC_9_3 does not work on Darwin for now.
-  tests.disable('Test_TC_CC_9_3');
+  // But is disabled in CI, so we can't disable it here.
+  //tests.disable('Test_TC_CC_9_3');
 
   // TODO: Test_TC_MC_3_7 does not work on Darwin for now.
   tests.disable('Test_TC_MC_3_7');

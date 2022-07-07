@@ -192,9 +192,11 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
-                 enable_ble=True, enable_wifi=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
-                 use_libfuzzer=False, use_clang=False, interactive_mode=True, extra_tests=False,
+    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
+                 enable_ipv4=True, enable_ble=True, enable_wifi=True,
+                 enable_thread=True, use_tsan=False, use_asan=False,
+                 separate_event_loop=True, use_libfuzzer=False, use_clang=False,
+                 interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -216,6 +218,9 @@ class HostBuilder(GnBuilder):
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
 
+        if not enable_thread:
+            self.extra_gn_options.append('chip_enable_openthread=false')
+
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
 
@@ -233,6 +238,11 @@ class HostBuilder(GnBuilder):
 
         if use_clang:
             self.extra_gn_options.append('is_clang=true')
+
+            if self.board == HostBoard.FAKE:
+                # Fake uses "//build/toolchain/fake:fake_x64_gcc"
+                # so setting clang is not correct
+                raise Exception('Fake host board is always gcc (not clang)')
 
         if use_platform_mdns:
             self.extra_gn_options.append('chip_mdns="platform"')
@@ -285,6 +295,7 @@ class HostBuilder(GnBuilder):
                     'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
                     'chip_link_tests=true',
                     'chip_device_platform="fake"',
+                    'chip_fake_platform=true',
                 ]
             )
             return self.extra_gn_options

@@ -44,15 +44,13 @@ tests:
           constraints:
               type: map32
 
-    #Issue 17970
     - label: "TH reads the AttributeList attribute from the DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 65528, 65529, 65530, 65531, 65532, 65533]
           constraints:
               type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
 
     - label: "TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"

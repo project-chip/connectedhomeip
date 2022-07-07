@@ -17,10 +17,31 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
+
+declare_args() {
+  # Set to true to run the PersistentStorageDelegate API compliance audit
+  chip_support_enable_storage_api_audit = false
+
+  # Set to true to run the PersistentStorageDelegate load test audit
+  chip_support_enable_storage_load_test_audit = false
+}
+
+config("storage_audit_config") {
+  defines = []
+
+  if (chip_support_enable_storage_api_audit) {
+    defines += [ "CHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT" ]
+  }
+
+  if (chip_support_enable_storage_load_test_audit) {
+    defines += [ "CHIP_SUPPORT_ENABLE_STORAGE_LOAD_TEST_AUDIT" ]
+  }
+}
 
 if (chip_pw_tokenizer_logging) {
   import("//build_overrides/pigweed.gni")
@@ -86,10 +107,14 @@ static_library("support") {
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "IniEscaping.cpp",
+    "IniEscaping.h",
     "Iterators.h",
     "LifetimePersistedCounter.h",
     "ObjectLifeCycle.h",
     "PersistedCounter.h",
+    "PersistentStorageAudit.cpp",
+    "PersistentStorageAudit.h",
     "PersistentStorageMacros.h",
     "Pool.cpp",
     "Pool.h",
@@ -105,10 +130,6 @@ static_library("support") {
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
     "TimeUtils.h",
-    "UnitTestRegistration.cpp",
-    "UnitTestRegistration.h",
-    "UnitTestUtils.cpp",
-    "UnitTestUtils.h",
     "Variant.h",
     "ZclString.cpp",
     "ZclString.h",
@@ -163,6 +184,7 @@ static_library("support") {
   public_configs = [
     "${chip_root}/src:includes",
     "${chip_root}/src/system:system_config",
+    ":storage_audit_config",
   ]
 
   if (chip_config_memory_management == "simple") {
@@ -186,4 +208,24 @@ static_library("support") {
   if (chip_config_memory_debug_dmalloc) {
     libs += [ "dmallocthcxx" ]
   }
+}
+
+static_library("testing") {
+  output_name = "libSupportTesting"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [
+    "UnitTestExtendedAssertions.h",
+    "UnitTestRegistration.cpp",
+    "UnitTestRegistration.h",
+    "UnitTestUtils.cpp",
+    "UnitTestUtils.h",
+  ]
+
+  public_deps = [
+    ":support",
+    "${chip_root}/src/lib/core",
+    "${nlassert_root}:nlassert",
+    "${nlunit_test_root}:nlunit-test",
+  ]
 }

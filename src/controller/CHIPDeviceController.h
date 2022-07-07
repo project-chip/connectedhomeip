@@ -50,6 +50,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/Pool.h>
 #include <lib/support/SafeInt.h>
@@ -152,7 +153,7 @@ public:
      *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
      *  ensure this happened before calling this method.
      */
-    virtual CHIP_ERROR Shutdown();
+    virtual void Shutdown();
 
     SessionManager * SessionMgr()
     {
@@ -191,11 +192,12 @@ public:
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
-    CHIP_ERROR GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
+    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(PeerId(GetCompressedFabricId(), peerNodeId), onConnection,
+                                                               onFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -203,9 +205,9 @@ public:
      * DEPRECATED - to be removed
      *
      * Forces a DNSSD lookup for the specified device. It finds the corresponding session
-     * for the given nodeID and initiates a DNSSD lookup to find/update the node address
+     * for the given peerNodeId and initiates a DNSSD lookup to find/update the node address
      */
-    CHIP_ERROR UpdateDevice(NodeId deviceId);
+    CHIP_ERROR UpdateDevice(NodeId peerNodeId);
 
     /**
      * @brief
@@ -229,26 +231,53 @@ public:
     /**
      * @brief Get the Compressed Fabric ID assigned to the device.
      */
-    uint64_t GetCompressedFabricId() const { return mLocalId.GetCompressedFabricId(); }
+    uint64_t GetCompressedFabricId() const
+    {
+        const auto * fabricInfo = GetFabricInfo();
+        return (fabricInfo != nullptr) ? static_cast<uint64_t>(fabricInfo->GetCompressedFabricId()) : kUndefinedCompressedFabricId;
+    }
+
+    /**
+     * @brief Get the Compressed Fabric Id as a big-endian 64 bit octet string.
+     *
+     * Output span is resized to 8 bytes on success if it was larger.
+     *
+     * @param outBytes span to contain the compressed fabric ID, must be at least 8 bytes long
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL if `outBytes` is too small, CHIP_ERROR_INVALID_FABRIC_INDEX
+     *         if the controller is somehow not associated with a fabric (internal error!) or
+     *         CHIP_NO_ERROR on success.
+     */
+    CHIP_ERROR GetCompressedFabricIdBytes(MutableByteSpan & outBytes) const;
 
     /**
      * @brief Get the raw Fabric ID assigned to the device.
      */
-    uint64_t GetFabricId() const { return mFabricId; }
+    uint64_t GetFabricId() const
+    {
+        const auto * fabricInfo = GetFabricInfo();
+        return (fabricInfo != nullptr) ? static_cast<uint64_t>(fabricInfo->GetFabricId()) : kUndefinedFabricId;
+    }
 
     /**
      * @brief Get the Node ID of this instance.
      */
-    NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
-
-    CHIP_ERROR GetFabricIndex(FabricIndex * value)
+    NodeId GetNodeId() const
     {
-        VerifyOrReturnError(mState == State::Initialized && mFabricInfo != nullptr && value != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        *value = mFabricInfo->GetFabricIndex();
-        return CHIP_NO_ERROR;
+        const auto * fabricInfo = GetFabricInfo();
+        return (fabricInfo != nullptr) ? static_cast<uint64_t>(fabricInfo->GetNodeId()) : kUndefinedNodeId;
     }
 
-    FabricInfo * GetFabricInfo() { return mFabricInfo; }
+    /**
+     * @brief Get the root public key for the fabric
+     *
+     * @param outRootPublicKey reference to public key object that gets updated on success.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INCORRECT_STATE if fabric table is unset, or another internal error
+     *         on storage access failure.
+     */
+    CHIP_ERROR GetRootPublicKey(Crypto::P256PublicKey & outRootPublicKey) const;
+
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     const FabricTable * GetFabricTable() const
     {
@@ -259,7 +288,7 @@ public:
         return mSystemState->Fabrics();
     }
 
-    void ReleaseOperationalDevice(NodeId remoteDeviceId);
+    void ReleaseOperationalDevice(NodeId remoteNodeId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
@@ -299,11 +328,19 @@ protected:
         Initialized
     };
 
+    // This is not public to avoid users of DeviceController relying on "innards" access to
+    // the raw fabric table. Everything needed should be available with getters on DeviceController.
+    const FabricInfo * GetFabricInfo() const
+    {
+        VerifyOrReturnError((mState == State::Initialized) && (mFabricIndex != kUndefinedFabricIndex), nullptr);
+        VerifyOrReturnError(GetFabricTable() != nullptr, nullptr);
+
+        return GetFabricTable()->FindFabricWithIndex(mFabricIndex);
+    }
+
     State mState;
 
-    PeerId mLocalId          = PeerId();
-    FabricId mFabricId       = kUndefinedFabricId;
-    FabricInfo * mFabricInfo = nullptr;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
@@ -371,7 +408,7 @@ public:
      *
      *  Please see implementation for more details.
      */
-    CHIP_ERROR Shutdown() override;
+    void Shutdown() override;
 
     // ----- Connection Management -----
     /**
@@ -545,9 +582,8 @@ public:
      *   Once we have finished all commissioning work, the Controller should close the BLE
      *   connection to the device and establish CASE session / another PASE session to the device
      *   if needed.
-     * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR CloseBleConnection();
+    void CloseBleConnection();
 #endif
     /**
      * @brief
@@ -611,7 +647,8 @@ public:
     // Commissioner will establish new device connections after PASE.
     OperationalDeviceProxy * GetDeviceSession(const PeerId & peerId) override;
 
-    // Issue an NOC chain using the associated OperationalCredentialsDelegate.
+    // Issue an NOC chain using the associated OperationalCredentialsDelegate. The NOC chain will
+    // be provided in X509 DER format.
     // NOTE: This is only valid assuming that `mOperationalCredentialsDelegate` is what is desired
     // to issue the NOC chain.
     CHIP_ERROR IssueNOCChain(const ByteSpan & NOCSRElements, NodeId nodeId,
@@ -793,8 +830,7 @@ private:
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
     {
-        ClusterObjectT cluster;
-        cluster.Associate(device, endpoint);
+        ClusterObjectT cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint);
         cluster.SetCommandTimeout(timeout);
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);

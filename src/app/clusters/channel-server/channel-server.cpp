@@ -115,18 +115,10 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     }
 }
 
-bool HasFeature(chip::EndpointId endpoint, ChannelFeature feature)
+bool Delegate::HasFeature(chip::EndpointId endpoint, ChannelFeature feature)
 {
-    bool hasFeature     = false;
-    uint32_t featureMap = 0;
-
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
-    {
-        hasFeature = (featureMap & chip::to_underlying(feature));
-    }
-
-    return hasFeature;
+    uint32_t featureMap = GetFeatureMap(endpoint);
+    return (featureMap & chip::to_underlying(feature));
 }
 
 } // namespace Channel
@@ -150,6 +142,7 @@ private:
     CHIP_ERROR ReadChannelListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadLineupAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ChannelAttrAccess gChannelAttrAccess;
@@ -162,7 +155,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
     switch (aPath.mAttributeId)
     {
     case app::Clusters::Channel::Attributes::ChannelList::Id: {
-        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kChannelList))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kChannelList))
         {
             return aEncoder.EncodeEmptyList();
         }
@@ -170,7 +163,7 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadChannelListAttribute(aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::Lineup::Id: {
-        if (isDelegateNull(delegate, endpoint) || !HasFeature(endpoint, ChannelFeature::kLineupInfo))
+        if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, ChannelFeature::kLineupInfo))
         {
             return CHIP_NO_ERROR;
         }
@@ -185,12 +178,27 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
         return ReadCurrentChannelAttribute(aEncoder, delegate);
     }
+    case app::Clusters::Channel::Attributes::FeatureMap::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return CHIP_NO_ERROR;
+        }
+
+        return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
+    }
     default: {
         break;
     }
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChannelAttrAccess::ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder,
+                                                       Delegate * delegate)
+{
+    uint32_t featureFlag = delegate->GetFeatureMap(endpoint);
+    return aEncoder.Encode(featureFlag);
 }
 
 CHIP_ERROR ChannelAttrAccess::ReadChannelListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

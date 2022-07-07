@@ -16,6 +16,7 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace std;
 using namespace chip::app::DataModel;
@@ -235,4 +236,16 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = MediaPlaybackStatusEnum::kSuccess;
     helper.Success(response);
+}
+
+uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

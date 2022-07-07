@@ -35,7 +35,17 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mTransport = transport;
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
-    ReturnErrorOnFailure(mFabricTable.Init(&mStorage));
+
+    ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
+    ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
+
+    chip::FabricTable::InitParams initParams;
+    initParams.storage             = &mStorage;
+    initParams.operationalKeystore = &mOpKeyStore;
+    initParams.opCertStore         = &mOpCertStore;
+
+    ReturnErrorOnFailure(mFabricTable.Init(initParams));
+
     ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager, &mStorage, &mFabricTable));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
@@ -43,16 +53,13 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     if (mInitializeNodes)
     {
-        FabricInfo aliceFabric;
-        FabricInfo bobFabric;
+        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                                GetNodeA1CertAsset().mCert,
+                                                                                GetNodeA1CertAsset().mKey, &mAliceFabricIndex));
 
-        ReturnErrorOnFailure(aliceFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
-                                                             GetNodeA1CertAsset().mCert, GetNodeA1CertAsset().mKey));
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(aliceFabric, &mAliceFabricIndex));
-
-        bobFabric.TestOnlyBuildFabric(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert, GetNodeA2CertAsset().mCert,
-                                      GetNodeA2CertAsset().mKey);
-        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTest(bobFabric, &mBobFabricIndex));
+        ReturnErrorOnFailure(mFabricTable.AddNewFabricForTestIgnoringCollisions(GetRootACertAsset().mCert, GetIAA1CertAsset().mCert,
+                                                                                GetNodeA2CertAsset().mCert,
+                                                                                GetNodeA2CertAsset().mKey, &mBobFabricIndex));
 
         ReturnErrorOnFailure(CreateSessionBobToAlice());
         ReturnErrorOnFailure(CreateSessionAliceToBob());
@@ -66,14 +73,16 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 }
 
 // Shutdown all layers, finalize operations
-CHIP_ERROR MessagingContext::Shutdown()
+void MessagingContext::Shutdown()
 {
-    VerifyOrReturnError(mInitialized == true, CHIP_ERROR_INTERNAL);
+    VerifyOrDie(mInitialized);
     mInitialized = false;
 
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
-    return CHIP_NO_ERROR;
+    mFabricTable.Shutdown();
+    mOpCertStore.Finish();
+    mOpKeyStore.Finish();
 }
 
 CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
@@ -81,13 +90,12 @@ CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
     return Init(existing.mTransport, existing.mIOContext);
 }
 
-CHIP_ERROR MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
+void MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
 {
-    CHIP_ERROR err = Shutdown();
+    Shutdown();
     // Point the transport back to the original session manager, since we had
     // pointed it to ours.
     existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
-    return err;
 }
 
 CHIP_ERROR MessagingContext::CreateSessionBobToAlice()

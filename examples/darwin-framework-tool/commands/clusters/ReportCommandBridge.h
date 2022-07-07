@@ -50,10 +50,10 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [device
             readAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
@@ -125,10 +125,10 @@ public:
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
@@ -195,11 +195,11 @@ public:
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         [device subscribeWithQueue:callbackQueue

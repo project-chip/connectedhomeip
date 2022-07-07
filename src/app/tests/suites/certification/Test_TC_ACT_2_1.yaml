@@ -31,6 +31,7 @@ tests:
           endpoints that can be exposed using the Actions server cluster (NOTE
           if this is not provided, it is assumed the DUT automagically creates
           these)"
+      PICS: ACT.S.M.FillEndpointLists
       verification: |
           no Matter messages, result will be used in steps 4a and beyond
       disabled: true
@@ -40,6 +41,7 @@ tests:
           actions that can be exposed using the Actions server cluster (NOTE if
           this is not provided, it is assumed the DUT automagically creates
           these)"
+      PICS: ACT.S.M.FillActionList
       verification: |
           no Matter messages, result will be used in steps 5a and beyond
       disabled: true
@@ -56,9 +58,8 @@ tests:
           internal TH: create list of all EP on this server
       disabled: true
 
-    - label:
-          "Read EndpointLists attribute of Actions server and validate the
-          EndpointListStructs using the following steps"
+    - label: "Read EndpointLists attribute of Actions server"
+      PICS: ACT.S.A0001
       verification: |
           Read EndpointLists attribute
       disabled: true
@@ -93,13 +94,13 @@ tests:
           "For each EndpointListStruct, verify Name and Type against the
           name/type of each group of endpoints provided by the manufacturers
           means"
+      PICS: ACT.S.A0001 && ACT.S.M.FillEndpointLists
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
 
-    - label:
-          "Read ActionList attribute of Actions server and validate the
-          ActionStructs using the following steps"
+    - label: "Read ActionList attribute of Actions server"
+      PICS: ACT.S.A0000
       verification: |
           Read ActionList attribute
       disabled: true
@@ -145,18 +146,18 @@ tests:
           "For each ActionStruct, verify Name, Type and State against the
           name/type/state info for the action provided by the manufacturers
           means"
+      PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
           no Matter messages, but TH internal checking
       disabled: true
 
     - label: "Read SetupURL attribute"
+      PICS: ACT.S.A0002
       verification: |
           Read SetupURL attribute
       disabled: true
 
-    - label:
-          "Verify that its syntax follows the syntax as specified in RFC 3986,
-          max. 512 ASCII characters"
+    - label: "Verify that its syntax"
       verification: |
           no Matter messages, but TH internal checking
       disabled: true

@@ -28,8 +28,7 @@ CHIP_ERROR ModelCommand::RunCommand()
 
     if (IsGroupId(mDestinationId))
     {
-        FabricIndex fabricIndex;
-        ReturnErrorOnFailure(CurrentCommissioner().GetFabricIndex(&fabricIndex));
+        FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
         ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
 
         return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
@@ -67,7 +66,8 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CH
 
 void ModelCommand::Shutdown()
 {
-    ResetArguments();
     mOnDeviceConnectedCallback.Cancel();
     mOnDeviceConnectionFailureCallback.Cancel();
+
+    CHIPCommand::Shutdown();
 }

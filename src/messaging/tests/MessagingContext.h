@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -82,7 +84,7 @@ public:
     CHIP_ERROR Init(TransportMgrBase * transport, IOContext * io);
 
     // Shutdown all layers, finalize operations
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     // Initialize from an existing messaging context.  Useful if we want to
     // share some state (like the transport).
@@ -90,7 +92,7 @@ public:
 
     // The shutdown method to use if using InitFromExisting.  Must pass in the
     // same existing context as was passed to InitFromExisting.
-    CHIP_ERROR ShutdownAndRestoreExisting(MessagingContext & existing);
+    void ShutdownAndRestoreExisting(MessagingContext & existing);
 
     static Inet::IPAddress GetAddress()
     {
@@ -112,8 +114,8 @@ public:
 
     FabricIndex GetAliceFabricIndex() { return mAliceFabricIndex; }
     FabricIndex GetBobFabricIndex() { return mBobFabricIndex; }
-    FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
-    FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
+    const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
+    const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
 
     CHIP_ERROR CreateSessionBobToAlice();
     CHIP_ERROR CreateSessionAliceToBob();
@@ -146,12 +148,15 @@ private:
     bool mInitializeNodes = true;
     bool mInitialized;
     FabricTable mFabricTable;
+
     SessionManager mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
     TransportMgrBase * mTransport;                // Only needed for InitFromExisting.
     chip::TestPersistentStorageDelegate mStorage; // for SessionManagerInit
+    chip::PersistentStorageOperationalKeystore mOpKeyStore;
+    chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 
     FabricIndex mAliceFabricIndex = kUndefinedFabricIndex;
     FabricIndex mBobFabricIndex   = kUndefinedFabricIndex;
@@ -183,12 +188,11 @@ public:
     }
 
     // Shutdown all layers, finalize operations
-    virtual CHIP_ERROR Shutdown()
+    virtual void Shutdown()
     {
-        ReturnErrorOnFailure(MessagingContext::Shutdown());
-        ReturnErrorOnFailure(LoopbackTransportManager::Shutdown());
+        MessagingContext::Shutdown();
+        LoopbackTransportManager::Shutdown();
         chip::Platform::MemoryShutdown();
-        return CHIP_NO_ERROR;
     }
 
     // Init/Shutdown Helpers that can be used directly as the nlTestSuite
@@ -202,7 +206,8 @@ public:
     static int Finalize(void * context)
     {
         auto * ctx = static_cast<LoopbackMessagingContext *>(context);
-        return ctx->Shutdown() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+        ctx->Shutdown();
+        return SUCCESS;
     }
 
     using LoopbackTransportManager::GetSystemLayer;

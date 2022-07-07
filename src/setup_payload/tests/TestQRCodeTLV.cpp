@@ -20,6 +20,7 @@
 #include <nlunit-test.h>
 
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
@@ -81,6 +82,12 @@ void TestSimpleWrite(nlTestSuite * inSuite, void * inContext)
     string result;
     CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    string result2;
+    err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, result == result2);
 }
 
 void TestSimpleRead(nlTestSuite * inSuite, void * inContext)
@@ -157,6 +164,12 @@ void TestOptionalDataWriteSerial(nlTestSuite * inSuite, void * inContext)
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    string result2;
+    err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, result == result2);
 }
 
 void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
@@ -168,6 +181,12 @@ void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
     CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    string result2;
+    err = generator.payloadBase38RepresentationWithAutoTLVBuffer(result2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, result == result2);
 }
 
 void TestOptionalDataReadSerial(nlTestSuite * inSuite, void * inContext)
@@ -251,11 +270,6 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-struct TestContext
-{
-    nlTestSuite * mSuite;
-};
-
 /**
  *  Set up the test suite.
  */
@@ -292,17 +306,11 @@ int TestQRCodeTLV()
         TestQRCodeTLV_Teardown
     };
     // clang-format on
-    TestContext context;
-
-    context.mSuite = &theSuite;
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
 
-    // Run test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return nlTestRunnerStats(&theSuite);
+    return chip::ExecuteTestsWithoutContext(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestQRCodeTLV);

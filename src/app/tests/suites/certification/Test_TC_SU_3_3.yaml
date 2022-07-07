@@ -13,7 +13,8 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.12.1. [TC-SU-3.3] Tests the transfer of Images between the DUT and OTA-R
+name:
+    3.8.1. [TC-SU-3.3] Transfer of Software Update Images between DUT and OTA-R
 
 config:
     nodeId: 0x12344321
@@ -22,11 +23,11 @@ config:
 
 tests:
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. Protocol supported
-          should only list 'BDX' DUT responds with the QueryImageResponse to the
-          OTA-R/TH."
+          'OTA-R/TH sends a QueryImage Command to the DUT. Protocol supported
+          should only list "BDX" DUT responds with the QueryImageResponse to the
+          OTA-R/TH.'
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -49,17 +50,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT has a cached copy of the software image requested. OTA-R/TH sends
-          a QueryImage Command to the DUT. Protocol supported should only list
-          'BDX' DUT responds with the QueryImageResponse to the OTA-R/TH"
-      verification: |
-          Same as #1
-      disabled: true
-
-    - label:
           "TH sends a QueryImage command to the DUT. RequestorCanConsent is set
           to True by TH. DUT responds with a QueryImageResponse with
           UserConsentNeeded field set to True."
+      PICS: OTAS.S.M.UserConsentNeeded
       verification: |
           Run the OTA Requestor App using command
           chip-ota-requestor-app --discriminator ${REQUESTOR_LONG_DISCRIMINATOR} --secured-device-port ${REQUESTOR_UDP_PORT} --KVS ${KVS_STORE_LOCATION} --periodicQueryTimeout ${TIME_IN_SECONDS} -c
@@ -73,6 +67,7 @@ tests:
           "TH sends a QueryImage command to the DUT. RequestorCanConsent is set
           to True by TH. DUT responds with a QueryImageResponse with
           UserConsentNeeded field set to False."
+      PICS: OTAS.S.M.UserConsentNeeded
       verification: |
           Run the OTA Requestor App using command
 
@@ -88,7 +83,7 @@ tests:
           transfer before it completely transfers the image. Wait for the Idle
           timeout. Initiate another QueryImage Command from OTA-R/TH to the DUT."
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -116,6 +111,7 @@ tests:
     - label:
           "IF (PICS_DT_Vendor_Specific) Perform the OTA Update from DUT using
           vendor specific mechanism."
+      PICS: MCORE.OTA.VendorSpecific
       verification: |
           Use vendor specific steps to initiate OTA Update and verify that the software image is transferred from the DUT
       disabled: true

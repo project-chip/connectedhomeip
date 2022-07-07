@@ -34,7 +34,12 @@ public:
     void HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper,
                        const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 
+    uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
+
 private:
     jobject mKeypadInputManagerObject = nullptr;
     jmethodID mSendKeyMethod          = nullptr;
+
+    // TODO: set this based upon meta data from app
+    uint32_t mDynamicEndpointFeatureMap = 7;
 };

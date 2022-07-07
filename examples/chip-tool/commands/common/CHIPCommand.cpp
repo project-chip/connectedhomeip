@@ -72,11 +72,13 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     ReturnLogErrorOnFailure(mDefaultStorage.Init());
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
+    ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
+    factoryInitParams.opCertStore              = &mOpCertStore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -126,34 +128,36 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     // Initialize Group Data, including IPK
     for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
-        chip::FabricInfo * fabric = it->second->GetFabricInfo();
-        if ((nullptr != fabric) && (0 != it->first.compare(kIdentityNull)))
+        if (0 == it->first.compare(kIdentityNull))
         {
-            uint8_t compressed_fabric_id[sizeof(uint64_t)];
-            chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
-            ReturnLogErrorOnFailure(fabric->GetCompressedId(compressed_fabric_id_span));
-
-            ReturnLogErrorOnFailure(
-                chip::GroupTesting::InitData(&mGroupDataProvider, fabric->GetFabricIndex(), compressed_fabric_id_span));
-
-            // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
-            // key is the same, but the derived keys will be different for each fabric.
-            // This has to be done here after we know the Compressed Fabric ID of all
-            // chip-tool-managed fabrics
-            chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
-            ReturnLogErrorOnFailure(chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabric->GetFabricIndex(),
-                                                                            defaultIpk, compressed_fabric_id_span));
+            continue;
         }
+        const chip::Controller::DeviceCommissioner * controller = it->second.get();
+
+        chip::FabricIndex fabricIndex = controller->GetFabricIndex();
+        uint8_t compressed_fabric_id[sizeof(uint64_t)];
+        chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
+        ReturnLogErrorOnFailure(controller->GetCompressedFabricIdBytes(compressed_fabric_id_span));
+
+        ReturnLogErrorOnFailure(chip::GroupTesting::InitData(&mGroupDataProvider, fabricIndex, compressed_fabric_id_span));
+
+        // Configure the default IPK for all fabrics used by CHIP-tool. The epoch
+        // key is the same, but the derived keys will be different for each fabric.
+        // This has to be done here after we know the Compressed Fabric ID of all
+        // chip-tool-managed fabrics
+        chip::ByteSpan defaultIpk = chip::GroupTesting::DefaultIpkValue::GetDefaultIpk();
+        ReturnLogErrorOnFailure(
+            chip::Credentials::SetSingleIpkEpochKey(&mGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPCommand::MaybeTearDownStack()
+void CHIPCommand::MaybeTearDownStack()
 {
     if (IsInteractive())
     {
-        return CHIP_NO_ERROR;
+        return;
     }
 
     //
@@ -161,21 +165,19 @@ CHIP_ERROR CHIPCommand::MaybeTearDownStack()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityNull));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
+    ShutdownCommissioner(kIdentityNull);
+    ShutdownCommissioner(kIdentityAlpha);
+    ShutdownCommissioner(kIdentityBeta);
+    ShutdownCommissioner(kIdentityGamma);
 
     std::string name        = GetIdentity();
     chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
     if (fabricId >= kIdentityOtherFabricId)
     {
-        ReturnLogErrorOnFailure(ShutdownCommissioner(name));
+        ShutdownCommissioner(name);
     }
 
     StopTracing();
-
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPCommand::Run()
@@ -197,7 +199,7 @@ CHIP_ERROR CHIPCommand::Run()
         Cleanup();
     }
 
-    ReturnErrorOnFailure(MaybeTearDownStack());
+    MaybeTearDownStack();
 
     return err;
 }
@@ -318,9 +320,9 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(const char *
     return *item->second;
 }
 
-CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
+void CHIPCommand::ShutdownCommissioner(std::string key)
 {
-    return mCommissioners[key].get()->Shutdown();
+    mCommissioners[key].get()->Shutdown();
 }
 
 CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId,

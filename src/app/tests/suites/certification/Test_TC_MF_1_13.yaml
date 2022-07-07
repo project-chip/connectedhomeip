@@ -24,20 +24,20 @@ config:
 
 tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      PICS: PICS_MF
       verification: |
-          "1. Provision the device using 1st controller chip tool on the raspi (use above instructions) ,
-          "
+          "1. Provision the device using 1st controller chip tool on the raspi (use above instructions) ,"
       disabled: true
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using ECM and TH_CR3 Commissions
-          with DUT_CE"
+          timeout of PIXIT_COMM_WIN seconds using ECM"
+      PICS: PICS_MF
       verification: |
           On the 1st controller using chip tool, open commissioning window using ECM
 
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
           [1635874557.409509][4549:4554] CHIP:SC: Success status report received. Session was established
           [1635874557.409553][4549:4554] CHIP:IN: New secure session created for device 0x0000000000000001, key 76!!
@@ -49,14 +49,6 @@ tests:
           [1635874557.417449][4549:4554] CHIP:DMG: ICR moving to [CommandSen]
           [1635874557.417505][4549:4554] CHIP:CTL: Manual pairing code: [35484132896]
           [1635874557.417577][4549:4554] CHIP:CTL: SetupQRCode: [MT:00000CQM00AT-F5A510]
-
-
-          1. On 3rd controller using chip tool connect using manual code
-
-          ./chip-tool pairing manualcode 1 35484132896
-
-          Verify you got below message
-          Device commissioning completed with success
       disabled: true
 
     - label: "DNS-SD records shows DUT_CE advertising"
@@ -77,15 +69,27 @@ tests:
           grl@grl-ThinkPad-L480:~/2nd_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
+    - label: "TH_CR3 Commissions with DUT_CE"
+      PICS: PICS_MF
+      verification: |
+          1. On 3rd controller using chip tool connect using manual code
+
+          ./chip-tool pairing code 3 35484132896
+
+          Verify you got below message
+          Device commissioning completed with success
+      disabled: true
+
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT_COMM_WIN seconds using ECM and TH_CR2 Commissions
           with DUT_CE"
+      PICS: PICS_MF
       verification: |
           On the 1st controller using chip tool, open commissioning window using ECM
 
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
           [1635874557.409509][4549:4554] CHIP:SC: Success status report received. Session was established
           [1635874557.409553][4549:4554] CHIP:IN: New secure session created for device 0x0000000000000001, key 76!!
@@ -101,7 +105,7 @@ tests:
 
           1. On 2nd controller using chip tool connect using manual code
 
-          ./chip-tool pairing manualcode 1 35484132896
+          ./chip-tool pairing code 1 35484132896
 
           Verify you got below message
           Device commissioning completed with success
@@ -110,11 +114,12 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT_COMM_WIN seconds using ECM"
+      PICS: PICS_MF
       verification: |
           On the 1st controller using chip tool, open commissioning window using ECM
 
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
           [1635874557.409509][4549:4554] CHIP:SC: Success status report received. Session was established
           [1635874557.409553][4549:4554] CHIP:IN: New secure session created for device 0x0000000000000001, key 76!!
@@ -132,47 +137,49 @@ tests:
           "Before the expiration of PIXIT_COMM_WIN seconds which was set in step
           5, TH_CR1 opens a 2nd commissioning window on DUT_CE using a
           commissioning timeout of PIXIT_COMM_WIN seconds using ECM"
+      PICS: PICS_MF
       verification: |
           Before the timer expiry, on the 1st controller using chip tool, open commissioning window using ECM. Verify the General code return error 1
 
 
-          ./chip-tool pairing open-commissioning-window 1 1 100 1000 3840
+          ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527291.952055][8566:8571] CHIP:DMG: {
-          [1650527291.952074][8566:8571] CHIP:DMG: 	suppressResponse = false,
-          [1650527291.952091][8566:8571] CHIP:DMG: 	InvokeResponseIBs =
-          [1650527291.952116][8566:8571] CHIP:DMG: 	[
-          [1650527291.952134][8566:8571] CHIP:DMG: 		InvokeResponseIB =
-          [1650527291.952172][8566:8571] CHIP:DMG: 		{
-          [1650527291.952195][8566:8571] CHIP:DMG: 			CommandStatusIB =
-          [1650527291.952220][8566:8571] CHIP:DMG: 			{
-          [1650527291.952245][8566:8571] CHIP:DMG: 				CommandPathIB =
-          [1650527291.952276][8566:8571] CHIP:DMG: 				{
-          [1650527291.952303][8566:8571] CHIP:DMG: 					EndpointId = 0x0,
-          [1650527291.952334][8566:8571] CHIP:DMG: 					ClusterId = 0x3c,
-          [1650527291.952369][8566:8571] CHIP:DMG: 					CommandId = 0x0,
-          [1650527291.952394][8566:8571] CHIP:DMG: 				},
+          [1650527291.952074][8566:8571] CHIP:DMG:         suppressResponse = false,
+          [1650527291.952091][8566:8571] CHIP:DMG:         InvokeResponseIBs =
+          [1650527291.952116][8566:8571] CHIP:DMG:         [
+          [1650527291.952134][8566:8571] CHIP:DMG:                 InvokeResponseIB =
+          [1650527291.952172][8566:8571] CHIP:DMG:                 {
+          [1650527291.952195][8566:8571] CHIP:DMG:                         CommandStatusIB =
+          [1650527291.952220][8566:8571] CHIP:DMG:                         {
+          [1650527291.952245][8566:8571] CHIP:DMG:                                 CommandPathIB =
+          [1650527291.952276][8566:8571] CHIP:DMG:                                 {
+          [1650527291.952303][8566:8571] CHIP:DMG:                                         EndpointId = 0x0,
+          [1650527291.952334][8566:8571] CHIP:DMG:                                         ClusterId = 0x3c,
+          [1650527291.952369][8566:8571] CHIP:DMG:                                         CommandId = 0x0,
+          [1650527291.952394][8566:8571] CHIP:DMG:                                 },
           [1650527291.952431][8566:8571] CHIP:DMG:
-          [1650527291.952458][8566:8571] CHIP:DMG: 				StatusIB =
-          [1650527291.952488][8566:8571] CHIP:DMG: 				{
-          [1650527291.952519][8566:8571] CHIP:DMG: 					status = 0x01 (FAILURE),
-          [1650527291.952555][8566:8571] CHIP:DMG: 					cluster-status = 0x1,
-          [1650527291.952578][8566:8571] CHIP:DMG: 				},
+          [1650527291.952458][8566:8571] CHIP:DMG:                                 StatusIB =
+          [1650527291.952488][8566:8571] CHIP:DMG:                                 {
+          [1650527291.952519][8566:8571] CHIP:DMG:                                         status = 0x01 (FAILURE),
+          [1650527291.952555][8566:8571] CHIP:DMG:                                         cluster-status = 0x1,
+          [1650527291.952578][8566:8571] CHIP:DMG:                                 },
           [1650527291.952612][8566:8571] CHIP:DMG:
-          [1650527291.952634][8566:8571] CHIP:DMG: 			},
+          [1650527291.952634][8566:8571] CHIP:DMG:                         },
           [1650527291.952671][8566:8571] CHIP:DMG:
-          [1650527291.952694][8566:8571] CHIP:DMG: 		},
+          [1650527291.952694][8566:8571] CHIP:DMG:                 },
           [1650527291.952731][8566:8571] CHIP:DMG:
-          [1650527291.952751][8566:8571] CHIP:DMG: 	],
+          [1650527291.952751][8566:8571] CHIP:DMG:         ],
           [1650527291.952781][8566:8571] CHIP:DMG:
-          [1650527291.952795][8566:8571] CHIP:DMG: 	InteractionModelRevision = 1
+          [1650527291.952795][8566:8571] CHIP:DMG:         InteractionModelRevision = 1
           [1650527291.952807][8566:8571] CHIP:DMG: },
           [1650527291.952886][8566:8571] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x1
           [1650527291.952931][8566:8571] CHIP:CTL: Failed to open pairing window on the device. Status IM Error 0x00000601: Cluster-specific error: 0x01
       disabled: true
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      PICS: PICS_MF && PICS_MF_BCM
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -209,6 +216,7 @@ tests:
     - label:
           "Wait for the expiration of PIXIT_COMM_WIN seconds that was set in
           step 6"
+      PICS: PICS_MF
       verification: |
           Wait for the expiration of PIXIT_COMM_WIN seconds
       disabled: true
@@ -216,6 +224,7 @@ tests:
     - label:
           "TH_CR1 re-opens a commissioning window on DUT_CE using a
           commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
+      PICS: PICS_MF
       verification: |
           On the 1st controller using chip tool, open commissioning window using BCM
 
@@ -268,8 +277,9 @@ tests:
 
     - label:
           "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
-          9, TH_CR3 opens a 2nd commissioning window on DUT_CE using a
+          10, TH_CR3 opens a 2nd commissioning window on DUT_CE using a
           commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
+      PICS: PICS_MF
       verification: |
           On the 3rd controller using chip tool, open commissioning window using BCM before the timer expiry of the above step
 
@@ -312,11 +322,13 @@ tests:
     - label:
           "Wait for the expiration of PIXIT_COMM_WIN seconds that was set in
           step 11"
+      PICS: PICS_MF
       verification: |
           Wait for the expiration of PIXIT_COMM_WIN seconds
       disabled: true
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      PICS: PICS_MF
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -353,6 +365,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT_COMM_WIN seconds using BCM"
+      PICS: PICS_MF
       verification: |
           On the 1st controller using chip tool, open commissioning window using BCM
 
@@ -397,6 +410,7 @@ tests:
           "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
           14, TH_CR2 opens a second commissioning window on DUT_CE using a
           commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
+      PICS: PICS_MF
       verification: |
           On the 2nd controller using chip tool, open commissioning window using BCM before timer expiry from above step
 

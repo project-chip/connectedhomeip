@@ -37,7 +37,6 @@
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
@@ -758,7 +757,8 @@ CHIP_ERROR PASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralS
         err = CHIP_ERROR_INTERNAL;
         break;
     };
-    ChipLogError(SecureChannel, "Received error (protocol code %d) during PASE process. %s", protocolCode, ErrorStr(err));
+    ChipLogError(SecureChannel, "Received error (protocol code %d) during PASE process: %" CHIP_ERROR_FORMAT, protocolCode,
+                 err.Format());
     return err;
 }
 
@@ -852,7 +852,7 @@ exit:
         // exchange will handle that.
         DiscardExchange();
         Clear();
-        ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed during PASE session setup: %" CHIP_ERROR_FORMAT, err.Format());
         // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }

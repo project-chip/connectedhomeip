@@ -38,14 +38,6 @@ StaticTask_t shellTaskStruct;
 
 ShellTask ShellTask::sShellTask;
 
-/* required by cmd_send.cpp:ProcessCommand */
-extern "C" unsigned int sleep(unsigned int seconds)
-{
-    const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
-    vTaskDelay(xDelay);
-    return 0;
-}
-
 // using namespace ::chip;
 
 int ShellTask::Init(void)
@@ -60,8 +52,6 @@ int ShellTask::Init(void)
 
     cmd_misc_init();
     cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif // CHIP_SHELL_ENABLE_CMD_SERVER

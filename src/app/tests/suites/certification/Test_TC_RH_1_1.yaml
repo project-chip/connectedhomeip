@@ -36,15 +36,37 @@ tests:
           constraints:
               type: list
 
-    #Disabled due to issue 17462
     - label: "Read the global attribute: AttributeList"
-      PICS: PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-          value: [0, 1, 2]
           constraints:
               type: list
+              contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Read FeatureMap attribute from the DUT and Verify that the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     - label:
           "Read EventList attribute from the DUT and Verify that the DUT
@@ -60,25 +82,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-
-    - label: "Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          constraints:
-              type: list
-
-    - label: "Read FeatureMap attribute from the DUT and Verify that the DUT"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-          constraints:
-              type: map32

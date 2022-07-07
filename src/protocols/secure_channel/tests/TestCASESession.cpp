@@ -23,6 +23,7 @@
 
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
 #include <errno.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -32,6 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/tests/MessagingContext.h>
 #include <nlunit-test.h>
@@ -45,7 +47,6 @@ using namespace chip;
 using namespace Credentials;
 using namespace TestCerts;
 
-using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
@@ -53,7 +54,23 @@ using namespace chip::Protocols;
 
 using TestContext = Test::LoopbackMessagingContext;
 
+namespace chip {
 namespace {
+
+CHIP_ERROR InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
+                           chip::Crypto::OperationalKeystore * opKeyStore,
+                           chip::Credentials::PersistentStorageOpCertStore * opCertStore)
+{
+    ReturnErrorOnFailure(opCertStore->Init(testStorage));
+
+    chip::FabricTable::InitParams initParams;
+    initParams.storage             = testStorage;
+    initParams.operationalKeystore = opKeyStore;
+    initParams.opCertStore         = opCertStore;
+
+    return fabricTable.Init(initParams);
+}
+
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
@@ -102,7 +119,7 @@ public:
 
     CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -117,6 +134,10 @@ public:
         VerifyOrReturnError(fabricIndex == mSingleFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
         return mKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
     }
+
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override { return Platform::New<Crypto::P256Keypair>(); }
+
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override { Platform::Delete<Crypto::P256Keypair>(keypair); }
 
 protected:
     Platform::UniquePtr<P256Keypair> mKeypair;
@@ -142,6 +163,9 @@ GroupDataProviderImpl gDeviceGroupDataProvider;
 TestPersistentStorageDelegate gDeviceStorageDelegate;
 TestOperationalKeystore gDeviceOperationalKeystore;
 
+Credentials::PersistentStorageOpCertStore gCommissionerOpCertStore;
+Credentials::PersistentStorageOpCertStore gDeviceOpCertStore;
+
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 NodeId Node01_02 = 0xDEDEDEDE00010002;
 
@@ -163,7 +187,7 @@ CHIP_ERROR InitTestIpk(GroupDataProvider & groupDataProvider, const FabricInfo &
 
     uint8_t compressedId[sizeof(uint64_t)];
     MutableByteSpan compressedIdSpan(compressedId);
-    ReturnErrorOnFailure(fabricInfo.GetCompressedId(compressedIdSpan));
+    ReturnErrorOnFailure(fabricInfo.GetCompressedFabricIdBytes(compressedIdSpan));
     return groupDataProvider.SetKeySet(fabricInfo.GetFabricIndex(), compressedIdSpan, ipkKeySet);
 }
 
@@ -174,26 +198,26 @@ CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(gCommissionerGroupDataProvider.Init());
 
     FabricInfo commissionerFabric;
+    {
+        P256SerializedKeypair opKeysSerialized;
 
-    P256SerializedKeypair opKeysSerialized;
-    // TODO: Rename gCommissioner* to gInitiator*
-    memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
-           sTestCert_Node01_02_PrivateKey_Len);
+        // TODO: Rename gCommissioner* to gInitiator*
+        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
+        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
+               sTestCert_Node01_02_PrivateKey_Len);
 
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
+        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
 
-    P256Keypair opKey;
-    ReturnErrorOnFailure(opKey.Deserialize(opKeysSerialized));
-    ReturnErrorOnFailure(commissionerFabric.SetOperationalKeypair(&opKey));
+        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
+        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
+        chip::ByteSpan nocSpan(sTestCert_Node01_02_Chip, sTestCert_Node01_02_Chip_Len);
+        chip::ByteSpan opKeySpan(opKeysSerialized.ConstBytes(), opKeysSerialized.Length());
 
-    ReturnErrorOnFailure(commissionerFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-    ReturnErrorOnFailure(commissionerFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
-    ReturnErrorOnFailure(commissionerFabric.SetNOCCert(ByteSpan(sTestCert_Node01_02_Chip, sTestCert_Node01_02_Chip_Len)));
+        ReturnErrorOnFailure(
+            gCommissionerFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, opKeySpan, &gCommissionerFabricIndex));
+    }
 
-    ReturnErrorOnFailure(gCommissionerFabrics.AddNewFabric(commissionerFabric, &gCommissionerFabricIndex));
-
-    FabricInfo * newFabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    const FabricInfo * newFabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     VerifyOrReturnError(newFabric != nullptr, CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(InitTestIpk(gCommissionerGroupDataProvider, *newFabric, /* numIpks= */ 1));
 
@@ -202,23 +226,30 @@ CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(gDeviceGroupDataProvider.Init());
     FabricInfo deviceFabric;
 
-    auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
-    memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
-           sTestCert_Node01_01_PrivateKey_Len);
+    {
+        P256SerializedKeypair opKeysSerialized;
 
-    ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
+        auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
+        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+               sTestCert_Node01_01_PrivateKey_Len);
 
-    ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
+        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
-    gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));
-    ReturnErrorOnFailure(gDeviceFabrics.Init(&gDeviceStorageDelegate, &gDeviceOperationalKeystore));
+        ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
 
-    ReturnErrorOnFailure(deviceFabric.SetRootCert(ByteSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len)));
-    ReturnErrorOnFailure(deviceFabric.SetICACert(ByteSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len)));
-    ReturnErrorOnFailure(deviceFabric.SetNOCCert(ByteSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len)));
+        // Use an injected operational key for device
+        gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));
 
-    ReturnErrorOnFailure(gDeviceFabrics.AddNewFabric(deviceFabric, &gDeviceFabricIndex));
+        ReturnErrorOnFailure(
+            InitFabricTable(gDeviceFabrics, &gDeviceStorageDelegate, &gDeviceOperationalKeystore, &gDeviceOpCertStore));
+
+        chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
+        chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
+        chip::ByteSpan nocSpan(sTestCert_Node01_01_Chip, sTestCert_Node01_01_Chip_Len);
+
+        ReturnErrorOnFailure(gDeviceFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, ByteSpan{}, &gDeviceFabricIndex));
+    }
 
     // TODO: Validate more cases of number of IPKs on both sides
     newFabric = gDeviceFabrics.FindFabricWithIndex(gDeviceFabricIndex);
@@ -228,39 +259,57 @@ CHIP_ERROR InitCredentialSets()
     return CHIP_NO_ERROR;
 }
 
-} // namespace
+} // anonymous namespace
 
-void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
+// Specifically for SimulateUpdateNOCInvalidatePendingEstablishment, we need it to be static so that the class below can
+// be a friend to CASESession so that test can get access to CASESession::State and test method that are not public. To
+// keep the rest of this file consistent we brought all other tests into this class.
+class TestCASESession
+{
+public:
+    static void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext);
+    static void SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext);
+    static void Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext);
+    static void DestinationIdTest(nlTestSuite * inSuite, void * inContext);
+    static void SessionResumptionStorage(nlTestSuite * inSuite, void * inContext);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    static void SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext);
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+};
+
+void TestCASESession::SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     FabricTable fabrics;
-    // In normal operation scope of FabricTable outlives CASESession. Without this scoping we hit
-    // ASAN test issue since FabricTable is not normally on the stack.
-    {
-        CASESession caseSession;
+    CASESession caseSession;
 
-        NL_TEST_ASSERT(inSuite, caseSession.GetSecureSessionType() == SecureSession::Type::kCASE);
+    NL_TEST_ASSERT(inSuite, caseSession.GetSecureSessionType() == SecureSession::Type::kCASE);
 
-        caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
-        NL_TEST_ASSERT(inSuite,
-                       caseSession.PrepareForSessionEstablishment(
-                           sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
-                           Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_INVALID_ARGUMENT);
-        NL_TEST_ASSERT(inSuite,
-                       caseSession.PrepareForSessionEstablishment(
-                           sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
-                           Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_ERROR_INVALID_ARGUMENT);
-        NL_TEST_ASSERT(
-            inSuite,
-            caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
-                                                       Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
-    }
+    caseSession.SetGroupDataProvider(&gDeviceGroupDataProvider);
+    NL_TEST_ASSERT(inSuite,
+                   caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, nullptr, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   caseSession.PrepareForSessionEstablishment(sessionManager, nullptr, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite,
+                   caseSession.PrepareForSessionEstablishment(sessionManager, &fabrics, nullptr, nullptr, &delegate, ScopedNodeId(),
+                                                              Optional<ReliableMessageProtocolConfig>::Missing()) == CHIP_NO_ERROR);
+
+    // Calling Clear() here since ASAN will have an issue if FabricTable destructor is called before CASESession's
+    // destructor. We could reorder FabricTable and CaseSession, but this makes it a little more clear what we are
+    // doing here.
+    caseSession.Clear();
 }
 
-void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     SessionManager sessionManager;
@@ -315,8 +364,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     loopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
-void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
-                                           CASESession & pairingCommissioner, TestCASESecurePairingDelegate & delegateCommissioner)
+void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SessionManager & sessionManager,
+                                      CASESession & pairingCommissioner, TestCASESecurePairingDelegate & delegateCommissioner)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -374,18 +423,18 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
-void CASE_SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
-    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
+    SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
 }
 
 CASEServerForTest gPairingServer;
 
-void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
     // TODO: Add cases for mismatching IPK config between initiator/responder
 
@@ -463,7 +512,7 @@ struct Sigma1Params
     static constexpr bool expectSuccess = true;
 };
 
-void CASE_DestinationIdTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::DestinationIdTest(nlTestSuite * inSuite, void * inContext)
 {
     // Validate example test vector from CASE section of spec
 
@@ -679,7 +728,7 @@ struct Sigma1SessionIdTooBig : public BadSigma1ParamsBase
     static constexpr uint32_t initiatorSessionId = UINT16_MAX + 1;
 };
 
-static void CASE_Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::Sigma1ParsingTest(nlTestSuite * inSuite, void * inContext)
 {
     // 1280 bytes must be enough by definition.
     constexpr size_t bufferSize = 1280;
@@ -752,7 +801,7 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
     Crypto::P256ECDHDerivedSecret * mSharedSecret = nullptr;
 };
 
-static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inContext)
 {
     // Test the SessionResumptionStorage external interface.
     //
@@ -850,18 +899,8 @@ static void CASE_SessionResumptionStorage(nlTestSuite * inSuite, void * inContex
     }
 }
 
-// TODO, move all tests above into this class
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-namespace chip {
-// TODO rename CASESessionForTest to TestCASESession. Not doing that immediately since that requires
-// removing a lot of the `using namesapce` above which is a larger cleanup.
-class CASESessionForTest
-{
-public:
-    static void CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext);
-};
-
-void CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
+void TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
 {
     SessionManager sessionManager;
     TestCASESecurePairingDelegate delegateCommissioner;
@@ -928,8 +967,9 @@ void CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nl
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 0);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 0);
 }
-} // namespace chip
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+} // namespace chip
 
 // Test Suite
 
@@ -939,17 +979,17 @@ void CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment(nl
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("WaitInit",    CASE_SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       CASE_SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
-    NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
-    NL_TEST_DEF("Sigma1Parsing", CASE_Sigma1ParsingTest),
-    NL_TEST_DEF("DestinationId", CASE_DestinationIdTest),
-    NL_TEST_DEF("SessionResumptionStorage", CASE_SessionResumptionStorage),
+    NL_TEST_DEF("WaitInit",    chip::TestCASESession::SecurePairingWaitTest),
+    NL_TEST_DEF("Start",       chip::TestCASESession::SecurePairingStartTest),
+    NL_TEST_DEF("Handshake",   chip::TestCASESession::SecurePairingHandshakeTest),
+    NL_TEST_DEF("ServerHandshake", chip::TestCASESession::SecurePairingHandshakeServerTest),
+    NL_TEST_DEF("Sigma1Parsing", chip::TestCASESession::Sigma1ParsingTest),
+    NL_TEST_DEF("DestinationId", chip::TestCASESession::DestinationIdTest),
+    NL_TEST_DEF("SessionResumptionStorage", chip::TestCASESession::SessionResumptionStorage),
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // This is compiled for host tests which is enough test coverage to ensure updating NOC invalidates
     // CASESession that are in the process of establishing.
-    NL_TEST_DEF("InvalidatePendingSessionEstablishment", chip::CASESessionForTest::CASE_SimulateUpdateNOCInvalidatePendingEstablishment),
+    NL_TEST_DEF("InvalidatePendingSessionEstablishment", chip::TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment),
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     NL_TEST_SENTINEL()
@@ -980,7 +1020,8 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
     ctx.ConfigInitializeNodes(false);
     ReturnErrorOnFailure(ctx.Init());
 
-    gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
+    ReturnErrorOnFailure(InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
+                                         &gCommissionerOpCertStore));
 
     return InitCredentialSets();
 }
@@ -1019,14 +1060,9 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
 /**
  *  Main
  */
-int TestCASESession()
+int TestCASESessionTest()
 {
-    TestContext sContext;
-
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCASESession)
+CHIP_REGISTER_TEST_SUITE(TestCASESessionTest)

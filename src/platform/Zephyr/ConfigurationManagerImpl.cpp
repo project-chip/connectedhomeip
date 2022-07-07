@@ -29,10 +29,6 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/Zephyr/ZephyrConfig.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.ipp>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -55,19 +51,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ZephyrConfig>::Init();
     SuccessOrExit(err);
-
-    // TODO: Initialize the global GroupKeyStore object here
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-    {
-        FactoryProvisioning factoryProv;
-        uint8_t * const kDeviceRAMStart = (uint8_t *) CONFIG_SRAM_BASE_ADDRESS;
-        uint8_t * const kDeviceRAMEnd   = kDeviceRAMStart + CONFIG_SRAM_SIZE * 1024 - 1;
-
-        // Scan device RAM for injected provisioning data and save to persistent storage if found.
-        err = factoryProv.ProvisionDeviceFromRAM(kDeviceRAMStart, kDeviceRAMEnd);
-        SuccessOrExit(err);
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
     if (ZephyrConfig::ConfigValueExists(ZephyrConfig::kCounterKey_RebootCount))
     {
@@ -188,7 +171,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
 
     if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "Factory reset failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();

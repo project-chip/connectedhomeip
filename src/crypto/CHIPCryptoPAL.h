@@ -361,16 +361,6 @@ public:
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) const = 0;
 
-    /**
-     * @brief A function to sign a hash using ECDSA
-     * @param hash Hash that needs to be signed
-     * @param hash_length Length of hash
-     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     * in raw <r,s> point form (see SEC1).
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) const = 0;
-
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
      * ASN.1 DER encoded as padded big-endian field elements as described in SEC 1: Elliptic Curve Cryptography
@@ -454,16 +444,6 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
-
-    /**
-     * @brief A function to sign a hash using ECDSA
-     * @param hash Hash that needs to be signed
-     * @param hash_length Length of hash
-     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
-     * in raw <r,s> point form (see SEC1).
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief A function to derive a shared secret using ECDH
@@ -1581,6 +1561,7 @@ public:
 /**
  *  @brief Derives the Operational Group Key using the Key Derivation Function (KDF) from the given epoch key.
  * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[in] compressed_fabric_id The compressed fabric ID for the fabric (big endian byte string)
  * @param[out] out_key  Symmetric key used as the encryption key during message processing for group communication.
  The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
@@ -1595,6 +1576,15 @@ CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, const ByteSpan 
  * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INVALID_ARGUMENT if the provided key is invalid.
  **/
 CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id);
+
+/**
+ *  @brief Derives the Privacy Group Key using the Key Derivation Function (KDF) from the given epoch key.
+ * @param[in] epoch_key  The epoch key. Must be CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @param[out] out_key  Symmetric key used as the privacy key during message processing for group communication.
+ The buffer size must be at least CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES bytes length.
+ * @return Returns a CHIP_NO_ERROR on succcess, or CHIP_ERROR_INTERNAL if the provided key is invalid.
+ **/
+CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
 
 } // namespace Crypto
 } // namespace chip

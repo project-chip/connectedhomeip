@@ -17,11 +17,13 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
 
 chip_test_suite("tests") {
   output_name = "libCoreTests"
 
   test_sources = [
+    "TestCATValues.cpp",
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPTLV.cpp",
@@ -34,6 +36,14 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
+}
+
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-tlv-reader") {
+    sources = [ "FuzzTlvReader.cpp" ]
+    public_deps = [ "${chip_root}/src/lib/core" ]
+  }
 }

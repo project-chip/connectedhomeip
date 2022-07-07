@@ -51,7 +51,7 @@ ReliableMessageMgr::RetransTableEntry::~RetransTableEntry()
     ec->SetMessageNotAcked(false);
 }
 
-ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+ReliableMessageMgr::ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr)
 {}
 

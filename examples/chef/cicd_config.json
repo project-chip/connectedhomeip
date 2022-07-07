@@ -1,5 +1,5 @@
 {
-    "ci_allow_list": ["rootnode_dimmablelight_gY80DaqEUL"],
+    "ci_allow_list": ["rootnode_dimmablelight_bCwGYSDpoe"],
     "cd_platforms": {
         "linux": "linux_x86",
         "esp32": "m5stack",
