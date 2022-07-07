@@ -417,7 +417,8 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
 
-    VerifyOrReturnValue(IsCredentialIndexGreaterThanZero(credentialIndex, credentialType), false); // indices are one-indexed except ProgrammingPin
+    VerifyOrReturnValue(IsCredentialIndexGreaterThanZero(credentialIndex, credentialType),
+                        false); // indices are one-indexed except ProgrammingPin
 
     credentialIndex--;
 
@@ -464,7 +465,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 const chip::ByteSpan & credentialData)
 {
 
-    VerifyOrReturnValue(IsCredentialIndexGreaterThanZero(credentialIndex, credentialType), false); // indices are one-indexed except ProgrammingPin
+    VerifyOrReturnValue(IsCredentialIndexGreaterThanZero(credentialIndex, credentialType),
+                        false); // indices are one-indexed except ProgrammingPin
 
     credentialIndex--;
 
