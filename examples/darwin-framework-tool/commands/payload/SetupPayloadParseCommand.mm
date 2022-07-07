@@ -17,8 +17,8 @@
  */
 
 #include "SetupPayloadParseCommand.h"
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPError_Internal.h>
+#include "MTRError_Utils.h"
+#import <Matter/Matter.h>
 
 using namespace ::chip;
 
@@ -26,16 +26,16 @@ namespace {
 
 #if CHIP_PROGRESS_LOGGING
 
-NSString * CustomFlowString(CHIPCommissioningFlow flow)
+NSString * CustomFlowString(MTRCommissioningFlow flow)
 {
     switch (flow) {
-    case kCommissioningFlowStandard:
+    case MTRCommissioningFlowStandard:
         return @"STANDARD";
-    case kCommissioningFlowUserActionRequired:
+    case MTRCommissioningFlowUserActionRequired:
         return @"USER ACTION REQUIRED";
-    case kCommissioningFlowCustom:
+    case MTRCommissioningFlowCustom:
         return @"CUSTOM";
-    case kCommissioningFlowInvalid:
+    case MTRCommissioningFlowInvalid:
         return @"INVALID";
     }
 
@@ -48,7 +48,7 @@ NSString * CustomFlowString(CHIPCommissioningFlow flow)
 
 void SetupPayloadParseCommand::LogNSError(const char * logString, NSError * error)
 {
-    CHIP_ERROR err = [CHIPError errorToCHIPErrorCode:error];
+    CHIP_ERROR err = MTRErrorToCHIPErrorCode(error);
     if (err == CHIP_NO_ERROR) {
         ChipLogProgress(chipTool, "%s: %s", logString, chip::ErrorStr(err));
     } else {
@@ -60,14 +60,14 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
 {
     NSString * codeString = [NSString stringWithCString:mCode encoding:NSASCIIStringEncoding];
     NSError * error;
-    CHIPSetupPayload * payload;
-    CHIPOnboardingPayloadType codeType;
+    MTRSetupPayload * payload;
+    MTROnboardingPayloadType codeType;
     if (IsQRCode(codeString)) {
-        codeType = CHIPOnboardingPayloadTypeQRCode;
+        codeType = MTROnboardingPayloadTypeQRCode;
     } else {
-        codeType = CHIPOnboardingPayloadTypeManualCode;
+        codeType = MTROnboardingPayloadTypeManualCode;
     }
-    payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:codeString ofType:codeType error:&error];
+    payload = [MTROnboardingPayloadParser setupPayloadForOnboardingPayload:codeString ofType:codeType error:&error];
     if (error) {
         LogNSError("Error: ", error);
         return CHIP_ERROR_INTERNAL;
@@ -77,7 +77,7 @@ CHIP_ERROR SetupPayloadParseCommand::Run()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
+CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
 {
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
@@ -87,19 +87,19 @@ CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
         NSMutableString * humanFlags = [[NSMutableString alloc] init];
 
         if (payload.rendezvousInformation) {
-            if (payload.rendezvousInformation & kRendezvousInformationNone) {
+            if (payload.rendezvousInformation & MTRRendezvousInformationNone) {
                 [humanFlags appendString:@"NONE"];
             } else {
-                if (payload.rendezvousInformation & kRendezvousInformationSoftAP) {
+                if (payload.rendezvousInformation & MTRRendezvousInformationSoftAP) {
                     [humanFlags appendString:@"SoftAP"];
                 }
-                if (payload.rendezvousInformation & kRendezvousInformationBLE) {
+                if (payload.rendezvousInformation & MTRRendezvousInformationBLE) {
                     if (!humanFlags) {
                         [humanFlags appendString:@", "];
                     }
                     [humanFlags appendString:@"BLE"];
                 }
-                if (payload.rendezvousInformation & kRendezvousInformationOnNetwork) {
+                if (payload.rendezvousInformation & MTRRendezvousInformationOnNetwork) {
                     if (!humanFlags) {
                         [humanFlags appendString:@", "];
                     }
@@ -119,14 +119,14 @@ CHIP_ERROR SetupPayloadParseCommand::Print(CHIPSetupPayload * payload)
         NSLog(@"SerialNumber: %@", payload.serialNumber);
     }
     NSError * error;
-    NSArray<CHIPOptionalQRCodeInfo *> * optionalVendorData = [payload getAllOptionalVendorData:&error];
+    NSArray<MTROptionalQRCodeInfo *> * optionalVendorData = [payload getAllOptionalVendorData:&error];
     if (error) {
         LogNSError("Error: ", error);
         return CHIP_ERROR_INTERNAL;
     }
-    for (const CHIPOptionalQRCodeInfo * info : optionalVendorData) {
-        bool isTypeString = [info.infoType isEqual:@(kOptionalQRCodeInfoTypeString)];
-        bool isTypeInt32 = [info.infoType isEqual:@(kOptionalQRCodeInfoTypeInt32)];
+    for (const MTROptionalQRCodeInfo * info : optionalVendorData) {
+        bool isTypeString = [info.infoType isEqual:@(MTROptionalQRCodeInfoTypeString)];
+        bool isTypeInt32 = [info.infoType isEqual:@(MTROptionalQRCodeInfoTypeInt32)];
         VerifyOrReturnError(isTypeString || isTypeInt32, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (isTypeString) {

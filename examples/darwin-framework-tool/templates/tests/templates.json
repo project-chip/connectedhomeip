@@ -49,16 +49,6 @@
             "path": "commands.zapt",
             "name": "Tests Commands header",
             "output": "test/Commands.h"
-        },
-        {
-            "path": "MTRTestClustersObjc.zapt",
-            "name": "Test Objc API Header",
-            "output": "cluster/MTRTestClustersObjc.h"
-        },
-        {
-            "path": "MTRTestClustersObjc-src.zapt",
-            "name": "Test Objc API",
-            "output": "cluster/MTRTestClustersObjc.mm"
         }
     ]
 }
