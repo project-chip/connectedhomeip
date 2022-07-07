@@ -27,7 +27,7 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -36,7 +36,7 @@ tests:
           entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -45,7 +45,7 @@ tests:
           'MaxNetworksVal ue' - 'NumNetworks' and saves as 'RemainingNetwor
           kSlots'"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -54,7 +54,7 @@ tests:
           argument value as 'Userwifi_ssid2', Credentials argument value as
           'Userwifi_Credentials' and Breadcrumb argument value as 1"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -62,7 +62,7 @@ tests:
           "TH calculates the midpoint of the network list as floor(('MaxNetwor
           ksValue' + 1)/2) and saves as 'Midpoint'"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -70,7 +70,7 @@ tests:
           "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
           field set to 900"
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
@@ -89,7 +89,7 @@ tests:
           'OriginalNetworkL ist'"
       PICS: CNET.S.A0001
       verification: |
-          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4 
+          The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 

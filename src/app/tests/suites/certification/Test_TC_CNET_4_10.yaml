@@ -27,13 +27,13 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0 
+          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
 
           [1650391404.723087][10042:10047] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650391404.723164][10042:10047] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1650391404.723269][10042:10047] CHIP:TOO:   ArmFailSafeResponse: {
           [1650391404.723342][10042:10047] CHIP:TOO:     errorCode: 0
-          [1650391404.723381][10042:10047] CHIP:TOO:     debugText: 
+          [1650391404.723381][10042:10047] CHIP:TOO:     debugText:
           [1650391404.723419][10042:10047] CHIP:TOO:    }
           [1650391404.723479][10042:10047] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

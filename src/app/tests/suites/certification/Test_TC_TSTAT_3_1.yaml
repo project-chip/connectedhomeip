@@ -38,15 +38,15 @@ tests:
           [1652264555.304431][7099:7099] CHIP:DMG:                         Cluster = 0x201,
           [1652264555.304499][7099:7099] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1652264555.304566][7099:7099] CHIP:DMG:                 }
-          [1652264555.304618][7099:7099] CHIP:DMG:                         
+          [1652264555.304618][7099:7099] CHIP:DMG:
           [1652264555.304680][7099:7099] CHIP:DMG:         ],
-          [1652264555.304733][7099:7099] CHIP:DMG:                 
-          [1652264555.304798][7099:7099] CHIP:DMG:         isFabricFiltered = true, 
+          [1652264555.304733][7099:7099] CHIP:DMG:
+          [1652264555.304798][7099:7099] CHIP:DMG:         isFabricFiltered = true,
           [1652264555.304846][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652264555.304906][7099:7099] CHIP:DMG: },
 
 
-          ./chip-tool thermostat read  control-sequence-of-operation 1 1 
+          ./chip-tool thermostat read  control-sequence-of-operation 1 1
 
 
           [1652265275.022068][7099:7099] CHIP:DMG: ReadRequestMessage =
@@ -59,10 +59,10 @@ tests:
           [1652265275.022390][7099:7099] CHIP:DMG:                         Cluster = 0x201,
           [1652265275.022443][7099:7099] CHIP:DMG:                         Attribute = 0x0000_001B,
           [1652265275.022490][7099:7099] CHIP:DMG:                 }
-          [1652265275.022536][7099:7099] CHIP:DMG:                         
+          [1652265275.022536][7099:7099] CHIP:DMG:
           [1652265275.022583][7099:7099] CHIP:DMG:         ],
-          [1652265275.022632][7099:7099] CHIP:DMG:                 
-          [1652265275.022675][7099:7099] CHIP:DMG:         isFabricFiltered = true, 
+          [1652265275.022632][7099:7099] CHIP:DMG:
+          [1652265275.022675][7099:7099] CHIP:DMG:         isFabricFiltered = true,
           [1652265275.022717][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652265275.022756][7099:7099] CHIP:DMG: },
 
@@ -77,10 +77,10 @@ tests:
           [1652265332.312079][7099:7099] CHIP:DMG:                         Cluster = 0x201,
           [1652265332.312138][7099:7099] CHIP:DMG:                         Attribute = 0x0000_001C,
           [1652265332.312187][7099:7099] CHIP:DMG:                 }
-          [1652265332.312238][7099:7099] CHIP:DMG:                         
+          [1652265332.312238][7099:7099] CHIP:DMG:
           [1652265332.312290][7099:7099] CHIP:DMG:         ],
-          [1652265332.312341][7099:7099] CHIP:DMG:                 
-          [1652265332.312388][7099:7099] CHIP:DMG:         isFabricFiltered = true, 
+          [1652265332.312341][7099:7099] CHIP:DMG:
+          [1652265332.312388][7099:7099] CHIP:DMG:         isFabricFiltered = true,
           [1652265332.312435][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652265332.312477][7099:7099] CHIP:DMG: },
       disabled: true
@@ -105,8 +105,8 @@ tests:
           [1652265582.913672][7099:7099] CHIP:DMG: IM WH moving to [Initialized]
           [1652265582.913768][7099:7099] CHIP:DMG: WriteRequestMessage =
           [1652265582.913820][7099:7099] CHIP:DMG: {
-          [1652265582.913954][7099:7099] CHIP:DMG:         suppressResponse = false, 
-          [1652265582.914074][7099:7099] CHIP:DMG:         timedRequest = false, 
+          [1652265582.913954][7099:7099] CHIP:DMG:         suppressResponse = false,
+          [1652265582.914074][7099:7099] CHIP:DMG:         timedRequest = false,
           [1652265582.914123][7099:7099] CHIP:DMG:         AttributeDataIBs =
           [1652265582.914212][7099:7099] CHIP:DMG:         [
           [1652265582.914280][7099:7099] CHIP:DMG:                 AttributeDataIB =
@@ -117,27 +117,27 @@ tests:
           [1652265582.914624][7099:7099] CHIP:DMG:                                 Cluster = 0x201,
           [1652265582.914700][7099:7099] CHIP:DMG:                                 Attribute = 0x0000_001C,
           [1652265582.914772][7099:7099] CHIP:DMG:                         }
-          [1652265582.914847][7099:7099] CHIP:DMG:                                 
-          [1652265582.914915][7099:7099] CHIP:DMG:                                 Data = 2, 
+          [1652265582.914847][7099:7099] CHIP:DMG:
+          [1652265582.914915][7099:7099] CHIP:DMG:                                 Data = 2,
           [1652265582.914980][7099:7099] CHIP:DMG:                 },
-          [1652265582.915093][7099:7099] CHIP:DMG:                 
+          [1652265582.915093][7099:7099] CHIP:DMG:
           [1652265582.915278][7099:7099] CHIP:DMG:         ],
-          [1652265582.915348][7099:7099] CHIP:DMG:         
-          [1652265582.915400][7099:7099] CHIP:DMG:         moreChunkedMessages = false, 
+          [1652265582.915348][7099:7099] CHIP:DMG:
+          [1652265582.915400][7099:7099] CHIP:DMG:         moreChunkedMessages = false,
           [1652265582.915460][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652265582.915509][7099:7099] CHIP:DMG: },
 
 
 
-           ./chip-tool thermostat write  control-sequence-of-operation 1 1 1 
+           ./chip-tool thermostat write  control-sequence-of-operation 1 1 1
 
 
           [1652265678.578137][7099:7099] CHIP:IM: Received Write request
           [1652265678.578192][7099:7099] CHIP:DMG: IM WH moving to [Initialized]
           [1652265678.578284][7099:7099] CHIP:DMG: WriteRequestMessage =
           [1652265678.578343][7099:7099] CHIP:DMG: {
-          [1652265678.578378][7099:7099] CHIP:DMG:         suppressResponse = false, 
-          [1652265678.578419][7099:7099] CHIP:DMG:         timedRequest = false, 
+          [1652265678.578378][7099:7099] CHIP:DMG:         suppressResponse = false,
+          [1652265678.578419][7099:7099] CHIP:DMG:         timedRequest = false,
           [1652265678.578466][7099:7099] CHIP:DMG:         AttributeDataIBs =
           [1652265678.578521][7099:7099] CHIP:DMG:         [
           [1652265678.578587][7099:7099] CHIP:DMG:                 AttributeDataIB =
@@ -148,13 +148,13 @@ tests:
           [1652265678.578938][7099:7099] CHIP:DMG:                                 Cluster = 0x201,
           [1652265678.579071][7099:7099] CHIP:DMG:                                 Attribute = 0x0000_001B,
           [1652265678.579134][7099:7099] CHIP:DMG:                         }
-          [1652265678.579212][7099:7099] CHIP:DMG:                                 
-          [1652265678.579288][7099:7099] CHIP:DMG:                                 Data = 1, 
+          [1652265678.579212][7099:7099] CHIP:DMG:
+          [1652265678.579288][7099:7099] CHIP:DMG:                                 Data = 1,
           [1652265678.579347][7099:7099] CHIP:DMG:                 },
-          [1652265678.579402][7099:7099] CHIP:DMG:                 
+          [1652265678.579402][7099:7099] CHIP:DMG:
           [1652265678.579430][7099:7099] CHIP:DMG:         ],
-          [1652265678.579461][7099:7099] CHIP:DMG:         
-          [1652265678.579567][7099:7099] CHIP:DMG:         moreChunkedMessages = false, 
+          [1652265678.579461][7099:7099] CHIP:DMG:
+          [1652265678.579567][7099:7099] CHIP:DMG:         moreChunkedMessages = false,
           [1652265678.579598][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652265678.579624][7099:7099] CHIP:DMG: },
       disabled: true
@@ -201,15 +201,15 @@ tests:
           [1652264555.304431][7099:7099] CHIP:DMG:                         Cluster = 0x201,
           [1652264555.304499][7099:7099] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1652264555.304566][7099:7099] CHIP:DMG:                 }
-          [1652264555.304618][7099:7099] CHIP:DMG:                         
+          [1652264555.304618][7099:7099] CHIP:DMG:
           [1652264555.304680][7099:7099] CHIP:DMG:         ],
-          [1652264555.304733][7099:7099] CHIP:DMG:                 
-          [1652264555.304798][7099:7099] CHIP:DMG:         isFabricFiltered = true, 
+          [1652264555.304733][7099:7099] CHIP:DMG:
+          [1652264555.304798][7099:7099] CHIP:DMG:         isFabricFiltered = true,
           [1652264555.304846][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652264555.304906][7099:7099] CHIP:DMG: },
 
 
-          ./chip-tool thermostat read  control-sequence-of-operation 1 1 
+          ./chip-tool thermostat read  control-sequence-of-operation 1 1
 
 
           [1652265275.022068][7099:7099] CHIP:DMG: ReadRequestMessage =
@@ -222,10 +222,10 @@ tests:
           [1652265275.022390][7099:7099] CHIP:DMG:                         Cluster = 0x201,
           [1652265275.022443][7099:7099] CHIP:DMG:                         Attribute = 0x0000_001B,
           [1652265275.022490][7099:7099] CHIP:DMG:                 }
-          [1652265275.022536][7099:7099] CHIP:DMG:                         
+          [1652265275.022536][7099:7099] CHIP:DMG:
           [1652265275.022583][7099:7099] CHIP:DMG:         ],
-          [1652265275.022632][7099:7099] CHIP:DMG:                 
-          [1652265275.022675][7099:7099] CHIP:DMG:         isFabricFiltered = true, 
+          [1652265275.022632][7099:7099] CHIP:DMG:
+          [1652265275.022675][7099:7099] CHIP:DMG:         isFabricFiltered = true,
           [1652265275.022717][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652265275.022756][7099:7099] CHIP:DMG: },
 
@@ -240,10 +240,10 @@ tests:
           [1652265332.312079][7099:7099] CHIP:DMG:                         Cluster = 0x201,
           [1652265332.312138][7099:7099] CHIP:DMG:                         Attribute = 0x0000_001C,
           [1652265332.312187][7099:7099] CHIP:DMG:                 }
-          [1652265332.312238][7099:7099] CHIP:DMG:                         
+          [1652265332.312238][7099:7099] CHIP:DMG:
           [1652265332.312290][7099:7099] CHIP:DMG:         ],
-          [1652265332.312341][7099:7099] CHIP:DMG:                 
-          [1652265332.312388][7099:7099] CHIP:DMG:         isFabricFiltered = true, 
+          [1652265332.312341][7099:7099] CHIP:DMG:
+          [1652265332.312388][7099:7099] CHIP:DMG:         isFabricFiltered = true,
           [1652265332.312435][7099:7099] CHIP:DMG:         InteractionModelRevision = 1
           [1652265332.312477][7099:7099] CHIP:DMG: },"
       disabled: true
