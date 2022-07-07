@@ -59,7 +59,13 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-mb_space_before=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+#Fix storage location of Docker images and containers for osx or linux
+if [[ $OSTYPE == 'darwin'* ]]; 
+    then
+        mb_space_before=$(df -m ~/Library/Containers/com.docker.docker/Data/vms/0/ | awk 'FNR==2{print $3}')
+    else
+        mb_space_before=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+fi
 
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
@@ -91,9 +97,17 @@ docker image prune --force
     }
 }
 
+#Fix storage location of Docker images and containers for osx or linux
 docker images --filter=reference="$ORG/*"
-df -h /var/lib/docker/
-mb_space_after=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+if [[ $OSTYPE == 'darwin'* ]]; 
+    then
+        df -h ~/Library/Containers/com.docker.docker/Data/vms/0/
+        mb_space_after=$(df -m ~/Library/Containers/com.docker.docker/Data/vms/0/ | awk 'FNR==2{print $3}')
+    else
+        df -h /var/lib/docker/
+        mb_space_after=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+fi
+
 printf "%'.f MB total used\n" "$((mb_space_before - mb_space_after))"
 
 exit 0
