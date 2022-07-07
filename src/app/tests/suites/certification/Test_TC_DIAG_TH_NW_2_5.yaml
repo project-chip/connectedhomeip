@@ -24,46 +24,55 @@ config:
 
 tests:
     - label: "Induce a DUT by an Unspecified failure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by LinkDown failure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by HardwareFailure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by NetworkJammed Failure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by an Unspecified failure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by LinkDown failure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by HardwareFailure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Induce a DUT by NetworkJammed Failure"
+      PICS: DGTHREAD.S.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Disconnect and reconnect a node to a Thread network"
+      PICS: DGTHREAD.S.E00
       verification: |
           ./chip-tool  threadnetworkdiagnostics  read-event connection-status 137 0
 

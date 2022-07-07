@@ -59,7 +59,6 @@ tests:
 
     - label: "Reads constraints of attribute: Tolerance"
       PICS: RH.S.A0003
-      optional: true
       command: "readAttribute"
       attribute: "tolerance"
       response:
