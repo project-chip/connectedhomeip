@@ -104,17 +104,6 @@ bool LockManager::IsValidUserIndex(uint16_t userIndex)
     return (userIndex < kMaxUsers);
 }
 
-bool LockManager::IsCredentialIndexGreaterThanZero(uint16_t credentialIndex, DlCredentialType type)
-{
-    // Programming PIN index is the only index allowed to be 0
-    if (DlCredentialType::kProgrammingPIN == type)
-    {
-        return (0 == credentialIndex);
-    }
-
-    return (credentialIndex > 0);
-}
-
 bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, DlCredentialType type)
 {
     // appclusters, 5.2.6.3.1: 0 is allowed index for Programming PIN credential only
@@ -417,11 +406,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
 
-    VerifyOrReturnValue(IsCredentialIndexGreaterThanZero(credentialIndex, credentialType), false); // indices are one-indexed except ProgrammingPin
-
-    credentialIndex--;
-
-    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
+    VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // indices are one-indexed
 
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
@@ -464,11 +449,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 const chip::ByteSpan & credentialData)
 {
 
-    VerifyOrReturnValue(IsCredentialIndexGreaterThanZero(credentialIndex, credentialType), false); // indices are one-indexed except ProgrammingPin
-
-    credentialIndex--;
-
-    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
+    VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // indices are one-indexed
 
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetCredential "
