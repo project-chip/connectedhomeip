@@ -419,26 +419,13 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
         struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
         VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
-        if (join)
-        {
-            lStatus = igmp_joingroup_netif(lNetif, &lIPv4Address);
-        }
-        else
-        {
-            lStatus = igmp_leavegroup_netif(lNetif, &lIPv4Address);
-        }
+        lStatus = join ? igmp_joingroup_netif(lNetif, &lIPv4Address) //
+                       : igmp_leavegroup_netif(lNetif, &lIPv4Address);
     }
     else
     {
-
-        if (join)
-        {
-            lStatus = igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address);
-        }
-        else
-        {
-            lStatus = igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
-        }
+        lStatus = join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
+                       : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
     }
 
     if (lStatus == ERR_MEM)
@@ -461,14 +448,15 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInt
     {
         struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
         VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-        const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
-        lStatus           = method(lNetif, &lIPv6Address);
+        lStatus = join ? mld6_joingroup_netif(lNetif, &lIPv6Address) //
+                       : mld6_leavegroup_netif(lNetif, &lIPv6Address);
     }
     else
     {
-        const auto method = join ? mld6_joingroup : mld6_leavegroup;
-        lStatus           = method(IP6_ADDR_ANY6, &lIPv6Address);
+        lStatus = join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
+                       : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
     }
+
     if (lStatus == ERR_MEM)
     {
         return CHIP_ERROR_NO_MEMORY;
