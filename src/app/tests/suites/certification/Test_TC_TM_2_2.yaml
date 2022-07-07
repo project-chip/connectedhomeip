@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "read the mandatory attribute: MinMeasuredValue"
+      PICS: TM.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -38,6 +39,7 @@ tests:
               maxValue: 32766
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
+      PICS: TM.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
@@ -47,9 +49,9 @@ tests:
               maxValue: 32767
 
     - label: "Reads MeasuredValue attribute from DUT"
+      PICS: TM.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
-      PICS: A_TEMPERATURE
       response:
           saveAs: valueBeforeChange
           constraints:
@@ -58,7 +60,7 @@ tests:
     - label: "Operate on device to change the temperature significantly"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && TM.M.ManuallyControlled
       arguments:
           values:
               - name: "message"
@@ -69,7 +71,7 @@ tests:
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "MeasuredValue"
-      PICS: A_TEMPERATURE
+      PICS: TM.S.A0000
       response:
           constraints:
               type: uint16
