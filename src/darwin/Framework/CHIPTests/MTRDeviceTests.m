@@ -61,12 +61,12 @@ static void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_
     XCTAssertNotNil(controller);
 
     [controller getBaseDevice:kDeviceId
-                    queue:dispatch_get_main_queue()
-        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            [expectation fulfill];
-            mConnectedDevice = device;
-        }];
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [expectation fulfill];
+                mConnectedDevice = device;
+            }];
 }
 
 static MTRBaseDevice * GetConnectedDevice(void)
@@ -178,12 +178,12 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
     [controller getBaseDevice:kDeviceId
-                    queue:dispatch_get_main_queue()
-        completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            [connectionExpectation fulfill];
-            connectionExpectation = nil;
-        }];
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [connectionExpectation fulfill];
+                connectionExpectation = nil;
+            }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 }
 
