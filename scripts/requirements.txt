@@ -46,6 +46,7 @@ anytree
 cxxfilt
 ghapi
 pandas ; platform_machine != 'aarch64' and platform_machine != 'arm64'
+tabulate
 
 # scripts/build
 click
