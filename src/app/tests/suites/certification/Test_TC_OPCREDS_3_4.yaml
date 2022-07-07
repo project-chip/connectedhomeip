@@ -21,74 +21,284 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "Modify the contents of NOC_Tests Subject and save the certificate TH1
-          sends UpdateNOC Command with NOC_Test to DUT"
+    - label: "Modify the contents of NOC_Tests Subject and save the certificate"
       verification: |
           Not Verifiable
       disabled: true
 
-    - label:
-          "From TH1 Read the NOCs (NOCStruct) list from DUT Extract the NOC from
-          NOCStruct"
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
       verification: |
-          Not Verifiable
+          Verify TH log during commisssioning
+
+          [1655290769.343207][5196:5201] CHIP:DMG: >> to BLE | 255378492 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 25008 / Exchange = 11376]
+          [1655290769.343256][5196:5201] CHIP:DMG: Header Flags =
+          [1655290769.343281][5196:5201] CHIP:DMG: {
+          [1655290769.343318][5196:5201] CHIP:DMG:     Exchange (0x01) =
+          [1655290769.343343][5196:5201] CHIP:DMG:     {
+          [1655290769.343363][5196:5201] CHIP:DMG:         Initiator = true
+          [1655290769.343385][5196:5201] CHIP:DMG:     }
+          [1655290769.343414][5196:5201] CHIP:DMG: }
+          [1655290769.343437][5196:5201] CHIP:DMG:
+          [1655290769.343468][5196:5201] CHIP:DMG: Encrypted Payload (94 bytes) =
+          [1655290769.343491][5196:5201] CHIP:DMG: {
+          [1655290769.343512][5196:5201] CHIP:DMG:     data = 00b061003cc4380f4d9768bc173f4f4f9c6e5969606c83c80018abf7dd286e55fbf860a4e56ed75272350da28dac7364f1bb92a26b42a939719bce6bb880ed47f83a7fde421c7190aa4fb2449e114da8d68aa8dc5f9779aeb49b64b469f3
+          [1655290769.343535][5196:5201] CHIP:DMG:     buffer_ptr = 281472426668912
+          [1655290769.343555][5196:5201] CHIP:DMG: }
+          [1655290769.343574][5196:5201] CHIP:DMG:
+          [1655290769.343652][5196:5201] CHIP:DMG: InvokeRequestMessage =
+          [1655290769.343679][5196:5201] CHIP:DMG: {
+          [1655290769.343702][5196:5201] CHIP:DMG:         suppressResponse = false,
+          [1655290769.343728][5196:5201] CHIP:DMG:         timedRequest = false,
+          [1655290769.343753][5196:5201] CHIP:DMG:         InvokeRequests =
+          [1655290769.343783][5196:5201] CHIP:DMG:         [
+          [1655290769.343807][5196:5201] CHIP:DMG:                 CommandDataIB =
+          [1655290769.343834][5196:5201] CHIP:DMG:                 {
+          [1655290769.343860][5196:5201] CHIP:DMG:                         CommandPathIB =
+          [1655290769.343891][5196:5201] CHIP:DMG:                         {
+          [1655290769.343924][5196:5201] CHIP:DMG:                                 EndpointId = 0x0,
+          [1655290769.343961][5196:5201] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1655290769.343996][5196:5201] CHIP:DMG:                                 CommandId = 0x4,
+          [1655290769.344026][5196:5201] CHIP:DMG:                         },
+          [1655290769.344058][5196:5201] CHIP:DMG:
+          [1655290769.344084][5196:5201] CHIP:DMG:                         CommandFields =
+          [1655290769.344114][5196:5201] CHIP:DMG:                         {
+          [1655290769.344172][5196:5201] CHIP:DMG:                                 0x0 = [
+          [1655290769.344216][5196:5201] CHIP:DMG:                                         0x69, 0xd6, 0xfa, 0x31, 0x2e, 0x58, 0x48, 0x66, 0x0, 0x76, 0xf6, 0x73, 0xc3, 0x5a, 0xc5, 0x76, 0x2, 0x63, 0xa8, 0x50, 0x9e, 0x95, 0xeb, 0xc3, 0xb1, 0x8e, 0xc2, 0x94, 0x86, 0x8, 0x86, 0xb2,
+          [1655290769.344253][5196:5201] CHIP:DMG:                         ]
+          [1655290769.344283][5196:5201] CHIP:DMG:                         },
+          [1655290769.344311][5196:5201] CHIP:DMG:                 },
+          [1655290769.344341][5196:5201] CHIP:DMG:
+          [1655290769.344364][5196:5201] CHIP:DMG:         ],
+          [1655290769.344393][5196:5201] CHIP:DMG:
+          [1655290769.344417][5196:5201] CHIP:DMG:         InteractionModelRevision = 1
+          [1655290769.344440][5196:5201] CHIP:DMG: },
+          [1655290769.344462][5196:5201] CHIP:DMG:
+          [1655290769.344613][5196:5201] CHIP:DMG: ICR moving to [CommandSen]
+          [1655290769.344655][5196:5201] CHIP:CTL: Sent CSR request, waiting for the CSR
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
+      verification: |
+          [1655290768.024789][5196:5201] CHIP:CTL: Arming failsafe (60 seconds)
+          [1655290768.024854][5196:5201] CHIP:DMG: ICR moving to [AddingComm]
+          [1655290768.024889][5196:5201] CHIP:DMG: ICR moving to [AddedComma]
+          [1655290768.025167][5196:5201] CHIP:IN: Prepared secure message 0xffff7d789f68 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 11371i with MessageCounter:255378487.
+          [1655290768.025218][5196:5201] CHIP:IN: Sending encrypted msg 0xffff7d789f68 with MessageCounter:255378487 to 0xFFFFFFFB00000000 (0) at monotonic time: 000000000166E1CE msec
+          [1655290768.025440][5196:5201] CHIP:DMG: >> to BLE | 255378487 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 25008 / Exchange = 11371]
+          [1655290768.025482][5196:5201] CHIP:DMG: Header Flags =
+          [1655290768.025508][5196:5201] CHIP:DMG: {
+          [1655290768.025548][5196:5201] CHIP:DMG:     Exchange (0x01) =
+          [1655290768.025573][5196:5201] CHIP:DMG:     {
+          [1655290768.025596][5196:5201] CHIP:DMG:         Initiator = true
+          [1655290768.025620][5196:5201] CHIP:DMG:     }
+          [1655290768.025651][5196:5201] CHIP:DMG: }
+          [1655290768.025676][5196:5201] CHIP:DMG:
+          [1655290768.025707][5196:5201] CHIP:DMG: Encrypted Payload (65 bytes) =
+          [1655290768.025733][5196:5201] CHIP:DMG: {
+          [1655290768.025757][5196:5201] CHIP:DMG:     data = 00b0610037c4380f32a71cf8c0d3c24ad9968f546fa1a79e41adf472a5a1cc15b53b3bd2f08eb249dcab1430fc217708442ac61d1d5c6d70b7631f6efc18c94cc7
+          [1655290768.025783][5196:5201] CHIP:DMG:     buffer_ptr = 281472426648640
+          [1655290768.025806][5196:5201] CHIP:DMG: }
+          [1655290768.025830][5196:5201] CHIP:DMG:
+          [1655290768.025903][5196:5201] CHIP:DMG: InvokeRequestMessage =
+          [1655290768.025933][5196:5201] CHIP:DMG: {
+          [1655290768.025959][5196:5201] CHIP:DMG: 	suppressResponse = false,
+          [1655290768.025988][5196:5201] CHIP:DMG: 	timedRequest = false,
+          [1655290768.026016][5196:5201] CHIP:DMG: 	InvokeRequests =
+          [1655290768.026051][5196:5201] CHIP:DMG: 	[
+          [1655290768.026079][5196:5201] CHIP:DMG: 		CommandDataIB =
+          [1655290768.026113][5196:5201] CHIP:DMG: 		{
+          [1655290768.026144][5196:5201] CHIP:DMG: 			CommandPathIB =
+          [1655290768.026180][5196:5201] CHIP:DMG: 			{
+          [1655290768.026216][5196:5201] CHIP:DMG: 				EndpointId = 0x0,
+          [1655290768.026257][5196:5201] CHIP:DMG: 				ClusterId = 0x30,
+          [1655290768.026296][5196:5201] CHIP:DMG: 				CommandId = 0x0,
+          [1655290768.026330][5196:5201] CHIP:DMG: 			},
+          [1655290768.026367][5196:5201] CHIP:DMG:
+          [1655290768.026420][5196:5201] CHIP:DMG: 			CommandFields =
+          [1655290768.026483][5196:5201] CHIP:DMG: 			{
+          [1655290768.026520][5196:5201] CHIP:DMG: 				0x0 = 60,
+          [1655290768.026558][5196:5201] CHIP:DMG: 				0x1 = 3,
+          [1655290768.026597][5196:5201] CHIP:DMG: 			},
+          [1655290768.026629][5196:5201] CHIP:DMG: 		},
+          [1655290768.026664][5196:5201] CHIP:DMG:
+          [1655290768.026692][5196:5201] CHIP:DMG: 	],
+          [1655290768.026725][5196:5201] CHIP:DMG:
+          [1655290768.026752][5196:5201] CHIP:DMG: 	InteractionModelRevision = 1
+          [1655290768.026779][5196:5201] CHIP:DMG: },
+          [1655290768.026804][5196:5201] CHIP:DMG:
+          [1655290768.026973][5196:5201] CHIP:DMG: ICR moving to [CommandSen]
+          [1655290768.108147][5196:5201] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1655290768.110051][5196:5199] CHIP:DL: Indication received, conn = 0xffff74039fb0
+          [1655290768.110203][5196:5201] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1655290768.110746][5196:5201] CHIP:DMG: << from BLE | 192898618 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 61656 / Exchange = 11371]
+          [1655290768.110799][5196:5201] CHIP:DMG: Header Flags =
+          [1655290768.110822][5196:5201] CHIP:DMG: {
+          [1655290768.110861][5196:5201] CHIP:DMG: }
+          [1655290768.110883][5196:5201] CHIP:DMG:
+          [1655290768.110912][5196:5201] CHIP:DMG: Encrypted Payload (66 bytes) =
+          [1655290768.110935][5196:5201] CHIP:DMG: {
+          [1655290768.110955][5196:5201] CHIP:DMG:     data = 00d8f0003a667f0bb192daf065d175922cac76d987f198e1bcb595497966921cfba210b015e785daeb1231017f0a27715234363b772f1f7816595e2fc99e9f85a274
+          [1655290768.110978][5196:5201] CHIP:DMG:     buffer_ptr = 281472426657904
+          [1655290768.110999][5196:5201] CHIP:DMG: }
+          [1655290768.111019][5196:5201] CHIP:DMG:
+          [1655290768.111084][5196:5201] CHIP:DMG:
+          [1655290768.111121][5196:5201] CHIP:DMG: Additional Fields =
+          [1655290768.111143][5196:5201] CHIP:DMG: {
+          [1655290768.111168][5196:5201] CHIP:DMG:     peer_address = BLE
+          [1655290768.111189][5196:5201] CHIP:DMG: }
+          [1655290768.111209][5196:5201] CHIP:DMG:
+          [1655290768.111239][5196:5201] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:192898618 on exchange 11371i
+          [1655290768.111267][5196:5201] CHIP:EM: Found matching exchange: 11371i, Delegate: 0xffff68003360
+          [1655290768.111311][5196:5201] CHIP:DMG: ICR moving to [ResponseRe]
+          [1655290768.111353][5196:5201] CHIP:DMG: InvokeResponseMessage =
+          [1655290768.111378][5196:5201] CHIP:DMG: {
+          [1655290768.111403][5196:5201] CHIP:DMG: 	suppressResponse = false,
+          [1655290768.111427][5196:5201] CHIP:DMG: 	InvokeResponseIBs =
+          [1655290768.111458][5196:5201] CHIP:DMG: 	[
+          [1655290768.111483][5196:5201] CHIP:DMG: 		InvokeResponseIB =
+          [1655290768.111515][5196:5201] CHIP:DMG: 		{
+          [1655290768.111540][5196:5201] CHIP:DMG: 			CommandDataIB =
+          [1655290768.111573][5196:5201] CHIP:DMG: 			{
+          [1655290768.111603][5196:5201] CHIP:DMG: 				CommandPathIB =
+          [1655290768.111640][5196:5201] CHIP:DMG: 				{
+          [1655290768.111678][5196:5201] CHIP:DMG: 					EndpointId = 0x0,
+          [1655290768.111717][5196:5201] CHIP:DMG: 					ClusterId = 0x30,
+          [1655290768.111755][5196:5201] CHIP:DMG: 					CommandId = 0x1,
+          [1655290768.111790][5196:5201] CHIP:DMG: 				},
+          [1655290768.111825][5196:5201] CHIP:DMG:
+          [1655290768.111855][5196:5201] CHIP:DMG: 				CommandFields =
+          [1655290768.111891][5196:5201] CHIP:DMG: 				{
+          [1655290768.111929][5196:5201] CHIP:DMG: 					0x0 = 0,
+          [1655290768.111966][5196:5201] CHIP:DMG: 					0x1 = "",
+          [1655290768.112000][5196:5201] CHIP:DMG: 				},
+          [1655290768.112034][5196:5201] CHIP:DMG: 			},
+          [1655290768.112068][5196:5201] CHIP:DMG:
+          [1655290768.112095][5196:5201] CHIP:DMG: 		},
+          [1655290768.112125][5196:5201] CHIP:DMG:
+          [1655290768.112149][5196:5201] CHIP:DMG: 	],
+          [1655290768.112179][5196:5201] CHIP:DMG:
+          [1655290768.112203][5196:5201] CHIP:DMG: 	InteractionModelRevision = 1
+          [1655290768.112226][5196:5201] CHIP:DMG: },
+          [1655290768.112287][5196:5201] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1655290768.112354][5196:5201] CHIP:CTL: Received ArmFailSafe response errorCode=0
+          [1655290768.112386][5196:5201] CHIP:CTL: Successfully finished commissioning step 'ArmFailSafe'
+          [1655290768.112408][5196:5201] CHIP:CTL: Commissioning stage next step: 'ArmFailSafe' -> 'ConfigRegulatory'
       disabled: true
 
     - label:
           "Modify the public key to a value different from Key 1 in the NOC_Test
-          and save the certificate TH1 sends UpdateNOC Command with NOC_Test to
+          and save the certificate TH sends UpdateNOC Command with NOC_Test to
           DUT"
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
           Not Verifiable
       disabled: true
 
     - label:
           "Modify the Node Operational ID in the NOC_Test and save the
-          certificate TH1 sends UpdateNOC Command with NOC_Test to DUT"
+          certificate TH sends UpdateNOC Command with NOC_Test to DUT"
       verification: |
           Not Verifiable
+      disabled: true
+
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+          Not Verifiable
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
+      verification: |
+
       disabled: true
 
     - label:
           "Extract a NOC that is not in the TrustedRootCertificates of DUT and
-          save the certificate as NOC_Test TH1 sends UpdateNOC Command with
+          save the certificate as NOC_Test TH sends UpdateNOC Command with
           NOC_Test to DUT"
       verification: |
-          Not Verifiable
+
       disabled: true
 
-    - label:
-          "Modify the NOC_Test certificate with corrupt CSR value and save the
-          certificate TH1 sends UpdateNOC Command with NOC_Test to DUT"
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
       verification: |
-          Not Verifiable
+
       disabled: true
 
-    - label:
-          "Start the Commissioning process of TH on DUT TH1 sends ADDNOC Command
-          with missing CaseAdminNode field to DUT"
+    - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          Not Verifiable
+
       disabled: true
 
     - label:
-          "Start the Commissioning process of TH on DUT TH1 sends ADDNOC Command
-          with missing IpkValue field to DUT"
+          "Start the Commissioning process of TH on DUT TH sends ADDNOC Command
+          with invalid CaseAdminSubject field to DUT"
       verification: |
-          Not Verifiable
+
+      disabled: true
+
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
+      verification: |
+
       disabled: true
 
     - label:
-          "Start the Commissioning process of TH on DUT TH1 sends ADDNOC Command
+          "Start the Commissioning process of TH on DUT TH sends ADDNOC Command
+          with invalid IpkValue to DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "Start the Commissioning process of TH on DUT TH sends ADDNOC Command
           with valid fields to DUT"
       verification: |
-          Not Verifiable
+
+      disabled: true
+
+    - label: "TH1 Sends CSRRequest command"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends ArmFailSafe command to the DUT"
+      verification: |
+
       disabled: true
 
     - label:
-          "TH1 sends ADDNOC Command with valid fields same as previous step to
+          "TH sends ADDNOC Command with valid fields same as previous step to
           DUT"
       verification: |
-          Not Verifiable
+
       disabled: true

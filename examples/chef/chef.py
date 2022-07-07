@@ -615,7 +615,7 @@ def main(argv: Sequence[str]) -> None:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
-                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={"1" if options.do_rpc else "0"}"]',
             ])
             if options.cpu_type == "arm64":
                 uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)

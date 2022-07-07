@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.16. [TC-CNET-4.16] [Thread] NetworkIDNotFound value as
-    LastNetworkingStatus argument validation [DUT-Server]
+    11.4.14. [TC-CNET-4.16] [Thread] NetworkIDNotFound returned in
+    LastNetworkingStatus field validation [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -24,10 +24,10 @@ config:
 
 tests:
     - label:
-          "TH reads Network attribute from the DUT TH saves the single entrys
-          NetworkID value as 'Userth_op' value for the future use"
+          "* TH reads Network attribute from the DUT * TH saves the single
+          entrys NetworkID value as 'Userth_op' value for the future use"
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
+          ./chip-tool networkcommissioning read networks 162 0
 
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
@@ -43,7 +43,7 @@ tests:
 
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
+          ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
 
           [1650392597.976230][10152:10157] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -56,11 +56,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID argument
-          value as 'Userth_op1' that not matches 'Userth_op' value and
-          Breadcrumb argument value as 1"
+          "TH sendsRemoveNetworkCommand to theDUT withNetworkID fieldset to the
+          extendedr PAN ID ofPIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,which does
+          notmatch thecommissionedr network, andBreadcrumb fieldset to 1"
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 0119100899082022 62 0
+          ./chip-tool networkcommissioning remove-network 47524C50726976617465 62 0
 
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
@@ -72,11 +72,11 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork Command to the DUT with NetworkID value as
-          'Userth_op1' that not matches 'Userth_op' value and Breadcrumb
-          argument value as 1"
+          "TH sendsConnectNetwork Command to theDUT withNetworkID valueas the
+          extendedr PAN ID ofPIXIT.CNET.THREAD_2ND_OPERATIONALDATASET,which does
+          notmatch thecommissionedr network, andBreadcrumb fieldset to 1"
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 0119100899082022 62 0
+          ./chip-tool networkcommissioning connect-network 47524C50726976617465 62 0
 
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007

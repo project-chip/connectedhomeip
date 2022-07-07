@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.10. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
+    11.4.8. [TC-CNET-4.10] [Thread] Verification for RemoveNetwork Command
     [DUT-Server]
 
 config:
@@ -23,7 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH sends ArmFailSafe command to the DUT"
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 900"
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
 
@@ -36,34 +38,123 @@ tests:
           [1650391404.723479][10042:10047] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+    - label: "TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network 0119100899082022 62 0
+
+      disabled: true
+
+    - label:
+          "TH finds the index of the Networks list entry with\r NetworkID field
+          value PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and saves it as
+          'Userwifi_netidx'"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      verification: |
+          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network hex:0119100899082022 62 0
 
           [1650391420.469341][10048:10053] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650391420.469452][10048:10053] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1650391420.469634][10048:10053] CHIP:TOO:   NetworkConfigResponse: {
-          [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 3
+          [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 0
           [1650391420.469812][10048:10053] CHIP:TOO:    }
           [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH reads MaxNetworks attribute from the DUT"
+    - label: "TH1 reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 62 0
 
-          [1650391430.631516][10054:10059] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1086989578
-          [1650391430.631657][10054:10059] CHIP:TOO:   MaxNetworks: 1
-          [1650391430.631837][10054:10059] CHIP:EM: Sending Standalone Ack for MessageCounter:6413170 on exchange 3154i
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 62 0
 
-          [1650391466.970540][10062:10067] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1086989578
-          [1650391466.970790][10062:10067] CHIP:TOO:   LastNetworkingStatus: 0
-          [1650391466.970972][10062:10067] CHIP:EM: Sending Standalone Ack for MessageCounter:3830389 on exchange 32831i
+      disabled: true
+
+    - label: "TH reads LastNetworkID attribute from the DUT"
+      PICS: CNET.S.A0006
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcrumb attribute from the General Commissioning cluster
+          of the DUT"
+      PICS: CNET.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ConnectNetwork command to the DUT with NetworkID field set
+          to PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to
+          2"
+      PICS: CNET.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcrumb attribute from the General Commissioning cluster
+          of the DUT"
+      PICS: CNET.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 0"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe  command to the DUT with ExpiryLengthSeconds set
+          to 90"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+          PIXIT.CNET.WIFI 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends the CommissioningComplete command to the DUT"
+      PICS: CNET.S.C04.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 0 to ensure the CommissioningCo mplete call properly persisted the
+          failsafe context. This call should have no effect if Commissionining
+          Complete call is handled correctly"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
       disabled: true

@@ -348,11 +348,14 @@ function getManualTests() {
     ];
 
     const DoorLock = [
-        "Test_TC_DLRK_1_1",
-        "Test_TC_DLRK_2_1",
-        "Test_TC_DLRK_2_6",
-        "Test_TC_DLRK_2_8",
-        "Test_TC_DLRK_2_10",
+        "Test_TC_DRLK_1_1",
+        "Test_TC_DRLK_2_1",
+        "Test_TC_DRLK_2_6",
+        "Test_TC_DRLK_2_8",
+        "Test_TC_DRLK_2_10",
+        "Test_TC_DRLK_3_1",
+        "Test_TC_DRLK_3_2",
+        "Test_TC_DRLK_3_3",
     ];
 
     const LocalizationConfiguration = [
@@ -418,7 +421,7 @@ function getManualTests() {
     const FixedLabel = [
         "Test_TC_FLABEL_1_1",
         "Test_TC_FLABEL_2_1",
-        "Test_TC_FLABEL_2_2",
+        "Test_TC_FLABEL_3_1",
     ];
 
     const Binding = [
@@ -562,7 +565,7 @@ function getTests() {
         "Test_TC_ULABEL_2_2",
         "Test_TC_ULABEL_2_3",
         "Test_TC_ULABEL_2_4",
-        "Test_TC_ULABEL_2_5",
+        "Test_TC_ULABEL_3_1",
     ];
 
     const MediaControl = [
@@ -732,12 +735,12 @@ function getTests() {
         "DL_UsersAndCredentials",
         "DL_LockUnlock",
         "DL_Schedules",
-        "Test_TC_DLRK_2_2",
-        "Test_TC_DLRK_2_3",
-        "Test_TC_DLRK_2_4",
-        "Test_TC_DLRK_2_5",
-        "Test_TC_DLRK_2_7",
-        "Test_TC_DLRK_2_9",
+        "Test_TC_DRLK_2_2",
+        "Test_TC_DRLK_2_3",
+        "Test_TC_DRLK_2_4",
+        "Test_TC_DRLK_2_5",
+        "Test_TC_DRLK_2_7",
+        "Test_TC_DRLK_2_9",
     ];
 
     const Groups = [
