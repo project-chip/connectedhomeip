@@ -410,13 +410,36 @@ CHIP_ERROR UDPEndPointImplLwIP::SetMulticastLoopback(IPVersion aIPVersion, bool 
 CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if LWIP_IPV4 && LWIP_IGMP
-    const auto method = join ? igmp_joingroup_netif : igmp_leavegroup_netif;
-
-    struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
     const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
-    const err_t lStatus           = method(lNetif, &lIPv4Address);
+    err_t lStatus;
+
+    if (aInterfaceId.IsPresent())
+    {
+
+        struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+        VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+        if (join)
+        {
+            lStatus = igmp_joingroup_netif(lNetif, &lIPv4Address);
+        }
+        else
+        {
+            lStatus = igmp_leavegroup(lNetif, &lIPv4Address);
+        }
+    }
+    else
+    {
+        if (join)
+        {
+            lStatus = igmp_joingroup(IP_ADDR_ANY, &lIPv4Address);
+        }
+        else
+        {
+            lStatus = igmp_leavegroup(IP_ADDR_ANY, &lIPv4Address);
+        }
+    }
+
     if (lStatus == ERR_MEM)
     {
         return CHIP_ERROR_NO_MEMORY;
