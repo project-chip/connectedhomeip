@@ -158,6 +158,7 @@ public:
                                 uint32_t localEndTime, DlOperatingMode operatingMode);
 
     bool IsValidUserIndex(uint16_t userIndex);
+    bool IsCredentialIndexGreaterThanZero(uint16_t credentialIndex, DlCredentialType type);
     bool IsValidCredentialIndex(uint16_t credentialIndex, DlCredentialType type);
     bool IsValidWeekdayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
