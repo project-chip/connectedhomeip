@@ -105,10 +105,10 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext  = Server::GetInstance().GetFailSafeContext();
-    auto & commissionMgr    = Server::GetInstance().GetCommissioningWindowManager();
+    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     VerifyOrExit(!failSafeContext.IsFailSafeArmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
@@ -167,10 +167,10 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     InteractionModel::Status globalStatus = InteractionModel::Status::Success;
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
 
-    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-    auto & failSafeContext  = Server::GetInstance().GetFailSafeContext();
-    auto & commissionMgr    = Server::GetInstance().GetCommissioningWindowManager();
+    FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+    const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
+    auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
 

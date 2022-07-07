@@ -99,6 +99,7 @@ private:
         kDeviceNameSet            = 0x0020, /**< The device name has been set. */
         kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
                                             flag is set*/
+        kEnablingAdvertising = 0x0080, /**< The BLE controller is setting up Advertisements. */
     };
 
     enum

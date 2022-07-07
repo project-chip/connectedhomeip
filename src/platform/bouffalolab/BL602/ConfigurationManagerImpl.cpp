@@ -31,11 +31,9 @@
 #include <platform/bouffalolab/BL602/BL602Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
-//#include "esp_wifi.h"
-//#include "nvs.h"
-//#include "nvs_flash.h"
 extern "C" {
 #include <bl602_hal/hal_sys.h>
+#include <easyflash.h>
 }
 
 namespace chip {
@@ -70,21 +68,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<BL602Config>::Init();
     SuccessOrExit(err);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
-    {
-        FactoryProvisioning factoryProv;
-        uint8_t * const kInternalSRAM12Start = (uint8_t *) 0x3FFAE000;
-        uint8_t * const kInternalSRAM12End   = kInternalSRAM12Start + (328 * 1024) - 1;
-
-        // Scan ESP32 Internal SRAM regions 1 and 2 for injected provisioning data and save
-        // to persistent storage if found.
-        err = factoryProv.ProvisionDeviceFromRAM(kInternalSRAM12Start, kInternalSRAM12End);
-        SuccessOrExit(err);
-    }
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
@@ -192,24 +175,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Performing factory reset");
-
-    // 3R: TODO
-
-    // // Erase all values in the chip-config NVS namespace.
-    // err = ClearNamespace(kConfigNamespace_ChipConfig);
-    // if (err != CHIP_NO_ERROR)
-    // {
-    //     ChipLogError(DeviceLayer, "ClearNamespace(ChipConfig) failed: %s", chip::ErrorStr(err));
-    // }
-
-    // // Restore WiFi persistent settings to default values.
-    // err = esp_wifi_restore();
-    // if (err != ESP_OK)
-    // {
-    //     ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", chip::ErrorStr(err));
-    // }
-
-    // Restart the system.
+    ef_port_erase_all();
     ChipLogProgress(DeviceLayer, "System restarting");
     hal_reboot();
 }

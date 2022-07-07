@@ -1411,8 +1411,7 @@ exit:
 /*
         Callback to receive the cluster modification event
 */
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t mask, uint8_t type, uint16_t size,
-                                       uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t type, uint16_t size, uint8_t * value)
 {
     PRINTF("==> MatterPostAttributeChangeCallback, cluster: %x, attr: %x, size: %d \r\n", path.mClusterId, path.mAttributeId, size);
     // path.mEndpointId, path.mClusterId, path.mAttributeId, mask, type, size, value

@@ -36,7 +36,7 @@ tests:
     - label: "1a: read the RO mandatory attribute default: Type"
       command: "readAttribute"
       attribute: "Type"
-      PICS: A_TYPE
+      PICS: WNCV.S.A0000
       response:
           constraints:
               type: enum8
@@ -47,7 +47,7 @@ tests:
     - label: "1b: read the RO mandatory attribute default: ConfigStatus"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: A_CONFIGSTATUS
+      PICS: WNCV.S.A0007
       response:
           constraints:
               type: map8
@@ -58,7 +58,7 @@ tests:
     - label: "1c: read the RO mandatory attribute default: OperationalStatus"
       command: "readAttribute"
       attribute: "OperationalStatus"
-      PICS: A_OPERATIONALSTATUS
+      PICS: WNCV.S.A000a
       response:
           constraints:
               type: map8
@@ -69,7 +69,7 @@ tests:
     - label: "1d: read the RO mandatory attribute default: EndProductType"
       command: "readAttribute"
       attribute: "EndProductType"
-      PICS: A_ENDPRODUCTTYPE
+      PICS: WNCV.S.A000d
       response:
           constraints:
               type: enum8
@@ -80,7 +80,7 @@ tests:
     - label: "1e: read the RW mandatory attribute default: Mode"
       command: "readAttribute"
       attribute: "Mode"
-      PICS: A_MODE
+      PICS: WNCV.S.A0017
       response:
           constraints:
               type: map8
@@ -90,7 +90,7 @@ tests:
     - label: "1f: write a value into the RW mandatory attribute:: Mode"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: A_MODE
+      PICS: WNCV.S.A0017
       arguments:
           value: 0
 
@@ -101,7 +101,7 @@ tests:
           TargetPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: A_TARGETPOSITIONLIFTPERCENT100THS
+      PICS: WNCV.S.A000b
       response:
           constraints:
               type: Percent100ths
@@ -114,7 +114,7 @@ tests:
           TargetPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: A_TARGETPOSITIONTILTPERCENT100THS
+      PICS: WNCV.S.A000c
       response:
           constraints:
               type: Percent100ths
@@ -127,7 +127,7 @@ tests:
           CurrentPositionLiftPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: A_CURRENTPOSITIONLIFTPERCENT100THS
+      PICS: WNCV.S.A000e
       response:
           constraints:
               type: Percent100ths
@@ -140,7 +140,7 @@ tests:
           CurrentPositionTiltPercent100ths"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: A_CURRENTPOSITIONTILTPERCENT100THS
+      PICS: WNCV.S.A000f
       response:
           constraints:
               type: Percent100ths
@@ -152,7 +152,7 @@ tests:
           "2e: read the RO optional attribute default: InstalledOpenLimitLift"
       command: "readAttribute"
       attribute: "InstalledOpenLimitLift"
-      PICS: A_INSTALLEDOPENLIMITLIFT
+      PICS: WNCV.S.A0010
       response:
           constraints:
               type: uint16
@@ -164,7 +164,7 @@ tests:
           "2f: read the RO optional attribute default: InstalledClosedLimitLift"
       command: "readAttribute"
       attribute: "InstalledClosedLimitLift"
-      PICS: A_INSTALLEDCLOSEDLIMITLIFT
+      PICS: WNCV.S.A0011
       response:
           constraints:
               type: uint16
@@ -176,7 +176,7 @@ tests:
           "2g: read the RO optional attribute default: InstalledOpenLimitTilt"
       command: "readAttribute"
       attribute: "InstalledOpenLimitTilt"
-      PICS: A_INSTALLEDOPENLIMITTILT
+      PICS: WNCV.S.A0012
       response:
           constraints:
               type: uint16
@@ -188,7 +188,7 @@ tests:
           "2h: read the RO optional attribute default: InstalledClosedLimitTilt"
       command: "readAttribute"
       attribute: "InstalledClosedLimitTilt"
-      PICS: A_INSTALLEDCLOSEDLIMITTILT
+      PICS: WNCV.S.A0013
       response:
           constraints:
               type: uint16
@@ -200,7 +200,7 @@ tests:
     - label: "3a: read the RO mandatory attribute default: SafetyStatus"
       command: "readAttribute"
       attribute: "SafetyStatus"
-      PICS: A_SAFETYSTATUS
+      PICS: WNCV.S.A001a
       response:
           constraints:
               type: map16
@@ -212,7 +212,7 @@ tests:
           "3b: read the RO optional attribute default: PhysicalClosedLimitLift"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitLift"
-      PICS: A_PHYSICALCLOSEDLIMITLIFT
+      PICS: WNCV.S.A0001
       response:
           constraints:
               type: uint16
@@ -224,7 +224,7 @@ tests:
           "3c: read the RO optional attribute default: PhysicalClosedLimitTilt"
       command: "readAttribute"
       attribute: "PhysicalClosedLimitTilt"
-      PICS: A_PHYSICALCLOSEDLIMITTILT
+      PICS: WNCV.S.A0002
       response:
           constraints:
               type: uint16
@@ -235,7 +235,7 @@ tests:
     - label: "3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
-      PICS: A_CURRENTPOSITIONLIFT
+      PICS: WNCV.S.A0003
       response:
           constraints:
               type: uint16
@@ -246,7 +246,7 @@ tests:
     - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
-      PICS: A_CURRENTPOSITIONTILT
+      PICS: WNCV.S.A0004
       response:
           constraints:
               type: uint16
@@ -258,7 +258,7 @@ tests:
           "3f: read the RO optional attribute default: NumberOfActuationsLift"
       command: "readAttribute"
       attribute: "NumberOfActuationsLift"
-      PICS: A_NUMBEROFACTUATIONSLIFT
+      PICS: WNCV.S.A0005
       response:
           constraints:
               type: uint16
@@ -270,7 +270,7 @@ tests:
           "3g: read the RO optional attribute default: NumberOfActuationsTilt"
       command: "readAttribute"
       attribute: "NumberOfActuationsTilt"
-      PICS: A_NUMBEROFACTUATIONSTILT
+      PICS: WNCV.S.A0006
       response:
           constraints:
               type: uint16
@@ -283,7 +283,7 @@ tests:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.A0008
       response:
           constraints:
               type: Percent
@@ -296,7 +296,7 @@ tests:
           CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: WNCV.S.A0009
       response:
           constraints:
               type: Percent

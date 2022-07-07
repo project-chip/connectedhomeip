@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.3. [TC-UL-2.1]Read and Write Unit Localization Cluster Attributes [DUT as
-    Client]
+    103.2.1. [TC-UL-2.1] Read and Write Unit Localization Cluster Attributes
+    [DUT as Client]
 
 config:
     nodeId: 0x12344321
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -45,6 +46,7 @@ tests:
       disabled: true
 
     - label: "DUT writes 0 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Fahrenheit
       verification: |
           ./chip-tool unitlocalization write temperature-unit 0 1 0
 
@@ -74,6 +76,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -95,6 +98,7 @@ tests:
       disabled: true
 
     - label: "DUT writes 1 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Celsius
       verification: |
           ./chip-tool unitlocalization write temperature-unit 1 1 0
           [1651190221.098512][4306:4306] CHIP:DMG: WriteRequestMessage =
@@ -125,6 +129,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
@@ -146,6 +151,7 @@ tests:
       disabled: true
 
     - label: "DUT writes 2 to TemperatureUnit attribute"
+      PICS: LUNIT.C.A0000.Kelvin
       verification: |
           ./chip-tool unitlocalization write temperature-unit 2 1 0
           [1651190829.683764][4306:4306] CHIP:DMG: WriteRequestMessage =
@@ -174,6 +180,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TemperatureUnit attribute from TH"
+      PICS: LUNIT.C.A0000
       verification: |
           ./chip-tool unitlocalization read temperature-unit 1 0
           [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =

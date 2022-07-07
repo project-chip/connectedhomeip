@@ -1410,7 +1410,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)

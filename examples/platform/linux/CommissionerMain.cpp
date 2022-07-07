@@ -117,6 +117,7 @@ MyServerStorageDelegate gServerStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
 NodeId gLocalId = kMaxOperationalNodeId;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
+AutoCommissioner gAutoCommissioner;
 
 CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
 {
@@ -171,6 +172,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort)
     params.controllerRCAC     = rcacSpan;
     params.controllerICAC     = icacSpan;
     params.controllerNOC      = nocSpan;
+
+    params.defaultCommissioner = &gAutoCommissioner;
 
     auto & factory = Controller::DeviceControllerFactory::GetInstance();
     ReturnErrorOnFailure(factory.Init(factoryParams));
@@ -322,10 +325,10 @@ void PairingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevice
 
     if (cdc != nullptr)
     {
-        // TODO: get from DAC!
-        UDCClientState * udc = cdc->GetUDCClientState();
-        uint16_t vendorId    = (udc == nullptr ? 0 : udc->GetVendorId());
-        uint16_t productId   = (udc == nullptr ? 0 : udc->GetProductId());
+        uint16_t vendorId  = gAutoCommissioner.GetCommissioningParameters().GetRemoteVendorId().Value();
+        uint16_t productId = gAutoCommissioner.GetCommissioningParameters().GetRemoteProductId().Value();
+        ChipLogProgress(Support, " ----- AutoCommissioner -- Commissionee vendorId=0x%04X productId=0x%04X", vendorId, productId);
+
         cdc->CommissioningSucceeded(vendorId, productId, gRemoteId, device);
     }
 }
@@ -345,6 +348,7 @@ CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, Transport:
 {
     RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
 
+    gOpCredsIssuer.GetRandomOperationalNodeId(&gRemoteId);
     gCommissioner.RegisterPairingDelegate(&gPairingCommand);
     gCommissioner.PairDevice(gRemoteId, params);
 

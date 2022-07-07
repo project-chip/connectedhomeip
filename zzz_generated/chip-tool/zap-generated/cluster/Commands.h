@@ -17356,6 +17356,7 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<SubscribeAttribute>(credsIssuerConfig), //
         make_unique<ReadEvent>(credsIssuerConfig),          //
         make_unique<SubscribeEvent>(credsIssuerConfig),     //
+        make_unique<ReadAll>(credsIssuerConfig),            //
     };
 
     commands.Register(clusterName, clusterCommands);

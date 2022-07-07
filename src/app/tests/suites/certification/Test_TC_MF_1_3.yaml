@@ -28,20 +28,6 @@ config:
         defaultValue: "MT:0000000000I31506010" # This value needs to be generated automatically
 
 tests:
-    - label: "Stop target device"
-      cluster: "SystemCommands"
-      command: "Stop"
-
-    - label:
-          "Start target device with the provided discriminator for basic
-          commissioning advertisement"
-      cluster: "SystemCommands"
-      command: "Start"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
-
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"

@@ -400,22 +400,6 @@ public:
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     const FabricInfo * FindFabric(const Crypto::P256PublicKey & rootPubKey, FabricId fabricId) const;
-
-    /**
-     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
-     *
-     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
-     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
-     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
-     *       entries used during fail-safe.
-     *
-     * TODO(#19929): Need to make this const and private, but can't just yet.
-     *
-     * @param fabricIndex - fabric index for which to get the FabricInfo entry/
-     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
-     */
-    FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex);
-
     const FabricInfo * FindFabricWithIndex(FabricIndex fabricIndex) const;
     const FabricInfo * FindFabricWithCompressedId(CompressedFabricId compressedFabricId) const;
 
@@ -506,6 +490,19 @@ public:
     ConstFabricIterator end() const { return cend(); }
 
     /**
+     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
+     *
+     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
+     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
+     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
+     *       entries used during fail-safe.
+     *
+     * @param fabricIndex - fabric index for which to get a mutable FabricInfo entry
+     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
+     */
+    FabricInfo * GetMutableFabricByIndex(FabricIndex fabricIndex);
+
+    /**
      * @brief Get the RCAC (operational root certificate) associated with a fabric.
      *
      * If a root is pending for `fabricIndex` from `AddNewPendingTrustedRootCert`, it is returned.
@@ -565,6 +562,17 @@ public:
     CHIP_ERROR FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const;
 
     /**
+     * @brief Get the CASE Authenticated Tags from the NOC for the given `fabricIndex`.
+     *
+     * @param fabricIndex - Fabric for which to get the root public key (subject public key of RCAC)
+     * @param cats - CATValues struct to write the NOC CATs for the given fabric index
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if not found/available, or `fabricIndex` has a bad value
+     * @retval other CHIP_ERROR values on other invalid arguments or internal errors.
+     */
+    CHIP_ERROR FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const;
+
+    /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for
      *        CASE and the only way the key should be used.
      *
@@ -581,6 +589,26 @@ public:
      * @retval other CHIP_ERROR value on internal errors
      */
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan message, Crypto::P256ECDSASignature & outSignature) const;
+
+    /**
+     * @brief Create an ephemeral keypair for use in session establishment.
+     *
+     * WARNING: The return value MUST be released by `ReleaseEphemeralKeypair`. This is because
+     *          Matter CHIPMem.h does not properly support UniquePtr in a way that would
+     *          safely allow classes derived from Crypto::P256Keypair to be released properly.
+     *
+     * This delegates to the OperationalKeystore if one exists, otherwise it directly allocates a base
+     * Crypto::P256Keypair instance
+     *
+     * @return a pointer to a dynamically P256Keypair (or derived class thereof), which may evaluate to nullptr
+     *         if running out of memory.
+     */
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE();
+
+    /**
+     * @brief Release an ephemeral keypair previously created by `AllocateEphemeralKeypairForCASE()`
+     */
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair);
 
     /**
      * This initializes a new keypair for the given fabric and generates a CSR for it,

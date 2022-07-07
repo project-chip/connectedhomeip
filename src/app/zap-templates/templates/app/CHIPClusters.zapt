@@ -18,7 +18,7 @@ namespace Controller {
 class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 {
 public:
-    {{asUpperCamelCase name}}Cluster() : ClusterBase(app::Clusters::{{asUpperCamelCase name}}::Id) {}
+    {{asUpperCamelCase name}}Cluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::{{asUpperCamelCase name}}::Id, endpoint) {}
     ~{{asUpperCamelCase name}}Cluster() {}
 };
 

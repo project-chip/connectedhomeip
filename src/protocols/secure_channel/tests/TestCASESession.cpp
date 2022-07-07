@@ -135,6 +135,10 @@ public:
         return mKeypair->ECDSA_sign_msg(message.data(), message.size(), outSignature);
     }
 
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override { return Platform::New<Crypto::P256Keypair>(); }
+
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override { Platform::Delete<Crypto::P256Keypair>(keypair); }
+
 protected:
     Platform::UniquePtr<P256Keypair> mKeypair;
     FabricIndex mSingleFabricIndex = kUndefinedFabricIndex;
@@ -213,7 +217,7 @@ CHIP_ERROR InitCredentialSets()
             gCommissionerFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, opKeySpan, &gCommissionerFabricIndex));
     }
 
-    FabricInfo * newFabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
+    const FabricInfo * newFabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     VerifyOrReturnError(newFabric != nullptr, CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(InitTestIpk(gCommissionerGroupDataProvider, *newFabric, /* numIpks= */ 1));
 

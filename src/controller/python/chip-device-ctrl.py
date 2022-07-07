@@ -552,8 +552,7 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.EstablishPASESessionIP(args[1].encode(
-                    "utf-8"), int(args[2]), nodeid)
+                self.devCtrl.EstablishPASESessionIP(args[1], int(args[2]), nodeid)
             else:
                 print("Usage:")
                 self.do_help("paseonly")
@@ -614,8 +613,7 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.CommissionIP(args[1].encode(
-                    "utf-8"), int(args[2]), nodeid)
+                self.devCtrl.CommissionIP(args[1], int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             elif args[0] in ['-qr', '-code'] and len(args) >= 2:
@@ -948,7 +946,7 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("set-pairing-wifi-credential")
                 return
             self.devCtrl.SetWiFiCredentials(
-                args[0].encode("utf-8"), args[1].encode("utf-8"))
+                args[0], args[1])
         except Exception as ex:
             print(str(ex))
             return

@@ -29,18 +29,34 @@ tests:
                 value: nodeId
 
     - label: "TH sends On command to DUT"
+      PICS: OO.S.C01.Rsp
       command: "On"
 
     - label: "TH writes a value of 0 to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: 0
 
-    - label: "Power Off and On DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -51,21 +67,37 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
     - label: "TH writes a value of 1 to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: 1
 
-    - label: "Power Off and On DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -76,21 +108,37 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "TH writes a value of 2 to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: 2
 
-    - label: "Power Off and On DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -101,15 +149,30 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 0
 
-    - label: "Power Off and On DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -120,21 +183,37 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "TH writes NULL to StartUpOnOff attribute of DUT"
+      PICS: OO.S.A4003
       command: "writeAttribute"
       attribute: "StartUpOnOff"
       arguments:
           value: null
 
-    - label: "Power Off and On DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in chip-tool
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -145,18 +224,34 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
           value: 1
 
     - label: "TH sends Off command to DUT"
+      PICS: OO.S.C00.Rsp
       command: "Off"
 
-    - label: "Power Off and On DUT"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       endpoint: 0
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -167,6 +262,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads the OnOff attribute from the DUT"
+      PICS: OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:

@@ -78,7 +78,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
         {
             isRunning = true;
         }
-        VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
+        VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err || CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err, err);
     }
 
     if (searchOverAll || payload.rendezvousInformation == RendezvousInformationFlag::kSoftAP)
@@ -87,7 +87,7 @@ CHIP_ERROR SetUpCodePairer::Connect(SetupPayload & payload)
         {
             isRunning = true;
         }
-        VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
+        VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err || CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE == err, err);
     }
 
     // We always want to search on network because any node that has already been commissioned will use on-network regardless of the

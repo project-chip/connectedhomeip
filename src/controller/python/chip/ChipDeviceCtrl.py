@@ -120,7 +120,7 @@ class DCState(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -134,7 +134,7 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
 
         if res != 0:
@@ -278,13 +278,13 @@ class ChipDeviceController():
                 self.devCtrl, nodeid)
         )
 
-    def EstablishPASESessionIP(self, ipaddr, setupPinCode, nodeid):
+    def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
         self.CheckIsActive()
 
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
-                self.devCtrl, ipaddr, setupPinCode, nodeid)
+                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
         )
 
     def Commission(self, nodeid):
@@ -345,7 +345,7 @@ class ChipDeviceController():
             return False
         return self._ChipStack.commissioningEventRes == 0
 
-    def CommissionIP(self, ipaddr, setupPinCode, nodeid):
+    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
         self.CheckIsActive()
 
         # IP connection will run through full commissioning, so we need to wait
@@ -356,7 +356,7 @@ class ChipDeviceController():
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
-                self.devCtrl, ipaddr, setupPinCode, nodeid)
+                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
@@ -374,18 +374,18 @@ class ChipDeviceController():
         self.SetThreadOperationalDataset(threadOperationalDataset)
         return self.ConnectBLE(discriminator, setupPinCode, nodeId)
 
-    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid, credentials):
+    def CommissionWiFi(self, discriminator, setupPinCode, nodeId, ssid: str, credentials: str):
         ''' Commissions a WiFi device over BLE
         '''
         self.SetWiFiCredentials(ssid, credentials)
         return self.ConnectBLE(discriminator, setupPinCode, nodeId)
 
-    def SetWiFiCredentials(self, ssid, credentials):
+    def SetWiFiCredentials(self, ssid: str, credentials: str):
         self.CheckIsActive()
 
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
-                ssid, credentials)
+                ssid.encode("utf-8"), credentials.encode("utf-8"))
         )
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):

@@ -107,15 +107,10 @@ CHIP_ERROR InitRandomStaticAddress()
     int error = 0;
     bt_addr_le_t addr;
 
-#if CONFIG_BT_HOST_CRYPTO
-    // When CONFIG_BT_HOST_CRYPTO is enabled, bt_addr_le_create_static() depends on HCI transport
-    // which is not yet started at this point, so use a different method for generating the address
+    // generating the address
     addr.type = BT_ADDR_LE_RANDOM;
     error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
     BT_ADDR_SET_STATIC(&addr.a);
-#else
-    error = bt_addr_le_create_static(&addr);
-#endif
 
     if (error)
     {
@@ -627,8 +622,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kServiceProvisioningChange:
-    case DeviceEventType::kAccountPairingChange:
-
         // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
         // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
         // is now fully provisioned.

@@ -22,6 +22,12 @@ For the nRF Connect platform, the factory data is stored by default in a
 separate partition of the internal flash memory. This helps to keep the factory
 data secure by applying hardware write protection.
 
+> Note: Due to hardware limitations, in the nRF Connect platform, protection
+> against writing can be applied only to the internal memory partition. The
+> [Fprotect](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/libraries/others/fprotect.html)
+> is the hardware flash protection driver, and we used it to ensure write
+> protection of the factory data partition in internal flash memory.
+
 <p align="center">
   <img src="../../examples/platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
   <img src="../../examples/platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
@@ -666,7 +672,7 @@ override the inherited classes, complete the following steps:
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
-    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
+    CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
