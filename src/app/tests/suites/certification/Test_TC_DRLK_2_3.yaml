@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.C22.Rsp
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -55,6 +56,7 @@ tests:
                 value: 2
 
     - label: "Precondition: Door is in locked state"
+      PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -63,12 +65,14 @@ tests:
                 value: "123456"
 
     - label: "TH writes AutoRelockTime attribute value as 10 seconds on the DUT"
+      PICS: DRLK.S.A0023
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 10
 
     - label: "TH sends the unlock Door command to the DUT with valid PINCode"
+      PICS: DRLK.S.C01.Rsp
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -77,6 +81,7 @@ tests:
                 value: "123456"
 
     - label: "TH reads AutoRelockTime attribute from DUT"
+      PICS: DRLK.S.A0023
       command: "readAttribute"
       attribute: "AutoRelockTime"
       response:
@@ -91,12 +96,14 @@ tests:
                 value: 10000
 
     - label: "TH reads LockState attribute"
+      PICS: DRLK.S.A0000
       command: "readAttribute"
       attribute: "LockState"
       response:
           value: 1
 
     - label: "Clean the created credential"
+      PICS: DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
       arguments:

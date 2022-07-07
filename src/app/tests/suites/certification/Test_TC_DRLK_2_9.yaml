@@ -34,6 +34,7 @@ tests:
     - label:
           "TH reads NumberOfTotalUsersSupported attribute and saves for future
           use."
+      PICS: DRLK.C.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
@@ -41,6 +42,7 @@ tests:
           value: 10
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -59,6 +61,7 @@ tests:
                 value: 0
 
     - label: "TH sends Get Credential Status Command"
+      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -82,6 +85,7 @@ tests:
                     minValue: 1
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -100,6 +104,7 @@ tests:
                 value: 10
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -118,6 +123,7 @@ tests:
                 value: 0
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -136,6 +142,7 @@ tests:
                 value: 0
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -154,6 +161,7 @@ tests:
                 value: 0
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -172,6 +180,7 @@ tests:
                 value: 0
 
     - label: "TH sends Clear Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -180,6 +189,7 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -198,6 +208,7 @@ tests:
                 value: 0
 
     - label: "TH sends Clear Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -206,6 +217,7 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 0xFFFE }
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -224,6 +236,7 @@ tests:
                 value: 0
 
     - label: "TH sends Clear Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -232,6 +245,7 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 0xFFFE }
 
     - label: "TH sends Get Credential Status Command"
+      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -243,6 +257,7 @@ tests:
                 value: null
 
     - label: "TH sends Set Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -261,6 +276,7 @@ tests:
                 value: 0
 
     - label: "TH sends Clear Credential Command to DUT"
+      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000
       arguments:

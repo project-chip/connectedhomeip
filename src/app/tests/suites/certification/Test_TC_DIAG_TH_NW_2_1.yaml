@@ -28,26 +28,16 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read configured Channel attribute value"
-      command: "readAttribute"
-      attribute: "channel"
-      response:
-          value: null
-
-    - label: "Validate constraints of attribute: Channel"
+    - label: "TH reads Channel attribute value from DUT"
+      PICS: DGTHREAD.S.A0001
       command: "readAttribute"
       attribute: "channel"
       response:
           constraints:
               type: uint16
 
-    - label: "read RoutingRole atribute from DUT"
-      command: "readAttribute"
-      attribute: "RoutingRole"
-      response:
-          value: null
-
-    - label: "Validate constraints of attribute: RoutingRole"
+    - label: "TH reads RoutingRole attribute value from DUT"
+      PICS: DGTHREAD.S.A0002
       command: "readAttribute"
       attribute: "RoutingRole"
       response:
@@ -56,14 +46,16 @@ tests:
               minValue: 0
               maxValue: 6
 
-    - label: "read NetworkName attribute from DUT"
+    - label: "TH reads Network Name attribute value from DUT"
+      PICS: DGTHREAD.S.A0003
       command: "readAttribute"
       attribute: "NetworkName"
       response:
-          value: null
+          constraints:
+              type: string
 
     - label:
-          "read NetworkName attribute from DUT and verify response value, If
+          "Read NetworkName attribute from DUT and verify response value, If
           value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read network-name 476 0
@@ -76,7 +68,7 @@ tests:
            [1649823714.281135][3183:3188] CHIP:TOO:   NetworkName: OpenThreaddDemo
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
       arguments:
           values:
               - name: "message"
@@ -84,7 +76,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "read PanId attribute from DUT"
+    - label: "TH reads PanId attribute value from DUT"
+      PICS: DGTHREAD.S.A0004
       command: "readAttribute"
       attribute: "PanId"
       response:
@@ -92,7 +85,7 @@ tests:
               type: uint16
 
     - label:
-          "read PanId attribute from DUT and verify response value, If value is
+          "Read PanId attribute from DUT and verify response value, If value is
           NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read pan-id 476 0
@@ -104,7 +97,7 @@ tests:
            [1649824713.095867][3292:3297] CHIP:TOO:   PanId: 4660
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
       arguments:
           values:
               - name: "message"
@@ -112,7 +105,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Validate constraints of attribute: ExtendedPanId"
+    - label: "TH reads ExtendedPanId attribute value from DUT"
+      PICS: DGTHREAD.S.A0005
       command: "readAttribute"
       attribute: "ExtendedPanId"
       response:
@@ -120,7 +114,7 @@ tests:
               type: uint64
 
     - label:
-          "read ExtendedPanId attribute from DUT and verify response value, If
+          "Read ExtendedPanId attribute from DUT and verify response value, If
           value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read extended-pan-id 476 0
@@ -132,7 +126,7 @@ tests:
            [1649824746.371387][3300:3305] CHIP:TOO:   ExtendedPanId: 1229782942828601890
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
       arguments:
           values:
               - name: "message"
@@ -142,7 +136,7 @@ tests:
 
     #issue #18144
     - label:
-          "read MeshLocalPrefix attribute from DUT and verify response value, If
+          "Read MeshLocalPrefix attribute from DUT and verify response value, If
           value is NULL then verify that RoutingRole is set to 1"
       verification: |
           ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 476 0
@@ -154,7 +148,7 @@ tests:
            [1649824777.962509][3306:3311] CHIP:TOO:   MeshLocalPrefix: 40FD7B3042ED5F42CF
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
       arguments:
           values:
               - name: "message"
@@ -162,7 +156,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Validate constraints of attribute: OverrunCount"
+    - label: "TH reads OverrunCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0007
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
@@ -182,7 +177,7 @@ tests:
           [1649824808.715038][3314:3319] CHIP:TOO:   OverrunCount: 0
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0007
       arguments:
           values:
               - name: "message"
@@ -204,7 +199,7 @@ tests:
            [1649824841.786317][3322:3327] CHIP:TOO:   NeighborTableList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0008
       arguments:
           values:
               - name: "message"
@@ -213,7 +208,7 @@ tests:
                 value: "y"
 
     - label:
-          "read RouteTableList attribute from DUT and Verify that the
+          "Read RouteTableList attribute from DUT and Verify that the
           RouteTableList List size is Zero or greater and verify each node types"
       verification: |
           ./chip-tool threadnetworkdiagnostics read route-table-list 476 0
@@ -238,7 +233,7 @@ tests:
           [1649824896.845829][3329:3334] CHIP:EM: Sending Standalone Ack for MessageCounter:14412289 on exchange 3041i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0009
       arguments:
           values:
               - name: "message"
@@ -246,77 +241,88 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Validate constraints of attribute: PartitionId"
+    - label: "TH reads PartitionId attribute value from DUT"
+      PICS: DGTHREAD.S.A000a
       command: "readAttribute"
       attribute: "PartitionId"
       response:
           constraints:
               type: uint32
 
-    - label: "Validate constraints of attribute: weighting"
+    - label: "TH reads Weighting attribute value from DUT"
+      PICS: DGTHREAD.S.A000b
       command: "readAttribute"
       attribute: "weighting"
       response:
           constraints:
               type: uint8
 
-    - label: "Validate constraints of attribute: DataVersion"
+    - label: "TH reads DataVersion attribute value from DUT"
+      PICS: DGTHREAD.S.A000c
       command: "readAttribute"
       attribute: "DataVersion"
       response:
           constraints:
               type: uint8
 
-    - label: "Validate constraints of attribute: StableDataVersion"
+    - label: "TH reads StableDataVersion attribute value from DUT"
+      PICS: DGTHREAD.S.A000d
       command: "readAttribute"
       attribute: "StableDataVersion"
       response:
           constraints:
               type: uint8
 
-    - label: "Validate constraints of attribute: LeaderRouterId"
+    - label: "TH reads LeaderRouterId attribute value from DUT"
+      PICS: DGTHREAD.S.A000e
       command: "readAttribute"
       attribute: "LeaderRouterId"
       response:
           constraints:
               type: uint8
 
-    - label: "Validate constraints of attribute: DetachedRoleCount"
+    - label: "TH reads DetachedRoleCount attribute value from DUT"
+      PICS: DGTHREAD.S.A000f
       command: "readAttribute"
       attribute: "DetachedRoleCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: ChildRoleCount"
+    - label: "TH reads ChildRoleCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0010
       command: "readAttribute"
       attribute: "ChildRoleCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: RouterRoleCount"
+    - label: "TH reads RouterRoleCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0011
       command: "readAttribute"
       attribute: "RouterRoleCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: LeaderRoleCount"
+    - label: "TH reads LeaderRoleCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0012
       command: "readAttribute"
       attribute: "LeaderRoleCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: AttachAttemptCount"
+    - label: "TH reads AttachAttemptCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0013
       command: "readAttribute"
       attribute: "AttachAttemptCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: PartitionIdChangeCount"
+    - label: "TH reads PartitionIdChangeCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0014
       command: "readAttribute"
       attribute: "PartitionIdChangeCount"
       response:
@@ -324,259 +330,40 @@ tests:
               type: uint16
 
     - label:
-          "Validate constraints of attribute: BetterPartitionAttachAttemptCount"
+          "TH reads BetterPartitionAttachAttemptCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0015
       command: "readAttribute"
       attribute: "BetterPartitionAttachAttemptCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: ParentChangeCount"
+    - label: "TH reads ParentChangeCount attribute value from DUT"
+      PICS: DGTHREAD.S.A0016
       command: "readAttribute"
       attribute: "ParentChangeCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Validate constraints of attribute: TxTotalCount"
-      command: "readAttribute"
-      attribute: "TxTotalCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxUnicastCount"
-      command: "readAttribute"
-      attribute: "TxUnicastCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxBroadcastCount"
-      command: "readAttribute"
-      attribute: "TxBroadcastCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxNoAckRequestedCount"
-      command: "readAttribute"
-      attribute: "TxNoAckRequestedCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxDataCount"
-      command: "readAttribute"
-      attribute: "TxDataCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxDataPollCount"
-      command: "readAttribute"
-      attribute: "TxDataPollCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxBeaconCount"
-      command: "readAttribute"
-      attribute: "TxBeaconCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxBeaconRequestCount"
-      command: "readAttribute"
-      attribute: "TxBeaconRequestCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxOtherCount"
-      command: "readAttribute"
-      attribute: "TxOtherCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxRetryCount"
-      command: "readAttribute"
-      attribute: "TxRetryCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxDirectMaxRetryExpiryCount"
-      command: "readAttribute"
-      attribute: "TxDirectMaxRetryExpiryCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxIndirectMaxRetryExpiryCount"
-      command: "readAttribute"
-      attribute: "TxIndirectMaxRetryExpiryCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxErrCcaCount"
-      command: "readAttribute"
-      attribute: "TxErrCcaCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxErrAbortCount"
-      command: "readAttribute"
-      attribute: "TxErrAbortCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: TxErrBusyChannelCount"
-      command: "readAttribute"
-      attribute: "TxErrBusyChannelCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxTotalCount"
-      command: "readAttribute"
-      attribute: "RxTotalCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxUnicastCount"
-      command: "readAttribute"
-      attribute: "RxUnicastCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxBroadcastCount"
-      command: "readAttribute"
-      attribute: "RxBroadcastCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxDataCount"
-      command: "readAttribute"
-      attribute: "RxDataCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxDataPollCount"
-      command: "readAttribute"
-      attribute: "RxDataPollCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxBeaconCount"
-      command: "readAttribute"
-      attribute: "RxBeaconCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxBeaconRequestCount"
-      command: "readAttribute"
-      attribute: "RxBeaconRequestCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxOtherCount"
-      command: "readAttribute"
-      attribute: "RxOtherCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxAddressFilteredCount"
-      command: "readAttribute"
-      attribute: "RxAddressFilteredCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxDestAddrFilteredCount"
-      command: "readAttribute"
-      attribute: "RxDestAddrFilteredCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxDuplicatedCount"
-      command: "readAttribute"
-      attribute: "RxDuplicatedCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxErrNoFrameCount"
-      command: "readAttribute"
-      attribute: "RxErrNoFrameCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxErrUnknownNeighborCount"
-      command: "readAttribute"
-      attribute: "RxErrUnknownNeighborCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxErrInvalidSrcAddrCount"
-      command: "readAttribute"
-      attribute: "RxErrInvalidSrcAddrCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxErrInvalidSrcAddrCount"
-      command: "readAttribute"
-      attribute: "RxErrSecCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxErrFcsCount"
-      command: "readAttribute"
-      attribute: "RxErrFcsCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: RxErrOtherCount"
-      command: "readAttribute"
-      attribute: "RxErrOtherCount"
-      response:
-          constraints:
-              type: uint32
-
-    - label: "Validate constraints of attribute: ActiveTimestamp"
+    - label: "TH reads ActiveTimestamp attribute value from DUT"
+      PICS: DGTHREAD.S.A0039
       command: "readAttribute"
       attribute: "ActiveTimestamp"
       response:
           constraints:
               type: uint64
 
-    - label: "Validate constraints of attribute: PendingTimestamp"
+    - label: "TH reads PendingTimestamp attribute value from DUT"
+      PICS: DGTHREAD.S.A003a
       command: "readAttribute"
       attribute: "PendingTimestamp"
       response:
           constraints:
               type: uint64
 
-    - label: "Validate constraints of attribute: delay"
+    - label: "TH reads Delay attribute value from DUT"
+      PICS: DGTHREAD.S.A003b
       command: "readAttribute"
       attribute: "delay"
       response:
@@ -585,7 +372,7 @@ tests:
 
     #issue #14097
     - label:
-          "read SecurityPolicy struct attribute from DUT and Verify the each
+          "Read SecurityPolicy struct attribute from DUT and Verify the each
           field"
       verification: |
           ./chip-tool threadnetworkdiagnostics read security-policy 476 0
@@ -601,7 +388,7 @@ tests:
           [1649825860.867921][3472:3477] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003c
       arguments:
           values:
               - name: "message"
@@ -609,7 +396,8 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Validate constraints of attribute: ChannelPage0Mask"
+    - label: "TH reads ChannelPage0Mask attribute value from DUT"
+      PICS: DGTHREAD.S.A003d
       command: "readAttribute"
       attribute: "ChannelMask"
       response:
@@ -618,7 +406,7 @@ tests:
 
     #issue #14097
     - label:
-          "read OperationalDatasetComponents struct attribute from DUT and
+          "Read OperationalDatasetComponents struct attribute from DUT and
           Verify the each field"
       verification: |
           ./chip-tool threadnetworkdiagnostics read security-policy 476 0
@@ -634,7 +422,7 @@ tests:
           [1649825860.867921][3472:3477] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003e
       arguments:
           values:
               - name: "message"
@@ -643,8 +431,8 @@ tests:
                 value: "y"
 
     #issue #18145
-    - label: "read ActiveNetworkFaults attribute value"
-      PICS: PICS_SKIP_SAMPLE_APP
+    - label: "TH reads ActiveNetworkFaults attribute value from DUT"
+      PICS: DGTHREAD.S.A003f
       command: "readAttribute"
       attribute: "ActiveNetworkFaultsList"
       response:

@@ -25,77 +25,80 @@ config:
 tests:
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+          ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
-          [1650373284.201813][42676:42681] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1650373284.201880][42676:42681] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1650373284.201989][42676:42681] CHIP:TOO:   ArmFailSafeResponse: {
-          [1650373284.202055][42676:42681] CHIP:TOO:     errorCode: 0
-          [1650373284.202094][42676:42681] CHIP:TOO:     debugText:
-          [1650373284.202131][42676:42681] CHIP:TOO:    }
-          [1650373284.202190][42676:42681] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653478311.640549][30368:30373] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1653478311.640646][30368:30373] CHIP:TOO:   ArmFailSafeResponse: {
+          [1653478311.640696][30368:30373] CHIP:TOO:     errorCode: 0
+          [1653478311.640729][30368:30373] CHIP:TOO:     debugText:
+          [1653478311.640763][30368:30373] CHIP:TOO:    }
+          [1653478311.640821][30368:30373] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653478311.640901][30368:30373] CHIP:EM: Sending Standalone Ack for MessageCounter:8633037 on exchange 20698i
       disabled: true
 
     - label:
           "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
           argument value as 'Userwifi_ssid', Credentials argument value as
           'Userwifi_Credentials' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 matter123 1 0
 
-          [1650373290.002126][42685:42690] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650373290.002187][42685:42690] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650373290.002286][42685:42690] CHIP:TOO:   NetworkConfigResponse: {
-          [1650373290.002351][42685:42690] CHIP:TOO:     networkingStatus: 0
-          [1650373290.002388][42685:42690] CHIP:TOO:     networkIndex: 0
-          [1650373290.002422][42685:42690] CHIP:TOO:    }
-          [1650373290.002477][42685:42690] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650373290.002541][42685:42690] CHIP:EM: Sending Standalone Ack for MessageCounter:11932100 on exchange 5790i
+          [1653478317.416576][30375:30380] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1653478317.416654][30375:30380] CHIP:TOO:   NetworkConfigResponse: {
+          [1653478317.416693][30375:30380] CHIP:TOO:     networkingStatus: 0
+          [1653478317.416716][30375:30380] CHIP:TOO:     networkIndex: 0
+          [1653478317.416740][30375:30380] CHIP:TOO:    }
+          [1653478317.416778][30375:30380] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653478317.416840][30375:30380] CHIP:EM: Sending Standalone Ack for MessageCounter:435021 on exchange 13893i
       disabled: true
 
     - label: "TH1 reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
+          ./chip-tool networkcommissioning read networks 1 0
 
-          [1650373295.460938][42691:42696] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3182776035
-          [1650373295.461048][42691:42696] CHIP:TOO:   Networks: 1 entries
-          [1650373295.461114][42691:42696] CHIP:TOO:     [1]: {
-          [1650373295.461153][42691:42696] CHIP:TOO:       NetworkID: 47524C50726976617465
-          [1650373295.461187][42691:42696] CHIP:TOO:       Connected: FALSE
-          [1650373295.461222][42691:42696] CHIP:TOO:      }
-          [1650373295.461343][42691:42696] CHIP:EM: Sending Standalone Ack for MessageCounter:3408941 on exchange 18040i
+          [1653478322.228998][30381:30386] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
+          [1653478322.229108][30381:30386] CHIP:TOO:   Networks: 1 entries
+          [1653478322.229185][30381:30386] CHIP:TOO:     [1]: {
+          [1653478322.229228][30381:30386] CHIP:TOO:       NetworkID: 47524C50726976617465
+          [1653478322.229266][30381:30386] CHIP:TOO:       Connected: TRUE
+          [1653478322.229303][30381:30386] CHIP:TOO:      }
+          [1653478322.229445][30381:30386] CHIP:EM: Sending Standalone Ack for MessageCounter:3962835 on exchange 61433i
       disabled: true
 
     - label:
           "TH sends RemoveNetwork Command to the DUT with NetworkID argument
           value as 'Userwifi_ssid' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650373300.704957][42697:42702] CHIP:TOO:   NetworkConfigResponse: {
-          [1650373300.705012][42697:42702] CHIP:TOO:     networkingStatus: 0
-          [1650373300.705044][42697:42702] CHIP:TOO:     networkIndex: 0
-          [1650373300.705073][42697:42702] CHIP:TOO:    }
-          [1650373300.705120][42697:42702] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650373300.705181][42697:42702] CHIP:EM: Sending Standalone Ack for MessageCounter:9924068 on exchange 3557i
+
+          [1653478327.351092][30388:30393] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1653478327.351200][30388:30393] CHIP:TOO:   NetworkConfigResponse: {
+          [1653478327.351252][30388:30393] CHIP:TOO:     networkingStatus: 0
+          [1653478327.351288][30388:30393] CHIP:TOO:     networkIndex: 0
+          [1653478327.351320][30388:30393] CHIP:TOO:    }
+          [1653478327.351373][30388:30393] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653478327.351449][30388:30393] CHIP:EM: Sending Standalone Ack for MessageCounter:14887098 on exchange 8676i
       disabled: true
 
     - label: "TH1 reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 1 0
-
-          [1650373307.419826][42703:42708] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3182776035
-          [1650373307.419952][42703:42708] CHIP:TOO:   Networks: 0 entries
-          [1650373307.420120][42703:42708] CHIP:EM: Sending Standalone Ack for MessageCounter:11050013 on exchange 13049i
+          ./chip-tool networkcommissioning read networks 1 0
+          [1653478331.979300][30395:30400] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
+          [1653478331.979380][30395:30400] CHIP:TOO:   Networks: 0 entries
+          [1653478331.979496][30395:30400] CHIP:EM: Sending Standalone Ack for MessageCounter:609449 on exchange 40264i
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 1 0
+          ./chip-tool networkcommissioning read last-networking-status 1 0
 
-          [1650373314.295677][42709:42714] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 3182776035
-          [1650373314.295780][42709:42714] CHIP:TOO:   LastNetworkingStatus: 0
-          [1650373314.295863][42709:42714] CHIP:EM: Sending Standalone Ack for MessageCounter:7583587 on exchange 57489i
+          [1653478850.425096][30420:30425] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1600858167
+          [1653478850.425170][30420:30425] CHIP:TOO:   LastNetworkingStatus: 0
+          [1653478850.425269][30420:30425] CHIP:EM: Sending Standalone Ack for MessageCounter:8275942 on exchange 13394i
       disabled: true

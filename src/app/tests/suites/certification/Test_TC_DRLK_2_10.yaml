@@ -23,6 +23,7 @@ config:
 
 tests:
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 0"
+      PICS: DRLK.S.E00
       verification: |
           sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -34,6 +35,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 1"
+      PICS: DRLK.S.E00
       verification: |
           "sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -45,6 +47,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 3"
+      PICS: DRLK.S.E00
       verification: |
           sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -56,6 +59,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 4"
+      PICS: DRLK.S.E00
       verification: |
           "sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -67,6 +71,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 5"
+      PICS: DRLK.S.E00
       verification: |
           "sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -78,6 +83,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 6"
+      PICS: DRLK.S.E00
       verification: |
           sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -89,6 +95,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 7"
+      PICS: DRLK.S.E00
       verification: |
           sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -100,6 +107,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorLockAlarm Event by setting the AlarmCode to 8"
+      PICS: DRLK.S.E00
       verification: |
           sudo  ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -111,6 +119,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorStateChange event by setting the DoorState to 0"
+      PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           sudo  ./chip-tool doorlock read-event door-state-change 1 1
 
@@ -122,6 +131,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorStateChange event by setting the DoorState to 1"
+      PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           sudo  ./chip-tool doorlock read-event door-state-change 1 1
 
@@ -133,6 +143,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorStateChange event by setting the DoorState to 2"
+      PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           sudo  ./chip-tool doorlock read-event door-state-change 1 1
 
@@ -144,6 +155,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorStateChange event by setting the DoorState to 3"
+      PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           sudo  ./chip-tool doorlock read-event door-state-change 1 1
 
@@ -155,6 +167,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorStateChange event by setting the DoorState to 4"
+      PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           sudo  ./chip-tool doorlock read-event door-state-change 1 1
 
@@ -166,6 +179,7 @@ tests:
       disabled: true
 
     - label: "Initiate a DoorStateChange event by setting the DoorState to 5"
+      PICS: DRLK.S.F05 && DRLK.S.E01
       verification: |
           sudo  ./chip-tool doorlock read-event door-state-change 1 1
 
@@ -177,6 +191,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 0"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -188,6 +203,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 1"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -199,6 +215,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 2"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -210,6 +227,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 3"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -221,6 +239,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 4"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -232,6 +251,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 5"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -243,6 +263,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 6"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -254,6 +275,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 7"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -265,6 +287,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 8"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -276,6 +299,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockOperation event by setting OperationSource to 9"
+      PICS: DRLK.S.E02
       verification: |
           sudo  ./chip-tool doorlock read-event lock-operation 1 1
 
@@ -288,6 +312,7 @@ tests:
 
     - label:
           "Initiate a LockOperationError Event by setting OperationError as 0"
+      PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
@@ -300,6 +325,7 @@ tests:
 
     - label:
           "Initiate a LockOperationError Event by setting OperationError as 1"
+      PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
@@ -312,6 +338,7 @@ tests:
 
     - label:
           "Initiate a LockOperationError Event by setting OperationError as 2"
+      PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
@@ -324,6 +351,7 @@ tests:
 
     - label:
           "Initiate a LockOperationError Event by setting OperationError as 3"
+      PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
@@ -336,6 +364,7 @@ tests:
 
     - label:
           "Initiate a LockOperationError Event by setting OperationError as 4"
+      PICS: DRLK.S.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 1 1
 
@@ -347,6 +376,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockUserChange event by changing the Lock User"
+      PICS: DRLK.S.E03
       verification: |
           sudo  ./chip-tool doorlock read-event lock-user-change 1 1
 
@@ -358,6 +388,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockUserChange event by changing the Schedule"
+      PICS: DRLK.S.E03
       verification: |
           sudo  ./chip-tool doorlock read-event lock-user-change 1 1
 
@@ -369,6 +400,7 @@ tests:
       disabled: true
 
     - label: "Initiate a LockUserChange event by changing the Credential"
+      PICS: DRLK.S.E03
       verification: |
           sudo  ./chip-tool doorlock read-event lock-user-change 1 1
 

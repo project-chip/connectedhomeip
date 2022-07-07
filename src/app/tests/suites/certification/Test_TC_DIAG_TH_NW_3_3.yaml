@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 48.9. [TC-DIAG-TH_NW-2.8] Attributes-Rx [DUT Client]
+name: 48.9. [TC-DIAG-TH_NW-3.3] Attributes-Rx [DUT Client]
 
 config:
     nodeId: 0x12344321
@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxTotalCount attribute value from TH"
+      PICS: DGTHREAD.C.A0028
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-total-count 180 0
 
@@ -61,6 +62,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxUnicastCount attribute value from TH"
+      PICS: DGTHREAD.C.A0029
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-unicast-count 180 0
 
@@ -73,6 +75,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxBroadcastCount attribute value from TH"
+      PICS: DGTHREAD.C.A002a
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-broadcast-count 180 0
 
@@ -85,6 +88,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxDataCount attribute value from TH"
+      PICS: DGTHREAD.C.A002b
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-data-count 180 0
 
@@ -97,6 +101,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxDataPollCount attribute value from TH"
+      PICS: DGTHREAD.C.A002c
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-data-poll-count 180 0
 
@@ -109,6 +114,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxBeaconCount attribute value from TH"
+      PICS: DGTHREAD.C.A002d
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-beacon-count 180 0
 
@@ -121,6 +127,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxBeaconRequestCount attribute value from TH"
+      PICS: DGTHREAD.C.A002e
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-beacon-request-count 180 0
 
@@ -133,6 +140,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxOtherCount attribute value from TH"
+      PICS: DGTHREAD.C.A002f
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-other-count 180 0
 
@@ -145,6 +153,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxAddressFilteredCount attribute value from TH"
+      PICS: DGTHREAD.C.A0030
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-address-filtered-count 180 0
 
@@ -157,6 +166,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxDestAddrFilteredCount attribute value from TH"
+      PICS: DGTHREAD.C.A0031
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-dest-addr-filtered-count 180 0
 
@@ -169,6 +179,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxDuplicatedCount attribute value from TH"
+      PICS: DGTHREAD.C.A0032
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-duplicated-count 180 0
 
@@ -181,6 +192,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxErrNoFrameCount attribute value from TH"
+      PICS: DGTHREAD.C.A0033
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-no-frame-count 180 0
 
@@ -193,6 +205,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxErrUnknownNeighborCount attribute value from TH"
+      PICS: DGTHREAD.C.A0034
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-unknown-neighbor-count 180 0
 
@@ -205,6 +218,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxErrInvalidScrAddrCount attribute value from TH"
+      PICS: DGTHREAD.C.A0035
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-invalid-src-addr-count 180 0
 
@@ -217,6 +231,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxErrSecCount attribute value from TH"
+      PICS: DGTHREAD.C.A0036
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-sec-count 180 0
 
@@ -229,6 +244,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxErrFcsCount attribute value from TH"
+      PICS: DGTHREAD.C.A0037
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-fcs-count 180 0
 
@@ -241,6 +257,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RxErrOtherCount attribute value from TH"
+      PICS: DGTHREAD.C.A0038
       verification: |
           ./chip-tool threadnetworkdiagnostics read rx-err-other-count 180 0
 

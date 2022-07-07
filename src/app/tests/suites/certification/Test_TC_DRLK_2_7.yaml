@@ -84,6 +84,7 @@ tests:
                 value: 3
 
     - label: "Get Max number of year Day schedules for user"
+      PICS: DRLK.S.F04 && DRLK.S.A0015
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
       response:
@@ -91,6 +92,7 @@ tests:
           value: 10
 
     - label: "Get number of supported users"
+      PICS: DRLK.C.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
@@ -98,6 +100,7 @@ tests:
           value: 10
 
     - label: "Send Set Year Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0E.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -112,6 +115,7 @@ tests:
 
     #issue #18591 and #18590
     - label: "send Get Year Day Schedule Command"
+      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -141,6 +145,7 @@ tests:
     - label:
           "Send Set Year Day Schedule Command to DUT and verify INVALID_COMMAND
           response"
+      PICS: DRLK.S.C0E.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -158,6 +163,7 @@ tests:
     - label:
           "send Get Year Day Schedule Command to DUT and Verify INVALID_FIELD
           response"
+      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -183,6 +189,7 @@ tests:
     - label:
           "send Get Year Day Schedule Command to DUT and verify NOT_FOUND
           response"
+      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -208,6 +215,7 @@ tests:
     - label:
           "send Get Year Day Schedule Command  to DUT and verify NOT_FOUND
           response "
+      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
@@ -231,6 +239,7 @@ tests:
                     hasValue: false
 
     - label: "Send Set Year Day Schedule Command to DUT"
+      PICS: DRLK.S.C0E.Rsp
       command: "SetYearDaySchedule"
       arguments:
           values:
@@ -244,6 +253,7 @@ tests:
                 value: 20
 
     - label: "send Get Year Day Schedule Command "
+      PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
       command: "GetYearDaySchedule"
       arguments:
           values:
