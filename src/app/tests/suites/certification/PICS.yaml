@@ -660,6 +660,13 @@ PICS:
     - label: "Supports a System Mode of Auto"
       id: TSTAT_AUTO
 
+    #Client Commands
+    - label: "Does the device implement sending the SetpointRaiseLower command?"
+      id: TSTAT.C.C00.Tx
+
+    - label: "Does the device implement sending the GetRelayStatusLog command?"
+      id: TSTAT.C.C04.Tx
+
       # Window covering cluster
       ## WC-Features
     - label: "Does the device implement the Lift feature?"
@@ -1097,12 +1104,6 @@ PICS:
           "Does the device implement the
           PhysicalContactUnoccupiedToOccupiedThreshold attribute?"
       id: OCC.C.A0032
-
-    - label: "Does the device implement the Tolerance attribute?"
-      id: FLW.S.A0003
-
-    - label: "Does the device support extended range and resolution?"
-      id: PRS.S.F00
 
     #Level Control Cluster
     - label:
@@ -2799,3 +2800,1409 @@ PICS:
     #Power Source Configuration Cluster
     - label: "Does the device implement the Sources attribute?"
       id: PSCFG.S.A0000
+
+    #Thread Network Diagnostics Cluster
+    #server attributes
+    - label: "Does the DUT-server support the channel attribute?"
+      id: DGTHREAD.S.A0001
+
+    - label: "Does the DUT-server support the RoutingRole attribute?"
+      id: DGTHREAD.S.A0002
+
+    - label: "Does the DUT-server support the NetworkName attribute?"
+      id: DGTHREAD.S.A0003
+
+    - label: "Does the DUT-server support the PanId attribute?"
+      id: DGTHREAD.S.A0004
+
+    - label: "Does the DUT-server support the ExtendedPanId attribute?"
+      id: DGTHREAD.S.A0005
+
+    - label: "Does the DUT-server support the MeshLocalPrefix attribute?"
+      id: DGTHREAD.S.A0006
+
+    - label: "Does the DUT-server support the OverrunCount attribute?"
+      id: DGTHREAD.S.A0007
+
+    - label: "Does the DUT-server support the NeighborTable attribute?"
+      id: DGTHREAD.S.A0008
+
+    - label: "Does the DUT-server support the RouteTable attribute?"
+      id: DGTHREAD.S.A0009
+
+    - label: "Does the DUT-server support the PartitionId attribute?"
+      id: DGTHREAD.S.A000a
+
+    - label: "Does the DUT-server support the Weighting attribute?"
+      id: DGTHREAD.S.A000b
+
+    - label: "Does the DUT-server support the DataVersion attribute?"
+      id: DGTHREAD.S.A000c
+
+    - label: "Does the DUT-server support the StableDataVersion attribute?"
+      id: DGTHREAD.S.A000d
+
+    - label: "Does the DUT-server support the LeaderRouterId attribute?"
+      id: DGTHREAD.S.A000e
+
+    - label: "Does the DUT-server support the DetachedRoleCount attribute?"
+      id: DGTHREAD.S.A000f
+
+    - label: "Does the DUT-server support the ChildRoleCount attribute?"
+      id: DGTHREAD.S.A0010
+
+    - label: "Does the DUT-server support the RouterRoleCount attribute?"
+      id: DGTHREAD.S.A0011
+
+    - label: "Does the DUT-server support the LeaderRoleCount attribute?"
+      id: DGTHREAD.S.A0012
+
+    - label: "Does the DUT-server support the AttachAttemptCount attribute?"
+      id: DGTHREAD.S.A0013
+
+    - label: "Does the DUT-server support the PartitionIdChangeCount attribute?"
+      id: DGTHREAD.S.A0014
+
+    - label:
+          "Does the DUT-server support the BetterPartitionAttachAttemptCount
+          attribute?"
+      id: DGTHREAD.S.A0015
+
+    - label: "Does the DUT-server support the ParentChangeCount attribute?"
+      id: DGTHREAD.S.A0016
+
+    - label: "Does the DUT-server support the TxTotalCount attribute?"
+      id: DGTHREAD.S.A0017
+
+    - label: "Does the DUT-server support the TxUnicastCount attribute?"
+      id: DGTHREAD.S.A0018
+
+    - label: "Does the DUT-server support the TxBroadcastCount attribute?"
+      id: DGTHREAD.S.A0019
+
+    - label: "Does the DUT-server support the TxAckRequestedCount attribute?"
+      id: DGTHREAD.S.A001a
+
+    - label: "Does the DUT-server support the TxAckedCount attribute?"
+      id: DGTHREAD.S.A001b
+
+    - label: "Does the DUT-server support the TxNoAckRequestedCount attribute?"
+      id: DGTHREAD.S.A001c
+
+    - label: "Does the DUT-server support the TxDataCount attribute?"
+      id: DGTHREAD.S.A001d
+
+    - label: "Does the DUT-server support the TxDataPollCount attribute?"
+      id: DGTHREAD.S.A001e
+
+    - label: "Does the DUT-server support the TxBeaconCount attribute?"
+      id: DGTHREAD.S.A001f
+
+    - label: "Does the DUT-server support the TxBeaconRequestCount attribute?"
+      id: DGTHREAD.S.A0020
+
+    - label: "Does the DUT-server support the TxOtherCount attribute?"
+      id: DGTHREAD.S.A0021
+
+    - label: "Does the DUT-server support the TxRetryCount attribute?"
+      id: DGTHREAD.S.A0022
+
+    - label:
+          "Does the DUT-server support the TxDirectMaxRetryExpiryCount
+          attribute?"
+      id: DGTHREAD.S.A0023
+
+    - label:
+          "Does the DUT-server support the TxIndirectMaxRetryExpiryCount
+          attribute?"
+      id: DGTHREAD.S.A0024
+
+    - label: "Does the DUT-server support the TxErrCcaCount attribute?"
+      id: DGTHREAD.S.A0025
+
+    - label: "Does the DUT-server support the TxErrAbortCount attribute?"
+      id: DGTHREAD.S.A0026
+
+    - label: "Does the DUT-server support the TxErrBusyChannelCount attribute?"
+      id: DGTHREAD.S.A0027
+
+    - label: "Does the DUT-server support the RxTotalCount attribute?"
+      id: DGTHREAD.S.A0028
+
+    - label: "Does the DUT-server support the RxUnicastCount attribute?"
+      id: DGTHREAD.S.A0029
+
+    - label: "Does the DUT-server support the RxBroadcastCount attribute?"
+      id: DGTHREAD.S.A002a
+
+    - label: "Does the DUT-server support the RxDataCount attribute?"
+      id: DGTHREAD.S.A002b
+
+    - label: "Does the DUT-server support the RxDataPollCount attribute?"
+      id: DGTHREAD.S.A002c
+
+    - label: "Does the DUT-server support the RxBeaconCount attribute?"
+      id: DGTHREAD.S.A002d
+
+    - label: "Does the DUT-server support the RxBeaconRequestCount attribute?"
+      id: DGTHREAD.S.A002e
+
+    - label: "Does the DUT-server support the RxOtherCount attribute?"
+      id: DGTHREAD.S.A002f
+
+    - label: "Does the DUT-server support the RxAddressFilteredCount attribute?"
+      id: DGTHREAD.S.A0030
+
+    - label:
+          "Does the DUT-server support the RxDestAddrFilteredCount attribute?"
+      id: DGTHREAD.S.A0031
+
+    - label: "Does the DUT-server support the RxDuplicatedCount attribute?"
+      id: DGTHREAD.S.A0032
+
+    - label: "Does the DUT-server support the RxErrNoFrameCount attribute?"
+      id: DGTHREAD.S.A0033
+
+    - label:
+          "Does the DUT-server support the RxErrUnknownNeighborCount attribute?"
+      id: DGTHREAD.S.A0034
+
+    - label:
+          "Does the DUT-server support the RxErrInvalidScrAddrCount attribute?"
+      id: DGTHREAD.S.A0035
+
+    - label: "Does the DUT-server support the RxErrSecCount attribute?"
+      id: DGTHREAD.S.A0036
+
+    - label: "Does the DUT-server support the RxErrFcsCount attribute?"
+      id: DGTHREAD.S.A0037
+
+    - label: "Does the DUT-server support the RxErrOtherCount attribute?"
+      id: DGTHREAD.S.A0038
+
+    - label: "Does the DUT-server support the ActiveTimestamp attribute?"
+      id: DGTHREAD.S.A0039
+
+    - label: "Does the DUT-server support the PendingTimestamp attribute?"
+      id: DGTHREAD.S.A003a
+
+    - label: "Does the DUT-server support the Delay attribute?"
+      id: DGTHREAD.S.A003b
+
+    - label: "Does the DUT-server support the SecurityPolicy attribute?"
+      id: DGTHREAD.S.A003c
+
+    - label: "Does the DUT-server support the ChannelPage0Mask attribute?"
+      id: DGTHREAD.S.A003d
+
+    - label:
+          "Does the DUT-server support the OperationalDatasetComponents
+          attribute?"
+      id: DGTHREAD.S.A003e
+
+    - label: "Does the DUT-server support the ActiveNetworkFaults attribute?"
+      id: DGTHREAD.S.A003f
+
+    #server commands
+    - label:
+          "Does the Device-Server implement receiving the ResetCounts command?"
+      id: DGTHREAD.S.C00.Rsp
+
+    #Events
+    - label: "Does the DUT-server support the ConnectionStatus event?"
+      id: DGTHREAD.S.E00
+
+    - label: "Does the DUT-server support the NetworkFaultChange event?"
+      id: DGTHREAD.S.E01
+
+    - label: "Does the DUT-client support the ConnectionStatus event?"
+      id: DGTHREAD.C.E00
+
+    - label: "Does the DUT-client support the NetworkFaultChange event?"
+      id: DGTHREAD.C.E01
+
+    #client commands
+    - label:
+          "Does the Device-client invoking/generating the ResetCounts command?"
+      id: DGTHREAD.C.C00.Tx
+
+    #client attributes
+    - label: "Does the DUT-client support the channel attribute?"
+      id: DGTHREAD.C.A0001
+
+    - label: "Does the DUT-client support the RoutingRole attribute?"
+      id: DGTHREAD.C.A0002
+
+    - label: "Does the DUT-client support the NetworkName attribute?"
+      id: DGTHREAD.C.A0003
+
+    - label: "Does the DUT-client support the PanId attribute?"
+      id: DGTHREAD.C.A0004
+
+    - label: "Does the DUT-client support the ExtendedPanId attribute?"
+      id: DGTHREAD.C.A0005
+
+    - label: "Does the DUT-client support the MeshLocalPrefix attribute?"
+      id: DGTHREAD.C.A0006
+
+    - label: "Does the DUT-client support the OverrunCount attribute?"
+      id: DGTHREAD.C.A0007
+
+    - label: "Does the DUT-client support the NeighborTable attribute?"
+      id: DGTHREAD.C.A0008
+
+    - label: "Does the DUT-client support the RouteTable attribute?"
+      id: DGTHREAD.C.A0009
+
+    - label: "Does the DUT-client support the PartitionId attribute?"
+      id: DGTHREAD.C.A000a
+
+    - label: "Does the DUT-client support the Weighting attribute?"
+      id: DGTHREAD.C.A000b
+
+    - label: "Does the DUT-client support the DataVersion attribute?"
+      id: DGTHREAD.C.A000c
+
+    - label: "Does the DUT-client support the StableDataVersion attribute?"
+      id: DGTHREAD.C.A000d
+
+    - label: "Does the DUT-client support the LeaderRouterId attribute?"
+      id: DGTHREAD.C.A000e
+
+    - label: "Does the DUT-client support the DetachedRoleCount attribute?"
+      id: DGTHREAD.C.A000f
+
+    - label: "Does the DUT-client support the ChildRoleCount attribute?"
+      id: DGTHREAD.C.A0010
+
+    - label: "Does the DUT-client support the RouterRoleCount attribute?"
+      id: DGTHREAD.C.A0011
+
+    - label: "Does the DUT-client support the LeaderRoleCount attribute?"
+      id: DGTHREAD.C.A0012
+
+    - label: "Does the DUT-client support the AttachAttemptCount attribute?"
+      id: DGTHREAD.C.A0013
+
+    - label: "Does the DUT-client support the PartitionIdChangeCount attribute?"
+      id: DGTHREAD.C.A0014
+
+    - label:
+          "Does the DUT-client support the BetterPartitionAttachAttemptCount
+          attribute?"
+      id: DGTHREAD.C.A0015
+
+    - label: "Does the DUT-client support the ParentChangeCount attribute?"
+      id: DGTHREAD.C.A0016
+
+    - label: "Does the DUT-client support the TxTotalCount attribute?"
+      id: DGTHREAD.C.A0017
+
+    - label: "Does the DUT-client support the TxUnicastCount attribute?"
+      id: DGTHREAD.C.A0018
+
+    - label: "Does the DUT-client support the TxBroadcastCount attribute?"
+      id: DGTHREAD.C.A0019
+
+    - label: "Does the DUT-client support the TxAckRequestedCount attribute?"
+      id: DGTHREAD.C.A001a
+
+    - label: "Does the DUT-client support the TxAckedCount attribute?"
+      id: DGTHREAD.C.A001b
+
+    - label: "Does the DUT-client support the TxNoAckRequestedCount attribute?"
+      id: DGTHREAD.C.A001c
+
+    - label: "Does the DUT-client support the TxDataCount attribute?"
+      id: DGTHREAD.C.A001d
+
+    - label: "Does the DUT-client support the TxDataPollCount attribute?"
+      id: DGTHREAD.C.A001e
+
+    - label: "Does the DUT-client support the TxBeaconCount attribute?"
+      id: DGTHREAD.C.A001f
+
+    - label: "Does the DUT-client support the TxBeaconRequestCount attribute?"
+      id: DGTHREAD.C.A0020
+
+    - label: "Does the DUT-client support the TxOtherCount attribute?"
+      id: DGTHREAD.C.A0021
+
+    - label: "Does the DUT-client support the TxRetryCount attribute?"
+      id: DGTHREAD.C.A0022
+
+    - label:
+          "Does the DUT-client support the TxDirectMaxRetryExpiryCount
+          attribute?"
+      id: DGTHREAD.C.A0023
+
+    - label:
+          "Does the DUT-client support the TxIndirectMaxRetryExpiryCount
+          attribute?"
+      id: DGTHREAD.C.A0024
+
+    - label: "Does the DUT-client support the TxErrCcaCount attribute?"
+      id: DGTHREAD.C.A0025
+
+    - label: "Does the DUT-client support the TxErrAbortCount attribute?"
+      id: DGTHREAD.C.A0026
+
+    - label: "Does the DUT-client support the TxErrBusyChannelCount attribute?"
+      id: DGTHREAD.C.A0027
+
+    - label: "Does the DUT-client support the RxTotalCount attribute?"
+      id: DGTHREAD.C.A0028
+
+    - label: "Does the DUT-client support the RxUnicastCount attribute?"
+      id: DGTHREAD.C.A0029
+
+    - label: "Does the DUT-client support the RxBroadcastCount attribute?"
+      id: DGTHREAD.C.A002a
+
+    - label: "Does the DUT-client support the RxDataCount attribute?"
+      id: DGTHREAD.C.A002b
+
+    - label: "Does the DUT-client support the RxDataPollCount attribute?"
+      id: DGTHREAD.C.A002c
+
+    - label: "Does the DUT-client support the RxBeaconCount attribute?"
+      id: DGTHREAD.C.A002d
+
+    - label: "Does the DUT-client support the RxBeaconRequestCount attribute?"
+      id: DGTHREAD.C.A002e
+
+    - label: "Does the DUT-client support the RxOtherCount attribute?"
+      id: DGTHREAD.C.A002f
+
+    - label: "Does the DUT-client support the RxAddressFilteredCount attribute?"
+      id: DGTHREAD.C.A0030
+
+    - label:
+          "Does the DUT-client support the RxDestAddrFilteredCount attribute?"
+      id: DGTHREAD.C.A0031
+
+    - label: "Does the DUT-client support the RxDuplicatedCount attribute?"
+      id: DGTHREAD.C.A0032
+
+    - label: "Does the DUT-client support the RxErrNoFrameCount attribute?"
+      id: DGTHREAD.C.A0033
+
+    - label:
+          "Does the DUT-client support the RxErrUnknownNeighborCount attribute?"
+      id: DGTHREAD.C.A0034
+
+    - label:
+          "Does the DUT-client support the RxErrInvalidScrAddrCount attribute?"
+      id: DGTHREAD.C.A0035
+
+    - label: "Does the DUT-client support the RxErrSecCount attribute?"
+      id: DGTHREAD.C.A0036
+
+    - label: "Does the DUT-client support the RxErrFcsCount attribute?"
+      id: DGTHREAD.C.A0037
+
+    - label: "Does the DUT-client support the RxErrOtherCount attribute?"
+      id: DGTHREAD.C.A0038
+
+    - label: "Does the DUT-client support the ActiveTimestamp attribute?"
+      id: DGTHREAD.C.A0039
+
+    - label: "Does the DUT-client support the PendingTimestamp attribute?"
+      id: DGTHREAD.C.A003a
+
+    - label: "Does the DUT-client support the Delay attribute?"
+      id: DGTHREAD.C.A003b
+
+    - label: "Does the DUT-client support the SecurityPolicy attribute?"
+      id: DGTHREAD.C.A003c
+
+    - label: "Does the DUT-client support the ChannelPage0Mask attribute?"
+      id: DGTHREAD.C.A003d
+
+    - label:
+          "Does the DUT-client support the OperationalDatasetComponents
+          attribute?"
+      id: DGTHREAD.C.A003e
+
+    - label: "Does the DUT-client support the ActiveNetworkFaults attribute?"
+      id: DGTHREAD.C.A003f
+
+    #Illuminance Measurement Cluster
+    #server
+    - label: "Does the device implement the MeasuredValue attribute?"
+      id: ILL.S.A0000
+
+    - label: "Does the device implement the MinMeasuredValue attribute?"
+      id: ILL.S.A0001
+
+    - label: "Does the device implement the MaxMeasuredValue attribute?"
+      id: ILL.S.A0002
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: ILL.S.A0003
+
+    - label: "Does the device implement the LightSensorType attribute?"
+      id: ILL.S.A0004
+
+    #Door Lock
+    #server attributes
+    - label: "Does the DUT-server support the LockState attribute?"
+      id: DRLK.S.A0000
+
+    - label: "Does the DUT-server support the LockType attribute?"
+      id: DRLK.S.A0001
+
+    - label: "Does the DUT-server support the ActuatorEnabled attribute?"
+      id: DRLK.S.A0002
+
+    - label: "Does the DUT-server support the DoorState attribute?"
+      id: DRLK.S.A0003
+
+    - label: "Does the DUT-server support the DoorOpenEvents attribute?"
+      id: DRLK.S.A0004
+
+    - label: "Does the DUT-server support the DoorClosedEvents attribute?"
+      id: DRLK.S.A0005
+
+    - label: "Does the DUT-server support the OpenPeriod attribute?"
+      id: DRLK.S.A0006
+
+    - label:
+          "Does the DUT-server support the NumberOfTotalUsersSupported
+          attribute?"
+      id: DRLK.S.A0011
+
+    - label:
+          "Does the DUT-server support the NumberofPINUsersSupported attribute?"
+      id: DRLK.S.A0012
+
+    - label:
+          "Does the DUT-server support the NumberofRFIDUsersSupported attribute?"
+      id: DRLK.S.A0013
+
+    - label:
+          "Does the DUT-server support the NumberofWeekDaysSchedulesSupported
+          attribute?"
+      id: DRLK.S.A0014
+
+    - label:
+          "Does the DUT-server support the NumberofYearDaysSchedulesSupported
+          attribute?"
+      id: DRLK.S.A0015
+
+    - label:
+          "Does the DUT-server support the NumberofHolidaySchedulesSupported
+          attribute?"
+      id: DRLK.S.A0016
+
+    - label: "Does the DUT-server support the MaxPINCodeLength attribute?"
+      id: DRLK.S.A0017
+
+    - label: "Does the DUT-server support the MinPINCodeLength attribute?"
+      id: DRLK.S.A0018
+
+    - label: "Does the DUT-server support the MaxRFIDCodeLength attribute?"
+      id: DRLK.S.A0019
+
+    - label: "Does the DUT-server support the MinRFIDCodeLength attribute?"
+      id: DRLK.S.A001a
+
+    - label: "Does the DUT-server support the CredentialRulesSupport attribute?"
+      id: DRLK.S.A001b
+
+    - label:
+          "Does the DUT-server support the NumberOfCredentialsSupportedPerUser
+          attribute?"
+      id: DRLK.S.A001c
+
+    - label: "Does the DUT-server support the Language attribute?"
+      id: DRLK.S.A0021
+
+    - label: "Does the DUT-server support the LEDSettings attribute?"
+      id: DRLK.S.A0022
+
+    - label: "Does the DUT-server support the AutoRelockTime attribute?"
+      id: DRLK.S.A0023
+
+    - label: "Does the DUT-server support the SoundVolume attribute?"
+      id: DRLK.S.A0024
+
+    - label: "Does the DUT-server support the OperatingMode attribute?"
+      id: DRLK.S.A0025
+
+    - label:
+          "Does the DUT-server support the SupportedOperatingModes attribute?"
+      id: DRLK.S.A0026
+
+    - label:
+          "Does the DUT-server support the DefaultConfigurationRegister
+          attribute?"
+      id: DRLK.S.A0027
+
+    - label: "Does the DUT-server support the EnableLocalProgramming attribute?"
+      id: DRLK.S.A0028
+
+    - label: "Does the DUT-server support the EnableOneTouchLocking attribute?"
+      id: DRLK.S.A0029
+
+    - label: "Does the DUT-server support the EnableInsideStatusLED attribute?"
+      id: DRLK.S.A002a
+
+    - label:
+          "Does the DUT-server support the EnablePrivacyModeButton attribute?"
+      id: DRLK.S.A002b
+
+    - label:
+          "Does the DUT-server support the LocalProgrammingFeatures attribute?"
+      id: DRLK.S.A002c
+
+    - label: "Does the DUT-server support the WrongCodeEntryLimit attribute?"
+      id: DRLK.S.A0030
+
+    - label:
+          "Does the DUT-server support the UserCodedTemporaryDisableTime
+          attribute?"
+      id: DRLK.S.A0031
+
+    - label: "Does the DUT-server support the SendPINOverTheAir attribute?"
+      id: DRLK.S.A0032
+
+    - label:
+          "Does the DUT-server support the RequirePINForRemoteOperation
+          attribute?"
+      id: DRLK.S.A0033
+
+    - label: "Does the DUT-server support the ExpiringUserTimeOut attribute?"
+      id: DRLK.S.A0035
+
+    #Server Event
+    - label: "Does the DUT-server support the DoorLockAlarm event?"
+      id: DRLK.S.E00
+
+    - label: "Does the DUT-server support the DoorStateChange event?"
+      id: DRLK.S.E01
+
+    - label: "Does the DUT-server support the LockOperation event?"
+      id: DRLK.S.E02
+
+    - label: "Does the DUT-server support the LockOperationError event?"
+      id: DRLK.S.E03
+
+    - label: "Does the DUT-server support the LockUserChange event?"
+      id: DRLK.S.E04
+
+    #Server Features
+    - label:
+          "Does the DUT(server) support the 'Lock supports PIN credentials (via
+          keypad, or over the-air)' feature?"
+      id: DRLK.S.F00
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports RFID credentials'
+          feature?"
+      id: DRLK.S.F01
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports finger related
+          credentials(fingerprint, fingervein)' feature?"
+      id: DRLK.S.F02
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports user access
+          schedules' feature?"
+      id: DRLK.S.F04
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports a door position
+          sensor that indicates door’s state' feature?"
+      id: DRLK.S.F05
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports face related
+          credentials (face, iris, retina)' feature?"
+      id: DRLK.S.F06
+
+    - label:
+          "Does the DUT(server) support the 'Lock supports the user commands and
+          database' feature?"
+      id: DRLK.S.F08
+
+    - label:
+          "Does the DUT(server) support the 'PIN codes over the-air supported
+          for lock/unlock operations' feature?"
+      id: DRLK.S.F07
+
+    #Server Commands
+    - label: "Does the DUT-server support the Lock Door command?"
+      id: DRLK.S.C00.Rsp
+
+    - label: "Does the DUT-server support the Unlock Door command?"
+      id: DRLK.S.C01.Rsp
+
+    - label: "Does the DUT-server support the UnlockwithTimeout command?"
+      id: DRLK.S.C03.Rsp
+
+    - label: "Does the DUT-server support the SetWeekDaySchedule command?"
+      id: DRLK.S.C0B.Rsp
+
+    - label: "Does the DUT-server support the GetWeekDaySchedule command?"
+      id: DRLK.S.C0C.Rsp
+
+    - label: "Does the DUT-server support the ClearWeekDaySchedule command?"
+      id: DRLK.S.C0D.Rsp
+
+    - label: "Does the DUT-server support the SetYearDaySchedule command?"
+      id: DRLK.S.C0E.Rsp
+
+    - label: "Does the DUT-server support the GetYearDaySchedule command?"
+      id: DRLK.S.C0F.Rsp
+
+    - label: "Does the DUT-server support the ClearYearDaySchedule command?"
+      id: DRLK.S.C10.Rsp
+
+    - label: "Does the DUT-server support the SetHolidaySchedule command?"
+      id: DRLK.S.C11.Rsp
+
+    - label: "Does the DUT-server support the GetHolidaySchedule command?"
+      id: DRLK.S.C12.Rsp
+
+    - label: "Does the DUT-server support the ClearHolidaySchedule command?"
+      id: DRLK.S.C13.Rsp
+
+    - label: "Does the DUT-server support the SetUser command?"
+      id: DRLK.S.C1A.Rsp
+
+    - label: "Does the DUT-server support the GetUser command?"
+      id: DRLK.S.C1B.Rsp
+
+    - label: "Does the DUT-server support the Clear User command?"
+      id: DRLK.S.C1D.Rsp
+
+    - label: "Does the DUT-server support the SetCredential command?"
+      id: DRLK.S.C22.Rsp
+
+    - label: "Does the DUT-server support the GetCredential command?"
+      id: DRLK.S.C24.Rsp
+
+    - label: "Does the DUT-server support the ClearCredential command?"
+      id: DRLK.S.C26.Rsp
+
+    - label:
+          "Does the DUT-server support the GetWeekDayScheduleResponse command?"
+      id: DRLK.S.C0C.Tx
+
+    - label:
+          "Does the DUT-server support the GetYearDayResponseSchedule command?"
+      id: DRLK.S.C0F.Tx
+
+    - label:
+          "Does the DUT-server support the GetHolidayScheduleResponse command?"
+      id: DRLK.S.C12.Tx
+
+    - label: "Does the DUT-server support the GetUserResponse command?"
+      id: DRLK.S.C1C.Tx
+
+    - label: "Does the DUT-server support the SetCredentialResponse command?"
+      id: DRLK.S.C23.Tx
+
+    - label: "Does the DUT-server support the GetCredentialResponse command?"
+      id: DRLK.S.C25.Tx
+
+    #client attributes
+    - label: "Does the DUT-client support the LockState attribute?"
+      id: DRLK.C.A0000
+
+    - label: "Does the DUT-client support the LockType attribute?"
+      id: DRLK.C.A0001
+
+    - label: "Does the DUT-client support the ActuatorEnabled attribute?"
+      id: DRLK.C.A0002
+
+    - label: "Does the DUT-client support the DoorState attribute?"
+      id: DRLK.C.A0003
+
+    - label: "Does the DUT-client support the DoorOpenEvents attribute?"
+      id: DRLK.C.A0004
+
+    - label: "Does the DUT-client support the DoorClosedEvents attribute?"
+      id: DRLK.C.A0005
+
+    - label: "Does the DUT-client support the OpenPeriod attribute?"
+      id: DRLK.C.A0006
+
+    - label:
+          "Does the DUT-client support the NumberOfTotalUsersSupported
+          attribute?"
+      id: DRLK.C.A0011
+
+    - label:
+          "Does the DUT-client support the NumberofPINUsersSupported attribute?"
+      id: DRLK.C.A0012
+
+    - label:
+          "Does the DUT-client support the NumberofRFIDUsersSupported attribute?"
+      id: DRLK.C.A0013
+
+    - label:
+          "Does the DUT-client support the NumberofWeekDaysSchedulesSupported
+          attribute?"
+      id: DRLK.C.A0014
+
+    - label:
+          "Does the DUT-client support the NumberofYearDaysSchedulesSupported
+          attribute?"
+      id: DRLK.C.A0015
+
+    - label:
+          "Does the DUT-client support the NumberofHolidaySchedulesSupported
+          attribute?"
+      id: DRLK.C.A0016
+
+    - label: "Does the DUT-client support the MaxPINCodeLength attribute?"
+      id: DRLK.C.A0017
+
+    - label: "Does the DUT-client support the MinPINCodeLength attribute?"
+      id: DRLK.C.A0018
+
+    - label: "Does the DUT-client support the MaxRFIDCodeLength attribute?"
+      id: DRLK.C.A0019
+
+    - label: "Does the DUT-client support the MinRFIDCodeLength attribute?"
+      id: DRLK.C.A001a
+
+    - label: "Does the DUT-client support the CredentialRulesSupport attribute?"
+      id: DRLK.C.A001b
+
+    - label:
+          "Does the DUT-client support the NumberOfCredentialsSupportedPerUser
+          attribute?"
+      id: DRLK.C.A001c
+
+    - label: "Does the DUT-client support the Language attribute?"
+      id: DRLK.C.A0021
+
+    - label: "Does the DUT-client support the LEDSettings attribute?"
+      id: DRLK.C.A0022
+
+    - label: "Does the DUT-client support the AutoRelockTime attribute?"
+      id: DRLK.C.A0023
+
+    - label: "Does the DUT-client support the SoundVolume attribute?"
+      id: DRLK.C.A0024
+
+    - label: "Does the DUT-client support the OperatingMode attribute?"
+      id: DRLK.C.A0025
+
+    - label:
+          "Does the DUT-client support the SupportedOperatingModes attribute?"
+      id: DRLK.C.A0026
+
+    - label:
+          "Does the DUT-client support the DefaultConfigurationRegister
+          attribute?"
+      id: DRLK.C.A0027
+
+    - label: "Does the DUT-client support the EnableLocalProgramming attribute?"
+      id: DRLK.C.A0028
+
+    - label: "Does the DUT-client support the EnableOneTouchLocking attribute?"
+      id: DRLK.C.A0029
+
+    - label: "Does the DUT-client support the EnableInsideStatusLED attribute?"
+      id: DRLK.C.A002a
+
+    - label:
+          "Does the DUT-client support the EnablePrivacyModeButton attribute?"
+      id: DRLK.C.A002b
+
+    - label:
+          "Does the DUT-client support the LocalProgrammingFeatures attribute?"
+      id: DRLK.C.A002c
+
+    - label: "Does the DUT-client support the WrongCodeEntryLimit attribute?"
+      id: DRLK.C.A0030
+
+    - label:
+          "Does the DUT-client support the UserCodedTemporaryDisableTime
+          attribute?"
+      id: DRLK.C.A0031
+
+    - label: "Does the DUT-client support the SendPINOverTheAir attribute?"
+      id: DRLK.C.A0032
+
+    - label:
+          "Does the DUT-client support the RequirePINForRemoteOperation
+          attribute?"
+      id: DRLK.C.A0033
+
+    - label: "Does the DUT-client support the ExpiringUserTimeOut attribute?"
+      id: DRLK.C.A0035
+
+    #Client event
+    - label: "Does the DUT-client support the DoorLockAlarm event?"
+      id: DRLK.C.E00
+
+    - label: "Does the DUT-client support the DoorStateChange event?"
+      id: DRLK.C.E01
+
+    - label: "Does the DUT-client support the LockOperation event?"
+      id: DRLK.C.E02
+
+    - label: "Does the DUT-client support the LockOperationError event?"
+      id: DRLK.C.E03
+
+    - label: "Does the DUT-client support the LockUserChange event?"
+      id: DRLK.C.E04
+
+    #Client Features
+    - label:
+          "Does the DUT(client) support the 'Lock supports PIN credentials (via
+          keypad, or over the-air)' feature?"
+      id: DRLK.C.F00
+
+    - label:
+          "Does the DUT(client) support the 'Lock supports RFID credentials'
+          feature?"
+      id: DRLK.C.F01
+
+    - label:
+          "Does the DUT(client) support the 'Lock supports finger related
+          credentials(fingerprint, fingervein)' feature?"
+      id: DRLK.C.F02
+
+    - label:
+          "Does the DUT(client) support the 'Lock supports user access
+          schedules' feature?"
+      id: DRLK.C.F04
+
+    - label:
+          "Does the DUT(client) support the 'Lock supports a door position
+          sensor that indicates door’s state' feature?"
+      id: DRLK.C.F05
+
+    - label:
+          "Does the DUT(client) support the 'Lock supports face related
+          credentials (face, iris, retina)' feature?"
+      id: DRLK.C.F06
+
+    - label:
+          "Does the DUT(client) support the 'Lock supports the user commands and
+          database' feature?"
+      id: DRLK.C.F08
+
+    - label:
+          "Does the DUT(client) support the 'PIN codes over the-air supported
+          for lock/unlock operations' feature?"
+      id: DRLK.C.F07
+
+    #Client Commands
+    - label: "Does the DUT(Client) support the Lock Door command?"
+      id: DRLK.C.C00.Tx
+
+    - label: "Does the DUT(Client) support the Unlock Door command?"
+      id: DRLK.C.C1.Tx
+
+    - label: "Does the DUT(Client) support the Unlock with Timeout command?"
+      id: DRLK.C.C3.Tx
+
+    - label: "Does the DUT(Client) support the Set Week Day Schedule command?"
+      id: DRLK.C.C0B.Tx
+
+    - label: "Does the DUT(Client) support the Get Week Day Schedule command?"
+      id: DRLK.C.C0C.Tx
+
+    - label: "Does the DUT(Client) support the Clear Week Day Schedule command?"
+      id: DRLK.C.C0D.Tx
+
+    - label: "Does the DUT(Client) support the Set Year Day Schedule command?"
+      id: DRLK.C.C0e.Tx
+
+    - label: "Does the DUT(Client) support the Get Year Day Schedule command?"
+      id: DRLK.C.C0f.Tx
+
+    - label: "Does the DUT(Client) support the Clear Year Day Schedule command?"
+      id: DRLK.C.C10.Tx
+
+    - label: "Does the DUT(Client) support the Set Holiday Schedule command?"
+      id: DRLK.C.C11.Tx
+
+    - label: "Does the DUT(Client) support the Get Holiday Schedule command?"
+      id: DRLK.C.C12.Tx
+
+    - label: "Does the DUT(Client) support the Clear Holiday Schedule command?"
+      id: DRLK.C.C13.Tx
+
+    - label: "Does the DUT(Client) support the Set User command?"
+      id: DRLK.C.C1a.Tx
+
+    - label: "Does the DUT-client support the GetUser command?"
+      id: DRLK.C.C1b.Tx
+
+    - label: "Does the DUT-client support the Clear User command?"
+      id: DRLK.C.C1d.Tx
+
+    - label: "Does the DUT-client support the SetCredential command?"
+      id: DRLK.C.C22.Tx
+
+    - label: "Does the DUT-client support the GetCredential command?"
+      id: DRLK.C.C24.Tx
+
+    - label: "Does the DUT-client support the ClearCredential command?"
+      id: DRLK.C.C26.Tx
+
+    - label:
+          "Does the DUT-client support the GetWeekDayScheduleResponse command?"
+      id: DRLK.C.C0c.Rsp
+
+    - label:
+          "Does the DUT-client support the GetYearDayResponseSchedule command?"
+      id: DRLK.C.C0f.Rsp
+
+    - label:
+          "Does the DUT-client support the GetHolidayScheduleResponse command?"
+      id: DRLK.C.C12.Rsp
+
+    - label: "Does the DUT-client support the GetUserResponse command?"
+      id: DRLK.C.C1c.Rsp
+
+    - label: "Does the DUT-client support the SetCredentialResponse command?"
+      id: DRLK.C.C23.Rsp
+
+    - label: "Does the DUT-client support the GetCredentialResponse command?"
+      id: DRLK.C.C25.Rsp
+
+    #Device Management
+    #Server Attributes
+    - label: "Does the DUT(server) support the DataModelRevision attribute?"
+      id: BINFO.S.A0000
+
+    - label: "Does the DUT(server) support the VendorName attribute?"
+      id: BINFO.S.A0001
+
+    - label: "Does the DUT(server) support the VendorID attribute?"
+      id: BINFO.S.A0002
+
+    - label: "Does the DUT(server) support the ProductName attribute?"
+      id: BINFO.S.A0003
+
+    - label: "Does the DUT(server) support the ProductID attribute?"
+      id: BINFO.S.A0004
+
+    - label: "Does the DUT(server) support the NodeLabel attribute?"
+      id: BINFO.S.A0005
+
+    - label: "Does the DUT(server) support the Location attribute?"
+      id: BINFO.S.A0006
+
+    - label: "Does the DUT(server) support the HardwareVersion attribute?"
+      id: BINFO.S.A0007
+
+    - label: "Does the DUT(server) support the HardwareVersionString attribute?"
+      id: BINFO.S.A0008
+
+    - label: "Does the DUT(server) support the SoftwareVersion attribute?"
+      id: BINFO.S.A0009
+
+    - label: "Does the DUT(server) support the SoftwareVersionString attribute?"
+      id: BINFO.S.A000a
+
+    - label: "Does the DUT(server) support the ManufacturingDate attribute?"
+      id: BINFO.S.A000b
+
+    - label: "Does the DUT(server) support the PartNumber attribute?"
+      id: BINFO.S.A000c
+
+    - label: "Does the DUT(server) support the ProductURL attribute?"
+      id: BINFO.S.A000d
+
+    - label: "Does the DUT(server) support the ProductLabel attribute?"
+      id: BINFO.S.A000e
+
+    - label: "Does the DUT(server) support the SerialNumber attribute?"
+      id: BINFO.S.A000f
+
+    - label: "Does the DUT(server) support the LocalConfigDisabled attribute?"
+      id: BINFO.S.A0010
+
+    - label: "Does the DUT(server) support the Reachable attribute?"
+      id: BINFO.S.A0011
+
+    - label: "Does the DUT(server) support the UniqueID attribute?"
+      id: BINFO.S.A0012
+
+    - label: "Does the DUT(server) support the CapabilityMinima attribute?"
+      id: BINFO.S.A0013
+
+    #Events
+    - label: "Does the DUT(server) support the StartUp event?"
+      id: BINFO.S.E00
+
+    - label: "Does the DUT(server) support the ShutDown event?"
+      id: BINFO.S.E01
+
+    - label: "Does the DUT(server) support the Leave event?"
+      id: BINFO.S.E02
+
+    - label: "Does the DUT(server) support the ReachableChanged event?"
+      id: BINFO.S.E03
+
+    #Client Attributes
+    - label: "Does the DUT(Client) support the DataModelRevision attribute?"
+      id: BINFO.C.A0000
+
+    - label: "Does the DUT(Client) support the VendorName attribute?"
+      id: BINFO.C.A0001
+
+    - label: "Does the DUT(Client) support the VendorID attribute?"
+      id: BINFO.C.A0002
+
+    - label: "Does the DUT(Client) support the ProductName attribute?"
+      id: BINFO.C.A0003
+
+    - label: "Does the DUT(Client) support the ProductID attribute?"
+      id: BINFO.C.A0004
+
+    - label: "Does the DUT(Client) support the NodeLabel attribute?"
+      id: BINFO.C.A0005
+
+    - label: "Does the DUT(Client) support the Location attribute?"
+      id: BINFO.C.A0006
+
+    - label: "Does the DUT(Client) support the HardwareVersion attribute?"
+      id: BINFO.C.A0007
+
+    - label: "Does the DUT(Client) support the HardwareVersionString attribute?"
+      id: BINFO.C.A0008
+
+    - label: "Does the DUT(Client) support the SoftwareVersion attribute?"
+      id: BINFO.C.A0009
+
+    - label: "Does the DUT(Client) support the SoftwareVersionString attribute?"
+      id: BINFO.C.A000a
+
+    - label: "Does the DUT(Client) support the ManufacturingDate attribute?"
+      id: BINFO.C.A000b
+
+    - label: "Does the DUT(Client) support the PartNumber attribute?"
+      id: BINFO.C.A000c
+
+    - label: "Does the DUT(Client) support the ProductURL attribute?"
+      id: BINFO.C.A000d
+
+    - label: "Does the DUT(Client) support the ProductLabel attribute?"
+      id: BINFO.C.A000e
+
+    - label: "Does the DUT(Client) support the SerialNumber attribute?"
+      id: BINFO.C.A000f
+
+    - label: "Does the DUT(Client) support the LocalConfigDisabled attribute?"
+      id: BINFO.C.A0010
+
+    - label: "Does the DUT(Client) support the Reachable attribute?"
+      id: BINFO.C.A0011
+
+    - label: "Does the DUT(Client) support the UniqueID attribute?"
+      id: BINFO.C.A0012
+
+    - label: "Does the DUT(Client) support the CapabilityMinima attribute?"
+      id: BINFO.C.A0013
+
+    #Events
+    - label: "Does the DUT(Client) support the StartUp event?"
+      id: BINFO.C.E00
+
+    - label: "Does the DUT(Client) support the ShutDown event?"
+      id: BINFO.C.E01
+
+    - label: "Does the DUT(Client) support the Leave event?"
+      id: BINFO.C.E02
+
+    - label: "Does the DUT(Client)) support the ReachableChanged event?"
+      id: BINFO.C.E03
+
+    #NetworkCommissioning Cluster
+    #Server Attributes
+    - label: "Does the DUT(Server) support MaxNetworks attribute?"
+      id: CNET.S.A0000
+
+    - label: "Does the DUT(Server) support Networks attribute?"
+      id: CNET.S.A0001
+
+    - label: "Does the DUT(Server) support ScanMaxTimeSeconds attribute?"
+      id: CNET.S.A0002
+
+    - label: "Does the DUT(Server) support ConnectMaxTimeSeconds attribute?"
+      id: CNET.S.A0003
+
+    - label: "Does the DUT(Server) support InterfaceEnabled attribute?"
+      id: CNET.S.A0004
+
+    - label: "Does the DUT(Server) support LastNetworkingStatus attribute?"
+      id: CNET.S.A0005
+
+    - label: "Does the DUT(Server) support LastNetworkID attribute?"
+      id: CNET.S.A0006
+
+    - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
+      id: CNET.S.A0007
+
+    #Server Commands
+    - label:
+          "Does the Device(Server) implement receiving the ScanNetworks command?"
+      id: CNET.S.C00.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the ScanNetworksResponse
+          command?"
+      id: CNET.S.C01.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the
+          AddOrUpdateWiFiNetwork command?"
+      id: CNET.S.C02.Rsp
+
+    - label:
+          "Does the Device(Server) implement receiving the
+          AddOrUpdateThreadNetwork command?"
+      id: CNET.S.C03.Rsp
+
+    - label:
+          "Does the Device(Server) implement receiving the RemoveNetwork
+          command?"
+      id: CNET.S.C04.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the NetworkConfigResponse
+          command?"
+      id: CNET.S.C05.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the ConnectNetwork
+          command?"
+      id: CNET.S.C06.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          ConnectNetworkResponse command?"
+      id: CNET.S.C07.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the ReorderNetwork
+          command?"
+      id: CNET.S.C08.Rsp
+
+    #Client Attributes
+    - label: "Does the DUT(Client) support MaxNetworks attribute?"
+      id: CNET.C.A0000
+
+    - label: "Does the DUT(Client) support Networks attribute?"
+      id: CNET.C.A0001
+
+    - label: "Does the DUT(Client) support ScanMaxTimeSeconds attribute?"
+      id: CNET.C.A0002
+
+    - label: "Does the DUT(Client) support ConnectMaxTimeSeconds attribute?"
+      id: CNET.C.A0003
+
+    - label: "Does the DUT(Client) support InterfaceEnabled attribute?"
+      id: CNET.C.A0004
+
+    - label: "Does the DUT(Client) support LastNetworkingStatus attribute?"
+      id: CNET.C.A0005
+
+    - label: "Does the DUT(Client) support LastNetworkID attribute?"
+      id: CNET.C.A0006
+
+    - label: "Does the DUT(Client) support LastConnectErrorValue attribute?"
+      id: CNET.C.A0007
+
+    #Client Commands
+    - label:
+          "Does the Device(Client) invoking/generating the ScanNetworks command?"
+      id: CNET.C.C00.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the
+          AddOrUpdateWiFiNetwork command?"
+      id: CNET.C.C02.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the
+          AddOrUpdateThreadNetwork command?"
+      id: CNET.C.C03.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the RemoveNetwork
+          command?"
+      id: CNET.C.C04.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the ConnectNetwork
+          command?"
+      id: CNET.C.C06.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the ReorderNetwork
+          command?"
+      id: CNET.C.C08.Tx
+
+    #Node Operational Credential
+    #Server Attributes
+    - label: "Does the DUT(server) support the NOC list attribute?"
+      id: OPCREDS.S.A0000
+
+    - label: "Does the DUT(server) support the Fabrics list attribute?"
+      id: OPCREDS.S.A0001
+
+    - label: "Does the DUT(server) support the SupportedFabrics attribute?"
+      id: OPCREDS.S.A0002
+
+    - label: "Does the DUT(server) support the CommissionedFabrics attribute?"
+      id: OPCREDS.S.A0003
+
+    - label:
+          "Does the DUT(server) support the TrustedRootCertificates attribute?"
+      id: OPCREDS.S.A0004
+
+    - label: "Does the DUT(server) support the CurrentFabricIndex attribute?"
+      id: OPCREDS.S.A0005
+
+    - label: "Does the DUT(server) support the NOC Certificate attribute?"
+      id: OPCREDS.S.A0006
+
+    - label: "Does the DUT(server) support the ICAC Certificate attribute?"
+      id: OPCREDS.S.A0007
+
+    #Server Commands
+    - label:
+          "Does the Device(Server) implement receiving the AttestationRequest
+          command?"
+      id: OPCREDS.S.C00.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the AttestationResponse
+          command?"
+      id: OPCREDS.S.C01.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the
+          CertificateChainRequest command?"
+      id: OPCREDS.S.C02.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          CertificateChainResponse command?"
+      id: OPCREDS.S.C03.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the CSRRequest command?"
+      id: OPCREDS.S.C04.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the CSRResponse command?"
+      id: OPCREDS.S.C05.Tx
+
+    - label: "Does the Device(Server) implement receiving the AddNOC command?"
+      id: OPCREDS.S.C06.Rsp
+
+    - label:
+          "Does the Device(Server) implement receiving the UpdateNOC command?"
+      id: OPCREDS.S.C07.Rsp
+
+    - label:
+          "Does the Device(Server) invoking/generating the NOCResponse command?"
+      id: OPCREDS.S.C08.Tx
+
+    - label:
+          "Does the Device(Server) implement receiving the UpdateFabricLabel
+          command?"
+      id: OPCREDS.S.C09.Rsp
+
+    - label:
+          "Does the Device(Server) implement receiving the RemoveFabric command?"
+      id: OPCREDS.S.C0a.Rsp
+
+    - label:
+          "Does the Device(Server) implement receiving the
+          AddTrustedRootCertificate command?"
+      id: OPCREDS.S.C0b.Rsp
+
+    #Client Attributes
+    - label: "Does the DUT(Client) support the NOC list attribute?"
+      id: OPCREDS.C.A0000
+
+    - label: "Does the DUT(Client) support the Fabrics list attribute?"
+      id: OPCREDS.C.A0001
+
+    - label: "Does the DUT(Client) support the SupportedFabrics attribute?"
+      id: OPCREDS.C.A0002
+
+    - label: "Does the DUT(Client) support the CommissionedFabrics attribute?"
+      id: OPCREDS.C.A0003
+
+    - label:
+          "Does the DUT(Client) support the TrustedRootCertificates attribute?"
+      id: OPCREDS.C.A0004
+
+    - label: "Does the DUT(Client) support the CurrentFabricIndex attribute?"
+      id: OPCREDS.C.A0005
+
+    - label: "Does the DUT(Client) support the NOC Certificate attribute?"
+      id: OPCREDS.C.A0006
+
+    - label: "Does the DUT(Client) support the ICAC Certificate attribute?"
+      id: OPCREDS.C.A0007
+
+    #Client Commands
+    - label:
+          "Does the Device(Client) implement receiving the AttestationRequest
+          command?"
+      id: OPCREDS.C.C00.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the AttestationResponse
+          command?"
+      id: OPCREDS.C.C01.Rsp
+
+    - label:
+          "Does the Device(Client) implement receiving the
+          CertificateChainRequest command?"
+      id: OPCREDS.C.C02.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the
+          CertificateChainResponse command?"
+      id: OPCREDS.C.C03.Rsp
+
+    - label:
+          "Does the Device(Client) implement receiving the CSRRequest command?"
+      id: OPCREDS.C.C04.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the CSRResponse command?"
+      id: OPCREDS.C.C05.Rsp
+
+    - label: "Does the Device(Client) implement receiving the AddNOC command?"
+      id: OPCREDS.C.C06.Tx
+
+    - label:
+          "Does the Device(Client) implement receiving the UpdateNOC command?"
+      id: OPCREDS.C.C07.Tx
+
+    - label:
+          "Does the Device(Client) invoking/generating the NOCResponse command?"
+      id: OPCREDS.C.C08.Rsp
+
+    - label:
+          "Does the Device(Client) implement receiving the UpdateFabricLabel
+          command?"
+      id: OPCREDS.C.C09.Tx
+
+    - label:
+          "Does the Device(Client) implement receiving the RemoveFabric command?"
+      id: OPCREDS.C.C0a.Tx
+
+    - label:
+          "Does the Device(Client) implement receiving the
+          AddTrustedRootCertificate command?"
+      id: OPCREDS.C.C0b.Tx

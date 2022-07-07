@@ -32,6 +32,7 @@ tests:
       command: "ResetCounts"
 
     - label: "Read the Overruncount attribute"
+      PICS: DGTHREAD.S.A0007
       command: "readAttribute"
       attribute: "OverrunCount"
       response:

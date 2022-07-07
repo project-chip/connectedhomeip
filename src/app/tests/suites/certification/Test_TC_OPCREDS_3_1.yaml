@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.3.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
-    validation [DUT-Server]
+    3.2.1. [TC-OPCREDS-3.1] Attribute-NOCs, TrustedRootCertificates list
+    validation [DUT-Commissionee]
 
 config:
     nodeId: 0x12344321
@@ -26,109 +26,562 @@ tests:
     - label:
           "Factory Reset DUT (to ensure NOC list is empty at the beginning of
           the following steps)"
+      PICS: OPCREDS.S.A0000
       verification: |
-          Not Verifiable
+          On both DUT and TH side
+          sudo rm -rf /tmp/chip_*
       disabled: true
 
     - label: "Start the commissioning process DUT by TH1 on a first Fabric"
       verification: |
-          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841
+          DUT side:
+          sudo ./chip-all-clusters-app --wifi
+
+          TH side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
+    - label: "TH1 sends AttestationRequest command to DUT"
+      PICS: OPCREDS.S.C00.Rsp
+      verification: |
+          Verify in TH log  during commissioning
+          [1655468538.157845][13015:13020] CHIP:CTL: Sending Attestation Request to the device.
+          [1655468538.157895][13015:13020] CHIP:CTL: Sending Attestation request to 0xffff8c000b60 device
+          [1655468538.158012][13015:13020] CHIP:DMG: ICR moving to [AddingComm]
+          [1655468538.158085][13015:13020] CHIP:DMG: ICR moving to [AddedComma]
+          [1655468538.158597][13015:13020] CHIP:IN: Prepared secure message 0xffff967cc958 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 10360i with MessageCounter:149163721.
+          [1655468538.158702][13015:13020] CHIP:IN: Sending encrypted msg 0xffff967cc958 with MessageCounter:149163721 to 0xFFFFFFFB00000000 (0) at monotonic time: 00000000017BF667 msec
+          [1655468538.159191][13015:13020] CHIP:DMG: >> to BLE | 149163721 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 60420 / Exchange = 10360]
+          [1655468538.159385][13015:13020] CHIP:DMG: Header Flags =
+          [1655468538.159446][13015:13020] CHIP:DMG: {
+          [1655468538.159533][13015:13020] CHIP:DMG:     Exchange (0x01) =
+          [1655468538.159588][13015:13020] CHIP:DMG:     {
+          [1655468538.159637][13015:13020] CHIP:DMG:         Initiator = true
+          [1655468538.159689][13015:13020] CHIP:DMG:     }
+          [1655468538.159759][13015:13020] CHIP:DMG: }
+          [1655468538.159814][13015:13020] CHIP:DMG:
+          [1655468538.159883][13015:13020] CHIP:DMG: Encrypted Payload (94 bytes) =
+          [1655468538.159937][13015:13020] CHIP:DMG: {
+          [1655468538.159990][13015:13020] CHIP:DMG:     data = 0004ec00c90ee4087fc3ac4bd5a116fd361c5e04d88e4ce91c073c8496372c14c0b23b692dd6a21874ee111e9f4a5c1ab993473d7b884f693cc74908a8068f3b6e96f060d668b364df9b7e190c271800cea785354ed9ebcfe86fd770baa8
+          [1655468538.160046][13015:13020] CHIP:DMG:     buffer_ptr = 281473030640128
+          [1655468538.160097][13015:13020] CHIP:DMG: }
+          [1655468538.160147][13015:13020] CHIP:DMG:
+          [1655468538.160306][13015:13020] CHIP:DMG: InvokeRequestMessage =
+          [1655468538.160351][13015:13020] CHIP:DMG: {
+          [1655468538.160374][13015:13020] CHIP:DMG:         suppressResponse = false,
+          [1655468538.160400][13015:13020] CHIP:DMG:         timedRequest = false,
+          [1655468538.160424][13015:13020] CHIP:DMG:         InvokeRequests =
+          [1655468538.160465][13015:13020] CHIP:DMG:         [
+          [1655468538.160491][13015:13020] CHIP:DMG:                 CommandDataIB =
+          [1655468538.160521][13015:13020] CHIP:DMG:                 {
+          [1655468538.160546][13015:13020] CHIP:DMG:                         CommandPathIB =
+          [1655468538.160578][13015:13020] CHIP:DMG:                         {
+          [1655468538.160610][13015:13020] CHIP:DMG:                                 EndpointId = 0x0,
+          [1655468538.160646][13015:13020] CHIP:DMG:                                 ClusterId = 0x3e,
+          [1655468538.160680][13015:13020] CHIP:DMG:                                 CommandId = 0x0,
+          [1655468538.160714][13015:13020] CHIP:DMG:                         },
+          [1655468538.160747][13015:13020] CHIP:DMG:
+          [1655468538.160774][13015:13020] CHIP:DMG:                         CommandFields =
+          [1655468538.160803][13015:13020] CHIP:DMG:                         {
+          [1655468538.160836][13015:13020] CHIP:DMG:                                 0x0 = [
+          [1655468538.160880][13015:13020] CHIP:DMG:                                         0x2d, 0x5c, 0x2e, 0x70, 0x51, 0x5a, 0x8d, 0x82, 0x61, 0x5, 0xca, 0xec, 0xd1, 0x2a, 0xec, 0x32, 0xa8, 0xdc, 0xc9, 0x4, 0x44, 0x4c, 0x87, 0x55, 0xf, 0x86, 0xd6, 0xaa, 0x41, 0x70, 0xa1, 0x4a,
+          [1655468538.160916][13015:13020] CHIP:DMG:                         ]
+          [1655468538.160946][13015:13020] CHIP:DMG:                         },
+          [1655468538.160976][13015:13020] CHIP:DMG:                 },
+          [1655468538.161005][13015:13020] CHIP:DMG:
+          [1655468538.161029][13015:13020] CHIP:DMG:         ],
+          [1655468538.161058][13015:13020] CHIP:DMG:
+          [1655468538.161082][13015:13020] CHIP:DMG:         InteractionModelRevision = 1
+          [1655468538.161105][13015:13020] CHIP:DMG: },
+          [1655468538.161128][13015:13020] CHIP:DMG:
+          [1655468538.161273][13015:13020] CHIP:DMG: ICR moving to [CommandSen]
+          [1655468538.161310][13015:13020] CHIP:CTL: Sent Attestation request, waiting for the Attestation Information
+      disabled: true
+
+    - label: "TH1 sends ArmFailSafe command to the DUT"
+      PICS: CGEN.S.C00.Rsp
+      verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 500 600 1 0
+
+          [1655469679.636495][13173:13178] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1655469679.636600][13173:13178] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1655469679.636738][13173:13178] CHIP:TOO:   ArmFailSafeResponse: {
+          [1655469679.636817][13173:13178] CHIP:TOO:     errorCode: 0
+          [1655469679.636876][13173:13178] CHIP:TOO:     debugText:
+          [1655469679.636930][13173:13178] CHIP:TOO:    }
+      disabled: true
+
     - label:
-          "TH sends CertificateChainRequest Command to DUT for both PAI and DAC"
+          "TH1 sends CertificateChainRequest Command to DUT for both PAI and DAC"
+      PICS: OPCREDS.S.C02.Rsp
       verification: |
-          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
+          Verify TH log during commissioning
 
-          [1651570197.289787][3689:3694] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
-          [1651570197.289857][3689:3694] CHIP:TOO:   CertificateChainResponse: {
-          [1651570197.289898][3689:3694] CHIP:TOO:     certificate: Elided value too large of size 491
-          [1651570197.289954][3689:3694] CHIP:TOO:    }
+          [1655468537.763350][13015:13020] CHIP:DMG: DAC/PAI (463) =
+          [1655468537.763466][13015:13020] CHIP:DMG: {
+          -----BEGIN CERTIFICATE-----
+          MIIByzCCAXGgAwIBAgIIVq2CIq2UW2QwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP
+          TWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMjAyMDUw
+          MDAwMDBaGA85OTk5MTIzMTIzNTk1OVowPTElMCMGA1UEAwwcTWF0dGVyIERldiBQ
+          QUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZGRjEwWTATBgcqhkjO
+          PQIBBggqhkjOPQMBBwNCAARBmpMVwhc+DIyHbQPM/JRIUmR/f+xeUIL0BZko7KiU
+          xZQVEwmsYx5MsDOSr2hLC6+35ls7gWLC9Sv5MbjneqqCo2YwZDASBgNVHRMBAf8E
+          CDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUY1QOR/ZLHDjROISk
+          YtFsGV2P+zwwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZI
+          zj0EAwIDSAAwRQIhALLvJ/Sa6bUPuR7qyUxNC9u415KcbLiPrOUpNo0SBUwMAiBl
+          Xckrhr2QmIKmxiF3uCXX0F7b58Ivn+pxIg5+pwP4kQ==
+          -----END CERTIFICATE-----
       disabled: true
 
-    - label: "TH saves DAC and the PAI certificates."
+    - label: "TH1 saves DAC and the PAI certificates."
       verification: |
-          Not Verifiable
+          Verify below data is less or equal to 600 bytes
+
+          MIIByzCCAXGgAwIBAgIIVq2CIq2UW2QwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP
+          TWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMjAyMDUw
+          MDAwMDBaGA85OTk5MTIzMTIzNTk1OVowPTElMCMGA1UEAwwcTWF0dGVyIERldiBQ
+          QUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZGRjEwWTATBgcqhkjO
+          PQIBBggqhkjOPQMBBwNCAARBmpMVwhc+DIyHbQPM/JRIUmR/f+xeUIL0BZko7KiU
+          xZQVEwmsYx5MsDOSr2hLC6+35ls7gWLC9Sv5MbjneqqCo2YwZDASBgNVHRMBAf8E
+          CDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUY1QOR/ZLHDjROISk
+          YtFsGV2P+zwwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZI
+          zj0EAwIDSAAwRQIhALLvJ/Sa6bUPuR7qyUxNC9u415KcbLiPrOUpNo0SBUwMAiBl
+          Xckrhr2QmIKmxiF3uCXX0F7b58Ivn+pxIg5+pwP4kQ==
+      disabled: true
+
+    - label: "TH1 Sends CSRRequest command with a random 32-byte nonce"
+      PICS: OPCREDS.S.C04.Rsp
+      verification: |
+          Verify in TH log during commissioning
+
+          [1656307574.648253][15168:15173] CHIP:CTL: Sending CSR request to 0xffff74000b60 device
+          [1656307574.648387][15168:15173] CHIP:DMG: ICR moving to [AddingComm]
+          [1656307574.648463][15168:15173] CHIP:DMG: ICR moving to [AddedComma]
+          [1656307574.649023][15168:15173] CHIP:IN: Prepared secure message 0xffff877ec028 to 0xFFFFFFFB00000000 (0)  of type 0x8 and protocolId (0, 1) on exchange 3350i with MessageCounter:222219370.
+          [1656307574.649128][15168:15173] CHIP:IN: Sending encrypted msg 0xffff877ec028 with MessageCounter:222219370 to 0xFFFFFFFB00000000 (0) at monotonic time: 00000000008AAFA1 msec
+          [1656307574.649613][15168:15173] CHIP:DMG: >> to BLE | 222219370 | [Interaction Model  (1) / InvokeCommandRequest (0x08) / Session = 48092 / Exchange = 3350]
+          [1656307574.649833][15168:15173] CHIP:DMG: Header Flags =
+          [1656307574.649897][15168:15173] CHIP:DMG: {
+          [1656307574.649985][15168:15173] CHIP:DMG:     Exchange (0x01) =
+          [1656307574.650041][15168:15173] CHIP:DMG:     {
+          [1656307574.650090][15168:15173] CHIP:DMG:         Initiator = true
+          [1656307574.650142][15168:15173] CHIP:DMG:     }
+          [1656307574.650209][15168:15173] CHIP:DMG: }
+          [1656307574.650263][15168:15173] CHIP:DMG:
+          [1656307574.650330][15168:15173] CHIP:DMG: Encrypted Payload (94 bytes) =
+          [1656307574.650384][15168:15173] CHIP:DMG: {
+          [1656307574.650437][15168:15173] CHIP:DMG:     data = 00dcbb006acc3e0d04a94ba12213788e9f5d817fafabfb592848b041cde4cb2e4b986deab9caf6b111742c30e541068d3e9f1ae8f755ee80543b71c27d4cc80e8ea3b856d4cd27f88a3603ace3ec58852f3d64b46ff2877cc7717338beb3
+          [1656307574.650494][15168:15173] CHIP:DMG:     buffer_ptr = 281472627992672
+          [1656307574.650544][15168:15173] CHIP:DMG: }
+          [1656307574.650594][15168:15173] CHIP:DMG:
+          [1656307574.650754][15168:15173] CHIP:DMG: InvokeRequestMessage =
+          [1656307574.650818][15168:15173] CHIP:DMG: {
+          [1656307574.650874][15168:15173] CHIP:DMG: 	suppressResponse = false,
+          [1656307574.650938][15168:15173] CHIP:DMG: 	timedRequest = false,
+          [1656307574.650998][15168:15173] CHIP:DMG: 	InvokeRequests =
+          [1656307574.651073][15168:15173] CHIP:DMG: 	[
+          [1656307574.651133][15168:15173] CHIP:DMG: 		CommandDataIB =
+          [1656307574.651198][15168:15173] CHIP:DMG: 		{
+          [1656307574.651262][15168:15173] CHIP:DMG: 			CommandPathIB =
+          [1656307574.651339][15168:15173] CHIP:DMG: 			{
+          [1656307574.651416][15168:15173] CHIP:DMG: 				EndpointId = 0x0,
+          [1656307574.651499][15168:15173] CHIP:DMG: 				ClusterId = 0x3e,
+          [1656307574.651571][15168:15173] CHIP:DMG: 				CommandId = 0x4,
+          [1656307574.651646][15168:15173] CHIP:DMG: 			},
+          [1656307574.651723][15168:15173] CHIP:DMG:
+          [1656307574.651787][15168:15173] CHIP:DMG: 			CommandFields =
+          [1656307574.651908][15168:15173] CHIP:DMG: 			{
+          [1656307574.652026][15168:15173] CHIP:DMG: 				0x0 = [
+          [1656307574.652135][15168:15173] CHIP:DMG: 						0xcd, 0x5d, 0x72, 0xba, 0x11, 0x46, 0xf2, 0x35, 0x4, 0x3e, 0x64, 0x5c, 0xc3, 0x76, 0x7e, 0xfd, 0x7, 0x91, 0x37, 0xf8, 0x70, 0xe6, 0x62, 0x54, 0xb4, 0x97, 0xa8, 0x10, 0xe1, 0xa, 0x7c, 0x35,
+          [1656307574.652372][15168:15173] CHIP:DMG: 				]
+          [1656307574.652457][15168:15173] CHIP:DMG: 			},
+          [1656307574.652529][15168:15173] CHIP:DMG: 		},
+          [1656307574.652603][15168:15173] CHIP:DMG:
+          [1656307574.652662][15168:15173] CHIP:DMG: 	],
+          [1656307574.652734][15168:15173] CHIP:DMG:
+          [1656307574.652794][15168:15173] CHIP:DMG: 	InteractionModelRevision = 1
+          [1656307574.652852][15168:15173] CHIP:DMG: },
+          [1656307574.652906][15168:15173] CHIP:DMG:
+          [1656307574.653159][15168:15173] CHIP:DMG: ICR moving to [CommandSen]
+          [1656307574.653233][15168:15173] CHIP:CTL: Sent CSR request, waiting for the CSR
+          [1656307574.653345][15168:15173] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1656307574.712918][15168:15173] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
+          [1656307574.761126][15168:15171] CHIP:DL: Indication received, conn = 0xffff7c03d9f0
+          [1656307574.761389][15168:15173] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1656307574.861665][15168:15171] CHIP:DL: Indication received, conn = 0xffff7c03d9f0
+          [1656307574.861959][15168:15173] CHIP:DL: HandlePlatformSpecificBLEEvent 16389
+          [1656307574.863170][15168:15173] CHIP:DMG: << from BLE | 75871068 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 34848 / Exchange = 3350]
+          [1656307574.863294][15168:15173] CHIP:DMG: Header Flags =
+          [1656307574.863356][15168:15173] CHIP:DMG: {
+          [1656307574.863457][15168:15173] CHIP:DMG: }
+          [1656307574.863514][15168:15173] CHIP:DMG:
+          [1656307574.863584][15168:15173] CHIP:DMG: Encrypted Payload (372 bytes) =
+          [1656307574.863639][15168:15173] CHIP:DMG: {
+          [1656307574.863693][15168:15173] CHIP:DMG:     data = 002088005cb3850449e4f72f19ee28896f2f11cbc43d6a3862e61d08d566d51901aeecfa75d2cde55b19812314df78cb4be7622a35c9a848bb818c0dd567d3212dda9640ddddb88c254a48f88eb35b79409d1d12badacca0260c3c463e995ced399bb9a84ffd6679546cc68520243550bfb498a334c609f8e4cc9a246b1c645cd4617b1fe60ac27285d6adbdfc38677fe01d5cfb33b9669a596af831b90afb5577c61a063ddc447da8961e140ddfe96bc65b41f1e3f3b64309474ef09a59c09ae650d3e46f859f0ec28bc660f7b46d0880250f929a44fed46c832ea45fd1dae20b06a12446bab5b4bfd3aaafe3f835488db918fa5f7ec3eb110deaa3f7c0b3da8e202116691144e137b5cf8741a876f5798a3605d531b7c85c4956a21085bbf218424db56c19eff224e2e82b3e343448018f62528873464bcec0dd817cc94b3d6617ffefd38505e10cd4bf993d68b2df8084b2f080327728ddd2c776ee53cd46bc2ee96fb5cb7ee56fb5e1d9306925cf73cfa197
+          [1656307574.863767][15168:15173] CHIP:DMG:     buffer_ptr = 281472627974512
+          [1656307574.863820][15168:15173] CHIP:DMG: }
+          [1656307574.863929][15168:15173] CHIP:DMG:
+          [1656307574.864162][15168:15173] CHIP:DMG: NOCSR Elements =
+          [1656307574.864226][15168:15173] CHIP:DMG: {
+          [1656307574.864303][15168:15173] CHIP:DMG:     CSR (202) = 3081C73070020100300E310C300A060355040A0C034353523059301306072A8648CE3D020106082A8648CE3D030107034200049C2B2AF5CDD5CF559AA1C26E13616E04F7E65C3CB490A413AED8C51539731DA595370FC4FA81A8F73C936213AD1E7E49193878F8211D419427017586CF264196A000300A06082A8648CE3D0403020347003044022019B404320D7A0E3D77BC913AAB9AFD3A77922501909C307D54938BE6D2D5E45102200E5C75F96348D926E962B19248C4FC018D7CCEFAF1B97B80E68174A3D6FB2CF1
+          [1656307574.864372][15168:15173] CHIP:DMG:     CSRNonce (32) = CD5D72BA1146F235043E645CC3767EFD079137F870E66254B497A810E10A7C35
+          [1656307574.864425][15168:15173] CHIP:DMG: }
+          [1656307574.864475][15168:15173] CHIP:DMG:
+          [1656307574.864527][15168:15173] CHIP:DMG: CSR (202) =
+          [1656307574.864612][15168:15173] CHIP:DMG: {
+          -----BEGIN CERTIFICATE REQUEST-----
+          MIHHMHACAQAwDjEMMAoGA1UECgwDQ1NSMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcD
+          QgAEnCsq9c3Vz1WaocJuE2FuBPfmXDy0kKQTrtjFFTlzHaWVNw/E+oGo9zyTYhOt
+          Hn5JGTh4+CEdQZQnAXWGzyZBlqAAMAoGCCqGSM49BAMCA0cAMEQCIBm0BDINeg49
+          d7yROqua/Tp3kiUBkJwwfVSTi+bS1eRRAiAOXHX5Y0jZJulisZJIxPwBjXzO+vG5
+          e4DmgXSj1vss8Q==
+          -----END CERTIFICATE REQUEST-----
+          [1656307574.864775][15168:15173] CHIP:DMG: }
+          [1656307574.864827][15168:15173] CHIP:DMG:
+          [1656307574.864893][15168:15173] CHIP:DMG:
+          [1656307574.864983][15168:15173] CHIP:DMG: Additional Fields =
+          [1656307574.865039][15168:15173] CHIP:DMG: {
+          [1656307574.865097][15168:15173] CHIP:DMG:     peer_address = BLE
+          [1656307574.865151][15168:15173] CHIP:DMG: }
+          [1656307574.865201][15168:15173] CHIP:DMG:
+          [1656307574.865273][15168:15173] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:75871068 on exchange 3350i
+          [1656307574.865344][15168:15173] CHIP:EM: Found matching exchange: 3350i, Delegate: 0xffff7c03f270
+          [1656307574.865444][15168:15173] CHIP:DMG: ICR moving to [ResponseRe]
+          [1656307574.865543][15168:15173] CHIP:DMG: InvokeResponseMessage =
+          [1656307574.865604][15168:15173] CHIP:DMG: {
+          [1656307574.865663][15168:15173] CHIP:DMG: 	suppressResponse = false,
+          [1656307574.865725][15168:15173] CHIP:DMG: 	InvokeResponseIBs =
+          [1656307574.865801][15168:15173] CHIP:DMG: 	[
+          [1656307574.865863][15168:15173] CHIP:DMG: 		InvokeResponseIB =
+          [1656307574.865943][15168:15173] CHIP:DMG: 		{
+          [1656307574.866007][15168:15173] CHIP:DMG: 			CommandDataIB =
+          [1656307574.866086][15168:15173] CHIP:DMG: 			{
+          [1656307574.866159][15168:15173] CHIP:DMG: 				CommandPathIB =
+          [1656307574.866243][15168:15173] CHIP:DMG: 				{
+          [1656307574.866335][15168:15173] CHIP:DMG: 					EndpointId = 0x0,
+          [1656307574.866430][15168:15173] CHIP:DMG: 					ClusterId = 0x3e,
+          [1656307574.866514][15168:15173] CHIP:DMG: 					CommandId = 0x5,
+          [1656307574.866594][15168:15173] CHIP:DMG: 				},
+          [1656307574.866679][15168:15173] CHIP:DMG:
+          [1656307574.866753][15168:15173] CHIP:DMG: 				CommandFields =
+          [1656307574.866832][15168:15173] CHIP:DMG: 				{
+          [1656307574.866917][15168:15173] CHIP:DMG: 					0x0 = [
+          [1656307574.867187][15168:15173] CHIP:DMG: 							0x15, 0x30, 0x1, 0xca, 0x30, 0x81, 0xc7, 0x30, 0x70, 0x2, 0x1, 0x0, 0x30, 0xe, 0x31, 0xc, 0x30, 0xa, 0x6, 0x3, 0x55, 0x4, 0xa, 0xc, 0x3, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x6, 0x7, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x2, 0x1, 0x6, 0x8, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x3, 0x1, 0x7, 0x3, 0x42, 0x0, 0x4, 0x9c, 0x2b, 0x2a, 0xf5, 0xcd, 0xd5, 0xcf, 0x55, 0x9a, 0xa1, 0xc2, 0x6e, 0x13, 0x61, 0x6e, 0x4, 0xf7, 0xe6, 0x5c, 0x3c, 0xb4, 0x90, 0xa4, 0x13, 0xae, 0xd8, 0xc5, 0x15, 0x39, 0x73, 0x1d, 0xa5, 0x95, 0x37, 0xf, 0xc4, 0xfa, 0x81, 0xa8, 0xf7, 0x3c, 0x93, 0x62, 0x13, 0xad, 0x1e, 0x7e, 0x49, 0x19, 0x38, 0x78, 0xf8, 0x21, 0x1d, 0x41, 0x94, 0x27, 0x1, 0x75, 0x86, 0xcf, 0x26, 0x41, 0x96, 0xa0, 0x0, 0x30, 0xa, 0x6, 0x8, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x4, 0x3, 0x2, 0x3, 0x47, 0x0, 0x30, 0x44, 0x2, 0x20, 0x19, 0xb4, 0x4, 0x32, 0xd, 0x7a, 0xe, 0x3d, 0x77, 0xbc, 0x91, 0x3a, 0xab, 0x9a, 0xfd, 0x3a, 0x77, 0x92, 0x25, 0x1, 0x90, 0x9c, 0x30, 0x7d, 0x54, 0x93, 0x8b, 0xe6, 0xd2, 0xd5, 0xe4, 0x51, 0x2, 0x20, 0xe, 0x5c, 0x75, 0xf9, 0x63, 0x48, 0xd9, 0x26, 0xe9, 0x62, 0xb1, 0x92, 0x48, 0xc4, 0xfc, 0x1, 0x8d, 0x7c, 0xce, 0xfa, 0xf1, 0xb9, 0x7b, 0x80, 0xe6, 0x81, 0x74, 0xa3, 0xd6, 0xfb, 0x2c, 0xf1, 0x30, 0x2, 0x20, 0xcd, 0x5d, 0x72, 0xba, 0x11, 0x46, 0xf2, 0x35, 0x4, 0x3e, 0x64, 0x5c, 0xc3, 0x76, 0x7e, 0xfd, 0x7, 0x91, 0x37, 0xf8, 0x70, 0xe6, 0x62, 0x54, 0xb4, 0x97, 0xa8, 0x10, 0xe1, 0xa, 0x7c, 0x35, 0x18,
+          [1656307574.867353][15168:15173] CHIP:DMG: 					]
+          [1656307574.867438][15168:15173] CHIP:DMG: 					0x1 = [
+          [1656307574.867568][15168:15173] CHIP:DMG: 							0x51, 0xa0, 0x8f, 0x6a, 0xf3, 0x3d, 0x10, 0xc1, 0xdf, 0xbc, 0x9e, 0xe, 0xf, 0x2, 0x5f, 0x58, 0xfb, 0x80, 0x16, 0x87, 0x14, 0xab, 0xd1, 0xae, 0xb4, 0x9f, 0x97, 0xb8, 0x6, 0x58, 0x92, 0x52, 0x19, 0xaf, 0xc4, 0xb1, 0x9a, 0xbc, 0x2, 0x2e, 0xa6, 0xe7, 0xb9, 0xce, 0xd, 0xfc, 0x5, 0x58, 0x4a, 0xaa, 0x8c, 0xd7, 0xd6, 0x6a, 0x60, 0x52, 0x4, 0xd0, 0xcf, 0xcb, 0xa8, 0xc6, 0xca, 0x33,
+          [1656307574.867670][15168:15173] CHIP:DMG: 					]
+          [1656307574.867755][15168:15173] CHIP:DMG: 				},
+          [1656307574.867949][15168:15173] CHIP:DMG: 			},
+          [1656307574.868055][15168:15173] CHIP:DMG:
+          [1656307574.868121][15168:15173] CHIP:DMG: 		},
+          [1656307574.868199][15168:15173] CHIP:DMG:
+          [1656307574.868259][15168:15173] CHIP:DMG: 	],
+          [1656307574.868336][15168:15173] CHIP:DMG:
+          [1656307574.868396][15168:15173] CHIP:DMG: 	InteractionModelRevision = 1
+          [1656307574.868454][15168:15173] CHIP:DMG: },
+          [1656307574.868597][15168:15173] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0005
+          [1656307574.868679][15168:15173] CHIP:CTL: Received certificate signing request from the device
+          [1656307574.868752][15168:15173] CHIP:CTL: Successfully finished commissioning step 'SendOpCertSigningRequest'
       disabled: true
 
     - label:
-          "TH completes the Device Attestation Procedures validation using the
-          DAC and PAI certificates"
-      verification: |
-          Not Verifiable
-      disabled: true
-
-    - label: "TH Sends CSRRequest command"
-      verification: |
-          Not Verifiable
-      disabled: true
-
-    - label:
-          "TH validates the attestation response, obtains the NOC, the Root CA
+          "TH1 validates the attestation response, obtains the NOC, the Root CA
           Certificate and ICAC (optional) and also allocates the FabricID and
           NodeID. Save RCAC certificate as Root_CA_Certificate_Original_TH1"
       verification: |
-          Not Verifiable
+          Verify in TH log during commissioning'
+
+
+          [1655290769.330332][5196:5201] CHIP:DMG: << from BLE | 192898622 | [Interaction Model  (1) / InvokeCommandResponse (0x09) / Session = 61656 / Exchange = 11375]
+          [1655290769.330388][5196:5201] CHIP:DMG: Header Flags =
+          [1655290769.330412][5196:5201] CHIP:DMG: {
+          [1655290769.330510][5196:5201] CHIP:DMG: }
+          [1655290769.330536][5196:5201] CHIP:DMG:
+          [1655290769.330570][5196:5201] CHIP:DMG: Encrypted Payload (716 bytes) =
+          [1655290769.330593][5196:5201] CHIP:DMG: {
+          [1655290769.330614][5196:5201] CHIP:DMG:     data = 00d8f0003e667f0bad61a61c6c43bba4004d9d031cc5315fbf19fd56bbdcf3b966b90ce84f794dad16b0fce43f8805a7e51f43a6becbaff2a1a59de66821fae88166b847d427aec4cd2f42b49389a6c7bd8d37ffb28812b63107fe791b12f437472b093d8e68a483b6601a5834026a0275630294c55d08c3addff9e3df25ba3f9fe01a48b131cb83baa3d9d1ff57da9e6b06136d8ca6e3cbc6981d0cc8eb57be18a4a612bd0020cd49702d33afa8f6e56a7b0f2334f6267c5ff4e846a742da71f13f17b00766f2c6f42cc757cd923282aa05d4107643c3895d0a463c5ea4a001607cecadd6422bc42c2e10d5835c6e5b7e0d845f972082aa1a1b15fbe96732859a362223ab9e213a938d502c6786d2234297f84c94a35ec67fb554b2c9c028af4d03c8b9e79d751bd3bf686382b1126a685df7dfca94adb3088727f3c6cf7d486fa70ae6f10a28a3e5460447ebf4ad9e4dcbb1caf0bb49fe399b4b5e66d40346dd2e2339f94435133a8a3fafaa54cbd7d4845ff4f133e7b190c5eee9af38e2c8aa16694466de6fb74eb52e15c400835492eaa92b1202e22704e6960e4e78eac37f9296bb3ea1d01ea001caf0f5e9f6541bd70f2aa5271d558001108c8729667f140e36b8106ee066cfb59be1e64754094ab48656c601b5b21c3c852ef1286a3324b9a1fd9c7fb899a23c0462d3aba5b80a4a7bebfdf275d4658775662ef82527d450b3377365f7c0c3a6564520139ed92957496acc87c984c57840fdbf14b5ee9d4246d8754d1ea934526846d06bb37b51d069c0eb2e833abb886c5c9fcd9dea7390cc8d3463d3a0ecbe02b4c2b994b4b08f61a44da8cb22e983877c2543b05c69ef5f33c6c902484e6e1c0f4e87973f99bede289a4981cccf050e272d58030051ccd5c39f9aa847a4a2ad699990a15d9206d5442aa4ac0eeae61a69f44abcd7bb3f7a5d7ca54bc4843e20ca40940a2af143585e161eb6e731ef814dc71d2a2dc2df2aa8864ef4dd2b3774d5
+          [1655290769.330666][5196:5201] CHIP:DMG:     buffer_ptr = 281472426657904
+          [1655290769.330687][5196:5201] CHIP:DMG: }
+          [1655290769.330707][5196:5201] CHIP:DMG:
+          [1655290769.330848][5196:5201] CHIP:DMG: Attestation Elements (585 bytes) =
+          [1655290769.330876][5196:5201] CHIP:DMG: {
+          [1655290769.330898][5196:5201] CHIP:DMG:     Certification Declaration =
+          [1655290769.330918][5196:5201] CHIP:DMG:     {
+          [1655290769.331827][5196:5201] CHIP:DMG:         Format Version = 1
+          [1655290769.331873][5196:5201] CHIP:DMG:         Vendor Id = 65521
+          [1655290769.331898][5196:5201] CHIP:DMG:         Product Ids =
+          [1655290769.331919][5196:5201] CHIP:DMG:         {
+          [1655290769.332029][5196:5201] CHIP:DMG:             Product Id = 32768
+          [1655290769.332053][5196:5201] CHIP:DMG:             Product Id = 32769
+          [1655290769.332076][5196:5201] CHIP:DMG:             Product Id = 32770
+          [1655290769.332099][5196:5201] CHIP:DMG:             Product Id = 32771
+          [1655290769.332123][5196:5201] CHIP:DMG:             Product Id = 32772
+          [1655290769.332146][5196:5201] CHIP:DMG:             Product Id = 32773
+          [1655290769.332169][5196:5201] CHIP:DMG:             Product Id = 32774
+          [1655290769.332193][5196:5201] CHIP:DMG:             Product Id = 32775
+          [1655290769.332216][5196:5201] CHIP:DMG:             Product Id = 32776
+          [1655290769.332239][5196:5201] CHIP:DMG:             Product Id = 32777
+          [1655290769.332361][5196:5201] CHIP:DMG:             Product Id = 32778
+          [1655290769.332392][5196:5201] CHIP:DMG:             Product Id = 32779
+          [1655290769.332416][5196:5201] CHIP:DMG:             Product Id = 32780
+          [1655290769.332440][5196:5201] CHIP:DMG:             Product Id = 32781
+          [1655290769.332463][5196:5201] CHIP:DMG:             Product Id = 32782
+          [1655290769.332486][5196:5201] CHIP:DMG:             Product Id = 32783
+          [1655290769.332509][5196:5201] CHIP:DMG:             Product Id = 32784
+          [1655290769.332532][5196:5201] CHIP:DMG:             Product Id = 32785
+          [1655290769.332555][5196:5201] CHIP:DMG:             Product Id = 32786
+          [1655290769.332578][5196:5201] CHIP:DMG:             Product Id = 32787
+          [1655290769.332601][5196:5201] CHIP:DMG:             Product Id = 32788
+          [1655290769.332624][5196:5201] CHIP:DMG:             Product Id = 32789
+          [1655290769.332647][5196:5201] CHIP:DMG:             Product Id = 32790
+          [1655290769.332670][5196:5201] CHIP:DMG:             Product Id = 32791
+          [1655290769.332693][5196:5201] CHIP:DMG:             Product Id = 32792
+          [1655290769.332716][5196:5201] CHIP:DMG:             Product Id = 32793
+          [1655290769.332739][5196:5201] CHIP:DMG:             Product Id = 32794
+          [1655290769.332762][5196:5201] CHIP:DMG:             Product Id = 32795
+          [1655290769.332785][5196:5201] CHIP:DMG:             Product Id = 32796
+          [1655290769.332807][5196:5201] CHIP:DMG:             Product Id = 32797
+          [1655290769.332830][5196:5201] CHIP:DMG:             Product Id = 32798
+          [1655290769.332853][5196:5201] CHIP:DMG:             Product Id = 32799
+          [1655290769.332876][5196:5201] CHIP:DMG:             Product Id = 32800
+          [1655290769.332899][5196:5201] CHIP:DMG:             Product Id = 32801
+          [1655290769.332922][5196:5201] CHIP:DMG:             Product Id = 32802
+          [1655290769.332945][5196:5201] CHIP:DMG:             Product Id = 32803
+          [1655290769.332968][5196:5201] CHIP:DMG:             Product Id = 32804
+          [1655290769.332991][5196:5201] CHIP:DMG:             Product Id = 32805
+          [1655290769.333014][5196:5201] CHIP:DMG:             Product Id = 32806
+          [1655290769.333037][5196:5201] CHIP:DMG:             Product Id = 32807
+          [1655290769.333060][5196:5201] CHIP:DMG:             Product Id = 32808
+          [1655290769.333083][5196:5201] CHIP:DMG:             Product Id = 32809
+          [1655290769.333106][5196:5201] CHIP:DMG:             Product Id = 32810
+          [1655290769.333129][5196:5201] CHIP:DMG:             Product Id = 32811
+          [1655290769.333152][5196:5201] CHIP:DMG:             Product Id = 32812
+          [1655290769.333175][5196:5201] CHIP:DMG:             Product Id = 32813
+          [1655290769.333198][5196:5201] CHIP:DMG:             Product Id = 32814
+          [1655290769.333221][5196:5201] CHIP:DMG:             Product Id = 32815
+          [1655290769.333244][5196:5201] CHIP:DMG:             Product Id = 32816
+          [1655290769.333267][5196:5201] CHIP:DMG:             Product Id = 32817
+          [1655290769.333290][5196:5201] CHIP:DMG:             Product Id = 32818
+          [1655290769.333313][5196:5201] CHIP:DMG:             Product Id = 32819
+          [1655290769.333336][5196:5201] CHIP:DMG:             Product Id = 32820
+          [1655290769.333359][5196:5201] CHIP:DMG:             Product Id = 32821
+          [1655290769.333382][5196:5201] CHIP:DMG:             Product Id = 32822
+          [1655290769.333405][5196:5201] CHIP:DMG:             Product Id = 32823
+          [1655290769.333428][5196:5201] CHIP:DMG:             Product Id = 32824
+          [1655290769.333451][5196:5201] CHIP:DMG:             Product Id = 32825
+          [1655290769.333474][5196:5201] CHIP:DMG:             Product Id = 32826
+          [1655290769.333497][5196:5201] CHIP:DMG:             Product Id = 32827
+          [1655290769.333520][5196:5201] CHIP:DMG:             Product Id = 32828
+          [1655290769.333543][5196:5201] CHIP:DMG:             Product Id = 32829
+          [1655290769.333566][5196:5201] CHIP:DMG:             Product Id = 32830
+          [1655290769.333589][5196:5201] CHIP:DMG:             Product Id = 32831
+          [1655290769.333612][5196:5201] CHIP:DMG:             Product Id = 32832
+          [1655290769.333635][5196:5201] CHIP:DMG:             Product Id = 32833
+          [1655290769.333658][5196:5201] CHIP:DMG:             Product Id = 32834
+          [1655290769.333681][5196:5201] CHIP:DMG:             Product Id = 32835
+          [1655290769.333704][5196:5201] CHIP:DMG:             Product Id = 32836
+          [1655290769.333728][5196:5201] CHIP:DMG:             Product Id = 32837
+          [1655290769.333750][5196:5201] CHIP:DMG:             Product Id = 32838
+          [1655290769.333773][5196:5201] CHIP:DMG:             Product Id = 32839
+          [1655290769.333796][5196:5201] CHIP:DMG:             Product Id = 32840
+          [1655290769.333819][5196:5201] CHIP:DMG:             Product Id = 32841
+          [1655290769.333842][5196:5201] CHIP:DMG:             Product Id = 32842
+          [1655290769.333865][5196:5201] CHIP:DMG:             Product Id = 32843
+          [1655290769.333888][5196:5201] CHIP:DMG:             Product Id = 32844
+          [1655290769.333911][5196:5201] CHIP:DMG:             Product Id = 32845
+          [1655290769.333933][5196:5201] CHIP:DMG:             Product Id = 32846
+          [1655290769.333956][5196:5201] CHIP:DMG:             Product Id = 32847
+          [1655290769.333979][5196:5201] CHIP:DMG:             Product Id = 32848
+          [1655290769.334002][5196:5201] CHIP:DMG:             Product Id = 32849
+          [1655290769.334024][5196:5201] CHIP:DMG:             Product Id = 32850
+          [1655290769.334048][5196:5201] CHIP:DMG:             Product Id = 32851
+          [1655290769.334070][5196:5201] CHIP:DMG:             Product Id = 32852
+          [1655290769.334093][5196:5201] CHIP:DMG:             Product Id = 32853
+          [1655290769.334117][5196:5201] CHIP:DMG:             Product Id = 32854
+          [1655290769.334139][5196:5201] CHIP:DMG:             Product Id = 32855
+          [1655290769.334162][5196:5201] CHIP:DMG:             Product Id = 32856
+          [1655290769.334185][5196:5201] CHIP:DMG:             Product Id = 32857
+          [1655290769.334208][5196:5201] CHIP:DMG:             Product Id = 32858
+          [1655290769.334231][5196:5201] CHIP:DMG:             Product Id = 32859
+          [1655290769.334254][5196:5201] CHIP:DMG:             Product Id = 32860
+          [1655290769.334277][5196:5201] CHIP:DMG:             Product Id = 32861
+          [1655290769.334300][5196:5201] CHIP:DMG:             Product Id = 32862
+          [1655290769.334323][5196:5201] CHIP:DMG:             Product Id = 32863
+          [1655290769.334346][5196:5201] CHIP:DMG:             Product Id = 32864
+          [1655290769.334369][5196:5201] CHIP:DMG:             Product Id = 32865
+          [1655290769.334392][5196:5201] CHIP:DMG:             Product Id = 32866
+          [1655290769.334415][5196:5201] CHIP:DMG:             Product Id = 32867
+          [1655290769.334456][5196:5201] CHIP:DMG:         }
+          [1655290769.334484][5196:5201] CHIP:DMG:         Device Type Id = 22
+          [1655290769.334511][5196:5201] CHIP:DMG:         Certificate Id (19) = ZIG20142ZB330003-24
+          [1655290769.334537][5196:5201] CHIP:DMG:         Security Level = 0
+          [1655290769.334561][5196:5201] CHIP:DMG:         Security Information = 0
+          [1655290769.334585][5196:5201] CHIP:DMG:         Version Number = 9876
+          [1655290769.334609][5196:5201] CHIP:DMG:         Certification Type = 0
+          [1655290769.334632][5196:5201] CHIP:DMG:     }
+          [1655290769.334659][5196:5201] CHIP:DMG:     Attestation Nonce (32) = 49FB25897AB41A60FACACA5B7C97785D902678928069EE696893D4C48874C1FE
+          [1655290769.334681][5196:5201] CHIP:DMG:     Timestamp = 0
+          [1655290769.334703][5196:5201] CHIP:DMG: }
+          [1655290769.334723][5196:5201] CHIP:DMG:
+          [1655290769.334753][5196:5201] CHIP:DMG:
+          [1655290769.334806][5196:5201] CHIP:DMG: Additional Fields =
+          [1655290769.334829][5196:5201] CHIP:DMG: {
+          [1655290769.334855][5196:5201] CHIP:DMG:     peer_address = BLE
+          [1655290769.334877][5196:5201] CHIP:DMG: }
+          [1655290769.334897][5196:5201] CHIP:DMG:
+          [1655290769.334935][5196:5201] CHIP:EM: Received message of type 0x9 with protocolId (0, 1) and MessageCounter:192898622 on exchange 11375i
+          [1655290769.334964][5196:5201] CHIP:EM: Found matching exchange: 11375i, Delegate: 0xffff68003360
+          [1655290769.335011][5196:5201] CHIP:DMG: ICR moving to [ResponseRe]
+          [1655290769.335055][5196:5201] CHIP:DMG: InvokeResponseMessage =
+          [1655290769.335080][5196:5201] CHIP:DMG: {
+          [1655290769.335105][5196:5201] CHIP:DMG:         suppressResponse = false,
+          [1655290769.335129][5196:5201] CHIP:DMG:         InvokeResponseIBs =
+          [1655290769.335160][5196:5201] CHIP:DMG:         [
+          [1655290769.335184][5196:5201] CHIP:DMG:                 InvokeResponseIB =
+          [1655290769.335224][5196:5201] CHIP:DMG:                 {
+          [1655290769.335253][5196:5201] CHIP:DMG:                         CommandDataIB =
+          [1655290769.335284][5196:5201] CHIP:DMG:                         {
+          [1655290769.335315][5196:5201] CHIP:DMG:                                 CommandPathIB =
+          [1655290769.335350][5196:5201] CHIP:DMG:                                 {
+          [1655290769.335388][5196:5201] CHIP:DMG:                                         EndpointId = 0x0,
+          [1655290769.335427][5196:5201] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1655290769.335464][5196:5201] CHIP:DMG:                                         CommandId = 0x1,
+          [1655290769.335499][5196:5201] CHIP:DMG:                                 },
+          [1655290769.335537][5196:5201] CHIP:DMG:
+          [1655290769.335567][5196:5201] CHIP:DMG:                                 CommandFields =
+          [1655290769.335602][5196:5201] CHIP:DMG:                                 {
+          [1655290769.335639][5196:5201] CHIP:DMG:                                         0x0 = [
+          [1655290769.335784][5196:5201] CHIP:DMG:                                                 0x15, 0x31, 0x1, 0x1d, 0x2, 0x30, 0x82, 0x2, 0x19, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x2, 0xa0, 0x82, 0x2, 0xa, 0x30, 0x82, 0x2, 0x6, 0x2, 0x1, 0x3, 0x31, 0xd, 0x30, 0xb, 0x6, 0x9, 0x60, 0x86, 0x48, 0x1, 0x65, 0x3, 0x4, 0x2, 0x1, 0x30, 0x82, 0x1, 0x71, 0x6, 0x9, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0xd, 0x1, 0x7, 0x1, 0xa0, 0x82, 0x1, 0x62, 0x4, 0x82, 0x1, 0x5e, 0x15, 0x24, 0x0, 0x1, 0x25, 0x1, 0xf1, 0xff, 0x36, 0x2, 0x5, 0x0, 0x80, 0x5, 0x1, 0x80, 0x5, 0x2, 0x80, 0x5, 0x3, 0x80, 0x5, 0x4, 0x80, 0x5, 0x5, 0x80, 0x5, 0x6, 0x80, 0x5, 0x7, 0x80, 0x5, 0x8, 0x80, 0x5, 0x9, 0x80, 0x5, 0xa, 0x80, 0x5, 0xb, 0x80, 0x5, 0xc, 0x80, 0x5, 0xd, 0x80, 0x5, 0xe, 0x80, 0x5, 0xf, 0x80, 0x5, 0x10, 0x80, 0x5, 0x11, 0x80, 0x5, 0x12, 0x80, 0x5, 0x13, 0x80, 0x5, 0x14, 0x80, 0x5, 0x15, 0x80, 0x5, 0x16, 0x80, 0x5, 0x17, 0x80, 0x5, 0x18, 0x80, 0x5, 0x19, 0x80, 0x5, 0x1a, 0x80, 0x5, 0x1b, 0x80, 0x5, 0x1c, 0x80, 0x5, 0x1d, 0x80, 0x5, 0x1e, 0x80, 0x5, 0x1f, 0x80, 0x5, 0x20, 0x80, 0x5, 0x21, 0x80, 0x5, 0x22, 0x80, 0x5, 0x23, 0x80, 0x5, 0x24, 0x80, 0x5, 0x25, 0x80, 0x5, 0x26, 0x80, 0x5, 0x27, 0x80, 0x5, 0x28, 0x80, 0x5, 0x29, 0x80, 0x5, 0x2a, 0x80, 0x5, 0x2b, 0x80, 0x5, 0x2c, 0x80, 0x5, 0x2d, 0x80, 0x5, 0x2e, 0x80, 0x5, 0x2f, 0x80, 0x5, 0x30, 0x80, 0x5, 0x31, 0x80, 0x5, 0x32, 0x80, 0x5, 0x33, 0x80, 0x5, 0x34, 0x80, 0x5, 0x35, 0x80, 0x5, 0x36, 0x80, 0x5, 0x37, 0x80, 0x5, 0x38, 0x80, 0x5, 0x39, 0x80, 0x5, 0x3a, 0x80, 0x5, 0x3b, 0x80, 0x5, 0x3c, 0x80, 0x5, 0x3d, 0x80, 0x5, 0x3e, 0x80, 0x5, 0x3f, 0x80, 0x5, 0x40, 0x80, 0x5, 0x41, 0x80, 0x5, 0x42, 0x80, 0x5, 0x43, 0x80, 0x5, 0x44, 0x80, 0x5, 0x45, 0x80, 0x5, 0x46, 0x80, 0x5, 0x47, 0x80, 0x5, 0x48, 0x80, 0x5, 0x49, 0x80, 0x5, 0x4a, 0x80, 0x5, 0x
+          [1655290769.335859][5196:5201] CHIP:DMG:                                 ]
+          [1655290769.335895][5196:5201] CHIP:DMG:                                         0x1 = [
+          [1655290769.336267][5196:5201] CHIP:DMG:                                                 0x27, 0x4d, 0x13, 0x4e, 0x60, 0xe6, 0x7a, 0xb2, 0x25, 0x90, 0x86, 0x10, 0x63, 0x85, 0x12, 0x14, 0x2c, 0x12, 0x14, 0x5a, 0xef, 0x9a, 0x73, 0x57, 0x85, 0x5e, 0x1e, 0xcb, 0x6b, 0x83, 0xe3, 0xda, 0xa0, 0x6, 0x23, 0x1c, 0x74, 0x9, 0x55, 0x67, 0x74, 0xd9, 0x70, 0xc5, 0xe1, 0xc3, 0x48, 0xc5, 0xdf, 0x1c, 0xc3, 0x26, 0xfc, 0x89, 0xca, 0x10, 0xdf, 0xa, 0x39, 0x53, 0xe0, 0xbb, 0x3f, 0x6d,
+          [1655290769.336312][5196:5201] CHIP:DMG:                                 ]
+          [1655290769.336345][5196:5201] CHIP:DMG:                                 },
+          [1655290769.336376][5196:5201] CHIP:DMG:                         },
+          [1655290769.336412][5196:5201] CHIP:DMG:
+          [1655290769.336439][5196:5201] CHIP:DMG:                 },
+          [1655290769.336471][5196:5201] CHIP:DMG:
+          [1655290769.336494][5196:5201] CHIP:DMG:         ],
+          [1655290769.336526][5196:5201] CHIP:DMG:
+          [1655290769.336549][5196:5201] CHIP:DMG:         InteractionModelRevision = 1
+          [1655290769.336573][5196:5201] CHIP:DMG: },
+          [1655290769.336637][5196:5201] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0001
+          [1655290769.336674][5196:5201] CHIP:CTL: Received Attestation Information from the device
       disabled: true
 
     - label:
-          "TH sends AddTrustedRootCertificate command to DUT to install the Root
-          CA Certificate to the trust store"
+          "TH1 sends AddTrustedRootCertificate command to DUT to install the
+          Root CA Certificate to the trust store"
+      PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          Not Verifiable
+          1. ./chip-tool generalcommissioning arm-fail-safe 500 600 1 0
+
+          2.  ./chip-tool operationalcredentials  add-trusted-root-certificate 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941043D96471BD73AAAA423AA3EBA87DE9CC7C0864D46FA5571F4BCC64D3F50453E95C5EDB07713B14D0FD22359A85595C3049E0D2046AF0692691DCC32BC1322830F370A350129011824026030041442E8D59F9829D4E11FEE544E8C89C92774A7E27E30051442E8D59F9829D4E11FEE544E8C89C92774A7E27E18300B402334770CE79AB4EAAAA70B5A07232B9AE0BE0AAA681118552726DCB5B04C7F0382519CA0A7A7D4C498CFB3EE479912832B3618926F4765BA4343D6E691FE238918 1 0
+
+
+          [1655374218.706390][35023:35028] CHIP:DMG:                         CommandFields =
+          [1655374218.706431][35023:35028] CHIP:DMG:                         {
+          [1655374218.706464][35023:35028] CHIP:DMG:                                 0x0 = [
+          [1655374218.706591][35023:35028] CHIP:DMG:                                         0x15, 0x30, 0x1, 0x1, 0x0, 0x24, 0x2, 0x1, 0x37, 0x3, 0x24, 0x14, 0x0, 0x18, 0x26, 0x4, 0x80, 0x22, 0x81, 0x27, 0x26, 0x5, 0x80, 0x25, 0x4d, 0x3a, 0x37, 0x6, 0x24, 0x14, 0x0, 0x18, 0x24, 0x7, 0x1, 0x24, 0x8, 0x1, 0x30, 0x9, 0x41, 0x4, 0xab, 0xae, 0x5e, 0xc6, 0x4f, 0xc4, 0x6e, 0x99, 0xc, 0x44, 0x55, 0x39, 0x2, 0x45, 0xf6, 0xe9, 0x9, 0xcb, 0xc3, 0xc3, 0xc, 0xa0, 0x8, 0xb7, 0x36, 0x96, 0x62, 0x56, 0x43, 0x56, 0xba, 0x22, 0x25, 0x38, 0x6f, 0x40, 0x50, 0xf8, 0x7b, 0xd1, 0xd7, 0xe4, 0xd6, 0x5c, 0x12, 0x30, 0x84, 0x91, 0xb3, 0x10, 0x8f, 0x6a, 0x71, 0x8, 0xe1, 0xf0, 0xc3, 0xa0, 0xd2, 0x4, 0x99, 0xe3, 0xfb, 0xf, 0x37, 0xa, 0x35, 0x1, 0x29, 0x1, 0x18, 0x24, 0x2, 0x60, 0x30, 0x4, 0x14, 0x89, 0x4f, 0x8f, 0xdd, 0xf2, 0x13, 0x8d, 0x8e, 0xe0, 0x12, 0x13, 0x72, 0xa2, 0xb4, 0x23, 0x25, 0xef, 0xd6, 0x25, 0x8c, 0x30, 0x5, 0x14, 0x89, 0x4f, 0x8f, 0xdd, 0xf2, 0x13, 0x8d, 0x8e, 0xe0, 0x12, 0x13, 0x72, 0xa2, 0xb4, 0x23, 0x25, 0xef, 0xd6, 0x25, 0x8c, 0x18, 0x30, 0xb, 0x40, 0xd3, 0x8f, 0x56, 0xa2, 0xd9, 0xb4, 0x4a, 0x3a, 0x79, 0x6d, 0xed, 0xd7, 0x1c, 0x7a, 0x3e, 0xd6, 0xb9, 0x8d, 0x80, 0xd6, 0x3d, 0xe2, 0xde, 0xa5, 0xb0, 0x3b, 0xc0, 0xce, 0x1a, 0xe9, 0x26, 0x0, 0x9d, 0x9c, 0x78, 0xe4, 0xf3, 0x78, 0x74, 0x3a, 0xd, 0xfa, 0xc8, 0x1f, 0x27, 0xaa, 0x5e, 0x9b, 0xef, 0x78, 0x48, 0x1e, 0x6a, 0x60, 0x1a, 0x71, 0xd8, 0x67, 0x9, 0x40, 0xb3, 0xe4, 0xd0, 0xc6, 0x18,
+
+          Verify we are getting success response
+          [1655371172.014771][2459:2464] CHIP:DMG: InvokeResponseMessage =
+          [1655371172.014797][2459:2464] CHIP:DMG: {
+          [1655371172.014822][2459:2464] CHIP:DMG:         suppressResponse = false,
+          [1655371172.014854][2459:2464] CHIP:DMG:         InvokeResponseIBs =
+          [1655371172.014889][2459:2464] CHIP:DMG:         [
+          [1655371172.014914][2459:2464] CHIP:DMG:                 InvokeResponseIB =
+          [1655371172.014959][2459:2464] CHIP:DMG:                 {
+          [1655371172.014989][2459:2464] CHIP:DMG:                         CommandStatusIB =
+          [1655371172.015024][2459:2464] CHIP:DMG:                         {
+          [1655371172.015055][2459:2464] CHIP:DMG:                                 CommandPathIB =
+          [1655371172.015090][2459:2464] CHIP:DMG:                                 {
+          [1655371172.015125][2459:2464] CHIP:DMG:                                         EndpointId = 0x0,
+          [1655371172.015161][2459:2464] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1655371172.015196][2459:2464] CHIP:DMG:                                         CommandId = 0xb,
+          [1655371172.015229][2459:2464] CHIP:DMG:                                 },
+          [1655371172.015266][2459:2464] CHIP:DMG:
+          [1655371172.015297][2459:2464] CHIP:DMG:                                 StatusIB =
+          [1655371172.015332][2459:2464] CHIP:DMG:                                 {
+          [1655371172.015366][2459:2464] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1655371172.015399][2459:2464] CHIP:DMG:                                 },
+          [1655371172.015433][2459:2464] CHIP:DMG:
+          [1655371172.015464][2459:2464] CHIP:DMG:                         },
+          [1655371172.015498][2459:2464] CHIP:DMG:
+          [1655371172.015527][2459:2464] CHIP:DMG:                 },
+          [1655371172.015560][2459:2464] CHIP:DMG:
+          [1655371172.015584][2459:2464] CHIP:DMG:         ],
+          [1655371172.015614][2459:2464] CHIP:DMG:
+          [1655371172.015639][2459:2464] CHIP:DMG:         InteractionModelRevision = 1
+          [1655371172.015665][2459:2464] CHIP:DMG: },
+          [1655371172.015725][2459:2464] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1655371172.015770][2459:2464] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
-          "TH sends AddTrustedRootCertificate command to DUT for the
+          "TH1 sends AddTrustedRootCertificate command to DUT for the
           installation of the same Root_CA_Certificate_Original_TH1"
+      PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          Not Verifiable
+          1. ./chip-tool generalcommissioning arm-fail-safe 500 600 1 0
+
+          2. ./chip-tool operationalcredentials  add-trusted-root-certificate FTABAQAkAgE3AyQUABgmBIAigScmBYAlTTo3BiQUABgkBwEkCAEwCUEE7v2ZbSMsKkVeeXBYD1r6THUa0+MwX1Sre4hF6HifssT8LmPXr7Yo5Oukmggl4zu0dHeXGoks+DcIqvMoSZqKTDcKNQEpARgkAmAwBBRk4uawYkPefrADlbkhMYSjioM+szAFFGTi5rBiQ95+sAOVuSExhKOKgz6zGDALQP+ShFEcnKP6jj903MIhM8/zcZpRq5whUk/z5ZJgiOztyTD5BTyfAOtLGxnC597PW5Rm4H1Eu+5EkJObonVQcBgY 1 0
+
+          Verify we are getting success response
+          [1655371172.014771][2459:2464] CHIP:DMG: InvokeResponseMessage =
+          [1655371172.014797][2459:2464] CHIP:DMG: {
+          [1655371172.014822][2459:2464] CHIP:DMG:         suppressResponse = false,
+          [1655371172.014854][2459:2464] CHIP:DMG:         InvokeResponseIBs =
+          [1655371172.014889][2459:2464] CHIP:DMG:         [
+          [1655371172.014914][2459:2464] CHIP:DMG:                 InvokeResponseIB =
+          [1655371172.014959][2459:2464] CHIP:DMG:                 {
+          [1655371172.014989][2459:2464] CHIP:DMG:                         CommandStatusIB =
+          [1655371172.015024][2459:2464] CHIP:DMG:                         {
+          [1655371172.015055][2459:2464] CHIP:DMG:                                 CommandPathIB =
+          [1655371172.015090][2459:2464] CHIP:DMG:                                 {
+          [1655371172.015125][2459:2464] CHIP:DMG:                                         EndpointId = 0x0,
+          [1655371172.015161][2459:2464] CHIP:DMG:                                         ClusterId = 0x3e,
+          [1655371172.015196][2459:2464] CHIP:DMG:                                         CommandId = 0xb,
+          [1655371172.015229][2459:2464] CHIP:DMG:                                 },
+          [1655371172.015266][2459:2464] CHIP:DMG:
+          [1655371172.015297][2459:2464] CHIP:DMG:                                 StatusIB =
+          [1655371172.015332][2459:2464] CHIP:DMG:                                 {
+          [1655371172.015366][2459:2464] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1655371172.015399][2459:2464] CHIP:DMG:                                 },
+          [1655371172.015433][2459:2464] CHIP:DMG:
+          [1655371172.015464][2459:2464] CHIP:DMG:                         },
+          [1655371172.015498][2459:2464] CHIP:DMG:
+          [1655371172.015527][2459:2464] CHIP:DMG:                 },
+          [1655371172.015560][2459:2464] CHIP:DMG:
+          [1655371172.015584][2459:2464] CHIP:DMG:         ],
+          [1655371172.015614][2459:2464] CHIP:DMG:
+          [1655371172.015639][2459:2464] CHIP:DMG:         InteractionModelRevision = 1
+          [1655371172.015665][2459:2464] CHIP:DMG: },
+          [1655371172.015725][2459:2464] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003E Command=0x0000_000B Status=0x0
+          [1655371172.015770][2459:2464] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label: "Read the TrustedRootCertificates list from DUT"
       verification: |
           ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          [1651570587.562845][3714:3719] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783037
-          [1651570587.562960][3714:3719] CHIP:TOO:   TrustedRootCertificates: 2 entries
-          [1651570587.565701][3714:3719] CHIP:TOO:     [1]: Elided value too large of size 231
-          [1651570587.565758][3714:3719] CHIP:TOO:     [2]: Elided value too large of size 231
-      disabled: true
-
-    - label:
-          "TH sends AddTrustedRootCertificate command to DUT to install the Root
-          CA Certificate which differs from Root_CA_Certificate_Original_TH1 by
-          one byte in the Subject field"
-      verification: |
-          Not Verifiable
-      disabled: true
-
-    - label: "Read the TrustedRootCertificates list from DUT"
-      verification: |
-          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
-
-          [1651570587.562845][3714:3719] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783037
-          [1651570587.562960][3714:3719] CHIP:TOO:   TrustedRootCertificates: 2 entries
-          [1651570587.565701][3714:3719] CHIP:TOO:     [1]: Elided value too large of size 231
-          [1651570587.565758][3714:3719] CHIP:TOO:     [2]: Elided value too large of size 231
-      disabled: true
-
-    - label:
-          "TH sends AddTrustedRootCertificate command to DUT to install a
-          malformed Root CA Certificate where the signature does not match the
-          public key"
-      verification: |
-          Not Verifiable
+          [1655296468.138167][5628:5633] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 323778350
+          [1655296468.138314][5628:5633] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1655296468.138421][5628:5633] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941040411C332B4D6CA8A742852BAA10666F9BD6A0D6180BAF8677011FD1542C19E1A89864CE9454AA409BF0CABB8E2305E6FBB4A767FE00C7D8C0A581758749650C8370A35012901182402603004145A3098A5158DF1C2E6C2188E2CB716AB925129933005145A3098A5158DF1C2E6C2188E2CB716AB9251299318300B40822E81D4315B3710181B44D7E35C91AE7E6578C90D112275BB07CF8B7906751830BC0F93BB53E43BD8AD38C58A74386101A1AC7759D6D53EB9F65F64870C875818
       disabled: true
 
     - label: "TH1 sends the AddNOC Command to DUT"
+      PICS: OPCREDS.S.C06.Rsp
       verification: |
           Not Verifiable
       disabled: true
 
-    - label: "Save the FabricIndex as FabricIndex_Test for future use"
+    - label:
+          "Save the FabricIndex as FabricIndex_TH1 or FabricIndex_TH2 (depending
+          on which TH was running the command) for future use"
       verification: |
           Not Verifiable
       disabled: true
@@ -137,33 +590,26 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read nocs 1 0
 
-          [1651570741.707935][3729:3734] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2018783037
-          [1651570741.708034][3729:3734] CHIP:TOO:   NOCs: 1 entries
-          [1651570741.708122][3729:3734] CHIP:TOO:     [1]: {
-          [1651570741.708163][3729:3734] CHIP:TOO:       Noc: Elided value too large of size 241
-          [1651570741.708202][3729:3734] CHIP:TOO:       Icac: Elided value too large of size 231
-          [1651570741.708238][3729:3734] CHIP:TOO:       FabricIndex: 1
-          [1651570741.708272][3729:3734] CHIP:TOO:      }
+          [1655470923.441130][13282:13287] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
+          [1655470923.441223][13282:13287] CHIP:TOO:   NOCs: 1 entries
+          [1655470923.441297][13282:13287] CHIP:TOO:     [1]: {
+          [1655470923.441352][13282:13287] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415012411011824070124080130094104D5FA104FF03F9118BDC2A072D50DB3BED32C47F138439FBF05753D02D01AEC10F350CB77EA22844A83FF0FEF6CFA764F5B1FD48E487F3EC82A201D376F56DCC8370A350128011824020136030402040118300414BD61F9405A7A15EFA38F8B6833AB9027876482E1300514B5AED0B2C2CDBB9D4D0124755B56278B081FD4AD18300B40441AA0EE6ACE43EEA2A52321821D8B260AAFFEBD394C2FD11E83008C5AD2DF5EA58FAFA14A3EF7BAFDE190591298311D7DE6A257819D98D0E9FE239A635684B418
+          [1655470923.441411][13282:13287] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104B267483D9981A2C15E7DE8C63298FEB6DC19EAA9AEA41D9D659CD3BBBD25B943B3186716C82B297091D64B1620E8FB2C6FD095F509684E074C5B479E583CE295370A3501290118240260300414B5AED0B2C2CDBB9D4D0124755B56278B081FD4AD3005146EDE812590A5E6E4463798EB06AC3BD5284DFAAE18300B404A48E0B45704A98739C0C656B0F1A4252AEED8E1EBA5FD1032C79A4B26BF8A314EFDD7C835947DEB4B3E9F6D0BF2A561CEE54B45F311773301D4B5CFFF2F76D918
+          [1655470923.441453][13282:13287] CHIP:TOO:       FabricIndex: 1
+          [1655470923.441486][13282:13287] CHIP:TOO:      }
       disabled: true
 
     - label: "Read the first NOCStruct element from the list"
       verification: |
-          ./chip-tool operationalcredentials read nocs 1 0
 
-          [1651570741.707935][3729:3734] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2018783037
-          [1651570741.708034][3729:3734] CHIP:TOO:   NOCs: 1 entries
-          [1651570741.708122][3729:3734] CHIP:TOO:     [1]: {
-          [1651570741.708163][3729:3734] CHIP:TOO:       Noc: Elided value too large of size 241
-          [1651570741.708202][3729:3734] CHIP:TOO:       Icac: Elided value too large of size 231
-          [1651570741.708238][3729:3734] CHIP:TOO:       FabricIndex: 1
-          [1651570741.708272][3729:3734] CHIP:TOO:      }
       disabled: true
 
     - label:
-          "TH sends UpdateFabricLabel command with 'Node Ope Credits 1' as Label
-          field to DUT"
+          "TH1 sends UpdateFabricLabel command with 'Label 1' as Label field to
+          DUT"
+      PICS: OPCREDS.S.C09.Rsp
       verification: |
-          ./chip-tool operationalcredentials update-fabric-label NodeOpeCredits1 1 0
+          ./chip-tool operationalcredentials update-fabric-label label2 1 0
 
           [1651571821.028022][3803:3808] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1651571821.028086][3803:3808] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -175,194 +621,168 @@ tests:
 
     - label:
           "Read the Fabrics List from DUT and get the FabricDescriptorStruct for
-          which FabricIndex = fabric-id field from the operational certificate"
+          which FabricIndex the FabricIndex field equals FabricIndex_TH1"
       verification: |
-          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
+          ./chip-tool operationalcredentials read fabrics 1 0
 
-          [1651572032.170920][3815:3820] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2018783041
-          [1651572032.171031][3815:3820] CHIP:TOO:   Fabrics: 2 entries
-          [1651572032.171179][3815:3820] CHIP:TOO:     [1]: {
-          [1651572032.171223][3815:3820] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
-          [1651572032.171262][3815:3820] CHIP:TOO:       VendorId: 65521
-          [1651572032.171296][3815:3820] CHIP:TOO:       FabricId: 1
-          [1651572032.171328][3815:3820] CHIP:TOO:       NodeId: 1
-          [1651572032.171360][3815:3820] CHIP:TOO:       Label: NodeOpeCredits1
-          [1651572032.171393][3815:3820] CHIP:TOO:       FabricIndex: 1
-          [1651572032.171427][3815:3820] CHIP:TOO:      }
-          [1651572032.171472][3815:3820] CHIP:TOO:     [2]: {
-          [1651572032.171511][3815:3820] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
-          [1651572032.171547][3815:3820] CHIP:TOO:       VendorId: 65521
-          [1651572032.171579][3815:3820] CHIP:TOO:       FabricId: 1
-          [1651572032.171610][3815:3820] CHIP:TOO:       NodeId: 2
-          [1651572032.171641][3815:3820] CHIP:TOO:       Label:
-          [1651572032.171673][3815:3820] CHIP:TOO:       FabricIndex: 2
-          [1651572032.171705][3815:3820] CHIP:TOO:      }
+          [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
+          [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
+          [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
+          [1655471672.386339][13377:13382] CHIP:TOO:       RootPublicKey: 04FB421853FB8AE6AEA281845DE7C8689E7C24AD3283A3536E09BA2FAAE88F6EA4C08DC055A965D8FE0A8060A7F9F45E509B7A4C9092FB3D8D2E253B057899F5AB
+          [1655471672.386378][13377:13382] CHIP:TOO:       VendorId: 65521
+          [1655471672.386412][13377:13382] CHIP:TOO:       FabricId: 1
+          [1655471672.386445][13377:13382] CHIP:TOO:       NodeId: 1
+          [1655471672.386675][13377:13382] CHIP:TOO:       Label:
+          [1655471672.386716][13377:13382] CHIP:TOO:       FabricIndex: 1
+          [1655471672.386750][13377:13382] CHIP:TOO:      }
       disabled: true
 
     - label: "Read the TrustedRootCertificates list from DUT"
       verification: |
-          "./chip-tool operationalcredentials read trusted-root-certificates 1 0
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          [1651570587.562845][3714:3719] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783037
-          [1651570587.562960][3714:3719] CHIP:TOO:   TrustedRootCertificates: 2 entries
-          [1651570587.565701][3714:3719] CHIP:TOO:     [1]: Elided value too large of size 231
-          [1651570587.565758][3714:3719] CHIP:TOO:     [2]: Elided value too large of size 231"
+          [1655296468.138167][5628:5633] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 323778350
+          [1655296468.138314][5628:5633] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1655296468.138421][5628:5633] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941040411C332B4D6CA8A742852BAA10666F9BD6A0D6180BAF8677011FD1542C19E1A89864CE9454AA409BF0CABB8E2305E6FBB4A767FE00C7D8C0A581758749650C8370A35012901182402603004145A3098A5158DF1C2E6C2188E2CB716AB925129933005145A3098A5158DF1C2E6C2188E2CB716AB9251299318300B40822E81D4315B3710181B44D7E35C91AE7E6578C90D112275BB07CF8B7906751830BC0F93BB53E43BD8AD38C58A74386101A1AC7759D6D53EB9F65F64870C875818
       disabled: true
 
     - label:
-          'TH sends UpdateFabricLabel command with "Node Ope Credits 1" as Label
-          field to DUT'
+          'TH2 starts comissionning DUT on a second fabric Repeat steps 3 to 30
+          for TH2 For UpdateFabricLabel command set the label value as "Label 2"
+          Save RCAC certificate as Root_CA_Certificate_Original_TH2'
       verification: |
-          ./chip-tool operationalcredentials update-fabric-label  2 1 0
+          To commission DUT to TH2 follow below procedure
+          1../chip-tool  pairing open-commissioning-window 1 1 400 2000 3841  on TH
+          2. manualcode will be provided by TH when we pass above command pass manualcode in TH2 to commission by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH
 
-          [1650455515.088785][4397:4402] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1650455515.088888][4397:4402] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1650455515.089107][4397:4402] CHIP:TOO:   NOCResponse: {
-          [1650455515.089208][4397:4402] CHIP:TOO:     statusCode: 0
-          [1650455515.089268][4397:4402] CHIP:TOO:     fabricIndex: 1
-          [1650455515.089326][4397:4402] CHIP:TOO:    }
-      disabled: true
-
-    - label:
-          "Start the commissioning process DUT by TH2 on a second Fabric Repeat
-          steps 3 to 38 for TH2 For UpdateFabricLabel command set the label
-          value as 'Node Ope Credits 2' Save RCAC certificate as
-          Root_CA_Certificate_Original_TH2"
-      verification: |
-          ./chip-tool operationalcredentials update-fabric-label NodeOpeCredits2 2 0
-
-          [1651574223.789186][4176:4181] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1651574223.789322][4176:4181] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1651574223.789490][4176:4181] CHIP:TOO:   NOCResponse: {
-          [1651574223.789565][4176:4181] CHIP:TOO:     statusCode: 0
-          [1651574223.789622][4176:4181] CHIP:TOO:     fabricIndex: 2
-          [1651574223.789681][4176:4181] CHIP:TOO:    }
+          Repeat Step 3 to 30 from DUT to Th
       disabled: true
 
     - label: "Read the TrustedRootCertificates list from DUT"
       verification: |
           ./chip-tool operationalcredentials read trusted-root-certificates 2 0
 
-          [1651574260.271930][4183:4188] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2018783045
-          [1651574260.272108][4183:4188] CHIP:TOO:   TrustedRootCertificates: 2 entries
-          [1651574260.275506][4183:4188] CHIP:TOO:     [1]: Elided value too large of size 231
-          [1651574260.275672][4183:4188] CHIP:TOO:     [2]: Elided value too large of size 231
+
+          [1655472305.543993][4402:4407] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2667297995
+          [1655472305.547119][4402:4407] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1655472305.547219][4402:4407] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A37062414001824070124080130094104FB421853FB8AE6AEA281845DE7C8689E7C24AD3283A3536E09BA2FAAE88F6EA4C08DC055A965D8FE0A8060A7F9F45E509B7A4C9092FB3D8D2E253B057899F5AB370A35012901182402603004146EDE812590A5E6E4463798EB06AC3BD5284DFAAE3005146EDE812590A5E6E4463798EB06AC3BD5284DFAAE18300B405F5AF97A75846BFB6B68727C697FEF7E233535D14303E2338A458BB50A6C7BA05AEC058DD802EB4138164D3525392F51D1F8595E8E9FC79E3F5704995762164218
+          [1655472305.547287][4402:4407] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941046E07C7995834C97544C01B348C6E99AECC2BFBC7A6C9D2CDF2B8C23AEC425463997F77AFF4F536257118CA4113AAD5EDBE64F548F525FF9C1EEEB1E71530CD2F370A3501290118240260300414532A927E58D5D6E4512CA432D4DC750058752C04300514532A927E58D5D6E4512CA432D4DC750058752C0418300B403FDF5247055ACF950C7717B9145ECA0BFE1702C780AD459CBB26E20927A22C5C73308CC5C9C982EAB1EC9F1310784B9F81E35C683D9EA01A5E4CFF9667B8235F18
       disabled: true
 
     - label:
-          "TH2 sends UpdateFabricLabel command with 'Node Ope Credits 1' as
-          Label field to DUT"
+          "TH2 sends UpdateFabricLabel command with 'Label 1' as Label field to
+          DUT"
+      PICS: OPCREDS.S.C09.Rsp
       verification: |
-          ./chip-tool operationalcredentials update-fabric-label NodeOpeCredits1 2 0
+          ./chip-tool operationalcredentials update-fabric-label label2 2 0
 
-          [1651574185.259939][4167:4172] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1651574185.260038][4167:4172] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1651574185.260186][4167:4172] CHIP:TOO:   NOCResponse: {
-          [1651574185.260394][4167:4172] CHIP:TOO:     statusCode: 10
-          [1651574185.260464][4167:4172] CHIP:TOO:    }
+          [1656311622.310656][20507:20512] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1656311622.310739][20507:20512] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1656311622.310848][20507:20512] CHIP:TOO:   NOCResponse: {
+          [1656311622.310937][20507:20512] CHIP:TOO:     statusCode: 10
+          [1656311622.310990][20507:20512] CHIP:TOO:    }
       disabled: true
 
     - label: "Read the Fabrics List from DUT"
       verification: |
-          ./chip-tool operationalcredentials read fabrics 1 0
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0
 
-          [1651239584.030782][2559:2564] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 693340809
-          [1651239584.032687][2559:2564] CHIP:TOO:   Fabrics: 1 entries
-          [1651239584.033091][2559:2564] CHIP:TOO:     [1]: {
-          [1651239584.033165][2559:2564] CHIP:TOO:       RootPublicKey: 048661B0C0D119C7636D1ADC7EBE1D26A374FFA6C944F7457DF1DDD1163677D4D00AF9FF1A620E73066F326118124D7C2521CFF2B4EDE69E87AF364D1CAD1D2C0A
-          [1651239584.033207][2559:2564] CHIP:TOO:       VendorId: 65521
-          [1651239584.033240][2559:2564] CHIP:TOO:       FabricId: 1
-          [1651239584.033272][2559:2564] CHIP:TOO:       NodeId: 1
-          [1651239584.033304][2559:2564] CHIP:TOO:       Label:
-          [1651239584.033336][2559:2564] CHIP:TOO:       FabricIndex: 1
-          [1651239584.033370][2559:2564] CHIP:TOO:      }
+          [1655472488.702974][4422:4427] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297999
+          [1655472488.703106][4422:4427] CHIP:TOO:   Fabrics: 2 entries
+          [1655472488.703199][4422:4427] CHIP:TOO:     [1]: {
+          [1655472488.703253][4422:4427] CHIP:TOO:       RootPublicKey: 04FB421853FB8AE6AEA281845DE7C8689E7C24AD3283A3536E09BA2FAAE88F6EA4C08DC055A965D8FE0A8060A7F9F45E509B7A4C9092FB3D8D2E253B057899F5AB
+          [1655472488.703299][4422:4427] CHIP:TOO:       VendorId: 65521
+          [1655472488.703338][4422:4427] CHIP:TOO:       FabricId: 1
+          [1655472488.703374][4422:4427] CHIP:TOO:       NodeId: 1
+          [1655472488.703411][4422:4427] CHIP:TOO:       Label:
+          [1655472488.703447][4422:4427] CHIP:TOO:       FabricIndex: 1
+          [1655472488.703480][4422:4427] CHIP:TOO:      }
+          [1655472488.703535][4422:4427] CHIP:TOO:     [2]: {
+          [1655472488.703581][4422:4427] CHIP:TOO:       RootPublicKey: 046E07C7995834C97544C01B348C6E99AECC2BFBC7A6C9D2CDF2B8C23AEC425463997F77AFF4F536257118CA4113AAD5EDBE64F548F525FF9C1EEEB1E71530CD2F
+          [1655472488.703622][4422:4427] CHIP:TOO:       VendorId: 65521
+          [1655472488.703660][4422:4427] CHIP:TOO:       FabricId: 1
+          [1655472488.703697][4422:4427] CHIP:TOO:       NodeId: 2
+          [1655472488.703735][4422:4427] CHIP:TOO:       Label: NodeOpeCredits1
+          [1655472488.703773][4422:4427] CHIP:TOO:       FabricIndex: 2
+          [1655472488.703805][4422:4427] CHIP:TOO:      }
       disabled: true
 
     - label:
           "Read the Fabrics List from DUT and get the FabricDescriptorStruct for
-          which FabricIndex = fabric-id field from the operational certificate"
+          which the FabricIndex field equals FabricIndex_TH2"
       verification: |
-          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0
-
-          [1651575635.120166][4259:4264] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2018783045
-          [1651575635.120365][4259:4264] CHIP:TOO:   Fabrics: 2 entries
-          [1651575635.120654][4259:4264] CHIP:TOO:     [1]: {
-          [1651575635.120726][4259:4264] CHIP:TOO:       RootPublicKey: 0412894491026CDACAC117D232D252EF827691D378BCCC9E8E717E6C70B3D36E4C5430FDF26B783EC579506D3E748BABFBC6D400302C72CD5BD40B152AA303724B
-          [1651575635.120789][4259:4264] CHIP:TOO:       VendorId: 65521
-          [1651575635.120844][4259:4264] CHIP:TOO:       FabricId: 1
-          [1651575635.120896][4259:4264] CHIP:TOO:       NodeId: 1
-          [1651575635.120948][4259:4264] CHIP:TOO:       Label: NodeOpeCredits1
-          [1651575635.121002][4259:4264] CHIP:TOO:       FabricIndex: 1
-          [1651575635.121057][4259:4264] CHIP:TOO:      }
-          [1651575635.121134][4259:4264] CHIP:TOO:     [2]: {
-          [1651575635.121224][4259:4264] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
-          [1651575635.121287][4259:4264] CHIP:TOO:       VendorId: 65521
-          [1651575635.121341][4259:4264] CHIP:TOO:       FabricId: 1
-          [1651575635.121394][4259:4264] CHIP:TOO:       NodeId: 2
-          [1651575635.121446][4259:4264] CHIP:TOO:       Label: NodeOpeCredits2
-          [1651575635.121499][4259:4264] CHIP:TOO:       FabricIndex: 2
-          [1651575635.121552][4259:4264] CHIP:TOO:      }
+          See above
       disabled: true
 
     - label:
           "From TH2 send RemoveFabric command with Fabric Index as
-          FabricIndex_Test + 5 (Invalid Fabric Index)to DUT"
+          FabricIndexTH2 + 5 (Invalid Fabric Index) to DUT"
+      PICS: OPCREDS.S.C0a.Rsp
       verification: |
-          ./chip-tool operationalcredentials remove-fabric 25 1 0
+          ./chip-tool operationalcredentials remove-fabric 3 2 0
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1646390608.860327][6336:6341] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1646390608.860465][6336:6341] CHIP:TOO:   NOCResponse: {
-          [1646390608.860548][6336:6341] CHIP:TOO:     statusCode: 11
-          [1646390608.860611][6336:6341] CHIP:TOO:    }
-          [1646390608.860695][6336:6341] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646390608.860801][6336:6341] CHIP:EM: Sending Standalone Ack for MessageCounter:1477607 on exchange 51257i
+          [1655472616.205550][4434:4439] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1655472616.205609][4434:4439] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1655472616.205671][4434:4439] CHIP:TOO:   NOCResponse: {
+          [1655472616.205722][4434:4439] CHIP:TOO:     statusCode: 11
+          [1655472616.205760][4434:4439] CHIP:TOO:    }
+          [1655472616.205799][4434:4439] CHIP:DMG: ICR moving to [AwaitingDe]
+
+
+          ./chip-tool operationalcredentials read  trusted-root-certificates 2 0
+
+          [1655472673.786473][4444:4449] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2667298001
+          [1655472673.786545][4444:4449] CHIP:TOO:   TrustedRootCertificates: 2 entries
+          [1655472673.786590][4444:4449] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A37062414001824070124080130094104FB421853FB8AE6AEA281845DE7C8689E7C24AD3283A3536E09BA2FAAE88F6EA4C08DC055A965D8FE0A8060A7F9F45E509B7A4C9092FB3D8D2E253B057899F5AB370A35012901182402603004146EDE812590A5E6E4463798EB06AC3BD5284DFAAE3005146EDE812590A5E6E4463798EB06AC3BD5284DFAAE18300B405F5AF97A75846BFB6B68727C697FEF7E233535D14303E2338A458BB50A6C7BA05AEC058DD802EB4138164D3525392F51D1F8595E8E9FC79E3F5704995762164218
+          [1655472673.786635][4444:4449] CHIP:TOO:     [2]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941046E07C7995834C97544C01B348C6E99AECC2BFBC7A6C9D2CDF2B8C23AEC425463997F77AFF4F536257118CA4113AAD5EDBE64F548F525FF9C1EEEB1E71530CD2F370A3501290118240260300414532A927E58D5D6E4512CA432D4DC750058752C04300514532A927E58D5D6E4512CA432D4DC750058752C0418300B403FDF5247055ACF950C7717B9145ECA0BFE1702C780AD459CBB26E20927A22C5C73308CC5C9C982EAB1EC9F1310784B9F81E35C683D9EA01A5E4CFF9667B8235F18
       disabled: true
 
     - label:
           "From TH2 sends RemoveFabric command with Fabric Index as
-          FabricIndex_Test (Valid Fabric Index)to DUT"
+          FabricIndex_TH1 (Valid Fabric Index) to DUT"
       verification: |
-          ./chip-tool operationalcredentials remove-fabric 1 1 0
+          ./chip-tool operationalcredentials remove-fabric 1 2 0
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          CHIP:TOO:   NOCResponse: {
-          CHIP:TOO:     statusCode: 0
-          CHIP:TOO:     fabricIndex: 2
-          CHIP:TOO:    }
-          CHIP:DMG: ICR moving to [AwaitingDe]
+          [1655472760.302540][4453:4458] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1655472760.302643][4453:4458] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1655472760.302815][4453:4458] CHIP:TOO:   NOCResponse: {
+          [1655472760.302885][4453:4458] CHIP:TOO:     statusCode: 0
+          [1655472760.303018][4453:4458] CHIP:TOO:     fabricIndex: 1
+          [1655472760.303070][4453:4458] CHIP:TOO:    }
+      disabled: true
+
+    - label: "From TH1 Read the Fabrics list from DUT."
+      verification: |
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
+
+          [1655472793.693681][13463:13468] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2667298005
+          [1655472793.693790][13463:13468] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1655472793.693869][13463:13468] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A37062414001824070124080130094104FB421853FB8AE6AEA281845DE7C8689E7C24AD3283A3536E09BA2FAAE88F6EA4C08DC055A965D8FE0A8060A7F9F45E509B7A4C9092FB3D8D2E253B057899F5AB370A35012901182402603004146EDE812590A5E6E4463798EB06AC3BD5284DFAAE3005146EDE812590A5E6E4463798EB06AC3BD5284DFAAE18300B405F5AF97A75846BFB6B68727C697FEF7E233535D14303E2338A458BB50A6C7BA05AEC058DD802EB4138164D3525392F51D1F8595E8E9FC79E3F5704995762164218
       disabled: true
 
     - label:
-          "From TH2 send RemoveTrustedRootCertificate command with certificate
-          value as Root_CA_Certificate_Original_TH2 to DUT"
+          "TH1 sends AddTrustedRootCertificate command to DUT to install the
+          Root CA Certificate which differs from
+          Root_CA_Certificate_Original_TH1 by one byte in the Subject field"
+      PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          Not Verifiable
+
       disabled: true
 
-    - label: "From TH Read the TrustedRootCertificates list from DUT."
+    - label: "Read the TrustedRootCertificates list from DUT"
       verification: |
-          ./chip-tool operationalcredentials read  trusted-root-certificates 2 0
+          ./chip-tool operationalcredentials read trusted-root-certificates 1 0
 
-          [1651577039.219545][4506:4511] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 2998576972
-          [1651577039.219645][4506:4511] CHIP:TOO:   TrustedRootCertificates: 2 entries
-          [1651577039.219727][4506:4511] CHIP:TOO:     [1]: Elided value too large of size 231
-          [1651577039.219771][4506:4511] CHIP:TOO:     [2]: Elided value too large of size 231
+          [1655296468.138167][5628:5633] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 323778350
+          [1655296468.138314][5628:5633] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1655296468.138421][5628:5633] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A370624140018240701240801300941040411C332B4D6CA8A742852BAA10666F9BD6A0D6180BAF8677011FD1542C19E1A89864CE9454AA409BF0CABB8E2305E6FBB4A767FE00C7D8C0A581758749650C8370A35012901182402603004145A3098A5158DF1C2E6C2188E2CB716AB925129933005145A3098A5158DF1C2E6C2188E2CB716AB9251299318300B40822E81D4315B3710181B44D7E35C91AE7E6578C90D112275BB07CF8B7906751830BC0F93BB53E43BD8AD38C58A74386101A1AC7759D6D53EB9F65F64870C875818
       disabled: true
 
-    - label: "From TH Read the Fabrics list from DUT."
+    - label:
+          "TH1 sends AddTrustedRootCertificate command to DUT to install a
+          malformed Root CA Certificate where the signature does not match the
+          public key"
+      PICS: OPCREDS.S.C0b.Rsp
       verification: |
-          ./chip-tool operationalcredentials read fabrics 2 0
-
-          [1651577163.247975][4519:4524] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2998576972
-          [1651577163.248161][4519:4524] CHIP:TOO:   Fabrics: 1 entries
-          [1651577163.248349][4519:4524] CHIP:TOO:     [1]: {
-          [1651577163.248425][4519:4524] CHIP:TOO:       RootPublicKey: 040983D9AC57DBF8DA04F818B1A15B2BD2821AD2BA1807099EAE1A52C62B404767972D4D7AB6B583395769881A666DCA8776EBC662EA1DE19B1DDDD9306A5DCB91
-          [1651577163.248489][4519:4524] CHIP:TOO:       VendorId: 65521
-          [1651577163.248545][4519:4524] CHIP:TOO:       FabricId: 1
-          [1651577163.248599][4519:4524] CHIP:TOO:       NodeId: 2
-          [1651577163.248653][4519:4524] CHIP:TOO:       Label:
-          [1651577163.248706][4519:4524] CHIP:TOO:       FabricIndex: 2
-          [1651577163.248763][4519:4524] CHIP:TOO:      }
+          Not verifiable
       disabled: true
