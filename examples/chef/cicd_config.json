@@ -1,8 +1,15 @@
 {
     "ci_allow_list": ["rootnode_dimmablelight_bCwGYSDpoe"],
     "cd_platforms": {
-        "linux": "linux_x86",
-        "esp32": "m5stack",
-        "nrfconnect": "nrf52840dk"
+        "linux": {
+            "linux_x86": ["--cpu_type", "x64"],
+            "linux_arm64_ipv6only": ["--cpu_type", "arm64", "--ipv6only"]
+        },
+        "esp32": {
+            "m5stack": []
+        },
+        "nrfconnect": {
+            "nrf52840dk": []
+        }
     }
 }
