@@ -33,7 +33,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 0
           constraints:
               type: uint8
 
@@ -42,7 +41,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 0
           constraints:
               type: uint8
 
@@ -51,7 +49,6 @@ tests:
       command: "readAttribute"
       attribute: "RemainingTime"
       response:
-          value: 0
           constraints:
               type: uint16
 
@@ -129,7 +126,6 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 0
           constraints:
               type: uint16
 
@@ -148,7 +144,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopActive"
       response:
-          value: 0
           constraints:
               type: uint8
 
@@ -157,7 +152,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopDirection"
       response:
-          value: 0
           constraints:
               type: uint8
 
@@ -166,7 +160,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopTime"
       response:
-          value: 25
           constraints:
               type: uint16
 
@@ -175,7 +168,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       response:
-          value: 8960
           constraints:
               type: uint16
 
@@ -184,7 +176,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       response:
-          value: 0
           constraints:
               type: uint16
 
