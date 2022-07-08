@@ -92,7 +92,7 @@ function getManualTests() {
 
     const bridge = [
         "Test_TC_BR_1",
-        "Test_TC_BR_2", 
+        "Test_TC_BR_2",
         "Test_TC_BR_3",
     ];
 
@@ -147,7 +147,7 @@ function getManualTests() {
     ];
 
     const Descriptor = [
-        "Test_TC_DESC_2_1", 
+        "Test_TC_DESC_2_1",
         "Test_TC_DESC_2_2",
     ];
 
@@ -171,12 +171,12 @@ function getManualTests() {
     ];
 
     const Identify = [
-        "Test_TC_I_3_1", 
+        "Test_TC_I_3_1",
         "Test_TC_I_3_2",
     ];
 
     const IlluminanceMeasurement = [
-        "Test_TC_ILL_2_2", 
+        "Test_TC_ILL_2_2",
         "Test_TC_ILL_3_1",
     ];
 
@@ -329,12 +329,12 @@ function getManualTests() {
     ];
 
     const WindowCovering = [
-        "Test_TC_WNCV_6_1", 
+        "Test_TC_WNCV_6_1",
         "Test_TC_WNCV_7_1",
     ];
 
     const FlowMeasurement = [
-        "Test_TC_FLW_2_2", 
+        "Test_TC_FLW_2_2",
         "Test_TC_FLW_3_1",
     ];
 
@@ -347,17 +347,17 @@ function getManualTests() {
     ];
 
     const PressureMeasurement = [
-        "Test_TC_PRS_2_2", 
+        "Test_TC_PRS_2_2",
         "Test_TC_PRS_3_1",
     ];
 
     const PowerSource = [
-        "Test_TC_PS_2_2", 
+        "Test_TC_PS_2_2",
         "Test_TC_PS_3_1",
     ];
 
     const BooleanState = [
-        "Test_TC_BOOL_2_2", 
+        "Test_TC_BOOL_2_2",
         "Test_TC_BOOL_3_1",
     ];
 
@@ -399,13 +399,13 @@ function getManualTests() {
     ];
 
     const OnOff = [
-        "Test_TC_OO_2_3", 
-        "Test_TC_OO_3_1", 
+        "Test_TC_OO_2_3",
+        "Test_TC_OO_3_1",
         "Test_TC_OO_3_2",
     ];
 
     const RelativeHumidityMeasurement = [
-        "Test_TC_RH_2_2", 
+        "Test_TC_RH_2_2",
         "Test_TC_RH_3_1",
     ];
 
@@ -422,7 +422,7 @@ function getManualTests() {
     ];
 
     const Thermostat = [
-        "Test_TC_TSTAT_3_1", 
+        "Test_TC_TSTAT_3_1",
         "Test_TC_TSTAT_3_2",
     ];
 
@@ -545,7 +545,7 @@ function getTests() {
     ];
 
     const BooleanState = [
-        "Test_TC_BOOL_1_1", 
+        "Test_TC_BOOL_1_1",
         "Test_TC_BOOL_2_1",
     ];
 
@@ -590,17 +590,17 @@ function getTests() {
     ];
 
     const FlowMeasurement = [
-        "Test_TC_FLW_1_1", 
+        "Test_TC_FLW_1_1",
         "Test_TC_FLW_2_1",
     ];
 
     const GeneralCommissioning = [
-        "Test_TC_CGEN_1_1", 
+        "Test_TC_CGEN_1_1",
         "Test_TC_CGEN_2_1",
     ];
 
     const GeneralDiagnostics = [
-        "Test_TC_DGGEN_1_1", 
+        "Test_TC_DGGEN_1_1",
         "Test_TC_DGGEN_2_1",
     ];
 
@@ -612,12 +612,12 @@ function getTests() {
     ];
 
     const IlluminanceMeasurement = [
-        "Test_TC_ILL_1_1", 
+        "Test_TC_ILL_1_1",
         "Test_TC_ILL_2_1",
     ];
 
     const OccupancySensing = [
-        "Test_TC_OCC_1_1", 
+        "Test_TC_OCC_1_1",
         "Test_TC_OCC_2_1",
     ];
 
@@ -699,12 +699,12 @@ function getTests() {
     ];
 
     const PowerSource = [
-        "Test_TC_PS_1_1", 
+        "Test_TC_PS_1_1",
         "Test_TC_PS_2_1",
     ];
 
     const PressureMeasurement = [
-        "Test_TC_PRS_1_1", 
+        "Test_TC_PRS_1_1",
         "Test_TC_PRS_2_1",
     ];
 
@@ -721,7 +721,7 @@ function getTests() {
     ];
 
     const RelativeHumidityMeasurement = [
-        "Test_TC_RH_1_1", 
+        "Test_TC_RH_1_1",
         "Test_TC_RH_2_1",
     ];
 
