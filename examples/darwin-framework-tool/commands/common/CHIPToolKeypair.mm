@@ -33,7 +33,7 @@ static NSString * const kOperationalCredentialsIPK = @"ChipToolOpCredsIPK";
     return _mKeyPair.Initialize() == CHIP_NO_ERROR;
 }
 
-- (NSData *)ECDSA_sign_message_raw:(NSData *)message
+- (NSData *)signMessageECDSA_RAW:(NSData *)message
 {
     chip::Crypto::P256ECDSASignature signature;
     NSData * out_signature;

@@ -179,9 +179,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
-    // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler(&mExchangeMgr);
-
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
@@ -246,6 +243,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                        &logStorageResources[0], &sGlobalEventIdCounter);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+    // This initializes clusters, so should come after lower level initialization.
+    InitDataModelHandler(&mExchangeMgr);
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);

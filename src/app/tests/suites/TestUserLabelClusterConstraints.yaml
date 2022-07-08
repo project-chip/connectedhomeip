@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,14 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 92.6. [TC-ULABEL-2.5] User label cluster [DUT-client]
+name: User Label Cluster Tests
 
 config:
     nodeId: 0x12344321
     cluster: "User Label"
-    endpoint: 1
+    endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -29,9 +28,30 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads LabelList attribute of the DUT"
-      command: "readAttribute"
+    - label: "Attempt to write overly long item for label"
+      command: "writeAttribute"
       attribute: "label list"
+      arguments:
+          value:
+              [
+                  {
+                      label: "this is longer than sixteen characters",
+                      value: "bedroom 2",
+                  },
+              ]
       response:
-          constraints:
-              type: list
+          error: FAILURE
+
+    - label: "Attempt to write overly long item for value"
+      command: "writeAttribute"
+      attribute: "label list"
+      arguments:
+          value:
+              [
+                  {
+                      label: "test",
+                      value: "this is longer than sixteen characters",
+                  },
+              ]
+      response:
+          error: FAILURE

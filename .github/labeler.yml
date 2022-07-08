@@ -51,6 +51,9 @@ gn:
     - "*.gn"
     - "*.gni"
 
+tests:
+    - src/app/tests/*
+
 github:
     - .github
 

@@ -22,6 +22,7 @@ config:
 
 tests:
     - label: "TH reads LockState attribute from DUT"
+      PICS: DRLK.S.A0000
       verification: |
           ./chip-tool doorlock read lock-state 1 1
           [1653374351.373518][2749:2755] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 4018252607
@@ -29,12 +30,14 @@ tests:
       disabled: true
 
     - label: "TH writes LockState attribute as 1"
+      PICS: DRLK.S.A0000
       verification: |
           ./chip-tool doorlock write lock-state 1 1
           [1653385331.682442][3714:3714] CHIP:TOO: Unknown attribute: lock-state
       disabled: true
 
     - label: "TH reads LockState attribute from DUT"
+      PICS: DRLK.S.A0000
       verification: |
           ./chip-tool doorlock read lock-state 1 1
           [1653374351.373518][2749:2755] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0000 DataVersion: 4018252607
@@ -50,12 +53,14 @@ tests:
       disabled: true
 
     - label: "TH writes LockType attribute as 10"
+      PICS: DRLK.S.A0001
       verification: |
           ./chip-tool doorlock write lock-type 1 1
           [1653385390.925430][3717:3717] CHIP:TOO: Unknown attribute: lock-type
       disabled: true
 
     - label: "TH reads LockType attribute from DUT"
+      PICS: DRLK.S.A0001
       verification: |
           ./chip-tool doorlock read lock-type 1 1
 
@@ -64,6 +69,7 @@ tests:
       disabled: true
 
     - label: "TH reads ActuatorEnabled attribute from DUT"
+      PICS: DRLK.S.A0002
       verification: |
           ./chip-tool doorlock read actuator-enabled 1 1
 
@@ -72,12 +78,14 @@ tests:
       disabled: true
 
     - label: "TH writes ActuatorEnabled attribute as 0"
+      PICS: DRLK.S.A0002
       verification: |
           ./chip-tool doorlock write actuator-enabled  1 1
           [1653385453.845278][3722:3722] CHIP:TOO: Unknown attribute: actuator-enabled
       disabled: true
 
     - label: "TH reads ActuatorEnabled attribute from DUT"
+      PICS: DRLK.S.A0002
       verification: |
           ./chip-tool doorlock read actuator-enabled 1 1
 
@@ -86,6 +94,7 @@ tests:
       disabled: true
 
     - label: "TH reads DoorState attribute from DUT"
+      PICS: DRLK.S.A0003 && DRLK.S.F05
       verification: |
           ./chip-tool doorlock read door-state 1 1
 
@@ -94,12 +103,14 @@ tests:
       disabled: true
 
     - label: "TH writes DoorState attribute as 1"
+      PICS: DRLK.S.A0003
       verification: |
           ./chip-tool doorlock write door-state 1 1
           [1653385494.200848][3724:3724] CHIP:TOO: Unknown attribute: door-state
       disabled: true
 
     - label: "TH reads DoorState attribute from DUT"
+      PICS: DRLK.S.A0003
       verification: |
           ./chip-tool doorlock read door-state 1 1
 
@@ -108,6 +119,7 @@ tests:
       disabled: true
 
     - label: "TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0004 && DRLK.S.F05
       verification: |
           ./chip-tool doorlock read door-open-events 1 1
 
@@ -129,6 +141,7 @@ tests:
       disabled: true
 
     - label: "TH writes DoorOpenEvents attribute as 10"
+      PICS: DRLK.S.A0004
       verification: |
           ./chip-tool doorlock write door-open-events 4 1 1
 
@@ -149,6 +162,7 @@ tests:
       disabled: true
 
     - label: "TH reads DoorOpenEvents attribute from DUT"
+      PICS: DRLK.S.A0004
       verification: |
           ./chip-tool doorlock read door-open-events 1 1
 
@@ -170,6 +184,7 @@ tests:
       disabled: true
 
     - label: "TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.A0005 && DRLK.S.F05
       verification: |
           ./chip-tool doorlock read door-closed-events 1 1
 
@@ -191,6 +206,7 @@ tests:
       disabled: true
 
     - label: "TH writes DoorClosedEvents attribute as 11"
+      PICS: DRLK.S.A0005
       verification: |
           ./chip-tool doorlock write door-closed-events 5 1 1
 
@@ -209,6 +225,7 @@ tests:
       disabled: true
 
     - label: "TH reads DoorClosedEvents attribute from DUT"
+      PICS: DRLK.S.A0005
       verification: |
           ./chip-tool doorlock read door-closed-events 1 1
 
@@ -230,6 +247,7 @@ tests:
       disabled: true
 
     - label: "TH reads OpenPeriod attribute from DUT"
+      PICS: DRLK.S.A0006 && DRLK.S.F05
       verification: |
           ./chip-tool doorlock read open-period 1 1
 
@@ -251,6 +269,7 @@ tests:
       disabled: true
 
     - label: "TH writes OpenPeriod attribute as 2 minutes"
+      PICS: DRLK.S.A0006
       verification: |
           ./chip-tool doorlock write open-period 6 1 1
 
@@ -270,6 +289,7 @@ tests:
       disabled: true
 
     - label: "TH reads OpenPeriod attribute from DUT"
+      PICS: DRLK.S.A0006
       verification: |
           ./chip-tool doorlock read open-period 1 1
 
@@ -291,6 +311,7 @@ tests:
       disabled: true
 
     - label: "TH reads NumberOfTotalUsersSupported attribute from DUT"
+      PICS: DRLK.S.A0011 && DRLK.S.F08
       verification: |
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
 
@@ -299,12 +320,14 @@ tests:
       disabled: true
 
     - label: "TH writes NumberOfTotalUsersSupported attribute as 20"
+      PICS: DRLK.S.A0011
       verification: |
           ./chip-tool doorlock write number-of-total-users-supported 1 1
           [1653385575.613595][3729:3729] CHIP:TOO: Unknown attribute: number-of-total-users-supported
       disabled: true
 
     - label: "TH reads NumberOfTotalUsersSupported attribute from DUT"
+      PICS: DRLK.S.A0011
       verification: |
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
 
@@ -313,6 +336,7 @@ tests:
       disabled: true
 
     - label: "TH reads NumberOfPINUsersSupported attribute from DUT"
+      PICS: DRLK.S.A0012 && DRLK.S.F00
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 1 1
 
@@ -321,12 +345,14 @@ tests:
       disabled: true
 
     - label: "TH writes NumberOfPINUsersSupported attribute as 25"
+      PICS: DRLK.S.A0012
       verification: |
           ./chip-tool doorlock write number-of-pinusers-supported 1 1
           [1653385619.471653][3733:3733] CHIP:TOO: Unknown attribute: number-of-pinusers-supported
       disabled: true
 
     - label: "TH reads NumberOfPINUsersSupported attribute from DUT"
+      PICS: DRLK.S.A0012
       verification: |
           ./chip-tool doorlock read number-of-pinusers-supported 1 1
 
@@ -335,6 +361,7 @@ tests:
       disabled: true
 
     - label: "TH reads NumberOfRFIDUsersSupported attribute from DUT"
+      PICS: DRLK.S.A0013 && DRLK.S.F01
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 1 1
 
@@ -343,12 +370,14 @@ tests:
       disabled: true
 
     - label: "TH writes NumberOfRFIDUsersSupported attribute as 30"
+      PICS: DRLK.S.A0013
       verification: |
           ./chip-tool doorlock write  number-of-rfidusers-supported 1 1
           [1653385665.709545][3737:3737] CHIP:TOO: Unknown attribute: number-of-rfidusers-supported
       disabled: true
 
     - label: "TH reads NumberOfRFIDUsersSupported attribute from DUT"
+      PICS: DRLK.S.A0013
       verification: |
           ./chip-tool doorlock read number-of-rfidusers-supported 1 1
 
@@ -358,6 +387,7 @@ tests:
 
     - label:
           "TH reads NumberOfWeekDaysSchedulesSupporterUser attribute from DUT"
+      PICS: DRLK.S.A0014 && DRLK.S.F04
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
 
@@ -367,6 +397,7 @@ tests:
 
     - label:
           "TH writes NumberOfWeekDaySchedulesSupportedPerUser attribute as 31"
+      PICS: DRLK.S.A0014
       verification: |
           ./chip-tool doorlock write number-of-week-day-schedules-supported-per-user 1 1
           [1653385709.789383][3739:3739] CHIP:TOO: Unknown attribute: number-of-week-day-schedules-supported-per-user
@@ -374,6 +405,7 @@ tests:
 
     - label:
           "TH reads NumberOfWeekDaySchedulesSupportedPerUser attribute from DUT"
+      PICS: DRLK.S.A0014
       verification: |
           ./chip-tool doorlock read  number-of-week-day-schedules-supported-per-user 1 1
 
@@ -383,6 +415,7 @@ tests:
 
     - label:
           "TH reads NumberOfYearDaySchedulesSupportedPeruser attribute from DUT"
+      PICS: DRLK.S.A0015 && DRLK.S.F04
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
 
@@ -392,6 +425,7 @@ tests:
 
     - label:
           "TH writes NumberOfYearDaySchedulesSupportedPerUser attribute as 35"
+      PICS: DRLK.S.A0015
       verification: |
           ./chip-tool doorlock write number-of-year-day-schedules-supported-per-user 1 1
           [1653385752.463713][3740:3740] CHIP:TOO: Unknown attribute: number-of-year-day-schedules-supported-per-user
@@ -399,6 +433,7 @@ tests:
 
     - label:
           "TH reads NumberOfYearDaySchedulesSupportedPerUser attribute from DUT"
+      PICS: DRLK.S.A0015
       verification: |
           ./chip-tool doorlock read number-of-year-day-schedules-supported-per-user 1 1
 
@@ -407,6 +442,7 @@ tests:
       disabled: true
 
     - label: "TH reads NumberOfHoliDaySchedulesSupported attribute from DUT"
+      PICS: DRLK.S.A0016 && DRLK.S.F04
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
 
@@ -415,12 +451,14 @@ tests:
       disabled: true
 
     - label: "TH writes NumberOfHolidaySchedulesSupported attribute as 36"
+      PICS: DRLK.S.A0016
       verification: |
           ./chip-tool doorlock write  number-of-holiday-schedules-supported 1 1
           [1653385816.916485][3743:3743] CHIP:TOO: Unknown attribute: number-of-holiday-schedules-supported
       disabled: true
 
     - label: "TH reads NumberOfHolidaySchedulesSupported attribute from DUT"
+      PICS: DRLK.S.A0016
       verification: |
           ./chip-tool doorlock read number-of-holiday-schedules-supported 1 1
 
@@ -429,6 +467,7 @@ tests:
       disabled: true
 
     - label: "TH reads MaxPINCodeLength attribute from DUT"
+      PICS: DRLK.S.A0017 && DRLK.S.F00
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
 
@@ -437,12 +476,14 @@ tests:
       disabled: true
 
     - label: "TH writes MaxPINCodeLength attribute as 85"
+      PICS: DRLK.S.A0017
       verification: |
           ./chip-tool doorlock write  max-pincode-length 1 1
           [1653385871.706688][3746:3746] CHIP:TOO: Unknown attribute: max-pincode-length
       disabled: true
 
     - label: "TH reads MaxPINCodeLength attribute from DUT"
+      PICS: DRLK.S.A0017
       verification: |
           ./chip-tool doorlock read  max-pincode-length 1 1
 
@@ -451,6 +492,7 @@ tests:
       disabled: true
 
     - label: "TH reads MinPINCodeLength attribute from DUT"
+      PICS: DRLK.S.A0018 && DRLK.S.F00
       verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
 
@@ -459,12 +501,14 @@ tests:
       disabled: true
 
     - label: "TH writes MinPINCodeLength attribute as 63"
+      PICS: DRLK.S.A0018
       verification: |
           ./chip-tool doorlock write  min-pincode-length 1 1
           [1653385909.076429][3750:3750] CHIP:TOO: Unknown attribute: min-pincode-length
       disabled: true
 
     - label: "TH reads MinPINCodeLength attribute from DUT"
+      PICS: DRLK.S.A0018
       verification: |
           ./chip-tool doorlock read min-pincode-length 1 1
 
@@ -473,6 +517,7 @@ tests:
       disabled: true
 
     - label: "TH reads MaxRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.A0019 && DRLK.S.F01
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
 
@@ -481,12 +526,14 @@ tests:
       disabled: true
 
     - label: "TH writes MaxRFIDCodeLength attribute as 46"
+      PICS: DRLK.S.A0019
       verification: |
           ./chip-tool doorlock write  max-rfidcode-length 1 1
           [1653385943.981181][3752:3752] CHIP:TOO: Unknown attribute: max-rfidcode-length
       disabled: true
 
     - label: "TH reads MaxRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.A0019
       verification: |
           ./chip-tool doorlock read  max-rfidcode-length 1 1
 
@@ -495,6 +542,7 @@ tests:
       disabled: true
 
     - label: "TH reads MinRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.A001a && DRLK.S.F01
       verification: |
           ./chip-tool doorlock read max-rfidcode-length 1 1
 
@@ -503,12 +551,14 @@ tests:
       disabled: true
 
     - label: "TH writes MinRFIDCodeLength attribute as 17"
+      PICS: DRLK.S.A001a
       verification: |
           ./chip-tool doorlock write  min-rfidcode-length 1 1
           [1653385975.104136][3754:3754] CHIP:TOO: Unknown attribute: min-rfidcode-length
       disabled: true
 
     - label: "TH reads MinRFIDCodeLength attribute from DUT"
+      PICS: DRLK.S.A001a
       verification: |
           ./chip-tool doorlock read max-rfidcode-length 1 1
 
@@ -517,6 +567,7 @@ tests:
       disabled: true
 
     - label: "TH reads CredentialRulesSupport attribute from DUT"
+      PICS: DRLK.S.A001b && DRLK.S.F08
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
 
@@ -525,12 +576,14 @@ tests:
       disabled: true
 
     - label: "TH writes CredentialRulesSupport attribute as bit 0 is set to 1"
+      PICS: DRLK.S.A001b
       verification: |
           ./chip-tool doorlock write  credential-rules-support 1 1
           [1653386016.121955][3760:3760] CHIP:TOO: Unknown attribute: credential-rules-support
       disabled: true
 
     - label: "TH reads CredentialRulesSupport attribute from DUT"
+      PICS: DRLK.S.A001b
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
 
@@ -539,6 +592,7 @@ tests:
       disabled: true
 
     - label: "TH reads Language attribute from DUT"
+      PICS: DRLK.S.A0021
       verification: |
           ./chip-tool doorlock read language 1 1
 
@@ -547,6 +601,7 @@ tests:
       disabled: true
 
     - label: "TH writes Language attribute as en"
+      PICS: DRLK.S.A0021
       verification: |
           ./chip-tool doorlock write language fr 1 1
 
@@ -564,6 +619,7 @@ tests:
       disabled: true
 
     - label: "TH reads Language attribute from DUT"
+      PICS: DRLK.S.A0021
       verification: |
           ./chip-tool doorlock read language 1 1
 
@@ -573,6 +629,7 @@ tests:
       disabled: true
 
     - label: "TH reads LEDSettings attribute from DUT"
+      PICS: DRLK.S.A0022
       verification: |
           ./chip-tool doorlock read ledsettings 1 1
 
@@ -581,6 +638,7 @@ tests:
       disabled: true
 
     - label: "TH writes LEDSettings attribute as 2"
+      PICS: DRLK.S.A0021
       verification: |
           ./chip-tool doorlock write ledsettings 2 1 1
 
@@ -599,6 +657,7 @@ tests:
       disabled: true
 
     - label: "TH reads LEDSettings attribute from DUT"
+      PICS: DRLK.S.A0021
       verification: |
           ./chip-tool doorlock read ledsettings 1 1
 
@@ -607,6 +666,7 @@ tests:
       disabled: true
 
     - label: "TH reads AutoRelockTime attribute from DUT"
+      PICS: DRLK.S.A0023
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
 
@@ -615,6 +675,7 @@ tests:
       disabled: true
 
     - label: "TH writes AutoRelockTime attribute as 180 seconds"
+      PICS: DRLK.S.A0023
       verification: |
           ./chip-tool doorlock write auto-relock-time 180 1 1
 
@@ -633,6 +694,7 @@ tests:
       disabled: true
 
     - label: "TH reads AutoRelockTime attribute from DUT"
+      PICS: DRLK.S.A0023
       verification: |
           ./chip-tool doorlock read  auto-relock-time 1 1
 
@@ -641,6 +703,7 @@ tests:
       disabled: true
 
     - label: "TH reads SoundVolume attribute from DUT"
+      PICS: DRLK.S.A0024
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
 
@@ -649,6 +712,7 @@ tests:
       disabled: true
 
     - label: "TH writes SoundVolume attribute as 3"
+      PICS: DRLK.S.A0024
       verification: |
           ./chip-tool doorlock write sound-volume 3 1 1
 
@@ -667,6 +731,7 @@ tests:
       disabled: true
 
     - label: "TH reads SoundVolume attribute from DUT"
+      PICS: DRLK.S.A0024
       verification: |
           ./chip-tool doorlock read sound-volume 1 1
 
@@ -675,6 +740,7 @@ tests:
       disabled: true
 
     - label: "TH reads OperatingMode attribute from DUT"
+      PICS: DRLK.S.A0025
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
 
@@ -683,6 +749,7 @@ tests:
       disabled: true
 
     - label: "TH writes OperatingMode attribute as 3"
+      PICS: DRLK.S.A0025
       verification: |
           ./chip-tool doorlock write operating-mode 3 1 1
 
@@ -701,6 +768,7 @@ tests:
       disabled: true
 
     - label: "TH reads OperatingMode attribute from DUT"
+      PICS: DRLK.S.A0025
       verification: |
           ./chip-tool doorlock read operating-mode 1 1
 
@@ -709,6 +777,7 @@ tests:
       disabled: true
 
     - label: "TH reads SupportedOperatingModes attribute from DUT"
+      PICS: DRLK.S.A0026
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
 
@@ -717,12 +786,14 @@ tests:
       disabled: true
 
     - label: "TH writes SupportedOperatingModes attribute as bit 0 is set to 0"
+      PICS: DRLK.S.A0026
       verification: |
           ./chip-tool doorlock write supported-operating-modes  1 1
           [1653386184.298481][3773:3773] CHIP:TOO: Unknown attribute: supported-operating-modes
       disabled: true
 
     - label: "TH reads SupportedOperatingModes attribute from DUT"
+      PICS: DRLK.S.A0026
       verification: |
           ./chip-tool doorlock read supported-operating-modes 1 1
 
@@ -731,6 +802,7 @@ tests:
       disabled: true
 
     - label: "TH reads DefualtConfigurationRegister attribute from DUT"
+      PICS: DRLK.S.A0027
       verification: |
           ./chip-tool doorlock read default-configuration-register 1 1
 
@@ -753,12 +825,14 @@ tests:
 
     - label:
           "TH writes DefaultConfigurationRegister attribute as bit 0 is set to 1"
+      PICS: DRLK.S.A0027
       verification: |
           ./chip-tool doorlock write default-configuration-register  1 1
           [1653386246.611681][3780:3780] CHIP:TOO: Unknown attribute: default-configuration-register
       disabled: true
 
     - label: "TH reads DefaultConfigurationRegister attribute from DUT"
+      PICS: DRLK.S.A0027
       verification: |
           ./chip-tool doorlock read default-configuration-register 1 1
 
@@ -780,6 +854,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnableLocalProgramming attribute from DUT"
+      PICS: DRLK.S.A0028
       verification: |
           ./chip-tool doorlock read enable-local-programming 1 1
 
@@ -801,6 +876,7 @@ tests:
       disabled: true
 
     - label: "TH writes EnableLocalProgramming attribute as false"
+      PICS: DRLK.S.A0028
       verification: |
           ./chip-tool doorlock write enable-local-programming 0 1 1
 
@@ -819,6 +895,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnableLocalProgramming attribute from DUT"
+      PICS: DRLK.S.A0028
       verification: |
           ./chip-tool doorlock read enable-local-programming 1 1
 
@@ -840,6 +917,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnableOneTouchLocking attribute from DUT"
+      PICS: DRLK.S.A0029
       verification: |
           ./chip-tool doorlock read enable-one-touch-locking 1 1
 
@@ -848,6 +926,7 @@ tests:
       disabled: true
 
     - label: "TH writes EnableOneTouchLocking attribute as true"
+      PICS: DRLK.S.A0029
       verification: |
           ./chip-tool doorlock write enable-one-touch-locking 1 1 1
 
@@ -866,6 +945,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnableOneTouchLocking attribute from DUT"
+      PICS: DRLK.S.A0029
       verification: |
           ./chip-tool doorlock read enable-one-touch-locking 1 1
 
@@ -874,6 +954,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnableInsideStatusLED attribute from DUT"
+      PICS: DRLK.S.A002a
       verification: |
           ./chip-tool doorlock read enable-inside-status-led 1 1
 
@@ -895,6 +976,7 @@ tests:
       disabled: true
 
     - label: "TH writes EnableInsideStatusLED attribute as true"
+      PICS: DRLK.S.A002a
       verification: |
           ./chip-tool doorlock write enable-inside-status-led 1 1 1
 
@@ -914,6 +996,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnableInsideStatusLED attribute from DUT"
+      PICS: DRLK.S.A002a
       verification: |
           ./chip-tool doorlock read enable-inside-status-led 1 1
 
@@ -935,6 +1018,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnablePrivacyModeButton attribute from DUT"
+      PICS: DRLK.S.A002b
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 1 1
 
@@ -943,6 +1027,7 @@ tests:
       disabled: true
 
     - label: "TH writes EnablePrivacyModeButton attribute as true"
+      PICS: DRLK.S.A002b
       verification: |
           ./chip-tool doorlock write enable-privacy-mode-button 1 1 1
 
@@ -962,6 +1047,7 @@ tests:
       disabled: true
 
     - label: "TH reads EnablePrivacyModeButton attribute from DUT"
+      PICS: DRLK.S.A002b
       verification: |
           ./chip-tool doorlock read enable-privacy-mode-button 1 1
 
@@ -970,6 +1056,7 @@ tests:
       disabled: true
 
     - label: "TH reads LocalProgrammingFeatures attribute from DUT"
+      PICS: DRLK.S.A002c
       verification: |
           ./chip-tool doorlock read  local-programming-features 1 1
 
@@ -991,6 +1078,7 @@ tests:
       disabled: true
 
     - label: "TH writes LocalProgrammingFeatures attribute as true"
+      PICS: DRLK.S.A002c
       verification: |
           ./chip-tool doorlock write local-programming-features 1 1 1
 
@@ -1009,6 +1097,7 @@ tests:
       disabled: true
 
     - label: "TH reads LocalProgrammingFeatures attribute from DUT"
+      PICS: DRLK.S.A002c
       verification: |
           ./chip-tool doorlock read  local-programming-features 1 1
 
@@ -1030,6 +1119,7 @@ tests:
       disabled: true
 
     - label: "TH reads WrongCodeEntryLimit attribute from DUT"
+      PICS: DRLK.S.A0030 && ( DRLK.S.F00 || DRLK.S.F01 )
       verification: |
           ./chip-tool doorlock read   wrong-code-entry-limit 1 1
 
@@ -1038,6 +1128,7 @@ tests:
       disabled: true
 
     - label: "TH writes WrongCodeEntryLimit attribute as 8"
+      PICS: DRLK.S.A0030
       verification: |
           ./chip-tool doorlock write wrong-code-entry-limit 8 1 1
 
@@ -1056,6 +1147,7 @@ tests:
       disabled: true
 
     - label: "TH reads WrongCodeEntryLimit attribute"
+      PICS: DRLK.S.A0030
       verification: |
           ./chip-tool doorlock read   wrong-code-entry-limit 1 1
 
@@ -1064,6 +1156,7 @@ tests:
       disabled: true
 
     - label: "TH reads UserCodeTemporaryDisableTime attribute from DUT"
+      PICS: DRLK.S.A0031 && ( DRLK.S.F00 || DRLK.S.F01 )
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 1 1
 
@@ -1072,6 +1165,7 @@ tests:
       disabled: true
 
     - label: "TH writes UserCodeTemporaryDisableTime attribute as 34"
+      PICS: DRLK.S.A0031
       verification: |
           ./chip-tool doorlock write user-code-temporary-disable-time 34 1 1
 
@@ -1090,6 +1184,7 @@ tests:
       disabled: true
 
     - label: "TH reads UserCodeTemporaryDisableTime attribute"
+      PICS: DRLK.S.A0031
       verification: |
           ./chip-tool doorlock read user-code-temporary-disable-time 1 1
 
@@ -1097,68 +1192,8 @@ tests:
           [1653384662.484152][3645:3650] CHIP:TOO:   UserCodeTemporaryDisableTime: 34
       disabled: true
 
-    - label: "TH reads SendPINOverTheAir attribute from DUT"
-      verification: |
-          ./chip-tool doorlock read send-pinover-the-air 1 1
-
-          [1653384719.659620][3654:3659] CHIP:DMG:                                StatusIB =
-          [1653384719.659669][3654:3659] CHIP:DMG:                                {
-          [1653384719.659717][3654:3659] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653384719.659762][3654:3659] CHIP:DMG:                                },
-          [1653384719.659810][3654:3659] CHIP:DMG:
-          [1653384719.659851][3654:3659] CHIP:DMG:                        },
-          [1653384719.659893][3654:3659] CHIP:DMG:
-          [1653384719.659930][3654:3659] CHIP:DMG:                },
-          [1653384719.659973][3654:3659] CHIP:DMG:
-          [1653384719.660004][3654:3659] CHIP:DMG:        ],
-          [1653384719.660045][3654:3659] CHIP:DMG:
-          [1653384719.660078][3654:3659] CHIP:DMG:        SuppressResponse = true,
-          [1653384719.660140][3654:3659] CHIP:DMG:        InteractionModelRevision = 1
-          [1653384719.660172][3654:3659] CHIP:DMG: }
-          [1653384719.660313][3654:3659] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
-
-    - label: "TH writes SendPINOverTheAir attribute as true"
-      verification: |
-          ./chip-tool doorlock write  send-pinover-the-air 1 1 1
-
-
-          [1653386559.030446][3821:3826] CHIP:DMG:                        StatusIB =
-          [1653386559.030508][3821:3826] CHIP:DMG:                        {
-          [1653386559.030571][3821:3826] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653386559.030630][3821:3826] CHIP:DMG:                        },
-          [1653386559.030689][3821:3826] CHIP:DMG:
-          [1653386559.030740][3821:3826] CHIP:DMG:                },
-          [1653386559.030799][3821:3826] CHIP:DMG:
-          [1653386559.030843][3821:3826] CHIP:DMG:        ],
-          [1653386559.030898][3821:3826] CHIP:DMG:
-          [1653386559.030942][3821:3826] CHIP:DMG:        InteractionModelRevision = 1
-          [1653386559.030985][3821:3826] CHIP:DMG: }
-          [1653386559.031093][3821:3826] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
-
-    - label: "TH reads SendPINOverTheAir attribute"
-      verification: |
-          ./chip-tool doorlock read send-pinover-the-air 1 1
-
-          [1653384719.659620][3654:3659] CHIP:DMG:                                StatusIB =
-          [1653384719.659669][3654:3659] CHIP:DMG:                                {
-          [1653384719.659717][3654:3659] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653384719.659762][3654:3659] CHIP:DMG:                                },
-          [1653384719.659810][3654:3659] CHIP:DMG:
-          [1653384719.659851][3654:3659] CHIP:DMG:                        },
-          [1653384719.659893][3654:3659] CHIP:DMG:
-          [1653384719.659930][3654:3659] CHIP:DMG:                },
-          [1653384719.659973][3654:3659] CHIP:DMG:
-          [1653384719.660004][3654:3659] CHIP:DMG:        ],
-          [1653384719.660045][3654:3659] CHIP:DMG:
-          [1653384719.660078][3654:3659] CHIP:DMG:        SuppressResponse = true,
-          [1653384719.660140][3654:3659] CHIP:DMG:        InteractionModelRevision = 1
-          [1653384719.660172][3654:3659] CHIP:DMG: }
-          [1653384719.660313][3654:3659] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      disabled: true
-
     - label: "TH reads RequirePINforRemoteOperation attribute from DUT"
+      PICS: DRLK.S.A0033 && ( DRLK.S.F00 || DRLK.S.F07 )
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 1 1
 
@@ -1167,6 +1202,7 @@ tests:
       disabled: true
 
     - label: "TH writes RequirePINforRemoteOperation attribute as true"
+      PICS: DRLK.S.A0033
       verification: |
           ./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
 
@@ -1185,6 +1221,7 @@ tests:
       disabled: true
 
     - label: "TH reads RequirePINforRemoteOperation attribute"
+      PICS: DRLK.S.A0033
       verification: |
           ./chip-tool doorlock read require-pinfor-remote-operation 1 1
 
@@ -1193,6 +1230,7 @@ tests:
       disabled: true
 
     - label: "TH reads ExpiringUserTimeOut attribute from DUT"
+      PICS: DRLK.S.A0035 && DRLK.S.F08
       verification: |
           ./chip-tool doorlock read expiring-user-timeout 1 1
 
@@ -1214,6 +1252,7 @@ tests:
       disabled: true
 
     - label: "TH writes ExpiringUserTimeout attribute as 10 minutes"
+      PICS: DRLK.S.A0035
       verification: |
           ./chip-tool doorlock write expiring-user-timeout 1 1 1
 
@@ -1232,6 +1271,7 @@ tests:
       disabled: true
 
     - label: "TH reads ExpiringUserTimeout attribute"
+      PICS: DRLK.S.A0035
       verification: |
           ./chip-tool doorlock read expiring-user-timeout 1 1
 

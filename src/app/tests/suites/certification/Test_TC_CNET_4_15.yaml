@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.15. [TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound value as
-    LastNetworkingStatus argument validation [DUT-Server]
+    11.4.13. [TC-CNET-4.15] [Wi-Fi] NetworkIDNotFound returned in
+    LastNetworkingStatus field validation [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -27,7 +27,7 @@ tests:
           "TH reads Network attribute from the DUT * TH saves the single entrys
           NetworkID value as 'userwifi_ssid' value for the future use"
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
+          ./chip-tool networkcommissioning read networks 1 0
 
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
@@ -35,15 +35,17 @@ tests:
           [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
           [1645772651.445875][3856:3861] CHIP:TOO:   Networks: 1 entries
           [1645772651.446057][3856:3861] CHIP:TOO:     [1]: {
-          [1645772651.446120][3856:3861] CHIP:TOO:       NetworkID: 0119100899082022
+          [1645772651.446120][3856:3861] CHIP:TOO:       NetworkID: 47524C50726976617465
           [1650389742.394958][9809:9814] CHIP:TOO:       Connected: TRUE
           [1645772651.446228][3856:3861] CHIP:TOO:      }
           [1645772651.446431][3856:3861] CHIP:EM: Sending Standalone Ack for MessageCounter:12695576 on exchange 11133i
       disabled: true
 
-    - label: "TH sends ArmFailSafe command to the DUT"
+    - label:
+          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
+          field set to 900"
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+          ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
           [1650383264.543046][44233:44238] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650383264.543109][44233:44238] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -56,11 +58,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends RemoveNetwork Command to the DUT with NetworkID argument
-          value as 'Userwifi_ssid1' that not matches 'userwifi_ssid' value and
-          Breadcrumb argument value as 1"
+          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+          PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, which does not match the
+          provisioned network, and Breadcrumb field set to 1"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
           [1650383270.888700][44239:44244] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650383270.888774][44239:44244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
@@ -72,11 +75,12 @@ tests:
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork Command to the DUT with NetworkID value as
-          'Userwifi_ssid1' that not matches 'userwifi_ssid' value and Breadcrumb
-          argument value as 1"
+          "TH sends connectNetwork Command to the DUT with NetworkID field set
+          to PIXIT.CNET.WIFI_ 2ND_ACCESSPOIN T_SSID, which does not match the
+          provisioned network, and Breadcrumb field set to 1"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
           [1650383278.349428][44245:44250] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650383278.349490][44245:44250] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007

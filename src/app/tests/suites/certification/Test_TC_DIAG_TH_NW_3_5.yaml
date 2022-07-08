@@ -24,46 +24,55 @@ config:
 
 tests:
     - label: "Simulate an Unspecified failure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate a LinkDown failure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate a HardwareFailure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate a NetworkJammed Failure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate an Unspecified failure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate a LinkDown failure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate a HardwareFailure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate a NetworkJammed Failure on TH"
+      PICS: DGTHREAD.C.E01
       verification: |
           Not Implemented in CHIP Tool
       disabled: true
 
     - label: "Simulate disconnecting and reconnecting to a Thread network on TH"
+      PICS: DGTHREAD.C.E00
       verification: |
           ./chip-tool  threadnetworkdiagnostics  read-event connection-status 137 0
 
