@@ -55,7 +55,7 @@ bool Command::InitArguments(int argc, char ** argv)
         }
     }
 
-    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+    VerifyOrExit((size_t) (argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
                               static_cast<unsigned int>(mandatoryArgsCount)));
 
@@ -312,7 +312,11 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         while (ss.good())
         {
             std::string valueAsString;
-            getline(ss, valueAsString, ',');
+            // By default the parameter separator is ";" in order to not collapse with the argument itself if it contains commas
+            // (e.g a struct argument with multiple fields). In case one needs to use ";" it can be overriden with the following
+            // environment variable.
+            constexpr const char * kSeparatorVariable = "CHIPTOOL_CUSTOM_ARGUMENTS_SEPARATOR";
+            getline(ss, valueAsString, getenv(kSeparatorVariable) ? getenv(kSeparatorVariable)[0] : ';');
 
             CustomArgument * customArgument = new CustomArgument();
             vectorArgument->push_back(customArgument);
