@@ -33,7 +33,13 @@ public final class EventState {
   private byte[] tlv;
   private JSONObject json;
 
-  public EventState(long eventNumber, int priorityLevel, long systemTimeStamp, Object valueObject, byte[] tlv, String jsonString) {
+  public EventState(
+      long eventNumber,
+      int priorityLevel,
+      long systemTimeStamp,
+      Object valueObject,
+      byte[] tlv,
+      String jsonString) {
     this.eventNumber = eventNumber;
     this.priorityLevel = priorityLevel;
     this.systemTimeStamp = systemTimeStamp;
