@@ -23146,6 +23146,12 @@ typedef NS_OPTIONS(uint32_t, MTRApplianceEventsAndAlertAlertStructure) {
     MTRApplianceEventsAndAlertAlertStructurePresenceRecovery = 0x3000,
 };
 
+typedef NS_ENUM(uint8_t, MTRDiscoBallRotate) {
+    MTRDiscoBallRotateOff = 0x00,
+    MTRDiscoBallRotateClockwise = 0x01,
+    MTRDiscoBallRotateCounterClockwise = 0x02,
+};
+
 typedef NS_ENUM(uint8_t, MTRTestClusterSimple) {
     MTRTestClusterSimpleUnspecified = 0x00,
     MTRTestClusterSimpleValueA = 0x01,

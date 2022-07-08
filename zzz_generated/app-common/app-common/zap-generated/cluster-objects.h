@@ -32875,6 +32875,110 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ElectricalMeasurement
+namespace DiscoBall {
+
+namespace Attributes {
+
+namespace Run {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Run::Id; }
+    static constexpr bool MustUseTimedWrite() { return true; }
+};
+} // namespace Run
+namespace Rotate {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::DiscoBall::RotateEnum;
+    using DecodableType    = chip::app::Clusters::DiscoBall::RotateEnum;
+    using DecodableArgType = chip::app::Clusters::DiscoBall::RotateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Rotate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Rotate
+namespace Speed {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Speed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Speed
+namespace Axis {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Axis::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Axis
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+};
+} // namespace AcceptedCommandList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::DiscoBall::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Run::TypeInfo::DecodableType run       = static_cast<bool>(0);
+        Attributes::Rotate::TypeInfo::DecodableType rotate = static_cast<chip::app::Clusters::DiscoBall::RotateEnum>(0);
+        Attributes::Speed::TypeInfo::DecodableType speed   = static_cast<uint8_t>(0);
+        Attributes::Axis::TypeInfo::DecodableType axis     = static_cast<uint8_t>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace DiscoBall
 namespace TestCluster {
 namespace Structs {
 namespace SimpleStruct {

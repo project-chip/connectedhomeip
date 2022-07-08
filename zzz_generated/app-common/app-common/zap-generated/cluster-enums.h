@@ -2417,6 +2417,17 @@ namespace ApplianceStatistics {
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
 
+namespace DiscoBall {
+
+// Enum for RotateEnum
+enum class RotateEnum : uint8_t
+{
+    kOff              = 0x00,
+    kClockwise        = 0x01,
+    kCounterClockwise = 0x02,
+};
+} // namespace DiscoBall
+
 namespace TestCluster {
 
 // Enum for SimpleEnum

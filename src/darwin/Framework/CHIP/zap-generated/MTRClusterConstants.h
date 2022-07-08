@@ -136,6 +136,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterApplianceEventsAndAlertID = 0x00000B02,
     MTRClusterApplianceStatisticsID = 0x00000B03,
     MTRClusterElectricalMeasurementID = 0x00000B04,
+    MTRClusterDiscoBallID = 0x00003456,
     MTRClusterTestClusterID = 0xFFF1FC05,
 };
 
@@ -1894,6 +1895,17 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterElectricalMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterElectricalMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterElectricalMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
+
+    // Cluster DiscoBall attributes
+    MTRClusterDiscoBallAttributeRunID = 0x00000000,
+    MTRClusterDiscoBallAttributeRotateID = 0x00000001,
+    MTRClusterDiscoBallAttributeSpeedID = 0x00000002,
+    MTRClusterDiscoBallAttributeAxisID = 0x00000003,
+    MTRClusterDiscoBallAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
+    MTRClusterDiscoBallAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
+    MTRClusterDiscoBallAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
+    MTRClusterDiscoBallAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
+    MTRClusterDiscoBallAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster TestCluster attributes
     MTRClusterTestClusterAttributeBooleanID = 0x00000000,

@@ -771,6 +771,12 @@
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DISCO_BALL_SERVER) || defined(ZCL_USING_DISCO_BALL_CLIENT)
+#define CHIP_PRINTCLUSTER_DISCO_BALL { ZCL_DISCO_BALL_ID, "Disco Ball" },
+#else
+#define CHIP_PRINTCLUSTER_DISCO_BALL
+#endif
+
 #if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, "Test Cluster" },
 #else
@@ -891,6 +897,7 @@
     CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
+    CHIP_PRINTCLUSTER_DISCO_BALL                                                                                                   \
     CHIP_PRINTCLUSTER_TEST_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 52

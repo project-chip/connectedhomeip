@@ -1640,6 +1640,16 @@
 #define ZCL_RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A16)
 #define ZCL_RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A17)
 
+// Attribute ids for cluster: Disco Ball
+
+// Client attributes
+
+// Server attributes
+#define ZCL_DISCO_BALL_RUN_ATTRIBUTE_ID (0x0000)
+#define ZCL_DISCO_BALL_ROTATE_ATTRIBUTE_ID (0x0001)
+#define ZCL_DISCO_BALL_SPEED_ATTRIBUTE_ID (0x0002)
+#define ZCL_DISCO_BALL_AXIS_ATTRIBUTE_ID (0x0003)
+
 // Attribute ids for cluster: Test Cluster
 
 // Client attributes

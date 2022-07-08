@@ -23197,6 +23197,55 @@ namespace Events {
 } // namespace Events
 
 } // namespace ElectricalMeasurement
+namespace DiscoBall {
+
+namespace Commands {
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::Run::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, run));
+        break;
+    case Attributes::Rotate::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, rotate));
+        break;
+    case Attributes::Speed::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, speed));
+        break;
+    case Attributes::Axis::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, axis));
+        break;
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
+        break;
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
+        break;
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
+        break;
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
+        break;
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
+        break;
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+} // namespace Attributes
+
+namespace Events {
+} // namespace Events
+
+} // namespace DiscoBall
 namespace TestCluster {
 namespace Structs {
 namespace SimpleStruct {

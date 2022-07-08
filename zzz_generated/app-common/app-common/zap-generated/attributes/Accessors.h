@@ -6519,6 +6519,42 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
+namespace DiscoBall {
+namespace Attributes {
+
+namespace Run {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace Run
+
+namespace Rotate {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::DiscoBall::RotateEnum * value); // RotateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DiscoBall::RotateEnum value);
+} // namespace Rotate
+
+namespace Speed {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace Speed
+
+namespace Axis {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace Axis
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DiscoBall
+
 namespace TestCluster {
 namespace Attributes {
 

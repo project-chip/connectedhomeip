@@ -146,6 +146,7 @@
 | ApplianceEventsAndAlert                                             | 0x0B02 |
 | ApplianceStatistics                                                 | 0x0B03 |
 | ElectricalMeasurement                                               | 0x0B04 |
+| DiscoBall                                                           | 0x3456 |
 | TestCluster                                                         | 0xFFF1FC05|
 \*----------------------------------------------------------------------------*/
 
@@ -9134,6 +9135,25 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster DiscoBall                                                   | 0x3456 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Run                                                               | 0x0000 |
+| * Rotate                                                            | 0x0001 |
+| * Speed                                                             | 0x0002 |
+| * Axis                                                              | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
 | Cluster TestCluster                                                 | 0xFFF1FC05|
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -16959,6 +16979,52 @@ void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerC
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterDiscoBall(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::DiscoBall;
+
+    const char * clusterName = "DiscoBall";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "run", Attributes::Run::Id, credsIssuerConfig),                                          //
+        make_unique<ReadAttribute>(Id, "rotate", Attributes::Rotate::Id, credsIssuerConfig),                                    //
+        make_unique<ReadAttribute>(Id, "speed", Attributes::Speed::Id, credsIssuerConfig),                                      //
+        make_unique<ReadAttribute>(Id, "axis", Attributes::Axis::Id, credsIssuerConfig),                                        //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
+        make_unique<WriteAttribute<bool>>(Id, "run", 0, 1, Attributes::Run::Id, credsIssuerConfig),                             //
+        make_unique<WriteAttribute<uint8_t>>(Id, "axis", 0, UINT8_MAX, Attributes::Axis::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "run", Attributes::Run::Id, credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, "rotate", Attributes::Rotate::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "speed", Attributes::Speed::Id, credsIssuerConfig),                                 //
+        make_unique<SubscribeAttribute>(Id, "axis", Attributes::Axis::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterTestCluster(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::TestCluster;
@@ -17478,6 +17544,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);
     registerClusterApplianceStatistics(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
+    registerClusterDiscoBall(commands, credsIssuerConfig);
     registerClusterTestCluster(commands, credsIssuerConfig);
     registerClusterSubscriptions(commands, credsIssuerConfig);
 }

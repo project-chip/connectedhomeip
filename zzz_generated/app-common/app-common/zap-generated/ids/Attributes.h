@@ -6721,6 +6721,48 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
+namespace DiscoBall {
+namespace Attributes {
+
+namespace Run {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Run
+
+namespace Rotate {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Rotate
+
+namespace Speed {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace Speed
+
+namespace Axis {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace Axis
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DiscoBall
+
 namespace TestCluster {
 namespace Attributes {
 

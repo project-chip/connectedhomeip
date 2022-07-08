@@ -361,5 +361,8 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_STATISTICS_CLUSTER_ID = 0x0B03;
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
 
+// Definitions for cluster: Disco Ball
+static constexpr chip::ClusterId ZCL_DISCO_BALL_ID = 0x3456;
+
 // Definitions for cluster: Test Cluster
 static constexpr chip::ClusterId ZCL_TEST_CLUSTER_ID = 0xFFF1FC05;

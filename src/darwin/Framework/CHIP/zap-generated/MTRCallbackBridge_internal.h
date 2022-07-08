@@ -556,6 +556,9 @@ typedef void (*ApplianceEventsAndAlertClusterEventIdentificationAttributeCallbac
     void *, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification);
 typedef void (*NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> &);
+typedef void (*DiscoBallClusterRotateEnumAttributeCallback)(void *, chip::app::Clusters::DiscoBall::RotateEnum);
+typedef void (*NullableDiscoBallClusterRotateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DiscoBall::RotateEnum> &);
 typedef void (*TestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::TestCluster::SimpleEnum);
 typedef void (*NullableTestClusterClusterSimpleEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &);
@@ -16819,6 +16822,61 @@ public:
     MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
         MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRDiscoBallClusterRotateEnumAttributeCallbackBridge : public MTRCallbackBridge<DiscoBallClusterRotateEnumAttributeCallback>
+{
+public:
+    MTRDiscoBallClusterRotateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+                                                         bool keepAlive = false) :
+        MTRCallbackBridge<DiscoBallClusterRotateEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::DiscoBall::RotateEnum value);
+};
+
+class MTRDiscoBallClusterRotateEnumAttributeCallbackSubscriptionBridge : public MTRDiscoBallClusterRotateEnumAttributeCallbackBridge
+{
+public:
+    MTRDiscoBallClusterRotateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     MTRActionBlock action,
+                                                                     SubscriptionEstablishedHandler establishedHandler) :
+        MTRDiscoBallClusterRotateEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableDiscoBallClusterRotateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableDiscoBallClusterRotateEnumAttributeCallback>
+{
+public:
+    MTRNullableDiscoBallClusterRotateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<NullableDiscoBallClusterRotateEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::DiscoBall::RotateEnum> & value);
+};
+
+class MTRNullableDiscoBallClusterRotateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableDiscoBallClusterRotateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableDiscoBallClusterRotateEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             MTRActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableDiscoBallClusterRotateEnumAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
