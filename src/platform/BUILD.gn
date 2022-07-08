@@ -41,9 +41,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Time the firmware was built.
     chip_device_config_firmware_build_time = ""
 
-    # Unix time the firmware was built at (seconds since the epoch)
-    chip_device_config_firmware_build_unix_time = ""
-
     # Use OpenThread ftd or mtd library
     chip_device_config_thread_ftd = chip_openthread_ftd
 
@@ -141,9 +138,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
-    }
-    if (chip_device_config_firmware_build_unix_time != "") {
-      defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_UNIX_TIME=${chip_device_config_firmware_build_unix_time}" ]
     }
 
     if (chip_use_transitional_commissionable_data_provider) {
