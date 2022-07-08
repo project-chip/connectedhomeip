@@ -25,11 +25,25 @@ import org.json.JSONObject;
 public final class EventState {
   private static final String TAG = "EventState";
 
+  private long eventNumber;
+  private int priorityLevel;
+  private long systemTimeStamp;
+
   private Object valueObject;
   private byte[] tlv;
   private JSONObject json;
 
-  public EventState(Object valueObject, byte[] tlv, String jsonString) {
+  public EventState(
+      long eventNumber,
+      int priorityLevel,
+      long systemTimeStamp,
+      Object valueObject,
+      byte[] tlv,
+      String jsonString) {
+    this.eventNumber = eventNumber;
+    this.priorityLevel = priorityLevel;
+    this.systemTimeStamp = systemTimeStamp;
+
     this.valueObject = valueObject;
     this.tlv = tlv;
     try {
@@ -37,6 +51,18 @@ public final class EventState {
     } catch (JSONException ex) {
       Log.e(TAG, "Error parsing JSON string", ex);
     }
+  }
+
+  public long getEventNumber() {
+    return eventNumber;
+  }
+
+  public int getPriorityLevel() {
+    return priorityLevel;
+  }
+
+  public long getSystemTimeStamp() {
+    return systemTimeStamp;
   }
 
   public Object getValue() {
