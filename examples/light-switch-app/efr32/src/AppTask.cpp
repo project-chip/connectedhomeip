@@ -238,13 +238,9 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Create FreeRTOS sw timer for LED Management.
-    sLightTimer = xTimerCreate("LightTmr", // Text Name
-                               10,         // Default timer period (mS)
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-                               false, // IF sed THEN no timer reload
-#else
-                               true, // IF NOT sed then reload
-#endif
+    sLightTimer = xTimerCreate("LightTmr",            // Text Name
+                               10,                    // Default timer period (mS)
+                               true,                  // reload timer
                                (void *) this,         // Timer Id
                                LightTimerEventHandler // Timer callback handler
     );
@@ -382,10 +378,6 @@ void AppTask::FunctionTimerEventHandler(TimerHandle_t xTimer)
 void AppTask::LightTimerEventHandler(TimerHandle_t xTimer)
 {
     sAppTask.LightEventHandler();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    sAppTask.StartLightTimer();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 }
 
 void AppTask::FunctionEventHandler(AppEvent * aEvent)
