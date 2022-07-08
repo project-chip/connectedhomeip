@@ -607,7 +607,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     auto nocResponse         = OperationalCertStatus::kSuccess;
     auto nonDefaultStatus    = Status::Success;
     bool needRevert          = false;
-    int line                 = 0;
 
     CHIP_ERROR err             = CHIP_NO_ERROR;
     FabricIndex newFabricIndex = kUndefinedFabricIndex;
@@ -626,22 +625,11 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
-    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, {
-        nonDefaultStatus = Status::InvalidCommand;
-        line             = __LINE__;
-    });
-    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength, {
-        nonDefaultStatus = Status::InvalidCommand;
-        line             = __LINE__;
-    });
-    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, {
-        nonDefaultStatus = Status::InvalidCommand;
-        line             = __LINE__;
-    });
-    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), {
-        nonDefaultStatus = Status::InvalidCommand;
-        line             = __LINE__;
-    });
+    VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(!ICACValue.HasValue() || ICACValue.Value().size() <= Credentials::kMaxCHIPCertLength,
+                 nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(ipkValue.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, nonDefaultStatus = Status::InvalidCommand);
+    VerifyOrExit(IsVendorIdValidOperationally(adminVendorId), nonDefaultStatus = Status::InvalidCommand);
 
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
@@ -778,7 +766,7 @@ exit:
     else
     {
         commandObj->AddStatus(commandPath, nonDefaultStatus);
-        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x, line %d", to_underlying(nonDefaultStatus), line);
+        ChipLogError(Zcl, "OpCreds: Failed AddNOC request with IM error 0x%02x", to_underlying(nonDefaultStatus));
     }
 
     return true;
