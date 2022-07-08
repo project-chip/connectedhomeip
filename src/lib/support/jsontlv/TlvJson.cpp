@@ -188,6 +188,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         // list indices of the elements in the respective collections.
         //
 
+    case TLV::kTLVType_List:
     case TLV::kTLVType_Array: {
         TLV::TLVType containerType;
 
