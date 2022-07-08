@@ -328,9 +328,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
+        auto fabricIndex = GetExchangeContext()->GetSessionHandle()->GetFabricIndex();
+        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath, fabricIndex));
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
-        MatterPostCommandReceivedCallback(concretePath);
+        MatterPostCommandReceivedCallback(concretePath, fabricIndex);
     }
 
 exit:
@@ -432,12 +433,12 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                 continue;
             }
         }
-
-        if ((err = MatterPreCommandReceivedCallback(concretePath)) == CHIP_NO_ERROR)
+        auto fabricIndex = GetExchangeContext()->GetSessionHandle()->GetFabricIndex();
+        if ((err = MatterPreCommandReceivedCallback(concretePath, fabricIndex)) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
-            MatterPostCommandReceivedCallback(concretePath);
+            MatterPostCommandReceivedCallback(concretePath, fabricIndex);
         }
         else
         {
@@ -675,8 +676,10 @@ void CommandHandler::Abort()
 } // namespace app
 } // namespace chip
 
-CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath)
+CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                                                  chip::FabricIndex fabricIndex)
 {
     return CHIP_NO_ERROR;
 }
-void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath) {}
+void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                                             chip::FabricIndex fabricIndex) {}
