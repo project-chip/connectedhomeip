@@ -30,6 +30,20 @@
 @property (nonatomic, readonly) CHIP_ERROR error;
 @end
 
+@implementation MTRErrorHolder
+
+- (instancetype)initWithError:(CHIP_ERROR)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _error = error;
+    return self;
+}
+
+@end
+
 CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 {
     if (error == nil) {

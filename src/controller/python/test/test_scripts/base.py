@@ -32,6 +32,7 @@ import time
 import ctypes
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
+from chip.utils import CommissioningBuildingBlocks
 from chip.ChipStack import *
 import chip.FabricAdmin
 import copy
@@ -62,8 +63,6 @@ _configurable_tests = set()
 _configurable_test_sets = set()
 _enabled_tests = []
 _disabled_tests = []
-
-_UINT16_MAX = 65535
 
 
 def SetTestSet(enabled_tests, disabled_tests):
@@ -369,101 +368,45 @@ class BaseTestHelper:
         self.logger.info("Waiting for attribute read for CommissionedFabrics")
         startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
 
-        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1, fabricId=3, fabricIndex=3)
+        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1)
         tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
 
-        self.logger.info("Setting failsafe on CASE connection")
-        resp = await self.devCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(60), timedRequestTimeoutMs=1000)
-        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
-            self.logger.error(
-                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
+        self.logger.info("Starting AddNOC using same node ID")
+        if not await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(self.devCtrl, tempDevCtrl, nodeid, nodeid):
+            self.logger.error("AddNOC failed")
             return False
 
-        csrForAddNOC = await self.devCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32))
-
-        chainForAddNOC = tempDevCtrl.IssueNOCChain(csrForAddNOC, nodeid)
-        if chainForAddNOC.rcacBytes is None or chainForAddNOC.icacBytes is None or chainForAddNOC.nocBytes is None or chainForAddNOC.ipkBytes is None:
-            self.logger.error("IssueNOCChain failed to generate valid cert chain for AddNOC")
-            return False
-
-        self.logger.info("Starting AddNOC portion of test")
-        # TODO error check on the commands below
-        await self.devCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(chainForAddNOC.rcacBytes))
-        await self.devCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.AddNOC(chainForAddNOC.nocBytes, chainForAddNOC.icacBytes, chainForAddNOC.ipkBytes, tempDevCtrl.GetNodeId(), 0xFFF1))
-        await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
-
-        afterAddNocFabricCount = await self._GetCommissonedFabricCount(nodeid)
-        if startOfTestFabricCount == afterAddNocFabricCount:
+        expectedFabricCountUntilRemoveFabric = startOfTestFabricCount + 1
+        if expectedFabricCountUntilRemoveFabric != await self._GetCommissonedFabricCount(nodeid):
             self.logger.error("Expected commissioned fabric count to change after AddNOC")
             return False
 
-        resp = await tempDevCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
-        clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
-        if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
-            self.logger.error(
-                "Failed to read valid cluster revision on newly added fabric {}".format(resp))
-            return False
-
         self.logger.info("Starting UpdateNOC using same node ID")
-        resp = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
-        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
-            self.logger.error(
-                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
-            return False
-        csrForUpdateNOC = await tempDevCtrl.SendCommand(
-            nodeid, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32, isForUpdateNOC=True))
-        chainForUpdateNOC = tempDevCtrl.IssueNOCChain(csrForUpdateNOC, nodeid)
-        if chainForUpdateNOC.rcacBytes is None or chainForUpdateNOC.icacBytes is None or chainForUpdateNOC.nocBytes is None or chainForUpdateNOC.ipkBytes is None:
-            self.logger.error("IssueNOCChain failed to generate valid cert chain for UpdateNOC")
+        if not await CommissioningBuildingBlocks.UpdateNOC(tempDevCtrl, nodeid, nodeid):
+            self.logger.error("UpdateNOC using same node ID failed")
             return False
 
-        await tempDevCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForUpdateNOC.nocBytes, chainForUpdateNOC.icacBytes))
-        await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
-        afterUpdateNocFabricCount = await self._GetCommissonedFabricCount(nodeid)
-        if afterUpdateNocFabricCount != afterAddNocFabricCount:
+        if expectedFabricCountUntilRemoveFabric != await self._GetCommissonedFabricCount(nodeid):
             self.logger.error("Expected commissioned fabric count to remain unchanged after UpdateNOC")
             return False
 
-        resp = await tempDevCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
-        clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
-        if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
-            self.logger.error(
-                "Failed to read valid cluster revision on after UpdateNOC {}".format(resp))
-            return False
-
         self.logger.info("Starting UpdateNOC using different node ID")
-        resp = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.GeneralCommissioning.Commands.ArmFailSafe(600), timedRequestTimeoutMs=1000)
-        if resp.errorCode is not Clusters.GeneralCommissioning.Enums.CommissioningError.kOk:
-            self.logger.error(
-                "Incorrect response received from arm failsafe - wanted OK, received {}".format(resp))
-            return False
-        csrForUpdateNOC = await tempDevCtrl.SendCommand(
-            nodeid, 0, Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=b'1' * 32, isForUpdateNOC=True))
-
         newNodeIdForUpdateNoc = nodeid + 1
-        chainForSecondUpdateNOC = tempDevCtrl.IssueNOCChain(csrForUpdateNOC, newNodeIdForUpdateNoc)
-        if chainForSecondUpdateNOC.rcacBytes is None or chainForSecondUpdateNOC.icacBytes is None or chainForSecondUpdateNOC.nocBytes is None or chainForSecondUpdateNOC.ipkBytes is None:
-            self.logger.error("IssueNOCChain failed to generate valid cert chain for UpdateNOC with new node ID")
+        if not await CommissioningBuildingBlocks.UpdateNOC(tempDevCtrl, nodeid, newNodeIdForUpdateNoc):
+            self.logger.error("UpdateNOC using different node ID failed")
             return False
-        updateNocResponse = await tempDevCtrl.SendCommand(nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateNOC(chainForSecondUpdateNOC.nocBytes, chainForSecondUpdateNOC.icacBytes))
-        await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.GeneralCommissioning.Commands.CommissioningComplete())
-        afterUpdateNocWithNewNodeIdFabricCount = await self._GetCommissonedFabricCount(nodeid)
-        if afterUpdateNocFabricCount != afterUpdateNocWithNewNodeIdFabricCount:
+
+        if expectedFabricCountUntilRemoveFabric != await self._GetCommissonedFabricCount(nodeid):
             self.logger.error("Expected commissioned fabric count to remain unchanged after UpdateNOC with new node ID")
             return False
 
         # TODO Read using old node ID and expect that it fails.
-        resp = await tempDevCtrl.ReadAttribute(newNodeIdForUpdateNoc, [(Clusters.Basic.Attributes.ClusterRevision)])
-        clusterRevision = resp[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]
-        if not isinstance(clusterRevision, chip.tlv.uint) or clusterRevision < 1 or clusterRevision > _UINT16_MAX:
-            self.logger.error(
-                "Failed to read valid cluster revision on after UpdateNOC with new node ID {}".format(resp))
-            return False
 
-        removeFabricResponse = await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(updateNocResponse.fabricIndex))
+        currentFabricIndexResponse = await tempDevCtrl.ReadAttribute(newNodeIdForUpdateNoc, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        updatedNOCFabricIndex = currentFabricIndexResponse[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        removeFabricResponse = await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(updatedNOCFabricIndex))
 
-        endOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
-        if endOfTestFabricCount != startOfTestFabricCount:
+        if startOfTestFabricCount != await self._GetCommissonedFabricCount(nodeid):
             self.logger.error("Expected fabric count to be the same at the end of test as when it started")
             return False
 
