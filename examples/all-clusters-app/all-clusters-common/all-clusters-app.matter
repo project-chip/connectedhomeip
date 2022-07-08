@@ -1750,6 +1750,7 @@ server cluster ModeSelect = 80 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  readonly attribute int8u manufacturerExtension = 4293984257;
 
   request struct ChangeToModeRequest {
     INT8U newMode = 0;
@@ -3497,7 +3498,7 @@ server cluster DiscoBall = 13398 {
     kCounterClockwise = 2;
   }
 
-  readonly attribute boolean run = 0;
+  attribute boolean run = 0;
   readonly attribute RotateEnum rotate = 1;
   readonly attribute int8u speed = 2;
   attribute int8u axis = 3;
@@ -4138,18 +4139,6 @@ endpoint 0 {
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
-
-  server cluster DiscoBall {
-    ram      attribute run;
-    ram      attribute rotate;
-    ram      attribute speed;
-    ram      attribute axis;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
-    ram      attribute clusterRevision default = 1;
-  }
 }
 endpoint 1 {
   device type onofflight = 256;
@@ -4293,6 +4282,7 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
+    ram      attribute manufacturerExtension default = 255;
   }
 
   server cluster DoorLock {
@@ -4650,6 +4640,18 @@ endpoint 1 {
     ram      attribute activePowerMax default = 0xffff;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
+  }
+
+  server cluster DiscoBall {
+    ram      attribute run;
+    ram      attribute rotate;
+    ram      attribute speed;
+    ram      attribute axis;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0001;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster TestCluster {
