@@ -162,7 +162,7 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
     // from a SessionDelegate::OnSessionReleased callback. Schedule the preparation as an async work item.
     //
     mSessionManager->SystemLayer()->ScheduleWork(
-        [](auto * systemLayer, auto * appState) {
+        [](auto * systemLayer, auto * appState) -> void {
             CASEServer * _this = static_cast<CASEServer *>(appState);
             _this->PrepareForSessionEstablishment();
         },

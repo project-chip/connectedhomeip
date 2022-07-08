@@ -36,12 +36,15 @@ public:
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override { return ResolveNodeIdStatus; }
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return FindCommissionersStatus; }
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return DiscoverCommissionersStatus; }
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
-    CHIP_ERROR InitStatus              = CHIP_NO_ERROR;
-    CHIP_ERROR ResolveNodeIdStatus     = CHIP_NO_ERROR;
-    CHIP_ERROR FindCommissionersStatus = CHIP_NO_ERROR;
+    CHIP_ERROR InitStatus                  = CHIP_NO_ERROR;
+    CHIP_ERROR ResolveNodeIdStatus         = CHIP_NO_ERROR;
+    CHIP_ERROR DiscoverCommissionersStatus = CHIP_NO_ERROR;
 };
 
 } // namespace
@@ -156,10 +159,10 @@ void TestDiscoverCommissioners_InitError_ReturnsError(nlTestSuite * inSuite, voi
     NL_TEST_ASSERT(inSuite, controller.DiscoverCommissioners() != CHIP_NO_ERROR);
 }
 
-void TestDiscoverCommissioners_FindCommissionersError_ReturnsError(nlTestSuite * inSuite, void * inContext)
+void TestDiscoverCommissioners_DiscoverCommissionersError_ReturnsError(nlTestSuite * inSuite, void * inContext)
 {
     MockResolver resolver;
-    resolver.FindCommissionersStatus = CHIP_ERROR_INTERNAL;
+    resolver.DiscoverCommissionersStatus = CHIP_ERROR_INTERNAL;
     CommissionableNodeController controller(&resolver);
     NL_TEST_ASSERT(inSuite, controller.DiscoverCommissioners() != CHIP_NO_ERROR);
 }
@@ -176,7 +179,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCase", TestDiscoverCommissioners_HappyCase),
     NL_TEST_DEF("TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter", TestDiscoverCommissioners_HappyCaseWithDiscoveryFilter),
     NL_TEST_DEF("TestDiscoverCommissioners_InitError_ReturnsError", TestDiscoverCommissioners_InitError_ReturnsError),
-    NL_TEST_DEF("TestDiscoverCommissioners_FindCommissionersError_ReturnsError", TestDiscoverCommissioners_FindCommissionersError_ReturnsError),
+    NL_TEST_DEF("TestDiscoverCommissioners_DiscoverCommissionersError_ReturnsError", TestDiscoverCommissioners_DiscoverCommissionersError_ReturnsError),
     NL_TEST_SENTINEL()
 };
 // clang-format on

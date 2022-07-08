@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT sends ResetCounts Command to TH"
+      PICS: DGTHREAD.C.C00.Tx
       verification: |
           ./chip-tool threadnetworkdiagnostics reset-counts 180 0
 
@@ -49,6 +50,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OverrunCount attribute from TH"
+      PICS: DGTHREAD.C.A0007
       verification: |
           ./chip-tool threadnetworkdiagnostics read overrun-count 180 0
 

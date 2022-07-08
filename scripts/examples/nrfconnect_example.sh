@@ -23,7 +23,7 @@ BOARD="$2"
 shift 2
 
 # Disable debug symbols and firmware build time to increase ccache hit ratio in CI
-COMMON_CI_FLAGS=(-DCONFIG_CHIP_DEBUG_SYMBOLS=n -DCONFIG_CHIP_FIRMWARE_BUILD_UNIX_TIME=n)
+COMMON_CI_FLAGS=(-DCONFIG_CHIP_DEBUG_SYMBOLS=n)
 
 if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" || -z "$BOARD" ]]; then
     echo "Usage: $0 <application> <board>" >&2

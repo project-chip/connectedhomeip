@@ -32,6 +32,7 @@ tests:
                 value: nodeId
 
     - label: "Create new PIN credential and lock/unlock user"
+      PICS: DRLK.S.C22.Rsp
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -58,6 +59,7 @@ tests:
                 value: 2
 
     - label: "Get Max number of Week Day schedules for user"
+      PICS: DRLK.S.F04 && DRLK.S.A0014
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
       response:
@@ -65,6 +67,7 @@ tests:
           value: 10
 
     - label: "Get number of supported users"
+      PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
@@ -72,6 +75,7 @@ tests:
           value: 10
 
     - label: "Send Set Week Day Schedule Command to DUT"
+      PICS: DRLK.S.F04 && DRLK.S.C0B.Rsp
       command: "SetWeekDaySchedule"
       arguments:
           values:
@@ -92,6 +96,7 @@ tests:
 
     #issue #18591
     - label: "send GetWeekDay Schedule Command "
+      PICS: DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
@@ -138,6 +143,7 @@ tests:
     - label:
           "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND
           response"
+      PICS: DRLK.S.F04 && DRLK.S.C0B.Rsp
       command: "SetWeekDaySchedule"
       arguments:
           values:
@@ -161,6 +167,7 @@ tests:
     - label:
           "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND
           response"
+      PICS: DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
@@ -193,6 +200,7 @@ tests:
                     hasValue: false
 
     - label: "Clear all week day schedules for the first user"
+      PICS: DRLK.S.F04 && DRLK.S.C0D.Rsp
       command: "ClearWeekDaySchedule"
       arguments:
           values:
@@ -202,6 +210,7 @@ tests:
                 value: 1
 
     - label: "send GetWeekDay Schedule Command "
+      PICS: DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:

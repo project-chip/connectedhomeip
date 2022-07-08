@@ -29,6 +29,7 @@ tests:
     - label:
           "Test Harness Client reads MinMeasuredValue and MaxMeasuredValue from
           Server DUT"
+      PICS: ILL.S.A0001 && ILL.S.A0002
       verification: |
           ./chip-tool illuminancemeasurement read min-measured-value 1 1
 
@@ -47,6 +48,7 @@ tests:
       disabled: true
 
     - label: "After a few seconds, TH reads MeasuredValue attribute from DUT"
+      PICS: ILL.S.A0000
       verification: |
           ./chip-tool illuminancemeasurement read measured-value 1 1
       disabled: true
@@ -57,6 +59,7 @@ tests:
       disabled: true
 
     - label: "After a few seconds, TH reads MeasuredValue attribute from DUT"
+      PICS: ILL.S.A0000
       verification: |
           ./chip-tool illuminancemeasurement read measured-value 1 1
       disabled: true

@@ -174,9 +174,9 @@ public:
     Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
                                             const ScopedNodeId & sessionEvictionHint);
 
-    void ExpireAllPairings(const ScopedNodeId & node);
-    void ExpireAllPairingsForFabric(FabricIndex fabric);
-    void ExpireAllPASEPairings();
+    void ExpireAllSessions(const ScopedNodeId & node);
+    void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
+    void ExpireAllPASESessions();
 
     /**
      * @brief

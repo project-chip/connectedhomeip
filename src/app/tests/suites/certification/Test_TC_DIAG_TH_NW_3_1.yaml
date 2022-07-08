@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 48.7. [TC-DIAG-TH_NW-2.6] Attributes [DUT Client]
+name: 48.7. [TC-DIAG-TH_NW-3.1] Attributes [DUT Client]
 
 config:
     nodeId: 0x12344321
@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT reads Channel attribute value from TH"
+      PICS: DGTHREAD.C.A0001
       verification: |
           ./chip-tool threadnetworkdiagnostics read channel 180 0
 
@@ -39,6 +40,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RoutingRole attribute value from TH"
+      PICS: DGTHREAD.C.A0002
       verification: |
           ./chip-tool threadnetworkdiagnostics read routing-role 180 0
 
@@ -50,6 +52,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NetworkName attribute value from TH."
+      PICS: DGTHREAD.C.A0003
       verification: |
           ./chip-tool threadnetworkdiagnostics read network-name 180 0
 
@@ -61,6 +64,7 @@ tests:
       disabled: true
 
     - label: "DUT reads PanId attribute value from TH."
+      PICS: DGTHREAD.C.A0004
       verification: |
           ./chip-tool threadnetworkdiagnostics read pan-id 180 0
 
@@ -72,6 +76,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ExtendedPanId attribute value from TH."
+      PICS: DGTHREAD.C.A0005
       verification: |
           ./chip-tool threadnetworkdiagnostics read extended-pan-id 180 0
 
@@ -83,6 +88,7 @@ tests:
       disabled: true
 
     - label: "DUT reads MeshLocalPrefix attribute value from TH."
+      PICS: DGTHREAD.C.A0006
       verification: |
           ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 180 0
 
@@ -95,6 +101,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OverrunCount attribute value from TH."
+      PICS: DGTHREAD.C.A0007
       verification: |
           ./chip-tool threadnetworkdiagnostics read overrun-count 180 0
 
@@ -107,6 +114,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NeighborTable attribute value from TH."
+      PICS: DGTHREAD.C.A0008
       verification: |
           ./chip-tool threadnetworkdiagnostics read neighbor-table-list 180 0
 
@@ -119,6 +127,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RouteTable attribute value from TH."
+      PICS: DGTHREAD.C.A0009
       verification: |
           ./chip-tool threadnetworkdiagnostics read route-table-list 180 0
 
@@ -142,6 +151,7 @@ tests:
       disabled: true
 
     - label: "DUT reads PartitionId attribute value from TH"
+      PICS: DGTHREAD.C.A000a
       verification: |
           ./chip-tool threadnetworkdiagnostics read partition-id 180 0
 
@@ -154,6 +164,7 @@ tests:
       disabled: true
 
     - label: "DUT reads Weighting attribute value from TH"
+      PICS: DGTHREAD.C.A000b
       verification: |
           ./chip-tool threadnetworkdiagnostics read weighting 180 0
 
@@ -166,6 +177,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DataVersion attribute value from TH"
+      PICS: DGTHREAD.C.A000c
       verification: |
           ./chip-tool threadnetworkdiagnostics read data-version 180 0
 
@@ -178,6 +190,7 @@ tests:
       disabled: true
 
     - label: "DUT reads StableDataVersion attribute value from TH"
+      PICS: DGTHREAD.C.A000d
       verification: |
           ./chip-tool threadnetworkdiagnostics read stable-data-version 180 0
 
@@ -190,6 +203,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LeaderRouterId attribute value from TH"
+      PICS: DGTHREAD.C.A000e
       verification: |
           ./chip-tool threadnetworkdiagnostics read leader-router-id 180 0
 
@@ -202,6 +216,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DetachedRoleCount attribute value from TH"
+      PICS: DGTHREAD.C.A000f
       verification: |
           ./chip-tool threadnetworkdiagnostics read detached-role-count 180 0
 
@@ -214,6 +229,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ChildRoleCount attribute value from TH"
+      PICS: DGTHREAD.C.A0010
       verification: |
           ./chip-tool threadnetworkdiagnostics read child-role-count 180 0
 
@@ -226,6 +242,7 @@ tests:
       disabled: true
 
     - label: "DUT reads RouterRoleCount attribute value from TH"
+      PICS: DGTHREAD.C.A0011
       verification: |
           ./chip-tool threadnetworkdiagnostics read router-role-count 180 0
 
@@ -238,6 +255,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LeaderRoleCount attribute value from TH"
+      PICS: DGTHREAD.C.A0012
       verification: |
           ./chip-tool threadnetworkdiagnostics read leader-role-count 180 0
 
@@ -250,6 +268,7 @@ tests:
       disabled: true
 
     - label: "DUT reads AttachAttemptCount attribute value from TH"
+      PICS: DGTHREAD.C.A0013
       verification: |
           ./chip-tool threadnetworkdiagnostics read attach-attempt-count 180 0
 
@@ -262,6 +281,7 @@ tests:
       disabled: true
 
     - label: "DUT reads PartitionIdChangeCount attribute value from TH"
+      PICS: DGTHREAD.C.A0014
       verification: |
           ./chip-tool threadnetworkdiagnostics read partition-id-change-count 180 0
 
@@ -275,6 +295,7 @@ tests:
 
     - label:
           "DUT reads BetterPartitionAttachAttemptCount attribute value from TH"
+      PICS: DGTHREAD.C.A0015
       verification: |
           ./chip-tool threadnetworkdiagnostics read better-partition-attach-attempt-count 180 0
 
@@ -287,6 +308,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ParentChangeCount attribute value from TH"
+      PICS: DGTHREAD.C.A0016
       verification: |
           ./chip-tool threadnetworkdiagnostics read parent-change-count 180 0
 
@@ -299,6 +321,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveTimestamp attribute value from TH"
+      PICS: DGTHREAD.C.A0039
       verification: |
           ./chip-tool threadnetworkdiagnostics read active-timestamp 180 0
 
@@ -311,6 +334,7 @@ tests:
       disabled: true
 
     - label: "DUT reads PendingTimestamp attribute value from TH"
+      PICS: DGTHREAD.C.A003a
       verification: |
           ./chip-tool threadnetworkdiagnostics read pending-timestamp 180 0
 
@@ -323,6 +347,7 @@ tests:
       disabled: true
 
     - label: "DUT reads Delay attribute value from TH"
+      PICS: DGTHREAD.C.A003b
       verification: |
           ./chip-tool threadnetworkdiagnostics read delay 180 0
 
@@ -334,6 +359,7 @@ tests:
       disabled: true
 
     - label: "DUT reads SecurityPolicy attribute value from TH"
+      PICS: DGTHREAD.C.A003c
       verification: |
           ./chip-tool threadnetworkdiagnostics read security-policy 180 0
 
@@ -350,6 +376,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ChannelPage0Mask attribute value from TH"
+      PICS: DGTHREAD.C.A003d
       verification: |
           ./chip-tool threadnetworkdiagnostics read channel-mask 180 0
 
@@ -362,6 +389,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OperationalDatasetComponents attribute from TH"
+      PICS: DGTHREAD.C.A003e
       verification: |
           ./chip-tool threadnetworkdiagnostics read operational-dataset-components 180 0
 
@@ -388,6 +416,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveNetworkFaults attribute value from TH"
+      PICS: DGTHREAD.C.A003f
       verification: |
           ./chip-tool threadnetworkdiagnostics read active-network-faults-list 180 0
 

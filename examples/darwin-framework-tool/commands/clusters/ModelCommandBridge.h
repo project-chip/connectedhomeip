@@ -42,7 +42,7 @@ public:
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
-    virtual CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endPointId) = 0;
+    virtual CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endPointId) = 0;
 
 private:
     chip::NodeId mNodeId;
