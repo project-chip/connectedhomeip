@@ -26,7 +26,7 @@ tests:
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
           If the DUT knows the Index value, then those can be sent as the argument.
-          Else User needs to execute the following command to know the index InputList 
+          Else User needs to execute the following command to know the index InputList
               ./chip-tool mediainput read  input-list 1 1
 
 
@@ -34,7 +34,7 @@ tests:
 
           [1651055405.266553][155495:155500] CHIP:DMG: InvokeResponseMessage =
           [1651055405.266572][155495:155500] CHIP:DMG: {
-          [1651055405.266589][155495:155500] CHIP:DMG:         suppressResponse = false, 
+          [1651055405.266589][155495:155500] CHIP:DMG:         suppressResponse = false,
           [1651055405.266605][155495:155500] CHIP:DMG:         InvokeResponseIBs =
           [1651055405.266629][155495:155500] CHIP:DMG:         [
           [1651055405.266645][155495:155500] CHIP:DMG:                 InvokeResponseIB =
@@ -47,21 +47,21 @@ tests:
           [1651055405.266781][155495:155500] CHIP:DMG:                                         ClusterId = 0x507,
           [1651055405.266800][155495:155500] CHIP:DMG:                                         CommandId = 0x0,
           [1651055405.266817][155495:155500] CHIP:DMG:                                 },
-          [1651055405.266841][155495:155500] CHIP:DMG:                                 
+          [1651055405.266841][155495:155500] CHIP:DMG:
           [1651055405.266857][155495:155500] CHIP:DMG:                                 StatusIB =
           [1651055405.266877][155495:155500] CHIP:DMG:                                 {
           [1651055405.266905][155495:155500] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1651055405.266923][155495:155500] CHIP:DMG:                                 },
-          [1651055405.266941][155495:155500] CHIP:DMG:                                 
+          [1651055405.266941][155495:155500] CHIP:DMG:
           [1651055405.266957][155495:155500] CHIP:DMG:                         },
-          [1651055405.266984][155495:155500] CHIP:DMG:                         
+          [1651055405.266984][155495:155500] CHIP:DMG:
           [1651055405.267005][155495:155500] CHIP:DMG:                 },
-          [1651055405.267038][155495:155500] CHIP:DMG:                 
+          [1651055405.267038][155495:155500] CHIP:DMG:
           [1651055405.267057][155495:155500] CHIP:DMG:         ],
-          [1651055405.267095][155495:155500] CHIP:DMG:         
+          [1651055405.267095][155495:155500] CHIP:DMG:
           [1651055405.267122][155495:155500] CHIP:DMG:         InteractionModelRevision = 1
           [1651055405.267146][155495:155500] CHIP:DMG: },
 
-          Enter the below command to read the current input.     
+          Enter the below command to read the current input.
           ./chip-tool mediainput read current-input 1 1
       disabled: true

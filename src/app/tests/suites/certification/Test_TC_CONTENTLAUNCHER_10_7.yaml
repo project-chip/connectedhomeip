@@ -27,7 +27,7 @@ tests:
           example, Gaby sHoffman'
       PICS: MC_CONTENTLAUNCHER.C.C0000
       verification: |
-          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1 
+          ./chip-tool contentlauncher launch-content '{"parameterList": [ { "type": 0, "value": "Gaby sHoffman", "externalIDList": [ { "name": "exampleName", "value": "exampleValue"} ] } ] }' 0 1 1
 
           [1651225059.893636][4190:4195] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
           [1651225059.893741][4190:4195] CHIP:TOO:   LaunchResponse: {

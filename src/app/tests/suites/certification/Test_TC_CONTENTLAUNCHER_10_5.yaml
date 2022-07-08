@@ -92,7 +92,7 @@ tests:
           [1652429829.721395][29660:29665] CHIP:TOO:    }
 
           [1654584050.322782][2478:2478] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_050A Command=0x0000_0001
-          [1654584050.322837][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found 
+          [1654584050.322837][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
           [1654584050.322860][2478:2478] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
           [1654584050.322891][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
           [1654584050.322915][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://badurl DisplayString= BrandingInformation.ProviderName=exampleName
@@ -114,7 +114,7 @@ tests:
           [1652429857.018103][29666:29671] CHIP:TOO:    }
 
           [1654584216.621632][2478:2478] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_050A Command=0x0000_0001
-          [1654584216.621692][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found 
+          [1654584216.621692][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
           [1654584216.621718][2478:2478] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
           [1654584216.621752][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
           [1654584216.621804][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/badauth DisplayString= BrandingInformation.ProviderName=exampleName
