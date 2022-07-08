@@ -188,59 +188,59 @@ function getManualTests() {
     ];
 
     const MediaControl = [
-        "Test_TC_MC_2_2",
-        "Test_TC_MC_3_7_1",
-        "Test_TC_MC_3_8_1",
-        "Test_TC_MC_3_9_1",
-        "Test_TC_MC_3_14",
-        "Test_TC_MC_3_15",
-        "Test_TC_MC_3_16",
-        "Test_TC_MC_3_17",
-        "Test_TC_MC_4_1",
-        "Test_TC_MC_5_4",
-        "Test_TC_MC_5_5",
-        "Test_TC_MC_5_6",
-        "Test_TC_MC_6_5",
-        "Test_TC_MC_6_7",
-        "Test_TC_MC_7_3",
-        "Test_TC_MC_7_4",
-        "Test_TC_MC_10_3",
-        "Test_TC_MC_10_5",
-        "Test_TC_MC_10_7",
+        "Test_TC_LOWPOWER_2_2",
+        "Test_TC_APPLAUNCHER_3_7_1",
+        "Test_TC_APPLAUNCHER_3_8_1",
+        "Test_TC_APPLAUNCHER_3_9_1",
+        "Test_TC_MEDIAINPUT_3_14",
+        "Test_TC_MEDIAINPUT_3_15",
+        "Test_TC_MEDIAINPUT_3_16",
+        "Test_TC_MEDIAINPUT_3_17",
+        "Test_TC_WAKEONLAN_4_1",
+        "Test_TC_CHANNEL_5_4",
+        "Test_TC_CHANNEL_5_5",
+        "Test_TC_CHANNEL_5_6",
+        "Test_TC_MEDIAPLAYBACK_6_5",
+        "Test_TC_MEDIAPLAYBACK_6_7",
+        "Test_TC_AUDIOOUTPUT_7_3",
+        "Test_TC_AUDIOOUTPUT_7_4",
+        "Test_TC_CONTENTLAUNCHER_10_3",
+        "Test_TC_CONTENTLAUNCHER_10_5",
+        "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
         "Test_TC_MC_11_2",
-        "Test_TC_MC_12_1",
-        "Test_TC_MC_12_2",
+        "Test_TC_ALOGIN_12_1",
+        "Test_TC_ALOGIN_12_2",
     ];
 
     const MultipleFabrics = [
-        "Test_TC_MF_1_1",
-        "Test_TC_MF_1_2",
-        "Test_TC_MF_1_7",
-        "Test_TC_MF_1_8",
-        "Test_TC_MF_1_11",
-        "Test_TC_MF_1_12",
-        "Test_TC_MF_1_13",
-        "Test_TC_MF_1_14",
-        "Test_TC_MF_1_16",
-        "Test_TC_MF_1_17",
-        "Test_TC_MF_1_18",
-        "Test_TC_MF_1_19",
-        "Test_TC_MF_1_20",
-        "Test_TC_MF_1_21",
-        "Test_TC_MF_1_22",
-        "Test_TC_MF_1_23",
-        "Test_TC_MF_1_24",
-        "Test_TC_MF_1_25",
-        "Test_TC_MF_1_26",
-        "Test_TC_MF_1_27",
-        "Test_TC_MF_1_28",
+        "Test_TC_CADMIN_1_1",
+        "Test_TC_CADMIN_1_2",
+        "Test_TC_CADMIN_1_7",
+        "Test_TC_CADMIN_1_8",
+        "Test_TC_CADMIN_1_11",
+        "Test_TC_CADMIN_1_12",
+        "Test_TC_CADMIN_1_13",
+        "Test_TC_CADMIN_1_14",
+        "Test_TC_CADMIN_1_16",
+        "Test_TC_CADMIN_1_17",
+        "Test_TC_CADMIN_1_18",
+        "Test_TC_CADMIN_1_19",
+        "Test_TC_CADMIN_1_20",
+        "Test_TC_CADMIN_1_21",
+        "Test_TC_CADMIN_1_22",
+        "Test_TC_CADMIN_1_23",
+        "Test_TC_CADMIN_1_24",
+        "Test_TC_CADMIN_1_25",
+        "Test_TC_CADMIN_1_26",
+        "Test_TC_CADMIN_1_27",
+        "Test_TC_CADMIN_1_28",
         // Slow tests that should not run in CI because they take many minutes each
-        "Test_TC_MF_1_5",
-        "Test_TC_MF_1_6",
-        "Test_TC_MF_1_9",
-        "Test_TC_MF_1_10",
-        "Test_TC_MF_1_15",
+        "Test_TC_CADMIN_1_5",
+        "Test_TC_CADMIN_1_6",
+        "Test_TC_CADMIN_1_9",
+        "Test_TC_CADMIN_1_10",
+        "Test_TC_CADMIN_1_15",
     ];
 
     const ModeSelect = [
@@ -381,20 +381,20 @@ function getManualTests() {
         "Test_TC_SWTCH_3_2",
     ];
 
-    const TemperatureMeasurement = ["Test_TC_TM_2_2", "Test_TC_TM_3_1"];
+    const TemperatureMeasurement = ["Test_TC_TMP_2_2", "Test_TC_TMP_3_1"];
 
     const Thermostat = ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"];
 
     const ThermostatUserConfiguration = ["Test_TC_TSUIC_3_1"];
 
     const ThreadNetworkDiagnostics = [
-        "Test_TC_DIAG_TH_NW_1_1",
-        "Test_TC_DIAG_TH_NW_2_5",
-        "Test_TC_DIAG_TH_NW_3_1",
-        "Test_TC_DIAG_TH_NW_3_2",
-        "Test_TC_DIAG_TH_NW_3_3",
-        "Test_TC_DIAG_TH_NW_3_4",
-        "Test_TC_DIAG_TH_NW_3_5",
+        "Test_TC_DGTHREAD_1_1",
+        "Test_TC_DGTHREAD_2_5",
+        "Test_TC_DGTHREAD_3_1",
+        "Test_TC_DGTHREAD_3_2",
+        "Test_TC_DGTHREAD_3_3",
+        "Test_TC_DGTHREAD_3_4",
+        "Test_TC_DGTHREAD_3_5",
     ];
 
     const Actions = [
@@ -405,17 +405,17 @@ function getManualTests() {
     ];
 
     const TimeFormatLocalization = [
-        "Test_TC_TFL_1_1",
-        "Test_TC_TFL_1_2",
-        "Test_TC_TFL_2_1",
-        "Test_TC_TFL_3_1",
+        "Test_TC_LTIME_1_1",
+        "Test_TC_LTIME_1_2",
+        "Test_TC_LTIME_2_1",
+        "Test_TC_LTIME_3_1",
     ];
 
     const UnitLocalization = [
-        "Test_TC_UL_1_1",
-        "Test_TC_UL_1_2",
-        "Test_TC_UL_2_1",
-        "Test_TC_UL_3_1",
+        "Test_TC_LUNIT_1_1",
+        "Test_TC_LUNIT_1_2",
+        "Test_TC_LUNIT_2_1",
+        "Test_TC_LUNIT_3_1",
     ];
 
     const FixedLabel = [
@@ -569,47 +569,47 @@ function getTests() {
     ];
 
     const MediaControl = [
-        "Test_TC_MC_1_1",
-        "Test_TC_MC_1_2",
-        "Test_TC_MC_1_3",
-        "Test_TC_MC_1_4",
-        "Test_TC_MC_1_5",
-        "Test_TC_MC_1_6",
-        "Test_TC_MC_1_7",
-        "Test_TC_MC_1_8",
-        "Test_TC_MC_1_9",
-        "Test_TC_MC_1_10",
-        "Test_TC_MC_1_11",
-        "Test_TC_MC_1_12",
-        "Test_TC_MC_2_1",
-        "Test_TC_MC_3_2",
-        "Test_TC_MC_3_3",
-        "Test_TC_MC_3_5",
-        "Test_TC_MC_3_6",
-        "Test_TC_MC_3_7",
-        "Test_TC_MC_3_8",
-        "Test_TC_MC_3_9",
-        "Test_TC_MC_3_10",
-        "Test_TC_MC_3_11",
-        "Test_TC_MC_3_12",
-        "Test_TC_MC_3_13",
-        "Test_TC_MC_5_1",
-        "Test_TC_MC_5_2",
-        "Test_TC_MC_5_3",
-        "Test_TC_MC_6_1",
-        "Test_TC_MC_6_2",
-        "Test_TC_MC_6_3",
-        "Test_TC_MC_6_4",
-        "Test_TC_MC_7_1",
-        "Test_TC_MC_7_2",
-        "Test_TC_MC_8_1",
-        "Test_TC_MC_9_1",
-        "Test_TC_MC_10_1",
+        "Test_TC_LOWPOWER_1_1",
+        "Test_TC_KEYPADINPUT_1_2",
+        "Test_TC_APPLAUNCHER_1_3",
+        "Test_TC_MEDIAINPUT_1_4",
+        "Test_TC_WAKEONLAN_1_5",
+        "Test_TC_CHANNEL_1_6",
+        "Test_TC_MEDIAPLAYBACK_1_7",
+        "Test_TC_AUDIOOUTPUT_1_8",
+        "Test_TC_TGTNAV_1_9",
+        "Test_TC_APBSC_1_10",
+        "Test_TC_CONTENTLAUNCHER_1_11",
+        "Test_TC_ALOGIN_1_12",
+        "Test_TC_LOWPOWER_2_1",
+        "Test_TC_KEYPADINPUT_3_2",
+        "Test_TC_KEYPADINPUT_3_3",
+        "Test_TC_APPLAUNCHER_3_5",
+        "Test_TC_APPLAUNCHER_3_6",
+        "Test_TC_APPLAUNCHER_3_7",
+        "Test_TC_APPLAUNCHER_3_8",
+        "Test_TC_APPLAUNCHER_3_9",
+        "Test_TC_MEDIAINPUT_3_10",
+        "Test_TC_MEDIAINPUT_3_11",
+        "Test_TC_MEDIAINPUT_3_12",
+        "Test_TC_MEDIAINPUT_3_13",
+        "Test_TC_CHANNEL_5_1",
+        "Test_TC_CHANNEL_5_2",
+        "Test_TC_CHANNEL_5_3",
+        "Test_TC_MEDIAPLAYBACK_6_1",
+        "Test_TC_MEDIAPLAYBACK_6_2",
+        "Test_TC_MEDIAPLAYBACK_6_3",
+        "Test_TC_MEDIAPLAYBACK_6_4",
+        "Test_TC_AUDIOOUTPUT_7_1",
+        "Test_TC_AUDIOOUTPUT_7_2",
+        "Test_TC_TGTNAV_8_1",
+        "Test_TC_APBSC_9_1",
+        "Test_TC_CONTENTLAUNCHER_10_1",
     ];
 
     const ModeSelect = ["Test_TC_MOD_1_1"];
 
-    const MultipleFabrics = ["Test_TC_MF_1_3", "Test_TC_MF_1_4"];
+    const MultipleFabrics = ["Test_TC_CADMIN_1_3", "Test_TC_CADMIN_1_4"];
 
     const OTASoftwareUpdate = ["OTA_SuccessfulTransfer"];
 
@@ -640,7 +640,7 @@ function getTests() {
 
     const Switch = ["Test_TC_SWTCH_2_1"];
 
-    const TemperatureMeasurement = ["Test_TC_TM_1_1", "Test_TC_TM_2_1"];
+    const TemperatureMeasurement = ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"];
 
     const Thermostat = [
         "Test_TC_TSTAT_1_1",
@@ -655,10 +655,10 @@ function getTests() {
     ];
 
     const ThreadNetworkDiagnostics = [
-        "Test_TC_DIAG_TH_NW_2_1",
-        "Test_TC_DIAG_TH_NW_2_2",
-        "Test_TC_DIAG_TH_NW_2_3",
-        "Test_TC_DIAG_TH_NW_2_4",
+        "Test_TC_DGTHREAD_2_1",
+        "Test_TC_DGTHREAD_2_2",
+        "Test_TC_DGTHREAD_2_3",
+        "Test_TC_DGTHREAD_2_4",
     ];
 
     const WiFiNetworkDiagnostics = ["Test_TC_DGWIFI_2_1", "Test_TC_DGWIFI_2_3"];
