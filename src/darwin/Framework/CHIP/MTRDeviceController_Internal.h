@@ -21,13 +21,15 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRDeviceController.h"
-
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
+#import "MTRBaseDevice.h"
+#import "MTRDeviceController.h"
+
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRControllerFactory;
+@class MTRDevice;
 
 namespace chip {
 class FabricTable;
@@ -36,6 +38,8 @@ class FabricTable;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController (InternalMethods)
+
+#pragma mark - MTRControllerFactory methods
 
 /**
  * Start a new controller.  Returns whether startup succeeded.  If this fails,
@@ -84,6 +88,11 @@ NS_ASSUME_NONNULL_BEGIN
  * Only MTRControllerFactory should be calling this.
  */
 - (void)shutDownCppController;
+
+#pragma mark - Device-specific data and SDK access
+// DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages
+- (MTRDevice *)deviceForDeviceID:(uint64_t)deviceID;
+- (void)removeDevice:(MTRDevice *)device;
 
 @end
 

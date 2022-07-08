@@ -1,0 +1,24 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+#import <os/lock.h>
+
+#import "MTRClusters.h"
+#import "MTRDevice.h"
+#import "MTRDevice_Internal.h"
+
+#include <controller-clusters/zap-generated/CHIPClusters.h>
+
+{{#chip_client_clusters includeAll=true}}
+
+@interface MTRCluster{{asUpperCamelCase name}} ()
+// Must only touch cppCluster on the Matter queue.
+@property (nonatomic, readonly) os_unfair_lock lock;
+@property (nonatomic, readonly) uint16_t endpoint;
+@property (nonatomic, readonly) dispatch_group_t cppClusterInitWaitGroup;
+@property (nonatomic, readonly) MTRDevice *device;
+@property (nonatomic, readonly) chip::Controller::{{asUpperCamelCase name}}Cluster * cppCluster;
+- (chip::Controller::{{asUpperCamelCase name}}Cluster **) cppClusterSlot;
+@end
+
+{{/chip_client_clusters}}

@@ -1290,6 +1290,13 @@ exit:
     return self;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
+                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint32_t) _attribute.unsignedLongValue];
+}
+
 + (instancetype)attributePathWithEndpointId:(NSNumber *)endpoint clusterId:(NSNumber *)clusterId attributeId:(NSNumber *)attributeId
 {
     ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpoint unsignedShortValue]),
@@ -1297,6 +1304,30 @@ exit:
         static_cast<chip::AttributeId>([attributeId unsignedLongValue]));
 
     return [[MTRAttributePath alloc] initWithPath:path];
+}
+
+- (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
+{
+    return [_endpoint isEqualToNumber:attributePath.endpoint] && [_cluster isEqualToNumber:attributePath.cluster] &&
+        [_attribute isEqualToNumber:attributePath.attribute];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[self class]]) {
+        return NO;
+    }
+    return [self isEqualToAttributePath:object];
+}
+
+- (NSUInteger)hash
+{
+    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTRAttributePath attributePathWithEndpointId:_endpoint clusterId:_cluster attributeId:_attribute];
 }
 @end
 
