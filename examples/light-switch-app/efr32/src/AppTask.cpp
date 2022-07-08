@@ -136,16 +136,16 @@ void OnTriggerIdentifyEffect(Identify * identify)
     ChipLogProgress(Zcl, "Trigger Identify Effect");
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
-    GetAppTask().StartLightTimer();
-#endif
-
     if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
     {
         ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
                         identify->mEffectVariant);
         sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    GetAppTask().StartLightTimer();
+#endif
 
     switch (sIdentifyEffect)
     {
@@ -470,24 +470,21 @@ void AppTask::LightEventHandler()
     {
         if (gIdentify.mActive)
         {
-            if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
+            sStatusLED.Blink(250, 250);
+        }
+        else if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
+        {
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
             {
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
-                {
-                    sStatusLED.Blink(50, 50);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
-                {
-                    sStatusLED.Blink(1000, 1000);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
-                {
-                    sStatusLED.Blink(300, 700);
-                }
+                sStatusLED.Blink(50, 50);
             }
-            else
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
             {
-                sStatusLED.Blink(250, 250);
+                sStatusLED.Blink(1000, 1000);
+            }
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
+            {
+                sStatusLED.Blink(300, 700);
             }
         }
 #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
