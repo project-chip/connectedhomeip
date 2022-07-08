@@ -69,9 +69,9 @@ tests:
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [2]
           constraints:
               type: list
+              contains: [2]
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:

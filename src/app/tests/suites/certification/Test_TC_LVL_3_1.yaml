@@ -102,14 +102,6 @@ tests:
       response:
           value: 100
 
-    - label: "Reads On Off Transition Time attribute from DUT"
-      PICS: LVL.S.A0010
-      command: "readAttribute"
-      attribute: "On Off Transition Time"
-      response:
-          constraints:
-              type: uint16
-
     - label: "sends a Move to level command"
       PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
@@ -144,9 +136,11 @@ tests:
       command: "readAttribute"
       attribute: "on off transition time"
       response:
+          saveAs: OnOffTransitionTimeValue
           constraints:
               type: uint16
 
+    # Null is not supported here 0xFFFF is considerd as Null
     - label: "sends a Move to level command"
       PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
@@ -155,7 +149,7 @@ tests:
               - name: "level"
                 value: 64
               - name: "transitionTime"
-                value: 0
+                value: 0xFFFF
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"

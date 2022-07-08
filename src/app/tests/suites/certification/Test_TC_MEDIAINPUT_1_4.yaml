@@ -60,9 +60,9 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0, 1, 2, 3]
           constraints:
               type: list
+              contains: [0, 1, 2, 3]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
