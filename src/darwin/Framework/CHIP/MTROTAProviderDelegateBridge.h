@@ -42,6 +42,22 @@ public:
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
 private:
+    void ConvertToQueryImageParams(
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
+        MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams);
+    void ConvertFromQueryImageResponseParms(
+        const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
+        chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type & response);
+    void ConvertToApplyUpdateRequestParams(
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
+        MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
+    void ConvertFromApplyUpdateRequestResponseParms(
+        const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
+        chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type & response);
+    void ConvertToNotifyUpdateAppliedParams(
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
+        MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
+
     _Nullable id<MTROTAProviderDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
 };
