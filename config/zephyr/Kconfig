@@ -229,13 +229,6 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 
 endif
 
-config CHIP_FIRMWARE_BUILD_UNIX_TIME
-	bool "Make Unix time of compilation available in source code"
-	default y
-	help
-	  When enabled, the Unix time of the firmware build is exposed to the
-	  source code and used to initialize the last known UTC time.
-
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y
