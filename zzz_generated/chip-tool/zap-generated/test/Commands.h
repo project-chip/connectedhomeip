@@ -2473,7 +2473,6 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentHue", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -2482,7 +2481,6 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentSaturation", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -2491,7 +2489,6 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("remainingTime", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
@@ -2569,7 +2566,6 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("enhancedCurrentHue", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
@@ -2588,7 +2584,6 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopActive", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -2597,7 +2592,6 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopDirection", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
             break;
@@ -2606,7 +2600,6 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopTime", value, 25U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
@@ -2615,7 +2608,6 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopStartEnhancedHue", value, 8960U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
@@ -2624,7 +2616,6 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("colorLoopStoredEnhancedHue", value, 0U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
             break;
