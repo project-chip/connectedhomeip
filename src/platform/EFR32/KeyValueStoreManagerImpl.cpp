@@ -107,7 +107,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t 
 
 void KeyValueStoreManagerImpl::ForceKeyMapSave()
 {
-        OnScheduledKeyMapSave(nullptr, nullptr);
+    OnScheduledKeyMapSave(nullptr, nullptr);
 }
 
 void KeyValueStoreManagerImpl::OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState)
