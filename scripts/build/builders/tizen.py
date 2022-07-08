@@ -26,6 +26,11 @@ Board = namedtuple('Board', ['target_cpu'])
 
 class TizenApp(Enum):
 
+    ALL_CLUSTERS = App(
+        'chip-all-clusters-app',
+        'examples/all-clusters-app/tizen',
+        ('chip-all-clusters-app',
+         'chip-all-clusters-app.map'))
     ALL_CLUSTERS_MINIMAL = App(
         'chip-all-clusters-minimal-app',
         'examples/all-clusters-minimal-app/tizen',
