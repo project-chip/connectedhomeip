@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2022 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="RotateEnum" type="ENUM8">
+    <cluster code="0x3456"/>
+    <item name="Off" value="0x00"/>
+    <item name="Clockwise" value="0x01"/>
+    <item name="CounterClockwise" value="0x02"/>
+  </enum>
+
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Disco Ball</name>
+    <define>DISCO_BALL</define>
+    <code>0x3456</code>
+    <description>This example cluster controls an imaginary mirrored disco ball, for the express purpose of disco dancing.</description>
+
+    <!-- Abbreviations used in descriptions -->
+    <tag name="AX" description="Allows the disco ball rotational axis to change" />
+    <tag name="WBL" description="Allows the disco ball to wobble on its axis as speed (dependent on Axis)" />
+    <tag name="PAT" description="Supports a list of patterns to cycle through automatically" />
+    <tag name="STA" description="Supports a request to statistics" />
+    <tag name="REV" description="Supports a Reverse command and counterclockwise rotation" />
+
+    <!-- Cluster feature map -->
+    <globalAttribute side="server" code="0xFFFC" value="0x0001">
+        <featureBit tag="AX" bit="0">true</featureBit>
+        <featureBit tag="WBL" bit="1">false</featureBit>
+        <featureBit tag="PAT" bit="2">false</featureBit>
+        <featureBit tag="STA" bit="3">false</featureBit>
+        <featureBit tag="REV" bit="4">false</featureBit>
+    </globalAttribute>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0" define="DISCO_BALL_RUN" type="BOOLEAN" writable="true" optional="false" default="false" mustUseTimedWrite="true">Run</attribute>
+    <attribute side="server" code="1" define="DISCO_BALL_ROTATE" type="RotateEnum" writable="false" optional="false" default="0">Rotate</attribute>
+    <attribute side="server" code="2" define="DISCO_BALL_SPEED" type="INT8U" writable="false" optional="false" default="0" min="0" max="200">Speed</attribute>
+    <attribute side="server" code="3" define="DISCO_BALL_AXIS" type="INT8U" writable="true" optional="false" default="0" min="0" max="90">Axis</attribute>
+
+  </cluster>
+</configurator>
