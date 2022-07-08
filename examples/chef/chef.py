@@ -384,34 +384,36 @@ def main(argv: Sequence[str]) -> None:
         os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
-            for platform, label in cicd_config["cd_platforms"].items():
-                command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
-                flush_print(f"Building {command}", with_border=True)
-                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-                shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
-                try:
-                    shell.run_cmd(command)
-                except RuntimeError as build_fail_error:
-                    failed_builds.append((device_name, platform, "build"))
-                    flush_print(str(build_fail_error))
-                    if not options.keep_going:
-                        exit(1)
-                    continue
-                try:
-                    bundle(platform, device_name)
-                except FileNotFoundError as bundle_fail_error:
-                    failed_builds.append((device_name, platform, "bundle"))
-                    flush_print(str(bundle_fail_error))
-                    if not options.keep_going:
-                        exit(1)
-                    continue
-                archive_name = f"{label}-{device_name}"
-                archive_full_name = archive_prefix + archive_name + archive_suffix
-                flush_print(f"Adding build output to archive {archive_full_name}")
-                if os.path.exists(archive_full_name):
-                    os.remove(archive_full_name)
-                with tarfile.open(archive_full_name, "w:gz") as tar:
-                    tar.add(_CD_STAGING_DIR, arcname=".")
+            for platform, label_args in cicd_config["cd_platforms"].items():
+                for label, args in label_args.items():
+                    command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
+                    command += " ".join(args)
+                    flush_print(f"Building {command}", with_border=True)
+                    shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+                    shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+                    try:
+                        shell.run_cmd(command)
+                    except RuntimeError as build_fail_error:
+                        failed_builds.append((device_name, platform, "build"))
+                        flush_print(str(build_fail_error))
+                        if not options.keep_going:
+                            exit(1)
+                        continue
+                    try:
+                        bundle(platform, device_name)
+                    except FileNotFoundError as bundle_fail_error:
+                        failed_builds.append((device_name, platform, "bundle"))
+                        flush_print(str(bundle_fail_error))
+                        if not options.keep_going:
+                            exit(1)
+                        continue
+                    archive_name = f"{label}-{device_name}"
+                    archive_full_name = archive_prefix + archive_name + archive_suffix
+                    flush_print(f"Adding build output to archive {archive_full_name}")
+                    if os.path.exists(archive_full_name):
+                        os.remove(archive_full_name)
+                    with tarfile.open(archive_full_name, "w:gz") as tar:
+                        tar.add(_CD_STAGING_DIR, arcname=".")
         if len(failed_builds) == 0:
             flush_print("No build failures", with_border=True)
         else:
