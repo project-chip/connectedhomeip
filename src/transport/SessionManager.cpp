@@ -111,6 +111,12 @@ void SessionManager::Shutdown()
         mFabricTable->RemoveFabricDelegate(this);
         mFabricTable = nullptr;
     }
+
+    mSecureSessions.ForEachSession([&](auto session) {
+        session->MarkForEviction();
+        return Loop::Continue;
+    });
+
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;

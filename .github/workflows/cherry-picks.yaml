@@ -36,6 +36,8 @@ jobs:
               with:
                   token: ${{ secrets.MATTER_PAT }}
                   branch: sve
+                  labels: |
+                      sve cherry pick
                   reviewers: |
                       woody-apple
                       andy31415
