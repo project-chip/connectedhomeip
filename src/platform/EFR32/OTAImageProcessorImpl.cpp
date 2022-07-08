@@ -51,10 +51,7 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 }
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    // Delay HandleApply() to give KVS time to store the data in StoreCurrentUpdateInfo()
-    ChipLogError(SoftwareUpdate, "Scheduling HandleApply");
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(EFR32_KVS_SAVE_DELAY_SECONDS + 1), HandleApply,
-                                                nullptr);
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
@@ -180,17 +177,20 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
-void OTAImageProcessorImpl::HandleApply(chip::System::Layer * systemLayer, void * context)
+void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
     ChipLogProgress(SoftwareUpdate, "OTAImageProcessorImpl::HandleApply()");
 
-    CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
+    // Force KVS to store pending keys such as data from StoreCurrentUpdateInfo()
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
 
+    CORE_CRITICAL_SECTION(err = bootloader_verifyImage(mSlotId, NULL);)
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_verifyImage() error %ld", err);
+
         return;
     }
 
@@ -198,6 +198,7 @@ void OTAImageProcessorImpl::HandleApply(chip::System::Layer * systemLayer, void 
     if (err != SL_BOOTLOADER_OK)
     {
         ChipLogError(SoftwareUpdate, "ERROR: bootloader_setImageToBootload() error %ld", err);
+
         return;
     }
 
