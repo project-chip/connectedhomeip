@@ -417,7 +417,7 @@ function getManualTests() {
     ];
 
     const TemperatureMeasurement = [
-        "Test_TC_TMP_2_2", 
+        "Test_TC_TMP_2_2",
         "Test_TC_TMP_3_1",
     ];
 
@@ -683,7 +683,7 @@ function getTests() {
     ];
 
     const MultipleFabrics = [
-        "Test_TC_CADMIN_1_3", 
+        "Test_TC_CADMIN_1_3",
         "Test_TC_CADMIN_1_4",
     ];
 
@@ -734,7 +734,7 @@ function getTests() {
     ];
 
     const TemperatureMeasurement = [
-        "Test_TC_TMP_1_1", 
+        "Test_TC_TMP_1_1",
         "Test_TC_TMP_2_1",
     ];
 
