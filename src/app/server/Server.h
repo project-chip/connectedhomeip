@@ -66,6 +66,10 @@ namespace chip {
 
 constexpr size_t kMaxBlePendingPackets = 1;
 
+//
+// NOTE: Please do not alter the order of template specialization here as the logic
+//       in the Server impl depends on this.
+//
 using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
                                               ,
