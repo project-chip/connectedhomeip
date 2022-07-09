@@ -1114,6 +1114,54 @@ export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
 source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light-switch -b tlsr9518adk80d {root}/examples/light-switch-app/telink'
 
+# Generating tizen-arm-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters
+
+# Generating tizen-arm-all-clusters-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-asan
+
+# Generating tizen-arm-all-clusters-minimal
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal
+
+# Generating tizen-arm-all-clusters-minimal-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-asan
+
+# Generating tizen-arm-all-clusters-minimal-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble
+
+# Generating tizen-arm-all-clusters-minimal-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble-asan
+
+# Generating tizen-arm-all-clusters-minimal-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi
+
+# Generating tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+
+# Generating tizen-arm-all-clusters-minimal-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-wifi
+
+# Generating tizen-arm-all-clusters-minimal-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-minimal-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-minimal-no-wifi-asan
+
+# Generating tizen-arm-all-clusters-no-ble
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble
+
+# Generating tizen-arm-all-clusters-no-ble-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble-asan
+
+# Generating tizen-arm-all-clusters-no-ble-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble-no-wifi
+
+# Generating tizen-arm-all-clusters-no-ble-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_config_network_layer_ble=false chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-ble-no-wifi-asan
+
+# Generating tizen-arm-all-clusters-no-wifi
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_enable_wifi=false target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-wifi
+
+# Generating tizen-arm-all-clusters-no-wifi-asan
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/tizen '--args=chip_enable_wifi=false is_asan=true target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-all-clusters-no-wifi-asan
+
 # Generating tizen-arm-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=target_os="tizen" target_cpu="arm" tizen_sdk_root="TEST_TIZEN_SDK_ROOT" tizen_sdk_sysroot="TEST_TIZEN_SDK_SYSROOT"' {out}/tizen-arm-chip-tool
 
@@ -2245,6 +2293,54 @@ ninja -C {out}/telink-tlsr9518adk80d-light
 
 # Building telink-tlsr9518adk80d-light-switch
 ninja -C {out}/telink-tlsr9518adk80d-light-switch
+
+# Building tizen-arm-all-clusters
+ninja -C {out}/tizen-arm-all-clusters
+
+# Building tizen-arm-all-clusters-asan
+ninja -C {out}/tizen-arm-all-clusters-asan
+
+# Building tizen-arm-all-clusters-minimal
+ninja -C {out}/tizen-arm-all-clusters-minimal
+
+# Building tizen-arm-all-clusters-minimal-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-asan
+
+# Building tizen-arm-all-clusters-minimal-no-ble
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble
+
+# Building tizen-arm-all-clusters-minimal-no-ble-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble-asan
+
+# Building tizen-arm-all-clusters-minimal-no-ble-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi
+
+# Building tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan
+
+# Building tizen-arm-all-clusters-minimal-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-wifi
+
+# Building tizen-arm-all-clusters-minimal-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-minimal-no-wifi-asan
+
+# Building tizen-arm-all-clusters-no-ble
+ninja -C {out}/tizen-arm-all-clusters-no-ble
+
+# Building tizen-arm-all-clusters-no-ble-asan
+ninja -C {out}/tizen-arm-all-clusters-no-ble-asan
+
+# Building tizen-arm-all-clusters-no-ble-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-no-ble-no-wifi
+
+# Building tizen-arm-all-clusters-no-ble-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-no-ble-no-wifi-asan
+
+# Building tizen-arm-all-clusters-no-wifi
+ninja -C {out}/tizen-arm-all-clusters-no-wifi
+
+# Building tizen-arm-all-clusters-no-wifi-asan
+ninja -C {out}/tizen-arm-all-clusters-no-wifi-asan
 
 # Building tizen-arm-chip-tool
 ninja -C {out}/tizen-arm-chip-tool
