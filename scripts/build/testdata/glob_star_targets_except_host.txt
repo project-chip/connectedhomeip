@@ -109,5 +109,7 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
+tizen-arm-all-clusters
+tizen-arm-all-clusters-minimal
 tizen-arm-chip-tool
 tizen-arm-light
