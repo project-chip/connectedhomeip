@@ -736,6 +736,37 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     certSet.Release();
 }
 
+static void TestChipCert_ValidateChipRCAC(nlTestSuite * inSuite, void * inContext)
+{
+    struct RCACTestCase
+    {
+        uint8_t Cert;
+        CHIP_ERROR mExpectedResult;
+    };
+
+    // clang-format off
+    static RCACTestCase sRCACTestCases[] = {
+        // Cert                    Expected Result
+        // ====================================================
+        {  TestCert::kRoot01,      CHIP_NO_ERROR              },
+        {  TestCert::kRoot02,      CHIP_NO_ERROR              },
+        {  TestCert::kICA01,       CHIP_ERROR_WRONG_CERT_TYPE },
+        {  TestCert::kICA02,       CHIP_ERROR_WRONG_CERT_TYPE },
+        {  TestCert::kICA01_1,     CHIP_ERROR_WRONG_CERT_TYPE },
+        {  TestCert::kFWSign01,    CHIP_ERROR_WRONG_CERT_TYPE },
+        {  TestCert::kNode01_01,   CHIP_ERROR_WRONG_CERT_TYPE },
+        {  TestCert::kNode02_08,   CHIP_ERROR_WRONG_CERT_TYPE },
+    };
+    // clang-format on
+
+    for (auto & testCase : sRCACTestCases)
+    {
+        ByteSpan cert;
+        NL_TEST_ASSERT(inSuite, GetTestCert(testCase.Cert, sNullLoadFlag, cert) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, ValidateChipRCAC(cert) == testCase.mExpectedResult);
+    }
+}
+
 class AlwaysAcceptValidityPolicy : public CertificateValidityPolicy
 {
 public:
@@ -1961,6 +1992,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Certificate Distinguish Name", TestChipCert_ChipDN),
     NL_TEST_DEF("Test CHIP Certificate Validation", TestChipCert_CertValidation),
     NL_TEST_DEF("Test CHIP Certificate Validation time", TestChipCert_CertValidTime),
+    NL_TEST_DEF("Test CHIP Root Certificate Validation", TestChipCert_ValidateChipRCAC),
     NL_TEST_DEF("Test CHIP Certificate Validity Policy injection", TestChipCert_CertValidityPolicyInjection),
     NL_TEST_DEF("Test CHIP Certificate Usage", TestChipCert_CertUsage),
     NL_TEST_DEF("Test CHIP Certificate Type", TestChipCert_CertType),
