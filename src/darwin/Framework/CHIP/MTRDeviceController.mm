@@ -618,7 +618,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     });
 }
 
-- (void)setOtaProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
 {
     dispatch_async(_chipWorkQueue, ^{
         self->_otaProviderDelegateBridge->setDelegate(delegate, queue);
