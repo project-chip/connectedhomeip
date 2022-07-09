@@ -381,7 +381,7 @@ tests:
           TH side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
-          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"""
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
     - label: "TH1 generates 32-byte CSRNonce"

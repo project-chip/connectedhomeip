@@ -81,45 +81,45 @@ public:
         printf("Test_TC_LVL_4_1\n");
         printf("Test_TC_LVL_5_1\n");
         printf("Test_TC_LVL_6_1\n");
-        printf("Test_TC_MC_1_1\n");
-        printf("Test_TC_MC_1_2\n");
-        printf("Test_TC_MC_1_3\n");
-        printf("Test_TC_MC_1_4\n");
-        printf("Test_TC_MC_1_5\n");
-        printf("Test_TC_MC_1_6\n");
-        printf("Test_TC_MC_1_7\n");
-        printf("Test_TC_MC_1_8\n");
-        printf("Test_TC_MC_1_9\n");
-        printf("Test_TC_MC_1_10\n");
-        printf("Test_TC_MC_1_11\n");
-        printf("Test_TC_MC_1_12\n");
-        printf("Test_TC_MC_2_1\n");
-        printf("Test_TC_MC_3_2\n");
-        printf("Test_TC_MC_3_3\n");
-        printf("Test_TC_MC_3_5\n");
-        printf("Test_TC_MC_3_6\n");
-        printf("Test_TC_MC_3_7\n");
-        printf("Test_TC_MC_3_8\n");
-        printf("Test_TC_MC_3_9\n");
-        printf("Test_TC_MC_3_10\n");
-        printf("Test_TC_MC_3_11\n");
-        printf("Test_TC_MC_3_12\n");
-        printf("Test_TC_MC_3_13\n");
-        printf("Test_TC_MC_5_1\n");
-        printf("Test_TC_MC_5_2\n");
-        printf("Test_TC_MC_5_3\n");
-        printf("Test_TC_MC_6_1\n");
-        printf("Test_TC_MC_6_2\n");
-        printf("Test_TC_MC_6_3\n");
-        printf("Test_TC_MC_6_4\n");
-        printf("Test_TC_MC_7_1\n");
-        printf("Test_TC_MC_7_2\n");
-        printf("Test_TC_MC_8_1\n");
-        printf("Test_TC_MC_9_1\n");
-        printf("Test_TC_MC_10_1\n");
+        printf("Test_TC_LOWPOWER_1_1\n");
+        printf("Test_TC_KEYPADINPUT_1_2\n");
+        printf("Test_TC_APPLAUNCHER_1_3\n");
+        printf("Test_TC_MEDIAINPUT_1_4\n");
+        printf("Test_TC_WAKEONLAN_1_5\n");
+        printf("Test_TC_CHANNEL_1_6\n");
+        printf("Test_TC_MEDIAPLAYBACK_1_7\n");
+        printf("Test_TC_AUDIOOUTPUT_1_8\n");
+        printf("Test_TC_TGTNAV_1_9\n");
+        printf("Test_TC_APBSC_1_10\n");
+        printf("Test_TC_CONTENTLAUNCHER_1_11\n");
+        printf("Test_TC_ALOGIN_1_12\n");
+        printf("Test_TC_LOWPOWER_2_1\n");
+        printf("Test_TC_KEYPADINPUT_3_2\n");
+        printf("Test_TC_KEYPADINPUT_3_3\n");
+        printf("Test_TC_APPLAUNCHER_3_5\n");
+        printf("Test_TC_APPLAUNCHER_3_6\n");
+        printf("Test_TC_APPLAUNCHER_3_7\n");
+        printf("Test_TC_APPLAUNCHER_3_8\n");
+        printf("Test_TC_APPLAUNCHER_3_9\n");
+        printf("Test_TC_MEDIAINPUT_3_10\n");
+        printf("Test_TC_MEDIAINPUT_3_11\n");
+        printf("Test_TC_MEDIAINPUT_3_12\n");
+        printf("Test_TC_MEDIAINPUT_3_13\n");
+        printf("Test_TC_CHANNEL_5_1\n");
+        printf("Test_TC_CHANNEL_5_2\n");
+        printf("Test_TC_CHANNEL_5_3\n");
+        printf("Test_TC_MEDIAPLAYBACK_6_1\n");
+        printf("Test_TC_MEDIAPLAYBACK_6_2\n");
+        printf("Test_TC_MEDIAPLAYBACK_6_3\n");
+        printf("Test_TC_MEDIAPLAYBACK_6_4\n");
+        printf("Test_TC_AUDIOOUTPUT_7_1\n");
+        printf("Test_TC_AUDIOOUTPUT_7_2\n");
+        printf("Test_TC_TGTNAV_8_1\n");
+        printf("Test_TC_APBSC_9_1\n");
+        printf("Test_TC_CONTENTLAUNCHER_10_1\n");
         printf("Test_TC_MOD_1_1\n");
-        printf("Test_TC_MF_1_3\n");
-        printf("Test_TC_MF_1_4\n");
+        printf("Test_TC_CADMIN_1_3\n");
+        printf("Test_TC_CADMIN_1_4\n");
         printf("OTA_SuccessfulTransfer\n");
         printf("Test_TC_OCC_1_1\n");
         printf("Test_TC_OCC_2_1\n");
@@ -141,18 +141,18 @@ public:
         printf("Test_TC_RH_2_1\n");
         printf("Test_TC_SC_4_2\n");
         printf("Test_TC_SWTCH_2_1\n");
-        printf("Test_TC_TM_1_1\n");
-        printf("Test_TC_TM_2_1\n");
+        printf("Test_TC_TMP_1_1\n");
+        printf("Test_TC_TMP_2_1\n");
         printf("Test_TC_TSTAT_1_1\n");
         printf("Test_TC_TSTAT_2_1\n");
         printf("Test_TC_TSTAT_2_2\n");
         printf("Test_TC_TSUIC_1_1\n");
         printf("Test_TC_TSUIC_2_1\n");
         printf("Test_TC_TSUIC_2_2\n");
-        printf("Test_TC_DIAG_TH_NW_2_1\n");
-        printf("Test_TC_DIAG_TH_NW_2_2\n");
-        printf("Test_TC_DIAG_TH_NW_2_3\n");
-        printf("Test_TC_DIAG_TH_NW_2_4\n");
+        printf("Test_TC_DGTHREAD_2_1\n");
+        printf("Test_TC_DGTHREAD_2_2\n");
+        printf("Test_TC_DGTHREAD_2_3\n");
+        printf("Test_TC_DGTHREAD_2_4\n");
         printf("Test_TC_ULABEL_1_1\n");
         printf("Test_TC_ULABEL_2_2\n");
         printf("Test_TC_ULABEL_2_3\n");
@@ -367,55 +367,55 @@ public:
         printf("Test_TC_IDM_6_4\n");
         printf("Test_TC_IDM_7_1\n");
         printf("Test_TC_IDM_8_1\n");
-        printf("Test_TC_MC_2_2\n");
-        printf("Test_TC_MC_3_7_1\n");
-        printf("Test_TC_MC_3_8_1\n");
-        printf("Test_TC_MC_3_9_1\n");
-        printf("Test_TC_MC_3_14\n");
-        printf("Test_TC_MC_3_15\n");
-        printf("Test_TC_MC_3_16\n");
-        printf("Test_TC_MC_3_17\n");
-        printf("Test_TC_MC_4_1\n");
-        printf("Test_TC_MC_5_4\n");
-        printf("Test_TC_MC_5_5\n");
-        printf("Test_TC_MC_5_6\n");
-        printf("Test_TC_MC_6_5\n");
-        printf("Test_TC_MC_6_7\n");
-        printf("Test_TC_MC_7_3\n");
-        printf("Test_TC_MC_7_4\n");
-        printf("Test_TC_MC_10_3\n");
-        printf("Test_TC_MC_10_5\n");
-        printf("Test_TC_MC_10_7\n");
+        printf("Test_TC_LOWPOWER_2_2\n");
+        printf("Test_TC_APPLAUNCHER_3_7_1\n");
+        printf("Test_TC_APPLAUNCHER_3_8_1\n");
+        printf("Test_TC_APPLAUNCHER_3_9_1\n");
+        printf("Test_TC_MEDIAINPUT_3_14\n");
+        printf("Test_TC_MEDIAINPUT_3_15\n");
+        printf("Test_TC_MEDIAINPUT_3_16\n");
+        printf("Test_TC_MEDIAINPUT_3_17\n");
+        printf("Test_TC_WAKEONLAN_4_1\n");
+        printf("Test_TC_CHANNEL_5_4\n");
+        printf("Test_TC_CHANNEL_5_5\n");
+        printf("Test_TC_CHANNEL_5_6\n");
+        printf("Test_TC_MEDIAPLAYBACK_6_5\n");
+        printf("Test_TC_MEDIAPLAYBACK_6_7\n");
+        printf("Test_TC_AUDIOOUTPUT_7_3\n");
+        printf("Test_TC_AUDIOOUTPUT_7_4\n");
+        printf("Test_TC_CONTENTLAUNCHER_10_3\n");
+        printf("Test_TC_CONTENTLAUNCHER_10_5\n");
+        printf("Test_TC_CONTENTLAUNCHER_10_7\n");
         printf("Test_TC_MC_11_1\n");
         printf("Test_TC_MC_11_2\n");
-        printf("Test_TC_MC_12_1\n");
-        printf("Test_TC_MC_12_2\n");
-        printf("Test_TC_MF_1_1\n");
-        printf("Test_TC_MF_1_2\n");
-        printf("Test_TC_MF_1_7\n");
-        printf("Test_TC_MF_1_8\n");
-        printf("Test_TC_MF_1_11\n");
-        printf("Test_TC_MF_1_12\n");
-        printf("Test_TC_MF_1_13\n");
-        printf("Test_TC_MF_1_14\n");
-        printf("Test_TC_MF_1_16\n");
-        printf("Test_TC_MF_1_17\n");
-        printf("Test_TC_MF_1_18\n");
-        printf("Test_TC_MF_1_19\n");
-        printf("Test_TC_MF_1_20\n");
-        printf("Test_TC_MF_1_21\n");
-        printf("Test_TC_MF_1_22\n");
-        printf("Test_TC_MF_1_23\n");
-        printf("Test_TC_MF_1_24\n");
-        printf("Test_TC_MF_1_25\n");
-        printf("Test_TC_MF_1_26\n");
-        printf("Test_TC_MF_1_27\n");
-        printf("Test_TC_MF_1_28\n");
-        printf("Test_TC_MF_1_5\n");
-        printf("Test_TC_MF_1_6\n");
-        printf("Test_TC_MF_1_9\n");
-        printf("Test_TC_MF_1_10\n");
-        printf("Test_TC_MF_1_15\n");
+        printf("Test_TC_ALOGIN_12_1\n");
+        printf("Test_TC_ALOGIN_12_2\n");
+        printf("Test_TC_CADMIN_1_1\n");
+        printf("Test_TC_CADMIN_1_2\n");
+        printf("Test_TC_CADMIN_1_7\n");
+        printf("Test_TC_CADMIN_1_8\n");
+        printf("Test_TC_CADMIN_1_11\n");
+        printf("Test_TC_CADMIN_1_12\n");
+        printf("Test_TC_CADMIN_1_13\n");
+        printf("Test_TC_CADMIN_1_14\n");
+        printf("Test_TC_CADMIN_1_16\n");
+        printf("Test_TC_CADMIN_1_17\n");
+        printf("Test_TC_CADMIN_1_18\n");
+        printf("Test_TC_CADMIN_1_19\n");
+        printf("Test_TC_CADMIN_1_20\n");
+        printf("Test_TC_CADMIN_1_21\n");
+        printf("Test_TC_CADMIN_1_22\n");
+        printf("Test_TC_CADMIN_1_23\n");
+        printf("Test_TC_CADMIN_1_24\n");
+        printf("Test_TC_CADMIN_1_25\n");
+        printf("Test_TC_CADMIN_1_26\n");
+        printf("Test_TC_CADMIN_1_27\n");
+        printf("Test_TC_CADMIN_1_28\n");
+        printf("Test_TC_CADMIN_1_5\n");
+        printf("Test_TC_CADMIN_1_6\n");
+        printf("Test_TC_CADMIN_1_9\n");
+        printf("Test_TC_CADMIN_1_10\n");
+        printf("Test_TC_CADMIN_1_15\n");
         printf("Test_TC_MOD_1_2\n");
         printf("Test_TC_MOD_1_3\n");
         printf("Test_TC_MOD_2_1\n");
@@ -518,30 +518,30 @@ public:
         printf("Test_TC_SWTCH_2_2\n");
         printf("Test_TC_SWTCH_3_1\n");
         printf("Test_TC_SWTCH_3_2\n");
-        printf("Test_TC_TM_2_2\n");
-        printf("Test_TC_TM_3_1\n");
+        printf("Test_TC_TMP_2_2\n");
+        printf("Test_TC_TMP_3_1\n");
         printf("Test_TC_TSTAT_3_1\n");
         printf("Test_TC_TSTAT_3_2\n");
         printf("Test_TC_TSUIC_3_1\n");
-        printf("Test_TC_DIAG_TH_NW_1_1\n");
-        printf("Test_TC_DIAG_TH_NW_2_5\n");
-        printf("Test_TC_DIAG_TH_NW_3_1\n");
-        printf("Test_TC_DIAG_TH_NW_3_2\n");
-        printf("Test_TC_DIAG_TH_NW_3_3\n");
-        printf("Test_TC_DIAG_TH_NW_3_4\n");
-        printf("Test_TC_DIAG_TH_NW_3_5\n");
+        printf("Test_TC_DGTHREAD_1_1\n");
+        printf("Test_TC_DGTHREAD_2_5\n");
+        printf("Test_TC_DGTHREAD_3_1\n");
+        printf("Test_TC_DGTHREAD_3_2\n");
+        printf("Test_TC_DGTHREAD_3_3\n");
+        printf("Test_TC_DGTHREAD_3_4\n");
+        printf("Test_TC_DGTHREAD_3_5\n");
         printf("Test_TC_ACT_2_1\n");
         printf("Test_TC_ACT_2_2\n");
         printf("Test_TC_ACT_3_1\n");
         printf("Test_TC_ACT_3_2\n");
-        printf("Test_TC_TFL_1_1\n");
-        printf("Test_TC_TFL_1_2\n");
-        printf("Test_TC_TFL_2_1\n");
-        printf("Test_TC_TFL_3_1\n");
-        printf("Test_TC_UL_1_1\n");
-        printf("Test_TC_UL_1_2\n");
-        printf("Test_TC_UL_2_1\n");
-        printf("Test_TC_UL_3_1\n");
+        printf("Test_TC_LTIME_1_1\n");
+        printf("Test_TC_LTIME_1_2\n");
+        printf("Test_TC_LTIME_2_1\n");
+        printf("Test_TC_LTIME_3_1\n");
+        printf("Test_TC_LUNIT_1_1\n");
+        printf("Test_TC_LUNIT_1_2\n");
+        printf("Test_TC_LUNIT_2_1\n");
+        printf("Test_TC_LUNIT_3_1\n");
         printf("Test_TC_FLABEL_1_1\n");
         printf("Test_TC_FLABEL_2_1\n");
         printf("Test_TC_FLABEL_3_1\n");
@@ -15049,10 +15049,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_1Suite : public TestCommand
+class Test_TC_LOWPOWER_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_1", 7, credsIssuerConfig)
+    Test_TC_LOWPOWER_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_LOWPOWER_1_1", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -15060,7 +15061,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_1Suite() {}
+    ~Test_TC_LOWPOWER_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -15222,10 +15223,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_2Suite : public TestCommand
+class Test_TC_KEYPADINPUT_1_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_2", 7, credsIssuerConfig)
+    Test_TC_KEYPADINPUT_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_KEYPADINPUT_1_2", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -15233,7 +15235,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_2Suite() {}
+    ~Test_TC_KEYPADINPUT_1_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -15400,10 +15402,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_3Suite : public TestCommand
+class Test_TC_APPLAUNCHER_1_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_3", 7, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_1_3", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -15411,7 +15414,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_3Suite() {}
+    ~Test_TC_APPLAUNCHER_1_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -15573,10 +15576,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_4Suite : public TestCommand
+class Test_TC_MEDIAINPUT_1_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_4", 7, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_1_4", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -15584,7 +15588,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_4Suite() {}
+    ~Test_TC_MEDIAINPUT_1_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -15746,10 +15750,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_5Suite : public TestCommand
+class Test_TC_WAKEONLAN_1_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_5", 7, credsIssuerConfig)
+    Test_TC_WAKEONLAN_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WAKEONLAN_1_5", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -15757,7 +15762,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_5Suite() {}
+    ~Test_TC_WAKEONLAN_1_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -15908,10 +15913,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_6Suite : public TestCommand
+class Test_TC_CHANNEL_1_6Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_6", 7, credsIssuerConfig)
+    Test_TC_CHANNEL_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_1_6", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -15919,7 +15925,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_6Suite() {}
+    ~Test_TC_CHANNEL_1_6Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -16076,10 +16082,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_7Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_1_7Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_7", 7, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_1_7", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16087,7 +16094,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_7Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_1_7Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -16243,10 +16250,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_8Suite : public TestCommand
+class Test_TC_AUDIOOUTPUT_1_8Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_8", 7, credsIssuerConfig)
+    Test_TC_AUDIOOUTPUT_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_AUDIOOUTPUT_1_8", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16254,7 +16262,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_8Suite() {}
+    ~Test_TC_AUDIOOUTPUT_1_8Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -16404,10 +16412,10 @@ private:
     }
 };
 
-class Test_TC_MC_1_9Suite : public TestCommand
+class Test_TC_TGTNAV_1_9Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_9", 8, credsIssuerConfig)
+    Test_TC_TGTNAV_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TGTNAV_1_9", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16415,7 +16423,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_9Suite() {}
+    ~Test_TC_TGTNAV_1_9Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -16614,10 +16622,10 @@ private:
     }
 };
 
-class Test_TC_MC_1_10Suite : public TestCommand
+class Test_TC_APBSC_1_10Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_10", 7, credsIssuerConfig)
+    Test_TC_APBSC_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_APBSC_1_10", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16625,7 +16633,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_10Suite() {}
+    ~Test_TC_APBSC_1_10Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -16783,10 +16791,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_11Suite : public TestCommand
+class Test_TC_CONTENTLAUNCHER_1_11Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_11", 7, credsIssuerConfig)
+    Test_TC_CONTENTLAUNCHER_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_1_11", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16794,7 +16803,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_11Suite() {}
+    ~Test_TC_CONTENTLAUNCHER_1_11Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -16950,10 +16959,11 @@ private:
     }
 };
 
-class Test_TC_MC_1_12Suite : public TestCommand
+class Test_TC_ALOGIN_1_12Suite : public TestCommand
 {
 public:
-    Test_TC_MC_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_1_12", 7, credsIssuerConfig)
+    Test_TC_ALOGIN_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ALOGIN_1_12", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16961,7 +16971,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_1_12Suite() {}
+    ~Test_TC_ALOGIN_1_12Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17129,10 +17139,11 @@ private:
     }
 };
 
-class Test_TC_MC_2_1Suite : public TestCommand
+class Test_TC_LOWPOWER_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_1", 2, credsIssuerConfig)
+    Test_TC_LOWPOWER_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_LOWPOWER_2_1", 2, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17140,7 +17151,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_2_1Suite() {}
+    ~Test_TC_LOWPOWER_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17209,10 +17220,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_2Suite : public TestCommand
+class Test_TC_KEYPADINPUT_3_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_2", 3, credsIssuerConfig)
+    Test_TC_KEYPADINPUT_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_KEYPADINPUT_3_2", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17220,7 +17232,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_2Suite() {}
+    ~Test_TC_KEYPADINPUT_3_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17312,10 +17324,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_3Suite : public TestCommand
+class Test_TC_KEYPADINPUT_3_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_3", 10, credsIssuerConfig)
+    Test_TC_KEYPADINPUT_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_KEYPADINPUT_3_3", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17323,7 +17336,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_3Suite() {}
+    ~Test_TC_KEYPADINPUT_3_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17541,10 +17554,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_5Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_5", 2, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_5", 2, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17552,7 +17566,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_5Suite() {}
+    ~Test_TC_APPLAUNCHER_3_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17624,10 +17638,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_6Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_6Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_6", 2, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_6Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_6", 2, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17635,7 +17650,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_6Suite() {}
+    ~Test_TC_APPLAUNCHER_3_6Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17708,10 +17723,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_7Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_7Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_7", 3, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_7Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_7", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17721,7 +17737,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_7Suite() {}
+    ~Test_TC_APPLAUNCHER_3_7Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17828,10 +17844,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_8Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_8Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_8", 3, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_8Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_8", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17841,7 +17858,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_8Suite() {}
+    ~Test_TC_APPLAUNCHER_3_8Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -17935,10 +17952,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_9Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_9Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_9", 3, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_9Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_9", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17948,7 +17966,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_9Suite() {}
+    ~Test_TC_APPLAUNCHER_3_9Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18041,10 +18059,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_10Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_10Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_10", 2, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_10Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_10", 2, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18052,7 +18071,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_10Suite() {}
+    ~Test_TC_MEDIAINPUT_3_10Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18122,10 +18141,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_11Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_11Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_11", 4, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_11Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_11", 4, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18133,7 +18153,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_11Suite() {}
+    ~Test_TC_MEDIAINPUT_3_11Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18231,10 +18251,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_12Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_12Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_12", 4, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_12Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_12", 4, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18242,7 +18263,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_12Suite() {}
+    ~Test_TC_MEDIAINPUT_3_12Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18338,10 +18359,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_13Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_13Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_13Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_13", 4, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_13Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_13", 4, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18349,7 +18371,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_13Suite() {}
+    ~Test_TC_MEDIAINPUT_3_13Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18448,10 +18470,11 @@ private:
     }
 };
 
-class Test_TC_MC_5_1Suite : public TestCommand
+class Test_TC_CHANNEL_5_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_5_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_1", 2, credsIssuerConfig)
+    Test_TC_CHANNEL_5_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_5_1", 2, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18459,7 +18482,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_5_1Suite() {}
+    ~Test_TC_CHANNEL_5_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18531,10 +18554,11 @@ private:
     }
 };
 
-class Test_TC_MC_5_2Suite : public TestCommand
+class Test_TC_CHANNEL_5_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_5_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_2", 5, credsIssuerConfig)
+    Test_TC_CHANNEL_5_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_5_2", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18544,7 +18568,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_5_2Suite() {}
+    ~Test_TC_CHANNEL_5_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18660,10 +18684,11 @@ private:
     }
 };
 
-class Test_TC_MC_5_3Suite : public TestCommand
+class Test_TC_CHANNEL_5_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_5_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_3", 7, credsIssuerConfig)
+    Test_TC_CHANNEL_5_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_5_3", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18673,7 +18698,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_5_3Suite() {}
+    ~Test_TC_CHANNEL_5_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -18817,10 +18842,11 @@ private:
     }
 };
 
-class Test_TC_MC_6_1Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_6_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_1", 12, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_6_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_6_1", 12, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -18828,7 +18854,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_6_1Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_6_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -19056,10 +19082,11 @@ private:
     }
 };
 
-class Test_TC_MC_6_2Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_6_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_2", 18, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_6_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_6_2", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -19067,7 +19094,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_6_2Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_6_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -19397,10 +19424,11 @@ private:
     }
 };
 
-class Test_TC_MC_6_3Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_6_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_3", 10, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_6_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_6_3", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -19409,7 +19437,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_6_3Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_6_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -19607,10 +19635,11 @@ private:
     }
 };
 
-class Test_TC_MC_6_4Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_6_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_4", 18, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_6_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_6_4", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -19618,7 +19647,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_6_4Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_6_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -19938,10 +19967,11 @@ private:
     }
 };
 
-class Test_TC_MC_7_1Suite : public TestCommand
+class Test_TC_AUDIOOUTPUT_7_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_7_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_1", 4, credsIssuerConfig)
+    Test_TC_AUDIOOUTPUT_7_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_AUDIOOUTPUT_7_1", 4, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -19949,7 +19979,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_7_1Suite() {}
+    ~Test_TC_AUDIOOUTPUT_7_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -20047,10 +20077,11 @@ private:
     }
 };
 
-class Test_TC_MC_7_2Suite : public TestCommand
+class Test_TC_AUDIOOUTPUT_7_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_7_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_2", 4, credsIssuerConfig)
+    Test_TC_AUDIOOUTPUT_7_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_AUDIOOUTPUT_7_2", 4, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -20058,7 +20089,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_7_2Suite() {}
+    ~Test_TC_AUDIOOUTPUT_7_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -20162,10 +20193,10 @@ private:
     }
 };
 
-class Test_TC_MC_8_1Suite : public TestCommand
+class Test_TC_TGTNAV_8_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_8_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_8_1", 5, credsIssuerConfig)
+    Test_TC_TGTNAV_8_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TGTNAV_8_1", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -20175,7 +20206,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_8_1Suite() {}
+    ~Test_TC_TGTNAV_8_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -20296,10 +20327,10 @@ private:
     }
 };
 
-class Test_TC_MC_9_1Suite : public TestCommand
+class Test_TC_APBSC_9_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_9_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_9_1", 9, credsIssuerConfig)
+    Test_TC_APBSC_9_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_APBSC_9_1", 9, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -20307,7 +20338,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_9_1Suite() {}
+    ~Test_TC_APBSC_9_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -20479,10 +20510,11 @@ private:
     }
 };
 
-class Test_TC_MC_10_1Suite : public TestCommand
+class Test_TC_CONTENTLAUNCHER_10_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_10_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_1", 3, credsIssuerConfig)
+    Test_TC_CONTENTLAUNCHER_10_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_10_1", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -20490,7 +20522,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_10_1Suite() {}
+    ~Test_TC_CONTENTLAUNCHER_10_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -20742,10 +20774,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_3Suite : public TestCommand
+class Test_TC_CADMIN_1_3Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_3", 12, credsIssuerConfig)
+    Test_TC_CADMIN_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_3", 12, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("nodeId2", 0, UINT64_MAX, &mNodeId2);
@@ -20755,7 +20787,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_3Suite() {}
+    ~Test_TC_CADMIN_1_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -20981,10 +21013,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_4Suite : public TestCommand
+class Test_TC_CADMIN_1_4Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_4", 12, credsIssuerConfig)
+    Test_TC_CADMIN_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_4", 12, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("nodeId2", 0, UINT64_MAX, &mNodeId2);
@@ -20994,7 +21026,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_4Suite() {}
+    ~Test_TC_CADMIN_1_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -26786,10 +26818,10 @@ private:
     }
 };
 
-class Test_TC_TM_1_1Suite : public TestCommand
+class Test_TC_TMP_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_TM_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_1_1", 7, credsIssuerConfig)
+    Test_TC_TMP_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TMP_1_1", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -26797,7 +26829,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TM_1_1Suite() {}
+    ~Test_TC_TMP_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -26948,10 +26980,10 @@ private:
     }
 };
 
-class Test_TC_TM_2_1Suite : public TestCommand
+class Test_TC_TMP_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_TM_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_1", 5, credsIssuerConfig)
+    Test_TC_TMP_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TMP_2_1", 5, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -26959,7 +26991,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TM_2_1Suite() {}
+    ~Test_TC_TMP_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -30270,11 +30302,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_2_1Suite : public TestCommand
+class Test_TC_DGTHREAD_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_2_1", 34, credsIssuerConfig)
+    Test_TC_DGTHREAD_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_2_1", 34, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -30282,7 +30314,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_2_1Suite() {}
+    ~Test_TC_DGTHREAD_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -30817,11 +30849,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_2_2Suite : public TestCommand
+class Test_TC_DGTHREAD_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_2_2", 18, credsIssuerConfig)
+    Test_TC_DGTHREAD_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_2_2", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -30829,7 +30861,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_2_2Suite() {}
+    ~Test_TC_DGTHREAD_2_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -31123,11 +31155,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_2_3Suite : public TestCommand
+class Test_TC_DGTHREAD_2_3Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_2_3", 18, credsIssuerConfig)
+    Test_TC_DGTHREAD_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_2_3", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -31135,7 +31167,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_2_3Suite() {}
+    ~Test_TC_DGTHREAD_2_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -31429,11 +31461,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_2_4Suite : public TestCommand
+class Test_TC_DGTHREAD_2_4Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_2_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_2_4", 3, credsIssuerConfig)
+    Test_TC_DGTHREAD_2_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_2_4", 3, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -31441,7 +31473,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_2_4Suite() {}
+    ~Test_TC_DGTHREAD_2_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70458,10 +70490,11 @@ private:
     }
 };
 
-class Test_TC_MC_2_2Suite : public TestCommand
+class Test_TC_LOWPOWER_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_2_2", 0, credsIssuerConfig)
+    Test_TC_LOWPOWER_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_LOWPOWER_2_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70469,7 +70502,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_2_2Suite() {}
+    ~Test_TC_LOWPOWER_2_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70514,10 +70547,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_7_1Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_7_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_7_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_7_1", 0, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_7_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_7_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70525,7 +70559,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_7_1Suite() {}
+    ~Test_TC_APPLAUNCHER_3_7_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70570,10 +70604,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_8_1Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_8_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_8_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_8_1", 0, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_8_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_8_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70581,7 +70616,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_8_1Suite() {}
+    ~Test_TC_APPLAUNCHER_3_8_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70626,10 +70661,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_9_1Suite : public TestCommand
+class Test_TC_APPLAUNCHER_3_9_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_9_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_9_1", 0, credsIssuerConfig)
+    Test_TC_APPLAUNCHER_3_9_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_APPLAUNCHER_3_9_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70637,7 +70673,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_9_1Suite() {}
+    ~Test_TC_APPLAUNCHER_3_9_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70682,10 +70718,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_14Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_14Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_14Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_14", 0, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_14Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_14", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70693,7 +70730,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_14Suite() {}
+    ~Test_TC_MEDIAINPUT_3_14Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70738,10 +70775,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_15Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_15Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_15", 0, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_15Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_15", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70749,7 +70787,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_15Suite() {}
+    ~Test_TC_MEDIAINPUT_3_15Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70794,10 +70832,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_16Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_16Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_16Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_16", 0, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_16Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_16", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70805,7 +70844,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_16Suite() {}
+    ~Test_TC_MEDIAINPUT_3_16Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70850,10 +70889,11 @@ private:
     }
 };
 
-class Test_TC_MC_3_17Suite : public TestCommand
+class Test_TC_MEDIAINPUT_3_17Suite : public TestCommand
 {
 public:
-    Test_TC_MC_3_17Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_3_17", 0, credsIssuerConfig)
+    Test_TC_MEDIAINPUT_3_17Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAINPUT_3_17", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70861,7 +70901,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_3_17Suite() {}
+    ~Test_TC_MEDIAINPUT_3_17Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70906,10 +70946,11 @@ private:
     }
 };
 
-class Test_TC_MC_4_1Suite : public TestCommand
+class Test_TC_WAKEONLAN_4_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_4_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_4_1", 0, credsIssuerConfig)
+    Test_TC_WAKEONLAN_4_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_WAKEONLAN_4_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70917,7 +70958,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_4_1Suite() {}
+    ~Test_TC_WAKEONLAN_4_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -70962,10 +71003,11 @@ private:
     }
 };
 
-class Test_TC_MC_5_4Suite : public TestCommand
+class Test_TC_CHANNEL_5_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_5_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_4", 0, credsIssuerConfig)
+    Test_TC_CHANNEL_5_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_5_4", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -70973,7 +71015,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_5_4Suite() {}
+    ~Test_TC_CHANNEL_5_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71018,10 +71060,11 @@ private:
     }
 };
 
-class Test_TC_MC_5_5Suite : public TestCommand
+class Test_TC_CHANNEL_5_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_5_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_5", 0, credsIssuerConfig)
+    Test_TC_CHANNEL_5_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_5_5", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71029,7 +71072,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_5_5Suite() {}
+    ~Test_TC_CHANNEL_5_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71074,10 +71117,11 @@ private:
     }
 };
 
-class Test_TC_MC_5_6Suite : public TestCommand
+class Test_TC_CHANNEL_5_6Suite : public TestCommand
 {
 public:
-    Test_TC_MC_5_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_5_6", 0, credsIssuerConfig)
+    Test_TC_CHANNEL_5_6Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CHANNEL_5_6", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71085,7 +71129,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_5_6Suite() {}
+    ~Test_TC_CHANNEL_5_6Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71130,10 +71174,11 @@ private:
     }
 };
 
-class Test_TC_MC_6_5Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_6_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_5", 0, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_6_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_6_5", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71141,7 +71186,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_6_5Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_6_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71186,10 +71231,11 @@ private:
     }
 };
 
-class Test_TC_MC_6_7Suite : public TestCommand
+class Test_TC_MEDIAPLAYBACK_6_7Suite : public TestCommand
 {
 public:
-    Test_TC_MC_6_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_6_7", 0, credsIssuerConfig)
+    Test_TC_MEDIAPLAYBACK_6_7Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_MEDIAPLAYBACK_6_7", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71197,7 +71243,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_6_7Suite() {}
+    ~Test_TC_MEDIAPLAYBACK_6_7Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71242,10 +71288,11 @@ private:
     }
 };
 
-class Test_TC_MC_7_3Suite : public TestCommand
+class Test_TC_AUDIOOUTPUT_7_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_7_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_3", 0, credsIssuerConfig)
+    Test_TC_AUDIOOUTPUT_7_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_AUDIOOUTPUT_7_3", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71253,7 +71300,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_7_3Suite() {}
+    ~Test_TC_AUDIOOUTPUT_7_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71298,10 +71345,11 @@ private:
     }
 };
 
-class Test_TC_MC_7_4Suite : public TestCommand
+class Test_TC_AUDIOOUTPUT_7_4Suite : public TestCommand
 {
 public:
-    Test_TC_MC_7_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_7_4", 0, credsIssuerConfig)
+    Test_TC_AUDIOOUTPUT_7_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_AUDIOOUTPUT_7_4", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71309,7 +71357,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_7_4Suite() {}
+    ~Test_TC_AUDIOOUTPUT_7_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71354,10 +71402,11 @@ private:
     }
 };
 
-class Test_TC_MC_10_3Suite : public TestCommand
+class Test_TC_CONTENTLAUNCHER_10_3Suite : public TestCommand
 {
 public:
-    Test_TC_MC_10_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_3", 0, credsIssuerConfig)
+    Test_TC_CONTENTLAUNCHER_10_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_10_3", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71365,7 +71414,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_10_3Suite() {}
+    ~Test_TC_CONTENTLAUNCHER_10_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71410,10 +71459,11 @@ private:
     }
 };
 
-class Test_TC_MC_10_5Suite : public TestCommand
+class Test_TC_CONTENTLAUNCHER_10_5Suite : public TestCommand
 {
 public:
-    Test_TC_MC_10_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_5", 0, credsIssuerConfig)
+    Test_TC_CONTENTLAUNCHER_10_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_10_5", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71421,7 +71471,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_10_5Suite() {}
+    ~Test_TC_CONTENTLAUNCHER_10_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71466,10 +71516,11 @@ private:
     }
 };
 
-class Test_TC_MC_10_7Suite : public TestCommand
+class Test_TC_CONTENTLAUNCHER_10_7Suite : public TestCommand
 {
 public:
-    Test_TC_MC_10_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_10_7", 0, credsIssuerConfig)
+    Test_TC_CONTENTLAUNCHER_10_7Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_10_7", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71477,7 +71528,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_10_7Suite() {}
+    ~Test_TC_CONTENTLAUNCHER_10_7Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71634,10 +71685,11 @@ private:
     }
 };
 
-class Test_TC_MC_12_1Suite : public TestCommand
+class Test_TC_ALOGIN_12_1Suite : public TestCommand
 {
 public:
-    Test_TC_MC_12_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_12_1", 0, credsIssuerConfig)
+    Test_TC_ALOGIN_12_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ALOGIN_12_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71645,7 +71697,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_12_1Suite() {}
+    ~Test_TC_ALOGIN_12_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71690,10 +71742,11 @@ private:
     }
 };
 
-class Test_TC_MC_12_2Suite : public TestCommand
+class Test_TC_ALOGIN_12_2Suite : public TestCommand
 {
 public:
-    Test_TC_MC_12_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MC_12_2", 0, credsIssuerConfig)
+    Test_TC_ALOGIN_12_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_ALOGIN_12_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71701,7 +71754,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MC_12_2Suite() {}
+    ~Test_TC_ALOGIN_12_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71746,10 +71799,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_1Suite : public TestCommand
+class Test_TC_CADMIN_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_1", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71757,7 +71810,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_1Suite() {}
+    ~Test_TC_CADMIN_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71802,10 +71855,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_2Suite : public TestCommand
+class Test_TC_CADMIN_1_2Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_2", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71813,7 +71866,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_2Suite() {}
+    ~Test_TC_CADMIN_1_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71858,10 +71911,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_7Suite : public TestCommand
+class Test_TC_CADMIN_1_7Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_7", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_7", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71869,7 +71922,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_7Suite() {}
+    ~Test_TC_CADMIN_1_7Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71914,10 +71967,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_8Suite : public TestCommand
+class Test_TC_CADMIN_1_8Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_8", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_8", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71925,7 +71978,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_8Suite() {}
+    ~Test_TC_CADMIN_1_8Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -71970,10 +72023,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_11Suite : public TestCommand
+class Test_TC_CADMIN_1_11Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_11", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_11", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -71981,7 +72035,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_11Suite() {}
+    ~Test_TC_CADMIN_1_11Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72026,10 +72080,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_12Suite : public TestCommand
+class Test_TC_CADMIN_1_12Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_12", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_12Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_12", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72037,7 +72092,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_12Suite() {}
+    ~Test_TC_CADMIN_1_12Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72082,10 +72137,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_13Suite : public TestCommand
+class Test_TC_CADMIN_1_13Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_13", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_13", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72093,7 +72149,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_13Suite() {}
+    ~Test_TC_CADMIN_1_13Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72138,10 +72194,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_14Suite : public TestCommand
+class Test_TC_CADMIN_1_14Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_14", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_14", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72149,7 +72206,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_14Suite() {}
+    ~Test_TC_CADMIN_1_14Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72194,10 +72251,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_16Suite : public TestCommand
+class Test_TC_CADMIN_1_16Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_16Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_16", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_16Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_16", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72205,7 +72263,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_16Suite() {}
+    ~Test_TC_CADMIN_1_16Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72250,10 +72308,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_17Suite : public TestCommand
+class Test_TC_CADMIN_1_17Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_17Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_17", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_17Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_17", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72261,7 +72320,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_17Suite() {}
+    ~Test_TC_CADMIN_1_17Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72306,10 +72365,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_18Suite : public TestCommand
+class Test_TC_CADMIN_1_18Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_18Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_18", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_18Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_18", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72317,7 +72377,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_18Suite() {}
+    ~Test_TC_CADMIN_1_18Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72362,10 +72422,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_19Suite : public TestCommand
+class Test_TC_CADMIN_1_19Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_19Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_19", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_19Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_19", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72373,7 +72434,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_19Suite() {}
+    ~Test_TC_CADMIN_1_19Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72418,10 +72479,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_20Suite : public TestCommand
+class Test_TC_CADMIN_1_20Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_20Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_20", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_20Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_20", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72429,7 +72491,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_20Suite() {}
+    ~Test_TC_CADMIN_1_20Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72474,10 +72536,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_21Suite : public TestCommand
+class Test_TC_CADMIN_1_21Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_21Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_21", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_21Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_21", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72485,7 +72548,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_21Suite() {}
+    ~Test_TC_CADMIN_1_21Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72530,10 +72593,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_22Suite : public TestCommand
+class Test_TC_CADMIN_1_22Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_22Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_22", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_22Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_22", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72541,7 +72605,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_22Suite() {}
+    ~Test_TC_CADMIN_1_22Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72586,10 +72650,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_23Suite : public TestCommand
+class Test_TC_CADMIN_1_23Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_23Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_23", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_23Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_23", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72597,7 +72662,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_23Suite() {}
+    ~Test_TC_CADMIN_1_23Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72642,10 +72707,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_24Suite : public TestCommand
+class Test_TC_CADMIN_1_24Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_24Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_24", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_24Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_24", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72653,7 +72719,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_24Suite() {}
+    ~Test_TC_CADMIN_1_24Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72698,10 +72764,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_25Suite : public TestCommand
+class Test_TC_CADMIN_1_25Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_25Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_25", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_25Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_25", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72709,7 +72776,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_25Suite() {}
+    ~Test_TC_CADMIN_1_25Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72754,10 +72821,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_26Suite : public TestCommand
+class Test_TC_CADMIN_1_26Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_26Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_26", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_26Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_26", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -72765,7 +72833,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_MF_1_26Suite() {}
+    ~Test_TC_CADMIN_1_26Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -72810,17 +72878,18 @@ private:
     }
 };
 
-class Test_TC_MF_1_27Suite : public TestCommand
+class Test_TC_CADMIN_1_27Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_27Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_27", 8, credsIssuerConfig)
+    Test_TC_CADMIN_1_27Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_27", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
-    ~Test_TC_MF_1_27Suite() {}
+    ~Test_TC_CADMIN_1_27Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(330)); }
 
@@ -72963,17 +73032,18 @@ private:
     }
 };
 
-class Test_TC_MF_1_28Suite : public TestCommand
+class Test_TC_CADMIN_1_28Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_28Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_28", 8, credsIssuerConfig)
+    Test_TC_CADMIN_1_28Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_28", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
-    ~Test_TC_MF_1_28Suite() {}
+    ~Test_TC_CADMIN_1_28Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(330)); }
 
@@ -73133,10 +73203,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_5Suite : public TestCommand
+class Test_TC_CADMIN_1_5Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_5", 13, credsIssuerConfig)
+    Test_TC_CADMIN_1_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_5", 13, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -73148,7 +73218,7 @@ public:
         AddArgument("payload", &mPayload);
     }
 
-    ~Test_TC_MF_1_5Suite() {}
+    ~Test_TC_CADMIN_1_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(300)); }
 
@@ -73384,10 +73454,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_6Suite : public TestCommand
+class Test_TC_CADMIN_1_6Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_6", 14, credsIssuerConfig)
+    Test_TC_CADMIN_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_6", 14, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -73399,7 +73469,7 @@ public:
         AddArgument("payload", &mPayload);
     }
 
-    ~Test_TC_MF_1_6Suite() {}
+    ~Test_TC_CADMIN_1_6Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(300)); }
 
@@ -73618,10 +73688,10 @@ private:
     }
 };
 
-class Test_TC_MF_1_9Suite : public TestCommand
+class Test_TC_CADMIN_1_9Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_9", 24, credsIssuerConfig)
+    Test_TC_CADMIN_1_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CADMIN_1_9", 24, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -73634,7 +73704,7 @@ public:
         AddArgument("payload2", &mPayload2);
     }
 
-    ~Test_TC_MF_1_9Suite() {}
+    ~Test_TC_CADMIN_1_9Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(700)); }
 
@@ -73979,10 +74049,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_10Suite : public TestCommand
+class Test_TC_CADMIN_1_10Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_10", 24, credsIssuerConfig)
+    Test_TC_CADMIN_1_10Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_10", 24, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -73995,7 +74066,7 @@ public:
         AddArgument("payload2", &mPayload2);
     }
 
-    ~Test_TC_MF_1_10Suite() {}
+    ~Test_TC_CADMIN_1_10Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(700)); }
 
@@ -74331,10 +74402,11 @@ private:
     }
 };
 
-class Test_TC_MF_1_15Suite : public TestCommand
+class Test_TC_CADMIN_1_15Suite : public TestCommand
 {
 public:
-    Test_TC_MF_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MF_1_15", 17, credsIssuerConfig)
+    Test_TC_CADMIN_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_15", 17, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -74346,7 +74418,7 @@ public:
         AddArgument("payload", &mPayload);
     }
 
-    ~Test_TC_MF_1_15Suite() {}
+    ~Test_TC_CADMIN_1_15Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(500)); }
 
@@ -84326,10 +84398,10 @@ private:
     }
 };
 
-class Test_TC_TM_2_2Suite : public TestCommand
+class Test_TC_TMP_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_TM_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_2_2", 6, credsIssuerConfig)
+    Test_TC_TMP_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TMP_2_2", 6, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84337,7 +84409,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TM_2_2Suite() {}
+    ~Test_TC_TMP_2_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84471,10 +84543,10 @@ private:
     }
 };
 
-class Test_TC_TM_3_1Suite : public TestCommand
+class Test_TC_TMP_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_TM_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TM_3_1", 0, credsIssuerConfig)
+    Test_TC_TMP_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TMP_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84482,7 +84554,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TM_3_1Suite() {}
+    ~Test_TC_TMP_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84695,11 +84767,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_1_1Suite : public TestCommand
+class Test_TC_DGTHREAD_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_1_1", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_1_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84707,7 +84779,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_1_1Suite() {}
+    ~Test_TC_DGTHREAD_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84752,11 +84824,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_2_5Suite : public TestCommand
+class Test_TC_DGTHREAD_2_5Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_2_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_2_5", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_2_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_2_5", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84764,7 +84836,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_2_5Suite() {}
+    ~Test_TC_DGTHREAD_2_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84809,11 +84881,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_3_1Suite : public TestCommand
+class Test_TC_DGTHREAD_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_3_1", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84821,7 +84893,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_3_1Suite() {}
+    ~Test_TC_DGTHREAD_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84866,11 +84938,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_3_2Suite : public TestCommand
+class Test_TC_DGTHREAD_3_2Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_3_2", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_3_2Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_3_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84878,7 +84950,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_3_2Suite() {}
+    ~Test_TC_DGTHREAD_3_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84923,11 +84995,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_3_3Suite : public TestCommand
+class Test_TC_DGTHREAD_3_3Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_3_3", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_3_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_3_3", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84935,7 +85007,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_3_3Suite() {}
+    ~Test_TC_DGTHREAD_3_3Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -84980,11 +85052,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_3_4Suite : public TestCommand
+class Test_TC_DGTHREAD_3_4Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_3_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_3_4", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_3_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_3_4", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -84992,7 +85064,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_3_4Suite() {}
+    ~Test_TC_DGTHREAD_3_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85037,11 +85109,11 @@ private:
     }
 };
 
-class Test_TC_DIAG_TH_NW_3_5Suite : public TestCommand
+class Test_TC_DGTHREAD_3_5Suite : public TestCommand
 {
 public:
-    Test_TC_DIAG_TH_NW_3_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_DIAG_TH_NW_3_5", 0, credsIssuerConfig)
+    Test_TC_DGTHREAD_3_5Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_DGTHREAD_3_5", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85049,7 +85121,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_DIAG_TH_NW_3_5Suite() {}
+    ~Test_TC_DGTHREAD_3_5Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85318,10 +85390,10 @@ private:
     }
 };
 
-class Test_TC_TFL_1_1Suite : public TestCommand
+class Test_TC_LTIME_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_TFL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_1_1", 0, credsIssuerConfig)
+    Test_TC_LTIME_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LTIME_1_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85329,7 +85401,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TFL_1_1Suite() {}
+    ~Test_TC_LTIME_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85374,10 +85446,10 @@ private:
     }
 };
 
-class Test_TC_TFL_1_2Suite : public TestCommand
+class Test_TC_LTIME_1_2Suite : public TestCommand
 {
 public:
-    Test_TC_TFL_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_1_2", 0, credsIssuerConfig)
+    Test_TC_LTIME_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LTIME_1_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85385,7 +85457,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TFL_1_2Suite() {}
+    ~Test_TC_LTIME_1_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85430,10 +85502,10 @@ private:
     }
 };
 
-class Test_TC_TFL_2_1Suite : public TestCommand
+class Test_TC_LTIME_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_TFL_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_2_1", 0, credsIssuerConfig)
+    Test_TC_LTIME_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LTIME_2_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85441,7 +85513,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TFL_2_1Suite() {}
+    ~Test_TC_LTIME_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85486,10 +85558,10 @@ private:
     }
 };
 
-class Test_TC_TFL_3_1Suite : public TestCommand
+class Test_TC_LTIME_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_TFL_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TFL_3_1", 0, credsIssuerConfig)
+    Test_TC_LTIME_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LTIME_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85497,7 +85569,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_TFL_3_1Suite() {}
+    ~Test_TC_LTIME_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85542,10 +85614,10 @@ private:
     }
 };
 
-class Test_TC_UL_1_1Suite : public TestCommand
+class Test_TC_LUNIT_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_UL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_1_1", 0, credsIssuerConfig)
+    Test_TC_LUNIT_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LUNIT_1_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85553,7 +85625,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_UL_1_1Suite() {}
+    ~Test_TC_LUNIT_1_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85598,10 +85670,10 @@ private:
     }
 };
 
-class Test_TC_UL_1_2Suite : public TestCommand
+class Test_TC_LUNIT_1_2Suite : public TestCommand
 {
 public:
-    Test_TC_UL_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_1_2", 0, credsIssuerConfig)
+    Test_TC_LUNIT_1_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LUNIT_1_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85609,7 +85681,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_UL_1_2Suite() {}
+    ~Test_TC_LUNIT_1_2Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85654,10 +85726,10 @@ private:
     }
 };
 
-class Test_TC_UL_2_1Suite : public TestCommand
+class Test_TC_LUNIT_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_UL_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_2_1", 0, credsIssuerConfig)
+    Test_TC_LUNIT_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LUNIT_2_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85665,7 +85737,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_UL_2_1Suite() {}
+    ~Test_TC_LUNIT_2_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85710,10 +85782,10 @@ private:
     }
 };
 
-class Test_TC_UL_3_1Suite : public TestCommand
+class Test_TC_LUNIT_3_1Suite : public TestCommand
 {
 public:
-    Test_TC_UL_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_UL_3_1", 0, credsIssuerConfig)
+    Test_TC_LUNIT_3_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LUNIT_3_1", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -85721,7 +85793,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_UL_3_1Suite() {}
+    ~Test_TC_LUNIT_3_1Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -86551,45 +86623,45 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_LVL_4_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_LVL_5_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_LVL_6_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_4Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_6Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_7Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_8Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_9Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_10Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_11Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_1_12Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_6Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_7Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_8Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_9Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_10Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_11Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_12Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_13Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_5_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_5_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_5_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_6_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_6_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_6_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_6_4Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_7_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_7_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_8_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_9_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_10_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LOWPOWER_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_KEYPADINPUT_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_1_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_WAKEONLAN_1_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_1_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_1_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_AUDIOOUTPUT_1_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TGTNAV_1_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APBSC_1_10Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_1_11Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ALOGIN_1_12Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LOWPOWER_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_KEYPADINPUT_3_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_KEYPADINPUT_3_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_10Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_11Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_12Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_13Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_5_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_5_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_5_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_6_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_6_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_6_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_6_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_AUDIOOUTPUT_7_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_AUDIOOUTPUT_7_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TGTNAV_8_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APBSC_9_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_10_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_4Suite>(credsIssuerConfig),
         make_unique<OTA_SuccessfulTransferSuite>(credsIssuerConfig),
         make_unique<Test_TC_OCC_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_OCC_2_1Suite>(credsIssuerConfig),
@@ -86611,18 +86683,18 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_RH_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_SC_4_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_SWTCH_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TM_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TM_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TMP_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TMP_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSTAT_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSTAT_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSTAT_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSUIC_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSUIC_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSUIC_2_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_2_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_2_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_2_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_2_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_2_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_ULABEL_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_ULABEL_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_ULABEL_2_3Suite>(credsIssuerConfig),
@@ -86826,55 +86898,55 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_IDM_6_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_7_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_IDM_8_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_2_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_7_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_8_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_9_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_14Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_15Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_16Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_3_17Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_4_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_5_4Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_5_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_5_6Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_6_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_6_7Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_7_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_7_4Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_10_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_10_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_10_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LOWPOWER_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_7_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_8_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_APPLAUNCHER_3_9_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_14Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_15Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_16Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAINPUT_3_17Suite>(credsIssuerConfig),
+        make_unique<Test_TC_WAKEONLAN_4_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_5_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_5_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CHANNEL_5_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_6_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_MEDIAPLAYBACK_6_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_AUDIOOUTPUT_7_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_AUDIOOUTPUT_7_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_10_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_10_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_10_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_11_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_11_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_12_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MC_12_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_7Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_8Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_11Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_12Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_13Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_14Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_16Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_17Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_18Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_19Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_20Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_21Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_22Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_23Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_24Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_25Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_26Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_27Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_28Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_6Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_9Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_10Suite>(credsIssuerConfig),
-        make_unique<Test_TC_MF_1_15Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ALOGIN_12_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ALOGIN_12_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_11Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_12Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_13Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_14Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_16Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_17Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_18Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_19Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_20Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_21Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_22Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_23Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_24Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_25Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_26Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_27Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_28Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_10Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_15Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_2_1Suite>(credsIssuerConfig),
@@ -86977,30 +87049,30 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_SWTCH_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_SWTCH_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_SWTCH_3_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TM_2_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TM_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TMP_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_TMP_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSTAT_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSTAT_3_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_TSUIC_3_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_2_5Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_3_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_3_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_3_3Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_3_4Suite>(credsIssuerConfig),
-        make_unique<Test_TC_DIAG_TH_NW_3_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_2_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_3_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_3_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_3_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_DGTHREAD_3_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_ACT_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_ACT_2_2Suite>(credsIssuerConfig),
         make_unique<Test_TC_ACT_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_ACT_3_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TFL_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TFL_1_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TFL_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_TFL_3_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_UL_1_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_UL_1_2Suite>(credsIssuerConfig),
-        make_unique<Test_TC_UL_2_1Suite>(credsIssuerConfig),
-        make_unique<Test_TC_UL_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LTIME_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LTIME_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LTIME_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LTIME_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LUNIT_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LUNIT_1_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LUNIT_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_LUNIT_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLABEL_1_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLABEL_2_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_FLABEL_3_1Suite>(credsIssuerConfig),

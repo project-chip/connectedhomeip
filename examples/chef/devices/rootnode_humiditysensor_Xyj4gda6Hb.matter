@@ -45,6 +45,10 @@ server cluster Identify = 3 {
 }
 
 client cluster Groups = 4 {
+  bitmap GroupClusterFeature : BITMAP32 {
+    kGroupNames = 0x1;
+  }
+
   readonly attribute bitmap8 nameSupport = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -54,6 +58,10 @@ client cluster Groups = 4 {
 }
 
 server cluster Groups = 4 {
+  bitmap GroupClusterFeature : BITMAP32 {
+    kGroupNames = 0x1;
+  }
+
   readonly attribute bitmap8 nameSupport = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

@@ -1,0 +1,59 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.5.6. [TC-MEDIAINPUT-3.15] Show Input Status Verification (DUT as Client)
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT sends ShowInputStatus command to TH"
+      PICS: MC_MEDIAINPUT.C.C0001
+      verification: |
+          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+
+          ./chip-tool mediainput show-input-status 1 1
+          [1653309190.706455][6534:6539] CHIP:DMG: InvokeResponseMessage =
+          [1653309190.706466][6534:6539] CHIP:DMG: {
+          [1653309190.706478][6534:6539] CHIP:DMG:         suppressResponse = false,
+          [1653309190.706491][6534:6539] CHIP:DMG:         InvokeResponseIBs =
+          [1653309190.706508][6534:6539] CHIP:DMG:         [
+          [1653309190.706518][6534:6539] CHIP:DMG:                 InvokeResponseIB =
+          [1653309190.706536][6534:6539] CHIP:DMG:                 {
+          [1653309190.706548][6534:6539] CHIP:DMG:                         CommandStatusIB =
+          [1653309190.706561][6534:6539] CHIP:DMG:                         {
+          [1653309190.706573][6534:6539] CHIP:DMG:                                 CommandPathIB =
+          [1653309190.706586][6534:6539] CHIP:DMG:                                 {
+          [1653309190.706600][6534:6539] CHIP:DMG:                                         EndpointId = 0x1,
+          [1653309190.706612][6534:6539] CHIP:DMG:                                         ClusterId = 0x507,
+          [1653309190.706620][6534:6539] CHIP:DMG:                                         CommandId = 0x1,
+          [1653309190.706630][6534:6539] CHIP:DMG:                                 },
+          [1653309190.706642][6534:6539] CHIP:DMG:
+          [1653309190.706651][6534:6539] CHIP:DMG:                                 StatusIB =
+          [1653309190.706660][6534:6539] CHIP:DMG:                                 {
+          [1653309190.706672][6534:6539] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1653309190.706683][6534:6539] CHIP:DMG:                                 },
+          [1653309190.706697][6534:6539] CHIP:DMG:
+          [1653309190.706706][6534:6539] CHIP:DMG:                         },
+          [1653309190.706718][6534:6539] CHIP:DMG:
+          [1653309190.706726][6534:6539] CHIP:DMG:                 },
+          [1653309190.706740][6534:6539] CHIP:DMG:
+          [1653309190.706748][6534:6539] CHIP:DMG:         ],
+          [1653309190.706762][6534:6539] CHIP:DMG:
+          [1653309190.706771][6534:6539] CHIP:DMG:         InteractionModelRevision = 1
+          [1653309190.706779][6534:6539] CHIP:DMG: },
+      disabled: true
