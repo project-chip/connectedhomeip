@@ -21627,6 +21627,10 @@ typedef NS_ENUM(uint8_t, MTRIdentifyType) {
     MTRIdentifyTypeActuator = 0x05,
 };
 
+typedef NS_OPTIONS(uint32_t, MTRGroupsGroupClusterFeature) {
+    MTRGroupsGroupClusterFeatureGroupNames = 0x1,
+};
+
 typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
     MTRScenesCopyModeCopyAllScenes = 0x1,
 };
