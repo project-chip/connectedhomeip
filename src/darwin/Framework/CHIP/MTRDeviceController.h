@@ -127,7 +127,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  *
  * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setOtaProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.
