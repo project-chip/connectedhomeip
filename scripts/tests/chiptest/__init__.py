@@ -21,7 +21,7 @@ from .test_definition import ApplicationPaths, TestDefinition, TestTarget
 
 
 def target_for_name(name: str):
-    if name.startswith("TV_") or name.startswith("Test_TC_MC_"):
+    if name.startswith("TV_") or name.startswith("Test_TC_MC_") or name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_"):
         return TestTarget.TV
     if name.startswith("DL_") or name.startswith("Test_TC_DLRK_"):
         return TestTarget.LOCK
