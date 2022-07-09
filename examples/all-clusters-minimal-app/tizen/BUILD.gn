@@ -17,40 +17,59 @@ import("//build_overrides/tizen.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/common_flags.gni")
-import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
 assert(chip_build_tools)
 
-executable("chip-lighting-app") {
+source_set("chip-all-clusters-common") {
+  sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/all-clusters-minimal-app/all-clusters-common",
+    "${chip_root}/src/lib/shell:shell_core",
+  ]
+
+  include_dirs =
+      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+}
+
+executable("chip-all-clusters-minimal-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
     "src/main.cpp",
   ]
 
   deps = [
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/examples/lighting-app/lighting-common:lighting-manager",
+    ":chip-all-clusters-common",
     "${chip_root}/examples/platform/tizen:app-main",
     "${chip_root}/src/lib",
   ]
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/zzz_generated/all-clusters-minimal-app",
+    "include",
+  ]
 
   output_dir = root_out_dir
 }
 
-tizen_sdk_package("chip-lighting-app:tpk") {
-  deps = [ ":chip-lighting-app" ]
+tizen_sdk_package("chip-all-clusters-minimal-app:tpk") {
+  deps = [ ":chip-all-clusters-minimal-app" ]
   manifest = rebase_path("tizen-manifest.xml")
   sign_security_profile = "CHIP"
 }
 
 group("tizen") {
-  deps = [ ":chip-lighting-app" ]
+  deps = [ ":chip-all-clusters-minimal-app" ]
 }
 
 group("tizen:tpk") {
-  deps = [ ":chip-lighting-app:tpk" ]
+  deps = [ ":chip-all-clusters-minimal-app:tpk" ]
 }
 
 group("default") {
