@@ -151,10 +151,14 @@ class AsyncCallableHandle:
             self._cv.notify_all()
         pythonapi.Py_DecRef(py_object(self))
 
-    def Wait(self):
+    def Wait(self, timeoutMs: int = None):
+        timeout = None
+        if timeoutMs is not None:
+            timeout = float(timeoutMs) / 1000
+
         with self._cv:
             while self._finish is False:
-                self._cv.wait()
+                self._cv.wait(timeout)
             if self._exc is not None:
                 raise self._exc
             return self._res
@@ -335,7 +339,7 @@ class ChipStack(object):
         self.devMgr = None
         self.callbackRes = None
 
-    def Call(self, callFunct):
+    def Call(self, callFunct, timeoutMs: int = None):
         '''Run a Python function on CHIP stack, and wait for the response.
         This function is a wrapper of PostTaskOnChipThread, which includes some handling of application specific logics.
         Calling this function on CHIP on CHIP mainloop thread will cause deadlock.
@@ -344,7 +348,7 @@ class ChipStack(object):
         self.callbackRes = None
         self.completeEvent.clear()
         with self.networkLock:
-            res = self.PostTaskOnChipThread(callFunct).Wait()
+            res = self.PostTaskOnChipThread(callFunct).Wait(timeoutMs)
         self.completeEvent.set()
         if res == 0 and self.callbackRes != None:
             return self.callbackRes
