@@ -588,7 +588,7 @@ void ExchangeContext::AbortAllOtherCommunicationOnFabric()
 
     SetIgnoreSessionRelease(true);
 
-    GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(mSession->GetFabricIndex());
+    GetExchangeMgr()->GetSessionManager()->ExpireAllSessionsForFabric(mSession->GetFabricIndex());
 
     mSession.GrabExpiredSession(session.Value());
 

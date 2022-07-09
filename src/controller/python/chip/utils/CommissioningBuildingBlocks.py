@@ -119,6 +119,9 @@ async def UpdateNOC(devCtrl, existingNodeId, newNodeId):
         await devCtrl.SendCommand(existingNodeId, 0, generalCommissioning.Commands.ArmFailSafe(0), timedRequestTimeoutMs=1000)
         return False
 
+    # Forget our session since the peer deleted it
+    devCtrl.ExpireSessions(existingNodeId)
+
     resp = await devCtrl.SendCommand(newNodeId, 0, generalCommissioning.Commands.CommissioningComplete())
     if resp.errorCode is not generalCommissioning.Enums.CommissioningError.kOk:
         # Expiring the failsafe timer in an attempt to clean up.
