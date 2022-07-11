@@ -226,8 +226,18 @@ CHIP_ERROR FabricTable::DeleteMetadataFromStorage(FabricIndex fabricIndex)
 
     if (deleteErr != CHIP_NO_ERROR)
     {
-        ChipLogError(FabricProvisioning, "Error deleting part of fabric %d: %" CHIP_ERROR_FORMAT, fabricIndex, deleteErr.Format());
+        if (deleteErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(FabricProvisioning, "Warning: metadata not found during delete of fabric 0x%x",
+                         static_cast<unsigned>(fabricIndex));
+        }
+        else
+        {
+            ChipLogError(FabricProvisioning, "Error deleting metadata for fabric fabric 0x%x: %" CHIP_ERROR_FORMAT,
+                         static_cast<unsigned>(fabricIndex), deleteErr.Format());
+        }
     }
+
     return deleteErr;
 }
 
@@ -1733,6 +1743,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     bool isAdding                = mStateFlags.Has(StateFlags::kIsAddPending);
     bool isUpdating              = mStateFlags.Has(StateFlags::kIsUpdatePending);
     bool hasPending              = mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent);
+    bool onlyHaveNewTrustedRoot  = hasPending && haveNewTrustedRoot && !(isAdding || isUpdating);
     bool hasInvalidInternalState = hasPending && (!IsValidFabricIndex(mFabricIndexWithPendingState) || !(isAdding || isUpdating));
 
     FabricIndex fabricIndexBeingCommitted = mFabricIndexWithPendingState;
@@ -1783,20 +1794,20 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
     // If there was nothing pending, we are either in a completely OK state, or weird internally inconsistent
     // state. In either case, let's clear all pending state anyway, in case it was partially stale!
-    if (!hasPending || hasInvalidInternalState)
+    if (!hasPending || onlyHaveNewTrustedRoot || hasInvalidInternalState)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        if (hasInvalidInternalState)
-        {
-            ChipLogError(FabricProvisioning, "Failed to commit: internally inconsistent state!");
-            err = CHIP_ERROR_INTERNAL;
-        }
-        else if (haveNewTrustedRoot)
+
+        if (onlyHaveNewTrustedRoot)
         {
             ChipLogError(FabricProvisioning,
                          "Failed to commit: tried to commit with only a new trusted root cert. No data committed.");
-            hasInvalidInternalState = true;
-            err                     = CHIP_ERROR_INCORRECT_STATE;
+            err = CHIP_ERROR_INCORRECT_STATE;
+        }
+        else if (hasInvalidInternalState)
+        {
+            ChipLogError(FabricProvisioning, "Failed to commit: internally inconsistent state!");
+            err = CHIP_ERROR_INTERNAL;
         }
         else
         {
@@ -2005,13 +2016,13 @@ void FabricTable::RevertPendingOpCertsExceptRoot()
 CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan & fabricLabel)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     ReturnErrorCodeIf(fabricLabel.size() > kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
     FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
     bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();
-    VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Update fabric table current in-memory entry, whether pending or not
     ReturnErrorOnFailure(fabricInfo->SetFabricLabel(fabricLabel));
@@ -2022,6 +2033,15 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
         ReturnErrorOnFailure(StoreFabricMetadata(fabricInfo));
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::GetFabricLabel(FabricIndex fabricIndex, CharSpan & outFabricLabel)
+{
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    outFabricLabel = fabricInfo->GetFabricLabel();
     return CHIP_NO_ERROR;
 }
 

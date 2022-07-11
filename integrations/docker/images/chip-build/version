@@ -1,1 +1,1 @@
-0.5.84 Version bump reason: two more Yocto SDKs are to be integrated into the imx docker image
+0.5.85 Version bump reason: remove two Yocto SDKs to decrease the imx docker image size
