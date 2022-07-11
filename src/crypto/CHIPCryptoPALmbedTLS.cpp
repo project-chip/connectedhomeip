@@ -514,11 +514,11 @@ static int uECC_is_rng_set(void)
 
 #endif
 
-mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
+mbedtls_ecp_group_id MapECPGroupId(SupportedECKeyTypes keyType)
 {
     switch (keyType)
     {
-    case SupportedECPKeyTypes::ECP256R1:
+    case SupportedECKeyTypes::ECP256R1:
         return MBEDTLS_ECP_DP_SECP256R1;
     default:
         return MBEDTLS_ECP_DP_NONE;

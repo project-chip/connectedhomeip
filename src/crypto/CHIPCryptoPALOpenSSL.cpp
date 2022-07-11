@@ -583,11 +583,11 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
     return CHIP_NO_ERROR;
 }
 
-ECName MapECName(SupportedECPKeyTypes keyType)
+ECName MapECName(SupportedECKeyTypes keyType)
 {
     switch (keyType)
     {
-    case SupportedECPKeyTypes::ECP256R1:
+    case SupportedECKeyTypes::ECP256R1:
         return ECName::P256v1;
     default:
         return ECName::None;

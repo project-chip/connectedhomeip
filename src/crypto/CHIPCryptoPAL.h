@@ -73,8 +73,9 @@ constexpr size_t kSpake2p_Max_PBKDF_Salt_Length  = 32;
 constexpr uint32_t kSpake2p_Min_PBKDF_Iterations = 1000;
 constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 
-constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
-constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+constexpr size_t kP256_PrivateKey_Length  = CHIP_CRYPTO_GROUP_SIZE_BYTES;
+constexpr size_t kP256_PublicKey_Length   = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+constexpr size_t kMax_SerializeKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
 
 constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
@@ -167,7 +168,7 @@ enum class CHIP_SPAKE2P_ROLE : uint8_t
     PROVER   = 1, // Commissioner
 };
 
-enum class SupportedECPKeyTypes : uint8_t
+enum class SupportedECKeyTypes : uint8_t
 {
     ECP256R1 = 0,
 };
@@ -199,30 +200,6 @@ void ClearSecretData(uint8_t (&buf)[N])
  * @return true if `n` first bytes of both buffers are equal, false otherwise
  */
 bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n);
-
-template <typename Sig>
-class ECPKey
-{
-public:
-    virtual ~ECPKey() {}
-    virtual SupportedECPKeyTypes Type() const  = 0;
-    virtual size_t Length() const              = 0;
-    virtual bool IsUncompressed() const        = 0;
-    virtual operator const uint8_t *() const   = 0;
-    virtual operator uint8_t *()               = 0;
-    virtual const uint8_t * ConstBytes() const = 0;
-    virtual uint8_t * Bytes()                  = 0;
-
-    virtual bool Matches(const ECPKey<Sig> & other) const
-    {
-        return (this->Length() == other.Length()) &&
-            IsBufferContentEqualConstantTime(this->ConstBytes(), other.ConstBytes(), this->Length());
-    }
-
-    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;
-    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
-                                                     const Sig & signature) const                                              = 0;
-};
 
 template <size_t Cap>
 class CapacityBoundBuffer
@@ -287,7 +264,33 @@ typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
 
 typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 
-class P256PublicKey : public ECPKey<P256ECDSASignature>
+typedef CapacityBoundBuffer<kMax_SerializeKey_Length> P256SerializedKeypair;
+
+template <typename Sig>
+class ECPublicKey
+{
+public:
+    virtual ~ECPublicKey() {}
+    virtual SupportedECKeyTypes Type() const   = 0;
+    virtual size_t Length() const              = 0;
+    virtual bool IsUncompressed() const        = 0;
+    virtual operator const uint8_t *() const   = 0;
+    virtual operator uint8_t *()               = 0;
+    virtual const uint8_t * ConstBytes() const = 0;
+    virtual uint8_t * Bytes()                  = 0;
+
+    virtual bool Matches(const ECPublicKey<Sig> & other) const
+    {
+        return (this->Length() == other.Length()) &&
+            IsBufferContentEqualConstantTime(this->ConstBytes(), other.ConstBytes(), this->Length());
+    }
+
+    virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const = 0;
+    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
+                                                     const Sig & signature) const                                              = 0;
+};
+
+class P256PublicKey : public ECPublicKey<P256ECDSASignature>
 {
 public:
     P256PublicKey() {}
@@ -314,7 +317,7 @@ public:
         return *this;
     }
 
-    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
+    SupportedECKeyTypes Type() const override { return SupportedECKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() override { return bytes; }
     operator const uint8_t *() const override { return bytes; }
@@ -377,8 +380,6 @@ struct alignas(size_t) P256KeypairContext
 {
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
-
-typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
 
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
