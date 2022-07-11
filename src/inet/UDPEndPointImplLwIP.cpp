@@ -241,6 +241,18 @@ void UDPEndPointImplLwIP::CloseImpl()
         udp_remove(mUDP);
         mUDP              = nullptr;
         mLwIPEndPointType = LwIPEndPointType::Unknown;
+
+        // In case that there is a UDPEndPointImplLwIP::LwIPReceiveUDPMessage
+        // event pending in the event queue (SystemLayer::ScheduleLambda), we
+        // schedule a release call to the end of the queue, to ensure that the
+        // queued pointer to UDPEndPointImplLwIP is not dangling.
+        Retain();
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+        if (err != CHIP_NO_ERROR)
+        {
+            // There is nothing we can do here, accept the chance of racing
+            Release();
+        }
     }
 
     // Unlock LwIP stack
@@ -342,6 +354,10 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
     IPPacketInfo * pktInfo         = nullptr;
     System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
+
+    if (ep->mState == State::kClosed)
+        return;
+
     if (buf->HasChainedBuffer())
     {
         // Try the simple expedient of flattening in-place.
