@@ -23237,7 +23237,7 @@ private:
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::Clusters::PowerSource::PowerSourceStatus value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -23263,7 +23263,7 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
@@ -23271,7 +23271,7 @@ private:
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                chip::app::DataModel::Nullable<uint16_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
             }
@@ -23279,7 +23279,7 @@ private:
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::Clusters::PowerSource::WiredCurrentType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -23289,7 +23289,7 @@ private:
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
@@ -23321,7 +23321,7 @@ private:
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<uint8_t> value;
+                chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -23329,7 +23329,7 @@ private:
         case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
@@ -23337,7 +23337,7 @@ private:
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::DataModel::Nullable<uint8_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
             }
@@ -23345,7 +23345,7 @@ private:
         case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
@@ -23353,7 +23353,7 @@ private:
         case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::Clusters::PowerSource::BatChargeLevel value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -23371,7 +23371,7 @@ private:
         case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::Clusters::PowerSource::BatReplaceability value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -23389,7 +23389,7 @@ private:
         case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<uint8_t> value;
+                chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -23460,7 +23460,7 @@ private:
         case 27:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::Clusters::PowerSource::BatChargeState value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "enum8"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
@@ -23470,7 +23470,7 @@ private:
         case 28:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
@@ -23486,7 +23486,7 @@ private:
         case 30:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint32_t value;
+                chip::app::DataModel::Nullable<uint32_t> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint32"));
             }
@@ -23494,7 +23494,7 @@ private:
         case 31:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::DataModel::DecodableList<uint8_t> value;
+                chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
@@ -23590,122 +23590,122 @@ private:
         case 12: {
             LogStep(12, "Test Harness Client reads BatVoltage from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryVoltage::Id, true,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatVoltage::Id, true,
                                  chip::NullOptional);
         }
         case 13: {
             LogStep(13, "Test Harness Client reads BatPercentRemaining from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryPercentRemaining::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatPercentRemaining::Id,
+                                 true, chip::NullOptional);
         }
         case 14: {
             LogStep(14, "Test Harness Client reads BatTimeRemaining from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryTimeRemaining::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatTimeRemaining::Id,
                                  true, chip::NullOptional);
         }
         case 15: {
             LogStep(15, "Test Harness Client reads BatChargeLevel from Server DUT");
             VerifyOrDo(!ShouldSkip("PS.S.A000e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryChargeLevel::Id,
-                                 true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id, true,
+                                 chip::NullOptional);
         }
         case 16: {
             LogStep(16, "Test Harness Client reads BatReplacementNeeded from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryReplacementNeeded::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatReplacementNeeded::Id,
+                                 true, chip::NullOptional);
         }
         case 17: {
             LogStep(17, "Test Harness Client reads BatReplaceability from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryReplaceability::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatReplaceability::Id,
+                                 true, chip::NullOptional);
         }
         case 18: {
             LogStep(18, "Test Harness Client reads BatPresent from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryPresent::Id, true,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatPresent::Id, true,
                                  chip::NullOptional);
         }
         case 19: {
             LogStep(19, "Test Harness Client readsActiveBatFaults from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::ActiveBatteryFaults::Id,
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::ActiveBatFaults::Id,
                                  true, chip::NullOptional);
         }
         case 20: {
             LogStep(20, "Test Harness Client reads BatReplacementDescription from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryReplacementDescription::Id, true, chip::NullOptional);
+                                 PowerSource::Attributes::BatReplacementDescription::Id, true, chip::NullOptional);
         }
         case 21: {
             LogStep(21, "Test Harness Client reads BatCommonDesignation from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryCommonDesignation::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatCommonDesignation::Id,
+                                 true, chip::NullOptional);
         }
         case 22: {
             LogStep(22, "Test Harness Client reads BatANSIDesignation from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryANSIDesignation::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatANSIDesignation::Id,
+                                 true, chip::NullOptional);
         }
         case 23: {
             LogStep(23, "Test Harness Client reads BatIECDesignation from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryIECDesignation::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatIECDesignation::Id,
+                                 true, chip::NullOptional);
         }
         case 24: {
             LogStep(24, "Test Harness Client reads BatApprovedChemistry from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryApprovedChemistry::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatApprovedChemistry::Id,
+                                 true, chip::NullOptional);
         }
         case 25: {
             LogStep(25, "Test Harness Client reads BatCapacity from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryCapacity::Id,
-                                 true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatCapacity::Id, true,
+                                 chip::NullOptional);
         }
         case 26: {
             LogStep(26, "Test Harness Client reads BatQuantity from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryQuantity::Id,
-                                 true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatQuantity::Id, true,
+                                 chip::NullOptional);
         }
         case 27: {
             LogStep(27, "Test Harness Client reads BatChargeState from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A001a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatteryChargeState::Id,
-                                 true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatChargeState::Id, true,
+                                 chip::NullOptional);
         }
         case 28: {
             LogStep(28, "Test Harness Client reads BatTimeToFullCharge from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryTimeToFullCharge::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatTimeToFullCharge::Id,
+                                 true, chip::NullOptional);
         }
         case 29: {
             LogStep(29, "Test Harness Client reads BatFunctionalWhileCharging from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A001c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryFunctionalWhileCharging::Id, true, chip::NullOptional);
+                                 PowerSource::Attributes::BatFunctionalWhileCharging::Id, true, chip::NullOptional);
         }
         case 30: {
             LogStep(30, "Test Harness Client reads BatChargingCurrent from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A001d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::BatteryChargingCurrent::Id, true, chip::NullOptional);
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::BatChargingCurrent::Id,
+                                 true, chip::NullOptional);
         }
         case 31: {
             LogStep(31, "Test Harness Client reads ActiveBatChargeFaults from Server DUT");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PS.S.A001e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id,
-                                 PowerSource::Attributes::ActiveBatteryChargeFaults::Id, true, chip::NullOptional);
+                                 PowerSource::Attributes::ActiveBatChargeFaults::Id, true, chip::NullOptional);
         }
         }
         return CHIP_NO_ERROR;
