@@ -1792,8 +1792,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
             {
                 ChipLogError(FabricProvisioning,
                              "Failed to commit: tried to commit with only a new trusted root cert. No data committed.");
-                hasInvalidInternalState = true;
-                err                     = CHIP_ERROR_INCORRECT_STATE;
+                err = CHIP_ERROR_INCORRECT_STATE;
             }
             else
             {
