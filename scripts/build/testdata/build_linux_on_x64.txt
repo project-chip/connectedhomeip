@@ -515,7 +515,7 @@ ninja -C {out}/linux-x64-tests-coverage check
 lcov --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_test.info
 
 # Final coverage info
-lcov --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_base.info --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_tes.info --output-file {out}/linux-x64-tests-coverage/coverage/lcov_final.info
+lcov --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_base.info --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_test.info --output-file {out}/linux-x64-tests-coverage/coverage/lcov_final.info
 
 # HTML coverage
 genhtml {out}/linux-x64-tests-coverage/coverage/lcov_final.info {out}/linux-x64-tests-coverage/coverage/html
