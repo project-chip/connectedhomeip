@@ -18,7 +18,7 @@ import("//build_overrides/tizen.gni")
 
 import("${build_root}/config/tizen/config.gni")
 
-tizen_manifest_parser = rebase_path("tizen_manifest_parser.py")
+tizen_manifest_parser = get_path_info("tizen_manifest_parser.py", "abspath")
 
 template("tizen_sdk") {
   forward_variables_from(invoker,
@@ -74,7 +74,9 @@ template("tizen_sdk_package") {
              "should be used for signing TPK package.")
 
   # Extract data from Tizen XML manifest.
-  manifest = exec_script(tizen_manifest_parser, [ invoker.manifest ], "json")
+  manifest = exec_script(tizen_manifest_parser,
+                         [ rebase_path(invoker.manifest, root_build_dir) ],
+                         "json")
   manifest_package = manifest["package"]
   manifest_apps = manifest["apps"]
 

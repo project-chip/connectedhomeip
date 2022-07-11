@@ -41,7 +41,7 @@ executable("chip-lighting-app") {
 
 tizen_sdk_package("chip-lighting-app:tpk") {
   deps = [ ":chip-lighting-app" ]
-  manifest = rebase_path("tizen-manifest.xml")
+  manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
 }
 
