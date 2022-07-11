@@ -435,8 +435,6 @@ public:
     CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
     void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
-    // Set the Fabric Label for the given fabricIndex.
-
     /**
      * @brief Set the Fabric Label for the fabric referred by `fabricIndex`.
      *
