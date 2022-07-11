@@ -207,6 +207,7 @@ public:
         printf("TestSystemCommands\n");
         printf("TestBinding\n");
         printf("TestUserLabelCluster\n");
+        printf("TestUserLabelClusterConstraints\n");
         printf("TestArmFailSafe\n");
         printf("TestFanControl\n");
         printf("TestMultiAdmin\n");
@@ -51861,6 +51862,118 @@ private:
     }
 };
 
+class TestUserLabelClusterConstraintsSuite : public TestCommand
+{
+public:
+    TestUserLabelClusterConstraintsSuite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestUserLabelClusterConstraints", 3, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~TestUserLabelClusterConstraintsSuite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Attempt to write overly long item for label");
+            ListFreer listFreer;
+            chip::app::DataModel::List<const chip::app::Clusters::UserLabel::Structs::LabelStruct::Type> value;
+
+            {
+                auto * listHolder_0 = new ListHolder<chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>(1);
+                listFreer.add(listHolder_0);
+
+                listHolder_0->mList[0].label =
+                    chip::Span<const char>("this is longer than sixteen charactersgarbage: not in length on purpose", 38);
+                listHolder_0->mList[0].value = chip::Span<const char>("bedroom 2garbage: not in length on purpose", 9);
+
+                value =
+                    chip::app::DataModel::List<chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>(listHolder_0->mList, 1);
+            }
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), UserLabel::Id, UserLabel::Attributes::LabelList::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 2: {
+            LogStep(2, "Attempt to write overly long item for value");
+            ListFreer listFreer;
+            chip::app::DataModel::List<const chip::app::Clusters::UserLabel::Structs::LabelStruct::Type> value;
+
+            {
+                auto * listHolder_0 = new ListHolder<chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>(1);
+                listFreer.add(listHolder_0);
+
+                listHolder_0->mList[0].label = chip::Span<const char>("testgarbage: not in length on purpose", 4);
+                listHolder_0->mList[0].value =
+                    chip::Span<const char>("this is longer than sixteen charactersgarbage: not in length on purpose", 38);
+
+                value =
+                    chip::app::DataModel::List<chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>(listHolder_0->mList, 1);
+            }
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), UserLabel::Id, UserLabel::Attributes::LabelList::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class TestArmFailSafeSuite : public TestCommand
 {
 public:
@@ -86564,6 +86677,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestSystemCommandsSuite>(credsIssuerConfig),
         make_unique<TestBindingSuite>(credsIssuerConfig),
         make_unique<TestUserLabelClusterSuite>(credsIssuerConfig),
+        make_unique<TestUserLabelClusterConstraintsSuite>(credsIssuerConfig),
         make_unique<TestArmFailSafeSuite>(credsIssuerConfig),
         make_unique<TestFanControlSuite>(credsIssuerConfig),
         make_unique<TestMultiAdminSuite>(credsIssuerConfig),
