@@ -75,12 +75,12 @@ executable("darwin-framework-tool") {
     # framework" library, because otherwise the weak symbols from
     # RequiredPrivilege.cpp mean we never actually pull in the function from
     # privilege-storage.cpp.
-    "${chip_root}/src/app/util/privilege-storage.cpp",
-    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Command.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/Command.h",
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
-    "${chip_root}/examples/chip-tool/commands/common/Command.h",
+    "${chip_root}/src/app/util/privilege-storage.cpp",
+    "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/clusters/ReportCommandBridge.h",
@@ -97,9 +97,9 @@ executable("darwin-framework-tool") {
     "commands/pairing/PairingCommandBridge.mm",
     "commands/pairing/PairingDelegateBridge.mm",
     "commands/payload/SetupPayloadParseCommand.mm",
+    "commands/provider/Commands.h",
     "commands/provider/OTAProviderDelegate.mm",
     "commands/provider/OTASoftwareUpdateInteractive.mm",
-    "commands/provider/Commands.h",
     "commands/storage/Commands.h",
     "commands/storage/StorageManagementCommand.mm",
     "main.mm",
@@ -108,12 +108,16 @@ executable("darwin-framework-tool") {
   deps = [
     ":build-darwin-framework",
     "${chip_root}/src/app/tests/suites/commands/delay",
+
     # IM is needed for MTRError
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
+
     # Log is needed by tests UserPrompt and Log
     "${chip_root}/src/app/tests/suites/commands/log",
+
     # System is needed by tests FactoryReset etc..
     "${chip_root}/src/app/tests/suites/commands/system",
+
     # pics is needed by tests
     "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/third_party/inipp",
