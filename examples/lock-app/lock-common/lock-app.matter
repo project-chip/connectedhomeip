@@ -449,7 +449,7 @@ server cluster PowerSourceConfiguration = 46 {
 }
 
 server cluster PowerSource = 47 {
-  enum BatChargeFaultType : ENUM8 {
+  enum BatChargeFault : ENUM8 {
     kUnspecfied = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
@@ -476,7 +476,7 @@ server cluster PowerSource = 47 {
     kIsNotCharging = 3;
   }
 
-  enum BatFaultType : ENUM8 {
+  enum BatFault : ENUM8 {
     kUnspecfied = 0;
     kOverTemp = 1;
     kUnderTemp = 2;
@@ -501,7 +501,7 @@ server cluster PowerSource = 47 {
     kDc = 1;
   }
 
-  enum WiredFaultType : ENUM8 {
+  enum WiredFault : ENUM8 {
     kUnspecfied = 0;
     kOverVoltage = 1;
     kUnderVoltage = 2;
@@ -514,14 +514,14 @@ server cluster PowerSource = 47 {
     kReplaceable = 0x8;
   }
 
-  readonly attribute enum8 status = 0;
+  readonly attribute PowerSourceStatus status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute int32u wiredAssessedCurrent = 6;
-  readonly attribute enum8 batteryChargeLevel = 14;
-  readonly attribute boolean batteryReplacementNeeded = 15;
-  readonly attribute enum8 batteryReplaceability = 16;
-  readonly attribute char_string<60> batteryReplacementDescription = 19;
+  readonly attribute nullable int32u wiredAssessedCurrent = 6;
+  readonly attribute BatChargeLevel batChargeLevel = 14;
+  readonly attribute boolean batReplacementNeeded = 15;
+  readonly attribute BatReplaceability batReplaceability = 16;
+  readonly attribute char_string<60> batReplacementDescription = 19;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2238,10 +2238,10 @@ endpoint 1 {
     ram      attribute status default = 1;
     ram      attribute order default = 1;
     ram      attribute description default = "Battery";
-    ram      attribute batteryChargeLevel;
-    ram      attribute batteryReplacementNeeded;
-    ram      attribute batteryReplaceability;
-    ram      attribute batteryReplacementDescription;
+    ram      attribute batChargeLevel;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
+    ram      attribute batReplacementDescription;
     ram      attribute featureMap default = 0x0A;
     ram      attribute clusterRevision default = 1;
   }

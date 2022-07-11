@@ -492,8 +492,8 @@ namespace PowerSourceConfiguration {
 
 namespace PowerSource {
 
-// Enum for BatChargeFaultType
-enum class BatChargeFaultType : uint8_t
+// Enum for BatChargeFault
+enum class BatChargeFault : uint8_t
 {
     kUnspecfied          = 0x00,
     kAmbientTooHot       = 0x01,
@@ -525,8 +525,8 @@ enum class BatChargeState : uint8_t
     kIsNotCharging  = 0x03,
 };
 
-// Enum for BatFaultType
-enum class BatFaultType : uint8_t
+// Enum for BatFault
+enum class BatFault : uint8_t
 {
     kUnspecfied = 0x00,
     kOverTemp   = 0x01,
@@ -558,8 +558,8 @@ enum class WiredCurrentType : uint8_t
     kDc = 0x01,
 };
 
-// Enum for WiredFaultType
-enum class WiredFaultType : uint8_t
+// Enum for WiredFault
+enum class WiredFault : uint8_t
 {
     kUnspecfied   = 0x00,
     kOverVoltage  = 0x01,
