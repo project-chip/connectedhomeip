@@ -53,6 +53,29 @@ private:
     CHIP_ERROR WriteLabelList(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
+/// Matches constraints on a LabelStruct.
+bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
+{
+    constexpr size_t kMaxLabelSize = 16;
+    constexpr size_t kMaxValueSize = 16;
+
+    // NOTE: spec default for label and value is empty, so empty is accepted here
+    return (entry.label.size() <= kMaxLabelSize) && (entry.value.size() <= kMaxValueSize);
+}
+
+bool IsValidLabelEntryList(const LabelList::TypeInfo::DecodableType & list)
+{
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        if (!IsValidLabelEntry(iter.GetValue()))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 UserLabelAttrAccess gAttrAccess;
 
 CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
@@ -106,6 +129,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         LabelList::TypeInfo::DecodableType decodablelist;
 
         ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
+        ReturnErrorCodeIf(!IsValidLabelEntryList(decodablelist), CHIP_ERROR_INVALID_ARGUMENT);
 
         auto iter = decodablelist.begin();
         while (iter.Next())
@@ -120,7 +144,10 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
         Structs::LabelStruct::DecodableType entry;
+
         ReturnErrorOnFailure(aDecoder.Decode(entry));
+        ReturnErrorCodeIf(!IsValidLabelEntry(entry), CHIP_ERROR_INVALID_ARGUMENT);
+
         return provider->AppendUserLabel(endpoint, entry);
     }
 

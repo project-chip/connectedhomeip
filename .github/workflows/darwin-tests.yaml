@@ -82,42 +82,23 @@ jobs:
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
-            - name: Run macOS Build
-              timeout-minutes: 40
-              # Enable -Werror by hand here, because the Xcode config can't
-              # enable it for various reasons.  Keep whatever Xcode settings
-              # for OTHER_CFLAGS exist by using ${inherited}.
-              #
-              # Disable -Wmacro-redefined because CHIP_DEVICE_CONFIG_ENABLE_MDNS
-              # seems to be unconditionally defined in CHIPDeviceBuildConfig.h,
-              # which is apparently being included after CHIPDeviceConfig.h.
-              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-macro-redefined'
-              working-directory: src/darwin/Framework
-            - name: Copying Framework to Temporary Path
-              continue-on-error: true
+            - name: Build Apps
+              timeout-minutes: 75
               run: |
-                  mkdir -p /tmp/macos_framework_output
-                  ls -la /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/
-                  mv /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/Matter.framework /tmp/macos_framework_output
-                  ls -la /tmp/macos_framework_output
-            # Disabling for now
-            #
-            # - name: Build Apps
-            #   timeout-minutes: 60
-            #   run: |
-            #       ./scripts/run_in_build_env.sh \
-            #          "./scripts/build/build_examples.py \
-            #             --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT} \
-            #             --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-            #             --target darwin-x64-lock-${BUILD_VARIANT} \
-            #             --target darwin-x64-ota-provider-${BUILD_VARIANT} \
-            #             --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
-            #             --target darwin-x64-tv-app-${BUILD_VARIANT} \
-            #             build \
-            #             --copy-artifacts-to objdir-clone \
-            #          "
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT} \
+                        --target darwin-x64-all-clusters-${BUILD_VARIANT} \
+                        --target darwin-x64-lock-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
+                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
+                        --target darwin-x64-tv-app-${BUILD_VARIANT} \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
+            # Disable for now
             # - name: Run Tests
-            #   timeout-minutes: 60
+            #   timeout-minutes: 65
             #   run: |
             #       ./scripts/run_in_build_env.sh \
             #       "./scripts/tests/run_test_suite.py \

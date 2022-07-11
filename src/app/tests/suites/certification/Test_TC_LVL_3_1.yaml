@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the MinLevel attribute"
+      PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -36,6 +37,7 @@ tests:
               type: uint8
 
     - label: "Reads the MaxLevel attribute"
+      PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "max level"
       response:
@@ -43,6 +45,7 @@ tests:
               type: uint8
 
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
@@ -64,12 +67,14 @@ tests:
                 value: 100
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C04.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 64
 
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
@@ -91,19 +96,14 @@ tests:
                 value: 100
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 100
 
-    - label: "Reads On Off Transition Time attribute from DUT"
-      command: "readAttribute"
-      attribute: "On Off Transition Time"
-      response:
-          constraints:
-              type: uint16
-
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
       arguments:
           values:
@@ -125,26 +125,31 @@ tests:
                 value: 11000
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 128
 
     - label: "Reads the OnOffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "on off transition time"
       response:
+          saveAs: OnOffTransitionTimeValue
           constraints:
               type: uint16
 
+    # Null is not supported here 0xFFFF is considerd as Null
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
       arguments:
           values:
               - name: "level"
                 value: 64
               - name: "transitionTime"
-                value: 0
+                value: 0xFFFF
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -159,12 +164,14 @@ tests:
                 value: 1000
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 64
 
     - label: "Reset level to 254"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:

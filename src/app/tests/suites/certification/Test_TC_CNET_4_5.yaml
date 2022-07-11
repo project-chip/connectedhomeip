@@ -28,35 +28,39 @@ tests:
           following argument: SSID argument value as 'Userwifi_ssid' Credentials
           argument value as 'Userwifi_Credentials' Breadcrumb argument value as
           1"
+      PICS: CNET.S.C02.Rsp
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 matter123 1 0
 
-          [1650363084.943413][42042:42047] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0002 Status=0x7e
-          [1650363084.943461][42042:42047] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650363084.943513][42042:42047] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650363084.943584][42042:42047] CHIP:EM: Sending Standalone Ack for MessageCounter:13026244 on exchange 58732i
+          [1653476386.237761][30120:30125] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0002 Status=0x7e
+          [1653476386.237809][30120:30125] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1653476386.237862][30120:30125] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653476386.237936][30120:30125] CHIP:EM: Sending Standalone Ack for MessageCounter:80621 on exchange 31019i
       disabled: true
 
     - label:
           "TH sends RemoveNetwork command to the DUT with NetworkID argument
           value as 'Userwifi_ssid' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C02.Rsp
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
-          [1650363090.882328][42048:42054] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004 Status=0x7e
-          [1650363090.882371][42048:42054] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650363090.882418][42048:42054] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650363090.882488][42048:42054] CHIP:EM: Sending Standalone Ack for MessageCounter:722842 on exchange 26352i
+
+          [1653476465.080140][30133:30138] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004 Status=0x7e
+          [1653476465.080178][30133:30138] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1653476465.080218][30133:30138] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653476465.080283][30133:30138] CHIP:EM: Sending Standalone Ack for MessageCounter:8000679 on exchange 31408i
       disabled: true
 
     - label:
           "TH sends ConnectNetwork command to the DUT with NetworkID argument
           value as 'Userwifi_ssid' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C06.Rsp
       verification: |
-          ubuntu@TE-8:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          [1650363096.818575][42055:42060] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006 Status=0x7e
-          [1650363096.818618][42055:42060] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1650363096.818663][42055:42060] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650363096.818727][42055:42060] CHIP:EM: Sending Standalone Ack for MessageCounter:478391 on exchange 56118i
+          [1653476531.525782][30142:30147] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006 Status=0x7e
+          [1653476531.525840][30142:30147] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1653476531.525948][30142:30147] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653476531.526067][30142:30147] CHIP:EM: Sending Standalone Ack for MessageCounter:9576225 on exchange 7511i
       disabled: true

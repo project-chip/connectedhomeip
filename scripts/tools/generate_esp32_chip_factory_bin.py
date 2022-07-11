@@ -41,6 +41,11 @@ INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
 TOOLS = {}
 
 
+FACTORY_PARTITION_CSV = 'nvs_partition.csv'
+FACTORY_PARTITION_BIN = 'factory_partition.bin'
+NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
+
+
 FACTORY_DATA = {
     # CommissionableDataProvider
     'discriminator': {
@@ -262,28 +267,39 @@ def generate_nvs_bin(args):
             continue
         csv_content += f"{k},{v['type']},{v['encoding']},{v['value']}\n"
 
-    with open('nvs_partition.csv', 'w') as f:
+    with open(FACTORY_PARTITION_CSV, 'w') as f:
         f.write(csv_content)
 
-    nvs_args = SimpleNamespace(input='nvs_partition.csv',
-                               output='partition.bin',
-                               size=hex(args.size),
-                               outdir=os.getcwd(),
-                               version=2)
+    if args.encrypt:
+        nvs_args = SimpleNamespace(version=2,
+                                   keygen=True,
+                                   keyfile=NVS_KEY_PARTITION_BIN,
+                                   inputkey=None,
+                                   outdir=os.getcwd(),
+                                   input=FACTORY_PARTITION_CSV,
+                                   output=FACTORY_PARTITION_BIN,
+                                   size=hex(args.size))
+        nvs_partition_gen.encrypt(nvs_args)
+    else:
+        nvs_args = SimpleNamespace(input=FACTORY_PARTITION_CSV,
+                                   output=FACTORY_PARTITION_BIN,
+                                   size=hex(args.size),
+                                   outdir=os.getcwd(),
+                                   version=2)
+        nvs_partition_gen.generate(nvs_args)
 
-    nvs_partition_gen.generate(nvs_args)
 
-
-def print_flashing_help():
-    logging.info('To flash the generated partition.bin, run the following command:')
-    logging.info('==============================================================')
-    logging.info('esptool.py -p <port> write_flash <addr> partition.bin')
-    logging.info('==============================================================')
-    logging.info('default \"nvs\" partition addr is 0x9000')
+def print_flashing_help(encrypt):
+    logging.info('Run below command to flash {}'.format(FACTORY_PARTITION_BIN))
+    logging.info('esptool.py -p (PORT) write_flash (FACTORY_PARTITION_ADDR) {}'.format(os.path.join(os.getcwd(), FACTORY_PARTITION_BIN)))
+    if (encrypt):
+        logging.info('Run below command to flash {}'.format(NVS_KEY_PARTITION_BIN))
+        logging.info('esptool.py -p (PORT) write_flash --encrypt (NVS_KEY_PARTITION_ADDR) {}'.format(
+            os.path.join(os.getcwd(), 'keys', NVS_KEY_PARTITION_BIN)))
 
 
 def clean_up():
-    os.remove('nvs_partition.csv')
+    os.remove(FACTORY_PARTITION_CSV)
     os.remove(FACTORY_DATA['dac-pub-key']['value'])
     os.remove(FACTORY_DATA['dac-key']['value'])
 
@@ -323,6 +339,8 @@ def main():
 
     parser.add_argument('-s', '--size', type=any_base_int, required=False, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
+    parser.add_argument('-e', '--encrypt', action='store_true', required=False,
+                        help='Encrypt the factory parititon NVS binary')
 
     args = parser.parse_args()
     validate_args(args)
@@ -331,7 +349,7 @@ def main():
     populate_factory_data(args, spake2p_params)
     gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])
     generate_nvs_bin(args)
-    print_flashing_help()
+    print_flashing_help(args.encrypt)
     clean_up()
 
 

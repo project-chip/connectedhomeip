@@ -1,0 +1,18 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRBaseClusters.h"
+#import "MTRBaseDevice.h"
+
+#include <controller-clusters/zap-generated/CHIPClusters.h>
+
+{{#chip_client_clusters includeAll=true}}
+
+@interface MTRBaseCluster{{asUpperCamelCase name}} ()
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::{{asUpperCamelCase name}}Cluster * cppCluster;
+- (chip::Controller::{{asUpperCamelCase name}}Cluster **) cppClusterSlot;
+@end
+
+{{/chip_client_clusters}}

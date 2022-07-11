@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.18. [TC-CNET-4.18] [Thread] Verification for attributes check
+    11.4.16. [TC-CNET-4.18] [Thread] Verification for attributes check
     [DUT-Client]
 
 config:
@@ -24,102 +24,90 @@ config:
 
 tests:
     - label: "DUT reads the MaxNetworks attribute from the TH"
+      PICS: CNET.S.A0000
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
+          ./chip-tool networkcommissioning read max-networks 162 0
 
 
-          [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true,
-          [1645772548.257381][3837:3842] CHIP:DMG:         InteractionModelRevision = 1
-          [1645772548.257437][3837:3842] CHIP:DMG: }
-          [1645772548.257735][3837:3842] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 92121563
-          [1645772548.257878][3837:3842] CHIP:TOO:   MaxNetworks: 1
-          [1645772548.258032][3837:3842] CHIP:EM: Sending Standalone Ack for MessageCounter:7388528 on exchange 41499i
+          D: 3737668 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3737677 [DMG]<RE:Run> Cluster 31, Attribute 0 is dirty
+          D: 3737682 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0000 (expanded=)
+          D: 3737691 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
     - label: "DUT reads the Networks attribute from the TH"
+      PICS: CNET.S.A0001
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
+          ./chip-tool networkcommissioning read networks 162 0
 
-          [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
-          [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
-          [1645772651.445209][3856:3861] CHIP:DMG: }
-          [1645772651.445754][3856:3861] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001DataVersion: 92121563
-          [1645772651.445875][3856:3861] CHIP:TOO:   Networks: 1 entries
-          [1645772651.446057][3856:3861] CHIP:TOO:     [1]: {
-          [1645772651.446120][3856:3861] CHIP:TOO:       NetworkID: 1111161622222211
-          [1645772651.446173][3856:3861] CHIP:TOO:       Connected: TRUE
-          [1645772651.446228][3856:3861] CHIP:TOO:      }
-          [1645772651.446431][3856:3861] CHIP:EM: Sending Standalone Ack for MessageCounter:12695576 on exchange 11133i
+          D: 3805977 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3805986 [DMG]<RE:Run> Cluster 31, Attribute 1 is dirty
+          D: 3805991 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0001 (expanded=0)
+          D: 3806003 [DMG]<RE> Sending report (payload has 77 bytes)...
       disabled: true
 
     - label: "DUT reads ScanMaxTimeSeconds attribute from the TH"
+      PICS: CNET.S.A0002
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read scan-max-time-seconds 162 0
+          ./chip-tool networkcommissioning read scan-max-time-seconds 162 0
 
-          [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true,
-          [1645772820.740855][3867:3872] CHIP:DMG:         InteractionModelRevision = 1
-          [1645772820.740903][3867:3872] CHIP:DMG: }
-          [1645772820.741209][3867:3872] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0002DataVersion: 92121563
-          [1645772820.741357][3867:3872] CHIP:TOO:   ScanMaxTimeSeconds: 10
-          [1645772820.741512][3867:3872] CHIP:EM: Sending Standalone Ack for MessageCounter:10309775 on exchange 55305i
+          D: 3846143 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3846152 [DMG]<RE:Run> Cluster 31, Attribute 2 is dirty
+          D: 3846157 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0002 (expanded=0)
+          D: 3846167 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
     - label: "DUT reads ConnectMaxTimeSeconds attribute from the TH"
+      PICS: CNET.S.A0003
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read connect-max-time-seconds 162 0
+          ./chip-tool networkcommissioning read connect-max-time-seconds 162 0
 
-          [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true,
-          [1645772901.119008][3879:3884] CHIP:DMG:         InteractionModelRevision = 1
-          [1645772901.119141][3879:3884] CHIP:DMG: }
-          [1645772901.119684][3879:3884] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0003DataVersion: 92121563
-          [1645772901.119885][3879:3884] CHIP:TOO:   ConnectMaxTimeSeconds: 20
-          [1645772901.120100][3879:3884] CHIP:EM: Sending Standalone Ack for MessageCounter:11917538 on exchange 4188
+          D: 3903429 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3903437 [DMG]<RE:Run> Cluster 31, Attribute 3 is dirty
+          D: 3903443 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0003 (expanded=0)
+          D: 3903452 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
     - label: "DUT reads InterfaceEnabled attribute from the TH"
+      PICS: CNET.S.A0004
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 162 0
+          ./chip-tool networkcommissioning read interface-enabled 162 0
 
-          [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true,
-          [1645772984.654043][3895:3900] CHIP:DMG:         InteractionModelRevision = 1
-          [1645772984.654084][3895:3900] CHIP:DMG: }
-          [1645772984.654310][3895:3900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004DataVersion: 92121563
-          [1645772984.654388][3895:3900] CHIP:TOO:   InterfaceEnabled: TRUE
-          [1645772984.654530][3895:3900] CHIP:EM: Sending Standalone Ack for MessageCounter:14026610 on exchange 33717i
+          D: 3947219 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 3947228 [DMG]<RE:Run> Cluster 31, Attribute 4 is dirty
+          D: 3947233 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0004 (expanded=0)
+          D: 3947242 [DMG]<RE> Sending report (payload has 35 bytes)...
       disabled: true
 
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
+      PICS: CNET.S.A0005
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 162 0
+          ./chip-tool networkcommissioning read last-networking-status 162 0
 
-          [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true,
-          [1645773078.930579][3905:3910] CHIP:DMG:         InteractionModelRevision = 1
-          [1645773078.930635][3905:3910] CHIP:DMG: }
-          [1645773078.930943][3905:3910] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005DataVersion: 92121563
-          [1645773078.931067][3905:3910] CHIP:TOO:   LastNetworkingStatus: 0
-          [1645773078.931217][3905:3910] CHIP:EM: Sending Standalone Ack for MessageCounter:16576011 on exchange 44187i
+          D: 4034063 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 4034072 [DMG]<RE:Run> Cluster 31, Attribute 5 is dirty
+          D: 4034077 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0005 (expanded=0)
+          D: 4034087 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true
 
     - label: "DUT reads LastNetworkID attribute from the TH"
+      PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-network-id 162 0
+          ./chip-tool networkcommissioning read last-network-id 162 0
 
-          [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true,
-          [1645773167.178561][3913:3918] CHIP:DMG:         InteractionModelRevision = 1
-          [1645773167.178618][3913:3918] CHIP:DMG: }
-          [1645773167.178919][3913:3918] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006DataVersion: 92121563
-          [1645773167.182241][3913:3918] CHIP:TOO:   LastNetworkID: 1111161622222211
-          [1645773167.182422][3913:3918] CHIP:EM: Sending Standalone Ack for MessageCounter:2029571 on exchange 18566i
+          D: 4080067 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 4080076 [DMG]<RE:Run> Cluster 31, Attribute 6 is dirty
+          D: 4080081 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0006 (expanded=0)
+          D: 4080090 [DMG]<RE> Sending report (payload has 46 bytes)...
       disabled: true
 
     - label: "DUT reads LastConnectErrorValue attribute from the TH"
+      PICS: CNET.S.A0007
       verification: |
-          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-connect-error-value 162 0
+          ./chip-tool networkcommissioning read last-connect-error-value 162 0
 
-          [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true,
-          [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1
-          [1645773318.753043][3938:3943] CHIP:DMG: }
-          [1645773318.753543][3938:3943] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007DataVersion: 92121563
-          [1645773318.753724][3938:3943] CHIP:TOO:   LastConnectErrorValue: 0
-          [1645773318.753985][3938:3943] CHIP:EM: Sending Standalone Ack for MessageCounter:15303417 on exchange 41937i
+          D: 4176701 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          D: 4176710 [DMG]<RE:Run> Cluster 31, Attribute 7 is dirty
+          D: 4176715 [DMG]Reading attribute: Cluster=0x0000_0031 Endpoint=0 AttributeId=0x0000_0007 (expanded=0)
+          D: 4176725 [DMG]<RE> Sending report (payload has 36 bytes)...
       disabled: true

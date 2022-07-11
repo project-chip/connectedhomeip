@@ -15,38 +15,19 @@
  *    limitations under the License.
  */
 
+#import "MTRBaseDevice.h"
 #import "MTRCluster_internal.h"
-#import "MTRDevice.h"
 #import "NSDataSpanConversion.h"
 
 using namespace ::chip;
 
 @implementation MTRCluster
-- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(EndpointId)endpoint queue:(dispatch_queue_t)queue
+- (instancetype)initWithQueue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
-        Controller::ClusterBase * cppCluster = [self getCluster];
-        if (cppCluster == nullptr) {
-            return nil;
-        }
-
-        if (device == nullptr) {
-            return nil;
-        }
-
-        CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
-        if (err != CHIP_NO_ERROR) {
-            return nil;
-        }
-
         _callbackQueue = queue;
     }
     return self;
-}
-
-- (Controller::ClusterBase *)getCluster
-{
-    return nullptr;
 }
 
 - (chip::ByteSpan)asByteSpan:(NSData *)value

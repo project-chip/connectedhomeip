@@ -28,254 +28,51 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Validate constraints of attribute: CurrentHue"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.A0000 && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 0
           constraints:
               type: uint8
 
-    - label: "Validate constraints of attribute: CurrentSaturation"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.A0001 && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 0
           constraints:
               type: uint8
 
-    - label: "Reads CurrentX attribute from DUT"
-      PICS: CC.S.A0003
-      command: "readAttribute"
-      attribute: "CurrentX"
-      response:
-          value: 24939
-
-    - label: "Validate constraints of attribute: CurrentX"
-      PICS: CC.S.A0003
-      command: "readAttribute"
-      attribute: "CurrentX"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Reads CurrentY attribute from DUT"
-      PICS: CC.S.A0004
-      command: "readAttribute"
-      attribute: "CurrentY"
-      response:
-          value: 24701
-
-    - label: "Validate constraints of attribute: CurrentY"
-      PICS: CC.S.A0004
-      command: "readAttribute"
-      attribute: "CurrentY"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    #issue #18104
-    - label: "Reads ColorTemperatureMireds attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          value: 250
-
-    - label: "Validate constraints of attribute: ColorTemperatureMireds"
-      PICS: CC.S.A0007
-      command: "readAttribute"
-      attribute: "ColorTemperature"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    #issue #18104
-    - label: "Reads ColorMode attribute from DUT"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "ColorMode"
-      response:
-          value: 1
-
-    - label: "Validate constraints of attribute: ColorMode"
-      PICS: CC.S.A0008
-      command: "readAttribute"
-      attribute: "ColorMode"
-      response:
-          constraints:
-              type: enum8
-              minValue: 0
-              maxValue: 2
-
-    - label: "Validate constraints of attribute: Options"
-      PICS: CC.S.A000f
-      command: "readAttribute"
-      attribute: "Options"
-      response:
-          value: 0
-          constraints:
-              type: map8
-
-    - label: "Validate constraints of attribute: EnhancedCurrentHue"
-      PICS: CC.S.A4000
-      command: "readAttribute"
-      attribute: "EnhancedCurrentHue"
-      response:
-          value: 0
-          constraints:
-              type: uint16
-
-    #issue #18104
-    - label: "Validate constraints of attribute: EnhancedColorMode"
-      PICS: PICS_SKIP_SAMPLE_APP
-      command: "readAttribute"
-      attribute: "EnhancedColorMode"
-      response:
-          value: 1
-          constraints:
-              type: enum8
-
-    - label: "Validate constraints of attribute: ColorLoopActive"
-      PICS: CC.S.A4002
-      command: "readAttribute"
-      attribute: "ColorLoopActive"
-      response:
-          value: 0
-          constraints:
-              type: uint8
-
-    - label: "Validate constraints of attribute: ColorLoopDirection"
-      PICS: CC.S.A4003
-      command: "readAttribute"
-      attribute: "ColorLoopDirection"
-      response:
-          value: 0
-          constraints:
-              type: uint8
-
-    - label: "Validate constraints of attribute: ColorLoopTime"
-      PICS: CC.S.A4004
-      command: "readAttribute"
-      attribute: "ColorLoopTime"
-      response:
-          value: 25
-          constraints:
-              type: uint16
-
-    - label: "Validate constraints of attribute: ColorLoopStartEnhancedHue"
-      PICS: CC.S.A4005
-      command: "readAttribute"
-      attribute: "ColorLoopStartEnhancedHue"
-      response:
-          value: 8960
-          constraints:
-              type: uint16
-
-    - label: "Validate constraints of attribute: ColorLoopStoredEnhancedHue"
-      PICS: CC.S.A4006
-      command: "readAttribute"
-      attribute: "ColorLoopStoredEnhancedHue"
-      response:
-          value: 0
-          constraints:
-              type: uint16
-
-    - label: "read the optional global attribute: FeatureMap"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          saveAs: FeatureMapValue
-
-    - label: "Reads ColorCapabilities attribute from DUT"
-      PICS: CC.S.A400a
-      command: "readAttribute"
-      attribute: "ColorCapabilities"
-      response:
-          value: FeatureMapValue
-
-    - label: "Validate constraints of attribute: ColorCapabilities"
-      PICS: CC.S.A400a
-      command: "readAttribute"
-      attribute: "ColorCapabilities"
-      response:
-          constraints:
-              type: map16
-              minValue: 0
-              maxValue: 31
-
-    - label: "Reads ColorTempPhysicalMinMireds attribute from DUT"
-      PICS: CC.S.A400b
-      command: "readAttribute"
-      attribute: "ColorTempPhysicalMinMireds"
-      response:
-          value: 0
-
-    - label: "Validate constraints of attribute: ColorTempPhysicalMinMireds"
-      PICS: CC.S.A400b
-      command: "readAttribute"
-      attribute: "ColorTempPhysicalMinMireds"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Read ColorTempPhysicalMaxMireds attribute from DUT"
-      PICS: CC.S.A400c
-      command: "readAttribute"
-      attribute: "ColorTempPhysicalMaxMireds"
-      response:
-          value: 65279
-
-    - label: "Validate constraints of attribute: ColorTempPhysicalMaxMireds"
-      PICS: CC.S.A400c
-      command: "readAttribute"
-      attribute: "ColorTempPhysicalMaxMireds"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Read the optional attribute: CoupleColorTempToLevelMinMireds"
-      PICS: CC.S.A400d
-      command: "readAttribute"
-      attribute: "CoupleColorTempToLevelMinMireds"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Read the optional attribute: StartUpColorTemperatureMireds"
-      PICS: CC.S.A4010
-      command: "readAttribute"
-      attribute: "StartUpColorTemperatureMireds"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
-
-    - label: "Validate constraints of attribute: RemainingTime"
+    - label: "TH reads RemainingTime attribute from DUT"
       PICS: CC.S.A0002
       command: "readAttribute"
       attribute: "RemainingTime"
       response:
-          value: 0
           constraints:
               type: uint16
 
-    - label: "Read the optional attribute: DriftCompensation"
+    - label: "TH reads CurrentX attribute from DUT"
+      PICS: CC.S.A0003 && CC.S.F03
+      command: "readAttribute"
+      attribute: "CurrentX"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads CurrentY attribute from DUT"
+      PICS: CC.S.A0004 && CC.S.F04
+      command: "readAttribute"
+      attribute: "CurrentY"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads DriftCompensation attribute from DUT"
       PICS: CC.S.A0005
       command: "readAttribute"
       attribute: "DriftCompensation"
@@ -285,7 +82,7 @@ tests:
               minValue: 0
               maxValue: 4
 
-    - label: "Read the optional attribute: CompensationText"
+    - label: "TH reads CompensationText attribute from DUT"
       PICS: CC.S.A0005
       command: "readAttribute"
       attribute: "CompensationText"
@@ -294,8 +91,153 @@ tests:
               type: string
               maxLength: 254
 
+    - label: "TH reads ColorTemperatureMireds attribute from DUT"
+      PICS: CC.S.A0007 && CC.S.F04
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads ColorMode attribute from DUT"
+      PICS: CC.S.A0008
+      command: "readAttribute"
+      attribute: "ColorMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "TH reads Options attribute from DUT"
+      PICS: CC.S.A000f
+      command: "readAttribute"
+      attribute: "Options"
+      response:
+          constraints:
+              type: bitmap8
+              minValue: 0
+              maxValue: 4
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+      PICS: CC.S.A4000 && CC.S.F01
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "TH reads EnhancedColorMode attribute from DUT"
+      PICS: CC.S.F02 && CC.S.A4001
+      command: "readAttribute"
+      attribute: "EnhancedColorMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label: "TH reads ColorLoopActive attribute from DUT"
+      PICS: CC.S.A4002 && CC.S.F02
+      command: "readAttribute"
+      attribute: "ColorLoopActive"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "TH reads ColorLoopDirection attribute from DUT"
+      PICS: CC.S.A4003 && CC.S.F02
+      command: "readAttribute"
+      attribute: "ColorLoopDirection"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "TH reads ColorLoopTime attribute from DUT"
+      PICS: CC.S.A4004 && CC.S.F02
+      command: "readAttribute"
+      attribute: "ColorLoopTime"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "TH reads ColorLoopStartEnhancedHue attribute from DUT"
+      PICS: CC.S.A4005 && CC.S.F02
+      command: "readAttribute"
+      attribute: "ColorLoopStartEnhancedHue"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "TH reads ColorLoopStoredEnhancedHue attribute from DUT"
+      PICS: CC.S.A4006 && CC.S.F02
+      command: "readAttribute"
+      attribute: "ColorLoopStoredEnhancedHue"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "TH reads FeatureMap attribute from DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          saveAs: FeatureMapValue
+
+    - label: "TH reads ColorCapabilities attribute from DUT"
+      PICS: CC.S.A400a
+      command: "readAttribute"
+      attribute: "ColorCapabilities"
+      response:
+          value: FeatureMapValue
+          constraints:
+              type: map16
+              minValue: 0
+              maxValue: 31
+
+    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+      PICS: CC.S.A400b && CC.S.F04
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT"
+      PICS: CC.S.A400c && CC.S.F04
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads CoupleColorTempToLevelMinMireds attribute from DUT"
+      PICS: CC.S.A400d && CC.S.F04
+      command: "readAttribute"
+      attribute: "CoupleColorTempToLevelMinMireds"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads StartUpColorTemperatureMireds attribute from DUT"
+      PICS: CC.S.A4010 && CC.S.F04
+      command: "readAttribute"
+      attribute: "StartUpColorTemperatureMireds"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
     #Defined Primaries Information Attribute Set
-    - label: "Read the mandatory attribute: NumberOfPrimaries"
+    - label: "TH reads NumberOfPrimaries attribute from DUT"
       PICS: CC.S.A0010
       command: "readAttribute"
       attribute: "NumberOfPrimaries"
@@ -305,7 +247,7 @@ tests:
               minValue: 0
               maxValue: 6
 
-    - label: "Read the mandatory attribute: Primary1X"
+    - label: "TH reads Primary1X attribute from DUT"
       PICS: CC.S.A0011
       command: "readAttribute"
       attribute: "Primary1X"
@@ -315,7 +257,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary1Y"
+    - label: "TH reads Primary1Y attribute from DUT"
       PICS: CC.S.A0012
       command: "readAttribute"
       attribute: "Primary1Y"
@@ -325,7 +267,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary1Intensity"
+    - label: "TH reads Primary1Intensity attribute from DUT"
       PICS: CC.S.A0013
       command: "readAttribute"
       attribute: "Primary1Intensity"
@@ -333,7 +275,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "Read the mandatory attribute: Primary2X"
+    - label: "TH reads Primary2X attribute from DUT"
       PICS: CC.S.A0015
       command: "readAttribute"
       attribute: "Primary2X"
@@ -343,7 +285,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary2Y"
+    - label: "TH reads Primary2Y attribute from DUT"
       PICS: CC.S.A0016
       command: "readAttribute"
       attribute: "Primary2Y"
@@ -353,7 +295,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Validate constraints of attribute: Primary2Intensity"
+    - label: "TH reads Primary2Intensity attribute from DUT"
       PICS: CC.S.A0017
       command: "readAttribute"
       attribute: "Primary2Intensity"
@@ -361,7 +303,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "Read the mandatory attribute: Primary3X"
+    - label: "TH reads Primary3X attribute from DUT"
       PICS: CC.S.A0019
       command: "readAttribute"
       attribute: "Primary3X"
@@ -371,7 +313,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary3Y"
+    - label: "TH reads Primary3Y attribute from DUT"
       PICS: CC.S.A001a
       command: "readAttribute"
       attribute: "Primary3Y"
@@ -381,7 +323,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary3Intensity"
+    - label: "TH reads Primary3Intensity attribute from DUT"
       PICS: CC.S.A001b
       command: "readAttribute"
       attribute: "Primary3Intensity"
@@ -390,7 +332,7 @@ tests:
               type: uint8
 
     #Additional Defined Primaries Information Attribute Set
-    - label: "Read the mandatory attribute: Primary4X"
+    - label: "TH reads Primary4X attribute from DUT"
       PICS: CC.S.A0020
       command: "readAttribute"
       attribute: "Primary4X"
@@ -400,7 +342,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary4Y"
+    - label: "TH reads Primary4Y attribute from DUT"
       PICS: CC.S.A0021
       command: "readAttribute"
       attribute: "Primary4Y"
@@ -410,7 +352,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary4Intensity"
+    - label: "TH reads Primary4Intensity attribute from DUT"
       PICS: CC.S.A0022
       command: "readAttribute"
       attribute: "Primary4Intensity"
@@ -418,7 +360,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "Read the mandatory attribute: Primary5X"
+    - label: "TH reads Primary5X attribute from DUT"
       PICS: CC.S.A0024
       command: "readAttribute"
       attribute: "Primary5X"
@@ -428,7 +370,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary5Y"
+    - label: "TH reads Primary5Y attribute from DUT"
       PICS: CC.S.A0025
       command: "readAttribute"
       attribute: "Primary5Y"
@@ -438,7 +380,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary5Intensity"
+    - label: "TH reads Primary5Intensity attribute from DUT"
       PICS: CC.S.A0026
       command: "readAttribute"
       attribute: "Primary5Intensity"
@@ -446,7 +388,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "Read the mandatory attribute: Primary6X"
+    - label: "TH reads Primary6X attribute from DUT"
       PICS: CC.S.A0028
       command: "readAttribute"
       attribute: "Primary6X"
@@ -456,7 +398,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary6Y"
+    - label: "TH reads Primary6Y attribute from DUT"
       PICS: CC.S.A0029
       command: "readAttribute"
       attribute: "Primary6Y"
@@ -466,7 +408,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the mandatory attribute: Primary6Intensity"
+    - label: "TH reads Primary6Intensity attribute from DUT"
       PICS: CC.S.A002a
       command: "readAttribute"
       attribute: "Primary6Intensity"
@@ -475,7 +417,7 @@ tests:
               type: uint8
 
     #Defined Color Points Settings Attribute Set
-    - label: "Read the optional attribute: WhitePointX"
+    - label: "TH reads WhitePointX attribute from DUT"
       PICS: CC.S.A0030
       command: "readAttribute"
       attribute: "WhitePointX"
@@ -485,7 +427,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: WhitePointY"
+    - label: "TH reads WhitePointY attribute from DUT"
       PICS: CC.S.A0031
       command: "readAttribute"
       attribute: "WhitePointY"
@@ -495,7 +437,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointRX"
+    - label: "TH reads ColorPointRX attribute from DUT"
       PICS: CC.S.A0032
       command: "readAttribute"
       attribute: "ColorPointRX"
@@ -505,7 +447,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointRY"
+    - label: "TH reads ColorPointRY attribute from DUT"
       PICS: CC.S.A0033
       command: "readAttribute"
       attribute: "ColorPointRY"
@@ -515,7 +457,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointRIntensity"
+    - label: "TH reads ColorPointRIntensity attribute from DUT"
       PICS: CC.S.A0034
       command: "readAttribute"
       attribute: "ColorPointRIntensity"
@@ -523,7 +465,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "Read the optional attribute: ColorPointGX"
+    - label: "TH reads ColorPointGX attribute from DUT"
       PICS: CC.S.A0036
       command: "readAttribute"
       attribute: "ColorPointGX"
@@ -533,7 +475,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointGY"
+    - label: "TH reads ColorPointGY attribute from DUT"
       PICS: CC.S.A0037
       command: "readAttribute"
       attribute: "ColorPointGY"
@@ -543,7 +485,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointGIntensity"
+    - label: "TH reads ColorPointGIntensity attribute from DUT"
       PICS: CC.S.A0038
       command: "readAttribute"
       attribute: "ColorPointGIntensity"
@@ -551,7 +493,7 @@ tests:
           constraints:
               type: uint8
 
-    - label: "Read the optional attribute: ColorPointBX"
+    - label: "TH reads ColorPointBX attribute from DUT"
       PICS: CC.S.A003a
       command: "readAttribute"
       attribute: "ColorPointBX"
@@ -561,7 +503,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointBY"
+    - label: "TH reads ColorPointBY attribute from DUT"
       PICS: CC.S.A003b
       command: "readAttribute"
       attribute: "ColorPointBY"
@@ -571,7 +513,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Read the optional attribute: ColorPointBIntensity"
+    - label: "TH reads ColorPointBIntensity attribute from DUT"
       PICS: CC.S.A003c
       command: "readAttribute"
       attribute: "ColorPointBIntensity"

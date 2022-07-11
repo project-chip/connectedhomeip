@@ -19,14 +19,15 @@
 
 #import <Matter/MTROnboardingPayloadParser.h>
 
-@class MTRDevice;
+@class MTRBaseDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSError * _Nullable error);
+typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NSError * _Nullable error);
 
 @class MTRCommissioningParameters;
 @protocol MTRDevicePairingDelegate;
+@protocol MTROTAProviderDelegate;
 
 @interface MTRDeviceController : NSObject
 
@@ -92,8 +93,10 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
-- (nullable MTRDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
-- (BOOL)getDevice:(uint64_t)deviceID queue:(dispatch_queue_t)queue completionHandler:(MTRDeviceConnectionCallback)completionHandler;
+- (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
+- (BOOL)getBaseDevice:(uint64_t)deviceID
+                queue:(dispatch_queue_t)queue
+    completionHandler:(MTRDeviceConnectionCallback)completionHandler;
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error;
 - (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
@@ -101,12 +104,6 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
                                   discriminator:(NSUInteger)discriminator
                                        setupPIN:(NSUInteger)setupPIN
                                           error:(NSError * __autoreleasing *)error;
-
-/**
- * Temporary until PairingDelegate is fixed to clearly communicate this
- * information to consumers.
- */
-- (BOOL)deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
 
 /**
  * Controllers are created via the MTRControllerFactory object.
@@ -122,6 +119,15 @@ typedef void (^MTRDeviceConnectionCallback)(MTRDevice * _Nullable device, NSErro
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+/**
+ * Set the Delegate for the OTA Provider as well as the Queue on which the Delegate callbacks will be triggered
+ *
+ * @param[in] delegate The delegate the OTA Provider should use
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.

@@ -57,9 +57,9 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0]
           constraints:
               type: list
+              contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

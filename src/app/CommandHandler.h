@@ -227,6 +227,25 @@ public:
      */
     Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
+    /**
+     * @brief Flush acks right away for a slow command
+     *
+     * Some commands that do heavy lifting of storage/crypto should
+     * ack right away to improve reliability and reduce needless retries. This
+     * method can be manually called in commands that are especially slow to
+     * immediately schedule an acknowledgement (if needed) since the delayed
+     * stand-alone ack timer may actually not hit soon enough due to blocking command
+     * execution.
+     *
+     */
+    void FlushAcksRightAwayOnSlowCommand()
+    {
+        VerifyOrReturn(mpExchangeCtx != nullptr);
+        auto * msgContext = mpExchangeCtx->GetReliableMessageContext();
+        VerifyOrReturn(msgContext != nullptr);
+        msgContext->FlushAcks();
+    }
+
     Access::SubjectDescriptor GetSubjectDescriptor() const { return mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
 
 private:

@@ -510,4 +510,52 @@ protected:
 
         return true;
     }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksSet(const char * itemName, const T & current, const U & expected)
+    {
+        if (current & expected)
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to be set but it is not.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksSet(const char * itemName, const chip::BitMask<T> & current, const U & expected)
+    {
+        if (current.Has(static_cast<T>(expected)))
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to be set but it is not.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksClear(const char * itemName, const T & current, const U & expected)
+    {
+        if ((current & expected) == 0)
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to not be set but it is.");
+        return false;
+    }
+
+    template <typename T, typename U>
+    bool CheckConstraintHasMasksClear(const char * itemName, const chip::BitMask<T> & current, const U & expected)
+    {
+        if (!current.Has(static_cast<T>(expected)))
+        {
+            return true;
+        }
+
+        Exit(std::string(itemName) + " expects the field with value " + std::to_string(expected) + " to not be set but it is.");
+        return false;
+    }
 };

@@ -27,7 +27,7 @@
       {{>decodable_value target=(concat ../target "." (asStructPropertyName label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth ../depth) }}
     {{/zcl_struct_items_by_struct_name}}
   {{else}}
-    {{#if_chip_enum type}}
+    {{#if_is_strongly_typed_chip_enum type}}
       {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:chip::to_underlying({{source}})];
     {{else}}
       {{#if_is_strongly_typed_bitmap type}}
@@ -39,6 +39,6 @@
       {{else}}
         {{target}} = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:{{source}}];
       {{/if_is_strongly_typed_bitmap}}
-    {{/if_chip_enum}}
+    {{/if_is_strongly_typed_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

@@ -44,6 +44,8 @@ shared_library("ChipDeviceCtrl") {
     "chip/setup_payload/Parser.cpp",
   ]
 
+  sources += [ "chip/native/CommonStackInit.cpp" ]
+
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
@@ -63,7 +65,6 @@ shared_library("ChipDeviceCtrl") {
       "chip/internal/ChipThreadWork.h",
       "chip/internal/CommissionerImpl.cpp",
       "chip/logging/LoggingRedirect.cpp",
-      "chip/native/StackInit.cpp",
     ]
   } else {
     sources += [
@@ -163,6 +164,8 @@ pw_python_action("python") {
         "chip/setup_payload/setup_payload.py",
         "chip/storage/__init__.py",
         "chip/tlv/__init__.py",
+        "chip/utils/CommissioningBuildingBlocks.py",
+        "chip/utils/__init__.py",
       ]
 
       if (chip_controller) {

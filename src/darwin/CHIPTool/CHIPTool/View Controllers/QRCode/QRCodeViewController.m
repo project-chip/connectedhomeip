@@ -43,6 +43,17 @@
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
+@interface MTRDeviceController (ToDoRemove)
+
+/**
+ * TODO: Temporary until PairingDelegate is fixed to clearly communicate this
+ * information to consumers.
+ * This should be migrated over to the proper pairing delegate path
+ */
+- (BOOL)_deviceBeingCommissionedOverBLE:(uint64_t)deviceId;
+
+@end
+
 @interface QRCodeViewController ()
 
 @property (nonatomic, strong) AVCaptureSession * captureSession;
@@ -78,7 +89,7 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) MTRDeviceController * chipController;
-@property (nonatomic, strong) MTRNetworkCommissioning * cluster;
+@property (nonatomic, strong) MTRBaseClusterNetworkCommissioning * cluster;
 
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
 @property (strong, nonatomic) MTRSetupPayload * setupPayload;
@@ -467,7 +478,7 @@
 - (void)setVendorIDOnAccessory
 {
     NSLog(@"Call to setVendorIDOnAccessory");
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             if (!device) {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -486,7 +497,8 @@
     } else {
         MTRDeviceController * controller = InitializeMTR();
         uint64_t deviceId = MTRGetLastPairedDeviceId();
-        if ([controller deviceBeingCommissionedOverBLE:deviceId]) {
+        if ([controller respondsToSelector:@selector(_deviceBeingCommissionedOverBLE:)] &&
+            [controller _deviceBeingCommissionedOverBLE:deviceId]) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->_deviceList refreshDeviceList];
                 [self retrieveAndSendWiFiCredentials];
