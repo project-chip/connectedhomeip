@@ -238,7 +238,8 @@ private:
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override
     {
-        VerifyOrDieWithMsg(false, InteractionModel, "not expect a response, either caused by faulty logic, or at the EC that needs to be fixed.");
+        VerifyOrDieWithMsg(false, InteractionModel,
+                           "not expect a response, either caused by faulty logic, or at the EC that needs to be fixed.");
     }
 
     enum class State
