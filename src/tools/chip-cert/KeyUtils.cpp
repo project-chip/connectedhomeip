@@ -41,12 +41,12 @@ namespace {
 KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
 {
     static uint32_t p256PlaintextKeypairLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
-    static const char * ecPEMMarker          = "-----BEGIN EC PRIVATE KEY-----";
-    static const char * pkcs8PEMMarker       = "-----BEGIN PRIVATE KEY-----";
-    static const char * ecPUBPEMMarker       = "-----BEGIN PUBLIC KEY-----";
-    static const char * chipHexPrefix        = "04c2";
-    static const size_t chipHexPrefixLen     = strlen(chipHexPrefix);
-    static const size_t chipHexMinLen        = HEX_ENCODED_LENGTH(p256PlaintextKeypairLen);
+    static const char * ecPEMMarker         = "-----BEGIN EC PRIVATE KEY-----";
+    static const char * pkcs8PEMMarker      = "-----BEGIN PRIVATE KEY-----";
+    static const char * ecPUBPEMMarker      = "-----BEGIN PUBLIC KEY-----";
+    static const char * chipHexPrefix       = "04c2";
+    static const size_t chipHexPrefixLen    = strlen(chipHexPrefix);
+    static const size_t chipHexMinLen       = HEX_ENCODED_LENGTH(p256PlaintextKeypairLen);
 
     if (keyLen == p256PlaintextKeypairLen)
     {
@@ -286,7 +286,7 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     FILE * file            = nullptr;
     uint8_t * keyToWrite   = nullptr;
     uint32_t keyToWriteLen = 0;
-    P256PlaintextKeypair   plaintextKeypair;
+    P256PlaintextKeypair plaintextKeypair;
     uint32_t chipKeySize        = plaintextKeypair.Capacity();
     uint32_t chipKeyDecodedSize = HEX_ENCODED_LENGTH(chipKeySize);
     std::unique_ptr<uint8_t[]> chipKey(new uint8_t[chipKeySize]);

@@ -353,15 +353,9 @@ template <typename PK, typename Plaintext, typename Serialized, typename Sig, ty
 class ECKeypair
 {
 public:
-    ECKeypair()
-    {
-        mUsage = SupportedECKeyUsages::SIGNING;
-    }
+    ECKeypair() { mUsage = SupportedECKeyUsages::SIGNING; }
 
-    ECKeypair(SupportedECKeyUsages usage)
-    {
-        mUsage = usage;
-    }
+    ECKeypair(SupportedECKeyUsages usage) { mUsage = usage; }
 
     virtual ~ECKeypair() {}
 
@@ -445,7 +439,8 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
-class P256Keypair : public ECKeypair<P256PublicKey, P256PlaintextKeypair, P256SerializedKeypair, P256ECDSASignature, P256ECDHDerivedSecret>
+class P256Keypair
+    : public ECKeypair<P256PublicKey, P256PlaintextKeypair, P256SerializedKeypair, P256ECDSASignature, P256ECDHDerivedSecret>
 {
 public:
     P256Keypair() {}

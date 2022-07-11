@@ -91,8 +91,7 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (mUsage != SupportedECKeyUsages::SIGNING)
-    {
+    if (mUsage != SupportedECKeyUsages::SIGNING) {
         MTR_LOG_ERROR("ECDSA sign msg failure: keypair initialised with wrong usage.");
         return CHIP_ERROR_WRONG_KEY_TYPE;
     }
@@ -144,8 +143,7 @@ CHIP_ERROR MTRP256KeypairBridge::ECDH_derive_secret(
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    if (mUsage != SupportedECKeyUsages::DERIVING)
-    {
+    if (mUsage != SupportedECKeyUsages::DERIVING) {
         return CHIP_ERROR_WRONG_KEY_TYPE;
     }
 
