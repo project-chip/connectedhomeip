@@ -98,18 +98,15 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
     }
     payload->SetDataLength(static_cast<uint16_t>(msgLen));
 
-    ep->Retain();
-    auto * buf     = std::move(payload).UnsafeRelease();
-    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, buf] {
-        ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf));
-        ep->Release();
-    });
+    // TODO: add thread-safe reference counting for UDP endpoints
+    auto * buf = std::move(payload).UnsafeRelease();
+    CHIP_ERROR err =
+        ep->GetSystemLayer().ScheduleLambda([ep, buf] { ep->HandleDataReceived(System::PacketBufferHandle::Adopt(buf)); });
     if (err != CHIP_NO_ERROR)
     {
         // Make sure we properly clean up buf and ep, since our lambda will not
         // run.
         payload = System::PacketBufferHandle::Adopt(buf);
-        ep->Release();
     }
 }
 
