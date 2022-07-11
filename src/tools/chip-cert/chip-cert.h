@@ -93,9 +93,12 @@ enum CertFormat
     kCertFormat_Unknown = 0,
     kCertFormat_X509_DER,
     kCertFormat_X509_PEM,
+    kCertFormat_X509_Hex,
     kCertFormat_Chip_Raw,
     kCertFormat_Chip_Base64,
     kCertFormat_Chip_Hex,
+
+    kCertFormat_Default = kCertFormat_Chip_Base64,
 };
 
 enum KeyFormat
@@ -103,11 +106,32 @@ enum KeyFormat
     kKeyFormat_Unknown = 0,
     kKeyFormat_X509_DER,
     kKeyFormat_X509_PEM,
-    kKeyFormat_X509_PUBKEY_PEM,
+    kKeyFormat_X509_Hex,
+    kKeyFormat_X509_Pubkey_PEM,
     kKeyFormat_Chip_Raw,
     kKeyFormat_Chip_Base64,
-    kKeyFormat_Chip_Hex
+    kKeyFormat_Chip_Hex,
+    kKeyFormat_Chip_Pubkey_Raw,
+    kKeyFormat_Chip_Pubkey_Base64,
+    kKeyFormat_Chip_Pubkey_Hex,
+
+    kKeyFormat_Default = kKeyFormat_Chip_Base64,
 };
+
+enum DataFormat
+{
+    kDataFormat_Unknown = 0,
+    kDataFormat_Raw,
+    kDataFormat_Hex,
+    kDataFormat_Base64,
+};
+
+extern bool IsChipCertFormat(CertFormat certFormat);
+extern bool IsX509PrivateKeyFormat(KeyFormat keyFormat);
+extern bool IsChipPrivateKeyFormat(KeyFormat keyFormat);
+extern bool IsPrivateKeyFormat(KeyFormat keyFormat);
+extern bool IsChipPublicKeyFormat(KeyFormat keyFormat);
+extern bool IsPublicKeyFormat(KeyFormat keyFormat);
 
 enum AttCertType
 {
@@ -281,6 +305,7 @@ public:
     bool IsSignatureError() { return (mEnabled && mFlags.Has(CertErrorFlags::kSignature)); }
 
     bool IsCertOversized() { return (mEnabled && mFlags.Has(CertErrorFlags::kCertOversized)); }
+    uint32_t GetExtraCertLength() { return IsCertOversized() ? kExtraBufferLengthForOvesizedCert : 0; }
     bool IsSerialNumberPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kSerialNumberMissing)); }
     bool IsIssuerPresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kIssuerMissing)); }
     bool IsValidityNotBeforePresent() { return (!mEnabled || !mFlags.Has(CertErrorFlags::kValidityNotBeforeMissing)); }
@@ -349,6 +374,8 @@ private:
         kExtExtendedKeyUsageMissing = 0x0000800000000000,
     };
 
+    static constexpr uint32_t kExtraBufferLengthForOvesizedCert = 300;
+
     bool mEnabled = false;
     chip::BitFlags<CertErrorFlags> mFlags;
 };
@@ -397,7 +424,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
 extern bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve = false);
-extern bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
+extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
 extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);
 
 extern bool X509ToChipCert(X509 * cert, chip::MutableByteSpan & chipCert);
@@ -409,6 +436,7 @@ extern bool IsBase64String(const char * str, uint32_t strLen);
 extern bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataLen);
 extern bool ParseDateTime(const char * str, struct tm & date);
 extern bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen);
+extern bool WriteDataIntoFile(const char * fileName, const uint8_t * data, size_t dataLen, DataFormat dataFmt);
 extern bool OpenFile(const char * fileName, FILE *& file, bool toWrite = false);
 extern void CloseFile(FILE *& file);
 

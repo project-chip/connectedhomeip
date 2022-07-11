@@ -27,10 +27,13 @@
 
 #include "chip-cert.h"
 
+#include <lib/core/CHIPEncoding.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/SafeInt.h>
 
 using namespace chip;
 using namespace chip::Credentials;
+using namespace chip::Encoding;
 using namespace chip::ASN1;
 
 int gNIDChipNodeId;
@@ -113,6 +116,38 @@ exit:
     return res;
 }
 
+bool IsChipCertFormat(CertFormat certFormat)
+{
+    return ((certFormat == kCertFormat_Chip_Raw) || (certFormat == kCertFormat_Chip_Base64) ||
+            (certFormat == kCertFormat_Chip_Hex));
+}
+
+bool IsX509PrivateKeyFormat(KeyFormat keyFormat)
+{
+    return ((keyFormat == kKeyFormat_X509_PEM) || (keyFormat == kKeyFormat_X509_DER) || (keyFormat == kKeyFormat_X509_Hex));
+}
+
+bool IsChipPrivateKeyFormat(KeyFormat keyFormat)
+{
+    return ((keyFormat == kKeyFormat_Chip_Raw) || (keyFormat == kKeyFormat_Chip_Base64) || (keyFormat == kKeyFormat_Chip_Hex));
+}
+
+bool IsPrivateKeyFormat(KeyFormat keyFormat)
+{
+    return (IsX509PrivateKeyFormat(keyFormat) || IsChipPrivateKeyFormat(keyFormat));
+}
+
+bool IsChipPublicKeyFormat(KeyFormat keyFormat)
+{
+    return ((keyFormat == kKeyFormat_Chip_Pubkey_Raw) || (keyFormat == kKeyFormat_Chip_Pubkey_Base64) ||
+            (keyFormat == kKeyFormat_Chip_Pubkey_Hex));
+}
+
+bool IsPublicKeyFormat(KeyFormat keyFormat)
+{
+    return (IsChipPublicKeyFormat(keyFormat) || (keyFormat == kKeyFormat_X509_Pubkey_PEM));
+}
+
 bool Base64Encode(const uint8_t * inData, uint32_t inDataLen, uint8_t * outBuf, uint32_t outBufSize, uint32_t & outDataLen)
 {
     bool res = true;
@@ -192,15 +227,15 @@ bool ParseDateTime(const char * str, struct tm & date)
 
 bool OpenFile(const char * fileName, FILE *& file, bool toWrite)
 {
-    bool res = true;
+    VerifyOrReturnError(fileName != nullptr, false);
 
-    if (fileName != nullptr && strcmp(fileName, "-") != 0)
+    if (strcmp(fileName, "-") != 0)
     {
         file = fopen(fileName, toWrite ? "w+" : "r");
         if (file == nullptr)
         {
             fprintf(stderr, "Unable to open %s: %s\n", fileName, strerror(errno));
-            ExitNow(res = false);
+            return false;
         }
     }
     else
@@ -208,8 +243,7 @@ bool OpenFile(const char * fileName, FILE *& file, bool toWrite)
         file = toWrite ? stdout : stdin;
     }
 
-exit:
-    return res;
+    return true;
 }
 
 void CloseFile(FILE *& file)
@@ -252,6 +286,64 @@ bool ReadFileIntoMem(const char * fileName, uint8_t * data, uint32_t & dataLen)
             fprintf(stderr, "Error reading %s: %s\n", fileName, strerror(errno));
             ExitNow(res = false);
         }
+    }
+
+exit:
+    CloseFile(file);
+    return res;
+}
+
+bool WriteDataIntoFile(const char * fileName, const uint8_t * data, size_t dataLen, DataFormat dataFmt)
+{
+    bool res                    = true;
+    FILE * file                 = nullptr;
+    const uint8_t * dataToWrite = nullptr;
+    uint32_t dataToWriteLen     = 0;
+    std::unique_ptr<uint8_t[]> dataBuf;
+
+    VerifyOrExit(OpenFile(fileName, file, true) == true, res = false);
+    VerifyOrExit(data != nullptr, res = false);
+    VerifyOrExit(dataFmt != kDataFormat_Unknown, res = false);
+
+    if (dataFmt == kDataFormat_Base64)
+    {
+        VerifyOrExit(CanCastTo<uint32_t>(BASE64_ENCODED_LEN(dataLen)), res = false);
+        dataToWriteLen = static_cast<uint32_t>(BASE64_ENCODED_LEN(dataLen));
+        dataBuf        = std::unique_ptr<uint8_t[]>(new uint8_t[dataToWriteLen]);
+        dataToWrite    = dataBuf.get();
+
+        VerifyOrExit(Base64Encode(data, static_cast<uint32_t>(dataLen), dataBuf.get(), dataToWriteLen, dataToWriteLen),
+                     res = false);
+    }
+    else if (dataFmt == kDataFormat_Hex)
+    {
+        VerifyOrExit(CanCastTo<uint32_t>(HEX_ENCODED_LENGTH(dataLen)), res = false);
+        dataToWriteLen = static_cast<uint32_t>(HEX_ENCODED_LENGTH(dataLen));
+        dataBuf        = std::unique_ptr<uint8_t[]>(new uint8_t[dataToWriteLen]);
+        dataToWrite    = dataBuf.get();
+
+        VerifyOrExit(BytesToHex(data, dataLen, Uint8::to_char(dataBuf.get()), dataToWriteLen, HexFlags::kUppercase) ==
+                         CHIP_NO_ERROR,
+                     res = false);
+    }
+    else
+    {
+        VerifyOrExit(CanCastTo<uint32_t>(dataLen), res = false);
+        dataToWriteLen = static_cast<uint32_t>(dataLen);
+        dataToWrite    = data;
+    }
+
+    if (fwrite(dataToWrite, 1, dataToWriteLen, file) != dataToWriteLen)
+    {
+        fprintf(stderr, "Unable to write to %s: %s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
+        ExitNow(res = false);
+    }
+
+    // Add new line if the output is stdout
+    if ((strcmp(fileName, "-") == 0) && (fwrite("\n", 1, 1, file) != 1))
+    {
+        fprintf(stderr, "Unable to write to %s: %s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
+        ExitNow(res = false);
     }
 
 exit:

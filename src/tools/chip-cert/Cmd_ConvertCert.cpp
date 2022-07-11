@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -42,6 +42,7 @@ OptionDef gCmdOptionDefs[] =
 {
     { "x509-pem",   kNoArgument, 'p' },
     { "x509-der",   kNoArgument, 'd' },
+    { "x509-hex",   kNoArgument, 'X' },
     { "chip",       kNoArgument, 'c' },
     { "chip-hex",   kNoArgument, 'x' },
     { "chip-b64",   kNoArgument, 'b' },
@@ -56,6 +57,10 @@ const char * const gCmdOptionHelp =
     "  -d, --x509-der\n"
     "\n"
     "       Output certificate in X.509 DER format.\n"
+    "\n"
+    "  -X, --x509-hex\n"
+    "\n"
+    "       Output certificate in X.509 DER hex encoded format.\n"
     "\n"
     "  -c, --chip\n"
     "\n"
@@ -110,7 +115,7 @@ OptionSet * gCmdOptionSets[] =
 
 const char * gInFileName  = nullptr;
 const char * gOutFileName = nullptr;
-CertFormat gOutCertFormat = kCertFormat_Chip_Base64;
+CertFormat gOutCertFormat = kCertFormat_Default;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -121,6 +126,9 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
     case 'd':
         gOutCertFormat = kCertFormat_X509_DER;
+        break;
+    case 'X':
+        gOutCertFormat = kCertFormat_X509_Hex;
         break;
     case 'x':
         gOutCertFormat = kCertFormat_Chip_Hex;

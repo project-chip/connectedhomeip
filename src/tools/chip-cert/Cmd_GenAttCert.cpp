@@ -577,7 +577,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
 
     if (gOutKeyFileName != nullptr)
     {
-        res = WritePrivateKey(gOutKeyFileName, newKey.get(), kKeyFormat_X509_PEM);
+        res = WriteKey(gOutKeyFileName, newKey.get(), kKeyFormat_X509_PEM);
         VerifyTrueOrExit(res);
     }
 
