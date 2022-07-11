@@ -7,14 +7,14 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 
 
-bool 
+bool
 emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode, chip::app::Clusters::DoorLock::DlOperationError & err)
 {
     err = DlOperationError::kUnspecified;
     return true;
 }
 
-bool 
+bool
 emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode, chip::app::Clusters::DoorLock::DlOperationError & err)
 {
     err = DlOperationError::kUnspecified;
