@@ -3823,379 +3823,369 @@ NS_ASSUME_NONNULL_BEGIN
                                        completionHandler:
                                            (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryVoltageWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributeBatVoltageWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(MTRSubscribeParams * _Nullable)params
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatVoltageWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                         endpoint:(NSNumber *)endpoint
+                                            queue:(dispatch_queue_t)queue
+                                completionHandler:
+                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatPercentRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatPercentRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(MTRSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatPercentRemainingWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatTimeRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatTimeRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                              maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                   params:(MTRSubscribeParams * _Nullable)params
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatTimeRemainingWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                               endpoint:(NSNumber *)endpoint
+                                                  queue:(dispatch_queue_t)queue
+                                      completionHandler:
+                                          (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatChargeLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeBatteryVoltageWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeBatChargeLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
                                             maxInterval:(NSNumber * _Nonnull)maxInterval
                                                  params:(MTRSubscribeParams * _Nullable)params
                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                           reportHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryVoltageWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
++ (void)readAttributeBatChargeLevelWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                              endpoint:(NSNumber *)endpoint
                                                 queue:(dispatch_queue_t)queue
                                     completionHandler:
                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryPercentRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryPercentRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                          params:(MTRSubscribeParams * _Nullable)params
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                     NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryPercentRemainingWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                      endpoint:(NSNumber *)endpoint
-                                                         queue:(dispatch_queue_t)queue
-                                             completionHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryTimeRemainingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributeBatReplacementNeededWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeBatteryTimeRemainingWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeBatReplacementNeededWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
                                                        params:(MTRSubscribeParams * _Nullable)params
                                       subscriptionEstablished:
                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                                 reportHandler:
                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryTimeRemainingWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
++ (void)readAttributeBatReplacementNeededWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                    endpoint:(NSNumber *)endpoint
                                                       queue:(dispatch_queue_t)queue
                                           completionHandler:
                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryChargeLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                 NSError * _Nullable error))completionHandler;
+- (void)readAttributeBatReplaceabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeBatteryChargeLevelWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                     params:(MTRSubscribeParams * _Nullable)params
-                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                              reportHandler:
-                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryChargeLevelWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                 endpoint:(NSNumber *)endpoint
-                                                    queue:(dispatch_queue_t)queue
-                                        completionHandler:
-                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeBatReplaceabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(MTRSubscribeParams * _Nullable)params
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatReplaceabilityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                       completionHandler:
+                                           (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryReplacementNeededWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                       NSError * _Nullable error))completionHandler;
+- (void)readAttributeBatPresentWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeBatteryReplacementNeededWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                           params:(MTRSubscribeParams * _Nullable)params
-                                          subscriptionEstablished:
-                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryReplacementNeededWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                       endpoint:(NSNumber *)endpoint
-                                                          queue:(dispatch_queue_t)queue
-                                              completionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeBatPresentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                             params:(MTRSubscribeParams * _Nullable)params
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatPresentWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                         endpoint:(NSNumber *)endpoint
+                                            queue:(dispatch_queue_t)queue
+                                completionHandler:
+                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryReplaceabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryReplaceabilityWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                        params:(MTRSubscribeParams * _Nullable)params
-                                       subscriptionEstablished:
-                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                 reportHandler:
-                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryReplaceabilityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                    endpoint:(NSNumber *)endpoint
-                                                       queue:(dispatch_queue_t)queue
-                                           completionHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryPresentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                             NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryPresentWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                            maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                 params:(MTRSubscribeParams * _Nullable)params
-                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                          reportHandler:
-                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryPresentWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                             endpoint:(NSNumber *)endpoint
-                                                queue:(dispatch_queue_t)queue
-                                    completionHandler:
-                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeActiveBatteryFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                  NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeActiveBatteryFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                      params:(MTRSubscribeParams * _Nullable)params
-                                     subscriptionEstablished:
-                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                               reportHandler:
-                                                   (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeActiveBatteryFaultsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                  endpoint:(NSNumber *)endpoint
-                                                     queue:(dispatch_queue_t)queue
-                                         completionHandler:
-                                             (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryReplacementDescriptionWithCompletionHandler:(void (^)(NSString * _Nullable value,
-                                                                            NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryReplacementDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                           maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                                params:(MTRSubscribeParams * _Nullable)params
-                                               subscriptionEstablished:
-                                                   (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                         reportHandler:(void (^)(NSString * _Nullable value,
-                                                                           NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryReplacementDescriptionWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                            endpoint:(NSNumber *)endpoint
-                                                               queue:(dispatch_queue_t)queue
-                                                   completionHandler:(void (^)(NSString * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryCommonDesignationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                       NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryCommonDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                           params:(MTRSubscribeParams * _Nullable)params
-                                          subscriptionEstablished:
-                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryCommonDesignationWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                       endpoint:(NSNumber *)endpoint
-                                                          queue:(dispatch_queue_t)queue
-                                              completionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryANSIDesignationWithCompletionHandler:(void (^)(NSString * _Nullable value,
-                                                                     NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryANSIDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                         params:(MTRSubscribeParams * _Nullable)params
-                                        subscriptionEstablished:
-                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                  reportHandler:(void (^)(NSString * _Nullable value,
-                                                                    NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryANSIDesignationWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                     endpoint:(NSNumber *)endpoint
-                                                        queue:(dispatch_queue_t)queue
-                                            completionHandler:
-                                                (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryIECDesignationWithCompletionHandler:(void (^)(NSString * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryIECDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                        params:(MTRSubscribeParams * _Nullable)params
-                                       subscriptionEstablished:
-                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                 reportHandler:
-                                                     (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryIECDesignationWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                    endpoint:(NSNumber *)endpoint
-                                                       queue:(dispatch_queue_t)queue
-                                           completionHandler:
-                                               (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryApprovedChemistryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                       NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryApprovedChemistryWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                      maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                           params:(MTRSubscribeParams * _Nullable)params
-                                          subscriptionEstablished:
-                                              (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                    reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryApprovedChemistryWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                       endpoint:(NSNumber *)endpoint
-                                                          queue:(dispatch_queue_t)queue
-                                              completionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryCapacityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+- (void)readAttributeActiveBatFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeBatteryCapacityWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeActiveBatFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
                                              maxInterval:(NSNumber * _Nonnull)maxInterval
                                                   params:(MTRSubscribeParams * _Nullable)params
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryCapacityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeActiveBatFaultsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                               endpoint:(NSNumber *)endpoint
                                                  queue:(dispatch_queue_t)queue
                                      completionHandler:
-                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+                                         (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeBatteryQuantityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryQuantityWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                             maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                  params:(MTRSubscribeParams * _Nullable)params
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryQuantityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                              endpoint:(NSNumber *)endpoint
-                                                 queue:(dispatch_queue_t)queue
-                                     completionHandler:
-                                         (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryChargeStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                 NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryChargeStateWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                     params:(MTRSubscribeParams * _Nullable)params
-                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                              reportHandler:
-                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryChargeStateWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                 endpoint:(NSNumber *)endpoint
-                                                    queue:(dispatch_queue_t)queue
-                                        completionHandler:
-                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryTimeToFullChargeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryTimeToFullChargeWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                     maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                          params:(MTRSubscribeParams * _Nullable)params
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                     NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryTimeToFullChargeWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                      endpoint:(NSNumber *)endpoint
-                                                         queue:(dispatch_queue_t)queue
-                                             completionHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryFunctionalWhileChargingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                             NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryFunctionalWhileChargingWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                            maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                                 params:(MTRSubscribeParams * _Nullable)params
-                                                subscriptionEstablished:
-                                                    (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                          reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                            NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryFunctionalWhileChargingWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                             endpoint:(NSNumber *)endpoint
-                                                                queue:(dispatch_queue_t)queue
-                                                    completionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                          NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeBatteryChargingCurrentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                     NSError * _Nullable error))completionHandler;
-/**
- * This API does not support setting autoResubscribe to NO in the
- * MTRSubscribeParams.
- */
-- (void)subscribeAttributeBatteryChargingCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
-                                                    maxInterval:(NSNumber * _Nonnull)maxInterval
-                                                         params:(MTRSubscribeParams * _Nullable)params
-                                        subscriptionEstablished:
-                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                  reportHandler:(void (^)(NSNumber * _Nullable value,
-                                                                    NSError * _Nullable error))reportHandler;
-+ (void)readAttributeBatteryChargingCurrentWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
-                                                     endpoint:(NSNumber *)endpoint
-                                                        queue:(dispatch_queue_t)queue
-                                            completionHandler:
-                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeActiveBatteryChargeFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+- (void)readAttributeBatReplacementDescriptionWithCompletionHandler:(void (^)(NSString * _Nullable value,
                                                                         NSError * _Nullable error))completionHandler;
 /**
  * This API does not support setting autoResubscribe to NO in the
  * MTRSubscribeParams.
  */
-- (void)subscribeAttributeActiveBatteryChargeFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+- (void)subscribeAttributeBatReplacementDescriptionWithMinInterval:(NSNumber * _Nonnull)minInterval
                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
                                                             params:(MTRSubscribeParams * _Nullable)params
                                            subscriptionEstablished:
                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                     reportHandler:(void (^)(NSArray * _Nullable value,
+                                                     reportHandler:(void (^)(NSString * _Nullable value,
                                                                        NSError * _Nullable error))reportHandler;
-+ (void)readAttributeActiveBatteryChargeFaultsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
++ (void)readAttributeBatReplacementDescriptionWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
                                                         endpoint:(NSNumber *)endpoint
                                                            queue:(dispatch_queue_t)queue
-                                               completionHandler:(void (^)(NSArray * _Nullable value,
+                                               completionHandler:(void (^)(NSString * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatCommonDesignationWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatCommonDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(MTRSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatCommonDesignationWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatANSIDesignationWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatANSIDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(MTRSubscribeParams * _Nullable)params
+                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                              reportHandler:
+                                                  (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatANSIDesignationWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                 endpoint:(NSNumber *)endpoint
+                                                    queue:(dispatch_queue_t)queue
+                                        completionHandler:
+                                            (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatIECDesignationWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatIECDesignationWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                               maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                    params:(MTRSubscribeParams * _Nullable)params
+                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                             reportHandler:
+                                                 (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatIECDesignationWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                endpoint:(NSNumber *)endpoint
+                                                   queue:(dispatch_queue_t)queue
+                                       completionHandler:
+                                           (void (^)(NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatApprovedChemistryWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatApprovedChemistryWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                  maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                       params:(MTRSubscribeParams * _Nullable)params
+                                      subscriptionEstablished:
+                                          (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                reportHandler:
+                                                    (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatApprovedChemistryWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                          completionHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatCapacityWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatCapacityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(MTRSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatCapacityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatQuantityWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatQuantityWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                         maxInterval:(NSNumber * _Nonnull)maxInterval
+                                              params:(MTRSubscribeParams * _Nullable)params
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatQuantityWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                          endpoint:(NSNumber *)endpoint
+                                             queue:(dispatch_queue_t)queue
+                                 completionHandler:
+                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatChargeStateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatChargeStateWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                            maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                 params:(MTRSubscribeParams * _Nullable)params
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatChargeStateWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                             endpoint:(NSNumber *)endpoint
+                                                queue:(dispatch_queue_t)queue
+                                    completionHandler:
+                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatTimeToFullChargeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatTimeToFullChargeWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                 maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                      params:(MTRSubscribeParams * _Nullable)params
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatTimeToFullChargeWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                  endpoint:(NSNumber *)endpoint
+                                                     queue:(dispatch_queue_t)queue
+                                         completionHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatFunctionalWhileChargingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatFunctionalWhileChargingWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                        maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                             params:(MTRSubscribeParams * _Nullable)params
+                                            subscriptionEstablished:
+                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                      reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatFunctionalWhileChargingWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                         endpoint:(NSNumber *)endpoint
+                                                            queue:(dispatch_queue_t)queue
+                                                completionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBatChargingCurrentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeBatChargingCurrentWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                     params:(MTRSubscribeParams * _Nullable)params
+                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                              reportHandler:
+                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeBatChargingCurrentWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                 endpoint:(NSNumber *)endpoint
+                                                    queue:(dispatch_queue_t)queue
+                                        completionHandler:
+                                            (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeActiveBatChargeFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+/**
+ * This API does not support setting autoResubscribe to NO in the
+ * MTRSubscribeParams.
+ */
+- (void)subscribeAttributeActiveBatChargeFaultsWithMinInterval:(NSNumber * _Nonnull)minInterval
+                                                   maxInterval:(NSNumber * _Nonnull)maxInterval
+                                                        params:(MTRSubscribeParams * _Nullable)params
+                                       subscriptionEstablished:
+                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                 reportHandler:
+                                                     (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
++ (void)readAttributeActiveBatChargeFaultsWithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer
+                                                    endpoint:(NSNumber *)endpoint
+                                                       queue:(dispatch_queue_t)queue
+                                           completionHandler:
+                                               (void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
@@ -21868,18 +21858,18 @@ typedef NS_OPTIONS(uint32_t, MTRUnitLocalizationFeature) {
     MTRUnitLocalizationFeatureTemperatureUnit = 0x1,
 };
 
-typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeFaultType) {
-    MTRPowerSourceBatChargeFaultTypeUnspecfied = 0x00,
-    MTRPowerSourceBatChargeFaultTypeAmbientTooHot = 0x01,
-    MTRPowerSourceBatChargeFaultTypeAmbientTooCold = 0x02,
-    MTRPowerSourceBatChargeFaultTypeBatteryTooHot = 0x03,
-    MTRPowerSourceBatChargeFaultTypeBatteryTooCold = 0x04,
-    MTRPowerSourceBatChargeFaultTypeBatteryAbsent = 0x05,
-    MTRPowerSourceBatChargeFaultTypeBatteryOverVoltage = 0x06,
-    MTRPowerSourceBatChargeFaultTypeBatteryUnderVoltage = 0x07,
-    MTRPowerSourceBatChargeFaultTypeChargerOverVoltage = 0x08,
-    MTRPowerSourceBatChargeFaultTypeChargerUnderVoltage = 0x09,
-    MTRPowerSourceBatChargeFaultTypeSafetyTimeout = 0x0A,
+typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeFault) {
+    MTRPowerSourceBatChargeFaultUnspecfied = 0x00,
+    MTRPowerSourceBatChargeFaultAmbientTooHot = 0x01,
+    MTRPowerSourceBatChargeFaultAmbientTooCold = 0x02,
+    MTRPowerSourceBatChargeFaultBatteryTooHot = 0x03,
+    MTRPowerSourceBatChargeFaultBatteryTooCold = 0x04,
+    MTRPowerSourceBatChargeFaultBatteryAbsent = 0x05,
+    MTRPowerSourceBatChargeFaultBatteryOverVoltage = 0x06,
+    MTRPowerSourceBatChargeFaultBatteryUnderVoltage = 0x07,
+    MTRPowerSourceBatChargeFaultChargerOverVoltage = 0x08,
+    MTRPowerSourceBatChargeFaultChargerUnderVoltage = 0x09,
+    MTRPowerSourceBatChargeFaultSafetyTimeout = 0x0A,
 };
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeLevel) {
@@ -21895,10 +21885,10 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeState) {
     MTRPowerSourceBatChargeStateIsNotCharging = 0x03,
 };
 
-typedef NS_ENUM(uint8_t, MTRPowerSourceBatFaultType) {
-    MTRPowerSourceBatFaultTypeUnspecfied = 0x00,
-    MTRPowerSourceBatFaultTypeOverTemp = 0x01,
-    MTRPowerSourceBatFaultTypeUnderTemp = 0x02,
+typedef NS_ENUM(uint8_t, MTRPowerSourceBatFault) {
+    MTRPowerSourceBatFaultUnspecfied = 0x00,
+    MTRPowerSourceBatFaultOverTemp = 0x01,
+    MTRPowerSourceBatFaultUnderTemp = 0x02,
 };
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatReplaceability) {
@@ -21920,10 +21910,10 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceWiredCurrentType) {
     MTRPowerSourceWiredCurrentTypeDC = 0x01,
 };
 
-typedef NS_ENUM(uint8_t, MTRPowerSourceWiredFaultType) {
-    MTRPowerSourceWiredFaultTypeUnspecfied = 0x00,
-    MTRPowerSourceWiredFaultTypeOverVoltage = 0x01,
-    MTRPowerSourceWiredFaultTypeUnderVoltage = 0x02,
+typedef NS_ENUM(uint8_t, MTRPowerSourceWiredFault) {
+    MTRPowerSourceWiredFaultUnspecfied = 0x00,
+    MTRPowerSourceWiredFaultOverVoltage = 0x01,
+    MTRPowerSourceWiredFaultUnderVoltage = 0x02,
 };
 
 typedef NS_OPTIONS(uint32_t, MTRPowerSourceFeature) {

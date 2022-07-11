@@ -545,7 +545,7 @@ server cluster PowerSourceConfiguration = 46 {
 }
 
 server cluster PowerSource = 47 {
-  enum BatChargeFaultType : ENUM8 {
+  enum BatChargeFault : ENUM8 {
     kUnspecfied = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
@@ -572,7 +572,7 @@ server cluster PowerSource = 47 {
     kIsNotCharging = 3;
   }
 
-  enum BatFaultType : ENUM8 {
+  enum BatFault : ENUM8 {
     kUnspecfied = 0;
     kOverTemp = 1;
     kUnderTemp = 2;
@@ -597,7 +597,7 @@ server cluster PowerSource = 47 {
     kDc = 1;
   }
 
-  enum WiredFaultType : ENUM8 {
+  enum WiredFault : ENUM8 {
     kUnspecfied = 0;
     kOverVoltage = 1;
     kUnderVoltage = 2;
@@ -610,37 +610,37 @@ server cluster PowerSource = 47 {
     kReplaceable = 0x8;
   }
 
-  readonly attribute enum8 status = 0;
+  readonly attribute PowerSourceStatus status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute int32u wiredAssessedInputVoltage = 3;
-  readonly attribute int16u wiredAssessedInputFrequency = 4;
-  readonly attribute enum8 wiredCurrentType = 5;
-  readonly attribute int32u wiredAssessedCurrent = 6;
+  readonly attribute nullable int32u wiredAssessedInputVoltage = 3;
+  readonly attribute nullable int16u wiredAssessedInputFrequency = 4;
+  readonly attribute WiredCurrentType wiredCurrentType = 5;
+  readonly attribute nullable int32u wiredAssessedCurrent = 6;
   readonly attribute int32u wiredNominalVoltage = 7;
   readonly attribute int32u wiredMaximumCurrent = 8;
   readonly attribute boolean wiredPresent = 9;
-  readonly attribute ENUM8 activeWiredFaults[] = 10;
-  readonly attribute int32u batteryVoltage = 11;
-  readonly attribute int8u batteryPercentRemaining = 12;
-  readonly attribute int32u batteryTimeRemaining = 13;
-  readonly attribute enum8 batteryChargeLevel = 14;
-  readonly attribute boolean batteryReplacementNeeded = 15;
-  readonly attribute enum8 batteryReplaceability = 16;
-  readonly attribute boolean batteryPresent = 17;
-  readonly attribute ENUM8 activeBatteryFaults[] = 18;
-  readonly attribute char_string<60> batteryReplacementDescription = 19;
-  readonly attribute int32u batteryCommonDesignation = 20;
-  readonly attribute char_string<20> batteryANSIDesignation = 21;
-  readonly attribute char_string<20> batteryIECDesignation = 22;
-  readonly attribute int32u batteryApprovedChemistry = 23;
-  readonly attribute int32u batteryCapacity = 24;
-  readonly attribute int8u batteryQuantity = 25;
-  readonly attribute enum8 batteryChargeState = 26;
-  readonly attribute int32u batteryTimeToFullCharge = 27;
-  readonly attribute boolean batteryFunctionalWhileCharging = 28;
-  readonly attribute int32u batteryChargingCurrent = 29;
-  readonly attribute ENUM8 activeBatteryChargeFaults[] = 30;
+  readonly attribute WiredFault activeWiredFaults[] = 10;
+  readonly attribute nullable int32u batVoltage = 11;
+  readonly attribute nullable int8u batPercentRemaining = 12;
+  readonly attribute nullable int32u batTimeRemaining = 13;
+  readonly attribute BatChargeLevel batChargeLevel = 14;
+  readonly attribute boolean batReplacementNeeded = 15;
+  readonly attribute BatReplaceability batReplaceability = 16;
+  readonly attribute boolean batPresent = 17;
+  readonly attribute BatFault activeBatFaults[] = 18;
+  readonly attribute char_string<60> batReplacementDescription = 19;
+  readonly attribute int32u batCommonDesignation = 20;
+  readonly attribute char_string<20> batANSIDesignation = 21;
+  readonly attribute char_string<20> batIECDesignation = 22;
+  readonly attribute int32u batApprovedChemistry = 23;
+  readonly attribute int32u batCapacity = 24;
+  readonly attribute int8u batQuantity = 25;
+  readonly attribute BatChargeState batChargeState = 26;
+  readonly attribute nullable int32u batTimeToFullCharge = 27;
+  readonly attribute boolean batFunctionalWhileCharging = 28;
+  readonly attribute nullable int32u batChargingCurrent = 29;
+  readonly attribute BatChargeFault activeBatChargeFaults[] = 30;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
@@ -2671,26 +2671,26 @@ endpoint 0 {
     ram      attribute wiredMaximumCurrent;
     ram      attribute wiredPresent;
     callback attribute activeWiredFaults;
-    ram      attribute batteryVoltage;
-    ram      attribute batteryPercentRemaining;
-    ram      attribute batteryTimeRemaining;
-    ram      attribute batteryChargeLevel;
-    ram      attribute batteryReplacementNeeded;
-    ram      attribute batteryReplaceability;
-    ram      attribute batteryPresent;
-    callback attribute activeBatteryFaults;
-    ram      attribute batteryReplacementDescription;
-    ram      attribute batteryCommonDesignation;
-    ram      attribute batteryANSIDesignation;
-    ram      attribute batteryIECDesignation;
-    ram      attribute batteryApprovedChemistry;
-    ram      attribute batteryCapacity;
-    ram      attribute batteryQuantity;
-    ram      attribute batteryChargeState;
-    ram      attribute batteryTimeToFullCharge;
-    ram      attribute batteryFunctionalWhileCharging;
-    ram      attribute batteryChargingCurrent;
-    callback attribute activeBatteryChargeFaults;
+    ram      attribute batVoltage;
+    ram      attribute batPercentRemaining;
+    ram      attribute batTimeRemaining;
+    ram      attribute batChargeLevel;
+    ram      attribute batReplacementNeeded;
+    ram      attribute batReplaceability;
+    ram      attribute batPresent;
+    callback attribute activeBatFaults;
+    ram      attribute batReplacementDescription;
+    ram      attribute batCommonDesignation;
+    ram      attribute batANSIDesignation;
+    ram      attribute batIECDesignation;
+    ram      attribute batApprovedChemistry;
+    ram      attribute batCapacity;
+    ram      attribute batQuantity;
+    ram      attribute batChargeState;
+    ram      attribute batTimeToFullCharge;
+    ram      attribute batFunctionalWhileCharging;
+    ram      attribute batChargingCurrent;
+    callback attribute activeBatChargeFaults;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

@@ -131,7 +131,7 @@ tests:
     - label: "Test Harness Client reads BatVoltage from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000b
       command: "readAttribute"
-      attribute: "BatteryVoltage"
+      attribute: "BatVoltage"
       response:
           constraints:
               type: uint32
@@ -139,7 +139,7 @@ tests:
     - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000c
       command: "readAttribute"
-      attribute: "BatteryPercentRemaining"
+      attribute: "BatPercentRemaining"
       response:
           constraints:
               type: uint8
@@ -149,7 +149,7 @@ tests:
     - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000d
       command: "readAttribute"
-      attribute: "BatteryTimeRemaining"
+      attribute: "BatTimeRemaining"
       response:
           constraints:
               type: uint32
@@ -157,7 +157,7 @@ tests:
     - label: "Test Harness Client reads BatChargeLevel from Server DUT"
       PICS: PS.S.A000e
       command: "readAttribute"
-      attribute: "BatteryChargeLevel"
+      attribute: "BatChargeLevel"
       response:
           constraints:
               type: enum8
@@ -167,7 +167,7 @@ tests:
     - label: "Test Harness Client reads BatReplacementNeeded from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000f
       command: "readAttribute"
-      attribute: "BatteryReplacementNeeded"
+      attribute: "BatReplacementNeeded"
       response:
           constraints:
               type: bool
@@ -175,7 +175,7 @@ tests:
     - label: "Test Harness Client reads BatReplaceability from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0010
       command: "readAttribute"
-      attribute: "BatteryReplaceability"
+      attribute: "BatReplaceability"
       response:
           constraints:
               type: enum8
@@ -185,7 +185,7 @@ tests:
     - label: "Test Harness Client reads BatPresent from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0011
       command: "readAttribute"
-      attribute: "BatteryPresent"
+      attribute: "BatPresent"
       response:
           constraints:
               type: bool
@@ -193,7 +193,7 @@ tests:
     - label: "Test Harness Client readsActiveBatFaults from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0012
       command: "readAttribute"
-      attribute: "ActiveBatteryFaults"
+      attribute: "ActiveBatFaults"
       response:
           constraints:
               type: list
@@ -203,7 +203,7 @@ tests:
           "Test Harness Client reads BatReplacementDescription from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0013
       command: "readAttribute"
-      attribute: "BatteryReplacementDescription"
+      attribute: "BatReplacementDescription"
       response:
           constraints:
               type: string
@@ -212,7 +212,7 @@ tests:
     - label: "Test Harness Client reads BatCommonDesignation from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0014
       command: "readAttribute"
-      attribute: "BatteryCommonDesignation"
+      attribute: "BatCommonDesignation"
       response:
           constraints:
               type: uint32
@@ -222,7 +222,7 @@ tests:
     - label: "Test Harness Client reads BatANSIDesignation from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0015
       command: "readAttribute"
-      attribute: "BatteryANSIDesignation"
+      attribute: "BatANSIDesignation"
       response:
           constraints:
               type: string
@@ -231,7 +231,7 @@ tests:
     - label: "Test Harness Client reads BatIECDesignation from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0016
       command: "readAttribute"
-      attribute: "BatteryIECDesignation"
+      attribute: "BatIECDesignation"
       response:
           constraints:
               type: string
@@ -240,7 +240,7 @@ tests:
     - label: "Test Harness Client reads BatApprovedChemistry from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0017
       command: "readAttribute"
-      attribute: "BatteryApprovedChemistry"
+      attribute: "BatApprovedChemistry"
       response:
           constraints:
               type: uint32
@@ -250,7 +250,7 @@ tests:
     - label: "Test Harness Client reads BatCapacity from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0018
       command: "readAttribute"
-      attribute: "BatteryCapacity"
+      attribute: "BatCapacity"
       response:
           constraints:
               type: uint32
@@ -258,7 +258,7 @@ tests:
     - label: "Test Harness Client reads BatQuantity from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0019
       command: "readAttribute"
-      attribute: "BatteryQuantity"
+      attribute: "BatQuantity"
       response:
           constraints:
               type: uint8
@@ -266,7 +266,7 @@ tests:
     - label: "Test Harness Client reads BatChargeState from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001a
       command: "readAttribute"
-      attribute: "BatteryChargeState"
+      attribute: "BatChargeState"
       response:
           constraints:
               type: enum8
@@ -276,7 +276,7 @@ tests:
     - label: "Test Harness Client reads BatTimeToFullCharge from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001b
       command: "readAttribute"
-      attribute: "BatteryTimeToFullCharge"
+      attribute: "BatTimeToFullCharge"
       response:
           constraints:
               type: uint32
@@ -285,7 +285,7 @@ tests:
           "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001c
       command: "readAttribute"
-      attribute: "BatteryFunctionalWhileCharging"
+      attribute: "BatFunctionalWhileCharging"
       response:
           constraints:
               type: bool
@@ -293,7 +293,7 @@ tests:
     - label: "Test Harness Client reads BatChargingCurrent from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001d
       command: "readAttribute"
-      attribute: "BatteryChargingCurrent"
+      attribute: "BatChargingCurrent"
       response:
           constraints:
               type: uint32
@@ -301,7 +301,7 @@ tests:
     - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001e
       command: "readAttribute"
-      attribute: "ActiveBatteryChargeFaults"
+      attribute: "ActiveBatChargeFaults"
       response:
           constraints:
               type: list
