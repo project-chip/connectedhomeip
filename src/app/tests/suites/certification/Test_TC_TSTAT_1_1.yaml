@@ -38,8 +38,8 @@ tests:
 
     - label: "Read the optional global attribute constraints: FeatureMap"
       PICS:
-          ( TSTAT_HEAT || TSTAT_COOL || TSTAT_OCC || TSTAT_SCH || TSTAT_SB ||
-          TSTAT_AUTO )
+          TSTAT.S.F00 || TSTAT.S.F01 || TSTAT.S.F02 || TSTAT.S.F03 ||
+          TSTAT.S.F04 || TSTAT.S.F05
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

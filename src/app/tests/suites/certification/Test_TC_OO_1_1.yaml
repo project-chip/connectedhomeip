@@ -70,9 +70,9 @@ tests:
       attribute: "AcceptedCommandList"
       PICS: OO_LT
       response:
-          value: [0, 1, 2, 64, 65, 66]
           constraints:
               type: list
+              contains: [0, 1, 2, 64, 65, 66]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
