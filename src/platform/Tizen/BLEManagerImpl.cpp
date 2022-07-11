@@ -65,9 +65,6 @@ static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
 /* Tizen Default Connect Timeout */
 constexpr System::Clock::Timeout kConnectTimeoutMs = System::Clock::Seconds16(10);
 
-const int BtpServiceDataLenMax =
-    7; // OpCode(1) + Discriminator(2) + VendorId(2) + ProductId(2), 5.2.3.8.6. Advertising Data, CHIP Specification
-
 static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
 {
     ChipLogProgress(DeviceLayer, "Adapter State Changed: %s", adapterState == BT_ADAPTER_ENABLED ? "Enabled" : "Disabled");
@@ -584,9 +581,9 @@ exit:
 
 int BLEManagerImpl::StartAdvertising()
 {
-    int ret                                 = BT_ERROR_NONE;
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    char service_data[BtpServiceDataLenMax] = {
+    int ret                                                    = BT_ERROR_NONE;
+    CHIP_ERROR err                                             = CHIP_NO_ERROR;
+    char service_data[sizeof(ChipBLEDeviceIdentificationInfo)] = {
         0x0,
     }; // need to fill advertising data. 5.2.3.8.6. Advertising Data, CHIP Specification
     ChipBLEDeviceIdentificationInfo deviceIdInfo = {
