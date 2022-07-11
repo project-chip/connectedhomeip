@@ -32,7 +32,7 @@ config("p6_sdk_config") {
     include_dir = string_replace(include_dir, "-I", "", 1)
 
     # Path is relative to SDK
-    include_dir = "${p6_sdk_build_root}/p6_sdk/${include_dir}"
+    include_dir = "${p6_sdk_root}/${include_dir}"
 
     _system_include_dirs += [ include_dir ]
   }
@@ -57,7 +57,7 @@ config("p6_sdk_config") {
   libs = []
   foreach(lib, mtb_json.libs) {
     # Path is relative to SDK
-    lib = "${p6_sdk_build_root}/p6_sdk/${lib}"
+    lib = "${p6_sdk_root}/${lib}"
 
     libs += [ lib ]
   }
@@ -76,7 +76,7 @@ config("p6_sdk_config") {
       linker_script = string_replace(linker_script, "-T", "", 1)
 
       # Path is relative to SDK
-      linker_script = "${p6_sdk_build_root}/p6_sdk/${linker_script}"
+      linker_script = "${p6_sdk_root}/${linker_script}"
 
       ldflags += [ "-T" + rebase_path(linker_script, root_build_dir) ]
     }
