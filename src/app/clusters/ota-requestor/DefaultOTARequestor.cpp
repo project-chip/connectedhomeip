@@ -638,7 +638,6 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
     {
     case OTADownloader::State::kComplete:
         mOtaRequestorDriver->UpdateDownloaded();
-        mBdxMessenger.Reset();
         break;
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
