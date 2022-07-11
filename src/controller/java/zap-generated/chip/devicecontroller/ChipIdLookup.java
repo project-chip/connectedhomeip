@@ -788,64 +788,64 @@ public final class ChipIdLookup {
         return "ActiveWiredFaults";
       }
       if (attributeId == 11L) {
-        return "BatteryVoltage";
+        return "BatVoltage";
       }
       if (attributeId == 12L) {
-        return "BatteryPercentRemaining";
+        return "BatPercentRemaining";
       }
       if (attributeId == 13L) {
-        return "BatteryTimeRemaining";
+        return "BatTimeRemaining";
       }
       if (attributeId == 14L) {
-        return "BatteryChargeLevel";
+        return "BatChargeLevel";
       }
       if (attributeId == 15L) {
-        return "BatteryReplacementNeeded";
+        return "BatReplacementNeeded";
       }
       if (attributeId == 16L) {
-        return "BatteryReplaceability";
+        return "BatReplaceability";
       }
       if (attributeId == 17L) {
-        return "BatteryPresent";
+        return "BatPresent";
       }
       if (attributeId == 18L) {
-        return "ActiveBatteryFaults";
+        return "ActiveBatFaults";
       }
       if (attributeId == 19L) {
-        return "BatteryReplacementDescription";
+        return "BatReplacementDescription";
       }
       if (attributeId == 20L) {
-        return "BatteryCommonDesignation";
+        return "BatCommonDesignation";
       }
       if (attributeId == 21L) {
-        return "BatteryANSIDesignation";
+        return "BatANSIDesignation";
       }
       if (attributeId == 22L) {
-        return "BatteryIECDesignation";
+        return "BatIECDesignation";
       }
       if (attributeId == 23L) {
-        return "BatteryApprovedChemistry";
+        return "BatApprovedChemistry";
       }
       if (attributeId == 24L) {
-        return "BatteryCapacity";
+        return "BatCapacity";
       }
       if (attributeId == 25L) {
-        return "BatteryQuantity";
+        return "BatQuantity";
       }
       if (attributeId == 26L) {
-        return "BatteryChargeState";
+        return "BatChargeState";
       }
       if (attributeId == 27L) {
-        return "BatteryTimeToFullCharge";
+        return "BatTimeToFullCharge";
       }
       if (attributeId == 28L) {
-        return "BatteryFunctionalWhileCharging";
+        return "BatFunctionalWhileCharging";
       }
       if (attributeId == 29L) {
-        return "BatteryChargingCurrent";
+        return "BatChargingCurrent";
       }
       if (attributeId == 30L) {
-        return "ActiveBatteryChargeFaults";
+        return "ActiveBatChargeFaults";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";

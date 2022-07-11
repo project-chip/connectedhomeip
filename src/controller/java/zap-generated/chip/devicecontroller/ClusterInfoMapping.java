@@ -2045,8 +2045,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPowerSourceClusterActiveBatteryFaultsAttributeCallback
-      implements ChipClusters.PowerSourceCluster.ActiveBatteryFaultsAttributeCallback,
+  public static class DelegatedPowerSourceClusterActiveBatFaultsAttributeCallback
+      implements ChipClusters.PowerSourceCluster.ActiveBatFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2070,8 +2070,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedPowerSourceClusterActiveBatteryChargeFaultsAttributeCallback
-      implements ChipClusters.PowerSourceCluster.ActiveBatteryChargeFaultsAttributeCallback,
+  public static class DelegatedPowerSourceClusterActiveBatChargeFaultsAttributeCallback
+      implements ChipClusters.PowerSourceCluster.ActiveBatChargeFaultsAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 

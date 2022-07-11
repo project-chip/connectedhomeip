@@ -1,5 +1,5 @@
 {
-  "featureLevel": 71,
+  "featureLevel": 72,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -2219,7 +2219,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "PowerSourceStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2299,7 +2299,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "WiredCurrentType",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2391,7 +2391,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryVoltage",
+              "name": "BatVoltage",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -2407,7 +2407,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPercentRemaining",
+              "name": "BatPercentRemaining",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -2423,7 +2423,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeRemaining",
+              "name": "BatTimeRemaining",
               "code": 13,
               "mfgCode": null,
               "side": "server",
@@ -2439,11 +2439,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeLevel",
+              "name": "BatChargeLevel",
               "code": 14,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeLevel",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2455,7 +2455,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplacementNeeded",
+              "name": "BatReplacementNeeded",
               "code": 15,
               "mfgCode": null,
               "side": "server",
@@ -2471,11 +2471,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplaceability",
+              "name": "BatReplaceability",
               "code": 16,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatReplaceability",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2487,7 +2487,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPresent",
+              "name": "BatPresent",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -2503,7 +2503,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryFaults",
+              "name": "ActiveBatFaults",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -2519,7 +2519,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplacementDescription",
+              "name": "BatReplacementDescription",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -2535,7 +2535,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryCommonDesignation",
+              "name": "BatCommonDesignation",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -2551,7 +2551,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryANSIDesignation",
+              "name": "BatANSIDesignation",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -2567,7 +2567,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryIECDesignation",
+              "name": "BatIECDesignation",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -2583,7 +2583,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryApprovedChemistry",
+              "name": "BatApprovedChemistry",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -2599,7 +2599,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryCapacity",
+              "name": "BatCapacity",
               "code": 24,
               "mfgCode": null,
               "side": "server",
@@ -2615,7 +2615,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryQuantity",
+              "name": "BatQuantity",
               "code": 25,
               "mfgCode": null,
               "side": "server",
@@ -2631,11 +2631,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeState",
+              "name": "BatChargeState",
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeState",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2647,7 +2647,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeToFullCharge",
+              "name": "BatTimeToFullCharge",
               "code": 27,
               "mfgCode": null,
               "side": "server",
@@ -2663,7 +2663,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryFunctionalWhileCharging",
+              "name": "BatFunctionalWhileCharging",
               "code": 28,
               "mfgCode": null,
               "side": "server",
@@ -2679,7 +2679,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargingCurrent",
+              "name": "BatChargingCurrent",
               "code": 29,
               "mfgCode": null,
               "side": "server",
@@ -2695,7 +2695,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryChargeFaults",
+              "name": "ActiveBatChargeFaults",
               "code": 30,
               "mfgCode": null,
               "side": "server",
@@ -8107,166 +8107,6 @@
           ]
         },
         {
-          "name": "IAS Zone",
-          "code": 1280,
-          "mfgCode": null,
-          "define": "IAS_ZONE_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "ZoneEnrollResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "IAS Zone",
-          "code": 1280,
-          "mfgCode": null,
-          "define": "IAS_ZONE_CLUSTER",
-          "side": "server",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "ZoneStatusChangeNotification",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "ZoneEnrollRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "zone state",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "enum8",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "zone type",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "enum16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "zone status",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "IAS CIE address",
-              "code": 16,
-              "mfgCode": null,
-              "side": "server",
-              "type": "node_id",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "Zone ID",
-              "code": 17,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "Test Cluster",
           "code": 4294048773,
           "mfgCode": null,
@@ -11018,7 +10858,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "PowerSourceStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11098,7 +10938,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "WiredCurrentType",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11190,7 +11030,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryVoltage",
+              "name": "BatVoltage",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -11206,7 +11046,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPercentRemaining",
+              "name": "BatPercentRemaining",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -11222,7 +11062,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeRemaining",
+              "name": "BatTimeRemaining",
               "code": 13,
               "mfgCode": null,
               "side": "server",
@@ -11238,11 +11078,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeLevel",
+              "name": "BatChargeLevel",
               "code": 14,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeLevel",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11254,7 +11094,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplacementNeeded",
+              "name": "BatReplacementNeeded",
               "code": 15,
               "mfgCode": null,
               "side": "server",
@@ -11270,11 +11110,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplaceability",
+              "name": "BatReplaceability",
               "code": 16,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatReplaceability",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11286,7 +11126,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPresent",
+              "name": "BatPresent",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -11302,7 +11142,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryFaults",
+              "name": "ActiveBatFaults",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -11318,7 +11158,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplacementDescription",
+              "name": "BatReplacementDescription",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -11334,7 +11174,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryCommonDesignation",
+              "name": "BatCommonDesignation",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -11350,7 +11190,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryANSIDesignation",
+              "name": "BatANSIDesignation",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -11366,7 +11206,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryIECDesignation",
+              "name": "BatIECDesignation",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -11382,7 +11222,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryApprovedChemistry",
+              "name": "BatApprovedChemistry",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -11398,7 +11238,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryCapacity",
+              "name": "BatCapacity",
               "code": 24,
               "mfgCode": null,
               "side": "server",
@@ -11414,7 +11254,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryQuantity",
+              "name": "BatQuantity",
               "code": 25,
               "mfgCode": null,
               "side": "server",
@@ -11430,11 +11270,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeState",
+              "name": "BatChargeState",
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeState",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11446,7 +11286,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeToFullCharge",
+              "name": "BatTimeToFullCharge",
               "code": 27,
               "mfgCode": null,
               "side": "server",
@@ -11462,7 +11302,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryFunctionalWhileCharging",
+              "name": "BatFunctionalWhileCharging",
               "code": 28,
               "mfgCode": null,
               "side": "server",
@@ -11478,7 +11318,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargingCurrent",
+              "name": "BatChargingCurrent",
               "code": 29,
               "mfgCode": null,
               "side": "server",
@@ -11494,7 +11334,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryChargeFaults",
+              "name": "ActiveBatChargeFaults",
               "code": 30,
               "mfgCode": null,
               "side": "server",
@@ -13693,7 +13533,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "OperationalStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13869,7 +13709,7 @@
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap16",
+              "type": "SafetyStatus",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -17270,182 +17110,6 @@
           ]
         },
         {
-          "name": "IAS Zone",
-          "code": 1280,
-          "mfgCode": null,
-          "define": "IAS_ZONE_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "ZoneEnrollResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "IAS Zone",
-          "code": 1280,
-          "mfgCode": null,
-          "define": "IAS_ZONE_CLUSTER",
-          "side": "server",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "ZoneStatusChangeNotification",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ZoneEnrollRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "zone state",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "enum8",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "zone type",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "enum16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "zone status",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "IAS CIE address",
-              "code": 16,
-              "mfgCode": null,
-              "side": "server",
-              "type": "node_id",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "Zone ID",
-              "code": 17,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
           "name": "Wake on LAN",
           "code": 1283,
           "mfgCode": null,
@@ -19157,6 +18821,252 @@
           ]
         },
         {
+          "name": "Electrical Measurement",
+          "code": 2820,
+          "mfgCode": null,
+          "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Electrical Measurement",
+          "code": 2820,
+          "mfgCode": null,
+          "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
+          "side": "server",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "measurement type",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x000000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "total active power",
+              "code": 772,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int32s",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x000000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "rms voltage",
+              "code": 1285,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "rms voltage min",
+              "code": 1286,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x8000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "rms voltage max",
+              "code": 1287,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x8000",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "rms current",
+              "code": 1288,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "rms current min",
+              "code": 1289,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "rms current max",
+              "code": 1290,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "active power",
+              "code": 1291,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16s",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "active power min",
+              "code": 1292,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16s",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "active power max",
+              "code": 1293,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16s",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0xffff",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Test Cluster",
           "code": 4294048773,
           "mfgCode": null,
@@ -20747,252 +20657,6 @@
               "reportableChange": 0
             }
           ]
-        },
-        {
-          "name": "Electrical Measurement",
-          "code": 2820,
-          "mfgCode": null,
-          "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "commands": [],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "Electrical Measurement",
-          "code": 2820,
-          "mfgCode": null,
-          "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
-          "side": "server",
-          "enabled": 0,
-          "commands": [],
-          "attributes": [
-            {
-              "name": "measurement type",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x000000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "total active power",
-              "code": 772,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int32s",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x000000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "rms voltage",
-              "code": 1285,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "rms voltage min",
-              "code": 1286,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x8000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "rms voltage max",
-              "code": 1287,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x8000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "rms current",
-              "code": 1288,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "rms current min",
-              "code": 1289,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "rms current max",
-              "code": 1290,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "active power",
-              "code": 1291,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16s",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "active power min",
-              "code": 1292,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16s",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "active power max",
-              "code": 1293,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16s",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xffff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "FeatureMap",
-              "code": 65532,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap32",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "3",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
         }
       ]
     },
@@ -22331,7 +21995,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "PowerSourceStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -22411,7 +22075,7 @@
               "code": 5,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "WiredCurrentType",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -22503,7 +22167,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryVoltage",
+              "name": "BatVoltage",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -22519,7 +22183,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPercentRemaining",
+              "name": "BatPercentRemaining",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -22535,7 +22199,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeRemaining",
+              "name": "BatTimeRemaining",
               "code": 13,
               "mfgCode": null,
               "side": "server",
@@ -22551,11 +22215,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeLevel",
+              "name": "BatChargeLevel",
               "code": 14,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeLevel",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -22567,7 +22231,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplacementNeeded",
+              "name": "BatReplacementNeeded",
               "code": 15,
               "mfgCode": null,
               "side": "server",
@@ -22583,11 +22247,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplaceability",
+              "name": "BatReplaceability",
               "code": 16,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatReplaceability",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -22599,7 +22263,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPresent",
+              "name": "BatPresent",
               "code": 17,
               "mfgCode": null,
               "side": "server",
@@ -22615,7 +22279,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryFaults",
+              "name": "ActiveBatFaults",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -22631,7 +22295,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryReplacementDescription",
+              "name": "BatReplacementDescription",
               "code": 19,
               "mfgCode": null,
               "side": "server",
@@ -22647,7 +22311,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryCommonDesignation",
+              "name": "BatCommonDesignation",
               "code": 20,
               "mfgCode": null,
               "side": "server",
@@ -22663,7 +22327,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryANSIDesignation",
+              "name": "BatANSIDesignation",
               "code": 21,
               "mfgCode": null,
               "side": "server",
@@ -22679,7 +22343,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryIECDesignation",
+              "name": "BatIECDesignation",
               "code": 22,
               "mfgCode": null,
               "side": "server",
@@ -22695,7 +22359,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryApprovedChemistry",
+              "name": "BatApprovedChemistry",
               "code": 23,
               "mfgCode": null,
               "side": "server",
@@ -22711,7 +22375,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryCapacity",
+              "name": "BatCapacity",
               "code": 24,
               "mfgCode": null,
               "side": "server",
@@ -22727,7 +22391,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryQuantity",
+              "name": "BatQuantity",
               "code": 25,
               "mfgCode": null,
               "side": "server",
@@ -22743,11 +22407,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeState",
+              "name": "BatChargeState",
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeState",
               "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
@@ -22759,7 +22423,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeToFullCharge",
+              "name": "BatTimeToFullCharge",
               "code": 27,
               "mfgCode": null,
               "side": "server",
@@ -22775,7 +22439,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryFunctionalWhileCharging",
+              "name": "BatFunctionalWhileCharging",
               "code": 28,
               "mfgCode": null,
               "side": "server",
@@ -22791,7 +22455,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargingCurrent",
+              "name": "BatChargingCurrent",
               "code": 29,
               "mfgCode": null,
               "side": "server",
@@ -22807,7 +22471,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryChargeFaults",
+              "name": "ActiveBatChargeFaults",
               "code": 30,
               "mfgCode": null,
               "side": "server",
@@ -24594,166 +24258,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "IAS Zone",
-          "code": 1280,
-          "mfgCode": null,
-          "define": "IAS_ZONE_CLUSTER",
-          "side": "client",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "ZoneEnrollResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "client",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            }
-          ]
-        },
-        {
-          "name": "IAS Zone",
-          "code": 1280,
-          "mfgCode": null,
-          "define": "IAS_ZONE_CLUSTER",
-          "side": "server",
-          "enabled": 0,
-          "commands": [
-            {
-              "name": "ZoneStatusChangeNotification",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ZoneEnrollRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
-          "attributes": [
-            {
-              "name": "zone state",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "type": "enum8",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "zone type",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "enum16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "zone status",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "bitmap16",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0000",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "IAS CIE address",
-              "code": 16,
-              "mfgCode": null,
-              "side": "server",
-              "type": "node_id",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "Zone ID",
-              "code": 17,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0xff",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "ClusterRevision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int16u",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
