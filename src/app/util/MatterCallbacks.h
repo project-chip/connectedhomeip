@@ -30,7 +30,7 @@ void MatterPostAttributeWriteCallback(const chip::app::ConcreteAttributePath & a
  * before the command is dispatched to the receiver.
  */
 CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                            chip::FabricIndex fabricIndex);
+                                            const chip::Access::SubjectDescriptor & subjectDescriptor);
 
 /** @brief Matter Post Command Received
  *
@@ -38,4 +38,4 @@ CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath
  * after it being dispatched to the receiver.
  */
 void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                       chip::FabricIndex fabricIndex);
+                                       const chip::Access::SubjectDescriptor & subjectDescriptor);
