@@ -236,7 +236,10 @@ private:
     // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override {}
+    void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override
+    {
+        VerifyOrDieWithMsg(false, InteractionModel, "not expect a response, either caused by faulty logic, or at the EC that needs to be fixed.");
+    }
 
     enum class State
     {
