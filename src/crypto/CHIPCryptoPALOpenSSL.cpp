@@ -629,7 +629,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
     static_assert(P256ECDSASignature::Capacity() >= kP256_ECDSA_Signature_Length_Raw, "P256ECDSASignature must be large enough");
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit((mUsage == SupportedECKeyUsages::SIGNING), CHIP_ERROR_WRONG_KEY_TYPE);
+    VerifyOrExit((mUsage == SupportedECKeyUsages::SIGNING), error = CHIP_ERROR_WRONG_KEY_TYPE);
     nid = _nidForCurve(MapECName(mPublicKey.Type()));
     VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -850,7 +850,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit((mUsage == SupportedECKeyUsages::DERIVING), CHIP_ERROR_WRONG_KEY_TYPE);
+    VerifyOrExit((mUsage == SupportedECKeyUsages::DERIVING), error = CHIP_ERROR_WRONG_KEY_TYPE);
 
     local_key = EVP_PKEY_new();
     VerifyOrExit(local_key != nullptr, error = CHIP_ERROR_INTERNAL);
