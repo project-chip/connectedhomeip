@@ -340,11 +340,29 @@ private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
 
-template <typename PK, typename Secret, typename Sig>
-class ECPKeypair
+template <typename PK, typename Serialized, typename Sig, typename Secret>
+class ECKeypair
 {
 public:
     virtual ~ECPKeypair() {}
+
+    /**
+     * @brief Initialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Initialize() = 0;
+
+    /**
+     * @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Serialize(Serialized & output) const = 0;
+
+    /**
+     * @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Deserialize(Serialized & input) = 0;
 
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
@@ -374,6 +392,13 @@ public:
     virtual CHIP_ERROR ECDH_derive_secret(const PK & remote_public_key, Secret & out_secret) const = 0;
 
     virtual const PK & Pubkey() const = 0;
+
+    /** Release resources associated with this key pair */
+    virtual void Clear() = 0;
+
+protected:
+    bool mInitialized = false;
+    PK mPublicKey;
 };
 
 struct alignas(size_t) P256KeypairContext
@@ -381,32 +406,12 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
-class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
-{
-public:
-    /**
-     * @brief Initialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Initialize() = 0;
-
-    /**
-     * @brief Serialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const = 0;
-
-    /**
-     * @brief Deserialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) = 0;
-};
-
-class P256Keypair : public P256KeypairBase
+class P256Keypair : public ECKeypair<P256PublicKey, P256SerializedKeypair, P256ECDSASignature, P256ECDHDerivedSecret>
 {
 public:
     P256Keypair() {}
+
+
     ~P256Keypair() override;
 
     /**
@@ -466,12 +471,10 @@ public:
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
     /** Release resources associated with this key pair */
-    void Clear();
+    void Clear() override;
 
 private:
-    P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
-    bool mInitialized = false;
 };
 
 /**
