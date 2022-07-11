@@ -56,7 +56,6 @@ config("p6_sdk_config") {
   # Pull out static libs (.a files) from generated json
   libs = []
   foreach(lib, mtb_json.libs) {
-
     # Path is relative to SDK
     lib = "${p6_sdk_build_root}/p6_sdk/${lib}"
 
