@@ -304,7 +304,8 @@ def main(argv: Sequence[str]) -> None:
                       choices=['nrfconnect', 'esp32', 'linux', 'silabs-thread'],
                       metavar="TARGET",
                       default="esp32")
-    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="do_rpc")
+    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c",
+                      action="store_true", dest="do_rpc", default=False)
     parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
                       action="store_true", dest="do_automated_test_stamp")
     parser.add_option("-v", "--vid", dest="vid", type=int,
@@ -617,7 +618,7 @@ def main(argv: Sequence[str]) -> None:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
-                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={"1" if options.do_rpc else "0"}"]',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
             ])
             if options.cpu_type == "arm64":
                 uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
