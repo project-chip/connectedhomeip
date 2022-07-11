@@ -1224,7 +1224,7 @@ CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray p
     SuccessOrExit(err);
 
     env->ExceptionClear();
-    constructor = env->GetMethodID(paramsClass, "<init>", "(JI[B)V");
+    constructor = env->GetMethodID(paramsClass, "<init>", "(J[B)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     outParams = (jobject) env->NewObject(paramsClass, constructor, setupPincode, paseVerifier);
