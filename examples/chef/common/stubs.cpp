@@ -6,16 +6,15 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 
-
-bool
-emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode, chip::app::Clusters::DoorLock::DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
+                                            chip::app::Clusters::DoorLock::DlOperationError & err)
 {
     err = DlOperationError::kUnspecified;
     return true;
 }
 
-bool
-emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode, chip::app::Clusters::DoorLock::DlOperationError & err)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const chip::Optional<chip::ByteSpan> & pinCode,
+                                              chip::app::Clusters::DoorLock::DlOperationError & err)
 {
     err = DlOperationError::kUnspecified;
     return true;
