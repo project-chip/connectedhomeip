@@ -181,6 +181,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-all-clusters-app-nodeps-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-all-clusters-app-nodeps-ipv6only
 
+# Generating linux-x64-all-clusters-clang-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=use_coverage=true is_clang=true' {out}/linux-x64-all-clusters-clang-coverage
+
 # Generating linux-x64-all-clusters-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
 
@@ -201,6 +204,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--
 
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
+
+# Generating linux-x64-chip-tool-clang-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=use_coverage=true is_clang=true' {out}/linux-x64-chip-tool-clang-coverage
 
 # Generating linux-x64-chip-tool-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
@@ -267,6 +273,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} --a
 
 # Generating linux-x64-tests-clang
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=is_clang=true chip_build_tests=true' {out}/linux-x64-tests-clang
+
+# Generating linux-x64-tests-clang-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=use_coverage=true is_clang=true chip_build_tests=true' {out}/linux-x64-tests-clang-coverage
 
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
@@ -400,6 +409,9 @@ ninja -C {out}/linux-x64-all-clusters-app-nodeps
 # Building linux-x64-all-clusters-app-nodeps-ipv6only
 ninja -C {out}/linux-x64-all-clusters-app-nodeps-ipv6only
 
+# Building linux-x64-all-clusters-clang-coverage
+ninja -C {out}/linux-x64-all-clusters-clang-coverage
+
 # Building linux-x64-all-clusters-ipv6only
 ninja -C {out}/linux-x64-all-clusters-ipv6only
 
@@ -420,6 +432,9 @@ ninja -C {out}/linux-x64-chip-cert src/tools/chip-cert
 
 # Building linux-x64-chip-tool
 ninja -C {out}/linux-x64-chip-tool
+
+# Building linux-x64-chip-tool-clang-coverage
+ninja -C {out}/linux-x64-chip-tool-clang-coverage
 
 # Building linux-x64-chip-tool-ipv6only
 ninja -C {out}/linux-x64-chip-tool-ipv6only
@@ -486,6 +501,9 @@ ninja -C {out}/linux-x64-tests check
 
 # Building linux-x64-tests-clang
 ninja -C {out}/linux-x64-tests-clang check
+
+# Building linux-x64-tests-clang-coverage
+ninja -C {out}/linux-x64-tests-clang-coverage check
 
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat
