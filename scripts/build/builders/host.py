@@ -334,6 +334,11 @@ class HostBuilder(GnBuilder):
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
             self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
+    def PreBuildCommand(self):
+        if self.app == HostApp.TESTS and self.use_coverage:
+            self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
+            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
+
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
@@ -341,7 +346,7 @@ class HostBuilder(GnBuilder):
                            '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
                 ], title="Final coverage info")
-            self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+            self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory', os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
 
     def build_outputs(self):
         outputs = {}
