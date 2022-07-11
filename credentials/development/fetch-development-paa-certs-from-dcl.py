@@ -41,14 +41,18 @@ def parse_paa_root_certs(cmdpipe, paa_list):
     example output of a query to all x509 root certs in DCL:
 
     certs:
-    - subject: CN=Non Production ONLY - XFN PAA Class 3
-      subject_key_id: F8:99:A9:D5:AD:71:71:E4:C3:81:7F:14:10:7F:78:F0:D9:F7:62:E9
-    - subject: CN=Matter Development PAA
-      subject_key_id: FA:92:CF:9:5E:FA:42:E1:14:30:65:16:32:FE:FE:1B:2C:77:A7:C8
-    - subject: CN=Matter PAA 1,O=Google,C=US,1.3.6.1.4.1.37244.2.1=#130436303036
-      subject_key_id: B0:0:56:81:B8:88:62:89:62:80:E1:21:18:A1:A8:BE:9:DE:93:21
-    - subject: CN=Matter Test PAA,1.3.6.1.4.1.37244.2.1=#130431323544
-      subject_key_id: E2:90:8D:36:9C:3C:A3:C1:13:BB:9:E2:4D:C1:CC:C5:A6:66:91:D4
+    - subject: MCExHzAdBgNVBAMMFk1hdHRlciBEZXZlbG9wbWVudCBQQUE=
+    subjectKeyId: FA:92:CF:09:5E:FA:42:E1:14:30:65:16:32:FE:FE:1B:2C:77:A7:C8
+    - subject: MDAxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEUMBIGCisGAQQBgqJ8AgEMBDEyNUQ=
+    subjectKeyId: E2:90:8D:36:9C:3C:A3:C1:13:BB:09:E2:4D:C1:CC:C5:A6:66:91:D4
+    - subject: MEsxCzAJBgNVBAYTAlVTMQ8wDQYDVQQKDAZHb29nbGUxFTATBgNVBAMMDE1hdHRlciBQQUEgMTEUMBIGCisGAQQBgqJ8AgEMBDYwMDY=
+    subjectKeyId: B0:00:56:81:B8:88:62:89:62:80:E1:21:18:A1:A8:BE:09:DE:93:21
+    - subject: MFUxCzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5EaWdpQ2VydCwgSW5jLjEtMCsGA1UEAxMkRGlnaUNlcnQgVEVTVCBSb290IENBIGZvciBNQVRURVIgUEtJ
+    subjectKeyId: C0:E0:64:15:00:EC:67:E2:7C:AF:7C:6E:2D:49:94:C7:73:DE:B7:BA
+    - subject: MDAxLjAsBgNVBAMMJU5vbiBQcm9kdWN0aW9uIE9OTFkgLSBYRk4gUEFBIENsYXNzIDM=
+    subjectKeyId: F8:99:A9:D5:AD:71:71:E4:C3:81:7F:14:10:7F:78:F0:D9:F7:62:E9
+    - subject: MEIxGDAWBgNVBAMMD01hdHRlciBUZXN0IFBBQTEQMA4GA1UECgwHU2Ftc3VuZzEUMBIGCisGAQQBgqJ8AgEMBDEwRTE=
+    subjectKeyId: CF:9E:0A:16:78:8B:40:30:EC:DD:AB:34:B9:C2:EC:7B:E5:34:55:C0
 
     Brief:
     This method will search for the first line that contains ': ' char sequence.
@@ -74,6 +78,9 @@ def parse_paa_root_certs(cmdpipe, paa_list):
 
 
 def write_paa_root_cert(cmdpipe, subject):
+    pem_read = False
+    subject_as_text_read = False
+
     filename = 'paa-root-certs/dcld_mirror_' + \
         re.sub('[^a-zA-Z0-9_-]', '', re.sub('[=, ]', '_', subject))
     with open(filename + '.pem', 'wb+') as outfile:
@@ -82,19 +89,30 @@ def write_paa_root_cert(cmdpipe, subject):
             if not line:
                 break
             else:
-                if b'pem_cert: |' in line:
+                if b'pemCert: |' in line:
                     while True:
                         line = cmdpipe.stdout.readline()
                         outfile.write(line.strip(b' \t'))
                         if b'-----END CERTIFICATE-----' in line:
+                            pem_read = True
                             break
-    # convert pem file to der
-    with open(filename + '.pem', 'rb') as infile:
-        pem_certificate = x509.load_pem_x509_certificate(infile.read())
-    with open(filename + '.der', 'wb+') as outfile:
-        der_certificate = pem_certificate.public_bytes(
-            serialization.Encoding.DER)
-        outfile.write(der_certificate)
+                if b'subjectAsText:' in line:
+                    new_subject = line.split(b': ')[1].strip().decode("utf-8")
+                    new_filename = 'paa-root-certs/dcld_mirror_' + \
+                        re.sub('[=,\\\\ ]', '_', new_subject)
+                    subject_as_text_read = True
+                    break
+
+    # if successfully obtained all mandatory fields from the root certificate
+    if pem_read == True and subject_as_text_read == True:
+        os.rename(filename + '.pem', new_filename + '.pem')
+        # convert pem file to der
+        with open(new_filename + '.pem', 'rb') as infile:
+            pem_certificate = x509.load_pem_x509_certificate(infile.read())
+        with open(new_filename + '.der', 'wb+') as outfile:
+            der_certificate = pem_certificate.public_bytes(
+                serialization.Encoding.DER)
+            outfile.write(der_certificate)
 
 
 def main():
@@ -120,7 +138,7 @@ def main():
     for paa in paa_list:
         cmdpipe = subprocess.Popen(
             [dcld, 'query', 'pki', 'x509-cert', '-u',
-                paa[b'subject'].decode("utf-8"), '-k', paa[b'subject_key_id'].decode("utf-8")],
+                paa[b'subject'].decode("utf-8"), '-k', paa[b'subjectKeyId'].decode("utf-8")],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         write_paa_root_cert(cmdpipe, paa[b'subject'].decode("utf-8"))
 
