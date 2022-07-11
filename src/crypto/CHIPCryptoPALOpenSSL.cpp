@@ -988,6 +988,13 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::Initialize(P256PlaintextKeypair & input)
+{
+    // For crypto libraries who don't manage keys, plaintext and serialised
+    // format is the same.
+    return Deserialize(static_cast<P256SerializedKeypair &>(input));
+}
+
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;

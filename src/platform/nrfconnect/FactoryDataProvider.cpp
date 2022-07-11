@@ -26,11 +26,11 @@ namespace {
 
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair)
 {
-    Crypto::P256SerializedKeypair serializedKeypair;
-    ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
-    memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
-    memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
+    Crypto::P256PlaintextKeypair plaintextKeypair;
+    ReturnErrorOnFailure(plaintextKeypair.SetLength(privateKey.size() + publicKey.size()));
+    memcpy(plaintextKeypair.Bytes(), publicKey.data(), publicKey.size());
+    memcpy(plaintextKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
+    return keypair.Initialize(plaintextKeypair);
 }
 } // namespace
 

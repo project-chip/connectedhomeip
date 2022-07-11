@@ -56,11 +56,11 @@ public:
 
     TestOnlyLocalCertificateAuthority & Init()
     {
-        Crypto::P256SerializedKeypair emptyKeypair;
+        Crypto::P256PlaintextKeypair emptyKeypair;
         return Init(emptyKeypair);
     }
 
-    TestOnlyLocalCertificateAuthority & Init(Crypto::P256SerializedKeypair & rootKeyPair)
+    TestOnlyLocalCertificateAuthority & Init(Crypto::P256PlaintextKeypair & rootKeyPair)
     {
         SuccessOrExit(mCurrentStatus);
 
@@ -69,13 +69,14 @@ public:
 
         if (rootKeyPair.Length() != 0)
         {
-            mCurrentStatus = mRootKeypair->Deserialize(rootKeyPair);
-            SuccessOrExit(mCurrentStatus);
+            mCurrentStatus = mRootKeypair->Initialize(rootKeyPair);
         }
         else
         {
-            mRootKeypair->Initialize();
+            mCurrentStatus = mRootKeypair->Initialize();
         }
+        SuccessOrExit(mCurrentStatus);
+
         mCurrentStatus = GenerateRootCert(*mRootKeypair.get());
         SuccessOrExit(mCurrentStatus);
     exit:

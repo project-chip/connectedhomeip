@@ -40,20 +40,20 @@ namespace {
 
 KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
 {
-    static uint32_t p256SerializedKeypairLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
+    static uint32_t p256PlaintextKeypairLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
     static const char * ecPEMMarker          = "-----BEGIN EC PRIVATE KEY-----";
     static const char * pkcs8PEMMarker       = "-----BEGIN PRIVATE KEY-----";
     static const char * ecPUBPEMMarker       = "-----BEGIN PUBLIC KEY-----";
     static const char * chipHexPrefix        = "04c2";
     static const size_t chipHexPrefixLen     = strlen(chipHexPrefix);
-    static const size_t chipHexMinLen        = HEX_ENCODED_LENGTH(p256SerializedKeypairLen);
+    static const size_t chipHexMinLen        = HEX_ENCODED_LENGTH(p256PlaintextKeypairLen);
 
-    if (keyLen == p256SerializedKeypairLen)
+    if (keyLen == p256PlaintextKeypairLen)
     {
         return kKeyFormat_Chip_Raw;
     }
 
-    if (keyLen == BASE64_ENCODED_LEN(p256SerializedKeypairLen))
+    if (keyLen == BASE64_ENCODED_LEN(p256PlaintextKeypairLen))
     {
         return kKeyFormat_Chip_Base64;
     }
@@ -115,14 +115,14 @@ exit:
 
 } // namespace
 
-bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
+bool ExportKeyPair(EVP_PKEY * key, P256PlaintextKeypair & plaintextKeypair)
 {
     bool res                 = true;
     const BIGNUM * privKeyBN = nullptr;
     const EC_GROUP * group   = nullptr;
     const EC_KEY * ecKey     = nullptr;
     const EC_POINT * ecPoint = nullptr;
-    uint8_t * pubKey         = serializedKeypair.Bytes();
+    uint8_t * pubKey         = plaintextKeypair.Bytes();
     uint8_t * privKey        = pubKey + kP256_PublicKey_Length;
     size_t pubKeyLen         = 0;
     int privKeyLen           = 0;
@@ -146,7 +146,7 @@ bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
     privKeyLen = BN_bn2binpad(privKeyBN, privKey, kP256_PrivateKey_Length);
     VerifyOrExit(privKeyLen == kP256_PrivateKey_Length, res = false);
 
-    serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
+    plaintextKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
 
 exit:
     return res;
@@ -286,8 +286,8 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     FILE * file            = nullptr;
     uint8_t * keyToWrite   = nullptr;
     uint32_t keyToWriteLen = 0;
-    P256SerializedKeypair serializedKeypair;
-    uint32_t chipKeySize        = serializedKeypair.Capacity();
+    P256PlaintextKeypair   plaintextKeypair;
+    uint32_t chipKeySize        = plaintextKeypair.Capacity();
     uint32_t chipKeyDecodedSize = HEX_ENCODED_LENGTH(chipKeySize);
     std::unique_ptr<uint8_t[]> chipKey(new uint8_t[chipKeySize]);
     std::unique_ptr<uint8_t[]> chipKeyDecoded(new uint8_t[chipKeyDecodedSize]);
@@ -320,12 +320,12 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     case kKeyFormat_Chip_Raw:
     case kKeyFormat_Chip_Hex:
     case kKeyFormat_Chip_Base64:
-        res = SerializeKeyPair(key, serializedKeypair);
+        res = ExportKeyPair(key, plaintextKeypair);
         VerifyTrueOrExit(res);
 
         if (keyFmt == kKeyFormat_Chip_Base64)
         {
-            res = Base64Encode(serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), chipKeyDecoded.get(),
+            res = Base64Encode(plaintextKeypair.Bytes(), static_cast<uint32_t>(plaintextKeypair.Length()), chipKeyDecoded.get(),
                                chipKeyDecodedSize, chipKeyDecodedSize);
             VerifyTrueOrExit(res);
 
@@ -337,15 +337,15 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
             char * keyHex = reinterpret_cast<char *>(chipKeyDecoded.get());
 
             SuccessOrExit(Encoding::BytesToLowercaseHexBuffer(
-                serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), keyHex, chipKeyDecodedSize));
+                plaintextKeypair.Bytes(), static_cast<uint32_t>(plaintextKeypair.Length()), keyHex, chipKeyDecodedSize));
 
             keyToWrite    = chipKeyDecoded.get();
             keyToWriteLen = chipKeyDecodedSize;
         }
         else
         {
-            keyToWrite    = serializedKeypair.Bytes();
-            keyToWriteLen = static_cast<uint32_t>(serializedKeypair.Length());
+            keyToWrite    = plaintextKeypair.Bytes();
+            keyToWriteLen = static_cast<uint32_t>(plaintextKeypair.Length());
         }
 
         if (fwrite(keyToWrite, 1, keyToWriteLen, file) != keyToWriteLen)

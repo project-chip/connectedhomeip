@@ -135,14 +135,13 @@ CHIP_ERROR JNIDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan
     return GetJavaByteByMethod(mGetProductAttestationIntermediateCertMethod, out_pai_buffer);
 }
 
-// TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
+    Crypto::P256PlaintextKeypair plaintext_keypair;
+    ReturnErrorOnFailure(plaintext_keypair.SetLength(private_key.size() + public_key.size()));
+    memcpy(plaintext_keypair.Bytes(), public_key.data(), public_key.size());
+    memcpy(plaintext_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
+    return keypair.Initialize(plaintext_keypair);
 }
 
 CHIP_ERROR JNIDACProvider::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer)

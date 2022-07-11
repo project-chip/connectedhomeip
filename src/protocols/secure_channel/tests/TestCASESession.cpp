@@ -199,19 +199,19 @@ CHIP_ERROR InitCredentialSets()
 
     FabricInfo commissionerFabric;
     {
-        P256SerializedKeypair opKeysSerialized;
+        P256PlaintextKeypair opKeysPlaintext;
 
         // TODO: Rename gCommissioner* to gInitiator*
-        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
-        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
+        memcpy((uint8_t *) (opKeysPlaintext), sTestCert_Node01_02_PublicKey, sTestCert_Node01_02_PublicKey_Len);
+        memcpy((uint8_t *) (opKeysPlaintext) + sTestCert_Node01_02_PublicKey_Len, sTestCert_Node01_02_PrivateKey,
                sTestCert_Node01_02_PrivateKey_Len);
 
-        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
+        ReturnErrorOnFailure(opKeysPlaintext.SetLength(sTestCert_Node01_02_PublicKey_Len + sTestCert_Node01_02_PrivateKey_Len));
 
         chip::ByteSpan rcacSpan(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len);
         chip::ByteSpan icacSpan(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len);
         chip::ByteSpan nocSpan(sTestCert_Node01_02_Chip, sTestCert_Node01_02_Chip_Len);
-        chip::ByteSpan opKeySpan(opKeysSerialized.ConstBytes(), opKeysSerialized.Length());
+        chip::ByteSpan opKeySpan(opKeysPlaintext.ConstBytes(), opKeysPlaintext.Length());
 
         ReturnErrorOnFailure(
             gCommissionerFabrics.AddNewFabricForTest(rcacSpan, icacSpan, nocSpan, opKeySpan, &gCommissionerFabricIndex));
@@ -227,16 +227,16 @@ CHIP_ERROR InitCredentialSets()
     FabricInfo deviceFabric;
 
     {
-        P256SerializedKeypair opKeysSerialized;
+        P256PlaintextKeypair opKeysPlaintext;
 
         auto deviceOpKey = Platform::MakeUnique<Crypto::P256Keypair>();
-        memcpy((uint8_t *) (opKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-        memcpy((uint8_t *) (opKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+        memcpy((uint8_t *) (opKeysPlaintext), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+        memcpy((uint8_t *) (opKeysPlaintext) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
                sTestCert_Node01_01_PrivateKey_Len);
 
-        ReturnErrorOnFailure(opKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
+        ReturnErrorOnFailure(opKeysPlaintext.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len));
 
-        ReturnErrorOnFailure(deviceOpKey->Deserialize(opKeysSerialized));
+        ReturnErrorOnFailure(deviceOpKey->Initialize(opKeysPlaintext));
 
         // Use an injected operational key for device
         gDeviceOperationalKeystore.Init(1, std::move(deviceOpKey));

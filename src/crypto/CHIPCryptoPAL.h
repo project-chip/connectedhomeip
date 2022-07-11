@@ -76,6 +76,7 @@ constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 constexpr size_t kP256_PrivateKey_Length  = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length   = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 constexpr size_t kMax_SerializeKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
+constexpr size_t kMax_PlaintextKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
 
 constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
@@ -272,6 +273,8 @@ typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 
 typedef CapacityBoundBuffer<kMax_SerializeKey_Length> P256SerializedKeypair;
 
+typedef CapacityBoundBuffer<kMax_PlaintextKey_Length> P256PlaintextKeypair;
+
 template <typename Sig>
 class ECPublicKey
 {
@@ -346,7 +349,7 @@ private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
 
-template <typename PK, typename Serialized, typename Sig, typename Secret>
+template <typename PK, typename Plaintext, typename Serialized, typename Sig, typename Secret>
 class ECKeypair
 {
 public:
@@ -367,6 +370,25 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Initialize() = 0;
+
+    /**
+     * @brief Initialize the keypair by importing a plaintext key.
+     *
+     * This function takes a key in plaintext format to initialize
+     * the keypair object. Multiple keys can be instantiated from the
+     * same plaintext bytes.
+     *
+     * The plaintext format is defined as the binary concatenation of
+     * the public key and the private key, both in uncompressed form.
+     * For a key on the P256 curve, this means the plaintext key starts
+     * with a byte set to 0x04, followed by 32 bytes of public key X-coordinate,
+     * followed by 32 bytes of public key Y-coordinate, followed by
+     * 32 bytes of private key (all MSB first and zero-extended to
+     * the left if necessary).
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Initialize(Plaintext & input) = 0;
 
     /**
      * @brief Serialize the keypair.
@@ -423,7 +445,7 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
-class P256Keypair : public ECKeypair<P256PublicKey, P256SerializedKeypair, P256ECDSASignature, P256ECDHDerivedSecret>
+class P256Keypair : public ECKeypair<P256PublicKey, P256PlaintextKeypair, P256SerializedKeypair, P256ECDSASignature, P256ECDHDerivedSecret>
 {
 public:
     P256Keypair() {}
@@ -433,10 +455,29 @@ public:
     ~P256Keypair() override;
 
     /**
-     * @brief Initialize the keypair.
+     * @brief Initialize the keypair by generating a new key.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Initialize() override;
+
+    /**
+     * @brief Initialize the keypair by importing a plaintext key.
+     *
+     * This function takes a key in plaintext format to initialize
+     * the keypair object. Multiple keys can be instantiated from the
+     * same plaintext bytes.
+     *
+     * The plaintext format is defined as the binary concatenation of
+     * the public key and the private key, both in uncompressed form.
+     * For a key on the P256 curve, this means the plaintext key starts
+     * with a byte set to 0x04, followed by 32 bytes of public key X-coordinate,
+     * followed by 32 bytes of public key Y-coordinate, followed by
+     * 32 bytes of private key (all MSB first and zero-extended to
+     * the left if necessary).
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Initialize(P256PlaintextKeypair & input) override;
 
     /**
      * @brief Serialize the keypair.

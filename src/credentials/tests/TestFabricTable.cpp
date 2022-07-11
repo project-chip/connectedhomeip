@@ -88,10 +88,10 @@ private:
  */
 static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & fabricTable, bool doCommit)
 {
-    Crypto::P256SerializedKeypair opKeysSerialized;
+    Crypto::P256PlaintextKeypair opKeysPlaintext;
     FabricIndex fabricIndex;
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
+    memcpy((uint8_t *) (opKeysPlaintext), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
+    memcpy((uint8_t *) (opKeysPlaintext) + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
            TestCerts::sTestCert_Node01_01_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
@@ -99,9 +99,9 @@ static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & 
     ByteSpan nocSpan(TestCerts::sTestCert_Node01_01_Chip, TestCerts::sTestCert_Node01_01_Chip_Len);
 
     NL_TEST_ASSERT(inSuite,
-                   opKeysSerialized.SetLength(TestCerts::sTestCert_Node01_01_PublicKey_Len +
-                                              TestCerts::sTestCert_Node01_01_PrivateKey_Len) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gFabric1OpKey.Deserialize(opKeysSerialized) == CHIP_NO_ERROR);
+                   opKeysPlaintext.SetLength(TestCerts::sTestCert_Node01_01_PublicKey_Len +
+                                             TestCerts::sTestCert_Node01_01_PrivateKey_Len) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gFabric1OpKey.Initialize(opKeysPlaintext) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
 
@@ -123,10 +123,10 @@ static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & 
  */
 static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & fabricTable, bool doCommit)
 {
-    Crypto::P256SerializedKeypair opKeysSerialized;
+    Crypto::P256PlaintextKeypair opKeysPlaintext;
     FabricIndex fabricIndex;
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
+    memcpy((uint8_t *) (opKeysPlaintext), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
+    memcpy((uint8_t *) (opKeysPlaintext) + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
            TestCerts::sTestCert_Node02_01_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root02_Chip, TestCerts::sTestCert_Root02_Chip_Len);
@@ -134,9 +134,9 @@ static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & 
     ByteSpan nocSpan(TestCerts::sTestCert_Node02_01_Chip, TestCerts::sTestCert_Node02_01_Chip_Len);
 
     NL_TEST_ASSERT(inSuite,
-                   opKeysSerialized.SetLength(TestCerts::sTestCert_Node02_01_PublicKey_Len +
+                   opKeysPlaintext.SetLength(TestCerts::sTestCert_Node02_01_PublicKey_Len +
                                               TestCerts::sTestCert_Node02_01_PrivateKey_Len) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gFabric2OpKey.Deserialize(opKeysSerialized) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gFabric2OpKey.Initialize(opKeysPlaintext) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);
 

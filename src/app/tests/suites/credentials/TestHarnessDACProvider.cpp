@@ -92,14 +92,13 @@ ByteSpan ReadValue(Json::Value jsonValue, uint8_t * buffer, size_t bufferLen)
     return ByteSpan(buffer, bytesLen);
 }
 
-// TODO: This should be moved to a method of P256Keypair
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
-    Crypto::P256SerializedKeypair serialized_keypair;
-    ReturnErrorOnFailure(serialized_keypair.SetLength(private_key.size() + public_key.size()));
-    memcpy(serialized_keypair.Bytes(), public_key.data(), public_key.size());
-    memcpy(serialized_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
-    return keypair.Deserialize(serialized_keypair);
+    Crypto::P256PlaintextKeypair plaintext_keypair;
+    ReturnErrorOnFailure(plaintext_keypair.SetLength(private_key.size() + public_key.size()));
+    memcpy(plaintext_keypair.Bytes(), public_key.data(), public_key.size());
+    memcpy(plaintext_keypair.Bytes() + public_key.size(), private_key.data(), private_key.size());
+    return keypair.Deserialize(plaintext_keypair);
 }
 
 } // namespace

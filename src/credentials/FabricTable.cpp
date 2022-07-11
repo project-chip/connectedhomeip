@@ -649,16 +649,16 @@ CHIP_ERROR FabricTable::AddNewFabricForTest(const ByteSpan & rootCert, const Byt
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
 
     Crypto::P256Keypair injectedOpKey;
-    Crypto::P256SerializedKeypair injectedOpKeysSerialized;
+    Crypto::P256PlaintextKeypair injectedOpKeysPlaintext;
 
     Crypto::P256Keypair * opKey = nullptr;
     if (!opKeySpan.empty())
     {
-        VerifyOrReturnError(opKeySpan.size() == injectedOpKeysSerialized.Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(opKeySpan.size() == injectedOpKeysPlaintext.Capacity(), CHIP_ERROR_INVALID_ARGUMENT);
 
-        memcpy(injectedOpKeysSerialized.Bytes(), opKeySpan.data(), opKeySpan.size());
-        SuccessOrExit(err = injectedOpKeysSerialized.SetLength(opKeySpan.size()));
-        SuccessOrExit(err = injectedOpKey.Deserialize(injectedOpKeysSerialized));
+        memcpy(injectedOpKeysPlaintext.Bytes(), opKeySpan.data(), opKeySpan.size());
+        SuccessOrExit(err = injectedOpKeysPlaintext.SetLength(opKeySpan.size()));
+        SuccessOrExit(err = injectedOpKey.Initialize(injectedOpKeysPlaintext));
         opKey = &injectedOpKey;
     }
 

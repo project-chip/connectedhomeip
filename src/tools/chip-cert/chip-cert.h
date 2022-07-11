@@ -398,7 +398,7 @@ extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
 extern bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve = false);
 extern bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);
-extern bool SerializeKeyPair(EVP_PKEY * key, chip::Crypto::P256SerializedKeypair & serializedKeypair);
+extern bool ExportKeyPair(EVP_PKEY * key, chip::Crypto::P256PlaintextKeypair & plaintextKeypair);
 
 extern bool X509ToChipCert(X509 * cert, chip::MutableByteSpan & chipCert);
 

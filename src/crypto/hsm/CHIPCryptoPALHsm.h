@@ -132,6 +132,8 @@ public:
 
     virtual CHIP_ERROR Initialize() override;
 
+    virtual CHIP_ERROR Initialize(P256PlaintextKeypair & input) override;
+
     virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
     virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;

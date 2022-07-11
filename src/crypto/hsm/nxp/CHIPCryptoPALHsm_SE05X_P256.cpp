@@ -121,6 +121,14 @@ CHIP_ERROR P256KeypairHSM::Initialize()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR P256Keypair::Initialize(P256PlaintextKeypair & input)
+{
+    // Todo: support initialising a key from plaintext bytes when running
+    // FabricTable / CASE unit tests with plaintext keys on a device with
+    // this implementation
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
