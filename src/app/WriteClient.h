@@ -359,7 +359,7 @@ private:
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
     void ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                bool aSuppressErrorStatusResponse);
+                                bool aSendStatusResponse);
     /**
      * Create a new message (or a new chunk) for the write request.
      */

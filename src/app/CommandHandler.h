@@ -239,7 +239,7 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override
     {
         VerifyOrDieWithMsg(false, InteractionModel,
-                           "not expect a response, either caused by faulty logic, or at the EC that needs to be fixed.");
+                           "Not expecting a response. This is either caused by faulty IM or EC management logic.");
     }
 
     enum class State

@@ -152,10 +152,10 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
-    bool suppressErrorStatusResponse = false;
+    bool sendStatusResponse = true;
     CHIP_ERROR statusError           = CHIP_NO_ERROR;
     SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-    suppressErrorStatusResponse = true;
+    sendStatusResponse = false;
     SuccessOrExit(err = statusError);
     switch (mState)
     {
@@ -208,7 +208,7 @@ CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchange
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (!suppressErrorStatusResponse)
+        if (sendStatusResponse)
         {
             err = StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
             if (err == CHIP_NO_ERROR)

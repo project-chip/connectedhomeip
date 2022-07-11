@@ -118,7 +118,7 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
-    bool suppressErrorStatusResponse = false;
+    bool sendStatusResponse = true;
     if (mState == State::CommandSent)
     {
         MoveToState(State::ResponseReceived);
@@ -133,7 +133,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
             SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-            suppressErrorStatusResponse = true;
+            sendStatusResponse = false;
             SuccessOrExit(err = statusError);
             err = SendInvokeRequest();
         }
@@ -153,6 +153,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
+        // we would not expect to reveive status response in normal flow.
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
         SuccessOrExit(err = statusError);
@@ -164,14 +165,14 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
 
 exit:
-    ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
+    ResponseMessageHandled(err, apExchangeContext, sendStatusResponse);
     return err;
 }
 
 void CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                           bool aSuppressErrorStatusResponse)
+                                           bool aSendStatusResponse)
 {
-    if (aError != CHIP_NO_ERROR && !aSuppressErrorStatusResponse)
+    if (aError != CHIP_NO_ERROR && aSendStatusResponse)
     {
         CHIP_ERROR err =
             StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);

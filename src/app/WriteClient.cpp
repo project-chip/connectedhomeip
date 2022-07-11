@@ -448,7 +448,7 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
-    bool suppressErrorStatusResponse = false;
+    bool sendStatusResponse = true;
     if (mState == State::AwaitingResponse &&
         // We had sent the last chunk of data, and received all responses
         mChunks.IsNull())
@@ -469,7 +469,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
         {
             CHIP_ERROR statusError = CHIP_NO_ERROR;
             SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
-            suppressErrorStatusResponse = true;
+            sendStatusResponse = false;
             SuccessOrExit(err = statusError);
             err = SendWriteRequest();
         }
@@ -494,6 +494,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
+        // we would not expect to reveive status response in normal flow.
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
         SuccessOrExit(err = statusError);
@@ -505,28 +506,25 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     }
 
 exit:
-    ResponseMessageHandled(err, apExchangeContext, suppressErrorStatusResponse);
+    ResponseMessageHandled(err, apExchangeContext, sendStatusResponse);
     return err;
 }
 
 void WriteClient::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                         bool aSuppressErrorStatusResponse)
+                                         bool aSendStatusResponse)
 {
-    if (aError != CHIP_NO_ERROR)
+    if (aError != CHIP_NO_ERROR && aSendStatusResponse)
     {
         CHIP_ERROR err =
             StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
-        if (!aSuppressErrorStatusResponse)
+        if (err == CHIP_NO_ERROR)
         {
-            if (err == CHIP_NO_ERROR)
-            {
-                mpExchangeCtx = nullptr;
-            }
+            mpExchangeCtx = nullptr;
+        }
 
-            if (mpCallback != nullptr)
-            {
-                mpCallback->OnError(this, aError);
-            }
+        if (mpCallback != nullptr)
+        {
+            mpCallback->OnError(this, aError);
         }
     }
 

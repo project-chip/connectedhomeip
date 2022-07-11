@@ -282,7 +282,7 @@ private:
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
     void ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                bool aSuppressErrorStatusResponse);
+                                bool aSendStatusResponse);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;

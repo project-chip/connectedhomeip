@@ -597,6 +597,8 @@ exit:
         }
     }
 
+    // The caller is handling sending StatusResponse in the negative case,
+    // and transmission of StatusResponse in the positive cases are handled here.
     if (!suppressResponse && err == CHIP_NO_ERROR)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;

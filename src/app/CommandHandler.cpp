@@ -66,6 +66,9 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
+// The IM engine sends a status response back if it couldn't find a CommandHandler to handle it. But for when it does find one,
+// the responsibility should shift to the handler to handle that, since it may need to do special things to the EC.
+// (like manually calling Close() on it).
 Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & payloadHeader,
                                               System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
@@ -107,7 +110,12 @@ Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExc
         // Null out the (now-closed) exchange, so that when we try to
         // SendCommandResponse() later (when our holdoff count drops to 0) it
         // just fails and we don't double-respond.
+        // The reason that is not calling Close() on the handler object lies at which there is an active CommandHandler::Handle
+        // somewhere in the system for us to even arrive here, since in all normal command processing flows,
+        // the response is dispatched synchronously, and the EC closed synhcronously as well.
         mpExchangeCtx = nullptr;
+
+        // We have sent out the status response, if sending is failing, we don't wanna the caller resending the status respose again.
         status        = Status::Success;
     }
     return status;
