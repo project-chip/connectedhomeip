@@ -277,6 +277,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--
 # Generating linux-x64-tests-coverage
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=use_coverage=true chip_build_tests=true' {out}/linux-x64-tests-coverage
 
+# Create coverage output location
+mkdir -p {out}/linux-x64-tests-coverage/coverage
+
+# Initial coverage baseline
+lcov --initial --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_base.info
+
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
 
@@ -504,6 +510,15 @@ ninja -C {out}/linux-x64-tests-clang check
 
 # Building linux-x64-tests-coverage
 ninja -C {out}/linux-x64-tests-coverage check
+
+# Update coverage
+lcov --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_test.info
+
+# Final coverage info
+lcov --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_base.info --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_tes.info --output-file {out}/linux-x64-tests-coverage/coverage/lcov_final.info
+
+# HTML coverage
+genhtml {out}/linux-x64-tests-coverage/coverage/lcov_final.info {out}/linux-x64-tests-coverage/coverage/html
 
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat
