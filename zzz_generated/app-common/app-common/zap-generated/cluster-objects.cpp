@@ -7440,65 +7440,65 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ActiveWiredFaults::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, activeWiredFaults));
         break;
-    case Attributes::BatteryVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltage));
+    case Attributes::BatVoltage::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batVoltage));
         break;
-    case Attributes::BatteryPercentRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentRemaining));
+    case Attributes::BatPercentRemaining::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batPercentRemaining));
         break;
-    case Attributes::BatteryTimeRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryTimeRemaining));
+    case Attributes::BatTimeRemaining::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batTimeRemaining));
         break;
-    case Attributes::BatteryChargeLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargeLevel));
+    case Attributes::BatChargeLevel::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batChargeLevel));
         break;
-    case Attributes::BatteryReplacementNeeded::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplacementNeeded));
+    case Attributes::BatReplacementNeeded::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batReplacementNeeded));
         break;
-    case Attributes::BatteryReplaceability::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplaceability));
+    case Attributes::BatReplaceability::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batReplaceability));
         break;
-    case Attributes::BatteryPresent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPresent));
+    case Attributes::BatPresent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batPresent));
         break;
-    case Attributes::ActiveBatteryFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryFaults));
+    case Attributes::ActiveBatFaults::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatFaults));
         break;
-    case Attributes::BatteryReplacementDescription::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplacementDescription));
+    case Attributes::BatReplacementDescription::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batReplacementDescription));
         break;
-    case Attributes::BatteryCommonDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryCommonDesignation));
+    case Attributes::BatCommonDesignation::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batCommonDesignation));
         break;
-    case Attributes::BatteryANSIDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryANSIDesignation));
+    case Attributes::BatANSIDesignation::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batANSIDesignation));
         break;
-    case Attributes::BatteryIECDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryIECDesignation));
+    case Attributes::BatIECDesignation::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batIECDesignation));
         break;
-    case Attributes::BatteryApprovedChemistry::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryApprovedChemistry));
+    case Attributes::BatApprovedChemistry::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batApprovedChemistry));
         break;
-    case Attributes::BatteryCapacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryCapacity));
+    case Attributes::BatCapacity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batCapacity));
         break;
-    case Attributes::BatteryQuantity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryQuantity));
+    case Attributes::BatQuantity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batQuantity));
         break;
-    case Attributes::BatteryChargeState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargeState));
+    case Attributes::BatChargeState::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batChargeState));
         break;
-    case Attributes::BatteryTimeToFullCharge::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryTimeToFullCharge));
+    case Attributes::BatTimeToFullCharge::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batTimeToFullCharge));
         break;
-    case Attributes::BatteryFunctionalWhileCharging::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryFunctionalWhileCharging));
+    case Attributes::BatFunctionalWhileCharging::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batFunctionalWhileCharging));
         break;
-    case Attributes::BatteryChargingCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargingCurrent));
+    case Attributes::BatChargingCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batChargingCurrent));
         break;
-    case Attributes::ActiveBatteryChargeFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryChargeFaults));
+    case Attributes::ActiveBatChargeFaults::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatChargeFaults));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
