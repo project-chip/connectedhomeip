@@ -555,6 +555,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((mUsage == SupportedECKeyUsages::SIGNING), CHIP_ERROR_WRONG_KEY_TYPE);
 
     uint8_t digest[kSHA256_Hash_Length];
     memset(&digest[0], 0, sizeof(digest));
@@ -711,6 +712,7 @@ exit:
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
 #if defined(MBEDTLS_ECDH_C)
+    VerifyOrReturnError((mUsage == SupportedECKeyUsages::DERIVING), CHIP_ERROR_WRONG_KEY_TYPE);
 
 #if defined(MBEDTLS_USE_TINYCRYPT)
     CHIP_ERROR error     = CHIP_NO_ERROR;

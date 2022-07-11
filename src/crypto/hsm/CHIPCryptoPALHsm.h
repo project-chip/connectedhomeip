@@ -116,7 +116,13 @@ private:
 class P256KeypairHSM : public P256Keypair
 {
 public:
-    P256KeypairHSM()
+    P256KeypairHSM() : P256Keypair()
+    {
+        provisioned_key = false;
+        keyid           = 0;
+    }
+
+    P256KeypairHSM(SupportedECKeyUsages usage) : P256Keypair(usage)
     {
         provisioned_key = false;
         keyid           = 0;

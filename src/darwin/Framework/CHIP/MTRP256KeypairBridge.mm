@@ -82,6 +82,13 @@ CHIP_ERROR MTRP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg_
         MTR_LOG_ERROR("ECDSA sign msg failure: no keypair to sign with.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    if (mUsage != SupportedECKeyUsages::SIGNING)
+    {
+        MTR_LOG_ERROR("ECDSA sign msg failure: keypair initialised with wrong usage.");
+        return CHIP_ERROR_WRONG_KEY_TYPE;
+    }
+
     NSData * msgData = [NSData dataWithBytes:msg length:msg_length];
     NSData * signature;
     if ([mKeypair respondsToSelector:@selector(signMessageECDSA_DER:)]) {
@@ -127,6 +134,11 @@ CHIP_ERROR MTRP256KeypairBridge::ECDH_derive_secret(
 {
     if (!HasKeypair()) {
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (mUsage != SupportedECKeyUsages::DERIVING)
+    {
+        return CHIP_ERROR_WRONG_KEY_TYPE;
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

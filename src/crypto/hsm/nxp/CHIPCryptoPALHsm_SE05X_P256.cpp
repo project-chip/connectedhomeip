@@ -140,6 +140,7 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     VerifyOrReturnError(msg_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
+    VerifyOrReturnError((mUsage == SupportedECKeyUsages::SIGNING), CHIP_ERROR_WRONG_KEY_TYPE);
 
     ChipLogDetail(Crypto, "ECDSA_sign_msg: Using SE05X for Ecc Sign!");
 
@@ -262,6 +263,7 @@ CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_publi
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
     VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
+    VerifyOrReturnError((mUsage == SupportedECKeyUsages::DERIVING), CHIP_ERROR_WRONG_KEY_TYPE);
 
     ChipLogDetail(Crypto, "ECDH_derive_secret: Using SE05X for ECDH !");
 

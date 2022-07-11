@@ -85,7 +85,9 @@ class Test_P256Keypair : public P256KeypairHSM
 {
 public:
     Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
+    Test_P256Keypair(SupportedECKeyUsages usage) : P256KeypairHSM(usage) { SetKeyId(HSM_ECC_KEYID); }
     Test_P256Keypair(uint32_t keyId) { SetKeyId(keyId); }
+    Test_P256Keypair(SupportedECKeyUsages usage, uint32_t keyId) : P256KeypairHSM(usage) { SetKeyId(keyId); }
 };
 #else
 using Test_P256Keypair                  = P256Keypair;
@@ -1156,16 +1158,31 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
     signing_error = CHIP_NO_ERROR;
 }
 
+static void TestECDSA_InvalidUsage(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    Test_P256Keypair keypair1(SupportedECKeyUsages::DERIVING);
+    const char * msg  = "Hello World!";
+    size_t msg_length = strlen(msg);
+
+    NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
+
+    // Try to sign, and see that we're not allowed to
+    P256ECDSASignature signature;
+    CHIP_ERROR signing_error = keypair.ECDSA_sign_msg(reinterpret_cast<const uint8_t *>(msg), msg_length, signature);
+    NL_TEST_ASSERT(inSuite, signing_error != CHIP_NO_ERROR);
+}
+
 static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    Test_P256Keypair keypair1;
+    Test_P256Keypair keypair1(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
 
 #ifdef ENABLE_HSM_EC_KEY
-    Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
+    Test_P256Keypair keypair2(SupportedECKeyUsages::DERIVING, HSM_ECC_KEYID + 1);
 #else
-    Test_P256Keypair keypair2;
+    Test_P256Keypair keypair2(SupportedECKeyUsages::DERIVING);
 #endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
@@ -1191,6 +1208,22 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 
     bool signatures_match = (memcmp(Uint8::to_uchar(out_secret1), Uint8::to_uchar(out_secret2), out_secret1.Length()) == 0);
     NL_TEST_ASSERT(inSuite, signatures_match);
+}
+
+static void TestECDH_InvalidUsage(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    Test_P256Keypair keypair1(SupportedECKeyUsages::SIGNING);
+    NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
+
+    P256ECDHDerivedSecret out_secret1;
+    out_secret1[0] = 0;
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    // Try to self-derive, and see that we're not allowed to
+    error = keypair1.ECDH_derive_secret(keypair1.Pubkey(), out_secret1);
+    NL_TEST_ASSERT(inSuite, error != CHIP_NO_ERROR);
 }
 
 #if CHIP_CRYPTO_OPENSSL
@@ -2373,6 +2406,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ECDSA sign msg invalid parameters", TestECDSA_SigningMsgInvalidParams),
     NL_TEST_DEF("Test ECDSA msg signature validation invalid parameters", TestECDSA_ValidationMsgInvalidParam),
     NL_TEST_DEF("Test ECDSA hash signature validation invalid parameters", TestECDSA_ValidationHashInvalidParam),
+    NL_TEST_DEF("Test ECDSA fails using derivation key", TestECDSA_InvalidUsage),
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
     NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
@@ -2380,6 +2414,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
+    NL_TEST_DEF("Test ECDH fails using signing key", TestECDH_InvalidUsage),
     NL_TEST_DEF("Test adding entropy sources", TestAddEntropySources),
     NL_TEST_DEF("Test PBKDF2 SHA256", TestPBKDF2_SHA256_TestVectors),
     NL_TEST_DEF("Test P256 Keygen", TestP256_Keygen),

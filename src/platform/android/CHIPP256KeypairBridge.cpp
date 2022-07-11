@@ -115,6 +115,11 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    if (mUsage != SupportedECKeyUsages::SIGNING)
+    {
+        return CHIP_ERROR_WRONG_KEY_TYPE;
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     jbyteArray jniMsg;
     jobject signedResult = nullptr;
@@ -148,6 +153,11 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDH_derive_secret(const P256PublicKey & remot
     if (!HasKeypair())
     {
         return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (mUsage != SupportedECKeyUsages::DERIVING)
+    {
+        return CHIP_ERROR_WRONG_KEY_TYPE;
     }
 
     // Not required for Java SDK.

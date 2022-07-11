@@ -1350,7 +1350,7 @@ Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypairForCASE()
         return mOperationalKeystore->AllocateEphemeralKeypairForCASE();
     }
 
-    return Platform::New<Crypto::P256Keypair>();
+    return Platform::New<Crypto::P256Keypair>(SupportedECKeyUsages::DERIVING);
 }
 
 void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)

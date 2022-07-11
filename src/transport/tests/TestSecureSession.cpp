@@ -38,10 +38,10 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
 {
     CryptoContext channel;
 
-    P256Keypair keypair;
+    P256Keypair keypair(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    P256Keypair keypair2;
+    P256Keypair keypair2(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     // Test all combinations of invalid parameters
@@ -86,10 +86,10 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     CryptoContext::NonceStorage nonce;
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
 
-    P256Keypair keypair;
+    P256Keypair keypair(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    P256Keypair keypair2;
+    P256Keypair keypair2(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     // Test uninitialized channel
@@ -130,10 +130,10 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
 
     const char * salt = "Test Salt";
 
-    P256Keypair keypair;
+    P256Keypair keypair(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
-    P256Keypair keypair2;
+    P256Keypair keypair2(SupportedECKeyUsages::DERIVING);
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,

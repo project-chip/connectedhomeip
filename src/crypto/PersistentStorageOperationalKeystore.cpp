@@ -301,7 +301,7 @@ Crypto::P256Keypair * PersistentStorageOperationalKeystore::AllocateEphemeralKey
     // DO NOT CUT AND PASTE without considering the ReleaseEphemeralKeypair().
     // If allocating a derived class, then `ReleaseEphemeralKeypair` MUST
     // de-allocate the derived class after up-casting the base class pointer.
-    return Platform::New<Crypto::P256Keypair>();
+    return Platform::New<Crypto::P256Keypair>(SupportedECKeyUsages::DERIVING);
 }
 
 void PersistentStorageOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)

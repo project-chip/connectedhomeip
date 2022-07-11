@@ -173,6 +173,12 @@ enum class SupportedECKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+enum class SupportedECKeyUsages : uint8_t
+{
+    SIGNING  = 0, // Key supports ECDSA operations and rejects ECDH operations
+    DERIVING = 1, // Key supports ECDH operations and rejects ECDSA operations
+};
+
 /** @brief Safely clears the first `len` bytes of memory area `buf`.
  * @param buf Pointer to a memory buffer holding secret data that must be cleared.
  * @param len Specifies secret data size in bytes.
@@ -344,7 +350,17 @@ template <typename PK, typename Serialized, typename Sig, typename Secret>
 class ECKeypair
 {
 public:
-    virtual ~ECPKeypair() {}
+    ECKeypair()
+    {
+        mUsage = SupportedECKeyUsages::SIGNING;
+    }
+
+    ECKeypair(SupportedECKeyUsages usage)
+    {
+        mUsage = usage;
+    }
+
+    virtual ~ECKeypair() {}
 
     /**
      * @brief Initialize the keypair.
@@ -397,6 +413,7 @@ public:
     virtual void Clear() = 0;
 
 protected:
+    SupportedECKeyUsages mUsage;
     bool mInitialized = false;
     PK mPublicKey;
 };
@@ -411,6 +428,7 @@ class P256Keypair : public ECKeypair<P256PublicKey, P256SerializedKeypair, P256E
 public:
     P256Keypair() {}
 
+    P256Keypair(SupportedECKeyUsages usage) : ECKeypair(usage) {}
 
     ~P256Keypair() override;
 
