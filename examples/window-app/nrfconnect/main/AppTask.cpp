@@ -168,7 +168,7 @@ CHIP_ERROR AppTask::Init()
     }
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    
+
 #endif
 
     static CommonCaseDeviceServerInitParams initParams;
