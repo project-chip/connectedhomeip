@@ -49,18 +49,19 @@ namespace Internal {
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
 
 // Keys stored in the chip factory nam
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum             = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceId           = CONFIG_KEY(NAMESPACE_FACTORY "device-id");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceCert         = CONFIG_KEY(NAMESPACE_FACTORY "device-cert");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceICACerts     = CONFIG_KEY(NAMESPACE_FACTORY "device-ca-certs");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDevicePrivateKey   = CONFIG_KEY(NAMESPACE_FACTORY "device-key");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_HardwareVersion       = CONFIG_KEY(NAMESPACE_FACTORY "hardware-ver");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_ManufacturingDate     = CONFIG_KEY(NAMESPACE_FACTORY "mfg-date");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode          = CONFIG_KEY(NAMESPACE_FACTORY "pin-code");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator    = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pIterationCount = CONFIG_KEY(NAMESPACE_FACTORY "iteration-count");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pSalt           = CONFIG_KEY(NAMESPACE_FACTORY "salt");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pVerifier       = CONFIG_KEY(NAMESPACE_FACTORY "verifier");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum                = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceId              = CONFIG_KEY(NAMESPACE_FACTORY "device-id");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceCert            = CONFIG_KEY(NAMESPACE_FACTORY "device-cert");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceICACerts        = CONFIG_KEY(NAMESPACE_FACTORY "device-ca-certs");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDevicePrivateKey      = CONFIG_KEY(NAMESPACE_FACTORY "device-key");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_HardwareVersion          = CONFIG_KEY(NAMESPACE_FACTORY "hardware-ver");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ManufacturingDate        = CONFIG_KEY(NAMESPACE_FACTORY "mfg-date");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode             = CONFIG_KEY(NAMESPACE_FACTORY "pin-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator       = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pIterationCount    = CONFIG_KEY(NAMESPACE_FACTORY "iteration-count");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pSalt              = CONFIG_KEY(NAMESPACE_FACTORY "salt");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Spake2pVerifier          = CONFIG_KEY(NAMESPACE_FACTORY "verifier");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_CertificationDeclaration = CONFIG_KEY(NAMESPACE_FACTORY "cert-declaration");
 // Keys stored in the chip config namespace
 // NOTE: update sAllResettableConfigKeys definition when adding a new entry below
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ServiceConfig      = CONFIG_KEY(NAMESPACE_CONFIG "service-config");
