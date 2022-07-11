@@ -319,8 +319,8 @@ void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & 
             return;
         data->resize(size);
         memcpy(data->data() + 2, str.data(), str.size());
-        (*data)[0]      = (uint8_t) (size & 0xFF);
-        (*data)[1]      = (uint8_t) ((size >> 8) & 0xFF);
+        (*data)[0]      = (uint8_t)(size & 0xFF);
+        (*data)[1]      = (uint8_t)((size >> 8) & 0xFF);
         data->data()[0] = (uint8_t) str.size();
     }
     break;
