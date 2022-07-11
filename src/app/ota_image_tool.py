@@ -235,6 +235,11 @@ def full_header_size(args: object) -> int:
     return struct.calcsize(FIXED_HEADER_FORMAT) + header_size
 
 
+def read_chunk(file, size=1024):
+    while data := file.read(size):
+        yield data
+
+
 def remove_header(args: object) -> None:
     """
     Removes the header from args.image_file and writes to args.output_file
@@ -243,7 +248,8 @@ def remove_header(args: object) -> None:
     with open(args.image_file, 'rb') as file:
         with open(args.output_file, 'wb') as outfile:
             file.seek(image_start)
-            outfile.write(file.read())
+            for chunk in read_chunk(file):
+                outfile.write(chunk)
 
 
 def show_header(args: object):
@@ -307,7 +313,8 @@ def update_header_args(args: object) -> None:
         with open(args.output_file, 'wb') as outfile:
             outfile.write(header)
             infile.seek(full_header_size(args))
-            outfile.write(infile.read())
+            for chunk in read_chunk(infile):
+                outfile.write(chunk)
 
 
 def main():
