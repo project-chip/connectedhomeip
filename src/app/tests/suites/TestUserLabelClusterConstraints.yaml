@@ -40,7 +40,7 @@ tests:
                   },
               ]
       response:
-          error: FAILURE
+          error: CONSTRAINT_ERROR
 
     - label: "Attempt to write overly long item for value"
       command: "writeAttribute"
@@ -54,4 +54,4 @@ tests:
                   },
               ]
       response:
-          error: FAILURE
+          error: CONSTRAINT_ERROR
