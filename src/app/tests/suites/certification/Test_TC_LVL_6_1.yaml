@@ -110,8 +110,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 23
-              maxValue: 27
+              minValue: 22
+              maxValue: 32
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
@@ -162,8 +162,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 48
-              maxValue: 52
+              minValue: 45
+              maxValue: 55
               notValue: CurrentLevelValue
 
     - label: "Reset level to 254"

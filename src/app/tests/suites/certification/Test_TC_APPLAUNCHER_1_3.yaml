@@ -60,17 +60,17 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0, 1, 2]
           constraints:
               type: list
+              contains: [0, 1, 2]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [3]
           constraints:
               type: list
+              contains: [3]
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:
