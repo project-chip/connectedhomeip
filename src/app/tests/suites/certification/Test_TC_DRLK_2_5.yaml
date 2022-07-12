@@ -31,32 +31,54 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Create new PIN credential and lock/unlock user"
-      PICS: DRLK.S.C22.Rsp
-      command: "SetCredential"
+    - label: "Create new user"
+      command: "SetUser"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "operationType"
                 value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
-              - name: "userIndex"
-                value: null
-              - name: "userStatus"
-                value: null
-              - name: "userType"
-                value: null
-      response:
-          values:
-              - name: "status"
-                value: 0
               - name: "userIndex"
                 value: 1
-              - name: "nextCredentialIndex"
-                value: 2
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+              - name: "credentials"
+                value: null
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextUserIndex"
+                value: null
 
     - label: "Get Max number of Week Day schedules for user"
       PICS: DRLK.S.F04 && DRLK.S.A0014
@@ -64,7 +86,9 @@ tests:
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
       response:
           saveAs: NumberOfWeekDaySchedulesSupportedPerUser
-          value: 10
+          constraints:
+              minValue: 0
+              maxValue: 255
 
     - label: "Get number of supported users"
       PICS: DRLK.S.F08 && DRLK.S.A0011
@@ -72,7 +96,9 @@ tests:
       attribute: "NumberOfTotalUsersSupported"
       response:
           saveAs: NumberOfTotalUsersSupported
-          value: 10
+          constraints:
+              minValue: 0
+              maxValue: 65534
 
     - label: "Send Set Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0B.Rsp
@@ -109,9 +135,11 @@ tests:
               - name: "weekDayIndex"
                 constraints:
                     minValue: 1
+                    maxValue: NumberOfWeekDaySchedulesSupportedPerUser
               - name: "userIndex"
                 constraints:
                     minValue: 1
+                    maxValue: NumberOfTotalUsersSupported
               - name: "status"
                 value: 0x0
               - name: "daysMask"
@@ -205,7 +233,7 @@ tests:
       arguments:
           values:
               - name: "weekDayIndex"
-                value: 0xFE
+                value: 1
               - name: "userIndex"
                 value: 1
 
@@ -241,3 +269,11 @@ tests:
               - name: "endMinute"
                 constraints:
                     hasValue: false
+
+    - label: "Cleanup the created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
