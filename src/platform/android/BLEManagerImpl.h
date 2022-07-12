@@ -57,8 +57,6 @@ private:
 
     CHIP_ERROR _Init();
     void _Shutdown() {}
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising();

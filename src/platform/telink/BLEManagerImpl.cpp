@@ -467,11 +467,6 @@ void BLEManagerImpl::_InitGatt(void)
     bls_att_setAttributeTable((u8 *) gattTable);
 }
 
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     ble_sts_t status   = BLE_SUCCESS;
