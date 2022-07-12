@@ -22,10 +22,9 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("data-model") {
   zap_file = "repl.zap"
 
-  zap_pregenerated_dir =
-      "${chip_root}/zzz_generated/repl/zap-generated"
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/repl/zap-generated"
 
-    is_server = true
+  is_server = true
 
   #allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
