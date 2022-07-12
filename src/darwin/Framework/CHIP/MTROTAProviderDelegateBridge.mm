@@ -102,7 +102,7 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(chip::app::CommandHa
                                         handle.Release();
                                     }
                                });
-                               
+
                            }];
             });
         }
@@ -134,7 +134,7 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(chip::app::CommandH
                                         handler->AddStatus(cachedCommandPath, chip::Protocols::InteractionModel::Status::Success);
                                         handle.Release();
                                     }
-                                }); 
+                                });
                             }];
             });
         }
