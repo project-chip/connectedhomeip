@@ -27,9 +27,11 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace PowerConfiguration {} // namespace PowerConfiguration
+namespace PowerConfiguration {
+} // namespace PowerConfiguration
 
-namespace DeviceTemperatureConfiguration {} // namespace DeviceTemperatureConfiguration
+namespace DeviceTemperatureConfiguration {
+} // namespace DeviceTemperatureConfiguration
 
 namespace Identify {
 
@@ -166,7 +168,8 @@ enum class SceneFeatures : uint32_t
 };
 } // namespace OnOff
 
-namespace OnOffSwitchConfiguration {} // namespace OnOffSwitchConfiguration
+namespace OnOffSwitchConfiguration {
+} // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
 
@@ -205,13 +208,17 @@ enum class LevelControlFeature : uint32_t
 };
 } // namespace LevelControl
 
-namespace Alarms {} // namespace Alarms
+namespace Alarms {
+} // namespace Alarms
 
-namespace Time {} // namespace Time
+namespace Time {
+} // namespace Time
 
-namespace BinaryInputBasic {} // namespace BinaryInputBasic
+namespace BinaryInputBasic {
+} // namespace BinaryInputBasic
 
-namespace PowerProfile {} // namespace PowerProfile
+namespace PowerProfile {
+} // namespace PowerProfile
 
 namespace ApplianceControl {
 
@@ -269,11 +276,14 @@ enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
 };
 } // namespace ApplianceControl
 
-namespace PulseWidthModulation {} // namespace PulseWidthModulation
+namespace PulseWidthModulation {
+} // namespace PulseWidthModulation
 
-namespace Descriptor {} // namespace Descriptor
+namespace Descriptor {
+} // namespace Descriptor
 
-namespace Binding {} // namespace Binding
+namespace Binding {
+} // namespace Binding
 
 namespace AccessControl {
 
@@ -304,7 +314,8 @@ enum class Privilege : uint8_t
 };
 } // namespace AccessControl
 
-namespace PollControl {} // namespace PollControl
+namespace PollControl {
+} // namespace PollControl
 
 namespace BridgedActions {
 
@@ -362,7 +373,8 @@ enum class CommandBits : uint16_t
 };
 } // namespace BridgedActions
 
-namespace Basic {} // namespace Basic
+namespace Basic {
+} // namespace Basic
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -428,7 +440,8 @@ enum class OTAUpdateStateEnum : uint8_t
 };
 } // namespace OtaSoftwareUpdateRequestor
 
-namespace LocalizationConfiguration {} // namespace LocalizationConfiguration
+namespace LocalizationConfiguration {
+} // namespace LocalizationConfiguration
 
 namespace TimeFormatLocalization {
 
@@ -474,7 +487,8 @@ enum class UnitLocalizationFeature : uint32_t
 };
 } // namespace UnitLocalization
 
-namespace PowerSourceConfiguration {} // namespace PowerSourceConfiguration
+namespace PowerSourceConfiguration {
+} // namespace PowerSourceConfiguration
 
 namespace PowerSource {
 
@@ -878,11 +892,14 @@ using PHYRateType                     = EmberAfPHYRateType;
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace EthernetNetworkDiagnostics
 
-namespace TimeSynchronization {} // namespace TimeSynchronization
+namespace TimeSynchronization {
+} // namespace TimeSynchronization
 
-namespace BridgedDeviceBasic {} // namespace BridgedDeviceBasic
+namespace BridgedDeviceBasic {
+} // namespace BridgedDeviceBasic
 
-namespace Switch {} // namespace Switch
+namespace Switch {
+} // namespace Switch
 
 namespace AdministratorCommissioning {
 
@@ -938,17 +955,23 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 } // namespace GroupKeyManagement
 
-namespace FixedLabel {} // namespace FixedLabel
+namespace FixedLabel {
+} // namespace FixedLabel
 
-namespace UserLabel {} // namespace UserLabel
+namespace UserLabel {
+} // namespace UserLabel
 
-namespace ProxyConfiguration {} // namespace ProxyConfiguration
+namespace ProxyConfiguration {
+} // namespace ProxyConfiguration
 
-namespace ProxyDiscovery {} // namespace ProxyDiscovery
+namespace ProxyDiscovery {
+} // namespace ProxyDiscovery
 
-namespace ProxyValid {} // namespace ProxyValid
+namespace ProxyValid {
+} // namespace ProxyValid
 
-namespace BooleanState {} // namespace BooleanState
+namespace BooleanState {
+} // namespace BooleanState
 
 namespace ModeSelect {
 
@@ -959,7 +982,8 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
-namespace ShadeConfiguration {} // namespace ShadeConfiguration
+namespace ShadeConfiguration {
+} // namespace ShadeConfiguration
 
 namespace DoorLock {
 
@@ -1466,7 +1490,8 @@ enum class SafetyStatus : uint16_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {} // namespace BarrierControl
+namespace BarrierControl {
+} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
@@ -1641,9 +1666,11 @@ enum class WindSupportMask : uint8_t
 };
 } // namespace FanControl
 
-namespace DehumidificationControl {} // namespace DehumidificationControl
+namespace DehumidificationControl {
+} // namespace DehumidificationControl
 
-namespace ThermostatUserInterfaceConfiguration {} // namespace ThermostatUserInterfaceConfiguration
+namespace ThermostatUserInterfaceConfiguration {
+} // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
 
@@ -1787,7 +1814,8 @@ enum class ColorLoopUpdateFlags : uint8_t
 };
 } // namespace ColorControl
 
-namespace BallastConfiguration {} // namespace BallastConfiguration
+namespace BallastConfiguration {
+} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 
@@ -1799,7 +1827,8 @@ enum class LightSensorType : uint8_t
 };
 } // namespace IlluminanceMeasurement
 
-namespace TemperatureMeasurement {} // namespace TemperatureMeasurement
+namespace TemperatureMeasurement {
+} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 
@@ -1810,73 +1839,107 @@ enum class PressureFeature : uint32_t
 };
 } // namespace PressureMeasurement
 
-namespace FlowMeasurement {} // namespace FlowMeasurement
+namespace FlowMeasurement {
+} // namespace FlowMeasurement
 
-namespace RelativeHumidityMeasurement {} // namespace RelativeHumidityMeasurement
+namespace RelativeHumidityMeasurement {
+} // namespace RelativeHumidityMeasurement
 
-namespace OccupancySensing {} // namespace OccupancySensing
+namespace OccupancySensing {
+} // namespace OccupancySensing
 
-namespace CarbonMonoxideConcentrationMeasurement {} // namespace CarbonMonoxideConcentrationMeasurement
+namespace CarbonMonoxideConcentrationMeasurement {
+} // namespace CarbonMonoxideConcentrationMeasurement
 
-namespace CarbonDioxideConcentrationMeasurement {} // namespace CarbonDioxideConcentrationMeasurement
+namespace CarbonDioxideConcentrationMeasurement {
+} // namespace CarbonDioxideConcentrationMeasurement
 
-namespace EthyleneConcentrationMeasurement {} // namespace EthyleneConcentrationMeasurement
+namespace EthyleneConcentrationMeasurement {
+} // namespace EthyleneConcentrationMeasurement
 
-namespace EthyleneOxideConcentrationMeasurement {} // namespace EthyleneOxideConcentrationMeasurement
+namespace EthyleneOxideConcentrationMeasurement {
+} // namespace EthyleneOxideConcentrationMeasurement
 
-namespace HydrogenConcentrationMeasurement {} // namespace HydrogenConcentrationMeasurement
+namespace HydrogenConcentrationMeasurement {
+} // namespace HydrogenConcentrationMeasurement
 
-namespace HydrogenSulphideConcentrationMeasurement {} // namespace HydrogenSulphideConcentrationMeasurement
+namespace HydrogenSulphideConcentrationMeasurement {
+} // namespace HydrogenSulphideConcentrationMeasurement
 
-namespace NitricOxideConcentrationMeasurement {} // namespace NitricOxideConcentrationMeasurement
+namespace NitricOxideConcentrationMeasurement {
+} // namespace NitricOxideConcentrationMeasurement
 
-namespace NitrogenDioxideConcentrationMeasurement {} // namespace NitrogenDioxideConcentrationMeasurement
+namespace NitrogenDioxideConcentrationMeasurement {
+} // namespace NitrogenDioxideConcentrationMeasurement
 
-namespace OxygenConcentrationMeasurement {} // namespace OxygenConcentrationMeasurement
+namespace OxygenConcentrationMeasurement {
+} // namespace OxygenConcentrationMeasurement
 
-namespace OzoneConcentrationMeasurement {} // namespace OzoneConcentrationMeasurement
+namespace OzoneConcentrationMeasurement {
+} // namespace OzoneConcentrationMeasurement
 
-namespace SulfurDioxideConcentrationMeasurement {} // namespace SulfurDioxideConcentrationMeasurement
+namespace SulfurDioxideConcentrationMeasurement {
+} // namespace SulfurDioxideConcentrationMeasurement
 
-namespace DissolvedOxygenConcentrationMeasurement {} // namespace DissolvedOxygenConcentrationMeasurement
+namespace DissolvedOxygenConcentrationMeasurement {
+} // namespace DissolvedOxygenConcentrationMeasurement
 
-namespace BromateConcentrationMeasurement {} // namespace BromateConcentrationMeasurement
+namespace BromateConcentrationMeasurement {
+} // namespace BromateConcentrationMeasurement
 
-namespace ChloraminesConcentrationMeasurement {} // namespace ChloraminesConcentrationMeasurement
+namespace ChloraminesConcentrationMeasurement {
+} // namespace ChloraminesConcentrationMeasurement
 
-namespace ChlorineConcentrationMeasurement {} // namespace ChlorineConcentrationMeasurement
+namespace ChlorineConcentrationMeasurement {
+} // namespace ChlorineConcentrationMeasurement
 
-namespace FecalColiformAndEColiConcentrationMeasurement {} // namespace FecalColiformAndEColiConcentrationMeasurement
+namespace FecalColiformAndEColiConcentrationMeasurement {
+} // namespace FecalColiformAndEColiConcentrationMeasurement
 
-namespace FluorideConcentrationMeasurement {} // namespace FluorideConcentrationMeasurement
+namespace FluorideConcentrationMeasurement {
+} // namespace FluorideConcentrationMeasurement
 
-namespace HaloaceticAcidsConcentrationMeasurement {} // namespace HaloaceticAcidsConcentrationMeasurement
+namespace HaloaceticAcidsConcentrationMeasurement {
+} // namespace HaloaceticAcidsConcentrationMeasurement
 
-namespace TotalTrihalomethanesConcentrationMeasurement {} // namespace TotalTrihalomethanesConcentrationMeasurement
+namespace TotalTrihalomethanesConcentrationMeasurement {
+} // namespace TotalTrihalomethanesConcentrationMeasurement
 
-namespace TotalColiformBacteriaConcentrationMeasurement {} // namespace TotalColiformBacteriaConcentrationMeasurement
+namespace TotalColiformBacteriaConcentrationMeasurement {
+} // namespace TotalColiformBacteriaConcentrationMeasurement
 
-namespace TurbidityConcentrationMeasurement {} // namespace TurbidityConcentrationMeasurement
+namespace TurbidityConcentrationMeasurement {
+} // namespace TurbidityConcentrationMeasurement
 
-namespace CopperConcentrationMeasurement {} // namespace CopperConcentrationMeasurement
+namespace CopperConcentrationMeasurement {
+} // namespace CopperConcentrationMeasurement
 
-namespace LeadConcentrationMeasurement {} // namespace LeadConcentrationMeasurement
+namespace LeadConcentrationMeasurement {
+} // namespace LeadConcentrationMeasurement
 
-namespace ManganeseConcentrationMeasurement {} // namespace ManganeseConcentrationMeasurement
+namespace ManganeseConcentrationMeasurement {
+} // namespace ManganeseConcentrationMeasurement
 
-namespace SulfateConcentrationMeasurement {} // namespace SulfateConcentrationMeasurement
+namespace SulfateConcentrationMeasurement {
+} // namespace SulfateConcentrationMeasurement
 
-namespace BromodichloromethaneConcentrationMeasurement {} // namespace BromodichloromethaneConcentrationMeasurement
+namespace BromodichloromethaneConcentrationMeasurement {
+} // namespace BromodichloromethaneConcentrationMeasurement
 
-namespace BromoformConcentrationMeasurement {} // namespace BromoformConcentrationMeasurement
+namespace BromoformConcentrationMeasurement {
+} // namespace BromoformConcentrationMeasurement
 
-namespace ChlorodibromomethaneConcentrationMeasurement {} // namespace ChlorodibromomethaneConcentrationMeasurement
+namespace ChlorodibromomethaneConcentrationMeasurement {
+} // namespace ChlorodibromomethaneConcentrationMeasurement
 
-namespace ChloroformConcentrationMeasurement {} // namespace ChloroformConcentrationMeasurement
+namespace ChloroformConcentrationMeasurement {
+} // namespace ChloroformConcentrationMeasurement
 
-namespace SodiumConcentrationMeasurement {} // namespace SodiumConcentrationMeasurement
+namespace SodiumConcentrationMeasurement {
+} // namespace SodiumConcentrationMeasurement
 
-namespace WakeOnLan {} // namespace WakeOnLan
+namespace WakeOnLan {
+} // namespace WakeOnLan
 
 namespace Channel {
 
@@ -1962,7 +2025,8 @@ enum class MediaInputFeature : uint32_t
 };
 } // namespace MediaInput
 
-namespace LowPower {} // namespace LowPower
+namespace LowPower {
+} // namespace LowPower
 
 namespace KeypadInput {
 
@@ -2173,7 +2237,8 @@ enum class ApplicationStatusEnum : uint8_t
 };
 } // namespace ApplicationBasic
 
-namespace AccountLogin {} // namespace AccountLogin
+namespace AccountLogin {
+} // namespace AccountLogin
 
 namespace Messaging {
 
@@ -2318,9 +2383,11 @@ enum class MessagingExtendedControlMask : uint8_t
 };
 } // namespace Messaging
 
-namespace ApplianceIdentification {} // namespace ApplianceIdentification
+namespace ApplianceIdentification {
+} // namespace ApplianceIdentification
 
-namespace MeterIdentification {} // namespace MeterIdentification
+namespace MeterIdentification {
+} // namespace MeterIdentification
 
 namespace ApplianceEventsAndAlert {
 
@@ -2350,9 +2417,11 @@ enum class AlertStructure : uint32_t
 };
 } // namespace ApplianceEventsAndAlert
 
-namespace ApplianceStatistics {} // namespace ApplianceStatistics
+namespace ApplianceStatistics {
+} // namespace ApplianceStatistics
 
-namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
+namespace ElectricalMeasurement {
+} // namespace ElectricalMeasurement
 
 namespace TestCluster {
 
