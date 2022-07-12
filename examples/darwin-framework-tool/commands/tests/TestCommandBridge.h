@@ -19,7 +19,6 @@
 #pragma once
 
 #include "../common/CHIPCommandBridge.h"
-#include <app/tests/suites/commands/delay/DelayCommands.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
@@ -31,11 +30,18 @@
 
 #import <Matter/Matter.h>
 
+#import "MTRDevice_Externs.h"
 #import "MTRError_Utils.h"
 
 class TestCommandBridge;
 
 NS_ASSUME_NONNULL_BEGIN
+namespace {
+const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
+const char * getScriptsFolder() { return basePath; }
+} // namespace
+
+constexpr const char * kDefaultKey = "default";
 
 @interface TestPairingDelegate : NSObject <MTRDevicePairingDelegate>
 @property TestCommandBridge * commandBridge;
@@ -59,7 +65,6 @@ class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
                           public ConstraintsChecker,
                           public PICSChecker,
-                          public DelayCommands,
                           public LogCommands,
                           public SystemCommands {
 public:
@@ -101,16 +106,50 @@ public:
         SetCommandExitStatus(err);
     }
 
-    /////////// DelayCommands Interface /////////
-    void OnWaitForMs() override
+    /////////// DelayCommands /////////
+    // This function is a modified version of the one in DelayCommands.cpp and is needed here in order to
+    // skip compilation of DelayCommands, which needs to link against SDK internals.
+    CHIP_ERROR WaitForMs(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
     {
-        dispatch_async(mCallbackQueue, ^{
+        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(value.ms * NSEC_PER_MSEC));
+        dispatch_after(delayTime, mCallbackQueue, ^(void) {
             NextTest();
         });
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR WaitForCommissionee(const char * _Nullable identity,
-        const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override
+    // This function is identical to DelayCommands.cpp and is needed here in order to
+    // skip compilation of DelayCommands, which needs to link against SDK internals.
+    CHIP_ERROR WaitForMessage(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMessage::Type & value)
+    {
+        VerifyOrReturnError(!value.message.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        const char * scriptDir = getScriptsFolder();
+        constexpr const char * scriptName = "WaitForMessage.py";
+        const char * registerKeyValue = value.registerKey.HasValue() ? value.registerKey.Value().data() : kDefaultKey;
+        const size_t registerKeyLen = value.registerKey.HasValue() ? value.registerKey.Value().size() : strlen(kDefaultKey);
+
+        char command[128];
+        VerifyOrReturnError(
+            snprintf(command, sizeof(command), "%s%s %.*s %.*s", scriptDir, scriptName, static_cast<int>(registerKeyLen),
+                registerKeyValue, static_cast<int>(value.message.size()), value.message.data())
+                >= 0,
+            CHIP_ERROR_INTERNAL);
+        return RunInternal(command);
+    }
+
+    // This function is identical to DelayCommands.cpp and is needed here in order to
+    // skip compilation of DelayCommands, which needs to link against SDK internals.
+    CHIP_ERROR RunInternal(const char * _Nonnull command)
+    {
+        VerifyOrReturnError(system(command) == 0, CHIP_ERROR_INTERNAL);
+        return ContinueOnChipMainThread(CHIP_NO_ERROR);
+    }
+
+    CHIP_ERROR WaitForCommissionee(
+        const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
     {
         MTRDeviceController * controller = GetCommissioner(identity);
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
@@ -119,8 +158,9 @@ public:
 
         // Invalidate our existing CASE session; otherwise getConnectedDevice
         // will just hand it right back to us without establishing a new CASE
-        // session.
+        // session when a reboot is done on the server.
         if (GetDevice(identity) != nil) {
+            [GetDevice(identity) invalidateCASESession];
             mConnectedDevices[identity] = nil;
         }
 
