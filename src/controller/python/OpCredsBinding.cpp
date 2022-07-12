@@ -97,7 +97,6 @@ private:
 } // namespace Controller
 } // namespace chip
 
-extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
 extern chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 
@@ -296,12 +295,12 @@ void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCreden
     auto context      = Platform::MakeUnique<OpCredsContext>();
     context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex);
 
-    if (pychip_Storage_GetStorageAdapter() == nullptr)
+    if (Controller::Python::GetStorageAdapter() == nullptr)
     {
         return nullptr;
     }
 
-    if (context->mAdapter->Initialize(*pychip_Storage_GetStorageAdapter()) != CHIP_NO_ERROR)
+    if (context->mAdapter->Initialize(*Controller::Python::GetStorageAdapter()) != CHIP_NO_ERROR)
     {
         return nullptr;
     }

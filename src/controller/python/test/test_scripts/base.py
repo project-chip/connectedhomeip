@@ -170,7 +170,7 @@ class TestResult:
 
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
-        self.chipStack = ChipStack('/tmp/repl_storage.json')
+        self.chipStack = ChipStack('/tmp/repl_storage.json', stackInitType=chip.ChipStack.StackInitType.Controller)
         self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
                                                         fabricId=1, fabricIndex=1)
         self.devCtrl = self.fabricAdmin.NewController(

@@ -35,9 +35,9 @@ class {{asUpperCamelCase name}}(Cluster):
 
 {{#zcl_attributes_server}}
 {{#if entryType}}
-    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
 {{else}}
-    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
 {{/if}}
 {{/zcl_attributes_server}}
 

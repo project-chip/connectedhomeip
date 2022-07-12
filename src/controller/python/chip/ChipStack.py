@@ -47,6 +47,7 @@ from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import *
 
 import chip.native
+from enum import Enum
 
 __all__ = [
     "DeviceStatusStruct",
@@ -168,9 +169,14 @@ _LogMessageFunct = CFUNCTYPE(
 _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
 
+class StackInitType(Enum):
+    Controller = 1
+    Server = 2
+
+
 @_singleton
 class ChipStack(object):
-    def __init__(self, persistentStoragePath: str, installDefaultLogHandler=True, bluetoothAdapter=None):
+    def __init__(self, persistentStoragePath: str, stackInitType: StackInitType, installDefaultLogHandler=True, bluetoothAdapter=None):
         builtins.enableDebugMode = False
 
         self.networkLock = Lock()
@@ -261,10 +267,18 @@ class ChipStack(object):
         if (bluetoothAdapter is None):
             bluetoothAdapter = 0
 
-        # Initialize the chip stack.
-        res = self._ChipStackLib.pychip_DeviceController_StackInit(bluetoothAdapter)
-        if res != 0:
-            raise self.ErrorToException(res)
+        if (stackInitType == StackInitType.Controller):
+            # Initialize the chip stack.
+            res = self._ChipStackLib.pychip_DeviceController_StackInit(bluetoothAdapter)
+            if res != 0:
+                raise self.ErrorToException(res)
+        else:
+            res = self._ChipStackLib.pychip_Server_StackInit(ctypes.c_void_p(
+                self._persistentStorage.GetUnderlyingStorageAdapter()), bluetoothAdapter)
+            if res != 0:
+                raise self.ErrorToException(res)
+
+        self._stackInitType = stackInitType
 
         im.InitIMDelegate()
         ClusterAttribute.Init()
@@ -321,13 +335,17 @@ class ChipStack(object):
         # Make sure PersistentStorage is destructed before chipStack
         # to avoid accessing builtins.chipStack after destruction.
         self._persistentStorage = None
-        self.Call(lambda: self._ChipStackLib.pychip_DeviceController_StackShutdown())
 
+        if (self._stackInitType == StackInitType.Controller):
+            self._ChipStackLib.pychip_DeviceController_StackShutdown()
+        else:
+            self._ChipStackLib.pychip_Server_StackShutdown()
         #
         # Stack init happens in native, but shutdown happens here unfortunately.
         # #20437 tracks consolidating these.
         #
         self._ChipStackLib.pychip_CommonStackShutdown()
+
         self.networkLock = None
         self.completeEvent = None
         self._ChipStackLib = None

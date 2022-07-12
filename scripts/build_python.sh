@@ -43,6 +43,7 @@ declare enable_pybindings=false
 declare chip_mdns
 declare case_retry_delta
 declare install_wheel=no
+declare extra_args=""
 
 help() {
 
@@ -59,6 +60,7 @@ Input Options:
 
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
+  -a --extra_args extra_args                                Extra GN args
   -i, --install_wheel no|build-env|separate                 Where to install the Python wheel
                                                             no: Do not install
                                                             build-env: install to virtual env for build matter
@@ -94,6 +96,11 @@ while (($#)); do
             install_wheel=$2
             shift
             ;;
+
+        --extra_args | -a)
+            extra_args=$2
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -113,7 +120,9 @@ source "$CHIP_ROOT/scripts/activate.sh"
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
 [[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $extra_args"
+
+echo "GN Invocation:" gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $extra_args"
 
 # Compiles python files
 # Check pybindings was requested

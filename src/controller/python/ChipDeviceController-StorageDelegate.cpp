@@ -27,6 +27,29 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+chip::Controller::Python::StorageAdapter * gStorageAdapter = nullptr;
+
+extern "C" {
+
+void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
+                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
+                                             chip::Controller::Python::SetGetKeyValueCb getCb,
+                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
+{
+    gStorageAdapter = new chip::Controller::Python::StorageAdapter(context, setCb, getCb, deleteCb);
+}
+
+void pychip_Storage_ShutdownAdapter()
+{
+    delete gStorageAdapter;
+}
+
+void * pychip_Storage_GetStorageAdapter()
+{
+    return (void *) chip::Controller::Python::GetStorageAdapter();
+}
+}
+
 namespace chip {
 namespace Controller {
 
@@ -127,6 +150,11 @@ CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
     ChipLogDetail(Controller, "StorageAdapter::DeleteKeyValue: Key = %s", key);
     mDeleteKeyCb(mContext, key);
     return CHIP_NO_ERROR;
+}
+
+chip::Controller::Python::StorageAdapter * GetStorageAdapter()
+{
+    return gStorageAdapter;
 }
 
 } // namespace Python

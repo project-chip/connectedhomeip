@@ -70,6 +70,20 @@ private:
     PyObject * mContext;
 };
 
+chip::Controller::Python::StorageAdapter * GetStorageAdapter();
+
 } // namespace Python
 } // namespace Controller
 } // namespace chip
+
+extern "C" {
+
+void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
+                                             chip::Controller::Python::SyncSetKeyValueCb setCb,
+                                             chip::Controller::Python::SetGetKeyValueCb getCb,
+                                             chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
+
+void pychip_Storage_ShutdownAdapter();
+
+void * pychip_Storage_GetStorageAdapter();
+}

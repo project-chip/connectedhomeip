@@ -360,7 +360,14 @@ class ChipDeviceController():
             return False
         return self._ChipStack.commissioningEventRes == 0
 
-    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int):
+    def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = None):
+        ''' Commission a target given an IP address, a setup pin code and a node id to be assigned
+            to that target as part of commissioning.
+
+            To connect to a specific port on the target, a value can be provided to the port argument.
+            Omit or set to None to connect using the default port.
+        '''
+
         self.CheckIsActive()
 
         # IP connection will run through full commissioning, so we need to wait
@@ -369,9 +376,12 @@ class ChipDeviceController():
 
         self._ChipStack.commissioningCompleteEvent.clear()
 
+        if port is None:
+            port = 0
+
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(
-                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
+                self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid, port)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
@@ -1034,7 +1044,7 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64]
+                c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
                 c_char_p, c_uint32]
@@ -1086,7 +1096,7 @@ class ChipDeviceController():
             self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.restype = c_bool
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
-                c_void_p, c_char_p, c_uint32, c_uint64]
+                c_void_p, c_char_p, c_uint32, c_uint64, c_uint16]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_ConnectWithCode.argtypes = [

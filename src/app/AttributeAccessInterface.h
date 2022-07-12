@@ -90,6 +90,11 @@ public:
         return DataModel::EncodeForRead(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
                                         TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), accessingFabricIndex, item);
     }
+
+    /**
+     * Encodes the value field of the report using pre-encoded TLV provided in a TLVReader.
+     */
+    CHIP_ERROR EncodePreValue(AttributeReportIBs::Builder & aAttributeReportIBs, TLV::TLVReader & data);
 };
 
 /**
@@ -180,6 +185,21 @@ public:
     {
         mTriedEncode = true;
         return EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
+    }
+
+    /**
+     * Encode an AttributeReportIB with pre-encoded TLV provided as input. This TLV data is provided
+     * through a TLVReader positioned at the data that is copied in whole into the ensuing AttributeReportIB.
+     */
+    CHIP_ERROR EncodeAttributeReportIB(TLV::TLVReader & data)
+    {
+        AttributeReportBuilder builder;
+
+        mTriedEncode = true;
+
+        ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
+        ReturnErrorOnFailure(builder.EncodePreValue(mAttributeReportIBsBuilder, data));
+        return builder.FinishAttribute(mAttributeReportIBsBuilder);
     }
 
     /**

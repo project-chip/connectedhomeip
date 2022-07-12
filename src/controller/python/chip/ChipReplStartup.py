@@ -14,6 +14,7 @@ import builtins
 import chip.FabricAdmin
 from chip.utils import CommissioningBuildingBlocks
 import atexit
+import chip.dynamic_server.Server as Server
 
 _fabricAdmins = None
 
@@ -135,19 +136,41 @@ console = Console()
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default="/tmp/repl-storage.json")
+    "-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default=None)
 parser.add_argument(
     "-d", "--debug", help="Set default logging level to debug.", action="store_true")
+parser.add_argument(
+    "-m", "--mode", help="Whether to start the REPL in controller or server modes.", action="store", default="controller")
+
 args = parser.parse_args()
 
 ReplInit(args.debug)
-chipStack = ChipStack(persistentStoragePath=args.storagepath)
-fabricAdmins = LoadFabricAdmins()
-devCtrl = CreateDefaultDeviceController()
 
-builtins.devCtrl = devCtrl
+if (args.mode == "controller"):
+    if args.storagepath is None:
+        args.storagepath = '/tmp/repl-controller.json'
+
+    console.print(
+        '\n\n[bold red]>>>> Starting REPL in Controller Mode <<<<\n\n')
+
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, stackInitType=chip.ChipStack.StackInitType.Controller)
+    fabricAdmins = LoadFabricAdmins()
+    devCtrl = CreateDefaultDeviceController()
+    builtins.devCtrl = devCtrl
+
+    console.print(
+        '\n\n[blue]Default CHIP Device Controller has been initialized to manage [bold red]fabricAdmins[0][blue], and is available as [bold red]devCtrl')
+else:
+    if args.storagepath is None:
+        args.storagepath = '/tmp/repl-server.json'
+
+    console.print(
+        '\n\n[bold red]>>>> Starting REPL in Server Mode <<<<\n\n')
+
+    chipStack = ChipStack(persistentStoragePath=args.storagepath, stackInitType=chip.ChipStack.StackInitType.Server)
+    server = Server.Server()
+
+    console.print(
+        '\n\n[blue]Default CHIP Server instance has been initialized and is available as [bold red]server')
 
 atexit.register(StackShutdown)
-
-console.print(
-    '\n\n[blue]Default CHIP Device Controller has been initialized to manage [bold red]fabricAdmins[0][blue], and is available as [bold red]devCtrl')
