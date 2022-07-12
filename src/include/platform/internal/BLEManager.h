@@ -55,8 +55,6 @@ public:
 
     CHIP_ERROR Init();
     void Shutdown();
-    CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
-    CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsAdvertisingEnabled();
     CHIP_ERROR SetAdvertisingEnabled(bool val);
     bool IsAdvertising();
@@ -123,16 +121,6 @@ inline void BLEManager::Shutdown()
     GetBleLayer()->Shutdown();
 #endif
     static_cast<ImplClass *>(this)->_Shutdown();
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManager::GetCHIPoBLEServiceMode()
-{
-    return static_cast<ImplClass *>(this)->_GetCHIPoBLEServiceMode();
-}
-
-inline CHIP_ERROR BLEManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
 inline bool BLEManager::IsAdvertisingEnabled()

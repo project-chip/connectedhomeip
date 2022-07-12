@@ -161,24 +161,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     return err;
 }
 
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
-{
-    bool has       = false;
-    CHIP_ERROR err = HasFlag(Flags::kServiceModeEnabled, has);
-
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ConnectivityManager::kCHIPoBLEServiceMode_NotSupported);
-    return has ? ConnectivityManager::kCHIPoBLEServiceMode_Enabled : ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    ReturnErrorCodeIf(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
-
-    bool isSet = (val == ConnectivityManager::kCHIPoBLEServiceMode_Enabled) ? true : false;
-
-    return SetFlag(Flags::kServiceModeEnabled, isSet);
-}
-
 bool BLEManagerImpl::_IsAdvertisingEnabled()
 {
     bool has       = false;

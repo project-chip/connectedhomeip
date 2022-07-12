@@ -229,8 +229,6 @@ public:
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
-    CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
-    CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool IsBLEAdvertisingEnabled();
     /**
      * Enable or disable BLE advertising.
@@ -530,16 +528,6 @@ inline CHIP_ERROR ConnectivityManager::WriteThreadNetworkDiagnosticAttributeToTl
 inline Ble::BleLayer * ConnectivityManager::GetBleLayer()
 {
     return static_cast<ImplClass *>(this)->_GetBleLayer();
-}
-
-inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode()
-{
-    return static_cast<ImplClass *>(this)->_GetCHIPoBLEServiceMode();
-}
-
-inline CHIP_ERROR ConnectivityManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    return static_cast<ImplClass *>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
 inline bool ConnectivityManager::IsBLEAdvertisingEnabled()

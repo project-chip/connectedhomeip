@@ -125,19 +125,6 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     return err;
 }
 
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(BLEManager::CHIPoBLEServiceMode val)
-{
-    mServiceMode = val;
-
-    /* Trigger state update */
-    return DriveBLEState();
-}
-
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
