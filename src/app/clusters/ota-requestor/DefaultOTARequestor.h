@@ -138,7 +138,8 @@ private:
             }
             CHIP_ERROR err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
                                                        event.MsgData.Retain(), sendFlags);
-            if (err != CHIP_NO_ERROR) {
+            if (err != CHIP_NO_ERROR)
+            {
                 Reset();
             }
 
@@ -174,10 +175,7 @@ private:
             }
         }
 
-        void OnExchangeClosing(Messaging::ExchangeContext * ec) override
-        {
-            mExchangeCtx = nullptr;
-        }
+        void OnExchangeClosing(Messaging::ExchangeContext * ec) override { mExchangeCtx = nullptr; }
 
         void Init(chip::BDXDownloader * downloader, chip::Messaging::ExchangeContext * ec)
         {
