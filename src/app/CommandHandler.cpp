@@ -115,8 +115,9 @@ Status CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * apExc
         // the response is dispatched synchronously, and the EC closed synhcronously as well.
         mpExchangeCtx = nullptr;
 
-        // We have sent out the status response, if sending is failing, we don't wanna the caller resending the status respose again.
-        status        = Status::Success;
+        // We have sent out the status response, if sending is failing, we don't wanna the caller resending the status respose
+        // again.
+        status = Status::Success;
     }
     return status;
 }

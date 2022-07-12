@@ -151,9 +151,9 @@ CHIP_ERROR ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
 
 CHIP_ERROR ReadHandler::OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
     bool sendStatusResponse = true;
-    CHIP_ERROR statusError           = CHIP_NO_ERROR;
+    CHIP_ERROR statusError  = CHIP_NO_ERROR;
     SuccessOrExit(err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError));
     sendStatusResponse = false;
     SuccessOrExit(err = statusError);

@@ -281,8 +281,7 @@ private:
     CHIP_ERROR SendInvokeRequest();
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
-    void ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext,
-                                bool aSendStatusResponse);
+    void ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeContext * apExchangeContext, bool aSendStatusResponse);
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
