@@ -287,7 +287,7 @@ static void TestKeyValueStoreMgr_MultiRead(nlTestSuite * inSuite, void * inConte
 #ifdef __ZEPHYR__
 static void TestKeyValueStoreMgr_DoFactoryReset(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kStrKey  = "some_string_key";
+    constexpr const char * kStrKey  = "string_with_weird_chars\\=_key";
     constexpr const char * kUintKey = "some_uint_key";
 
     NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Put(kStrKey, "some_string") == CHIP_NO_ERROR);
