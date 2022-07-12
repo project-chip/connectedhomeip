@@ -109,10 +109,10 @@ public:
                       mLocalSessionId);
     }
 
-    SecureSession(SecureSession &&)      = delete;
-    SecureSession(const SecureSession &) = delete;
+    SecureSession(SecureSession &&)                  = delete;
+    SecureSession(const SecureSession &)             = delete;
     SecureSession & operator=(const SecureSession &) = delete;
-    SecureSession & operator=(SecureSession &&) = delete;
+    SecureSession & operator=(SecureSession &&)      = delete;
 
     void Retain() override;
     void Release() override;
@@ -304,8 +304,13 @@ private:
     uint16_t mPeerSessionId = 0;
 
     PeerAddress mPeerAddress;
-    System::Clock::Timestamp mLastActivityTime     = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last tx or rx
-    System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp(); ///< Timestamp of last rx
+
+    /// Timestamp of last tx or rx. @see SessionTimestamp in the spec
+    System::Clock::Timestamp mLastActivityTime = System::SystemClock().GetMonotonicTimestamp();
+
+    /// Timestamp of last rx. @see ActiveTimestamp in the spec
+    System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
+
     ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
