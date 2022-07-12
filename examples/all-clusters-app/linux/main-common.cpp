@@ -31,6 +31,7 @@
 #include <new>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <signal.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <system/SystemPacketBuffer.h>
@@ -50,11 +51,8 @@
 
 #include <Options.h>
 
-#define CHIP_EVENT_COMMAND_SIZE 80
-
-#define CHIP_EVENT_FIFO_PATH                                                                                                       \
-    "/tmp/"                                                                                                                        \
-    "chip_all_clusters_fifo"
+static constexpr const size_t kChipEventCmdBufSize     = 80;
+static constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_cluster_fifo_";
 
 using namespace chip;
 using namespace chip::app;
@@ -63,19 +61,22 @@ using namespace chip::DeviceLayer;
 namespace {
 static LowPowerManager lowPowerManager;
 pthread_t gChipEventCommandListener;
-char ChipEventFifoPath[128];
+std::string gChipEventFifoPath;
 
 void * EventCommandListenerTask(void * arg)
 {
-    int fd;
-    char readbuf[CHIP_EVENT_COMMAND_SIZE];
-    ssize_t readBytes;
+    char readbuf[kChipEventCmdBufSize];
 
     for (;;)
     {
-        fd = open(ChipEventFifoPath, O_RDONLY);
+        int fd = open(gChipEventFifoPath.c_str(), O_RDONLY);
+        if (fd == -1)
+        {
+            ChipLogError(Zcl, "Failed to open Event FIFO");
+            break;
+        }
 
-        readBytes          = read(fd, readbuf, CHIP_EVENT_COMMAND_SIZE);
+        ssize_t readBytes  = read(fd, readbuf, kChipEventCmdBufSize);
         readbuf[readBytes] = '\0';
         ChipLogProgress(Zcl, "Received payload: \"%s\" and length is %ld\n", readbuf, readBytes);
 
@@ -87,6 +88,44 @@ void * EventCommandListenerTask(void * arg)
 
     return nullptr;
 }
+
+// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
+
+// when the shell is enabled, don't intercept signals since it prevents the user from
+// using expected commands like CTRL-C to quit the application. (see issue #17845)
+// We should stop using signals for those faults, and move to a different notification
+// means, like a pipe. (see issue #19114)
+#if !defined(ENABLE_CHIP_SHELL)
+void OnRebootSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
+    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
+    // running process to terminate with different reasons.
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+    switch (signum)
+    {
+    case SIGINT:
+        bootReason = BootReasonType::kSoftwareReset;
+        break;
+    default:
+        IgnoreUnusedVariable(bootReason);
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void SetupSignalHandlers()
+{
+    // sigaction is not used here because Tsan interceptors seems to
+    // never dispatch the signals on darwin.
+    signal(SIGINT, OnRebootSignalHandler);
+}
+#endif // !defined(ENABLE_CHIP_SHELL)
 
 } // namespace
 
@@ -176,6 +215,10 @@ Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(k
 
 void ApplicationInit()
 {
+#if !defined(ENABLE_CHIP_SHELL)
+    SetupSignalHandlers();
+#endif // !defined(ENABLE_CHIP_SHELL)
+
     (void) kNetworkCommissioningEndpointMain;
     // Enable secondary endpoint only when we need it, this should be applied to all platforms.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
@@ -228,10 +271,14 @@ void ApplicationInit()
         sEthernetNetworkCommissioningInstance.Init();
     }
 
-    sprintf(ChipEventFifoPath, "%s-%d", CHIP_EVENT_FIFO_PATH, gettid());
+    gChipEventFifoPath = kChipEventFifoPathPrefix + std::to_string(getpid());
 
     // Creating the named file(FIFO)
-    mkfifo(ChipEventFifoPath, 0666);
+    if ((mkfifo(gChipEventFifoPath.c_str(), 0666) == -1) && (errno != EEXIST))
+    {
+        ChipLogError(Zcl, "Could not create Event FIFO");
+        exit(1);
+    }
 
     if (pthread_create(&gChipEventCommandListener, nullptr, EventCommandListenerTask, nullptr) != 0)
     {
@@ -241,15 +288,21 @@ void ApplicationInit()
 
 void ApplicationExit()
 {
+    if (pthread_cancel(gChipEventCommandListener) != 0)
+    {
+        ChipLogError(Zcl, "Failed to cancel EventCommandListenerTask");
+        exit(1);
+    }
+
     // Wait further for the thread to terminate if we had previously created it.
     if (pthread_join(gChipEventCommandListener, nullptr) != 0)
     {
         ChipLogError(Zcl, "Failed to terminate EventCommandListenerTask");
     }
 
-    if (unlink(ChipEventFifoPath) != 0)
+    if (unlink(gChipEventFifoPath.c_str()) != 0)
     {
-        ChipLogError(Zcl, "Failed to delete named file(FIFO):%s", ChipEventFifoPath);
+        ChipLogError(Zcl, "Failed to delete Event FIFO");
     }
 }
 

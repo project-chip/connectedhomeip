@@ -35,15 +35,9 @@ namespace {
 
 bool IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
-    bool retval = false;
+    EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
 
-    for (auto endpointId : EnabledEndpointsWithServerCluster(clusterId))
-    {
-        IgnoreUnusedVariable(endpointId);
-        retval = true;
-    }
-
-    return retval;
+    return (enabledEndpoints.begin() != enabledEndpoints.end());
 }
 
 /**

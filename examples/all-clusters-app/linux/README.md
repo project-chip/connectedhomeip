@@ -76,56 +76,56 @@ nicer stack traces.
 You can send a command to all-cluster-app to trigger specific event via
 all-cluster-app event named pipe /tmp/chip_all_clusters_fifo-<PID>.
 
-#### Trigger SoftwareFault events
+#### Trigger `SoftwareFault` events
 
-1. Generate event SoftwareFault when a software fault takes place on the Node.
+1. Generate event `SoftwareFault` when a software fault takes place on the Node.
 
 ```
 $ echo SoftwareFault > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-#### Trigger HardwareFault events
+#### Trigger `HardwareFault` events
 
-1. Generate event HardwareFaultChange to indicate a change in the set of
+1. Generate event `HardwareFaultChange` to indicate a change in the set of
    hardware faults currently detected by the Node.
 
 ```
 $ echo HardwareFaultChange > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-2. Generate event RadioFaultChange to indicate a change in the set of radio
+2. Generate event `RadioFaultChange` to indicate a change in the set of radio
    faults currently detected by the Node.
 
 ```
 $ echo RadioFaultChange > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-3. Generate event NetworkFaultChange to indicate a change in the set of network
-   faults currently detected by the Node.
+3. Generate event `NetworkFaultChange` to indicate a change in the set of
+   network faults currently detected by the Node.
 
 ```
 $ echo NetworkFaultChange > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-4. Generate event BootReason to indicate the reason that caused the device to
-   start-up, from the following set of BootReasons.
+4. Generate event `BootReason` to indicate the reason that caused the device to
+   start-up, from the following set of `BootReasons`.
 
--   PowerOnReboot The Node has booted as the result of physical interaction with
-    the device resulting in a reboot.
+-   `PowerOnReboot` The Node has booted as the result of physical interaction
+    with the device resulting in a reboot.
 
--   BrownOutReset The Node has rebooted as the result of a brown-out of the
+-   `BrownOutReset` The Node has rebooted as the result of a brown-out of the
     Node’s power supply.
 
--   SoftwareWatchdogReset The Node has rebooted as the result of a software
+-   `SoftwareWatchdogReset` The Node has rebooted as the result of a software
     watchdog timer.
 
--   HardwareWatchdogReset The Node has rebooted as the result of a hardware
+-   `HardwareWatchdogReset` The Node has rebooted as the result of a hardware
     watchdog timer.
 
--   SoftwareUpdateCompleted The Node has rebooted as the result of a completed
+-   `SoftwareUpdateCompleted` The Node has rebooted as the result of a completed
     software update.
 
--   SoftwareReset The Node has rebooted as the result of a software initiated
+-   `SoftwareReset` The Node has rebooted as the result of a software initiated
     reboot.
 
 ```
@@ -134,48 +134,48 @@ $ echo <BootReason> > /tmp/chip_all_clusters_fifo-<PID>
 
 #### Trigger Switch events
 
-1. Generate event SwitchLatched, when the latching switch is moved to a new
+1. Generate event `SwitchLatched`, when the latching switch is moved to a new
    position.
 
 ```
 $ echo SwitchLatched > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-2. Generate event InitialPress, when the momentary switch starts to be pressed.
+2. Generate event `InitialPress`, when the momentary switch starts to be
+   pressed.
 
 ```
 $ echo InitialPress > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-3. Generate event LongPress, when the momentary switch has been pressed for a
+3. Generate event `LongPress`, when the momentary switch has been pressed for a
    "long" time.
 
 ```
 $ echo LongPress > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-4. Generate event ShortRelease, when the momentary switch has been released
-   (after debouncing).
+4. Generate event `ShortRelease`, when the momentary switch has been released.
 
 ```
 $ echo ShortRelease > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-5. Generate event LongRelease when the momentary switch has been released (after
-   debouncing) and after having been pressed for a long time.
+5. Generate event `LongRelease` when the momentary switch has been released and
+   after having been pressed for a long time.
 
 ```
 $ echo LongRelease > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-6. Generate event MultiPressOngoing to indicate how many times the momentary
+6. Generate event `MultiPressOngoing` to indicate how many times the momentary
    switch has been pressed in a multi-press sequence, during that sequence.
 
 ```
 $ echo MultiPressOngoing > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
-7. Generate event MultiPressComplete to indicate how many times the momentary
+7. Generate event `MultiPressComplete` to indicate how many times the momentary
    switch has been pressed in a multi-press sequence, after it has been detected
    that the sequence has ended.
 
