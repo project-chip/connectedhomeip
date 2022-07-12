@@ -108,7 +108,10 @@ template("chip_data_model") {
 
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
-        sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
+        sources += [
+          "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
+          "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
+        ]
       } else if (cluster == "mode-select-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
