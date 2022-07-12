@@ -50,10 +50,10 @@ static_library("nrfconnect") {
   ]
 
   public = [
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "${chip_root}/src/credentials/CHIPCert.h",
     "${chip_root}/src/credentials/CertificationDeclaration.h",
-    "${chip_root}/src/credentials/CHIPCert.h"
-    ]
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
