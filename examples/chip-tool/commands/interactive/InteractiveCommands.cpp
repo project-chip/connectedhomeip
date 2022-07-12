@@ -18,7 +18,6 @@
 
 #include "InteractiveCommands.h"
 
-
 #include <editline.h>
 #include <iomanip>
 #include <sstream>
