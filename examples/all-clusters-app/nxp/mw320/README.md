@@ -39,8 +39,8 @@ $ gn gen out/debug
 $ ninja -v -C out/debug
 ```
 
-Example application binary file "chip-mw320-all-clusters-app.bin" will be generated under
-directory "out/debug".
+Example application binary file "chip-mw320-all-clusters-app.bin" will be
+generated under directory "out/debug".
 
 Note:
 

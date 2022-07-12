@@ -32,7 +32,7 @@ class MW320App(Enum):
             return 'chip-mw320-all-clusters-app'
         else:
             raise Exception('Unknown app type: %r' % self)
-            
+
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'nxp', 'mw320')
 
@@ -47,7 +47,6 @@ class MW320Builder(GnBuilder):
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
-
 
     def build_outputs(self):
         items = {}
