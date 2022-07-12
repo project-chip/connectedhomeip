@@ -102,7 +102,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     std::string arg;
 
     std::stringstream ss(command);
-    while (ss >> std::quoted(arg)) {
+    while (ss >> std::quoted(arg, '\'')) {
         if (argsCount == kInteractiveModeArgumentsMaxLength) {
             gIsCommandRunning = YES;
             ChipLogError(chipTool, "Too many arguments. Ignoring.");
