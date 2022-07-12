@@ -33,6 +33,7 @@
         break;
     case MTRPairingStatusFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
+        _commandBridge->SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE);
         break;
     case MTRPairingStatusUnknown:
         ChipLogError(chipTool, "Uknown Pairing Status");
