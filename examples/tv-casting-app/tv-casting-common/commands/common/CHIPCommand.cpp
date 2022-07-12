@@ -28,6 +28,9 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+// This is unused but it is needed by the CHIPCommand interface at the moment.
+chip::Controller::DeviceCommissioner gCommissioner;
+
 CHIP_ERROR CHIPCommand::Run()
 {
     CHIP_ERROR err = StartWaiting(GetWaitDuration());
@@ -82,4 +85,9 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
 void CHIPCommand::StopWaiting()
 {
     Shutdown();
+}
+
+chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(const char * identity)
+{
+    return gCommissioner;
 }

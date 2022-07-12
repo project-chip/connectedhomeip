@@ -20,6 +20,7 @@
 #include "commands/common/Commands.h"
 #include "commands/example/ExampleCredentialIssuerCommands.h"
 #include <zap-generated/cluster/Commands.h>
+#include <zap-generated/test/Commands.h>
 
 #include "CastingServer.h"
 #include "CastingUtils.h"
@@ -149,6 +150,7 @@ int main(int argc, char * argv[])
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
     registerClusters(gCommands, &gCredIssuerCommands);
+    registerCommandsTests(gCommands, &gCredIssuerCommands);
     registerClusterSubscriptions(gCommands, &gCredIssuerCommands);
 
     if (argc > 1)
