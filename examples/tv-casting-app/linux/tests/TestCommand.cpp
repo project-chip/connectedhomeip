@@ -18,26 +18,100 @@
 
 #include <commands/tests/TestCommand.h>
 
+#include <CastingServer.h>
+
+using namespace ::chip;
+
 CHIP_ERROR TestCommand::RunCommand()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    NextTest();
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TestCommand::WaitForCommissionee(const char * identity,
                                             const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    FabricIndex fabricIndex = CastingServer::GetInstance()->CurrentFabricIndex();
+
+    auto destinationId = CastingServer::GetInstance()->GetVideoPlayerNodeForFabricIndex(fabricIndex);
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, destinationId);
+
+    Server * server           = &(chip::Server::GetInstance());
+    const FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
+    if (fabric == nullptr)
+    {
+        ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
+        return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    }
+
+    PeerId peerID = fabric->GetPeerIdForNode(destinationId);
+    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
+                                                            &mOnDeviceConnectionFailureCallback);
+    return CHIP_NO_ERROR;
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device) {}
+void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
+{
+    ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
 
-void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error) {}
+    // The current code assumes the identity is alpha. That does not means much in the context
+    // of the tv-casting-app since there is a single identity.
+    command->mDevices["alpha"] = device;
 
-void TestCommand::ExitAsync(intptr_t context) {}
+    LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
+}
 
-void TestCommand::Exit(std::string message, CHIP_ERROR err) {}
+void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+{
+    ChipLogProgress(chipTool, " **** Test Setup: Device Connection Failure [deviceId=%" PRIu64 ". Error %" CHIP_ERROR_FORMAT "\n]",
+                    peerId.GetNodeId(), error.Format());
+    auto * command = static_cast<TestCommand *>(context);
+    VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
+
+    LogErrorOnFailure(command->ContinueOnChipMainThread(error));
+}
+
+void TestCommand::ExitAsync(intptr_t context)
+{
+    auto testCommand = reinterpret_cast<TestCommand *>(context);
+    testCommand->InteractionModel::Shutdown();
+    testCommand->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+}
+
+void TestCommand::Exit(std::string message, CHIP_ERROR err)
+{
+    mContinueProcessing = false;
+
+    LogEnd(message, err);
+
+    if (CHIP_NO_ERROR == err)
+    {
+        InteractionModel::Shutdown();
+        SetCommandExitStatus(err);
+    }
+    else
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(ExitAsync, reinterpret_cast<intptr_t>(this));
+    }
+}
 
 CHIP_ERROR TestCommand::ContinueOnChipMainThread(CHIP_ERROR err)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (mContinueProcessing == false)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (CHIP_NO_ERROR == err)
+    {
+        chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+        value.ms = 0;
+        return WaitForMs("", value);
+    }
+
+    Exit(chip::ErrorStr(err), err);
+    return CHIP_NO_ERROR;
 }
