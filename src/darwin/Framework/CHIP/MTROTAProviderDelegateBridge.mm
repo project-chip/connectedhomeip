@@ -31,7 +31,7 @@ MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge(void) {}
 
 void MTROTAProviderDelegateBridge::setDelegate(id<MTROTAProviderDelegate> delegate)
 {
-    mDelegate = delegate?:nil;
+    mDelegate = delegate ?: nil;
     mQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);
