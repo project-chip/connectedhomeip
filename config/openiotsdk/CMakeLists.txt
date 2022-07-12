@@ -257,29 +257,12 @@ target_link_libraries(openiotsdk-chip INTERFACE
 )
 add_dependencies(openiotsdk-chip chip-gn)
 
-# ==============================================================================
-# Parent target configuration according to CHIP component usage
-# ==============================================================================
-# CHIP includes path
-list(APPEND CHIP_INCLUDES)
-
-# CHIP defines
-list(APPEND CHIP_DEFINES)
-
-list(APPEND CHIP_INCLUDES
+target_include_directories(openiotsdk-chip INTERFACE
     ${CHIP_ROOT}/config/openiotsdk/mbedtls
 )
 
 if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    list(APPEND CHIP_DEFINES
+    target_compile_definitions(openiotsdk-chip INTERFACE
         NDEBUG
     )
 endif()
-
-target_include_directories(${APP_TARGET} PRIVATE
-                           ${CHIP_INCLUDES}
-)
-
-target_compile_definitions(${APP_TARGET} PRIVATE
-                           ${CHIP_DEFINES}
-)
