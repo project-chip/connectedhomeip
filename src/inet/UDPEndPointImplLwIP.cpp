@@ -250,6 +250,7 @@ void UDPEndPointImplLwIP::CloseImpl()
         CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
             // There is nothing we can do here, accept the chance of racing
             Release();
         }
