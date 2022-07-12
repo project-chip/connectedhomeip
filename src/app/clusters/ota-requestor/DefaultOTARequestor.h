@@ -136,9 +136,14 @@ private:
             {
                 sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
             }
-            ReturnErrorOnFailure(mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
-                                                           event.MsgData.Retain(), sendFlags));
-            return CHIP_NO_ERROR;
+            CHIP_ERROR err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
+                                                       event.MsgData.Retain(), sendFlags);
+            if (err != CHIP_NO_ERROR)
+            {
+                Reset();
+            }
+
+            return err;
         }
 
         CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
@@ -150,13 +155,14 @@ private:
                 return CHIP_NO_ERROR;
             }
 
-            mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
+            mDownloader->OnMessageReceived(payloadHeader, std::move(payload));
 
             // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
             if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
             }
+
             return CHIP_NO_ERROR;
         }
 
@@ -168,6 +174,8 @@ private:
                 mDownloader->OnDownloadTimeout();
             }
         }
+
+        void OnExchangeClosing(Messaging::ExchangeContext * ec) override { mExchangeCtx = nullptr; }
 
         void Init(chip::BDXDownloader * downloader, chip::Messaging::ExchangeContext * ec)
         {
