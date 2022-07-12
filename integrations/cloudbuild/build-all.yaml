@@ -19,7 +19,7 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target-glob '*' --skip-target-glob
-              '{tizen-*,*-tests*,*-chip-test}' build --create-archives
+              '{mbed-*,tizen-*,*-tests*,*-chip-test}' build --create-archives
               /workspace/artifacts/
       id: CompileAll
       waitFor:
