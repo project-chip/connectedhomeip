@@ -25,7 +25,7 @@ limitations under the License.
       <define>ILLUMINANCE_MEASUREMENT_CLUSTER</define>
       <client tick="false" init="false">true</client>
       <server tick="false" init="false">true</server>
-      <globalAttribute side="either" code="0xFFFD" value="2"/>
+      <globalAttribute side="either" code="0xFFFD" value="3"/>
       <attribute side="server" code="0x0000" define="ILLUM_MEASURED_VALUE"     type="INT16U" min="0x0000" max="0xFFFF" writable="false" reportable="true" isNullable="true" default="0x0000" optional="false">MeasuredValue</attribute>
       <attribute side="server" code="0x0001" define="ILLUM_MIN_MEASURED_VALUE" type="INT16U" min="0x0001" max="0xFFFD" writable="false"                   isNullable="true"                  optional="false">MinMeasuredValue</attribute>
       <attribute side="server" code="0x0002" define="ILLUM_MAX_MEASURED_VALUE" type="INT16U" min="0x0002" max="0xFFFE" writable="false"                   isNullable="true"                  optional="false">MaxMeasuredValue</attribute>

@@ -24,7 +24,7 @@ limitations under the License.
     <define>PRESSURE_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="PRESSURE_MEASURED_VALUE" type="INT16S" writable="false" reportable="true" default="0x0000" optional="false" isNullable="true">MeasuredValue</attribute>
     <attribute side="server" code="0x0001" define="PRESSURE_MIN_MEASURED_VALUE" type="INT16S" writable="false" optional="false" isNullable="true">MinMeasuredValue</attribute>
     <attribute side="server" code="0x0002" define="PRESSURE_MAX_MEASURED_VALUE" type="INT16S" writable="false" optional="false" isNullable="true">MaxMeasuredValue</attribute>

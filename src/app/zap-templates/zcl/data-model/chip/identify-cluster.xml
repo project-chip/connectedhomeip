@@ -50,7 +50,7 @@ limitations under the License.
     <define>IDENTIFY_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
     <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" writable="true"  default="0x0" optional="false">identify time</attribute>
     <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="ENUM8"                        writable="false" default="0x0" optional="false">identify type</attribute>
     <command source="client" code="0x00" name="Identify" optional="false">
