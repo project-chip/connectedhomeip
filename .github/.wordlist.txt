@@ -143,8 +143,6 @@ bluez
 BooleanState
 bootable
 Bootloader
-BootReason
-BootReasons
 BorderRouterAP
 bouffalolab
 BRD
@@ -157,7 +155,6 @@ bringup
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
-BrownOutReset
 bt
 btmgmt
 BTN
@@ -595,9 +592,6 @@ hardknott
 hardwarever
 HardwareVersion
 HardwareVersionString
-HardwareFault
-HardwareFaultChange
-HardwareWatchdogReset
 hasValue
 hci
 hciattach
@@ -651,7 +645,6 @@ Infineon
 ini
 init
 InitArgs
-InitialPress
 inlined
 InputLoop
 installDebug
@@ -761,8 +754,6 @@ LocalizationConfiguration
 localstatedir
 LockingState
 loopback
-LongPress
-LongRelease
 LowPower
 LPC
 LSP
@@ -859,8 +850,6 @@ Multiband
 Multicast
 multilib
 Multiprotocol
-MultiPressComplete
-MultiPressOngoing
 multithreaded
 mutexes
 MX
@@ -880,7 +869,6 @@ netcmp
 netif
 netplan
 NetworkCommissioning
-NetworkFaultChange
 networkID
 networkname
 NewUDPEndPoint
@@ -1015,7 +1003,6 @@ PowerConfiguration
 PowerProfile
 PowerSource
 PowerSourceConfiguration
-PowerOnReboot
 pre
 preprocessor
 Presetup
@@ -1074,7 +1061,6 @@ qvCHIP
 RADVD
 raspberryPi
 RasPi
-RadioFaultChange
 rAv
 RCP
 ReadAttribute
@@ -1177,7 +1163,6 @@ SHA
 ShadeConfiguration
 showDocumentation
 shubhamdp
-ShortRelease
 SIGINT
 SiLabs
 Silabs's
@@ -1204,10 +1189,6 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
-SoftwareFault
-SoftwareReset
-SoftwareUpdateCompleted
-SoftwareWatchdogReset
 SPI
 spiflash
 spinel
@@ -1249,7 +1230,6 @@ svg
 SVR
 SWD
 SWU
-SwitchLatched
 symlinks
 sysconfdir
 SysConfig
