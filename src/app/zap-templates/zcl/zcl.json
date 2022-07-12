@@ -1,6 +1,12 @@
 {
-    "version": "ZCL Test Data",
-    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
+    "description": "Matter SDK ZCL data",
+    "category": "matter",
+    "version": 1,
+    "xmlRoot": [
+        ".",
+        "./data-model/chip/",
+        "./data-model/silabs/"
+    ],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -78,9 +84,15 @@
     "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+            "defaultResponsePolicy": [
+                "Always",
+                "Conditional",
+                "Never"
+            ]
         },
-        "bool": ["commandDiscovery"]
+        "bool": [
+            "commandDiscovery"
+        ]
     },
     "defaults": {
         "text": {
@@ -123,7 +135,9 @@
             "UniqueID",
             "CapabilityMinima"
         ],
-        "Descriptor": ["ClusterRevision"],
+        "Descriptor": [
+            "ClusterRevision"
+        ],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -252,5 +266,12 @@
         ]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"]
+    "ZCLDataTypes": [
+        "ARRAY",
+        "BITMAP",
+        "ENUM",
+        "NUMBER",
+        "STRING",
+        "STRUCT"
+    ]
 }
