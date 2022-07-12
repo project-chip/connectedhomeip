@@ -56,16 +56,16 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(chip::app::CommandHandler * 
                 [strongDelegate handleQueryImage:commandParams
                                completionHandler:^(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                    NSError * _Nullable error) {
-                                    dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                        chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type response;
-                                        ConvertFromQueryImageResponseParms(data, response);
+                                   dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+                                       chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type response;
+                                       ConvertFromQueryImageResponseParms(data, response);
 
-                                        chip::app::CommandHandler * handler = handle.Get();
-                                        if (handler) {
-                                            handler->AddResponse(cachedCommandPath, response);
-                                            handle.Release();
-                                        }
-                                    });
+                                       chip::app::CommandHandler * handler = handle.Get();
+                                       if (handler) {
+                                           handler->AddResponse(cachedCommandPath, response);
+                                           handle.Release();
+                                       }
+                                   });
                                }];
             });
         }
@@ -92,17 +92,16 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(chip::app::CommandHa
                     handleApplyUpdateRequest:commandParams
                            completionHandler:^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                NSError * _Nullable error) {
-                                dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                    chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type response;
-                                    ConvertFromApplyUpdateRequestResponseParms(data, response);
+                               dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+                                   chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type response;
+                                   ConvertFromApplyUpdateRequestResponseParms(data, response);
 
-                                    chip::app::CommandHandler * handler = handle.Get();
-                                    if (handler) {
-                                        handler->AddResponse(cachedCommandPath, response);
-                                        handle.Release();
-                                    }
+                                   chip::app::CommandHandler * handler = handle.Get();
+                                   if (handler) {
+                                       handler->AddResponse(cachedCommandPath, response);
+                                       handle.Release();
+                                   }
                                });
-
                            }];
             });
         }
