@@ -1161,11 +1161,11 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
 static void TestECDSA_InvalidUsage(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    Test_P256Keypair keypair1(SupportedECKeyUsages::DERIVING);
+    Test_P256Keypair keypair(SupportedECKeyUsages::DERIVING);
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
-    NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     // Try to sign, and see that we're not allowed to
     P256ECDSASignature signature;
