@@ -44,7 +44,7 @@ tests:
                   },
               ]
       response:
-          error: FAILURE
+          error: CONSTRAINT_ERROR
 
     - label: "TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
@@ -59,4 +59,4 @@ tests:
                   },
               ]
       response:
-          error: FAILURE
+          error: CONSTRAINT_ERROR

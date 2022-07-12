@@ -74,9 +74,7 @@ RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
 # NXP uses a patch_sdk script to change SDK files
 RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
 
-RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.10-hardknott/
 RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.15-kirkstone/
-RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-wayland/5.15-kirkstone/
 
 # Add access to openocd for VSCode debugging
 RUN chown -R $USERNAME:$USERNAME /opt/openocd

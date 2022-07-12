@@ -72,6 +72,7 @@ tests:
               maxValue: 2
 
     #Issue 17997
+    #this step implicitly validating the attribute(BasicCommissioningInfo)constraints, as long as the payload is being parsed successfully
     - label:
           "TH1 reads BasicCommissioningInfo attribute from DUT and Verify that
           the BasicCommissioningInfo attribute has the following field:
@@ -80,19 +81,6 @@ tests:
       PICS: CGEN.S.A0001
       command: "readAttribute"
       attribute: "BasicCommissioningInfo"
-
-    - label:
-          "Step 6 is implicitly validating the attribute(BasicCommissioningInfo)
-          constraints, as long as the payload is being parsed successfully"
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "TH1 reads SupportsConcurrentConnection attribute from the DUT"
       PICS: CGEN.S.A0004

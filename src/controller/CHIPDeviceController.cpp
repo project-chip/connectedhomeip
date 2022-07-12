@@ -64,6 +64,7 @@
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <trace/trace.h>
@@ -105,6 +106,8 @@ DeviceController::DeviceController()
 
 CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(mState == State::NotInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(params.systemState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -282,6 +285,8 @@ CHIP_ERROR DeviceController::InitControllerNOCChain(const ControllerInitParams &
 
 void DeviceController::Shutdown()
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturn(mState != State::NotInitialized);
 
     ChipLogDetail(Controller, "Shutting down the controller");
