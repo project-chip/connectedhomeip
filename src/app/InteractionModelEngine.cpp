@@ -45,11 +45,15 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable)
 {
+    VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpFabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(apExchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(apFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     mpExchangeMgr = apExchangeMgr;
     mpFabricTable = apFabricTable;
 
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
-    VerifyOrReturnError(mpFabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mReportingEngine.Init();
     mMagic++;
@@ -61,6 +65,9 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
+    VerifyOrReturn(mpExchangeMgr != nullptr);
+    VerifyOrReturn(mpFabricTable != nullptr);
+
     CommandHandlerInterface * handlerIter = mCommandHandlerList;
 
     //
@@ -122,6 +129,9 @@ void InteractionModelEngine::Shutdown()
     mEventPathPool.ReleaseAll();
     mDataVersionFilterPool.ReleaseAll();
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
+
+    mpExchangeMgr = nullptr;
+    mpFabricTable = nullptr;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
