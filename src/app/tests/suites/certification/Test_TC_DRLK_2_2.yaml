@@ -28,6 +28,100 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Create new user"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+              - name: "credentials"
+                value: null
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextUserIndex"
+                value: null
+
+    - label: "Create new PIN credential and lock/unlock user"
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: 1
+              - name: "userStatus"
+                value: 0
+              - name: "userType"
+                value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label: "Verify created PIN credential"
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "credentialExists"
+                value: true
+              - name: "userIndex"
+                value: 1
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: null
+
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as False
           on the DUT"
@@ -41,12 +135,17 @@ tests:
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
+      response:
+          error: 0x00
+
+    - label: "TH sends Lock Door Command to the DUT with valid PINCode"
+      PICS: DRLK.S.C00.Rsp
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "PINCode"
-                value: ""
-      response:
-          error: FAILURE
+              - name: "pinCode"
+                value: "123456"
 
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as True on
@@ -57,32 +156,12 @@ tests:
       arguments:
           value: true
 
-    - label: "Create new PIN credential and lock/unlock user"
-      PICS: DRLK.S.C22.Rsp
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
-                value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
-              - name: "userIndex"
-                value: null
-              - name: "userStatus"
-                value: null
-              - name: "userType"
-                value: null
+    - label: "TH reads the RequirePINforRemoteOperation attribute from the DUT"
+      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
+      command: "readAttribute"
+      attribute: "RequirePINforRemoteOperation"
       response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "userIndex"
-                value: 1
-              - name: "nextCredentialIndex"
-                value: 2
+          value: true
 
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp
@@ -92,6 +171,17 @@ tests:
           values:
               - name: "pinCode"
                 value: "123456"
+
+    - label: "TH sends Lock Door Command to the DUT without valid PINCode"
+      PICS: DRLK.S.C00.Rsp
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "pinCode"
+                value: "645321"
+      response:
+          error: FAILURE
 
     - label:
           "TH sends Lock Door Command to the DUT without any argument PINCode"
@@ -119,7 +209,7 @@ tests:
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
-          value: 5
+          value: 15
 
     - label: "TH sends Lock Door Command to the DUT with invalid PINCode"
       PICS: DRLK.S.C00.Rsp
@@ -170,7 +260,7 @@ tests:
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
-          value: 5
+          value: 15
 
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp
@@ -181,7 +271,15 @@ tests:
               - name: "pinCode"
                 value: "123456"
 
-    - label: "Clean the created credential"
+    - label: "Clean the created user"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+
+    - label: "Cleanup the created credential"
       PICS: DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 10000

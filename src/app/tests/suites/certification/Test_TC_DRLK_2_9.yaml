@@ -31,6 +31,55 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Create new user with default parameters"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+
+    - label: "Read the user back and verify its fields"
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "userIndex"
+                value: 1
+      response:
+          values:
+              - name: "userIndex"
+                value: 1
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
+              - name: "credentials"
+                value: null
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextUserIndex"
+                value: null
+
     - label:
           "TH reads NumberOfTotalUsersSupported attribute and saves for future
           use."
@@ -39,7 +88,9 @@ tests:
       attribute: "NumberOfTotalUsersSupported"
       response:
           saveAs: NumberOfTotalUsersSupported
-          value: 10
+          constraints:
+              minValue: 0
+              maxValue: 255
 
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -59,6 +110,14 @@ tests:
                 value: 0
               - name: "userType"
                 value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 2
 
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
@@ -69,22 +128,23 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "CredentialType"
-                constraints:
-                    minValue: 0
-                    maxValue: 5
-              - name: "CredentialIndex"
-                constraints:
-                    minValue: 0
-                    maxValue: 65534
-              - name: "CredentialExists"
+              - name: "credentialExists"
                 constraints:
                     type: boolean
-              - name: "UserIndex"
+              - name: "userIndex"
                 constraints:
                     minValue: 1
+                    maxValue: NumberOfTotalUsersSupported
+              - name: "creatorFabricIndex"
+                value: 1
+              - name: "lastModifiedFabricIndex"
+                value: 1
+              - name: "nextCredentialIndex"
+                value: null
 
-    - label: "TH sends Set Credential Command to DUT"
+    - label:
+          "TH sends Set Credential Command to DUT and  verify the
+          INVALID_COMMAND if any of the fields are invalid"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -93,7 +153,7 @@ tests:
               - name: "operationType"
                 value: 0
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
+                value: { CredentialType: 1, CredentialIndex: 2 }
               - name: "credentialData"
                 value: "1234"
               - name: "userIndex"
@@ -102,46 +162,18 @@ tests:
                 value: 5
               - name: "userType"
                 value: 10
-
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
+      response:
           values:
-              - name: "operationType"
-                value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
+              - name: "status"
+                value: 0x85
               - name: "userIndex"
-                value: 2
-              - name: "userStatus"
-                value: 0
-              - name: "userType"
-                value: 0
+                value: null
+              - name: "nextCredentialIndex"
+                value: 3
 
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
-                value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
-              - name: "userIndex"
-                value: 2
-              - name: "userStatus"
-                value: 0
-              - name: "userType"
-                value: 0
-
-    - label: "TH sends Set Credential Command to DUT"
+    - label:
+          "TH sends Set Credential Command to DUT and verify response as
+          DUPLICATE if CredentialData is repeated"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -154,13 +186,52 @@ tests:
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
-                value: 3
+                value: 2
               - name: "userStatus"
                 value: 0
               - name: "userType"
                 value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0x02
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 3
 
-    - label: "TH sends Set Credential Command to DUT"
+    - label:
+          "TH sends Set Credential Command to DUT and verify response as
+          OCCUPIED if CredentialIndex is repeated"
+      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
+      command: "SetCredential"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+              - name: "credentialData"
+                value: "123456"
+              - name: "userIndex"
+                value: 2
+              - name: "userStatus"
+                value: 0
+              - name: "userType"
+                value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0x02
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 2
+
+    - label:
+          "TH sends Set Credential Command to DUT and verify the DUT response as
+          OCCUPIED if the CredentialIndex is not associated with the UserIndex"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -173,11 +244,19 @@ tests:
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
-                value: 3
+                value: 2
               - name: "userStatus"
                 value: 0
               - name: "userType"
                 value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0x02
+              - name: "userIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: 4
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
@@ -187,6 +266,48 @@ tests:
           values:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
+
+    - label:
+          "TH sends Get Credential Status Command and verify that the
+          CredentialType and  CredentialIndex for the provided value is cleared"
+      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "credentialExists"
+                value: false
+              - name: "userIndex"
+                value: null
+              - name: "creatorFabricIndex"
+                value: null
+              - name: "lastModifiedFabricIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: null
+
+    - label: "TH sends Set User Command to DUT"
+      command: "SetUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "operationType"
+                value: 0
+              - name: "userIndex"
+                value: 2
+              - name: "userName"
+                value: "xxx"
+              - name: "userUniqueId"
+                value: 6452
+              - name: "userStatus"
+                value: 1
+              - name: "userType"
+                value: 0
+              - name: "credentialRule"
+                value: 0
 
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -197,7 +318,7 @@ tests:
               - name: "operationType"
                 value: 0
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
+                value: { CredentialType: 1, CredentialIndex: 3 }
               - name: "credentialData"
                 value: "123456"
               - name: "userIndex"
@@ -206,34 +327,14 @@ tests:
                 value: 0
               - name: "userType"
                 value: 0
-
-    - label: "TH sends Clear Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
-      command: "ClearCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
+      response:
           values:
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 0xFFFE }
-
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
+              - name: "status"
                 value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
               - name: "userIndex"
-                value: 2
-              - name: "userStatus"
-                value: 0
-              - name: "userType"
-                value: 0
+                value: null
+              - name: "nextCredentialIndex"
+                value: 4
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
@@ -242,7 +343,17 @@ tests:
       arguments:
           values:
               - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 0xFFFE }
+                value: { CredentialType: 1, CredentialIndex: 65534 }
+
+    - label: "TH sends Get Credential Status Command"
+      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "credential"
+                value: { CredentialType: 1, CredentialIndex: 65534 }
+      response:
+          error: INVALID_COMMAND
 
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
@@ -253,27 +364,16 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "UserIndex"
-                value: null
-
-    - label: "TH sends Set Credential Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
-      command: "SetCredential"
-      timedInteractionTimeoutMs: 10000
-      arguments:
-          values:
-              - name: "operationType"
-                value: 0
-              - name: "credential"
-                value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
-                value: "123456"
+              - name: "credentialExists"
+                value: false
               - name: "userIndex"
-                value: 2
-              - name: "userStatus"
-                value: 0
-              - name: "userType"
-                value: 0
+                value: null
+              - name: "creatorFabricIndex"
+                value: null
+              - name: "lastModifiedFabricIndex"
+                value: null
+              - name: "nextCredentialIndex"
+                value: null
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
