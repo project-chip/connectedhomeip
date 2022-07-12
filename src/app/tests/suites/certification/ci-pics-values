@@ -786,6 +786,7 @@ OO.C.C02.Tx=1
 OO.C.C40.Tx=1
 OO.C.C41.Tx=1
 OO.C.C42.Tx=1
+OO.S.F00=1
 
 #Actions Cluster
 ACT.S.A0000=1

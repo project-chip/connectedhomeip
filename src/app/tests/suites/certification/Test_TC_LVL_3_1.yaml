@@ -44,9 +44,9 @@ tests:
           constraints:
               type: uint8
 
-    - label: "sends a Move to level command"
+    - label: "sends a MoveToLevelWithOnOff command"
       PICS: LVL.S.C00.Rsp
-      command: "MoveToLevel"
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"

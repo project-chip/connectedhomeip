@@ -39,13 +39,14 @@ tests:
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: OO_LT
+      PICS: OO.S.F00
       response:
           value: 1
           constraints:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
+      PICS: OO.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -65,14 +66,32 @@ tests:
                       65533,
                   ]
 
+    - label: "Read the global attribute: AttributeList"
+      PICS: " !OO.S.F00 "
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 65528, 65529, 65531, 65532, 65533]
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
-      PICS: OO_LT
+      PICS: OO.S.F00
       response:
           constraints:
               type: list
               contains: [0, 1, 2, 64, 65, 66]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      PICS: " !OO.S.F00 "
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
