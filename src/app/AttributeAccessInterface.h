@@ -191,7 +191,7 @@ public:
      * Encode an AttributeReportIB with pre-encoded TLV provided as input. This TLV data is provided
      * through a TLVReader positioned at the data that is copied in whole into the ensuing AttributeReportIB.
      */
-    CHIP_ERROR EncodeAttributeReportIB(TLV::TLVReader &data)
+    CHIP_ERROR EncodeAttributeReportIB(TLV::TLVReader & data)
     {
         AttributeReportBuilder builder;
 
@@ -314,7 +314,6 @@ private:
 
         return builder.FinishAttribute(mAttributeReportIBsBuilder);
     }
-
 
     /**
      * EnsureListStarted encodes the first item of one report with lists (an

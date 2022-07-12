@@ -85,6 +85,5 @@ void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject 
 
 void pychip_Storage_ShutdownAdapter();
 
-void* pychip_Storage_GetStorageAdapter();
-
+void * pychip_Storage_GetStorageAdapter();
 }

@@ -16,9 +16,9 @@
  */
 #pragma once
 
-#include <platform/CommissionableDataProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
+#include <platform/CommissionableDataProvider.h>
 
 namespace chip {
 namespace Controller {
@@ -103,14 +103,14 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    static constexpr uint32_t kDefaultTestPasscode = 20202021;
+    static constexpr uint32_t kDefaultTestPasscode      = 20202021;
     static constexpr uint16_t kDefaultTestDiscriminator = 3840;
 
 private:
     uint16_t mDiscriminator = kDefaultTestDiscriminator;
-    uint32_t mPasscode = kDefaultTestPasscode;
+    uint32_t mPasscode      = kDefaultTestPasscode;
 };
 
-}
-} // namespace DeviceLayer
+} // namespace Python
+} // namespace Controller
 } // namespace chip

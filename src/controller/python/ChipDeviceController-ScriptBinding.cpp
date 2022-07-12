@@ -40,10 +40,10 @@
 #include <inttypes.h>
 #include <net/if.h>
 
+#include <app/DefaultAttributePersistenceProvider.h>
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
-#include <app/DefaultAttributePersistenceProvider.h>
 
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
@@ -199,7 +199,7 @@ chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(Subscr
 
 ChipError::StorageType pychip_DeviceController_StackInit(uint32_t bluetoothAdapterId)
 {
-    auto *storageAdapter = chip::Controller::Python::GetStorageAdapter();
+    auto * storageAdapter = chip::Controller::Python::GetStorageAdapter();
 
     VerifyOrDie(storageAdapter != nullptr);
 
@@ -365,7 +365,8 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
 
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
 
-    if (port != 0) {
+    if (port != 0)
+    {
         addr.SetPort(port);
     }
 
@@ -686,5 +687,4 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return CHIP_NO_ERROR.AsInteger();
 }
-
 }

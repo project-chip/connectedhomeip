@@ -44,11 +44,10 @@ void pychip_Storage_ShutdownAdapter()
     delete gStorageAdapter;
 }
 
-void* pychip_Storage_GetStorageAdapter()
+void * pychip_Storage_GetStorageAdapter()
 {
-    return (void *)chip::Controller::Python::GetStorageAdapter();
+    return (void *) chip::Controller::Python::GetStorageAdapter();
 }
-
 }
 
 namespace chip {

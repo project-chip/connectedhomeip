@@ -122,7 +122,7 @@ void pychip_Server_StackShutdown()
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
-ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate *storageDelegate, int bleDevice)
+ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate * storageDelegate, int bleDevice)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -153,8 +153,10 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate *storag
 #if CONFIG_NETWORK_LAYER_BLE
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("RpiMatterDali"); // Use default device name (CHIP-XXXX)
 
-    err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(bleDevice != -1 ? bleDevice : LinuxDeviceOptions::GetInstance().mBleDevice, false);
-    if (err != CHIP_NO_ERROR) {
+    err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(
+        bleDevice != -1 ? bleDevice : LinuxDeviceOptions::GetInstance().mBleDevice, false);
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(DeviceLayer, "Failed to configure BLE as peripheral: %s", chip::ErrorStr(err));
         return err.AsInteger();
     }
@@ -179,13 +181,14 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate *storag
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.persistentStorageDelegate = storageDelegate;
 
-    (void)initParams.InitializeStaticResourcesBeforeServerInit();
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
-    initParams.operationalServicePort = 0;
+    initParams.operationalServicePort        = 0;
     initParams.userDirectedCommissioningPort = 0;
 
     err = chip::Server::GetInstance().Init(initParams);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogError(DeviceLayer, "Failed to init the server instance: %s", chip::ErrorStr(err));
         return err.AsInteger();
     }
@@ -221,5 +224,4 @@ void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::Cluster
         // ChipLogProgress(NotSpecified, "callback nullptr");
     }
 }
-
 };
