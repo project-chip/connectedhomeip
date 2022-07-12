@@ -352,21 +352,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
-{
-    VerifyOrReturnError(val != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (val != mServiceMode)
-    {
-        mServiceMode = val;
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     VerifyOrReturnError(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported,
