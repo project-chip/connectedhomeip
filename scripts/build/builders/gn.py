@@ -50,7 +50,7 @@ class GnBuilder(Builder):
         pass
 
     def PostBuildCommand(self):
-        """Extra steps to run before 'build'"""
+        """Extra steps to run after 'build'"""
         pass
 
     def generate(self):
