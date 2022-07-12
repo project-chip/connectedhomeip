@@ -35,22 +35,39 @@ namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
-static const char prefix[] = "/kv/chip-kvs-";
-
 class KeyBuilder
 {
 public:
     KeyBuilder(const char * key)
     {
-        auto ret = snprintf(buffer, sizeof(buffer), "%s%s", prefix, key);
-        valid    = (ret > 0) && ((size_t) ret <= (sizeof(buffer) - 1));
+        // Check sign by sign if key contians illegal characters
+        // Each illegal character will be replaced by '!' + capital encoded letter value
+        char * out = buffer + strlen(buffer);
+        char * illegal_ptr;
+        while ((out < buffer + sizeof(buffer) - 3) && *key) // 2 chars for potential illegal char + 1 for \0
+        {
+            illegal_ptr = strchr(illegalCharacters, *key);
+            if (illegal_ptr)
+            {
+                *out++ = '!';
+                *out++ = 'A' + (int) (illegal_ptr - illegalCharacters);
+            }
+            else
+            {
+                *out++ = *key;
+            }
+            key++;
+        }
+        valid = true;
     }
 
     const char * str() const { return valid ? buffer : nullptr; }
 
 private:
-    char buffer[100];
+    char buffer[100] = "chip-kvs-";
     bool valid;
+    // Mbed KV storage does not accept these characters in the key definition
+    const char * illegalCharacters = " */?:;\"|<>\\";
 };
 
 // NOTE: Currently this platform does not support partial and offset reads
