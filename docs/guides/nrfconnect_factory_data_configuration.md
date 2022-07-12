@@ -228,7 +228,8 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
         --passcode <pass_code> --spake2p_path <path to spake2p executable>
         ```
 
-    > Note: To generate new SPAKE2+ verifier you need `spake2p` executable. See the note at the end of this section to learn how to get it.
+    > Note: To generate new SPAKE2+ verifier you need `spake2p` executable. See
+    > the note at the end of this section to learn how to get it.
 
     - Manual:
 
@@ -237,7 +238,8 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
         ```
 
     d. Add paths to `.der` files that contain PAI and DAC certificates and the
-    DAC private key (replace the respective variables with the file names) using one of the following methods:
+    DAC private key (replace the respective variables with the file names) using
+    one of the following methods:
 
     - Automatic:
 
@@ -245,7 +247,8 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
     --chip_cert_path <path to chip-cert executable>
     ```
 
-    > Note: To generate new certificates, you need the `chip-cert` executable. See the note at the end of this section to learn how to get it.
+    > Note: To generate new certificates, you need the `chip-cert` executable.
+    > See the note at the end of this section to learn how to get it.
 
     - Manual:
 
@@ -340,13 +343,14 @@ If the script finishes successfully, go to the location you provided with the
 > 3.  Add the `connectedhomeip/src/tools/spake2p/out/spake2p` path as an
 >     argument of `--spake2p_path` for the Python script.
 
-> Note: Generating new certificates is optional if default vendor and product IDs are used and requires providing a
-> path to the `chip-cert` executable. To get it, complete the following steps:
+> Note: Generating new certificates is optional if default vendor and product
+> IDs are used and requires providing a path to the `chip-cert` executable. To
+> get it, complete the following steps:
 >
 > 1.  Navigate to the `connectedhomeip` root directory.
 > 2.  In a terminal, run the command:
->     `cd src/tools/chip-cert && gn gen out && ninja -C out chip-cert` to build the
->     executable.
+>     `cd src/tools/chip-cert && gn gen out && ninja -C out chip-cert` to build
+>     the executable.
 > 3.  Add the `connectedhomeip/src/tools/chip-cert/out/chip-cert` path as an
 >     argument of `--chip_cert_path` for the Python script.
 
@@ -647,7 +651,11 @@ $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
 ```
 
-You can also build an example with auto-generation of new CD, DAC and PAI certificates. The newly generated certificates will be added to factory data set automatically. To generate new certificates disable using default certificates by building an example with the additional option `-DCHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n`:
+You can also build an example with auto-generation of new CD, DAC and PAI
+certificates. The newly generated certificates will be added to factory data set
+automatically. To generate new certificates disable using default certificates
+by building an example with the additional option
+`-DCHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n`:
 
 ```
 $ west build -b nrf52840dk_nrf52840 -- \
@@ -657,7 +665,12 @@ $ west build -b nrf52840dk_nrf52840 -- \
 -DCONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS=n
 ```
 
-> Note: To generate new certificates using the nRF Connect platform build system, you need the `chip-cert` executable in your system variable PATH. To learn how to get `chip-cert`, go to the note at the end of [creating the factory data partition with the second script](#creating-the-factory-data-partition-with-the-second-script) section, and then add the newly built executable to the system variable PATH. The Cmake build system will find this executable automatically.
+> Note: To generate new certificates using the nRF Connect platform build
+> system, you need the `chip-cert` executable in your system variable PATH. To
+> learn how to get `chip-cert`, go to the note at the end of
+> [creating the factory data partition with the second script](#creating-the-factory-data-partition-with-the-second-script)
+> section, and then add the newly built executable to the system variable PATH.
+> The Cmake build system will find this executable automatically.
 
 After that, use the following command from the example's directory to write
 firmware and newly generated factory data at the same time:
