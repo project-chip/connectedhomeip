@@ -32,6 +32,7 @@
 		2CB7163C252E8A7C0026E2BB /* MTRDevicePairingDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2CB71639252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.mm */; };
 		2CB7163F252F731E0026E2BB /* MTRDevicePairingDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB7163E252F731E0026E2BB /* MTRDevicePairingDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2FD775552695557E00FF4B12 /* error-mapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2FD775542695557E00FF4B12 /* error-mapping.cpp */; };
+		5112F606287CD2C100B827E7 /* privilege-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5112F605287CD2C100B827E7 /* privilege-storage.cpp */; };
 		5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */ = {isa = PBXBuildFile; fileRef = 5129BCFC26A9EE3300122DDF /* MTRError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		5136661328067D550025EDAE /* MTRDeviceController_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */; };
 		5136661428067D550025EDAE /* MTRControllerFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5136661028067D540025EDAE /* MTRControllerFactory.mm */; };
@@ -149,6 +150,7 @@
 		2CB71639252E8A7B0026E2BB /* MTRDevicePairingDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDevicePairingDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB7163E252F731E0026E2BB /* MTRDevicePairingDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDevicePairingDelegate.h; sourceTree = "<group>"; };
 		2FD775542695557E00FF4B12 /* error-mapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "error-mapping.cpp"; path = "../../../app/util/error-mapping.cpp"; sourceTree = "<group>"; };
+		5112F605287CD2C100B827E7 /* privilege-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "privilege-storage.cpp"; path = "../../../app/util/privilege-storage.cpp"; sourceTree = "<group>"; };
 		5129BCFC26A9EE3300122DDF /* MTRError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRError.h; sourceTree = "<group>"; };
 		5136660F28067D540025EDAE /* MTRDeviceController_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceController_Internal.h; sourceTree = "<group>"; };
 		5136661028067D540025EDAE /* MTRControllerFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRControllerFactory.mm; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 		1E857311265519DE0050A4D9 /* CHIPApp */ = {
 			isa = PBXGroup;
 			children = (
+				5112F605287CD2C100B827E7 /* privilege-storage.cpp */,
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				51431AFA27D29CA4008A7943 /* ota-provider.cpp */,
 			);
@@ -635,6 +638,7 @@
 				5A7947E427C0129600434CF2 /* MTRDeviceController+XPC.m in Sources */,
 				5A6FEC9027B563D900F25F42 /* MTRDeviceControllerOverXPC.m in Sources */,
 				B289D4222639C0D300D4E314 /* MTROnboardingPayloadParser.m in Sources */,
+				5112F606287CD2C100B827E7 /* privilege-storage.cpp in Sources */,
 				2C1B027A2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.mm in Sources */,
 				7560FD1C27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* MTRSetupPayload.mm in Sources */,
