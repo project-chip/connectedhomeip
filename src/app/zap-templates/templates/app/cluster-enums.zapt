@@ -28,7 +28,7 @@ k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{#if (isWeaklyTypedEnum label)}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using {{asType label}} = EmberAf{{asType label}};
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 {{/if}}
 {{/zcl_enums}}
 {{#zcl_bitmaps}}

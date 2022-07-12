@@ -32913,8 +32913,8 @@ class Messaging(Cluster):
             kBatteryCoverRemoved = 0xA2
             kBatteryCoverClosed = 0xA3
             kExcessFlow = 0xA4
-            kCreditOk = 0xC0
-            kLowCredit = 0xC1
+            kCreditOk = 0xB0
+            kLowCredit = 0xB1
             kEmergencyCreditInUse = 0xC0
             kEmergencyCreditExhausted = 0xC1
             kZeroCreditEcNotSelected = 0xC2

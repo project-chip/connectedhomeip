@@ -55,7 +55,7 @@ bool Command::InitArguments(int argc, char ** argv)
         }
     }
 
-    VerifyOrExit((size_t) (argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
                               static_cast<unsigned int>(mandatoryArgsCount)));
 

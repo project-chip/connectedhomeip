@@ -42,6 +42,7 @@ class TestDataModelSerialization
 {
 public:
     static void TestDataModelSerialization_EncAndDecSimpleStruct(nlTestSuite * apSuite, void * apContext);
+    static void TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_EncAndDecNestedStruct(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_EncAndDecNestedStructList(nlTestSuite * apSuite, void * apContext);
     static void TestDataModelSerialization_EncAndDecDecodableNestedStructList(nlTestSuite * apSuite, void * apContext);
@@ -218,6 +219,55 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         NL_TEST_ASSERT(apSuite, StringMatches(t.e, "chip"));
         NL_TEST_ASSERT(apSuite, t.f.HasOnly(TestCluster::SimpleBitmap::kValueC));
+    }
+}
+
+void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum(nlTestSuite * apSuite,
+                                                                                              void * apContext)
+{
+    CHIP_ERROR err;
+    auto * _this = static_cast<TestDataModelSerialization *>(apContext);
+
+    _this->mpSuite = apSuite;
+    _this->SetupBuf();
+
+    //
+    // Encode
+    //
+    {
+        TestCluster::Structs::SimpleStruct::Type t;
+        uint8_t buf[4]  = { 0, 1, 2, 3 };
+        char strbuf[10] = "chip";
+
+        t.a = 20;
+        t.b = true;
+        t.c = static_cast<TestCluster::SimpleEnum>(10);
+        t.d = buf;
+
+        t.e = Span<char>{ strbuf, strlen(strbuf) };
+
+        t.f.Set(TestCluster::SimpleBitmap::kValueC);
+
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = _this->mWriter.Finalize();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        _this->DumpBuf();
+    }
+
+    //
+    // Decode
+    //
+    {
+        TestCluster::Structs::SimpleStruct::Type t;
+
+        _this->SetupReader();
+
+        err = DataModel::Decode(_this->mReader, t);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, to_underlying(t.c) == 4);
     }
 }
 
@@ -1057,6 +1107,7 @@ int Finalize(void * aContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimple", TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruct),
+    NL_TEST_DEF("TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum", TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStructNegativeEnum),
     NL_TEST_DEF("TestDataModelSerialization_EncAndDecNestedStruct", TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruct),
     NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableNestedStructList",  TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNestedStructList),
     NL_TEST_DEF("TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList", TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDoubleNestedStructList),

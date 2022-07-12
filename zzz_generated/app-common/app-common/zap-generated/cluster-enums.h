@@ -27,11 +27,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace PowerConfiguration {
-} // namespace PowerConfiguration
+namespace PowerConfiguration {} // namespace PowerConfiguration
 
-namespace DeviceTemperatureConfiguration {
-} // namespace DeviceTemperatureConfiguration
+namespace DeviceTemperatureConfiguration {} // namespace DeviceTemperatureConfiguration
 
 namespace Identify {
 
@@ -48,9 +46,9 @@ enum class IdentifyEffectIdentifier : uint8_t
     kFinishEffect  = 0xFE,
     kStopEffect    = 0xFF,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IdentifyEffectIdentifier        = EmberAfIdentifyEffectIdentifier;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -60,9 +58,9 @@ enum class IdentifyEffectVariant : uint8_t
 {
     kDefault = 0x00,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IdentifyEffectVariant           = EmberAfIdentifyEffectVariant;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -77,9 +75,9 @@ enum class IdentifyIdentifyType : uint8_t
     kDisplay      = 0x04,
     kActuator     = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using IdentifyIdentifyType            = EmberAfIdentifyIdentifyType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace Identify
 
 namespace Groups {
@@ -112,9 +110,9 @@ enum class OnOffDelayedAllOffEffectVariant : uint8_t
     kNoFade                                               = 0x01,
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDelayedAllOffEffectVariant = EmberAfOnOffDelayedAllOffEffectVariant;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -124,9 +122,9 @@ enum class OnOffDyingLightEffectVariant : uint8_t
 {
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffDyingLightEffectVariant    = EmberAfOnOffDyingLightEffectVariant;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -137,9 +135,9 @@ enum class OnOffEffectIdentifier : uint8_t
     kDelayedAllOff = 0x00,
     kDyingLight    = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for OnOffStartUpOnOff
 enum class OnOffStartUpOnOff : uint8_t
@@ -168,8 +166,7 @@ enum class SceneFeatures : uint32_t
 };
 } // namespace OnOff
 
-namespace OnOffSwitchConfiguration {
-} // namespace OnOffSwitchConfiguration
+namespace OnOffSwitchConfiguration {} // namespace OnOffSwitchConfiguration
 
 namespace LevelControl {
 
@@ -182,9 +179,9 @@ enum class MoveMode : uint8_t
     kUp   = 0x00,
     kDown = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using MoveMode                        = EmberAfMoveMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -195,9 +192,9 @@ enum class StepMode : uint8_t
     kUp   = 0x00,
     kDown = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StepMode                        = EmberAfStepMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for LevelControlFeature
 enum class LevelControlFeature : uint32_t
@@ -208,17 +205,13 @@ enum class LevelControlFeature : uint32_t
 };
 } // namespace LevelControl
 
-namespace Alarms {
-} // namespace Alarms
+namespace Alarms {} // namespace Alarms
 
-namespace Time {
-} // namespace Time
+namespace Time {} // namespace Time
 
-namespace BinaryInputBasic {
-} // namespace BinaryInputBasic
+namespace BinaryInputBasic {} // namespace BinaryInputBasic
 
-namespace PowerProfile {
-} // namespace PowerProfile
+namespace PowerProfile {} // namespace PowerProfile
 
 namespace ApplianceControl {
 
@@ -276,14 +269,11 @@ enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
 };
 } // namespace ApplianceControl
 
-namespace PulseWidthModulation {
-} // namespace PulseWidthModulation
+namespace PulseWidthModulation {} // namespace PulseWidthModulation
 
-namespace Descriptor {
-} // namespace Descriptor
+namespace Descriptor {} // namespace Descriptor
 
-namespace Binding {
-} // namespace Binding
+namespace Binding {} // namespace Binding
 
 namespace AccessControl {
 
@@ -314,8 +304,7 @@ enum class Privilege : uint8_t
 };
 } // namespace AccessControl
 
-namespace PollControl {
-} // namespace PollControl
+namespace PollControl {} // namespace PollControl
 
 namespace BridgedActions {
 
@@ -373,8 +362,7 @@ enum class CommandBits : uint16_t
 };
 } // namespace BridgedActions
 
-namespace Basic {
-} // namespace Basic
+namespace Basic {} // namespace Basic
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -440,8 +428,7 @@ enum class OTAUpdateStateEnum : uint8_t
 };
 } // namespace OtaSoftwareUpdateRequestor
 
-namespace LocalizationConfiguration {
-} // namespace LocalizationConfiguration
+namespace LocalizationConfiguration {} // namespace LocalizationConfiguration
 
 namespace TimeFormatLocalization {
 
@@ -487,8 +474,7 @@ enum class UnitLocalizationFeature : uint32_t
 };
 } // namespace UnitLocalization
 
-namespace PowerSourceConfiguration {
-} // namespace PowerSourceConfiguration
+namespace PowerSourceConfiguration {} // namespace PowerSourceConfiguration
 
 namespace PowerSource {
 
@@ -706,9 +692,9 @@ enum class HardwareFaultType : uint8_t
     kNonVolatileMemoryError = 0x09,
     kTamperDetected         = 0x0A,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HardwareFaultType               = EmberAfHardwareFaultType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -722,9 +708,9 @@ enum class InterfaceType : uint8_t
     kCellular    = 0x03,
     kThread      = 0x04,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using InterfaceType                   = EmberAfInterfaceType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -737,9 +723,9 @@ enum class NetworkFaultType : uint8_t
     kNetworkJammed    = 0x02,
     kConnectionFailed = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using NetworkFaultType                = EmberAfNetworkFaultType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -755,9 +741,9 @@ enum class RadioFaultType : uint8_t
     kBLEFault      = 0x05,
     kEthernetFault = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RadioFaultType                  = EmberAfRadioFaultType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
@@ -794,9 +780,9 @@ enum class RoutingRole : uint8_t
     kRouter          = 0x05,
     kLeader          = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using RoutingRole                     = EmberAfRoutingRole;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for ThreadConnectionStatus
 enum class ThreadConnectionStatus : uint8_t
@@ -839,9 +825,9 @@ enum class SecurityType : uint8_t
     kWpa2        = 0x04,
     kWpa3        = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SecurityType                    = EmberAfSecurityType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for WiFiConnectionStatus
 enum class WiFiConnectionStatus : uint8_t
@@ -863,9 +849,9 @@ enum class WiFiVersionType : uint8_t
     k80211ac = 0x04,
     k80211ax = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using WiFiVersionType                 = EmberAfWiFiVersionType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace WiFiNetworkDiagnostics
 
 namespace EthernetNetworkDiagnostics {
@@ -887,19 +873,16 @@ enum class PHYRateType : uint8_t
     k200g  = 0x08,
     k400g  = 0x09,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using PHYRateType                     = EmberAfPHYRateType;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace EthernetNetworkDiagnostics
 
-namespace TimeSynchronization {
-} // namespace TimeSynchronization
+namespace TimeSynchronization {} // namespace TimeSynchronization
 
-namespace BridgedDeviceBasic {
-} // namespace BridgedDeviceBasic
+namespace BridgedDeviceBasic {} // namespace BridgedDeviceBasic
 
-namespace Switch {
-} // namespace Switch
+namespace Switch {} // namespace Switch
 
 namespace AdministratorCommissioning {
 
@@ -921,9 +904,9 @@ enum class StatusCode : uint8_t
     kPAKEParameterError = 0x02,
     kWindowNotOpen      = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using StatusCode                      = EmberAfStatusCode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {
@@ -955,23 +938,17 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 } // namespace GroupKeyManagement
 
-namespace FixedLabel {
-} // namespace FixedLabel
+namespace FixedLabel {} // namespace FixedLabel
 
-namespace UserLabel {
-} // namespace UserLabel
+namespace UserLabel {} // namespace UserLabel
 
-namespace ProxyConfiguration {
-} // namespace ProxyConfiguration
+namespace ProxyConfiguration {} // namespace ProxyConfiguration
 
-namespace ProxyDiscovery {
-} // namespace ProxyDiscovery
+namespace ProxyDiscovery {} // namespace ProxyDiscovery
 
-namespace ProxyValid {
-} // namespace ProxyValid
+namespace ProxyValid {} // namespace ProxyValid
 
-namespace BooleanState {
-} // namespace BooleanState
+namespace BooleanState {} // namespace BooleanState
 
 namespace ModeSelect {
 
@@ -982,8 +959,7 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
-namespace ShadeConfiguration {
-} // namespace ShadeConfiguration
+namespace ShadeConfiguration {} // namespace ShadeConfiguration
 
 namespace DoorLock {
 
@@ -1490,8 +1466,7 @@ enum class SafetyStatus : uint16_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {
-} // namespace BarrierControl
+namespace BarrierControl {} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
@@ -1542,9 +1517,9 @@ enum class SetpointAdjustMode : uint8_t
     kCoolSetpoint         = 0x01,
     kHeatAndCoolSetpoints = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SetpointAdjustMode              = EmberAfSetpointAdjustMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for ThermostatControlSequence
 enum class ThermostatControlSequence : uint8_t
@@ -1666,11 +1641,9 @@ enum class WindSupportMask : uint8_t
 };
 } // namespace FanControl
 
-namespace DehumidificationControl {
-} // namespace DehumidificationControl
+namespace DehumidificationControl {} // namespace DehumidificationControl
 
-namespace ThermostatUserInterfaceConfiguration {
-} // namespace ThermostatUserInterfaceConfiguration
+namespace ThermostatUserInterfaceConfiguration {} // namespace ThermostatUserInterfaceConfiguration
 
 namespace ColorControl {
 
@@ -1684,9 +1657,9 @@ enum class ColorLoopAction : uint8_t
     kActivateFromColorLoopStartEnhancedHue = 0x01,
     kActivateFromEnhancedCurrentHue        = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorLoopAction                 = EmberAfColorLoopAction;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1697,9 +1670,9 @@ enum class ColorLoopDirection : uint8_t
     kDecrementHue = 0x00,
     kIncrementHue = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorLoopDirection              = EmberAfColorLoopDirection;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1711,9 +1684,9 @@ enum class ColorMode : uint8_t
     kCurrentXAndCurrentY            = 0x01,
     kColorTemperature               = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ColorMode                       = EmberAfColorMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1726,9 +1699,9 @@ enum class HueDirection : uint8_t
     kUp               = 0x02,
     kDown             = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HueDirection                    = EmberAfHueDirection;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1740,9 +1713,9 @@ enum class HueMoveMode : uint8_t
     kUp   = 0x01,
     kDown = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HueMoveMode                     = EmberAfHueMoveMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1753,9 +1726,9 @@ enum class HueStepMode : uint8_t
     kUp   = 0x01,
     kDown = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using HueStepMode                     = EmberAfHueStepMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1767,9 +1740,9 @@ enum class SaturationMoveMode : uint8_t
     kUp   = 0x01,
     kDown = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SaturationMoveMode              = EmberAfSaturationMoveMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -1780,9 +1753,9 @@ enum class SaturationStepMode : uint8_t
     kUp   = 0x01,
     kDown = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using SaturationStepMode              = EmberAfSaturationStepMode;
-#endif
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for ColorCapabilities
 enum class ColorCapabilities : uint16_t
@@ -1814,8 +1787,7 @@ enum class ColorLoopUpdateFlags : uint8_t
 };
 } // namespace ColorControl
 
-namespace BallastConfiguration {
-} // namespace BallastConfiguration
+namespace BallastConfiguration {} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 
@@ -1827,8 +1799,7 @@ enum class LightSensorType : uint8_t
 };
 } // namespace IlluminanceMeasurement
 
-namespace TemperatureMeasurement {
-} // namespace TemperatureMeasurement
+namespace TemperatureMeasurement {} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 
@@ -1839,107 +1810,73 @@ enum class PressureFeature : uint32_t
 };
 } // namespace PressureMeasurement
 
-namespace FlowMeasurement {
-} // namespace FlowMeasurement
+namespace FlowMeasurement {} // namespace FlowMeasurement
 
-namespace RelativeHumidityMeasurement {
-} // namespace RelativeHumidityMeasurement
+namespace RelativeHumidityMeasurement {} // namespace RelativeHumidityMeasurement
 
-namespace OccupancySensing {
-} // namespace OccupancySensing
+namespace OccupancySensing {} // namespace OccupancySensing
 
-namespace CarbonMonoxideConcentrationMeasurement {
-} // namespace CarbonMonoxideConcentrationMeasurement
+namespace CarbonMonoxideConcentrationMeasurement {} // namespace CarbonMonoxideConcentrationMeasurement
 
-namespace CarbonDioxideConcentrationMeasurement {
-} // namespace CarbonDioxideConcentrationMeasurement
+namespace CarbonDioxideConcentrationMeasurement {} // namespace CarbonDioxideConcentrationMeasurement
 
-namespace EthyleneConcentrationMeasurement {
-} // namespace EthyleneConcentrationMeasurement
+namespace EthyleneConcentrationMeasurement {} // namespace EthyleneConcentrationMeasurement
 
-namespace EthyleneOxideConcentrationMeasurement {
-} // namespace EthyleneOxideConcentrationMeasurement
+namespace EthyleneOxideConcentrationMeasurement {} // namespace EthyleneOxideConcentrationMeasurement
 
-namespace HydrogenConcentrationMeasurement {
-} // namespace HydrogenConcentrationMeasurement
+namespace HydrogenConcentrationMeasurement {} // namespace HydrogenConcentrationMeasurement
 
-namespace HydrogenSulphideConcentrationMeasurement {
-} // namespace HydrogenSulphideConcentrationMeasurement
+namespace HydrogenSulphideConcentrationMeasurement {} // namespace HydrogenSulphideConcentrationMeasurement
 
-namespace NitricOxideConcentrationMeasurement {
-} // namespace NitricOxideConcentrationMeasurement
+namespace NitricOxideConcentrationMeasurement {} // namespace NitricOxideConcentrationMeasurement
 
-namespace NitrogenDioxideConcentrationMeasurement {
-} // namespace NitrogenDioxideConcentrationMeasurement
+namespace NitrogenDioxideConcentrationMeasurement {} // namespace NitrogenDioxideConcentrationMeasurement
 
-namespace OxygenConcentrationMeasurement {
-} // namespace OxygenConcentrationMeasurement
+namespace OxygenConcentrationMeasurement {} // namespace OxygenConcentrationMeasurement
 
-namespace OzoneConcentrationMeasurement {
-} // namespace OzoneConcentrationMeasurement
+namespace OzoneConcentrationMeasurement {} // namespace OzoneConcentrationMeasurement
 
-namespace SulfurDioxideConcentrationMeasurement {
-} // namespace SulfurDioxideConcentrationMeasurement
+namespace SulfurDioxideConcentrationMeasurement {} // namespace SulfurDioxideConcentrationMeasurement
 
-namespace DissolvedOxygenConcentrationMeasurement {
-} // namespace DissolvedOxygenConcentrationMeasurement
+namespace DissolvedOxygenConcentrationMeasurement {} // namespace DissolvedOxygenConcentrationMeasurement
 
-namespace BromateConcentrationMeasurement {
-} // namespace BromateConcentrationMeasurement
+namespace BromateConcentrationMeasurement {} // namespace BromateConcentrationMeasurement
 
-namespace ChloraminesConcentrationMeasurement {
-} // namespace ChloraminesConcentrationMeasurement
+namespace ChloraminesConcentrationMeasurement {} // namespace ChloraminesConcentrationMeasurement
 
-namespace ChlorineConcentrationMeasurement {
-} // namespace ChlorineConcentrationMeasurement
+namespace ChlorineConcentrationMeasurement {} // namespace ChlorineConcentrationMeasurement
 
-namespace FecalColiformAndEColiConcentrationMeasurement {
-} // namespace FecalColiformAndEColiConcentrationMeasurement
+namespace FecalColiformAndEColiConcentrationMeasurement {} // namespace FecalColiformAndEColiConcentrationMeasurement
 
-namespace FluorideConcentrationMeasurement {
-} // namespace FluorideConcentrationMeasurement
+namespace FluorideConcentrationMeasurement {} // namespace FluorideConcentrationMeasurement
 
-namespace HaloaceticAcidsConcentrationMeasurement {
-} // namespace HaloaceticAcidsConcentrationMeasurement
+namespace HaloaceticAcidsConcentrationMeasurement {} // namespace HaloaceticAcidsConcentrationMeasurement
 
-namespace TotalTrihalomethanesConcentrationMeasurement {
-} // namespace TotalTrihalomethanesConcentrationMeasurement
+namespace TotalTrihalomethanesConcentrationMeasurement {} // namespace TotalTrihalomethanesConcentrationMeasurement
 
-namespace TotalColiformBacteriaConcentrationMeasurement {
-} // namespace TotalColiformBacteriaConcentrationMeasurement
+namespace TotalColiformBacteriaConcentrationMeasurement {} // namespace TotalColiformBacteriaConcentrationMeasurement
 
-namespace TurbidityConcentrationMeasurement {
-} // namespace TurbidityConcentrationMeasurement
+namespace TurbidityConcentrationMeasurement {} // namespace TurbidityConcentrationMeasurement
 
-namespace CopperConcentrationMeasurement {
-} // namespace CopperConcentrationMeasurement
+namespace CopperConcentrationMeasurement {} // namespace CopperConcentrationMeasurement
 
-namespace LeadConcentrationMeasurement {
-} // namespace LeadConcentrationMeasurement
+namespace LeadConcentrationMeasurement {} // namespace LeadConcentrationMeasurement
 
-namespace ManganeseConcentrationMeasurement {
-} // namespace ManganeseConcentrationMeasurement
+namespace ManganeseConcentrationMeasurement {} // namespace ManganeseConcentrationMeasurement
 
-namespace SulfateConcentrationMeasurement {
-} // namespace SulfateConcentrationMeasurement
+namespace SulfateConcentrationMeasurement {} // namespace SulfateConcentrationMeasurement
 
-namespace BromodichloromethaneConcentrationMeasurement {
-} // namespace BromodichloromethaneConcentrationMeasurement
+namespace BromodichloromethaneConcentrationMeasurement {} // namespace BromodichloromethaneConcentrationMeasurement
 
-namespace BromoformConcentrationMeasurement {
-} // namespace BromoformConcentrationMeasurement
+namespace BromoformConcentrationMeasurement {} // namespace BromoformConcentrationMeasurement
 
-namespace ChlorodibromomethaneConcentrationMeasurement {
-} // namespace ChlorodibromomethaneConcentrationMeasurement
+namespace ChlorodibromomethaneConcentrationMeasurement {} // namespace ChlorodibromomethaneConcentrationMeasurement
 
-namespace ChloroformConcentrationMeasurement {
-} // namespace ChloroformConcentrationMeasurement
+namespace ChloroformConcentrationMeasurement {} // namespace ChloroformConcentrationMeasurement
 
-namespace SodiumConcentrationMeasurement {
-} // namespace SodiumConcentrationMeasurement
+namespace SodiumConcentrationMeasurement {} // namespace SodiumConcentrationMeasurement
 
-namespace WakeOnLan {
-} // namespace WakeOnLan
+namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {
 
@@ -2025,8 +1962,7 @@ enum class MediaInputFeature : uint32_t
 };
 } // namespace MediaInput
 
-namespace LowPower {
-} // namespace LowPower
+namespace LowPower {} // namespace LowPower
 
 namespace KeypadInput {
 
@@ -2237,8 +2173,7 @@ enum class ApplicationStatusEnum : uint8_t
 };
 } // namespace ApplicationBasic
 
-namespace AccountLogin {
-} // namespace AccountLogin
+namespace AccountLogin {} // namespace AccountLogin
 
 namespace Messaging {
 
@@ -2308,8 +2243,8 @@ enum class EventId : uint8_t
     kBatteryCoverRemoved                = 0xA2,
     kBatteryCoverClosed                 = 0xA3,
     kExcessFlow                         = 0xA4,
-    kCreditOk                           = 0xC0,
-    kLowCredit                          = 0xC1,
+    kCreditOk                           = 0xB0,
+    kLowCredit                          = 0xB1,
     kEmergencyCreditInUse               = 0xC0,
     kEmergencyCreditExhausted           = 0xC1,
     kZeroCreditEcNotSelected            = 0xC2,
@@ -2383,11 +2318,9 @@ enum class MessagingExtendedControlMask : uint8_t
 };
 } // namespace Messaging
 
-namespace ApplianceIdentification {
-} // namespace ApplianceIdentification
+namespace ApplianceIdentification {} // namespace ApplianceIdentification
 
-namespace MeterIdentification {
-} // namespace MeterIdentification
+namespace MeterIdentification {} // namespace MeterIdentification
 
 namespace ApplianceEventsAndAlert {
 
@@ -2417,11 +2350,9 @@ enum class AlertStructure : uint32_t
 };
 } // namespace ApplianceEventsAndAlert
 
-namespace ApplianceStatistics {
-} // namespace ApplianceStatistics
+namespace ApplianceStatistics {} // namespace ApplianceStatistics
 
-namespace ElectricalMeasurement {
-} // namespace ElectricalMeasurement
+namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 
 namespace TestCluster {
 
