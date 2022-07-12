@@ -85,23 +85,17 @@ template("p6_sdk_sources") {
 
     # Pull out c sources from generated json
     foreach(src, mtb_json_local.c_source) {
-      sources += [ rebase_path(src,
-                               "${p6_project_dir}",
-                               "${p6_sdk_build_root}/p6_sdk/") ]
+      sources += [ "${p6_sdk_build_root}/p6_sdk/${src}" ]
     }
 
     # Pull out cpp sources from generated json
     foreach(src, mtb_json_local.cxx_source) {
-      sources += [ rebase_path(src,
-                               "${p6_project_dir}",
-                               "${p6_sdk_build_root}/p6_sdk/") ]
+      sources += [ "${p6_sdk_build_root}/p6_sdk/${src}" ]
     }
 
     # Pull out .S files from generated json
     foreach(asm, mtb_json_local.asm_source) {
-      sources += [ rebase_path(asm,
-                               "${p6_project_dir}",
-                               "${p6_sdk_build_root}/p6_sdk/") ]
+      sources += [ "${p6_sdk_build_root}/p6_sdk/${asm}" ]
     }
 
     public_deps = []
