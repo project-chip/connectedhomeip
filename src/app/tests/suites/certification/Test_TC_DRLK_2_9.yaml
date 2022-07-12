@@ -309,8 +309,7 @@ tests:
               - name: "credentialRule"
                 value: 0
 
-    - label:
-          "TH sends Set Credential Command to DUT"
+    - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000

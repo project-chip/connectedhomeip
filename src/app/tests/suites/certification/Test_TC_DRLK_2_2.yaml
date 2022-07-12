@@ -77,7 +77,6 @@ tests:
               - name: "nextUserIndex"
                 value: null
 
-
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -157,8 +156,7 @@ tests:
       arguments:
           value: true
 
-    - label:
-          "TH reads the RequirePINforRemoteOperation attribute from the DUT"
+    - label: "TH reads the RequirePINforRemoteOperation attribute from the DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
