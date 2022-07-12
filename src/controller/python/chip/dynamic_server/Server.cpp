@@ -140,7 +140,7 @@ ChipError::StorageType pychip_Server_SetCommissioningParams(uint16_t discriminat
 
 void pychip_Server_RegisterAttributeGetterCallback(void * appContext, GetAttributeValueCb getValueCb) {
     gGetAttributeContext = appContext;
-    gGetValueCb = getValueCb;    
+    gGetValueCb = getValueCb;
 }
 
 void pychip_Server_RemoveEndpoint(uint16_t endpointIndex)
@@ -158,7 +158,7 @@ uint32_t pychip_Server_RegisterEndpoint(EndpointId endpointId, uint16_t endpoint
     PyEmberAfEndpointType *pyEndpointType = (PyEmberAfEndpointType *)(buf);
     EmberAfEndpointType *endpoint = new EmberAfEndpointType();
 
-    endpoint->clusterCount = pyEndpointType->clusterCount;   
+    endpoint->clusterCount = pyEndpointType->clusterCount;
     endpoint->cluster = new EmberAfCluster[endpoint->clusterCount];
 
     auto *pyCluster = pyEndpointType->cluster;

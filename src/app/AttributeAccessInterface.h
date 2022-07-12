@@ -315,7 +315,7 @@ private:
         return builder.FinishAttribute(mAttributeReportIBsBuilder);
     }
 
-    
+
     /**
      * EnsureListStarted encodes the first item of one report with lists (an
      * empty list), as needed.

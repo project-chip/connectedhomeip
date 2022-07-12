@@ -105,7 +105,7 @@ public:
 
     static constexpr uint32_t kDefaultTestPasscode = 20202021;
     static constexpr uint16_t kDefaultTestDiscriminator = 3840;
-    
+
 private:
     uint16_t mDiscriminator = kDefaultTestDiscriminator;
     uint32_t mPasscode = kDefaultTestPasscode;

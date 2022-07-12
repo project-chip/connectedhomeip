@@ -125,7 +125,7 @@ void pychip_Server_StackShutdown()
 ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate *storageDelegate, int bleDevice)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
@@ -152,7 +152,7 @@ ChipError::StorageType pychip_Server_StackInit(PersistentStorageDelegate *storag
 
 #if CONFIG_NETWORK_LAYER_BLE
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("RpiMatterDali"); // Use default device name (CHIP-XXXX)
-    
+
     err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(bleDevice != -1 ? bleDevice : LinuxDeviceOptions::GetInstance().mBleDevice, false);
     if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Failed to configure BLE as peripheral: %s", chip::ErrorStr(err));
