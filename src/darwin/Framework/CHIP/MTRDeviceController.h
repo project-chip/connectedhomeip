@@ -124,10 +124,8 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Set the Delegate for the OTA Provider as well as the Queue on which the Delegate callbacks will be triggered
  *
  * @param[in] delegate The delegate the OTA Provider should use
- *
- * @param[in] queue The queue on which the callbacks will be delivered
  */
-- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate;
 
 /**
  * Shutdown the controller. Calls to shutdown after the first one are NO-OPs.

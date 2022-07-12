@@ -27,7 +27,7 @@ public:
     MTROTAProviderDelegateBridge();
     ~MTROTAProviderDelegateBridge();
 
-    void setDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue);
+    void setDelegate(id<MTROTAProviderDelegate> delegate);
 
     void HandleQueryImage(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

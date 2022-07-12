@@ -18,6 +18,7 @@
 #import "MTROTAProviderDelegateBridge.h"
 
 #include <app/clusters/ota-provider/ota-provider.h>
+#include <platform/PlatformManager.h>
 
 static NSInteger const kOtaProviderEndpoint = 0;
 
@@ -28,15 +29,10 @@ MTROTAProviderDelegateBridge::MTROTAProviderDelegateBridge(void)
 
 MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge(void) {}
 
-void MTROTAProviderDelegateBridge::setDelegate(id<MTROTAProviderDelegate> delegate, dispatch_queue_t queue)
+void MTROTAProviderDelegateBridge::setDelegate(id<MTROTAProviderDelegate> delegate)
 {
-    if (delegate && queue) {
-        mDelegate = delegate;
-        mQueue = queue;
-    } else {
-        mDelegate = nil;
-        mQueue = nil;
-    }
+    mDelegate = delegate?:nil;
+    mQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, this);
 }
