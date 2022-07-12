@@ -151,7 +151,7 @@ if (args.mode == "controller"):
         args.storagepath = '/tmp/repl-controller.json'
 
     console.print(
-            '\n\n[bold red]>>>> Starting REPL in Controller Mode <<<<\n\n')
+        '\n\n[bold red]>>>> Starting REPL in Controller Mode <<<<\n\n')
 
     chipStack = ChipStack(persistentStoragePath=args.storagepath, stackInitType=chip.ChipStack.StackInitType.Controller)
     fabricAdmins = LoadFabricAdmins()
@@ -163,9 +163,9 @@ if (args.mode == "controller"):
 else:
     if args.storagepath is None:
         args.storagepath = '/tmp/repl-server.json'
-    
+
     console.print(
-            '\n\n[bold red]>>>> Starting REPL in Server Mode <<<<\n\n')
+        '\n\n[bold red]>>>> Starting REPL in Server Mode <<<<\n\n')
 
     chipStack = ChipStack(persistentStoragePath=args.storagepath, stackInitType=chip.ChipStack.StackInitType.Server)
     server = Server.Server()

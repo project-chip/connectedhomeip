@@ -29,11 +29,13 @@ import builtins
     endpoints
 '''
 
+
 class EmberAfAttributeMetadata(ctypes.Structure):
     _fields_ = [
         ('attributeId', ctypes.c_uint32),
         ('attributeType', ctypes.c_uint8)
     ]
+
 
 class EmberAfCluster(ctypes.Structure):
     _fields_ = [
@@ -41,6 +43,7 @@ class EmberAfCluster(ctypes.Structure):
         ('attributeCount', ctypes.c_uint16),
         ('attributes', ctypes.POINTER(EmberAfAttributeMetadata))
     ]
+
 
 class EmberAfEndpointType(ctypes.Structure):
     _fields_ = [

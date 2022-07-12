@@ -168,9 +168,11 @@ _LogMessageFunct = CFUNCTYPE(
     None, c_int64, c_int64, c_char_p, c_uint8, c_char_p)
 _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 
+
 class StackInitType(Enum):
     Controller = 1
     Server = 2
+
 
 @_singleton
 class ChipStack(object):
@@ -271,7 +273,8 @@ class ChipStack(object):
             if res != 0:
                 raise self.ErrorToException(res)
         else:
-            res = self._ChipStackLib.pychip_Server_StackInit(ctypes.c_void_p(self._persistentStorage.GetUnderlyingStorageAdapter()), bluetoothAdapter)
+            res = self._ChipStackLib.pychip_Server_StackInit(ctypes.c_void_p(
+                self._persistentStorage.GetUnderlyingStorageAdapter()), bluetoothAdapter)
             if res != 0:
                 raise self.ErrorToException(res)
 

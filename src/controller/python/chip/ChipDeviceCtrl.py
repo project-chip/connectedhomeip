@@ -363,7 +363,7 @@ class ChipDeviceController():
     def CommissionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = None):
         ''' Commission a target given an IP address, a setup pin code and a node id to be assigned
             to that target as part of commissioning.
-            
+
             To connect to a specific port on the target, a value can be provided to the port argument.
             Omit or set to None to connect using the default port.
         '''

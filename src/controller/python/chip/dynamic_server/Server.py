@@ -28,7 +28,8 @@ import inspect
 import logging
 
 _AttributeGetterCbFunct = ctypes.CFUNCTYPE(
-        None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_char), ctypes.POINTER(ctypes.c_uint16))
+    None, ctypes.py_object, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32, ctypes.POINTER(ctypes.c_char), ctypes.POINTER(ctypes.c_uint16))
+
 
 @_AttributeGetterCbFunct
 def AttributeGetterCallback(serverObj, endpointId: int, clusterId: int, attributeId: int, value: bytes, size):
@@ -42,14 +43,15 @@ def AttributeGetterCallback(serverObj, endpointId: int, clusterId: int, attribut
             for attribute in clusterState:
                 if (attribute.attribute_id == attributeId):
                     tlvValue = attribute.ToTLV(None, clusterState[attribute])
-                    
+
                     count = 0
                     for idx, byte in enumerate(tlvValue):
                         value[idx] = byte
                         count = count + 1
-                    
+
                     size[0] = count
                     return
+
 
 class Server():
     ''' Class that handles the management of the server side of a Python REPL instance.
@@ -77,11 +79,11 @@ class Server():
         '''
         curLogLevel = logging.getLogger().level
         logging.getLogger().setLevel(logging.INFO)
-    
+
         res = self._handle.pychip_Server_SetCommissioningParams(discriminator)
         if res != 0:
             raise self.ErrorToException(res)
-    
+
         logging.getLogger().setLevel(curLogLevel)
 
     def FinalizeEndpoint(self, endpointId):
@@ -129,7 +131,8 @@ class Server():
 
         print(f"Finalizing Endpoint {endpointId} with Endpoint Index = {self.endpointConfig[endpointId]['endpointIndex']}")
 
-        c_deviceTypeList = (ctypes.c_uint32 * len(self.endpointConfig[endpointId]['deviceTypeList']))(*self.endpointConfig[endpointId]['deviceTypeList'])
+        c_deviceTypeList = (ctypes.c_uint32 * len(self.endpointConfig[endpointId]
+                            ['deviceTypeList']))(*self.endpointConfig[endpointId]['deviceTypeList'])
 
         self._handle.pychip_Server_RegisterEndpoint.restype = ctypes.c_uint32
 
@@ -139,9 +142,9 @@ class Server():
             the totality of all attribute state in the Python layer.
         '''
         builtins.chipStack.Call(
-                lambda: self._handle.pychip_Server_RegisterEndpoint(ctypes.c_uint16(endpointId), ctypes.c_uint16(self.endpointConfig[endpointId]['endpointIndex']), ctypes.byref(c_emberAfEndpointType),
-                    ctypes.pointer(c_deviceTypeList), 
-                    ctypes.c_uint16(len(self.endpointConfig[endpointId]['deviceTypeList'])))
+            lambda: self._handle.pychip_Server_RegisterEndpoint(ctypes.c_uint16(endpointId), ctypes.c_uint16(self.endpointConfig[endpointId]['endpointIndex']), ctypes.byref(c_emberAfEndpointType),
+                                                                ctypes.pointer(c_deviceTypeList),
+                                                                ctypes.c_uint16(len(self.endpointConfig[endpointId]['deviceTypeList'])))
         )
 
     def RemoveEndpoint(self, endpointId):
@@ -151,7 +154,7 @@ class Server():
             raise ValueError(f"{endpointId} not already present on this node")
 
         builtins.chipStack.Call(
-                lambda: self._handle.pychip_Server_RemoveEndpoint(ctypes.c_uint16(self.endpointConfig[endpointId]['endpointIndex']))
+            lambda: self._handle.pychip_Server_RemoveEndpoint(ctypes.c_uint16(self.endpointConfig[endpointId]['endpointIndex']))
         )
 
         self.attributeState.pop(endpointId)
@@ -181,8 +184,8 @@ class Server():
                     break
 
             if (occupied == False):
-               candidateEndpointIndex = targetEndpointIndex
-               break
+                candidateEndpointIndex = targetEndpointIndex
+                break
 
         if (candidateEndpointIndex is None):
             raise ValueError(f"Exceeded the maximum number of dynamic endpoints of {self.maxEndpoints}!")
@@ -208,8 +211,8 @@ class Server():
                         continue
 
                     self.attributeState[endpointId][cluster][attribute] = attribute().value
-        
-    def GetAttribute(self, endpointId = int, cluster = ClusterObjects.Cluster, attribute = ClusterObjects.ClusterObjectDescriptor):
+
+    def GetAttribute(self, endpointId=int, cluster=ClusterObjects.Cluster, attribute=ClusterObjects.ClusterObjectDescriptor):
         ''' Returns the value of an attribute in the attribute store.
         '''
         if (endpointId not in self.attributeState):
@@ -223,15 +226,16 @@ class Server():
     def GetAllAttributes(self):
         ''' Returns the value of all attributes in the store.
         '''
-        
+
         return self.attributeState
 
-    def SetAttribute(self, endpointId = int, cluster = ClusterObjects.Cluster, attribute = ClusterObjects.ClusterAttributeDescriptor, value = typing.Any):
+    def SetAttribute(self, endpointId=int, cluster=ClusterObjects.Cluster, attribute=ClusterObjects.ClusterAttributeDescriptor, value=typing.Any):
         ''' Sets the value of an attribute in the store. It will also mark it as dirty, triggering any report generation to fire as well.
         '''
-       
-        self.attributeState[endpointId][cluster][attribute] = value 
+
+        self.attributeState[endpointId][cluster][attribute] = value
 
         builtins.chipStack.Call(
-                lambda: self._handle.pychip_Server_SetDirty(ctypes.c_uint16(endpointId), ctypes.c_uint32(cluster.id), ctypes.c_uint32(attribute.attribute_id))
+            lambda: self._handle.pychip_Server_SetDirty(ctypes.c_uint16(
+                endpointId), ctypes.c_uint32(cluster.id), ctypes.c_uint32(attribute.attribute_id))
         )

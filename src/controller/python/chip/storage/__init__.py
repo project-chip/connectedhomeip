@@ -84,6 +84,7 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size, is_found):
 def _OnSyncDeleteKeyValueCb(storageObj, key):
     storageObj.DeleteSdkKey(key.decode("utf-8"))
 
+
 class PersistentStorage:
     def __init__(self, path: str):
         self._path = path
