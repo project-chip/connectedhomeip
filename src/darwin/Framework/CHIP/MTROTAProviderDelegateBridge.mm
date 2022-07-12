@@ -158,7 +158,8 @@ void MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     }
 
     if (commandData.location.HasValue()) {
-        NSData * locationData = [NSData dataWithBytes:commandData.location.Value().data() length:commandData.location.Value().size()];
+        NSData * locationData = [NSData dataWithBytes:commandData.location.Value().data()
+                                               length:commandData.location.Value().size()];
         commandParams.location = [[NSString alloc] initWithData:locationData encoding:NSUTF8StringEncoding];
     }
 
