@@ -77,7 +77,7 @@ tests:
               - name: "nextUserIndex"
                 value: null
 
-    
+
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -131,14 +131,14 @@ tests:
       attribute: "RequirePINforRemoteOperation"
       arguments:
           value: false
-          
+
     - label: "TH sends Lock Door Command to the DUT without PINCode"
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
       timedInteractionTimeoutMs: 10000
       response:
           error: 0x00
-    
+
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
@@ -147,7 +147,7 @@ tests:
           values:
               - name: "pinCode"
                 value: "123456"
-    
+
     - label:
           "TH writes the RequirePINforRemoteOperation attribute value as True on
           the DUT"
@@ -156,7 +156,7 @@ tests:
       attribute: "RequirePINforRemoteOperation"
       arguments:
           value: true
-    
+
     - label:
           "TH reads the RequirePINforRemoteOperation attribute from the DUT"
       PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033
@@ -173,7 +173,7 @@ tests:
           values:
               - name: "pinCode"
                 value: "123456"
-    
+
     - label: "TH sends Lock Door Command to the DUT without valid PINCode"
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"

@@ -308,7 +308,7 @@ tests:
                 value: 0
               - name: "credentialRule"
                 value: 0
-      
+
     - label:
           "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -336,7 +336,7 @@ tests:
                 value: null
               - name: "nextCredentialIndex"
                 value: 4
-    
+
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
@@ -345,7 +345,7 @@ tests:
           values:
               - name: "credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
-    
+
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
@@ -355,7 +355,7 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 65534 }
       response:
           error: INVALID_COMMAND
-    
+
     - label: "TH sends Get Credential Status Command"
       PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
@@ -375,7 +375,7 @@ tests:
                 value: null
               - name: "nextCredentialIndex"
                 value: null
-      
+
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
       command: "ClearCredential"
@@ -386,9 +386,3 @@ tests:
                 value: { CredentialType: 8, CredentialIndex: 2 }
       response:
           error: INVALID_COMMAND
-
-
-
-    
-
-  

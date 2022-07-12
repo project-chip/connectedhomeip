@@ -213,7 +213,7 @@ tests:
               - name: "LocalEndTime"
                 constraints:
                     hasValue: false
-    
+
     - label: "Clear a year day schedule for the first user"
       PICS: DRLK.S.C10.Rsp
       command: "ClearYearDaySchedule"
@@ -223,7 +223,7 @@ tests:
                 value: 1
               - name: "userIndex"
                 value: 1
-    
+
     - label:
           "send Get Year Day Schedule Command to DUT and verify NOT_FOUND response"
       PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx && DRLK.S.C10.Rsp
@@ -248,7 +248,7 @@ tests:
               - name: "LocalEndTime"
                 constraints:
                     hasValue: false
-    
+
     - label:
           "Send Set Year Day Schedule Command to DUT "
       PICS: DRLK.S.C0E.Rsp
@@ -263,7 +263,7 @@ tests:
                 value: 1080
               - name: "LocalEndTime"
                 value: 2100
-    
+
     - label: "send Get Year Day Schedule Command"
       PICS: DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx
       command: "GetYearDaySchedule"
@@ -295,7 +295,7 @@ tests:
                 value: 1
               - name: "userIndex"
                 value: 1
-        
+
     - label: "Cleanup the created user"
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000

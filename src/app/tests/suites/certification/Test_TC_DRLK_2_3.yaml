@@ -77,7 +77,7 @@ tests:
               - name: "nextUserIndex"
                 value: null
 
-    
+
     - label: "Create new PIN credential and lock/unlock user"
       command: "SetCredential"
       timedInteractionTimeoutMs: 10000
@@ -163,7 +163,7 @@ tests:
       attribute: "LockState"
       response:
           value: 2
-    
+
     - label: "Cleanup the created user"
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
