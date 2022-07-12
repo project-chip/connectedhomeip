@@ -202,15 +202,15 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
     PersistentStorageOperationalKeystore opKeyStore;
     NL_TEST_ASSERT_SUCCESS(inSuite, opKeyStore.Init(&storage));
 
-    Crypto::P256ECDSASignature sig;
-    uint8_t message[] = { 'm', 's', 'g' };
+    Crypto::P256ECDHDerivedSecret secret;
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
     NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
     NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
 
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+    // Test self-derivation just to check we got a valid key
+    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDH_derive_secret(ephemeralKeypair->Pubkey(), secret));
+    NL_TEST_ASSERT(inSuite, secret.Length() > 0);
 
     opKeyStore.ReleaseEphemeralKeypair(ephemeralKeypair);
 

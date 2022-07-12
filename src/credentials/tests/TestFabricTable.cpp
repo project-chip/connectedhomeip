@@ -1862,15 +1862,14 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
         FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
 
-        Crypto::P256ECDSASignature sig;
-        uint8_t message[] = { 'm', 's', 'g' };
+        Crypto::P256ECDHDerivedSecret secret;
 
         Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
 
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDH_derive_secret(ephemeralKeypair->Pubkey(), secret));
+        NL_TEST_ASSERT(inSuite, secret.Length() > 0);
 
         fabricTable.ReleaseEphemeralKeypair(ephemeralKeypair);
     }
@@ -1889,15 +1888,14 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.Init(initParams));
 
-        Crypto::P256ECDSASignature sig;
-        uint8_t message[] = { 'm', 's', 'g' };
+        Crypto::P256ECDHDerivedSecret secret;
 
         Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
 
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDH_derive_secret(ephemeralKeypair->Pubkey(), secret));
+        NL_TEST_ASSERT(inSuite, secret.Length() > 0);
 
         fabricTable.ReleaseEphemeralKeypair(ephemeralKeypair);
 
