@@ -51,7 +51,7 @@ class MW320Builder(GnBuilder):
 
     def build_outputs(self):
         items = {}
-        for extension in ["", ".map", ".hex"]:
+        for extension in [".bin", ".out", ".out.map"]:
             name = '%s%s' % (self.app.AppNamePrefix(), extension)
             items[name] = os.path.join(self.output_dir, name)
 
