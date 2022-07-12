@@ -140,7 +140,6 @@
 | ApplicationLauncher                                                 | 0x050C |
 | ApplicationBasic                                                    | 0x050D |
 | AccountLogin                                                        | 0x050E |
-| Messaging                                                           | 0x0703 |
 | ApplianceIdentification                                             | 0x0B00 |
 | MeterIdentification                                                 | 0x0B01 |
 | ApplianceEventsAndAlert                                             | 0x0B02 |
@@ -8636,118 +8635,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster Messaging                                                   | 0x0703 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * GetLastMessage                                                    |   0x00 |
-| * MessageConfirmation                                               |   0x01 |
-| * GetMessageCancellation                                            |   0x02 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * GeneratedCommandList                                              | 0xFFF8 |
-| * AcceptedCommandList                                               | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command GetLastMessage
- */
-class MessagingGetLastMessage : public ClusterCommand
-{
-public:
-    MessagingGetLastMessage(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-last-message", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000000, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000000, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Messaging::Commands::GetLastMessage::Type mRequest;
-};
-
-/*
- * Command MessageConfirmation
- */
-class MessagingMessageConfirmation : public ClusterCommand
-{
-public:
-    MessagingMessageConfirmation(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("message-confirmation", credsIssuerConfig)
-    {
-        AddArgument("MessageId", 0, UINT32_MAX, &mRequest.messageId);
-        AddArgument("ConfirmationTime", 0, UINT32_MAX, &mRequest.confirmationTime);
-        AddArgument("MessageConfirmationControl", 0, UINT8_MAX, &mRequest.messageConfirmationControl);
-        AddArgument("MessageResponse", &mRequest.messageResponse);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000001, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Messaging::Commands::MessageConfirmation::Type mRequest;
-};
-
-/*
- * Command GetMessageCancellation
- */
-class MessagingGetMessageCancellation : public ClusterCommand
-{
-public:
-    MessagingGetMessageCancellation(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-message-cancellation", credsIssuerConfig)
-    {
-        AddArgument("EarliestImplementationTime", 0, UINT32_MAX, &mRequest.earliestImplementationTime);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000002, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000002, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Messaging::Commands::GetMessageCancellation::Type mRequest;
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster ApplianceIdentification                                     | 0x0B00 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -16317,45 +16204,6 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterMessaging(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
-{
-    using namespace chip::app::Clusters::Messaging;
-
-    const char * clusterName = "Messaging";
-
-    commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
-        make_unique<MessagingGetLastMessage>(credsIssuerConfig),         //
-        make_unique<MessagingMessageConfirmation>(credsIssuerConfig),    //
-        make_unique<MessagingGetMessageCancellation>(credsIssuerConfig), //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
 void registerClusterApplianceIdentification(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ApplianceIdentification;
@@ -17460,7 +17308,6 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplicationLauncher(commands, credsIssuerConfig);
     registerClusterApplicationBasic(commands, credsIssuerConfig);
     registerClusterAccountLogin(commands, credsIssuerConfig);
-    registerClusterMessaging(commands, credsIssuerConfig);
     registerClusterApplianceIdentification(commands, credsIssuerConfig);
     registerClusterMeterIdentification(commands, credsIssuerConfig);
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);

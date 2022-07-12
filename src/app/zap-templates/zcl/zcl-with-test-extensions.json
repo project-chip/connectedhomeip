@@ -72,7 +72,6 @@
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
-        "ami.xml",
         "general.xml",
         "ha-devices.xml",
         "ha.xml",

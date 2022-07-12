@@ -233,8 +233,6 @@ void __attribute__((weak)) MatterApplicationBasicPluginClientInitCallback() {}
 void MatterApplicationBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterAccountLoginPluginClientInitCallback() {}
 void MatterAccountLoginPluginServerInitCallback();
-void __attribute__((weak)) MatterMessagingPluginClientInitCallback() {}
-void MatterMessagingPluginServerInitCallback();
 void __attribute__((weak)) MatterApplianceIdentificationPluginClientInitCallback() {}
 void MatterApplianceIdentificationPluginServerInitCallback();
 void __attribute__((weak)) MatterMeterIdentificationPluginClientInitCallback() {}

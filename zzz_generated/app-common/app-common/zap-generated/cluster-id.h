@@ -343,9 +343,6 @@ static constexpr chip::ClusterId ZCL_APPLICATION_BASIC_CLUSTER_ID = 0x050D;
 // Definitions for cluster: Account Login
 static constexpr chip::ClusterId ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
 
-// Definitions for cluster: Messaging
-static constexpr chip::ClusterId ZCL_MESSAGING_CLUSTER_ID = 0x0703;
-
 // Definitions for cluster: Appliance Identification
 static constexpr chip::ClusterId ZCL_APPLIANCE_IDENTIFICATION_CLUSTER_ID = 0x0B00;
 
