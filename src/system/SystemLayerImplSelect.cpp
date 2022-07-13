@@ -182,29 +182,18 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CancelTimer(onComplete, appState);
-
-    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
+    // We can't use a lambda with the three args we need (this, onComplete,
+    // appState) because there is a size limit on the size of the lambda that
+    // ScheduleLambda uses.  Work around this by using a timer to keep track of
+    // onComplete and appState.  We're not actually adding this timer to our
+    // timer list or anything like that, because it's not a "real" timer.  So it
+    // does not matter what timestamp we give it.  The only reason we're using a
+    // timer at all is so we don't have to invent a new type of object with a
+    // separate pool to track our callback data.
+    TimerList::Node * timer = mTimerPool.Create(*this, Clock::Timestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = GetDispatchQueue();
-    if (dispatchQueue)
-    {
-        (void) mTimerList.Add(timer);
-        dispatch_async(dispatchQueue, ^{
-            this->HandleTimerComplete(timer);
-        });
-        return CHIP_NO_ERROR;
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
-    if (mTimerList.Add(timer) == timer)
-    {
-        // The new timer is the earliest, so the time until the next event has probably changed.
-        Signal();
-    }
-    return CHIP_NO_ERROR;
+    return ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });
 }
 
 CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * tokenOut)

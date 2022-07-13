@@ -88,7 +88,15 @@ CHIP_ERROR LayerImplFreeRTOS::ScheduleWork(TimerCompleteCallback onComplete, voi
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
+    // We can't use a lambda with the three args we need (this, onComplete,
+    // appState) because there is a size limit on the size of the lambda that
+    // ScheduleLambda uses.  Work around this by using a timer to keep track of
+    // onComplete and appState.  We're not actually adding this timer to our
+    // timer list or anything like that, because it's not a "real" timer.  So it
+    // does not matter what timestamp we give it.  The only reason we're using a
+    // timer at all is so we don't have to invent a new type of object with a
+    // separate pool to track our callback data.
+    TimerList::Node * timer = mTimerPool.Create(*this, Clock::Timestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     return ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });
