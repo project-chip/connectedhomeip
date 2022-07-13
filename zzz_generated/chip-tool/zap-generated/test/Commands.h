@@ -11177,7 +11177,7 @@ private:
 class Test_TC_CGEN_2_1Suite : public TestCommand
 {
 public:
-    Test_TC_CGEN_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CGEN_2_1", 9, credsIssuerConfig)
+    Test_TC_CGEN_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CGEN_2_1", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -11260,10 +11260,6 @@ private:
             break;
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 bool value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
@@ -11334,19 +11330,7 @@ private:
                                  GeneralCommissioning::Attributes::BasicCommissioningInfo::Id, true, chip::NullOptional);
         }
         case 7: {
-            LogStep(7,
-                    "Step 6 is implicitly validating the attribute(BasicCommissioningInfo) constraints, as long as the payload is "
-                    "being parsed successfully");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 8: {
-            LogStep(8, "TH1 reads SupportsConcurrentConnection attribute from the DUT");
+            LogStep(7, "TH1 reads SupportsConcurrentConnection attribute from the DUT");
             VerifyOrDo(!ShouldSkip("CGEN.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GeneralCommissioning::Id,
                                  GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id, true, chip::NullOptional);
@@ -59225,7 +59209,7 @@ private:
 class Test_TC_DRLK_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_DRLK_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_2", 16, credsIssuerConfig)
+    Test_TC_DRLK_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_2", 23, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -59266,28 +59250,60 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckValueNonNull("userName", value.userName));
+                VerifyOrReturn(CheckValueAsString("userName.Value()", value.userName.Value(), chip::CharSpan("xxx", 3)));
+                VerifyOrReturn(CheckValueNonNull("userUniqueId", value.userUniqueId));
+                VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 6452UL));
+                VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("userType", value.userType));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
+                VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("credentials", value.credentials));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
+            }
             break;
         case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
-                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
                 VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("credentialExists", value.credentialExists, true));
+                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -59296,10 +59312,15 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                bool value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("requirePINforRemoteOperation", value, true));
+            }
             break;
         case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
@@ -59309,16 +59330,37 @@ private:
             break;
         case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint8_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("userCodeTemporaryDisableTime", value, 5U));
-            }
             break;
         case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("userCodeTemporaryDisableTime", value, 15U));
+            }
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 22:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
@@ -59344,40 +59386,38 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "TH writes the RequirePINforRemoteOperation attribute value as False on the DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(1, "Create new user");
             ListFreer listFreer;
-            bool value;
-            value = false;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
-                                  DoorLock::Attributes::RequirePINforRemoteOperation::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
-        }
-        case 2: {
-            LogStep(2, "TH sends Lock Door Command to the DUT without PINCode");
-            VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
-            value.pinCode.Emplace();
-            value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
+            chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
+            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+            value.userIndex     = 1U;
+            value.userName.SetNonNull();
+            value.userName.Value() = chip::Span<const char>("xxxgarbage: not in length on purpose", 3);
+            value.userUniqueId.SetNonNull();
+            value.userUniqueId.Value() = 6452UL;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            value.credentialRule.SetNonNull();
+            value.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
-        case 3: {
-            LogStep(3, "TH writes the RequirePINforRemoteOperation attribute value as True on the DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 2: {
+            LogStep(2, "Read the user back and verify its fields");
             ListFreer listFreer;
-            bool value;
-            value = true;
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
-                                  DoorLock::Attributes::RequirePINforRemoteOperation::Id, value, chip::NullOptional,
-                                  chip::NullOptional);
+            chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
+                               chip::NullOptional
+
+            );
         }
-        case 4: {
-            LogStep(4, "Create new PIN credential and lock/unlock user");
-            VerifyOrDo(!ShouldSkip("DRLK.S.C22.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 3: {
+            LogStep(3, "Create new PIN credential and lock/unlock user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
@@ -59386,16 +59426,52 @@ private:
             value.credential.credentialIndex = 1U;
 
             value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNull();
-            value.userStatus.SetNull();
-            value.userType.SetNull();
+            value.userIndex.SetNonNull();
+            value.userIndex.Value() = 1U;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
+        case 4: {
+            LogStep(4, "Verify created PIN credential");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
+
+            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.credentialIndex = 1U;
+
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
+                               chip::NullOptional
+
+            );
+        }
         case 5: {
-            LogStep(5, "TH sends Lock Door Command to the DUT with valid PINCode");
+            LogStep(5, "TH writes the RequirePINforRemoteOperation attribute value as False on the DUT");
+            VerifyOrDo(!ShouldSkip("DRLK.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            bool value;
+            value = false;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
+                                  DoorLock::Attributes::RequirePINforRemoteOperation::Id, value, chip::NullOptional,
+                                  chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "TH sends Lock Door Command to the DUT without PINCode");
+            VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 7: {
+            LogStep(7, "TH sends Lock Door Command to the DUT with valid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59406,8 +59482,48 @@ private:
 
             );
         }
-        case 6: {
-            LogStep(6, "TH sends Lock Door Command to the DUT without any argument PINCode");
+        case 8: {
+            LogStep(8, "TH writes the RequirePINforRemoteOperation attribute value as True on the DUT");
+            VerifyOrDo(!ShouldSkip("DRLK.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            bool value;
+            value = true;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
+                                  DoorLock::Attributes::RequirePINforRemoteOperation::Id, value, chip::NullOptional,
+                                  chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "TH reads the RequirePINforRemoteOperation attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
+                                 DoorLock::Attributes::RequirePINforRemoteOperation::Id, true, chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "TH sends Lock Door Command to the DUT with valid PINCode");
+            VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
+            value.pinCode.Emplace();
+            value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 11: {
+            LogStep(11, "TH sends Lock Door Command to the DUT without valid PINCode");
+            VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
+            value.pinCode.Emplace();
+            value.pinCode.Value() = chip::ByteSpan(chip::Uint8::from_const_char("645321garbage: not in length on purpose"), 6);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::LockDoor::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 12: {
+            LogStep(12, "TH sends Lock Door Command to the DUT without any argument PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59418,8 +59534,8 @@ private:
 
             );
         }
-        case 7: {
-            LogStep(7, "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT");
+        case 13: {
+            LogStep(13, "TH writes WrongCodeEntryLimit attribute value as 3 on the DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
@@ -59427,18 +59543,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::WrongCodeEntryLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 8: {
-            LogStep(8, "TH writes UserCodeTemporaryDisableTime attribute value as 5 seconds on the DUT");
+        case 14: {
+            LogStep(14, "TH writes UserCodeTemporaryDisableTime attribute value as 5 seconds on the DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint8_t value;
-            value = 5U;
+            value = 15U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
                                   DoorLock::Attributes::UserCodeTemporaryDisableTime::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 9: {
-            LogStep(9, "TH sends Lock Door Command to the DUT with invalid PINCode");
+        case 15: {
+            LogStep(15, "TH sends Lock Door Command to the DUT with invalid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59449,8 +59565,8 @@ private:
 
             );
         }
-        case 10: {
-            LogStep(10, "TH sends Lock Door Command to the DUT with invalid PINCode");
+        case 16: {
+            LogStep(16, "TH sends Lock Door Command to the DUT with invalid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59461,8 +59577,8 @@ private:
 
             );
         }
-        case 11: {
-            LogStep(11, "TH sends Lock Door Command to the DUT with invalid PINCode");
+        case 17: {
+            LogStep(17, "TH sends Lock Door Command to the DUT with invalid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59473,8 +59589,8 @@ private:
 
             );
         }
-        case 12: {
-            LogStep(12, "TH sends Lock Door Command to the DUT with invalid PINCode");
+        case 18: {
+            LogStep(18, "TH sends Lock Door Command to the DUT with invalid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59485,14 +59601,14 @@ private:
 
             );
         }
-        case 13: {
-            LogStep(13, "TH reads UserCodeTemporaryDisableTime attribute from DUT");
+        case 19: {
+            LogStep(19, "TH reads UserCodeTemporaryDisableTime attribute from DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
                                  DoorLock::Attributes::UserCodeTemporaryDisableTime::Id, true, chip::NullOptional);
         }
-        case 14: {
-            LogStep(14, "TH sends Lock Door Command to the DUT with valid PINCode");
+        case 20: {
+            LogStep(20, "TH sends Lock Door Command to the DUT with valid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59503,8 +59619,18 @@ private:
 
             );
         }
-        case 15: {
-            LogStep(15, "Clean the created credential");
+        case 21: {
+            LogStep(21, "Clean the created user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 22: {
+            LogStep(22, "Cleanup the created credential");
             VerifyOrDo(!ShouldSkip("DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
@@ -59526,7 +59652,7 @@ private:
 class Test_TC_DRLK_2_3Suite : public TestCommand
 {
 public:
-    Test_TC_DRLK_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_3", 9, credsIssuerConfig)
+    Test_TC_DRLK_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_3", 12, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -59565,47 +59691,83 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckValueNonNull("userName", value.userName));
+                VerifyOrReturn(CheckValueAsString("userName.Value()", value.userName.Value(), chip::CharSpan("xxx", 3)));
+                VerifyOrReturn(CheckValueNonNull("userUniqueId", value.userUniqueId));
+                VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 6452UL));
+                VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("userType", value.userType));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
+                VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("credentials", value.credentials));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
-                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
                 VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
                 VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
             }
             break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("credentialExists", value.credentialExists, true));
+                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
+            }
             break;
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("autoRelockTime", value, 10UL));
-            }
             break;
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
             break;
         case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("lockState", value));
-                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 1U));
+                VerifyOrReturn(CheckValue("lockState.Value()", value.Value(), 2U));
             }
             break;
-        case 8:
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
@@ -59631,8 +59793,38 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Create new PIN credential and lock/unlock user");
-            VerifyOrDo(!ShouldSkip("DRLK.S.C22.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(1, "Create new user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
+            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+            value.userIndex     = 1U;
+            value.userName.SetNonNull();
+            value.userName.Value() = chip::Span<const char>("xxxgarbage: not in length on purpose", 3);
+            value.userUniqueId.SetNonNull();
+            value.userUniqueId.Value() = 6452UL;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            value.credentialRule.SetNonNull();
+            value.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 2: {
+            LogStep(2, "Read the user back and verify its fields");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 3: {
+            LogStep(3, "Create new PIN credential and lock/unlock user");
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
@@ -59641,16 +59833,32 @@ private:
             value.credential.credentialIndex = 1U;
 
             value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNull();
-            value.userStatus.SetNull();
-            value.userType.SetNull();
+            value.userIndex.SetNonNull();
+            value.userIndex.Value() = 1U;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
-        case 2: {
-            LogStep(2, "Precondition: Door is in locked state");
+        case 4: {
+            LogStep(4, "Verify created PIN credential");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
+
+            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.credentialIndex = 1U;
+
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 5: {
+            LogStep(5, "Precondition: Door is in locked state");
             VerifyOrDo(!ShouldSkip("DRLK.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::LockDoor::Type value;
@@ -59661,17 +59869,17 @@ private:
 
             );
         }
-        case 3: {
-            LogStep(3, "TH writes AutoRelockTime attribute value as 10 seconds on the DUT");
+        case 6: {
+            LogStep(6, "TH writes AutoRelockTime attribute value as 10 seconds on the DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.A0023"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             uint32_t value;
-            value = 10UL;
+            value = 60UL;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::AutoRelockTime::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4, "TH sends the unlock Door command to the DUT with valid PINCode");
+        case 7: {
+            LogStep(7, "TH sends the unlock Door command to the DUT with valid PINCode");
             VerifyOrDo(!ShouldSkip("DRLK.S.C01.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type value;
@@ -59682,27 +59890,31 @@ private:
 
             );
         }
-        case 5: {
-            LogStep(5, "TH reads AutoRelockTime attribute from DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.A0023"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::AutoRelockTime::Id, true,
-                                 chip::NullOptional);
-        }
-        case 6: {
-            LogStep(6, "Wait 10000ms");
+        case 8: {
+            LogStep(8, "Wait 10000ms");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
-        case 7: {
-            LogStep(7, "TH reads LockState attribute");
+        case 9: {
+            LogStep(9, "TH reads LockState attribute");
             VerifyOrDo(!ShouldSkip("DRLK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Attributes::LockState::Id, true,
                                  chip::NullOptional);
         }
-        case 8: {
-            LogStep(8, "Clean the created credential");
+        case 10: {
+            LogStep(10, "Cleanup the created user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 11: {
+            LogStep(11, "Clean the created credential");
             VerifyOrDo(!ShouldSkip("DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
@@ -59905,7 +60117,7 @@ private:
 class Test_TC_DRLK_2_5Suite : public TestCommand
 {
 public:
-    Test_TC_DRLK_2_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_5", 10, credsIssuerConfig)
+    Test_TC_DRLK_2_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_5", 12, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -59947,44 +60159,64 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
-                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
-            }
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint8_t value;
+                chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfWeekDaySchedulesSupportedPerUser", value, 10U));
-                NumberOfWeekDaySchedulesSupportedPerUser = value;
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckValueNonNull("userName", value.userName));
+                VerifyOrReturn(CheckValueAsString("userName.Value()", value.userName.Value(), chip::CharSpan("xxx", 3)));
+                VerifyOrReturn(CheckValueNonNull("userUniqueId", value.userUniqueId));
+                VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 6452UL));
+                VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("userType", value.userType));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
+                VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("credentials", value.credentials));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                uint16_t value;
+                uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", value, 10U));
-                NumberOfTotalUsersSupported = value;
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 255U));
+                NumberOfWeekDaySchedulesSupportedPerUser = value;
             }
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65534U));
+                NumberOfTotalUsersSupported = value;
+            }
             break;
         case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value.weekDayIndex", value.weekDayIndex, 1U));
+                VerifyOrReturn(
+                    CheckConstraintMaxValue("value.weekDayIndex", value.weekDayIndex, NumberOfWeekDaySchedulesSupportedPerUser));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.userIndex", value.userIndex, NumberOfTotalUsersSupported));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
                 VerifyOrReturn(CheckConstraintHasValue("value.daysMask", value.daysMask, true));
                 VerifyOrReturn(CheckConstraintMinValue("value.daysMask.Value()", value.daysMask.Value(), 0U));
@@ -60003,10 +60235,10 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value.endMinute.Value()", value.endMinute.Value(), 59U));
             }
             break;
-        case 6:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
             break;
-        case 7:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60021,10 +60253,10 @@ private:
                 VerifyOrReturn(CheckConstraintHasValue("value.endMinute", value.endMinute, false));
             }
             break;
-        case 8:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 9:
+        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType value;
@@ -60038,6 +60270,9 @@ private:
                 VerifyOrReturn(CheckConstraintHasValue("value.endHour", value.endHour, false));
                 VerifyOrReturn(CheckConstraintHasValue("value.endMinute", value.endMinute, false));
             }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -60062,38 +60297,50 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Create new PIN credential and lock/unlock user");
-            VerifyOrDo(!ShouldSkip("DRLK.S.C22.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(1, "Create new user");
             ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
+            chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNull();
-            value.userStatus.SetNull();
-            value.userType.SetNull();
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
+            value.userIndex     = 1U;
+            value.userName.SetNonNull();
+            value.userName.Value() = chip::Span<const char>("xxxgarbage: not in length on purpose", 3);
+            value.userUniqueId.SetNonNull();
+            value.userUniqueId.Value() = 6452UL;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            value.credentialRule.SetNonNull();
+            value.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
         case 2: {
-            LogStep(2, "Get Max number of Week Day schedules for user");
+            LogStep(2, "Read the user back and verify its fields");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 3: {
+            LogStep(3, "Get Max number of Week Day schedules for user");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
                                  DoorLock::Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id, true, chip::NullOptional);
         }
-        case 3: {
-            LogStep(3, "Get number of supported users");
+        case 4: {
+            LogStep(4, "Get number of supported users");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
                                  DoorLock::Attributes::NumberOfTotalUsersSupported::Id, true, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4, "Send Set Week Day Schedule Command to DUT");
+        case 5: {
+            LogStep(5, "Send Set Week Day Schedule Command to DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
@@ -60109,8 +60356,8 @@ private:
 
             );
         }
-        case 5: {
-            LogStep(5, "send GetWeekDay Schedule Command ");
+        case 6: {
+            LogStep(6, "send GetWeekDay Schedule Command ");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60122,8 +60369,8 @@ private:
 
             );
         }
-        case 6: {
-            LogStep(6, "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND response");
+        case 7: {
+            LogStep(7, "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND response");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0B.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type value;
@@ -60139,8 +60386,8 @@ private:
 
             );
         }
-        case 7: {
-            LogStep(7, "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND response");
+        case 8: {
+            LogStep(8, "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND response");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60152,20 +60399,20 @@ private:
 
             );
         }
-        case 8: {
-            LogStep(8, "Clear all week day schedules for the first user");
+        case 9: {
+            LogStep(9, "Clear all week day schedules for the first user");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0D.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type value;
-            value.weekDayIndex = 254U;
+            value.weekDayIndex = 1U;
             value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearWeekDaySchedule::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 9: {
-            LogStep(9, "send GetWeekDay Schedule Command ");
+        case 10: {
+            LogStep(10, "send GetWeekDay Schedule Command ");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60177,6 +60424,16 @@ private:
 
             );
         }
+        case 11: {
+            LogStep(11, "Cleanup the created user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
         }
         return CHIP_NO_ERROR;
     }
@@ -60185,7 +60442,7 @@ private:
 class Test_TC_DRLK_2_7Suite : public TestCommand
 {
 public:
-    Test_TC_DRLK_2_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_7", 13, credsIssuerConfig)
+    Test_TC_DRLK_2_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_7", 16, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -60227,26 +60484,29 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
-                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 1U));
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
-            }
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
+                chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValueNonNull("userIndex", value.userIndex));
-                VerifyOrReturn(CheckValue("userIndex.Value()", value.userIndex.Value(), 2U));
-                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
-                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckValueNonNull("userName", value.userName));
+                VerifyOrReturn(CheckValueAsString("userName.Value()", value.userName.Value(), chip::CharSpan("xxx", 3)));
+                VerifyOrReturn(CheckValueNonNull("userUniqueId", value.userUniqueId));
+                VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 6452UL));
+                VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("userType", value.userType));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
+                VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("credentials", value.credentials));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 3:
@@ -60254,7 +60514,8 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfYearDaySchedulesSupportedPerUser", value, 10U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 255U));
                 NumberOfYearDaySchedulesSupportedPerUser = value;
             }
             break;
@@ -60263,7 +60524,8 @@ private:
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", value, 10U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 65534U));
                 NumberOfTotalUsersSupported = value;
             }
             break;
@@ -60276,7 +60538,10 @@ private:
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value.yearDayIndex", value.yearDayIndex, 1U));
+                VerifyOrReturn(
+                    CheckConstraintMaxValue("value.yearDayIndex", value.yearDayIndex, NumberOfYearDaySchedulesSupportedPerUser));
                 VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.userIndex", value.userIndex, NumberOfTotalUsersSupported));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, true));
                 VerifyOrReturn(CheckConstraintType("value.localStartTime.Value()", "", "epoch-s"));
@@ -60313,32 +60578,41 @@ private:
             break;
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckValue("status", value.status, 1U));
                 VerifyOrReturn(CheckConstraintHasValue("value.localStartTime", value.localStartTime, false));
                 VerifyOrReturn(CheckConstraintHasValue("value.localEndTime", value.localEndTime, false));
             }
             break;
-        case 11:
+        case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 12:
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 2U));
-                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 2U));
+                VerifyOrReturn(CheckValue("yearDayIndex", value.yearDayIndex, 1U));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
                 VerifyOrReturn(CheckValuePresent("localStartTime", value.localStartTime));
-                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 10UL));
+                VerifyOrReturn(CheckValue("localStartTime.Value()", value.localStartTime.Value(), 1080UL));
                 VerifyOrReturn(CheckValuePresent("localEndTime", value.localEndTime));
-                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 20UL));
+                VerifyOrReturn(CheckValue("localEndTime.Value()", value.localEndTime.Value(), 2100UL));
             }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
@@ -60363,38 +60637,33 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Create new PIN credential and lock/unlock user");
+            LogStep(1, "Create new user");
             ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
+            chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNull();
-            value.userStatus.SetNull();
-            value.userType.SetNull();
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
+            value.userIndex     = 1U;
+            value.userName.SetNonNull();
+            value.userName.Value() = chip::Span<const char>("xxxgarbage: not in length on purpose", 3);
+            value.userUniqueId.SetNonNull();
+            value.userUniqueId.Value() = 6452UL;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            value.credentialRule.SetNonNull();
+            value.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
                                chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
         case 2: {
-            LogStep(2, "Create new PIN credential and lock/unlock for second user");
+            LogStep(2, "Read the user back and verify its fields");
             ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
-            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 2U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123457garbage: not in length on purpose"), 6);
-            value.userIndex.SetNull();
-            value.userStatus.SetNull();
-            value.userType.SetNull();
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
+            chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
+                               chip::NullOptional
 
             );
         }
@@ -60417,8 +60686,8 @@ private:
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 1U;
             value.userIndex      = 1U;
-            value.localStartTime = 10UL;
-            value.localEndTime   = 20UL;
+            value.localStartTime = 960UL;
+            value.localEndTime   = 1980UL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -60443,9 +60712,9 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
             value.yearDayIndex   = 0U;
-            value.userIndex      = 10U;
-            value.localStartTime = 30UL;
-            value.localEndTime   = 10UL;
+            value.userIndex      = 15U;
+            value.localStartTime = 1020UL;
+            value.localEndTime   = 2040UL;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
                                chip::NullOptional
 
@@ -60478,42 +60747,76 @@ private:
             );
         }
         case 10: {
-            LogStep(10, "send Get Year Day Schedule Command  to DUT and verify NOT_FOUND response ");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(10, "Clear a year day schedule for the first user");
+            VerifyOrDo(!ShouldSkip("DRLK.S.C10.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2U;
-            value.userIndex    = 2U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = 1U;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
                                chip::NullOptional
 
             );
         }
         case 11: {
-            LogStep(11, "Send Set Year Day Schedule Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.C0E.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(11, "send Get Year Day Schedule Command to DUT and verify NOT_FOUND response");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx && DRLK.S.C10.Rsp"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
-            value.yearDayIndex   = 2U;
-            value.userIndex      = 2U;
-            value.localStartTime = 10UL;
-            value.localEndTime   = 20UL;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
+            chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
+            value.yearDayIndex = 1U;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
 
             );
         }
         case 12: {
-            LogStep(12, "send Get Year Day Schedule Command ");
+            LogStep(12, "Send Set Year Day Schedule Command to DUT ");
+            VerifyOrDo(!ShouldSkip("DRLK.S.C0E.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type value;
+            value.yearDayIndex   = 1U;
+            value.userIndex      = 1U;
+            value.localStartTime = 1080UL;
+            value.localEndTime   = 2100UL;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 13: {
+            LogStep(13, "send Get Year Day Schedule Command");
             VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C0F.Rsp && DRLK.S.C0F.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type value;
-            value.yearDayIndex = 2U;
-            value.userIndex    = 2U;
+            value.yearDayIndex = 1U;
+            value.userIndex    = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetYearDaySchedule::Id, value,
                                chip::NullOptional
+
+            );
+        }
+        case 14: {
+            LogStep(14, "Clear a year day schedule for the first user");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F04 && DRLK.S.C10.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type value;
+            value.yearDayIndex = 1U;
+            value.userIndex    = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearYearDaySchedule::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 15: {
+            LogStep(15, "Cleanup the created user");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
 
             );
         }
@@ -60525,7 +60828,7 @@ private:
 class Test_TC_DRLK_2_9Suite : public TestCommand
 {
 public:
-    Test_TC_DRLK_2_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_9", 17, credsIssuerConfig)
+    Test_TC_DRLK_2_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_DRLK_2_9", 18, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -60566,27 +60869,39 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("numberOfTotalUsersSupported", value, 10U));
-                NumberOfTotalUsersSupported = value;
-            }
             break;
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
+                chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckValueNonNull("userName", value.userName));
+                VerifyOrReturn(CheckValueAsString("userName.Value()", value.userName.Value(), chip::CharSpan("xxx", 3)));
+                VerifyOrReturn(CheckValueNonNull("userUniqueId", value.userUniqueId));
+                VerifyOrReturn(CheckValue("userUniqueId.Value()", value.userUniqueId.Value(), 6452UL));
+                VerifyOrReturn(CheckValueNonNull("userStatus", value.userStatus));
+                VerifyOrReturn(CheckValue("userStatus.Value()", value.userStatus.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("userType", value.userType));
+                VerifyOrReturn(CheckValue("userType.Value()", value.userType.Value(), 0U));
+                VerifyOrReturn(CheckValueNonNull("credentialRule", value.credentialRule));
+                VerifyOrReturn(CheckValue("credentialRule.Value()", value.credentialRule.Value(), 0U));
+                VerifyOrReturn(CheckValueNull("credentials", value.credentials));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextUserIndex", value.nextUserIndex));
             }
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
+                uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value.credentialExists", "", "boolean"));
-                VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 255U));
+                NumberOfTotalUsersSupported = value;
             }
             break;
         case 4:
@@ -60594,13 +60909,25 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
             }
             break;
         case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
+                chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value.credentialExists", "", "boolean"));
+                VerifyOrReturn(CheckConstraintMinValue("value.userIndex", value.userIndex, 1U));
+                VerifyOrReturn(CheckConstraintMaxValue("value.userIndex", value.userIndex, NumberOfTotalUsersSupported));
+                VerifyOrReturn(CheckValueNonNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValue("creatorFabricIndex.Value()", value.creatorFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNonNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValue("lastModifiedFabricIndex.Value()", value.lastModifiedFabricIndex.Value(), 1U));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
         case 6:
@@ -60608,6 +60935,10 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 133U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
             }
             break;
         case 7:
@@ -60615,6 +60946,10 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 3U));
             }
             break;
         case 8:
@@ -60622,47 +60957,71 @@ private:
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 2U));
             }
             break;
         case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 2U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 4U));
+            }
             break;
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
             break;
         case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
-            break;
-        case 13:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("credentialExists", value.credentialExists, false));
                 VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
             }
             break;
-        case 15:
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNonNull("nextCredentialIndex", value.nextCredentialIndex));
+                VerifyOrReturn(CheckValue("nextCredentialIndex.Value()", value.nextCredentialIndex.Value(), 4U));
             }
             break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
+            break;
         case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("credentialExists", value.credentialExists, false));
+                VerifyOrReturn(CheckValueNull("userIndex", value.userIndex));
+                VerifyOrReturn(CheckValueNull("creatorFabricIndex", value.creatorFabricIndex));
+                VerifyOrReturn(CheckValueNull("lastModifiedFabricIndex", value.lastModifiedFabricIndex));
+                VerifyOrReturn(CheckValueNull("nextCredentialIndex", value.nextCredentialIndex));
+            }
+            break;
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_COMMAND));
             break;
         default:
@@ -60688,13 +61047,44 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "TH reads NumberOfTotalUsersSupported attribute and saves for future use.");
+            LogStep(1, "Create new user with default parameters");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
+            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+            value.userIndex     = 1U;
+            value.userName.SetNonNull();
+            value.userName.Value() = chip::Span<const char>("xxxgarbage: not in length on purpose", 3);
+            value.userUniqueId.SetNonNull();
+            value.userUniqueId.Value() = 6452UL;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            value.credentialRule.SetNonNull();
+            value.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 2: {
+            LogStep(2, "Read the user back and verify its fields");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetUser::Type value;
+            value.userIndex = 1U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetUser::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 3: {
+            LogStep(3, "TH reads NumberOfTotalUsersSupported attribute and saves for future use.");
             VerifyOrDo(!ShouldSkip("DRLK.C.F08 && DRLK.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), DoorLock::Id,
                                  DoorLock::Attributes::NumberOfTotalUsersSupported::Id, true, chip::NullOptional);
         }
-        case 2: {
-            LogStep(2, "TH sends Set Credential Command to DUT");
+        case 4: {
+            LogStep(4, "TH sends Set Credential Command to DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60716,8 +61106,8 @@ private:
 
             );
         }
-        case 3: {
-            LogStep(3, "TH sends Get Credential Status Command");
+        case 5: {
+            LogStep(5, "TH sends Get Credential Status Command");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60731,8 +61121,8 @@ private:
 
             );
         }
-        case 4: {
-            LogStep(4, "TH sends Set Credential Command to DUT");
+        case 6: {
+            LogStep(6, "TH sends Set Credential Command to DUT and  verify the INVALID_COMMAND if any of the fields are invalid");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60740,7 +61130,7 @@ private:
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
+            value.credential.credentialIndex = 2U;
 
             value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("1234garbage: not in length on purpose"), 4);
             value.userIndex.SetNonNull();
@@ -60754,54 +61144,8 @@ private:
 
             );
         }
-        case 5: {
-            LogStep(5, "TH sends Set Credential Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
-            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNonNull();
-            value.userIndex.Value() = 2U;
-            value.userStatus.SetNonNull();
-            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
-            value.userType.SetNonNull();
-            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
-
-            );
-        }
-        case 6: {
-            LogStep(6, "TH sends Set Credential Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
-            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNonNull();
-            value.userIndex.Value() = 2U;
-            value.userStatus.SetNonNull();
-            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
-            value.userType.SetNonNull();
-            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
-
-            );
-        }
         case 7: {
-            LogStep(7, "TH sends Set Credential Command to DUT");
+            LogStep(7, "TH sends Set Credential Command to DUT and verify response as DUPLICATE if CredentialData is repeated");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60813,7 +61157,7 @@ private:
 
             value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
             value.userIndex.SetNonNull();
-            value.userIndex.Value() = 3U;
+            value.userIndex.Value() = 2U;
             value.userStatus.SetNonNull();
             value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
             value.userType.SetNonNull();
@@ -60824,7 +61168,32 @@ private:
             );
         }
         case 8: {
-            LogStep(8, "TH sends Set Credential Command to DUT");
+            LogStep(8, "TH sends Set Credential Command to DUT and verify response as OCCUPIED if CredentialIndex is repeated");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
+            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+
+            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.credentialIndex = 1U;
+
+            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
+            value.userIndex.SetNonNull();
+            value.userIndex.Value() = 2U;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 9: {
+            LogStep(9,
+                    "TH sends Set Credential Command to DUT and verify the DUT response as OCCUPIED if the CredentialIndex is not "
+                    "associated with the UserIndex");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60836,7 +61205,7 @@ private:
 
             value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
             value.userIndex.SetNonNull();
-            value.userIndex.Value() = 3U;
+            value.userIndex.Value() = 2U;
             value.userStatus.SetNonNull();
             value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
             value.userType.SetNonNull();
@@ -60846,8 +61215,8 @@ private:
 
             );
         }
-        case 9: {
-            LogStep(9, "TH sends Clear Credential Command to DUT");
+        case 10: {
+            LogStep(10, "TH sends Clear Credential Command to DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
@@ -60861,84 +61230,10 @@ private:
 
             );
         }
-        case 10: {
-            LogStep(10, "TH sends Set Credential Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
-            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNonNull();
-            value.userIndex.Value() = 2U;
-            value.userStatus.SetNonNull();
-            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
-            value.userType.SetNonNull();
-            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
-
-            );
-        }
         case 11: {
-            LogStep(11, "TH sends Clear Credential Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
-            value.credential.SetNonNull();
-
-            value.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.Value().credentialIndex = 65534U;
-
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
-
-            );
-        }
-        case 12: {
-            LogStep(12, "TH sends Set Credential Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::SetCredential::Type value;
-            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
-
-            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
-
-            value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
-            value.userIndex.SetNonNull();
-            value.userIndex.Value() = 2U;
-            value.userStatus.SetNonNull();
-            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(0);
-            value.userType.SetNonNull();
-            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
-
-            );
-        }
-        case 13: {
-            LogStep(13, "TH sends Clear Credential Command to DUT");
-            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
-            value.credential.SetNonNull();
-
-            value.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.Value().credentialIndex = 65534U;
-
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
-                               chip::Optional<uint16_t>(10000), chip::NullOptional
-
-            );
-        }
-        case 14: {
-            LogStep(14, "TH sends Get Credential Status Command");
+            LogStep(11,
+                    "TH sends Get Credential Status Command and verify that the CredentialType and  CredentialIndex for the "
+                    "provided value is cleared");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60952,8 +61247,29 @@ private:
 
             );
         }
-        case 15: {
-            LogStep(15, "TH sends Set Credential Command to DUT");
+        case 12: {
+            LogStep(12, "TH sends Set User Command to DUT");
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::SetUser::Type value;
+            value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
+            value.userIndex     = 2U;
+            value.userName.SetNonNull();
+            value.userName.Value() = chip::Span<const char>("xxxgarbage: not in length on purpose", 3);
+            value.userUniqueId.SetNonNull();
+            value.userUniqueId.Value() = 6452UL;
+            value.userStatus.SetNonNull();
+            value.userStatus.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserStatus>(1);
+            value.userType.SetNonNull();
+            value.userType.Value() = static_cast<chip::app::Clusters::DoorLock::DlUserType>(0);
+            value.credentialRule.SetNonNull();
+            value.credentialRule.Value() = static_cast<chip::app::Clusters::DoorLock::DlCredentialRule>(0);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::SetUser::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 13: {
+            LogStep(13, "TH sends Set Credential Command to DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -60961,7 +61277,7 @@ private:
             value.operationType = static_cast<chip::app::Clusters::DoorLock::DlDataOperationType>(0);
 
             value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
-            value.credential.credentialIndex = 1U;
+            value.credential.credentialIndex = 3U;
 
             value.credentialData = chip::ByteSpan(chip::Uint8::from_const_char("123456garbage: not in length on purpose"), 6);
             value.userIndex.SetNonNull();
@@ -60975,8 +61291,53 @@ private:
 
             );
         }
+        case 14: {
+            LogStep(14, "TH sends Clear Credential Command to DUT");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
+            value.credential.SetNonNull();
+
+            value.credential.Value().credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.Value().credentialIndex = 65534U;
+
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::ClearCredential::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 15: {
+            LogStep(15, "TH sends Get Credential Status Command");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
+
+            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.credentialIndex = 65534U;
+
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
+                               chip::NullOptional
+
+            );
+        }
         case 16: {
-            LogStep(16, "TH sends Clear Credential Command to DUT");
+            LogStep(16, "TH sends Get Credential Status Command");
+            VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C24.Rsp && DRLK.S.C25.Tx"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type value;
+
+            value.credential.credentialType  = static_cast<chip::app::Clusters::DoorLock::DlCredentialType>(1);
+            value.credential.credentialIndex = 1U;
+
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), DoorLock::Id, DoorLock::Commands::GetCredentialStatus::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 17: {
+            LogStep(17, "TH sends Clear Credential Command to DUT");
             VerifyOrDo(!ShouldSkip("DRLK.S.F08 && DRLK.S.C26.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DoorLock::Commands::ClearCredential::Type value;
