@@ -140,7 +140,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         if (enable_pylib) {
           deps += [ "${chip_root}/src/pybindings/pycontroller" ]
         }
-        deps += [ "${chip_root}/src/controller/python" ]
+        deps += [ "${chip_root}/src/controller/python:chip-repl" ]
       }
     }
 
@@ -166,7 +166,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         if (enable_pylib) {
           data_deps += [ "${chip_root}/src/pybindings/pycontroller" ]
         }
-        data_deps += [ "${chip_root}/src/controller/python" ]
+        data_deps += [ "${chip_root}/src/controller/python:chip-repl" ]
       }
 
       write_runtime_deps = "${root_out_dir}/certification.runtime_deps"

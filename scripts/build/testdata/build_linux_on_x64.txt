@@ -374,7 +374,7 @@ ninja -C {out}/linux-arm64-ota-requestor
 ninja -C {out}/linux-arm64-ota-requestor-ipv6only
 
 # Building linux-arm64-python-bindings
-ninja -C {out}/linux-arm64-python-bindings python
+ninja -C {out}/linux-arm64-python-bindings chip-repl
 
 # Building linux-arm64-shell
 ninja -C {out}/linux-arm64-shell
@@ -491,7 +491,7 @@ ninja -C {out}/linux-x64-ota-requestor
 ninja -C {out}/linux-x64-ota-requestor-ipv6only
 
 # Building linux-x64-python-bindings
-ninja -C {out}/linux-x64-python-bindings python
+ninja -C {out}/linux-x64-python-bindings chip-repl
 
 # Building linux-x64-rpc-console
 ninja -C {out}/linux-x64-rpc-console

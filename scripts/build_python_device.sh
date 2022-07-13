@@ -104,7 +104,7 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_deta
 if [ "$enable_pybindings" == true ]; then
     ninja -v -C "$OUTPUT_ROOT" pycontroller
 else
-    ninja -v -C "$OUTPUT_ROOT" python
+    ninja -v -C "$OUTPUT_ROOT" chip-library
 fi
 
 # Create a virtual environment that has access to the built python tools
@@ -113,14 +113,14 @@ virtualenv --clear "$ENVIRONMENT_ROOT"
 # Activate the new environment to register the python WHL
 
 if [ "$enable_pybindings" == true ]; then
-    WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)
+    WHEEL=("$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl)
 else
-    WHEEL=$(ls "$OUTPUT_ROOT"/controller/python/chip-*.whl | head -n 1)
+    WHEEL=("$OUTPUT_ROOT"/controller/python/chip_library*.whl)
 fi
 
 source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$WHEEL"
+"$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
 
 echo ""
 echo_green "Compilation completed and WHL package installed in: "
