@@ -110,8 +110,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 23
-              maxValue: 27
+              minValue: 22
+              maxValue: 28
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
