@@ -83,6 +83,22 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
 
+    // Check if there are key set associated with the given GroupId
+    auto it       = provider->IterateGroupKeys(fabricIndex);
+    bool keyFound = false;
+    GroupDataProvider::GroupKey entry;
+    GroupDataProvider::KeySet keys;
+
+    while (it->Next(entry) && !keyFound)
+    {
+        keyFound = (entry.group_id == groupId);
+    }
+    it->Release();
+    VerifyOrReturnError(keyFound, EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+    VerifyOrReturnError(CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys),
+                        EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+
+    // Add a new entry to the GroupTable
     CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
     if (CHIP_NO_ERROR == err)
     {
