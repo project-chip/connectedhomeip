@@ -89,9 +89,9 @@ tests:
       arguments:
           values:
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
@@ -141,9 +141,9 @@ tests:
       arguments:
           values:
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
