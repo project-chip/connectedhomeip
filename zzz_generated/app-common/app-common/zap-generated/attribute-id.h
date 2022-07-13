@@ -1450,12 +1450,6 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Messaging
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Appliance Identification
 
 // Client attributes

@@ -62,7 +62,6 @@
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
    <xi:include href="chip/window-covering.xml" />
    <xi:include href="chip/matter-devices.xml" />
-   <xi:include href="silabs/ami.xml" />
    <xi:include href="silabs/general.xml" />
    <xi:include href="silabs/ha-devices.xml" />
    <xi:include href="silabs/ha.xml" />
