@@ -20,6 +20,20 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("crypto.gni")
 
+if (chip_crypto == "") {
+  if (current_os == "android" || current_os == "freertos" ||
+      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
+    chip_crypto = "mbedtls"
+  } else {
+    chip_crypto = "openssl"
+  }
+}
+
+assert(
+    chip_crypto == "mbedtls" || chip_crypto == "openssl" ||
+        chip_crypto == "tinycrypt" || chip_crypto == "boringssl" || chip_crypto == "platform",
+    "Please select a valid crypto implementation: mbedtls, openssl, tinycrypt, boringssl, platform")
+
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
   header_dir = "crypto"
@@ -27,11 +41,13 @@ buildconfig_header("crypto_buildconfig") {
   chip_crypto_mbedtls = chip_crypto == "mbedtls"
   chip_crypto_openssl = chip_crypto == "openssl"
   chip_crypto_boringssl = chip_crypto == "boringssl"
+  chip_crypto_platform = chip_crypto == "platform"
 
   defines = [
     "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
+    "CHIP_CRYPTO_PLATFORM=${chip_crypto_platform}",
   ]
 
   if (chip_with_se05x == 1) {
@@ -104,6 +120,9 @@ static_library("crypto") {
   } else if (chip_crypto == "tinycrypt") {
     sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
     public_deps += [ "${mbedtls_root}:mbedtls" ]
+  } else if (chip_crypto == "platform") {
+    # Platform implementation is responsible for bringing their
+    # own implementation and dependencies
   } else {
     assert(false, "Invalid CHIP crypto")
   }
