@@ -23,7 +23,8 @@
 
 #pragma once
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
+#include <platform/PersistedStorage.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -63,6 +64,7 @@ public:
     static const Key kConfigKey_Spake2pIterationCount;
     static const Key kConfigKey_Spake2pSalt;
     static const Key kConfigKey_Spake2pVerifier;
+    static const Key kConfigKey_CertificationDeclaration;
 
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_BootReason;
