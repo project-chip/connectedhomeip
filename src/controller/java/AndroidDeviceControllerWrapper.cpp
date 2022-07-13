@@ -143,6 +143,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     initParams.listenPort                      = listenPort;
+    setupParams.controllerVendorId             = VendorId::NotSpecified;
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     initParams.fabricIndependentStorage        = wrapperStorage;
