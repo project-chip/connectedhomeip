@@ -24,6 +24,11 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#if !CHIP_DISABLE_PLATFORM_KVS
+#include <platform/Darwin/DeviceInstanceInfoProviderImpl.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#endif
+
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 
@@ -45,6 +50,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #if !CHIP_DISABLE_PLATFORM_KVS
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 #endif // CHIP_DISABLE_PLATFORM_KVS
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
