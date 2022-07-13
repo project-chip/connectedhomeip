@@ -17,10 +17,17 @@ import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/crypto/crypto.gni")
+
 assert(chip_device_platform == "efr32")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
+}
+
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
 }
 
 static_library("EFR32") {
@@ -56,6 +63,12 @@ static_library("EFR32") {
     "gatt_db.h",
   ]
 
+  if (chip_crypto == "platform") {
+    sources += [
+      "CHIPCryptoPALPsaEfr32.cpp",
+    ]
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
@@ -64,6 +77,10 @@ static_library("EFR32") {
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  if (chip_crypto == "platform") {
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
+  }
 
   # Add pigweed KVS
   deps = [
