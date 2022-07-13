@@ -72,6 +72,9 @@ constexpr uint8_t kBPKFSaltTag             = 0x02;
 constexpr uint8_t kNumberOFDevicesTag      = 0x03;
 constexpr uint8_t kCommissioningTimeoutTag = 0x04;
 
+constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
+constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
+
 // clang-format off
 const int kTotalPayloadDataSizeInBits =
     kVersionFieldLengthInBits +
@@ -123,6 +126,8 @@ struct PayloadContents
     bool isValidManualCode() const;
     bool isShortDiscriminator = false;
     bool operator==(PayloadContents & input) const;
+
+    static bool IsValidSetupPIN(uint32_t setupPIN);
 
 private:
     bool CheckPayloadCommonConstraints() const;

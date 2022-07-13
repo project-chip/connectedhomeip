@@ -49,9 +49,6 @@ extern const char * kSpake2pR2ISessionInfo;
 
 constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 
-constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
-constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
-
 using namespace Crypto;
 
 struct PASESessionSerialized;
