@@ -15596,8 +15596,8 @@ private:
             VerifyOrDo(!ShouldSkip("LVL.S.C03.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Stop::Type value;
-            value.optionMask     = 0U;
-            value.optionOverride = 0U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
@@ -15645,8 +15645,8 @@ private:
             LogStep(11, "Sends stop command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Stop::Type value;
-            value.optionMask     = 0U;
-            value.optionOverride = 0U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
