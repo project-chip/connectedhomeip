@@ -734,12 +734,6 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
-#if defined(ZCL_USING_MESSAGING_CLUSTER_SERVER) || defined(ZCL_USING_MESSAGING_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_MESSAGING_CLUSTER { ZCL_MESSAGING_CLUSTER_ID, "Messaging" },
-#else
-#define CHIP_PRINTCLUSTER_MESSAGING_CLUSTER
-#endif
-
 #if defined(ZCL_USING_APPLIANCE_IDENTIFICATION_CLUSTER_SERVER) || defined(ZCL_USING_APPLIANCE_IDENTIFICATION_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER { ZCL_APPLIANCE_IDENTIFICATION_CLUSTER_ID, "Appliance Identification" },
 #else
@@ -885,7 +879,6 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
-    CHIP_PRINTCLUSTER_MESSAGING_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_METER_IDENTIFICATION_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                           \
