@@ -346,9 +346,6 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
-namespace Messaging {
-static constexpr ClusterId Id = 0x00000703;
-} // namespace Messaging
 namespace ApplianceIdentification {
 static constexpr ClusterId Id = 0x00000B00;
 } // namespace ApplianceIdentification

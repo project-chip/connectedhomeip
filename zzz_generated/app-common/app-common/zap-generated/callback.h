@@ -901,14 +901,6 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Messaging Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfMessagingClusterInitCallback(chip::EndpointId endpoint);
-
 /** @brief Appliance Identification Cluster Init
  *
  * Cluster Init
@@ -11304,102 +11296,6 @@ void emberAfAccountLoginClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfAccountLoginClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Messaging Cluster
-//
-
-/** @brief Messaging Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfMessagingClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Messaging Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfMessagingClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Messaging Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterMessagingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Messaging Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfMessagingClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status);
-
-/** @brief Messaging Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfMessagingClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status);
-
-/** @brief Messaging Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterMessagingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Messaging Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterMessagingClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Messaging Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfMessagingClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Messaging Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfMessagingClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
 // Appliance Identification Cluster
 //
 
@@ -13425,48 +13321,6 @@ bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * command
 bool emberAfAccountLoginClusterLogoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AccountLogin::Commands::Logout::DecodableType & commandData);
-/**
- * @brief Messaging Cluster DisplayMessage Command callback (from server)
- */
-bool emberAfMessagingClusterDisplayMessageCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                   uint32_t messageId, uint8_t messageControl, uint32_t startTime,
-                                                   uint16_t durationInMinutes, chip::CharSpan message,
-                                                   uint8_t optionalExtendedMessageControl);
-/**
- * @brief Messaging Cluster GetLastMessage Command callback (from client)
- */
-bool emberAfMessagingClusterGetLastMessageCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Messaging::Commands::GetLastMessage::DecodableType & commandData);
-/**
- * @brief Messaging Cluster CancelMessage Command callback (from server)
- */
-bool emberAfMessagingClusterCancelMessageCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                  uint32_t messageId, uint8_t messageControl);
-/**
- * @brief Messaging Cluster MessageConfirmation Command callback (from client)
- */
-bool emberAfMessagingClusterMessageConfirmationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Messaging::Commands::MessageConfirmation::DecodableType & commandData);
-/**
- * @brief Messaging Cluster DisplayProtectedMessage Command callback (from server)
- */
-bool emberAfMessagingClusterDisplayProtectedMessageCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            uint32_t messageId, uint8_t messageControl, uint32_t startTime,
-                                                            uint16_t durationInMinutes, chip::CharSpan message,
-                                                            uint8_t optionalExtendedMessageControl);
-/**
- * @brief Messaging Cluster GetMessageCancellation Command callback (from client)
- */
-bool emberAfMessagingClusterGetMessageCancellationCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Messaging::Commands::GetMessageCancellation::DecodableType & commandData);
-/**
- * @brief Messaging Cluster CancelAllMessages Command callback (from server)
- */
-bool emberAfMessagingClusterCancelAllMessagesCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                      uint32_t implementationDateTime);
 /**
  * @brief Appliance Events and Alert Cluster GetAlerts Command callback (from client)
  */
