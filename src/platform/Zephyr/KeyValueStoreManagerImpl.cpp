@@ -44,7 +44,7 @@ struct ReadEntry
 
 struct DeleteSubtreeEntry
 {
-    CHIP_ERROR result;
+    int result;
 };
 
 // Random magic bytes to represent an empty value.
@@ -128,11 +128,16 @@ int DeleteSubtreeCallback(const char * name, size_t /* entrySize */, settings_re
                           void * param)
 {
     DeleteSubtreeEntry & entry = *static_cast<DeleteSubtreeEntry *>(param);
-    const CHIP_ERROR error     = KeyValueStoreMgr().Delete(name);
+    char fullKey[SETTINGS_MAX_NAME_LEN + 1];
 
-    if (entry.result == CHIP_NO_ERROR)
+    // name comes from Zephyr settings subsystem so it is guaranteed to fit in the buffer.
+    (void) snprintf(fullKey, sizeof(fullKey), CHIP_DEVICE_CONFIG_SETTINGS_KEY "/%s", name);
+    const int result = settings_delete(fullKey);
+
+    // Return the first error, but continue removing remaining keys anyway.
+    if (entry.result == 0)
     {
-        entry.result = error;
+        entry.result = result;
     }
 
     return 0;
@@ -199,11 +204,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 
 CHIP_ERROR KeyValueStoreManagerImpl::DoFactoryReset()
 {
-    DeleteSubtreeEntry entry{ CHIP_NO_ERROR };
-    const int result = settings_load_subtree_direct(CHIP_DEVICE_CONFIG_SETTINGS_KEY, DeleteSubtreeCallback, &entry);
+    DeleteSubtreeEntry entry{ /* success */ 0 };
+    int result = settings_load_subtree_direct(CHIP_DEVICE_CONFIG_SETTINGS_KEY, DeleteSubtreeCallback, &entry);
 
-    VerifyOrReturnError(result == 0, System::MapErrorZephyr(result));
-    return entry.result;
+    if (result == 0)
+    {
+        result = entry.result;
+    }
+
+    return System::MapErrorZephyr(result);
 }
 
 } // namespace PersistedStorage

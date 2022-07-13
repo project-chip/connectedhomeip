@@ -45,8 +45,6 @@ void service_app_control(app_control_h app_control, void * data)
 }
 }; // namespace
 
-void ApplicationInit() {}
-
 int TizenServiceAppMain::Init(int argc, char ** argv)
 {
     mArgc = argc;

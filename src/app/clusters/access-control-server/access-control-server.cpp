@@ -96,6 +96,35 @@ CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::Extensi
     return err;
 }
 
+CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
+{
+    CHIP_ERROR err;
+
+    TLV::TLVReader reader;
+    reader.Init(data);
+
+    auto containerType = chip::TLV::kTLVType_List;
+    err                = reader.Next(containerType, chip::TLV::AnonymousTag());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    err = reader.EnterContainer(containerType);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(chip::TLV::IsProfileTag(reader.GetTag()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    err = reader.ExitContainer(containerType);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    err = reader.Next();
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
@@ -294,6 +323,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
             ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+            ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
+
             ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
                                                          static_cast<uint16_t>(item.data.size())));
             ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
@@ -313,6 +345,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
         ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
+
         ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
                                                      static_cast<uint16_t>(item.data.size())));
         ReturnErrorOnFailure(

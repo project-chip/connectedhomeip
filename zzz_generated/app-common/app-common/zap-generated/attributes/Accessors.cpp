@@ -6993,9 +6993,9 @@ namespace Attributes {
 
 namespace Status {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatus * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatus>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -7007,9 +7007,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatus value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatus>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7085,24 +7085,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace WiredAssessedInputVoltage {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7112,28 +7115,50 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
 } // namespace WiredAssessedInputVoltage
 
 namespace WiredAssessedInputFrequency {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 {
     using Traits = NumericAttributeTraits<uint16_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7143,13 +7168,32 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
 } // namespace WiredAssessedInputFrequency
 
 namespace WiredCurrentType {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentType * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentType>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -7161,9 +7205,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentType value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentType>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7178,24 +7222,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace WiredAssessedCurrent {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7203,6 +7250,25 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace WiredAssessedCurrent
@@ -7300,26 +7366,29 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 } // namespace WiredPresent
 
-namespace BatteryVoltage {
+namespace BatVoltage {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7329,28 +7398,50 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryVoltage
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
 
-namespace BatteryPercentRemaining {
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+    return Set(endpoint, value.Value());
+}
+
+} // namespace BatVoltage
+
+namespace BatPercentRemaining {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
     using Traits = NumericAttributeTraits<uint8_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7360,28 +7451,50 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryPercentRemaining
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
 
-namespace BatteryTimeRemaining {
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+    return Set(endpoint, value.Value());
+}
+
+} // namespace BatPercentRemaining
+
+namespace BatTimeRemaining {
+
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7391,13 +7504,32 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryTimeRemaining
-
-namespace BatteryChargeLevel {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace BatTimeRemaining
+
+namespace BatChargeLevel {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevel * value)
+{
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevel>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -7409,9 +7541,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevel value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevel>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7422,9 +7554,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryChargeLevel
+} // namespace BatChargeLevel
 
-namespace BatteryReplacementNeeded {
+namespace BatReplacementNeeded {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
@@ -7453,13 +7585,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryReplacementNeeded
+} // namespace BatReplacementNeeded
 
-namespace BatteryReplaceability {
+namespace BatReplaceability {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceability * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceability>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -7471,9 +7603,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceability value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceability>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7484,9 +7616,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryReplaceability
+} // namespace BatReplaceability
 
-namespace BatteryPresent {
+namespace BatPresent {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
@@ -7515,9 +7647,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryPresent
+} // namespace BatPresent
 
-namespace BatteryReplacementDescription {
+namespace BatReplacementDescription {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
@@ -7545,9 +7677,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryReplacementDescription
+} // namespace BatReplacementDescription
 
-namespace BatteryCommonDesignation {
+namespace BatCommonDesignation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
 {
@@ -7576,9 +7708,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryCommonDesignation
+} // namespace BatCommonDesignation
 
-namespace BatteryANSIDesignation {
+namespace BatANSIDesignation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
@@ -7606,9 +7738,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryANSIDesignation
+} // namespace BatANSIDesignation
 
-namespace BatteryIECDesignation {
+namespace BatIECDesignation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
@@ -7636,40 +7768,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryIECDesignation
+} // namespace BatIECDesignation
 
-namespace BatteryApprovedChemistry {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = Traits::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
-}
-
-} // namespace BatteryApprovedChemistry
-
-namespace BatteryCapacity {
+namespace BatApprovedChemistry {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
 {
@@ -7698,9 +7799,40 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryCapacity
+} // namespace BatApprovedChemistry
 
-namespace BatteryQuantity {
+namespace BatCapacity {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace BatCapacity
+
+namespace BatQuantity {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -7729,13 +7861,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryQuantity
+} // namespace BatQuantity
 
-namespace BatteryChargeState {
+namespace BatChargeState {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeState * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeState>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -7747,9 +7879,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeState value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeState>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7760,28 +7892,31 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryChargeState
+} // namespace BatChargeState
 
-namespace BatteryTimeToFullCharge {
+namespace BatTimeToFullCharge {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7791,9 +7926,28 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryTimeToFullCharge
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
 
-namespace BatteryFunctionalWhileCharging {
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace BatTimeToFullCharge
+
+namespace BatFunctionalWhileCharging {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
@@ -7822,28 +7976,31 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryFunctionalWhileCharging
+} // namespace BatFunctionalWhileCharging
 
-namespace BatteryChargingCurrent {
+namespace BatChargingCurrent {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    if (Traits::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = Traits::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = Traits::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
     using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -7853,7 +8010,26 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
-} // namespace BatteryChargingCurrent
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType value;
+    Traits::SetNull(value);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
+} // namespace BatChargingCurrent
 
 namespace FeatureMap {
 

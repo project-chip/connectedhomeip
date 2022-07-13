@@ -304,7 +304,8 @@ def main(argv: Sequence[str]) -> None:
                       choices=['nrfconnect', 'esp32', 'linux', 'silabs-thread'],
                       metavar="TARGET",
                       default="esp32")
-    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="do_rpc")
+    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c",
+                      action="store_true", dest="do_rpc", default=False)
     parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
                       action="store_true", dest="do_automated_test_stamp")
     parser.add_option("-v", "--vid", dest="vid", type=int,
@@ -384,34 +385,36 @@ def main(argv: Sequence[str]) -> None:
         os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
-            for platform, label in cicd_config["cd_platforms"].items():
-                command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
-                flush_print(f"Building {command}", with_border=True)
-                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-                shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
-                try:
-                    shell.run_cmd(command)
-                except RuntimeError as build_fail_error:
-                    failed_builds.append((device_name, platform, "build"))
-                    flush_print(str(build_fail_error))
-                    if not options.keep_going:
-                        exit(1)
-                    continue
-                try:
-                    bundle(platform, device_name)
-                except FileNotFoundError as bundle_fail_error:
-                    failed_builds.append((device_name, platform, "bundle"))
-                    flush_print(str(bundle_fail_error))
-                    if not options.keep_going:
-                        exit(1)
-                    continue
-                archive_name = f"{label}-{device_name}"
-                archive_full_name = archive_prefix + archive_name + archive_suffix
-                flush_print(f"Adding build output to archive {archive_full_name}")
-                if os.path.exists(archive_full_name):
-                    os.remove(archive_full_name)
-                with tarfile.open(archive_full_name, "w:gz") as tar:
-                    tar.add(_CD_STAGING_DIR, arcname=".")
+            for platform, label_args in cicd_config["cd_platforms"].items():
+                for label, args in label_args.items():
+                    command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
+                    command += " ".join(args)
+                    flush_print(f"Building {command}", with_border=True)
+                    shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+                    shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+                    try:
+                        shell.run_cmd(command)
+                    except RuntimeError as build_fail_error:
+                        failed_builds.append((device_name, platform, "build"))
+                        flush_print(str(build_fail_error))
+                        if not options.keep_going:
+                            exit(1)
+                        continue
+                    try:
+                        bundle(platform, device_name)
+                    except FileNotFoundError as bundle_fail_error:
+                        failed_builds.append((device_name, platform, "bundle"))
+                        flush_print(str(bundle_fail_error))
+                        if not options.keep_going:
+                            exit(1)
+                        continue
+                    archive_name = f"{label}-{device_name}"
+                    archive_full_name = archive_prefix + archive_name + archive_suffix
+                    flush_print(f"Adding build output to archive {archive_full_name}")
+                    if os.path.exists(archive_full_name):
+                        os.remove(archive_full_name)
+                    with tarfile.open(archive_full_name, "w:gz") as tar:
+                        tar.add(_CD_STAGING_DIR, arcname=".")
         if len(failed_builds) == 0:
             flush_print("No build failures", with_border=True)
         else:
@@ -513,6 +516,7 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_build:
         sw_ver_string = ""
+
         if options.do_automated_test_stamp:
             branch = ""
             for branch_text in shell.run_cmd("git branch", return_cmd_output=True).split("\n"):
@@ -614,7 +618,7 @@ def main(argv: Sequence[str]) -> None:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
-                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={"1" if options.do_rpc else "0"}"]',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
             ])
             if options.cpu_type == "arm64":
                 uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)

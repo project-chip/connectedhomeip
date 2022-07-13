@@ -3503,7 +3503,7 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBr
 }
 
 void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3512,7 +3512,7 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -3541,8 +3541,8 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3551,7 +3551,7 @@ void MTRPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -3564,9 +3564,9 @@ void MTRPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -3580,8 +3580,8 @@ void MTRPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3590,7 +3590,7 @@ void MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge::OnSucce
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             NSNumber * newElement_0;
-            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
             [array_0 addObject:newElement_0];
         }
         CHIP_ERROR err = iter_0.GetStatus();
@@ -3603,9 +3603,9 @@ void MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRPowerSourceActiveBatteryChargeFaultsListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14734,17 +14734,17 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRPowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeFaultType value)
+void MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeFault value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14758,8 +14758,8 @@ void MTRPowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultType> & value)
+void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFault> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14770,9 +14770,9 @@ void MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatChargeFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14890,17 +14890,17 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatFaultType value)
+void MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatFault value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -14914,8 +14914,8 @@ void MTRPowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultType> & value)
+void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFault> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14926,9 +14926,9 @@ void MTRNullablePowerSourceClusterBatFaultTypeAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterBatFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -15098,17 +15098,17 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRPowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredFaultType value)
+void MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredFault value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -15122,8 +15122,8 @@ void MTRPowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultType> & value)
+void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFault> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -15134,9 +15134,9 @@ void MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<MTRNullablePowerSourceClusterWiredFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

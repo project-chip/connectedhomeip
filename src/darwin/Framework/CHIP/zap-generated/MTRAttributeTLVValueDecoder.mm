@@ -3266,7 +3266,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::Order::Id: {
@@ -3298,8 +3298,12 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::WiredAssessedInputFrequency::Id: {
@@ -3309,8 +3313,12 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedShort:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::WiredCurrentType::Id: {
@@ -3321,7 +3329,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::WiredAssessedCurrent::Id: {
@@ -3331,8 +3339,12 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::WiredNominalVoltage::Id: {
@@ -3382,7 +3394,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -3394,74 +3406,64 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             return value;
         }
-        case Attributes::BatteryVoltage::Id: {
-            using TypeInfo = Attributes::BatteryVoltage::TypeInfo;
+        case Attributes::BatVoltage::Id: {
+            using TypeInfo = Attributes::BatVoltage::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::BatPercentRemaining::Id: {
+            using TypeInfo = Attributes::BatPercentRemaining::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::BatTimeRemaining::Id: {
+            using TypeInfo = Attributes::BatTimeRemaining::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
+            return value;
+        }
+        case Attributes::BatChargeLevel::Id: {
+            using TypeInfo = Attributes::BatChargeLevel::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
-        case Attributes::BatteryPercentRemaining::Id: {
-            using TypeInfo = Attributes::BatteryPercentRemaining::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::BatteryTimeRemaining::Id: {
-            using TypeInfo = Attributes::BatteryTimeRemaining::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
-            return value;
-        }
-        case Attributes::BatteryChargeLevel::Id: {
-            using TypeInfo = Attributes::BatteryChargeLevel::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::BatteryReplacementNeeded::Id: {
-            using TypeInfo = Attributes::BatteryReplacementNeeded::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithBool:cppValue];
-            return value;
-        }
-        case Attributes::BatteryReplaceability::Id: {
-            using TypeInfo = Attributes::BatteryReplaceability::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
-            return value;
-        }
-        case Attributes::BatteryPresent::Id: {
-            using TypeInfo = Attributes::BatteryPresent::TypeInfo;
+        case Attributes::BatReplacementNeeded::Id: {
+            using TypeInfo = Attributes::BatReplacementNeeded::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3471,8 +3473,30 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithBool:cppValue];
             return value;
         }
-        case Attributes::ActiveBatteryFaults::Id: {
-            using TypeInfo = Attributes::ActiveBatteryFaults::TypeInfo;
+        case Attributes::BatReplaceability::Id: {
+            using TypeInfo = Attributes::BatReplaceability::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+        case Attributes::BatPresent::Id: {
+            using TypeInfo = Attributes::BatPresent::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::ActiveBatFaults::Id: {
+            using TypeInfo = Attributes::ActiveBatFaults::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3485,7 +3509,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();
@@ -3497,8 +3521,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             }
             return value;
         }
-        case Attributes::BatteryReplacementDescription::Id: {
-            using TypeInfo = Attributes::BatteryReplacementDescription::TypeInfo;
+        case Attributes::BatReplacementDescription::Id: {
+            using TypeInfo = Attributes::BatReplacementDescription::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3508,8 +3532,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::BatteryCommonDesignation::Id: {
-            using TypeInfo = Attributes::BatteryCommonDesignation::TypeInfo;
+        case Attributes::BatCommonDesignation::Id: {
+            using TypeInfo = Attributes::BatCommonDesignation::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3519,8 +3543,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
-        case Attributes::BatteryANSIDesignation::Id: {
-            using TypeInfo = Attributes::BatteryANSIDesignation::TypeInfo;
+        case Attributes::BatANSIDesignation::Id: {
+            using TypeInfo = Attributes::BatANSIDesignation::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3530,8 +3554,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::BatteryIECDesignation::Id: {
-            using TypeInfo = Attributes::BatteryIECDesignation::TypeInfo;
+        case Attributes::BatIECDesignation::Id: {
+            using TypeInfo = Attributes::BatIECDesignation::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3541,8 +3565,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
             return value;
         }
-        case Attributes::BatteryApprovedChemistry::Id: {
-            using TypeInfo = Attributes::BatteryApprovedChemistry::TypeInfo;
+        case Attributes::BatApprovedChemistry::Id: {
+            using TypeInfo = Attributes::BatApprovedChemistry::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3552,8 +3576,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
-        case Attributes::BatteryCapacity::Id: {
-            using TypeInfo = Attributes::BatteryCapacity::TypeInfo;
+        case Attributes::BatCapacity::Id: {
+            using TypeInfo = Attributes::BatCapacity::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3563,8 +3587,8 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
-        case Attributes::BatteryQuantity::Id: {
-            using TypeInfo = Attributes::BatteryQuantity::TypeInfo;
+        case Attributes::BatQuantity::Id: {
+            using TypeInfo = Attributes::BatQuantity::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3574,30 +3598,34 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithUnsignedChar:cppValue];
             return value;
         }
-        case Attributes::BatteryChargeState::Id: {
-            using TypeInfo = Attributes::BatteryChargeState::TypeInfo;
+        case Attributes::BatChargeState::Id: {
+            using TypeInfo = Attributes::BatChargeState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
-        case Attributes::BatteryTimeToFullCharge::Id: {
-            using TypeInfo = Attributes::BatteryTimeToFullCharge::TypeInfo;
+        case Attributes::BatTimeToFullCharge::Id: {
+            using TypeInfo = Attributes::BatTimeToFullCharge::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
             return value;
         }
-        case Attributes::BatteryFunctionalWhileCharging::Id: {
-            using TypeInfo = Attributes::BatteryFunctionalWhileCharging::TypeInfo;
+        case Attributes::BatFunctionalWhileCharging::Id: {
+            using TypeInfo = Attributes::BatFunctionalWhileCharging::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3607,19 +3635,23 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithBool:cppValue];
             return value;
         }
-        case Attributes::BatteryChargingCurrent::Id: {
-            using TypeInfo = Attributes::BatteryChargingCurrent::TypeInfo;
+        case Attributes::BatChargingCurrent::Id: {
+            using TypeInfo = Attributes::BatChargingCurrent::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedInt:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            }
             return value;
         }
-        case Attributes::ActiveBatteryChargeFaults::Id: {
-            using TypeInfo = Attributes::ActiveBatteryChargeFaults::TypeInfo;
+        case Attributes::ActiveBatChargeFaults::Id: {
+            using TypeInfo = Attributes::ActiveBatChargeFaults::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3632,7 +3664,7 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
                 while (iter_0.Next()) {
                     auto & entry_0 = iter_0.GetValue();
                     NSNumber * newElement_0;
-                    newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                    newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
                     [array_0 addObject:newElement_0];
                 }
                 CHIP_ERROR err = iter_0.GetStatus();

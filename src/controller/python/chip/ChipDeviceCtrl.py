@@ -270,6 +270,21 @@ class ChipDeviceController():
                 self.devCtrl)
         )
 
+    def ExpireSessions(self, nodeid):
+        """Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
+
+        This is needed to properly handle operations that invalidate a node's state, such as
+        UpdateNOC.
+
+        WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
+        """
+        self.CheckIsActive()
+
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+    # TODO: This needs to be called MarkSessionDefunct
     def CloseSession(self, nodeid):
         self.CheckIsActive()
 
@@ -1105,6 +1120,9 @@ class ChipDeviceController():
             self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [
                 c_void_p, c_uint64, c_void_p]
             self._dmLib.pychip_GetDeviceBeingCommissioned.restype = c_uint32
+
+            self._dmLib.pychip_ExpireSessions.argtypes = [c_void_p, c_uint64]
+            self._dmLib.pychip_ExpireSessions.restype = c_uint32
 
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [
                 c_void_p]

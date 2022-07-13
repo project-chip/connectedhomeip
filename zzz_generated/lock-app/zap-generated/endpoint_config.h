@@ -233,12 +233,12 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Power Source (server) */                                                                      \
-            { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(1) },             /* Status */                                 \
-            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },             /* Order */                                  \
-            { 0x00000002, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_LONG_DEFAULTS_INDEX(6) }, /* Description */                            \
-            { 0x00000006, ZAP_TYPE(INT32U), 4, 0, ZAP_EMPTY_DEFAULT() },              /* WiredAssessedCurrent */                   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(1) },          /* FeatureMap */                             \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },            /* ClusterRevision */                        \
+            { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(1) },                           /* Status */                   \
+            { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                           /* Order */                    \
+            { 0x00000002, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_LONG_DEFAULTS_INDEX(6) },               /* Description */              \
+            { 0x00000006, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* WiredAssessedCurrent */     \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(1) },                        /* FeatureMap */               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                          /* ClusterRevision */          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
             { 0x00000000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(10) }, /* Breadcrumb */       \
@@ -516,10 +516,10 @@
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(1) },              /* Status */                                \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(1) },              /* Order */                                 \
             { 0x00000002, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_LONG_DEFAULTS_INDEX(18) }, /* Description */                           \
-            { 0x0000000E, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                /* BatteryChargeLevel */                    \
-            { 0x0000000F, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },              /* BatteryReplacementNeeded */              \
-            { 0x00000010, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                /* BatteryReplaceability */                 \
-            { 0x00000013, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_EMPTY_DEFAULT() },         /* BatteryReplacementDescription */         \
+            { 0x0000000E, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                /* BatChargeLevel */                        \
+            { 0x0000000F, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },              /* BatReplacementNeeded */                  \
+            { 0x00000010, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                /* BatReplaceability */                     \
+            { 0x00000013, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_EMPTY_DEFAULT() },         /* BatReplacementDescription */             \
             { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_SIMPLE_DEFAULT(0x0A) },        /* FeatureMap */                            \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },             /* ClusterRevision */                       \
                                                                                                                                    \
