@@ -22,11 +22,12 @@ config:
 
 tests:
     - label: "DUT sends ShowInputStatus command to TH"
-      PICS: MC_MEDIAINPUT.C.C0001
+      PICS: MEDIAINPUT.C.C0001
       verification: |
+          ./chip-tool mediainput show-input-status 1 1
+
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
-          ./chip-tool mediainput show-input-status 1 1
           [1653309190.706455][6534:6539] CHIP:DMG: InvokeResponseMessage =
           [1653309190.706466][6534:6539] CHIP:DMG: {
           [1653309190.706478][6534:6539] CHIP:DMG:         suppressResponse = false,

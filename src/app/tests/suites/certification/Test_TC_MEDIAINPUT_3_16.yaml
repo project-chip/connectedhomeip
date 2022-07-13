@@ -22,11 +22,11 @@ config:
 
 tests:
     - label: "DUT sends HideInputStatus command to TH"
-      PICS: MC_MEDIAINPUT.C.C0002
+      PICS: MEDIAINPUT.C.C0002
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
-
           ./chip-tool mediainput hide-input-status 1 1
+
+          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
           [1653309229.717284][6542:6547] CHIP:DMG: InvokeResponseMessage =
           [1653309229.717304][6542:6547] CHIP:DMG: {

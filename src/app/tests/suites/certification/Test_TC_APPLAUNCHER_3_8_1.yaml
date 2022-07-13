@@ -23,7 +23,7 @@ config:
 
 tests:
     - label: "DUT sends StopApp command to TH"
-      PICS: MC_APPLAUNCHER.C.C0001
+      PICS: APPLAUNCHER.C.C0001
       verification: |
           product maker needs to provide instructions for how to trigger the command:
           Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.

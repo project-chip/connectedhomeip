@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Stop an app with the provided application ID"
-      PICS: MC_APPLAUNCHER.S.C0001
+      PICS: APPLAUNCHER.S.C0001
       command: "StopApp"
       arguments:
           values:

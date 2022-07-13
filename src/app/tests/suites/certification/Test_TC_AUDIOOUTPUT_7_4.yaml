@@ -21,37 +21,45 @@ config:
     endpoint: 0
 
 tests:
-    - label: "DUT sends Rename Output command to TH"
-      PICS: MC_AUDIOOUTPUT.S.C0001
+    - label: "DUT sends RenameOutput command to TH"
+      PICS: AUDIOOUTPUT.S.C0001
       verification: |
-          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+          If the DUT knows the Index value, then those can be sent as the argument.
+          Else User needs to execute the following command to know the index InputList
+
+          ./chip-tool audiooutput read output-list 1 1
 
           ./chip-tool audiooutput rename-output 1 'Kitchen Speakers' 1 1
+          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
           [1653156045562] [89108:1734332] CHIP: [DMG] InvokeRequestMessage =
           [1653156045562] [89108:1734332] CHIP: [DMG] {
-          [1653156045562] [89108:1734332] CHIP: [DMG] 	suppressResponse = false,
-          [1653156045562] [89108:1734332] CHIP: [DMG] 	timedRequest = false,
-          [1653156045562] [89108:1734332] CHIP: [DMG] 	InvokeRequests =
-          [1653156045562] [89108:1734332] CHIP: [DMG] 	[
-          [1653156045562] [89108:1734332] CHIP: [DMG] 		CommandDataIB =
-          [1653156045562] [89108:1734332] CHIP: [DMG] 		{
-          [1653156045562] [89108:1734332] CHIP: [DMG] 			CommandPathIB =
-          [1653156045562] [89108:1734332] CHIP: [DMG] 			{
-          [1653156045562] [89108:1734332] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653156045562] [89108:1734332] CHIP: [DMG] 				ClusterId = 0x50b,
-          [1653156045562] [89108:1734332] CHIP: [DMG] 				CommandId = 0x1,
-          [1653156045562] [89108:1734332] CHIP: [DMG] 			},
+          [1653156045562] [89108:1734332] CHIP: [DMG]         suppressResponse = false,
+          [1653156045562] [89108:1734332] CHIP: [DMG]         timedRequest = false,
+          [1653156045562] [89108:1734332] CHIP: [DMG]         InvokeRequests =
+          [1653156045562] [89108:1734332] CHIP: [DMG]         [
+          [1653156045562] [89108:1734332] CHIP: [DMG]                 CommandDataIB =
+          [1653156045562] [89108:1734332] CHIP: [DMG]                 {
+          [1653156045562] [89108:1734332] CHIP: [DMG]                         CommandPathIB =
+          [1653156045562] [89108:1734332] CHIP: [DMG]                         {
+          [1653156045562] [89108:1734332] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1653156045562] [89108:1734332] CHIP: [DMG]                                 ClusterId = 0x50b,
+          [1653156045562] [89108:1734332] CHIP: [DMG]                                 CommandId = 0x1,
+          [1653156045562] [89108:1734332] CHIP: [DMG]                         },
           [1653156045562] [89108:1734332] CHIP: [DMG]
-          [1653156045562] [89108:1734332] CHIP: [DMG] 			CommandData =
-          [1653156045562] [89108:1734332] CHIP: [DMG] 			{
-          [1653156045562] [89108:1734332] CHIP: [DMG] 				0x0 = 1,
-          [1653156045562] [89108:1734332] CHIP: [DMG] 				0x1 = "Kitchen Speakers",
-          [1653156045562] [89108:1734332] CHIP: [DMG] 			},
-          [1653156045562] [89108:1734332] CHIP: [DMG] 		},
+          [1653156045562] [89108:1734332] CHIP: [DMG]                         CommandData =
+          [1653156045562] [89108:1734332] CHIP: [DMG]                         {
+          [1653156045562] [89108:1734332] CHIP: [DMG]                                 0x0 = 1,
+          [1653156045562] [89108:1734332] CHIP: [DMG]                                 0x1 = "Kitchen Speakers",
+          [1653156045562] [89108:1734332] CHIP: [DMG]                         },
+          [1653156045562] [89108:1734332] CHIP: [DMG]                 },
           [1653156045562] [89108:1734332] CHIP: [DMG]
-          [1653156045562] [89108:1734332] CHIP: [DMG] 	],
+          [1653156045562] [89108:1734332] CHIP: [DMG]         ],
           [1653156045562] [89108:1734332] CHIP: [DMG]
-          [1653156045562] [89108:1734332] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1653156045562] [89108:1734332] CHIP: [DMG]         InteractionModelRevision = 1
           [1653156045562] [89108:1734332] CHIP: [DMG] },
+
+
+          Enter the below command to read the current input.
+          ./chip-tool audiooutput read output-list 1 1
       disabled: true
