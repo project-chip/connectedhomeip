@@ -39,7 +39,7 @@ tests:
           [1656652012.060820][2763:2768] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0005 DataVersion: 4209633606
           [1656652012.063135][2763:2768] CHIP:TOO:   CurrentFabricIndex: 1
           [1656652012.063267][2763:2768] CHIP:EM: Sending Standalone Ack for MessageCounter:205308569 on exchange 52625i
-          [1656652012.063360][2763:2768] CHIP:IN: Prepared secure message 0xffff7b7ed958 to 0x0000000000000001 (1)  
+          [1656652012.063360][2763:2768] CHIP:IN: Prepared secure message 0xffff7b7ed958 to 0x0000000000000001 (1)
           of type 0x10 and protocolId (0, 0) on exchange 52625i with MessageCounter:187919921.
       disabled: true
 
@@ -591,7 +591,7 @@ tests:
           (3) Subjects field: [555, 666, 777, 888] Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, 
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           {"fabricIndex": 1, "privilege": 1, "authMode": 2, "subjects":  [111, 222, 333, 444], "targets": null},
           {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects":  [111, 222, 333, 444], "targets": null}]' 1 0
 
@@ -825,7 +825,7 @@ tests:
           AuthMode field: CASE (2) Subjects field: null Targets field: null"
       PICS: ACL.S.A0000
       verification: |
-          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, 
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null},
           {"fabricIndex": 1, "privilege": 2, "authMode": 2, "subjects": null, "targets": null}]' 1 0
 
           [1656507439.868495][3249:3254] CHIP:DMG: WriteClient moving to [ResponseRe]

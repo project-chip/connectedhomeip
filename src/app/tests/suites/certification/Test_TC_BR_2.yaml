@@ -694,7 +694,7 @@ tests:
       verification: |
           Verify in TH Log
 
-                  
+
           ./chip-tool descriptor read parts-list 1 0
 
           [1657005165.790283][4885:4890] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 3573910942

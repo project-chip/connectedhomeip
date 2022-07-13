@@ -59,7 +59,7 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          Verify in TH all-clusters-app 
+          Verify in TH all-clusters-app
 
           ./chip-tool booleanstate read attribute-list 1 1
           [1654244313219] [91456:3997555] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_FFFB DataVersion: 2739318439
