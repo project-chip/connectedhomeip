@@ -40,20 +40,23 @@ add_executable(${APP_TARGET})
 set(CONFIG_CHIP_LIB_SHELL YES)
 include(${OPENIOTSDK_COMMON}/cmake/chip.cmake)
 
-target_include_directories(${APP_TARGET} PRIVATE
-                           main/include
-                           ${SHELL_COMMON}/include
+add_subdirectory(${OPENIOTSDK_COMMON}/app ./app_build)
+
+target_include_directories(${APP_TARGET} 
+    PRIVATE
+        main/include
+        ${SHELL_COMMON}/include
 )
 
-target_sources(${APP_TARGET} PRIVATE
-                main/main.cpp
-                ${SHELL_COMMON}/cmd_misc.cpp
-                ${SHELL_COMMON}/globals.cpp
+target_sources(${APP_TARGET} 
+    PRIVATE
+        main/main.cpp
+        ${SHELL_COMMON}/cmd_misc.cpp
+        ${SHELL_COMMON}/globals.cpp
 )
 
-target_link_libraries(${APP_TARGET} 
-    cmsis-rtos-implementation
-    openiotsdk-chip
+target_link_libraries(${APP_TARGET}
+    openiotsdk-app
 )
 
 include(${OPENIOTSDK_COMMON}/cmake/linker.cmake)
