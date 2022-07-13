@@ -1383,6 +1383,45 @@ typedef void (*CHIPColorControlClusterFeatureMapAttributeCallbackType)(
 typedef void (*CHIPColorControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
+typedef void (*CHIPBallastConfigurationClusterPhysicalMinLevelAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::PhysicalMinLevel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterPhysicalMaxLevelAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::PhysicalMaxLevel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterBallastStatusAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::BallastStatus::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterMinLevelAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::MinLevel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterMaxLevelAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::MaxLevel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterIntrinsicBalanceFactorAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterBallastFactorAdjustmentAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::BallastFactorAdjustment::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampQuantityAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampQuantity::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampType::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampManufacturerAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampManufacturer::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampRatedHoursAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampRatedHours::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampBurnHoursAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampBurnHours::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampAlarmModeAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampAlarmMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterLampBurnHoursTripPointAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterGeneratedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::BallastConfiguration::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPBallastConfigurationClusterAcceptedCommandListAttributeCallbackType)(
+    void *, const chip::app::Clusters::BallastConfiguration::Attributes::AcceptedCommandList::TypeInfo::DecodableType &);
+typedef void (*CHIPBallastConfigurationClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::BallastConfiguration::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPBallastConfigurationClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::FeatureMap::TypeInfo::DecodableArgType);
+typedef void (*CHIPBallastConfigurationClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::BallastConfiguration::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
 typedef void (*CHIPIlluminanceMeasurementClusterMeasuredValueAttributeCallbackType)(
     void *, chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo::DecodableArgType);
 typedef void (*CHIPIlluminanceMeasurementClusterMinMeasuredValueAttributeCallbackType)(

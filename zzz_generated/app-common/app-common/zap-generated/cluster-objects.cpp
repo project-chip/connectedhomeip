@@ -17051,20 +17051,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MaxLevel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxLevel));
         break;
-    case Attributes::PowerOnLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, powerOnLevel));
-        break;
-    case Attributes::PowerOnFadeTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, powerOnFadeTime));
-        break;
-    case Attributes::IntrinsicBallastFactor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBallastFactor));
+    case Attributes::IntrinsicBalanceFactor::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBalanceFactor));
         break;
     case Attributes::BallastFactorAdjustment::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, ballastFactorAdjustment));
         break;
-    case Attributes::LampQuality::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, lampQuality));
+    case Attributes::LampQuantity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampQuantity));
         break;
     case Attributes::LampType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lampType));

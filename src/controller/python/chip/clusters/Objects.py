@@ -22910,22 +22910,20 @@ class BallastConfiguration(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="physicalMinLevel", Tag=0x00000000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="physicalMaxLevel", Tag=0x00000001, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="ballastStatus", Tag=0x00000002, Type=uint),
-                ClusterObjectFieldDescriptor(Label="minLevel", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="maxLevel", Tag=0x00000011, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="powerOnLevel", Tag=0x00000012, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="powerOnFadeTime", Tag=0x00000013, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="intrinsicBallastFactor", Tag=0x00000014, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="ballastFactorAdjustment", Tag=0x00000015, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="lampQuality", Tag=0x00000020, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="physicalMinLevel", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="physicalMaxLevel", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="ballastStatus", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="minLevel", Tag=0x00000010, Type=uint),
+                ClusterObjectFieldDescriptor(Label="maxLevel", Tag=0x00000011, Type=uint),
+                ClusterObjectFieldDescriptor(Label="intrinsicBalanceFactor", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="ballastFactorAdjustment", Tag=0x00000015, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="lampQuantity", Tag=0x00000020, Type=uint),
                 ClusterObjectFieldDescriptor(Label="lampType", Tag=0x00000030, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="lampManufacturer", Tag=0x00000031, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="lampRatedHours", Tag=0x00000032, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="lampBurnHours", Tag=0x00000033, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="lampRatedHours", Tag=0x00000032, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="lampBurnHours", Tag=0x00000033, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="lampAlarmMode", Tag=0x00000034, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="lampBurnHoursTripPoint", Tag=0x00000035, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="lampBurnHoursTripPoint", Tag=0x00000035, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -22933,22 +22931,20 @@ class BallastConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    physicalMinLevel: 'typing.Optional[uint]' = None
-    physicalMaxLevel: 'typing.Optional[uint]' = None
-    ballastStatus: 'uint' = None
-    minLevel: 'typing.Optional[uint]' = None
-    maxLevel: 'typing.Optional[uint]' = None
-    powerOnLevel: 'typing.Optional[uint]' = None
-    powerOnFadeTime: 'typing.Optional[uint]' = None
-    intrinsicBallastFactor: 'typing.Optional[uint]' = None
-    ballastFactorAdjustment: 'typing.Optional[uint]' = None
-    lampQuality: 'typing.Optional[uint]' = None
+    physicalMinLevel: 'uint' = None
+    physicalMaxLevel: 'uint' = None
+    ballastStatus: 'typing.Optional[uint]' = None
+    minLevel: 'uint' = None
+    maxLevel: 'uint' = None
+    intrinsicBalanceFactor: 'typing.Union[None, Nullable, uint]' = None
+    ballastFactorAdjustment: 'typing.Union[None, Nullable, uint]' = None
+    lampQuantity: 'uint' = None
     lampType: 'typing.Optional[str]' = None
     lampManufacturer: 'typing.Optional[str]' = None
-    lampRatedHours: 'typing.Optional[uint]' = None
-    lampBurnHours: 'typing.Optional[uint]' = None
+    lampRatedHours: 'typing.Union[None, Nullable, uint]' = None
+    lampBurnHours: 'typing.Union[None, Nullable, uint]' = None
     lampAlarmMode: 'typing.Optional[uint]' = None
-    lampBurnHoursTripPoint: 'typing.Optional[uint]' = None
+    lampBurnHoursTripPoint: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -22971,9 +22967,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class PhysicalMaxLevel(ClusterAttributeDescriptor):
@@ -22987,9 +22983,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class BallastStatus(ClusterAttributeDescriptor):
@@ -23003,9 +22999,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class MinLevel(ClusterAttributeDescriptor):
@@ -23019,9 +23015,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class MaxLevel(ClusterAttributeDescriptor):
@@ -23035,44 +23031,12 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class PowerOnLevel(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0301
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000012
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
-        class PowerOnFadeTime(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0301
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000013
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class IntrinsicBallastFactor(ClusterAttributeDescriptor):
+        class IntrinsicBalanceFactor(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0301
@@ -23083,9 +23047,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class BallastFactorAdjustment(ClusterAttributeDescriptor):
@@ -23099,12 +23063,12 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
-        class LampQuality(ClusterAttributeDescriptor):
+        class LampQuantity(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0301
@@ -23115,9 +23079,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class LampType(ClusterAttributeDescriptor):
@@ -23163,9 +23127,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class LampBurnHours(ClusterAttributeDescriptor):
@@ -23179,9 +23143,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class LampAlarmMode(ClusterAttributeDescriptor):
@@ -23211,9 +23175,9 @@ class BallastConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
