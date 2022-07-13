@@ -53,6 +53,16 @@ tests:
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Read the global attribute: AcceptedCommandList"
+      PICS: " !I.C.C40.Tx "
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the global attribute: AcceptedCommandList"
+      PICS: I.C.C40.Tx
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:

@@ -1078,6 +1078,10 @@ PICS:
     - label: "Does the device implement sending the OnWithTimedOff command?"
       id: OO.C.C42.Tx
 
+    #Features
+    - label: "Level Control for Lighting"
+      id: OO.S.F00
+
     - label: "Does Dnssd advertisment broadcast Vendor ID"
       id: VENDOR_SUBTYPE
 

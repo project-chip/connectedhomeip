@@ -111,7 +111,7 @@ tests:
       response:
           constraints:
               minValue: 22
-              maxValue: 32
+              maxValue: 28
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
