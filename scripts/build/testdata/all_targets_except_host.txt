@@ -231,6 +231,22 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
+tizen-arm-all-clusters
+tizen-arm-all-clusters-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal
+tizen-arm-all-clusters-minimal-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-wifi-asan (NOGLOB: Reduce default build variants)
 tizen-arm-chip-tool
 tizen-arm-chip-tool-asan (NOGLOB: Reduce default build variants)
 tizen-arm-chip-tool-no-ble (NOGLOB: Reduce default build variants)

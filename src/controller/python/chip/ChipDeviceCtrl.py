@@ -120,7 +120,7 @@ class DCState(enum.IntEnum):
 class ChipDeviceController():
     activeList = set()
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
+    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, fabricIndex: int, nodeId: int, adminVendorId: int, paaTrustStorePath: str = "", useTestCommissioner: bool = False):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self._ChipStack = builtins.chipStack
@@ -134,7 +134,7 @@ class ChipDeviceController():
 
         res = self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
-                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
+                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId, adminVendorId, ctypes.c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner)
         )
 
         if res != 0:
@@ -270,6 +270,21 @@ class ChipDeviceController():
                 self.devCtrl)
         )
 
+    def ExpireSessions(self, nodeid):
+        """Close all sessions with `nodeid` (if any existed) so that sessions get re-established.
+
+        This is needed to properly handle operations that invalidate a node's state, such as
+        UpdateNOC.
+
+        WARNING: ONLY CALL THIS IF YOU UNDERSTAND THE SIDE-EFFECTS
+        """
+        self.CheckIsActive()
+
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_ExpireSessions(self.devCtrl, nodeid))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+    # TODO: This needs to be called MarkSessionDefunct
     def CloseSession(self, nodeid):
         self.CheckIsActive()
 
@@ -1105,6 +1120,9 @@ class ChipDeviceController():
             self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [
                 c_void_p, c_uint64, c_void_p]
             self._dmLib.pychip_GetDeviceBeingCommissioned.restype = c_uint32
+
+            self._dmLib.pychip_ExpireSessions.argtypes = [c_void_p, c_uint64]
+            self._dmLib.pychip_ExpireSessions.restype = c_uint32
 
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [
                 c_void_p]

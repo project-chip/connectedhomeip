@@ -2443,6 +2443,96 @@ private:
     bool keepAlive;
 };
 
+class CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterWiredAssessedInputVoltageAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterWiredAssessedInputFrequencyAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceWiredAssessedCurrentAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterWiredAssessedCurrentAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceWiredAssessedCurrentAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceWiredAssessedCurrentAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceWiredAssessedCurrentAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceWiredAssessedCurrentAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceWiredAssessedCurrentAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPPowerSourceActiveWiredFaultsAttributeCallback
     : public chip::Callback::Callback<CHIPPowerSourceClusterActiveWiredFaultsAttributeCallbackType>
 {
@@ -2460,7 +2550,8 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -2473,28 +2564,28 @@ private:
     bool keepAlive;
 };
 
-class CHIPPowerSourceActiveBatteryFaultsAttributeCallback
-    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatteryFaultsAttributeCallbackType>
+class CHIPPowerSourceBatVoltageAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatVoltageAttributeCallbackType>
 {
 public:
-    CHIPPowerSourceActiveBatteryFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPPowerSourceBatVoltageAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPPowerSourceActiveBatteryFaultsAttributeCallback();
+    ~CHIPPowerSourceBatVoltageAttributeCallback();
 
-    static void maybeDestroy(CHIPPowerSourceActiveBatteryFaultsAttributeCallback * callback)
+    static void maybeDestroy(CHIPPowerSourceBatVoltageAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPPowerSourceActiveBatteryFaultsAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPPowerSourceBatVoltageAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveBatteryFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatVoltageAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2503,28 +2594,180 @@ private:
     bool keepAlive;
 };
 
-class CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback
-    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatteryChargeFaultsAttributeCallbackType>
+class CHIPPowerSourceBatPercentRemainingAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatPercentRemainingAttributeCallbackType>
 {
 public:
-    CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPPowerSourceBatPercentRemainingAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback();
+    ~CHIPPowerSourceBatPercentRemainingAttributeCallback();
 
-    static void maybeDestroy(CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback * callback)
+    static void maybeDestroy(CHIPPowerSourceBatPercentRemainingAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPPowerSourceBatPercentRemainingAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveBatteryChargeFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatPercentRemainingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceBatTimeRemainingAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatTimeRemainingAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceBatTimeRemainingAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceBatTimeRemainingAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceBatTimeRemainingAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceBatTimeRemainingAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceBatTimeRemainingAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceActiveBatFaultsAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatFaultsAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceActiveBatFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceActiveBatFaultsAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceActiveBatFaultsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceActiveBatFaultsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceActiveBatFaultsAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceBatTimeToFullChargeAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatTimeToFullChargeAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceBatTimeToFullChargeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceBatTimeToFullChargeAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceBatTimeToFullChargeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceBatTimeToFullChargeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceBatTimeToFullChargeAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceBatChargingCurrentAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterBatChargingCurrentAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceBatChargingCurrentAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceBatChargingCurrentAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceBatChargingCurrentAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceBatChargingCurrentAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceBatChargingCurrentAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPowerSourceActiveBatChargeFaultsAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceClusterActiveBatChargeFaultsAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceActiveBatChargeFaultsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceActiveBatChargeFaultsAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceActiveBatChargeFaultsAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceActiveBatChargeFaultsAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPPowerSourceActiveBatChargeFaultsAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

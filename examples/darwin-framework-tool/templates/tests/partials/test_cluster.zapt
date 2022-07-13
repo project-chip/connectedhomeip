@@ -133,8 +133,8 @@ class {{filename}}: public TestCommandBridge
         {{/chip_tests_item_parameters}}
         return {{command}}("{{identity}}", value);
         {{else}}
-        MTRDevice * device = GetDevice("{{identity}}");
-        MTRTest{{asUpperCamelCase cluster}} * cluster = [[MTRTest{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
+        MTRBaseDevice * device = GetDevice("{{identity}}");
+        MTRBaseCluster{{asUpperCamelCase cluster}} * cluster = [[MTRBaseCluster{{asUpperCamelCase cluster}} alloc] initWithDevice:device endpoint:{{endpoint}} queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         {{#if isCommand}}
@@ -156,7 +156,7 @@ class {{filename}}: public TestCommandBridge
           {{/chip_tests_item_parameters}}
           MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
           [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:[NSNumber numberWithUnsignedInt:minIntervalArgument]
-                                                                   maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument] 
+                                                                   maxInterval:[NSNumber numberWithUnsignedInt:maxIntervalArgument]
                                                                    params:params
                                                                    subscriptionEstablished:^{
               VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));

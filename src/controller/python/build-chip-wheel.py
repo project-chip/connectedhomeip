@@ -158,6 +158,7 @@ try:
         'chip.ble.commissioning',
         'chip.configuration',
         'chip.clusters',
+        'chip.utils',
         'chip.discovery',
         'chip.exceptions',
         'chip.internal',

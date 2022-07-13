@@ -384,11 +384,15 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     {
         if (context.mEffectiveTime.Get<CurrentChipEpochTime>().count() < cert->mNotBeforeTime)
         {
+            ChipLogDetail(SecureChannel, "Certificate's mNotBeforeTime (%" PRIu32 ") is after current time (%" PRIu32 ")",
+                          cert->mNotBeforeTime, context.mEffectiveTime.Get<CurrentChipEpochTime>().count());
             validityResult = CertificateValidityResult::kNotYetValid;
         }
         else if (cert->mNotAfterTime != kNullCertTime &&
                  context.mEffectiveTime.Get<CurrentChipEpochTime>().count() > cert->mNotAfterTime)
         {
+            ChipLogDetail(SecureChannel, "Certificate's mNotAfterTime (%" PRIu32 ") is before current time (%" PRIu32 ")",
+                          cert->mNotAfterTime, context.mEffectiveTime.Get<CurrentChipEpochTime>().count());
             validityResult = CertificateValidityResult::kExpired;
         }
         else
@@ -407,6 +411,8 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         // certificate in question is expired.  Check for this.
         if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<LastKnownGoodChipEpochTime>().count() > cert->mNotAfterTime)
         {
+            ChipLogDetail(SecureChannel, "Certificate's mNotAfterTime (%" PRIu32 ") is before last known good time (%" PRIu32 ")",
+                          cert->mNotAfterTime, context.mEffectiveTime.Get<LastKnownGoodChipEpochTime>().count());
             validityResult = CertificateValidityResult::kExpiredAtLastKnownGoodTime;
         }
         else

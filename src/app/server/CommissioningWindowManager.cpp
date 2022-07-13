@@ -55,7 +55,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         DeviceLayer::SystemLayer().CancelTimer(HandleCommissioningWindowTimeout, this);
         mCommissioningTimeoutTimerArmed = false;
         Cleanup();
-        mServer->GetSecureSessionManager().ExpireAllPASEPairings();
+        mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE
         mServer->GetBleLayerObject()->CloseAllBleConnections();

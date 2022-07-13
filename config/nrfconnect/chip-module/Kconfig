@@ -254,4 +254,24 @@ config CHIP_DEVICE_ROTATING_DEVICE_UID
 	  A device rotating id unique id which will be generated if
 	  this config is not set in prj.conf file.
 
+config CHIP_CERTIFICATION_DECLARATION_STORAGE
+	bool "Enable storing Certification Declaration"
+	depends on CHIP_FACTORY_DATA
+	help
+	  Enables storing Certification Declaration in Zephyr settings
+	  instead of using hardcoded value from firmware. It also adds
+	  support for including new Certification Declaration into a firmware
+	  update image package sent via OTA Software Update.
+
+if CHIP_CERTIFICATION_DECLARATION_STORAGE
+
+config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
+	int "Certification declaration OTA image id"
+	default 205 #0xcd
+	help
+	  The image id of Certification Declaration image
+	  for sending it via OTA Software Update purposes.
+
+endif
+
 endif

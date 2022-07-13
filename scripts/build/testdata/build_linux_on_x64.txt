@@ -6,6 +6,16 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters'
 
+# Generating linux-arm64-all-clusters-app-nodeps
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-app-nodeps'
+
+# Generating linux-arm64-all-clusters-app-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-all-clusters-app-nodeps-ipv6only'
+
 # Generating linux-arm64-all-clusters-ipv6only
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -40,6 +50,16 @@ PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only'
+
+# Generating linux-arm64-chip-tool-nodeps
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-nodeps'
+
+# Generating linux-arm64-chip-tool-nodeps-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-nodeps-ipv6only'
 
 # Generating linux-arm64-light
 bash -c '
@@ -156,7 +176,13 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} {ou
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux {out}/linux-x64-all-clusters
 
 # Generating linux-x64-all-clusters-app-nodeps
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false' {out}/linux-x64-all-clusters-app-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-all-clusters-app-nodeps
+
+# Generating linux-x64-all-clusters-app-nodeps-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-all-clusters-app-nodeps-ipv6only
+
+# Generating linux-x64-all-clusters-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=use_coverage=true {out}/linux-x64-all-clusters-coverage
 
 # Generating linux-x64-all-clusters-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-all-clusters-ipv6only
@@ -179,11 +205,17 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--
 # Generating linux-x64-chip-tool
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool {out}/linux-x64-chip-tool
 
+# Generating linux-x64-chip-tool-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool --args=use_coverage=true {out}/linux-x64-chip-tool-coverage
+
 # Generating linux-x64-chip-tool-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
 
 # Generating linux-x64-chip-tool-nodeps
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false' {out}/linux-x64-chip-tool-nodeps
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-chip-tool-nodeps
+
+# Generating linux-x64-chip-tool-nodeps-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '--args=chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=false chip_enable_wifi=false chip_enable_openthread=false is_clang=true' {out}/linux-x64-chip-tool-nodeps-ipv6only
 
 # Generating linux-x64-light
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux {out}/linux-x64-light
@@ -242,6 +274,15 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root} --a
 # Generating linux-x64-tests-clang
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=is_clang=true chip_build_tests=true' {out}/linux-x64-tests-clang
 
+# Generating linux-x64-tests-coverage
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root} '--args=use_coverage=true chip_build_tests=true' {out}/linux-x64-tests-coverage
+
+# Create coverage output location
+mkdir -p {out}/linux-x64-tests-coverage/coverage
+
+# Initial coverage baseline
+lcov --initial --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_base.info
+
 # Generating linux-x64-thermostat
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/thermostat/linux {out}/linux-x64-thermostat
 
@@ -263,6 +304,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Building linux-arm64-all-clusters
 ninja -C {out}/linux-arm64-all-clusters
 
+# Building linux-arm64-all-clusters-app-nodeps
+ninja -C {out}/linux-arm64-all-clusters-app-nodeps
+
+# Building linux-arm64-all-clusters-app-nodeps-ipv6only
+ninja -C {out}/linux-arm64-all-clusters-app-nodeps-ipv6only
+
 # Building linux-arm64-all-clusters-ipv6only
 ninja -C {out}/linux-arm64-all-clusters-ipv6only
 
@@ -283,6 +330,12 @@ ninja -C {out}/linux-arm64-chip-tool
 
 # Building linux-arm64-chip-tool-ipv6only
 ninja -C {out}/linux-arm64-chip-tool-ipv6only
+
+# Building linux-arm64-chip-tool-nodeps
+ninja -C {out}/linux-arm64-chip-tool-nodeps
+
+# Building linux-arm64-chip-tool-nodeps-ipv6only
+ninja -C {out}/linux-arm64-chip-tool-nodeps-ipv6only
 
 # Building linux-arm64-light
 ninja -C {out}/linux-arm64-light
@@ -359,6 +412,12 @@ ninja -C {out}/linux-x64-all-clusters
 # Building linux-x64-all-clusters-app-nodeps
 ninja -C {out}/linux-x64-all-clusters-app-nodeps
 
+# Building linux-x64-all-clusters-app-nodeps-ipv6only
+ninja -C {out}/linux-x64-all-clusters-app-nodeps-ipv6only
+
+# Building linux-x64-all-clusters-coverage
+ninja -C {out}/linux-x64-all-clusters-coverage
+
 # Building linux-x64-all-clusters-ipv6only
 ninja -C {out}/linux-x64-all-clusters-ipv6only
 
@@ -380,11 +439,17 @@ ninja -C {out}/linux-x64-chip-cert src/tools/chip-cert
 # Building linux-x64-chip-tool
 ninja -C {out}/linux-x64-chip-tool
 
+# Building linux-x64-chip-tool-coverage
+ninja -C {out}/linux-x64-chip-tool-coverage
+
 # Building linux-x64-chip-tool-ipv6only
 ninja -C {out}/linux-x64-chip-tool-ipv6only
 
 # Building linux-x64-chip-tool-nodeps
 ninja -C {out}/linux-x64-chip-tool-nodeps
+
+# Building linux-x64-chip-tool-nodeps-ipv6only
+ninja -C {out}/linux-x64-chip-tool-nodeps-ipv6only
 
 # Building linux-x64-light
 ninja -C {out}/linux-x64-light
@@ -442,6 +507,24 @@ ninja -C {out}/linux-x64-tests check
 
 # Building linux-x64-tests-clang
 ninja -C {out}/linux-x64-tests-clang check
+
+# Build-only
+ninja -C {out}/linux-x64-tests-coverage default
+
+# Initial coverage baseline
+lcov --initial --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_base.info
+
+# Building linux-x64-tests-coverage
+ninja -C {out}/linux-x64-tests-coverage check
+
+# Update coverage
+lcov --capture --directory {out}/linux-x64-tests-coverage/obj --output-file {out}/linux-x64-tests-coverage/coverage/lcov_test.info
+
+# Final coverage info
+lcov --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_base.info --add-tracefile {out}/linux-x64-tests-coverage/coverage/lcov_test.info --output-file {out}/linux-x64-tests-coverage/coverage/lcov_final.info
+
+# HTML coverage
+genhtml {out}/linux-x64-tests-coverage/coverage/lcov_final.info --output-directory {out}/linux-x64-tests-coverage/coverage/html
 
 # Building linux-x64-thermostat
 ninja -C {out}/linux-x64-thermostat

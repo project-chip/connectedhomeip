@@ -175,7 +175,6 @@ efr32_executable("light_switch_app") {
     "${examples_plat_dir}/init_efrPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",
-    "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/binding-handler.cpp",
     "src/main.cpp",

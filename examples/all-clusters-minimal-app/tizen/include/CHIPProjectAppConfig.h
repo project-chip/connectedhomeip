@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +16,16 @@
  *    limitations under the License.
  */
 
-#ifndef MTR_CLUSTER_EXTERNS_H
-#define MTR_CLUSTER_EXTERNS_H
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-#import <Foundation/Foundation.h>
+#pragma once
 
-#import <Matter/Matter.h>
-
-@interface MTRCluster (PrivateExtensions)
-@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-
-- (chip::ByteSpan)asByteSpan:(NSData *)value;
-- (chip::CharSpan)asCharSpan:(NSString *)value;
-@end
-
-#endif
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>

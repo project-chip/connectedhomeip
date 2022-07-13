@@ -32,7 +32,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.5.79
+            image: connectedhomeip/chip-build-telink:0.5.84
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 

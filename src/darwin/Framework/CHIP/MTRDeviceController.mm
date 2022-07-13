@@ -25,6 +25,7 @@
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging.h"
+#import "MTROTAProviderDelegateBridge.h"
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
@@ -56,6 +57,7 @@ static NSString * const kErrorSigningKeypairInit = @"Init failure while creating
 static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorOperationalKeypairInit = @"Init failure while creating operational keypair bridge";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kErrorOtaProviderInit = @"Init failure while creating an OTA provider delegate";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -75,6 +77,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) MTRDevicePairingDelegateBridge * pairingDelegateBridge;
+@property (readonly) MTROTAProviderDelegateBridge * otaProviderDelegateBridge;
 @property (readonly) MTROperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) MTRP256KeypairBridge signingKeypairBridge;
 @property (readonly) MTRP256KeypairBridge operationalKeypairBridge;
@@ -92,6 +95,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         _pairingDelegateBridge = new MTRDevicePairingDelegateBridge();
         if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
+            return nil;
+        }
+
+        _otaProviderDelegateBridge = new MTROTAProviderDelegateBridge();
+        if ([self checkForInitError:(_otaProviderDelegateBridge != nullptr) logMsg:kErrorOtaProviderInit]) {
             return nil;
         }
 
@@ -607,6 +615,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 {
     dispatch_async(_chipWorkQueue, ^{
         self->_pairingDelegateBridge->setDelegate(delegate, queue);
+    });
+}
+
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)delegate queue:(dispatch_queue_t)queue;
+{
+    dispatch_async(_chipWorkQueue, ^{
+        self->_otaProviderDelegateBridge->setDelegate(delegate, queue);
     });
 }
 

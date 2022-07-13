@@ -259,6 +259,10 @@ def HostTargets():
         app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
         app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
+        nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False, use_clang=True)
+        app_targets.append(target.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args))
+        app_targets.append(target.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args))
+
     builder = VariantBuilder()
 
     # Possible build variants. Note that number of potential
@@ -290,6 +294,10 @@ def HostTargets():
     for target in builder.AllVariants():
         yield target
 
+    # limited subset for coverage
+    yield target_native.Extend('all-clusters-coverage', app=HostApp.ALL_CLUSTERS, use_coverage=True)
+    yield target_native.Extend('chip-tool-coverage', app=HostApp.CHIP_TOOL, use_coverage=True)
+
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
     yield target_native.Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
@@ -300,13 +308,11 @@ def HostTargets():
     yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
                                use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
-    nodeps_args = dict(enable_ipv4=False, enable_ble=False, enable_wifi=False, enable_thread=False)
-    yield target_native.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args)
-    yield target_native.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args)
+    yield target_native.Extend('tests', app=HostApp.TESTS)
+    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True)
+    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True)
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests', board=HostBoard.NATIVE, app=HostApp.TESTS)
-    yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests-clang', board=HostBoard.NATIVE, app=HostApp.TESTS, use_clang=True)
     yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
 
 
@@ -557,6 +563,8 @@ def TizenTargets():
 
     target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
 
+    builder.targets.append(target.Extend('all-clusters', app=TizenApp.ALL_CLUSTERS))
+    builder.targets.append(target.Extend('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL))
     builder.targets.append(target.Extend('chip-tool', app=TizenApp.CHIP_TOOL))
     builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
 

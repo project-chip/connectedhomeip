@@ -1,6 +1,7 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +16,16 @@
  *    limitations under the License.
  */
 
-#ifndef MTR_DEVICE_EXTERNS_H
-#define MTR_DEVICE_EXTERNS_H
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-#import <Foundation/Foundation.h>
-#import <Matter/Matter.h>
+#pragma once
 
-#include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/DeviceProxy.h>
-
-NS_ASSUME_NONNULL_BEGIN
-
-@interface MTRDevice (InternalIntrospection)
-
-// TODO: remove me
-// Used to access the internal chip::DeviceProxy from TestCommandBridge
-- (chip::DeviceProxy *)internalDevice;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-#endif /* MTR_DEVICE_EXTERNS_H */
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>

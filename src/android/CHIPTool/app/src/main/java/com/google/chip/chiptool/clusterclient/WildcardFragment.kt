@@ -107,6 +107,10 @@ class WildcardFragment : Fragment() {
           stringBuilder.append("\t\t$attributeName: ${attributeState.value}\n")
         }
         clusterState.eventStates.forEach { (eventId, eventState) ->
+          stringBuilder.append("\t\teventNumber: ${eventState.eventNumber}\n")
+          stringBuilder.append("\t\tpriorityLevel: ${eventState.priorityLevel}\n")
+          stringBuilder.append("\t\tsystemTimeStamp: ${eventState.systemTimeStamp}\n")
+
           val eventName = ChipIdLookup.eventIdToName(clusterId, eventId)
           stringBuilder.append("\t\t$eventName: ${eventState.value}\n")
         }

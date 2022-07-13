@@ -47,7 +47,7 @@ public:
 
     ~WriteAttribute() {}
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -69,7 +69,7 @@ public:
         return WriteAttribute::SendCommand(device, endpointId, mClusterId, mAttributeId, value);
     }
 
-    CHIP_ERROR SendCommand(MTRDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
         chip::AttributeId attributeId, id _Nonnull value)
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);

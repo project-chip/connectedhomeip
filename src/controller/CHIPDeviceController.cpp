@@ -298,7 +298,7 @@ void DeviceController::Shutdown()
         // sessions.  It just shuts down any ongoing CASE session establishment
         // we're in the middle of as initiator.  Maybe it should shut down
         // existing sessions too?
-        mSystemState->SessionMgr()->ExpireAllPairingsForFabric(mFabricIndex);
+        mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
 
         FabricTable * fabricTable = mSystemState->Fabrics();
         if (fabricTable != nullptr)

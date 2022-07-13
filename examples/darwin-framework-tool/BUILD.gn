@@ -24,19 +24,38 @@ if (config_use_interactive_mode) {
 
 assert(chip_build_tools)
 
+action("build-darwin-framwork") {
+  script = "${chip_root}/scripts/build/build_darwin_framework.py"
+
+  inputs = [ "${chip_root}/src/darwin/Framework/Matter.xcodeproj" ]
+
+  args = [
+    "--project_path",
+    rebase_path("${chip_root}/src/darwin/Framework/Matter.xcodeproj",
+                root_build_dir),
+    "--out_path",
+    "macos_framework_output",
+    "--target",
+    "Matter",
+    "--log_path",
+    rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
+  ]
+
+  output_name = "Matter.framework"
+  outputs = [ "${root_out_dir}/macos_framework_output/${output_name}" ]
+}
+
 config("config") {
   include_dirs = [
     ".",
-    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
-    "${chip_root}/src/darwin/Framework/CHIP",
     "${chip_root}/examples/darwin-framework-tool/commands/common",
     "${chip_root}/zzz_generated/darwin-framework-tool",
     "${chip_root}/zzz_generated/controller-clusters",
     "${chip_root}/examples/chip-tool/commands/clusters/ComplexArgument.h",
-    "/tmp/macos_framework_output",
+    "${root_out_dir}/macos_framework_output",
   ]
 
-  framework_dirs = [ "/tmp/macos_framework_output" ]
+  framework_dirs = [ "${root_out_dir}/macos_framework_output" ]
 
   defines = [
     "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
@@ -79,23 +98,24 @@ executable("darwin-framework-tool") {
     "main.mm",
   ]
 
+  deps = [
+    ":build-darwin-framwork",
+    "${chip_root}/examples/chip-tool:chip-tool-utils",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+    "${chip_root}/third_party/inipp",
+    "${chip_root}/third_party/jsoncpp",
+  ]
+
   if (config_use_interactive_mode) {
     sources += [ "commands/interactive/InteractiveCommands.mm" ]
     deps += [ "${editline_root}:editline" ]
   }
 
-  if (config_enable_yaml_tests) {
-    sources += [ "${chip_root}/zzz_generated/darwin-framework-tool/zap-generated/cluster/MTRTestClustersObjc.mm" ]
-  }
-
-  deps = [
-    "${chip_root}/examples/chip-tool:chip-tool-utils",
-    "${chip_root}/src/app/server",
-    "${chip_root}/src/darwin/Framework/CHIP:static-matter",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/platform",
-    "${chip_root}/third_party/inipp",
-    "${chip_root}/third_party/jsoncpp",
+  ldflags = [
+    "-rpath",
+    "@executable_path/macos_framework_output/",
   ]
 
   frameworks = [
