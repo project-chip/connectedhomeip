@@ -22,7 +22,8 @@
 
 #include "efr32_creds.h"
 #include "psa/crypto.h"
-#include "sl_token_api.h"
+
+extern uint32_t linker_nvm_end;
 
 namespace chip {
 namespace Credentials {
@@ -30,12 +31,15 @@ namespace EFR32 {
 
 namespace {
 
+uint8_t * kCredBaseAddr = (uint8_t *) &linker_nvm_end;
+
 class DeviceAttestationCredsEFR32 : public DeviceAttestationCredentialsProvider
 {
+
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_buffer) override
     {
-        ByteSpan cd_span(kCertificationDeclaration);
+        ByteSpan cd_span(kCredBaseAddr + EFR32_CREDENTIALS_CD_OFFSET, EFR32_CREDENTIALS_CD_SIZE);
         return CopySpanToMutableSpan(cd_span, out_buffer);
     }
 
@@ -48,29 +52,19 @@ public:
 
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_buffer) override
     {
-        uint8_t cert_buf[MFG_MATTER_DAC_SIZE];
-        ByteSpan cert_span(cert_buf);
-
-        int err = sl_token_get_data(CREATOR_MFG_MATTER_DAC, 0, cert_buf, sizeof(cert_buf));
-        VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
-        ChipLogByteSpan(DeviceLayer, cert_span);
+        ByteSpan cert_span(kCredBaseAddr + EFR32_CREDENTIALS_DAC_OFFSET, EFR32_CREDENTIALS_DAC_SIZE);
         return CopySpanToMutableSpan(cert_span, out_buffer);
     }
 
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) override
     {
-        uint8_t cert_buf[MFG_MATTER_PAI_SIZE];
-        ByteSpan cert_span(cert_buf);
-
-        int err = sl_token_get_data(CREATOR_MFG_MATTER_PAI, 0, cert_buf, sizeof(cert_buf));
-        VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
-        ChipLogByteSpan(DeviceLayer, cert_span);
+        ByteSpan cert_span(kCredBaseAddr + EFR32_CREDENTIALS_PAI_OFFSET, EFR32_CREDENTIALS_PAI_SIZE);
         return CopySpanToMutableSpan(cert_span, out_pai_buffer);
     }
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_buffer) override
     {
-        psa_key_id_t key_id   = MFG_MATTER_DAC_KEY_ID;
+        psa_key_id_t key_id   = EFR32_CREDENTIALS_DAC_KEY_ID;
         uint8_t signature[64] = { 0 };
         size_t signature_size = sizeof(signature);
 
