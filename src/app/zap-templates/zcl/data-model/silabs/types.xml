@@ -402,27 +402,6 @@ limitations under the License.
     <field name="NumberOfDigitsToTheLeftOfTheDecimalPoint" mask="0x78"/>
     <field name="SuppressLeadingZeros" mask="0x80"/>
   </bitmap>
-  <struct name="ScheduledPhase">
-    <cluster code="0x001A"/>
-    <item name="energyPhaseId" type="INT8U"/>
-    <item name="scheduledTime" type="INT16U"/>
-  </struct>
-  <struct name="TransferredPhase">
-    <cluster code="0x001A"/>
-    <item name="energyPhaseId" type="INT8U"/>
-    <item name="macroPhaseId" type="INT8U"/>
-    <item name="expectedDuration" type="INT16U"/>
-    <item name="peakPower" type="INT16U"/>
-    <item name="energy" type="INT16U"/>
-    <item name="maxActivationDelay" type="INT16U"/>
-  </struct>
-  <struct name="PowerProfileRecord">
-    <cluster code="0x001A"/>
-    <item name="powerProfileId" type="INT8U"/>
-    <item name="energyPhaseId" type="INT8U"/>
-    <item name="powerProfileRemoteControl" type="BOOLEAN"/>
-    <item name="powerProfileState" type="ENUM8"/>
-  </struct>
   <enum name="PowerProfileState" type="ENUM8">
     <item name="PowerProfileWaitingToStart" value="0x01"/>
     <item name="PowerProfileStarted" value="0x02"/>
@@ -434,29 +413,6 @@ limitations under the License.
     <item name="ProfileReadyForScheduling" value="0x08"/>
     <item name="PowerProfileScheduled" value="0x09"/>
   </enum>
-  <enum name="ApplianceStatus" type="ENUM8">
-    <cluster code="0x001B"/>
-    <item name="Off" value="0x01"/>
-    <item name="StandBy" value="0x02"/>
-    <item name="Programmed" value="0x03"/>
-    <item name="ProgrammedWaitingToStart" value="0x04"/>
-    <item name="Running" value="0x05"/>
-    <item name="Pause" value="0x06"/>
-    <item name="EndProgrammed" value="0x07"/>
-    <item name="Failure" value="0x08"/>
-    <item name="ProgrammeInterrupted" value="0x09"/>
-    <item name="Idle" value="0x0A"/>
-    <item name="RinseHold" value="0x0B"/>
-    <item name="Service" value="0x0C"/>
-    <item name="Superfreezing" value="0x0D"/>
-    <item name="Supercooling" value="0x0E"/>
-    <item name="Superheating" value="0x0F"/>
-  </enum>
-  <bitmap name="RemoteEnableFlagsAndDeviceStatus2" type="BITMAP8">
-    <cluster code="0x001B"/>
-    <field name="RemoteEnableFlags" mask="0x0F"/>
-    <field name="DeviceStatus2Structure" mask="0xF0"/>
-  </bitmap>
   <enum name="RemoteEnableFlags" type="ENUM8">
     <item name="Disabled" value="0x00"/>
     <item name="TemporarilyLockedDisabled" value="0x07"/>
@@ -474,28 +430,6 @@ limitations under the License.
   <enum name="TimeEncoding" type="ENUM8">
     <item name="Relative" value="0x00"/>
     <item name="Absolute" value="0x40"/>
-  </enum>
-  <enum name="CommandIdentification" type="ENUM8">
-    <cluster code="0x001B"/>
-    <item name="Start" value="0x01"/>
-    <item name="Stop" value="0x02"/>
-    <item name="Pause" value="0x03"/>
-    <item name="StartSuperfreezing" value="0x04"/>
-    <item name="StopSuperfreezing" value="0x05"/>
-    <item name="StartSupercooling" value="0x06"/>
-    <item name="StopSupercooling" value="0x07"/>
-    <item name="DisableGas" value="0x08"/>
-    <item name="EnableGas" value="0x09"/>
-    <item name="EnableEnergyControl" value="0x0A"/>
-    <item name="DisableEnergyControl" value="0x0B"/>
-  </enum>
-  <enum name="WarningEvent" type="ENUM8">
-    <cluster code="0x001B"/>
-    <item name="Warning1OverallPowerAboveAvailablePowerLevel" value="0x00"/>
-    <item name="Warning2OverallPowerAbovePowerThresholdLevel" value="0x01"/>
-    <item name="Warning3OverallPowerBackBelowTheAvailablePowerLevel" value="0x02"/>
-    <item name="Warning4OverallPowerBackBelowThePowerThresholdLevel" value="0x03"/>
-    <item name="Warning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts" value="0x04"/>
   </enum>
   <enum name="DoorLockState" type="ENUM8">
     <item name="NotFullyLocked" value="0x00"/>
@@ -685,41 +619,6 @@ limitations under the License.
     <item name="OnlyInstantaneousPowerNotCertified" value="0x0001"/>
     <item name="OnlyCumulatedConsumptionNotCertified" value="0x0002"/>
     <item name="NotCertifiedData" value="0x0003"/>
-  </enum>
-  <!-- APPLIANCE EVENTS AND ALERT -->
-  <bitmap name="AlertStructure" type="BITMAP24">
-    <cluster code="0x0B02"/>
-    <field name="AlertId" mask="0x0000FF"/>
-    <field name="Category" mask="0x000F00"/>
-    <field name="PresenceRecovery" mask="0x003000"/>
-  </bitmap>
-  <enum name="AlertStructureCategory" type="ENUM16">
-    <item name="Warning" value="0x0100"/>
-    <item name="Danger" value="0x0200"/>
-    <item name="Failure" value="0x0300"/>
-  </enum>
-  <enum name="AlertStructurePresenceRecovery" type="ENUM16">
-    <item name="Recovery" value="0x0000"/>
-    <item name="Presence" value="0x1000"/>
-  </enum>
-  <bitmap name="AlertCount" type="BITMAP8">
-    <cluster code="0x0B02"/>
-    <field name="NumberOfAlerts" mask="0x0F"/>
-    <field name="TypeOfAlert" mask="0xF0"/>
-  </bitmap>
-  <enum name="AlertCountType" type="ENUM8">
-    <item name="Unstructured" value="0x00"/>
-  </enum>
-  <enum name="EventIdentification" type="ENUM8">
-    <cluster code="0x0B02"/>
-    <item name="EndOfCycle" value="0x01"/>
-    <item name="TemperatureReached" value="0x04"/>
-    <item name="EndOfCooking" value="0x05"/>
-    <item name="SwitchingOff" value="0x06"/>
-    <item name="WrongData" value="0x07"/>
-  </enum>
-  <enum name="GenericDeviceClass" type="ENUM8">
-    <item name="Lighting" value="0x00"/>
   </enum>
   <!-- Lighting and Occupancy Types -->
   <enum name="GenericDeviceType" type="ENUM8">
