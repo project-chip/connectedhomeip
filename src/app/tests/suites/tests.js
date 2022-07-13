@@ -218,6 +218,7 @@ function getManualTests() {
         "Test_TC_AUDIOOUTPUT_7_3",
         "Test_TC_AUDIOOUTPUT_7_4",
         "Test_TC_CONTENTLAUNCHER_10_3",
+        "Test_TC_CONTENTLAUNCHER_10_4",
         "Test_TC_CONTENTLAUNCHER_10_5",
         "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
@@ -486,6 +487,20 @@ function getManualTests() {
         "Test_TC_PCC_3_1",
     ];
 
+    const AccessControl = [
+        "Test_TC_ACL_1_1",
+        "Test_TC_ACL_2_1",
+        "Test_TC_ACL_2_2",
+        "Test_TC_ACL_2_3",
+        "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
+        "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_8",
+        "Test_TC_ACL_2_9",
+        "Test_TC_ACL_2_10",
+    ];
+
     const tests = [
         DeviceDiscovery,
         Groups,
@@ -533,6 +548,7 @@ function getManualTests() {
         Binding,
         Scenes,
         PumpConfigurationControl,
+        AccessControl,
     ].flat(1);
 
     tests.disable = disable.bind(tests);

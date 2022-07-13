@@ -47,7 +47,7 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_TGTNAV.S.A0001
+      PICS: TGTNAV.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -56,7 +56,7 @@ tests:
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label: "Read the global attribute: AttributeList"
-      PICS: " !MC_TGTNAV.S.A0001 "
+      PICS: " !TGTNAV.S.A0001 "
       command: "readAttribute"
       attribute: "AttributeList"
       response:

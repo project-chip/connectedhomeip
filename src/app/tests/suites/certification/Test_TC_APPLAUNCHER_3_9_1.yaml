@@ -23,39 +23,21 @@ config:
 
 tests:
     - label: "DUT sends HideApp command to TH"
-      PICS: MC_APPLAUNCHER.C.C0002
+      PICS: APPLAUNCHER.C.C0002
       verification: |
+          product maker needs to provide instructions for how to trigger the command:
+          Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.
+
+
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
           ./chip-tool applicationlauncher hide-app '{"catalogVendorId": 123, "applicationId": "exampleid"}' 1 1
 
-          [1653155357497] [89108:1720718] CHIP: [DMG] InvokeRequestMessage =
-          [1653155357497] [89108:1720718] CHIP: [DMG] {
-          [1653155357497] [89108:1720718] CHIP: [DMG] 	suppressResponse = false,
-          [1653155357497] [89108:1720718] CHIP: [DMG] 	timedRequest = false,
-          [1653155357497] [89108:1720718] CHIP: [DMG] 	InvokeRequests =
-          [1653155357497] [89108:1720718] CHIP: [DMG] 	[
-          [1653155357497] [89108:1720718] CHIP: [DMG] 		CommandDataIB =
-          [1653155357497] [89108:1720718] CHIP: [DMG] 		{
-          [1653155357497] [89108:1720718] CHIP: [DMG] 			CommandPathIB =
-          [1653155357497] [89108:1720718] CHIP: [DMG] 			{
-          [1653155357497] [89108:1720718] CHIP: [DMG] 				EndpointId = 0x1,
-          [1653155357497] [89108:1720718] CHIP: [DMG] 				ClusterId = 0x50c,
-          [1653155357497] [89108:1720718] CHIP: [DMG] 				CommandId = 0x2,
-          [1653155357497] [89108:1720718] CHIP: [DMG] 			},
-          [1653155357497] [89108:1720718] CHIP: [DMG]
-          [1653155357497] [89108:1720718] CHIP: [DMG] 			CommandData =
-          [1653155357497] [89108:1720718] CHIP: [DMG] 			{
-          [1653155357497] [89108:1720718] CHIP: [DMG] 				0x0 =
-          [1653155357497] [89108:1720718] CHIP: [DMG] 				{
-          [1653155357497] [89108:1720718] CHIP: [DMG] 					0x0 = 123,
-          [1653155357497] [89108:1720718] CHIP: [DMG] 					0x1 = "exampleid",
-          [1653155357497] [89108:1720718] CHIP: [DMG] 				},
-          [1653155357497] [89108:1720718] CHIP: [DMG] 			},
-          [1653155357497] [89108:1720718] CHIP: [DMG] 		},
-          [1653155357497] [89108:1720718] CHIP: [DMG]
-          [1653155357497] [89108:1720718] CHIP: [DMG] 	],
-          [1653155357497] [89108:1720718] CHIP: [DMG]
-          [1653155357497] [89108:1720718] CHIP: [DMG] 	InteractionModelRevision = 1
-          [1653155357497] [89108:1720718] CHIP: [DMG] },
+          [1646163724324] [9419:3955535] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_050C Command 0x0000_0003
+          [1646163724324] [9419:3955535] CHIP: [TOO]   LauncherResponse: {
+          [1646163724324] [9419:3955535] CHIP: [TOO]     status: 0
+          [1646163724324] [9419:3955535] CHIP: [TOO]     data: 64617461
+          [1646163724324] [9419:3955535] CHIP: [TOO]    }
+          [1646163724324] [9419:3955535] CHIP: [DMG] ICR moving to [AwaitingDe]
+          [1646163724324] [9419:3955535] CHIP: [EM] Sending Standalone Ack for MessageCounter:12551545 on exchange 57948i
       disabled: true

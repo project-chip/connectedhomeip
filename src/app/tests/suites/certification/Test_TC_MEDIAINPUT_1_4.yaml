@@ -39,7 +39,7 @@ tests:
               type: uint16
 
     - label: "Read the optional global attribute: FeatureMap"
-      PICS: MC_MEDIAINPUT.S.NU
+      PICS: MEDIAINPUT.S.NU
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -48,7 +48,7 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
+      PICS: MEDIAINPUT.S.A0000 && MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:

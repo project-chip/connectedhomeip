@@ -39,7 +39,7 @@ tests:
               type: uint16
 
     - label: "Read the optional global attribute: FeatureMap"
-      PICS: MC_CONTENTLAUNCHER.S.CS || MC_CONTENTLAUNCHER.S.UP
+      PICS: CONTENTLAUNCHER.S.CS || CONTENTLAUNCHER.S.UP
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,7 +49,7 @@ tests:
               maxValue: 3
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_CONTENTLAUNCHER.S.A0000 && MC_CONTENTLAUNCHER.S.A0001
+      PICS: CONTENTLAUNCHER.S.A0000 && CONTENTLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:

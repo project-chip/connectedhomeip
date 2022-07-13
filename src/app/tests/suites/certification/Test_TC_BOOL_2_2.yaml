@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 67.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
+name: 68.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
 
 config:
     nodeId: 0x12344321
@@ -35,6 +35,8 @@ tests:
     - label: "TH reads the StateValue attribute from the DUT"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
+          Verify in TH Log:
+
           ./chip-tool booleanstate read state-value 1 1
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
@@ -50,6 +52,8 @@ tests:
     - label: "TH reads the StateValue attribute from the DUT"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
+          Verify in TH Log:
+
           ./chip-tool booleanstate read state-value 1 1
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071

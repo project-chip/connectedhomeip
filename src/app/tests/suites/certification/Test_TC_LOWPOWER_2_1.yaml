@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH sends Sleep command to DUT"
-      PICS: MC_LOWPOWER.S
+      PICS: LOWPOWER.S
       command: "Sleep"
       response:
           error: 0
