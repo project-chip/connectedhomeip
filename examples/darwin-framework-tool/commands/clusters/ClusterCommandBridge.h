@@ -95,7 +95,7 @@ public:
                                      }];
 
             if (mRepeatDelayInMs.HasValue()) {
-                [NSThread sleepForTimeInterval:(double)mRepeatDelayInMs.Value() / 1000];
+                [NSThread sleepForTimeInterval:(double) mRepeatDelayInMs.Value() / 1000];
             }
         }
         return CHIP_NO_ERROR;
