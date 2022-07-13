@@ -129,7 +129,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         LabelList::TypeInfo::DecodableType decodablelist;
 
         ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
-        ReturnErrorCodeIf(!IsValidLabelEntryList(decodablelist), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorCodeIf(!IsValidLabelEntryList(decodablelist), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         auto iter = decodablelist.begin();
         while (iter.Next())
@@ -146,7 +146,7 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         Structs::LabelStruct::DecodableType entry;
 
         ReturnErrorOnFailure(aDecoder.Decode(entry));
-        ReturnErrorCodeIf(!IsValidLabelEntry(entry), CHIP_ERROR_INVALID_ARGUMENT);
+        ReturnErrorCodeIf(!IsValidLabelEntry(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
         return provider->AppendUserLabel(endpoint, entry);
     }
