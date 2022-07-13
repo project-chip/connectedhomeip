@@ -570,6 +570,9 @@ PICS:
           device?"
       id: TM.M.ManuallyControlled
 
+    - label: "Does the device implement the Tolerance attribute?"
+      id: A_TEMPERATURE_TOLERANCE
+
       # Thermostat User Configuration cluster
     - label: "Does the device implement the TemperatureDisplayMode attribute?"
       id: TSUIC.S.A0000
@@ -601,7 +604,7 @@ PICS:
     - label: "Does the device implement the ResetWaterMarks command?"
       id: DGSW.S.C00
 
-      # Thermostat cluster
+    # Thermostat cluster
     - label: "Does the device implement the OccupiedCoolingSetpoint attribute"
       id: A_OCCUPIEDCOOLINGSETPOINT
 
@@ -639,26 +642,201 @@ PICS:
     - label: "Does the device implement the MinSetpointDeadBand attribute?"
       id: A_MINSETPOINTDEADBAND
 
-    - label: "Does the device implement the Tolerance attribute?"
-      id: A_TEMPERATURE_TOLERANCE
+    - label: "Does the device implement the LocalTemperature attribute?"
+      id: TSTAT.S.A0000
+
+    - label: "Does the device implement the OutdoorTemperature attribute?"
+      id: TSTAT.S.A0001
+
+    - label: "Does the device implement the Occupancy attribute?"
+      id: TSTAT.S.A0002
+
+    - label: "Does the device implement the AbsMinHeatSetpointLimit attribute?"
+      id: TSTAT.S.A0003
+
+    - label: "Does the device implement the AbsMaxHeatSetpointLimit attribute?"
+      id: TSTAT.S.A0004
+
+    - label: "Does the device implement the AbsMinCoolSetpointLimit attribute?"
+      id: TSTAT.S.A0005
+
+    - label: "Does the device implement the AbsMaxCoolSetpointLimit attribute?"
+      id: TSTAT.S.A0006
+
+    - label: "Does the device implement the PICoolingDemand attribute?"
+      id: TSTAT.S.A0007
+
+    - label: "Does the device implement the PIHeatingDemand attribute?"
+      id: TSTAT.S.A0008
+
+    - label:
+          "Does the device implement the HVACSystemTypeConfiguration attribute?"
+      id: TSTAT.S.A0009
+
+    - label:
+          "Does the device implement the LocalTemperatureCalibration attribute?"
+      id: TSTAT.S.A0010
+
+    - label: "Does the device implement the OccupiedCoolingSetpoint attribute?"
+      id: TSTAT.S.A0011
+
+    - label: "Does the device implement the OccupiedHeatingSetpoint attribute?"
+      id: TSTAT.S.A0012
+
+    - label:
+          "Does the device implement the UnoccupiedCoolingSetpoint attribute?"
+      id: TSTAT.S.A0013
+
+    - label:
+          "Does the device implement the UnoccupiedHeatingSetpoint attribute?"
+      id: TSTAT.S.A0014
+
+    - label: "Does the device implement the MinHeatSetpointLimit attribute?"
+      id: TSTAT.S.A0015
+
+    - label: "Does the device implement the MaxHeatSetpointLimit attribute?"
+      id: TSTAT.S.A0016
+
+    - label: "Does the device implement the MinCoolSetpointLimit attribute?"
+      id: TSTAT.S.A0017
+
+    - label: "Does the device implement the MaxCoolSetpointLimit attribute?"
+      id: TSTAT.S.A0018
+
+    - label: "Does the device implement the MinSetpointDeadBand attribute?"
+      id: TSTAT.S.A0019
+
+    - label: "Does the device implement the RemoteSensing attribute?"
+      id: TSTAT.S.A001a
+
+    - label:
+          "Does the device implement the ControlSequenceOfOperation attribute?"
+      id: TSTAT.S.A001b
+
+    - label: "Does the device implement the SystemMode attribute?"
+      id: TSTAT.S.A001c
+
+    - label: "Does the device implement the AlarmMask attribute?"
+      id: TSTAT.S.A001d
+
+    - label: "Does the device implement the ThermostatRunningMode attribute?"
+      id: TSTAT.S.A001e
+
+    - label: "Does the device implement the StartOfWeek attribute?"
+      id: TSTAT.S.A0020
+
+    - label:
+          "Does the device implement the NumberOfWeeklyTransitions attribute?"
+      id: TSTAT.S.A0021
+
+    - label: "Does the device implement the NumberOfDailyTransitions attribute?"
+      id: TSTAT.S.A0022
+
+    - label: "Does the device implement the TemperatureSetpointHold attribute?"
+      id: TSTAT.S.A0023
+
+    - label:
+          "Does the device implement the TemperatureSetpointHoldDuration
+          attribute?"
+      id: TSTAT.S.A0024
+
+    - label:
+          "Does the device implement the ThermostatProgrammingOperationMode
+          attribute?"
+      id: TSTAT.S.A0025
+
+    - label: "Does the device implement the ThermostatRunningState attribute?"
+      id: TSTAT.S.A0029
+
+    - label: "Does the device implement the SetpointChangeSource attribute?"
+      id: TSTAT.S.A0030
+
+    - label: "Does the device implement the SetpointChangeAmount attribute?"
+      id: TSTAT.S.A0031
+
+    - label:
+          "Does the device implement the SetpointChangeSourceTimestamp
+          attribute?"
+      id: TSTAT.S.A0032
+
+    - label: "Does the device implement the OccupiedSetback attribute?"
+      id: TSTAT.S.A0034
+
+    - label: "Does the device implement the OccupiedSetbackMin attribute?"
+      id: TSTAT.S.A0035
+
+    - label: "Does the device implement the OccupiedSetbackMax attribute?"
+      id: TSTAT.S.A0036
+
+    - label: "Does the device implement the UnoccupiedSetback attribute?"
+      id: TSTAT.S.A0037
+
+    - label: "Does the device implement the UnoccupiedSetbackMin attribute?"
+      id: TSTAT.S.A0038
+
+    - label: "Does the device implement the UnoccupiedSetbackMax attribute?"
+      id: TSTAT.S.A0039
+
+    - label: "Does the device implement the EmergencyHeatDelta attribute?"
+      id: TSTAT.S.A003a
+
+    - label: "Does the device implement the ACType attribute?"
+      id: TSTAT.S.A0040
+
+    - label: "Does the device implement the ACCapacity attribute?"
+      id: TSTAT.S.A0041
+
+    - label: "Does the device implement the ACRefrigerantType attribute?"
+      id: TSTAT.S.A0042
+
+    - label: "Does the device implement the ACCompressorType attribute?"
+      id: TSTAT.S.A0043
+
+    - label: "Does the device implement the ACErrorCode attribute?"
+      id: TSTAT.S.A0044
+
+    - label: "Does the device implement the ACLouverPosition attribute?"
+      id: TSTAT.S.A0045
+
+    - label: "Does the device implement the ACCoilTemperature attribute?"
+      id: TSTAT.S.A0046
+
+    - label: "Does the device implement the ACCapacityFormat attribute?"
+      id: TSTAT.S.A0047
+
+    #Thermostat commands
+    - label: "Does the device implement the SetpointRaiseLower command?"
+      id: TSTAT.S.C00.Rsp
+
+    - label: "Does the device implement the SetWeeklySchedule command?"
+      id: TSTAT.S.C01.Rsp
+
+    - label: "Does the device implement the GetWeeklySchedule command?"
+      id: TSTAT.S.C02.Rsp
+
+    - label: "Does the device implement the ClearWeeklySchedule command?"
+      id: TSTAT.S.C03.Rsp
+
+    - label: "Does the device implement the GetRelayStatusLog command?"
+      id: TSTAT.S.C04.Rsp
 
     - label: "Thermostat is capable of managing a heating device"
-      id: TSTAT_HEAT
+      id: TSTAT.S.F00
 
     - label: "Thermostat is capable of managing a cooling device"
-      id: TSTAT_COOL
+      id: TSTAT.S.F01
 
     - label: "Supports Occupied and Unoccupied setpoints"
-      id: TSTAT_OCC
+      id: TSTAT.S.F02
 
     - label: "Supports a weekly schedule of setpoint transitions"
-      id: TSTAT_SCH
+      id: TSTAT.S.F03
 
     - label: "Supports configurable setback (or span)"
-      id: TSTAT_SB
+      id: TSTAT.S.F04
 
     - label: "Supports a System Mode of Auto"
-      id: TSTAT_AUTO
+      id: TSTAT.S.F05
 
     #Client Commands
     - label: "Does the device implement sending the SetpointRaiseLower command?"

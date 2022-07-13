@@ -56,18 +56,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     return err;
 }
 
-ConnectivityManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
-    return ConnectivityManager::kCHIPoBLEServiceMode_NotSupported;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
-{
-    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);

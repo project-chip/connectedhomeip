@@ -90,7 +90,11 @@ function getManualTests() {
         "Test_TC_BDX_2_5",
     ];
 
-    const bridge = ["Test_TC_BR_1", "Test_TC_BR_2", "Test_TC_BR_3"];
+    const bridge = [
+        "Test_TC_BR_1",
+        "Test_TC_BR_2",
+        "Test_TC_BR_3",
+    ];
 
     const DeviceAttestation = [
         "Test_TC_DA_1_1",
@@ -142,7 +146,10 @@ function getManualTests() {
         "Test_TC_DLOG_3_1",
     ];
 
-    const Descriptor = ["Test_TC_DESC_2_1", "Test_TC_DESC_2_2"];
+    const Descriptor = [
+        "Test_TC_DESC_2_1",
+        "Test_TC_DESC_2_2",
+    ];
 
     const EthernetNetworkDiagnostics = [
         "Test_TC_DGETH_1_1",
@@ -163,9 +170,15 @@ function getManualTests() {
         "Test_TC_DGGEN_3_2",
     ];
 
-    const Identify = ["Test_TC_I_3_1", "Test_TC_I_3_2"];
+    const Identify = [
+        "Test_TC_I_3_1",
+        "Test_TC_I_3_2",
+    ];
 
-    const IlluminanceMeasurement = ["Test_TC_ILL_2_2", "Test_TC_ILL_3_1"];
+    const IlluminanceMeasurement = [
+        "Test_TC_ILL_2_2",
+        "Test_TC_ILL_3_1",
+    ];
 
     const InteractionDataModel = [
         "Test_TC_IDM_1_1",
@@ -315,9 +328,15 @@ function getManualTests() {
         "Test_TC_DGWIFI_3_2",
     ];
 
-    const WindowCovering = ["Test_TC_WNCV_6_1", "Test_TC_WNCV_7_1"];
+    const WindowCovering = [
+        "Test_TC_WNCV_6_1",
+        "Test_TC_WNCV_7_1",
+    ];
 
-    const FlowMeasurement = ["Test_TC_FLW_2_2", "Test_TC_FLW_3_1"];
+    const FlowMeasurement = [
+        "Test_TC_FLW_2_2",
+        "Test_TC_FLW_3_1",
+    ];
 
     const OccupancySensing = [
         "Test_TC_OCC_2_2",
@@ -327,11 +346,20 @@ function getManualTests() {
         "Test_TC_OCC_3_2",
     ];
 
-    const PressureMeasurement = ["Test_TC_PRS_2_2", "Test_TC_PRS_3_1"];
+    const PressureMeasurement = [
+        "Test_TC_PRS_2_2",
+        "Test_TC_PRS_3_1",
+    ];
 
-    const PowerSource = ["Test_TC_PS_2_2", "Test_TC_PS_3_1"];
+    const PowerSource = [
+        "Test_TC_PS_2_2",
+        "Test_TC_PS_3_1",
+    ];
 
-    const BooleanState = ["Test_TC_BOOL_2_2", "Test_TC_BOOL_3_1"];
+    const BooleanState = [
+        "Test_TC_BOOL_2_2",
+        "Test_TC_BOOL_3_1",
+    ];
 
     const ColorControl = [
         "Test_TC_CC_2_2",
@@ -370,9 +398,16 @@ function getManualTests() {
         "Test_TC_LVL_8_1",
     ];
 
-    const OnOff = ["Test_TC_OO_2_3", "Test_TC_OO_3_1", "Test_TC_OO_3_2"];
+    const OnOff = [
+        "Test_TC_OO_2_3",
+        "Test_TC_OO_3_1",
+        "Test_TC_OO_3_2",
+    ];
 
-    const RelativeHumidityMeasurement = ["Test_TC_RH_2_2", "Test_TC_RH_3_1"];
+    const RelativeHumidityMeasurement = [
+        "Test_TC_RH_2_2",
+        "Test_TC_RH_3_1",
+    ];
 
     const Switch = [
         "Test_TC_SWTCH_1_1",
@@ -381,11 +416,19 @@ function getManualTests() {
         "Test_TC_SWTCH_3_2",
     ];
 
-    const TemperatureMeasurement = ["Test_TC_TMP_2_2", "Test_TC_TMP_3_1"];
+    const TemperatureMeasurement = [
+        "Test_TC_TMP_2_2",
+        "Test_TC_TMP_3_1",
+    ];
 
-    const Thermostat = ["Test_TC_TSTAT_3_1", "Test_TC_TSTAT_3_2"];
+    const Thermostat = [
+        "Test_TC_TSTAT_3_1",
+        "Test_TC_TSTAT_3_2",
+    ];
 
-    const ThermostatUserConfiguration = ["Test_TC_TSUIC_3_1"];
+    const ThermostatUserConfiguration = [
+        "Test_TC_TSUIC_3_1",
+    ];
 
     const ThreadNetworkDiagnostics = [
         "Test_TC_DGTHREAD_1_1",
@@ -439,7 +482,9 @@ function getManualTests() {
         "Test_TC_S_3_1",
     ];
 
-    const PumpConfigurationControl = ["Test_TC_PCC_3_1"];
+    const PumpConfigurationControl = [
+        "Test_TC_PCC_3_1",
+    ];
 
     const tests = [
         DeviceDiscovery,
@@ -495,11 +540,18 @@ function getManualTests() {
 }
 
 function getTests() {
-    const AccessControl = ["TestAccessControlCluster"];
+    const AccessControl = [
+        "TestAccessControlCluster",
+    ];
 
-    const BooleanState = ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"];
+    const BooleanState = [
+        "Test_TC_BOOL_1_1",
+        "Test_TC_BOOL_2_1",
+    ];
 
-    const Actions = ["Test_TC_ACT_1_1"];
+    const Actions = [
+        "Test_TC_ACT_1_1",
+    ];
 
     const ColorControl = [
         "Test_TC_CC_1_1",
@@ -524,20 +576,33 @@ function getTests() {
         "Test_TC_CC_8_1",
     ];
 
-    const DeviceManagement = ["Test_TC_BINFO_2_1"];
+    const DeviceManagement = [
+        "Test_TC_BINFO_2_1",
+    ];
 
-    const Descriptor = ["Test_TC_DESC_1_1"];
+    const Descriptor = [
+        "Test_TC_DESC_1_1",
+    ];
 
     const EthernetNetworkDiagnostics = [
         "Test_TC_DGETH_2_1",
         "Test_TC_DGETH_2_2",
     ];
 
-    const FlowMeasurement = ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"];
+    const FlowMeasurement = [
+        "Test_TC_FLW_1_1",
+        "Test_TC_FLW_2_1",
+    ];
 
-    const GeneralCommissioning = ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"];
+    const GeneralCommissioning = [
+        "Test_TC_CGEN_1_1",
+        "Test_TC_CGEN_2_1",
+    ];
 
-    const GeneralDiagnostics = ["Test_TC_DGGEN_1_1", "Test_TC_DGGEN_2_1"];
+    const GeneralDiagnostics = [
+        "Test_TC_DGGEN_1_1",
+        "Test_TC_DGGEN_2_1",
+    ];
 
     const Identify = [
         "Test_TC_I_1_1",
@@ -546,9 +611,15 @@ function getTests() {
         "Test_TC_I_2_3",
     ];
 
-    const IlluminanceMeasurement = ["Test_TC_ILL_1_1", "Test_TC_ILL_2_1"];
+    const IlluminanceMeasurement = [
+        "Test_TC_ILL_1_1",
+        "Test_TC_ILL_2_1",
+    ];
 
-    const OccupancySensing = ["Test_TC_OCC_1_1", "Test_TC_OCC_2_1"];
+    const OccupancySensing = [
+        "Test_TC_OCC_1_1",
+        "Test_TC_OCC_2_1",
+    ];
 
     const LevelControl = [
         "Test_TC_LVL_1_1",
@@ -607,11 +678,18 @@ function getTests() {
         "Test_TC_CONTENTLAUNCHER_10_1",
     ];
 
-    const ModeSelect = ["Test_TC_MOD_1_1"];
+    const ModeSelect = [
+        "Test_TC_MOD_1_1",
+    ];
 
-    const MultipleFabrics = ["Test_TC_CADMIN_1_3", "Test_TC_CADMIN_1_4"];
+    const MultipleFabrics = [
+        "Test_TC_CADMIN_1_3",
+        "Test_TC_CADMIN_1_4",
+    ];
 
-    const OTASoftwareUpdate = ["OTA_SuccessfulTransfer"];
+    const OTASoftwareUpdate = [
+        "OTA_SuccessfulTransfer",
+    ];
 
     const OnOff = [
         "Test_TC_OO_1_1",
@@ -620,9 +698,15 @@ function getTests() {
         "Test_TC_OO_2_4",
     ];
 
-    const PowerSource = ["Test_TC_PS_1_1", "Test_TC_PS_2_1"];
+    const PowerSource = [
+        "Test_TC_PS_1_1",
+        "Test_TC_PS_2_1",
+    ];
 
-    const PressureMeasurement = ["Test_TC_PRS_1_1", "Test_TC_PRS_2_1"];
+    const PressureMeasurement = [
+        "Test_TC_PRS_1_1",
+        "Test_TC_PRS_2_1",
+    ];
 
     const PumpConfigurationControl = [
         "Test_TC_PCC_1_1",
@@ -632,15 +716,27 @@ function getTests() {
         "Test_TC_PCC_2_4",
     ];
 
-    const PowerSourceConfiguration = ["Test_TC_PSCFG_1_1"];
+    const PowerSourceConfiguration = [
+        "Test_TC_PSCFG_1_1",
+    ];
 
-    const RelativeHumidityMeasurement = ["Test_TC_RH_1_1", "Test_TC_RH_2_1"];
+    const RelativeHumidityMeasurement = [
+        "Test_TC_RH_1_1",
+        "Test_TC_RH_2_1",
+    ];
 
-    const SecureChannel = ["Test_TC_SC_4_2"];
+    const SecureChannel = [
+        "Test_TC_SC_4_2",
+    ];
 
-    const Switch = ["Test_TC_SWTCH_2_1"];
+    const Switch = [
+        "Test_TC_SWTCH_2_1",
+    ];
 
-    const TemperatureMeasurement = ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"];
+    const TemperatureMeasurement = [
+        "Test_TC_TMP_1_1",
+        "Test_TC_TMP_2_1",
+    ];
 
     const Thermostat = [
         "Test_TC_TSTAT_1_1",
@@ -661,7 +757,10 @@ function getTests() {
         "Test_TC_DGTHREAD_2_4",
     ];
 
-    const WiFiNetworkDiagnostics = ["Test_TC_DGWIFI_2_1", "Test_TC_DGWIFI_2_3"];
+    const WiFiNetworkDiagnostics = [
+        "Test_TC_DGWIFI_2_1",
+        "Test_TC_DGWIFI_2_3",
+    ];
 
     const WindowCovering = [
         "Test_TC_WNCV_1_1",
@@ -722,7 +821,9 @@ function getTests() {
         "TestFanControl",
     ];
 
-    const MultiAdmin = ["TestMultiAdmin"];
+    const MultiAdmin = [
+        "TestMultiAdmin",
+    ];
 
     const SoftwareDiagnostics = [
         "Test_TC_DGSW_2_1",
@@ -730,7 +831,9 @@ function getTests() {
         "Test_TC_DGSW_2_3",
     ];
 
-    const Subscriptions = ["TestSubscribe_OnOff"];
+    const Subscriptions = [
+        "TestSubscribe_OnOff",
+    ];
 
     const DoorLock = [
         "DL_UsersAndCredentials",

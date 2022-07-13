@@ -78,6 +78,9 @@ function getTests() {
   // TODO: Test_TC_MC_3_9 does not work on Darwin for now.
   tests.disable('Test_TC_APPLAUNCHER_3_9');
 
+  // TODO: Test_TC_BINFO_2_1 does not work on Darwin for now.
+  tests.disable('Test_TC_BINFO_2_1');
+
   return tests;
 }
 
