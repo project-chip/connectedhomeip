@@ -45,6 +45,14 @@ class GnBuilder(Builder):
         """
         return None
 
+    def PreBuildCommand(self):
+        """Extra steps to run before 'build'"""
+        pass
+
+    def PostBuildCommand(self):
+        """Extra steps to run after 'build'"""
+        pass
+
     def generate(self):
         if not os.path.exists(self.output_dir):
             cmd = [
@@ -75,8 +83,12 @@ class GnBuilder(Builder):
             self._Execute(cmd, title=title)
 
     def _build(self):
+        self.PreBuildCommand()
+
         cmd = ['ninja', '-C', self.output_dir]
         if self.build_command:
             cmd.append(self.build_command)
 
         self._Execute(cmd, title='Building ' + self.identifier)
+
+        self.PostBuildCommand()
