@@ -384,6 +384,9 @@ PICS:
     - label: "Does the device implement the MaxCoolSetpointLimit attribute"
       id: A_MAXCOOLSETPOINTLIMIT
 
+    - label: "Does the device implement the Tolerance attribute?"
+      id: A_TEMPERATURE_TOLERANCE
+      
       # Occupency sensing cluster
     - label: "Does the device implement the Occupancy attribute?"
       id: A_OCCUPANCY
