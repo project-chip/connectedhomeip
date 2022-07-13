@@ -31,12 +31,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            # TODO: this image SHOULD use a newer version.
-            #
-            # NOTE: After https://github.com/project-chip/connectedhomeip/pull/19941
-            #       the image became large enough that github CI runs out of space.
-            #       The image has increased from aroud 2.5GB to 10+GB
-            image: connectedhomeip/chip-build-imx:0.5.79
+            image: connectedhomeip/chip-build-imx:0.5.85
 
         steps:
             - uses: Wandalen/wretry.action@v1.0.15
