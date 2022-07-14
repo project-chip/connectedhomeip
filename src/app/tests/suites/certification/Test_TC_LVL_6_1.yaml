@@ -167,7 +167,7 @@ tests:
               notValue: CurrentLevelValue
 
     - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "MoveToLevel"
       arguments:
           values:

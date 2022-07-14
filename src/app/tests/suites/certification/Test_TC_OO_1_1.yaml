@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -36,12 +36,21 @@ tests:
           constraints:
               type: uint16
 
-    - label: "read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: OO.S.F00
       response:
           value: 1
+          constraints:
+              type: map32
+
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: " !OO.S.F00 "
+      response:
+          value: 0
           constraints:
               type: map32
 

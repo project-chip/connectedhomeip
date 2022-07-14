@@ -30,7 +30,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -38,7 +38,7 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: MC_MEDIAINPUT.S.NU
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,13 +48,30 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optonal attribute(InputList) in AttributeList"
+      PICS: MC_MEDIAINPUT.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the optonal attribute(CurrentInput) in AttributeList"
+      PICS: MC_MEDIAINPUT.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

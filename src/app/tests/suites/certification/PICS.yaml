@@ -573,6 +573,9 @@ PICS:
     - label: "Does the device implement the Tolerance attribute?"
       id: A_TEMPERATURE_TOLERANCE
 
+    - label: "Does the device implement the Tolerance attribute?"
+      id: TMP.S.A0003
+
       # Thermostat User Configuration cluster
     - label: "Does the device implement the TemperatureDisplayMode attribute?"
       id: TSUIC.S.A0000
@@ -590,16 +593,16 @@ PICS:
       id: DGSW.S.E00
 
     - label: "Does the device implement the ThreadMetrics attribute"
-      id: DGSW.S.A0001
+      id: DGSW.S.A0000
 
     - label: "Does the device implement the CurrentHeapFree attribute"
-      id: DGSW.S.A0002
+      id: DGSW.S.A0001
 
     - label: "Does the device implement the CurrentHeapUsed attribute"
-      id: DGSW.S.A0003
+      id: DGSW.S.A0002
 
     - label: "Does the device implement the CurrentHeapHighWaterMark attribute"
-      id: DGSW.S.A0004
+      id: DGSW.S.A0003
 
     - label: "Does the device implement the ResetWaterMarks command?"
       id: DGSW.S.C00
@@ -1288,6 +1291,11 @@ PICS:
           feature?"
       id: LVL.S.F02
 
+    - label:
+          "Does the DUT(server) support the Dependency with the On/Off cluster
+          feature?"
+      id: LVL.S.F00
+
     - label: "Does the DUT(server) support the CurrentLevel attribute?"
       id: LVL.S.A0000
 
@@ -1462,6 +1470,9 @@ PICS:
           "Does the device implement receiving the IdentifyQueryResponse
           command?"
       id: I.C.C00.Rsp
+
+    - label: "Supports multicast query for identification state"
+      id: I.S.F00
 
     #Scenes Cluster
     - label: "Does the device implement the SceneCount attribute?"
@@ -1775,11 +1786,6 @@ PICS:
       id: MC_MEDIAINPUT.S.A0001
 
     - label:
-          "Does the DUT support the Media Input server cluster Name Updates
-          feature?"
-      id: MC_MEDIAINPUT.S.NU
-
-    - label:
           "Does the DUT support the Channel server cluster Channel List feature?"
       id: MC_CHANNEL.S.CL
 
@@ -1825,8 +1831,9 @@ PICS:
       id: MC_MEDIAPLAYBACK.S.VS
 
     - label:
-          "Does the DUT the Audio Output server cluster Name Updates feature?"
-      id: NAMEUPDATES
+          "Does the DUT support the Media Input server cluster, Name Updates
+          feature?"
+      id: MC_MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Target Navigator server cluster
@@ -1892,11 +1899,6 @@ PICS:
     - label:
           "Does the DUT support the Media Input server cluster Rename command?"
       id: MC_MEDIAINPUT.S.C0003
-
-    - label:
-          "Does the DUT support the Media Input server cluster Name Updates
-          feature?"
-      id: MC_MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Media Input client cluster SelectInput
@@ -2592,6 +2594,18 @@ PICS:
 
     - label: "Does the device implement the BatChargeFaultChange event?"
       id: PS.S.E02
+
+    - label: "A wired power source"
+      id: PS.S.F00
+
+    - label: "A battery power source"
+      id: PS.S.F01
+
+    - label: "A rechargeable battery power source (requires Battery feature)"
+      id: PS.S.F02
+
+    - label: "A replaceable battery power source (requires Battery feature)"
+      id: PS.S.F03
 
     #Thermostat User Configuration Cluster
     - label: "Does the device implement the TemperatureDisplayMode attribute?"
@@ -4378,3 +4392,15 @@ PICS:
           "Does the Device(Client) implement receiving the
           AddTrustedRootCertificate command?"
       id: OPCREDS.C.C0b.Tx
+
+    #Mode select
+    - label: "Does the DUT support the StartUpMode attribute?"
+      id: MOD.S.A0004
+
+    - label: "Does the DUT support the OnMode attribute?"
+      id: MOD.S.A0005
+
+    - label:
+          "Does the Mode Select Cluster depend on an On/Off cluster implemented
+          on the same DUT?"
+      id: MOD.S.F00
