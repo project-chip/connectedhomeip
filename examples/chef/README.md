@@ -174,8 +174,8 @@ configuration should follow the following schema:
 
 ```json
 "$PLATFORM": {
-    "archive_output_prefix_1": ["option_1", "option_2"],
-    "archive_output_prefix_2": [],
+    "output_archive_prefix_1": ["option_1", "option_2"],
+    "output_archive_prefix_2": [],
 }
 ```
 
