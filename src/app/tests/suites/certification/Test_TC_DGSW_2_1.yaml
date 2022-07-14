@@ -33,7 +33,7 @@ tests:
           "Reads a list of ThreadMetrics struct non-global attribute from DUT."
       command: "readAttribute"
       attribute: "ThreadMetrics"
-      PICS: DGSW.S.A0001
+      PICS: DGSW.S.A0000
       response:
           constraints:
               type: list
@@ -41,7 +41,7 @@ tests:
     - label: "Reads CurrentHeapFree non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapFree"
-      PICS: DGSW.S.A0002
+      PICS: DGSW.S.A0001
       response:
           constraints:
               type: uint64
@@ -49,7 +49,7 @@ tests:
     - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
-      PICS: DGSW.S.A0003
+      PICS: DGSW.S.A0002
       response:
           constraints:
               type: uint64
@@ -58,7 +58,7 @@ tests:
           "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
-      PICS: DGSW.S.A0004
+      PICS: DGSW.S.A0003
       response:
           constraints:
               type: uint64

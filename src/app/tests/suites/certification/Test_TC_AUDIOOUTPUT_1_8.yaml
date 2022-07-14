@@ -38,13 +38,14 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: map32
+              minValue: 0
+              maxValue: 3
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
@@ -63,6 +64,16 @@ tests:
               contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
+      PICS: MC_MEDIAINPUT.S.NU
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: [1]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      PICS: " !MC_MEDIAINPUT.S.NU "
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

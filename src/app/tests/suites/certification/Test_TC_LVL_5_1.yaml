@@ -43,7 +43,7 @@ tests:
       arguments:
           values:
               - name: "level"
-                value: 1
+                value: MinlevelValue
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
@@ -56,12 +56,13 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: MinlevelValue
           saveAs: CurrentlevelValue
           constraints:
               type: uint8
 
     - label: "Sends step up command to DUT"
-      PICS: LVL.S.C02.Rsp
+      PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "Step"
       arguments:
           values:
@@ -89,12 +90,13 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 65
           constraints:
               type: uint8
+              minValue: 60
+              maxValue: 68
 
     - label: "Sends a StepWithOnOff command"
-      PICS: LVL.S.C06.Rsp
+      PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate
       command: "StepWithOnOff"
       arguments:
           values:
