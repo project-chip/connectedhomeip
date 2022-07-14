@@ -819,6 +819,7 @@ function getTests() {
         "TestUserLabelClusterConstraints",
         "TestArmFailSafe",
         "TestFanControl",
+        "TestAccessControlConstraints",
     ];
 
     const MultiAdmin = [
