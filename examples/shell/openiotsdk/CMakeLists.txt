@@ -31,6 +31,13 @@ if(TARGET lwip-cmsis-port)
         INTERFACE
             ${OPEN_IOT_SDK_CONFIG}/lwip
     )
+
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        target_compile_definitions(lwipopts
+            INTERFACE
+                LWIP_DEBUG
+        )
+    endif()
 endif()
 
 project(${APP_TARGET} LANGUAGES C CXX ASM)
