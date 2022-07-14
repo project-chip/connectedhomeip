@@ -25,6 +25,7 @@ jobs:
                 || (contains(github.event.pull_request.labels.*.name, 'tests'))
                 || (contains(github.event.pull_request.labels.*.name, 'workflows'))
                 || (contains(github.event.pull_request.labels.*.name, 'github'))
+                || (contains(github.event.pull_request.labels.*.name, 'request sve'))
                 || (contains(github.event.pull_request.labels.*.name, 'sve cherry-pick'))
             )
         steps:
