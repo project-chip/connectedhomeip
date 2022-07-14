@@ -1865,6 +1865,16 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         }
         break;
     }
+    case Clusters::BallastConfiguration::Id: {
+        using namespace Clusters::BallastConfiguration;
+        switch (aPath.mEventId) {
+
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case Clusters::IlluminanceMeasurement::Id: {
         using namespace Clusters::IlluminanceMeasurement;
         switch (aPath.mEventId) {

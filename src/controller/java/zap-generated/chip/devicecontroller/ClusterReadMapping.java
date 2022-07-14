@@ -8782,6 +8782,278 @@ public class ClusterReadMapping {
     readColorControlInteractionInfo.put(
         "readClusterRevisionAttribute", readColorControlClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("colorControl", readColorControlInteractionInfo);
+    Map<String, InteractionInfo> readBallastConfigurationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readBallastConfigurationPhysicalMinLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationPhysicalMinLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readPhysicalMinLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationPhysicalMinLevelCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readPhysicalMinLevelAttribute",
+        readBallastConfigurationPhysicalMinLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationPhysicalMaxLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationPhysicalMaxLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readPhysicalMaxLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationPhysicalMaxLevelCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readPhysicalMaxLevelAttribute",
+        readBallastConfigurationPhysicalMaxLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationBallastStatusCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationBallastStatusAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readBallastStatusAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationBallastStatusCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readBallastStatusAttribute",
+        readBallastConfigurationBallastStatusAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationMinLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationMinLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readMinLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationMinLevelCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readMinLevelAttribute", readBallastConfigurationMinLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationMaxLevelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationMaxLevelAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readMaxLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationMaxLevelCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readMaxLevelAttribute", readBallastConfigurationMaxLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationIntrinsicBalanceFactorCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationIntrinsicBalanceFactorAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readIntrinsicBalanceFactorAttribute(
+                      (ChipClusters.BallastConfigurationCluster
+                              .IntrinsicBalanceFactorAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationIntrinsicBalanceFactorCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readIntrinsicBalanceFactorAttribute",
+        readBallastConfigurationIntrinsicBalanceFactorAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationBallastFactorAdjustmentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationBallastFactorAdjustmentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readBallastFactorAdjustmentAttribute(
+                      (ChipClusters.BallastConfigurationCluster
+                              .BallastFactorAdjustmentAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationBallastFactorAdjustmentCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readBallastFactorAdjustmentAttribute",
+        readBallastConfigurationBallastFactorAdjustmentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampQuantityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampQuantityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampQuantityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationLampQuantityCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampQuantityAttribute", readBallastConfigurationLampQuantityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampTypeAttribute((ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readBallastConfigurationLampTypeCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampTypeAttribute", readBallastConfigurationLampTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampManufacturerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampManufacturerAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampManufacturerAttribute(
+                      (ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readBallastConfigurationLampManufacturerCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampManufacturerAttribute",
+        readBallastConfigurationLampManufacturerAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampRatedHoursCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampRatedHoursAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampRatedHoursAttribute(
+                      (ChipClusters.BallastConfigurationCluster.LampRatedHoursAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readBallastConfigurationLampRatedHoursCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampRatedHoursAttribute",
+        readBallastConfigurationLampRatedHoursAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampBurnHoursCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampBurnHoursAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampBurnHoursAttribute(
+                      (ChipClusters.BallastConfigurationCluster.LampBurnHoursAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readBallastConfigurationLampBurnHoursCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampBurnHoursAttribute",
+        readBallastConfigurationLampBurnHoursAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampAlarmModeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampAlarmModeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampAlarmModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationLampAlarmModeCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampAlarmModeAttribute",
+        readBallastConfigurationLampAlarmModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationLampBurnHoursTripPointCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationLampBurnHoursTripPointAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readLampBurnHoursTripPointAttribute(
+                      (ChipClusters.BallastConfigurationCluster
+                              .LampBurnHoursTripPointAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readBallastConfigurationLampBurnHoursTripPointCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readLampBurnHoursTripPointAttribute",
+        readBallastConfigurationLampBurnHoursTripPointAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationGeneratedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationGeneratedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readGeneratedCommandListAttribute(
+                      (ChipClusters.BallastConfigurationCluster
+                              .GeneratedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedBallastConfigurationClusterGeneratedCommandListAttributeCallback(),
+            readBallastConfigurationGeneratedCommandListCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readGeneratedCommandListAttribute",
+        readBallastConfigurationGeneratedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationAcceptedCommandListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationAcceptedCommandListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readAcceptedCommandListAttribute(
+                      (ChipClusters.BallastConfigurationCluster
+                              .AcceptedCommandListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedBallastConfigurationClusterAcceptedCommandListAttributeCallback(),
+            readBallastConfigurationAcceptedCommandListCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readAcceptedCommandListAttribute",
+        readBallastConfigurationAcceptedCommandListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.BallastConfigurationCluster.AttributeListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedBallastConfigurationClusterAttributeListAttributeCallback(),
+            readBallastConfigurationAttributeListCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readAttributeListAttribute",
+        readBallastConfigurationAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readBallastConfigurationFeatureMapCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readFeatureMapAttribute", readBallastConfigurationFeatureMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBallastConfigurationClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBallastConfigurationClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BallastConfigurationCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readBallastConfigurationClusterRevisionCommandParams);
+    readBallastConfigurationInteractionInfo.put(
+        "readClusterRevisionAttribute",
+        readBallastConfigurationClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("ballastConfiguration", readBallastConfigurationInteractionInfo);
     Map<String, InteractionInfo> readIlluminanceMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readIlluminanceMeasurementMeasuredValueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

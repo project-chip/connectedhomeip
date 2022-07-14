@@ -22596,55 +22596,31 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxLevel
-namespace PowerOnLevel {
+namespace IntrinsicBalanceFactor {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBalanceFactor::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PowerOnLevel
-namespace PowerOnFadeTime {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnFadeTime::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerOnFadeTime
-namespace IntrinsicBallastFactor {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace IntrinsicBallastFactor
+} // namespace IntrinsicBalanceFactor
 namespace BallastFactorAdjustment {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastFactorAdjustment::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BallastFactorAdjustment
-namespace LampQuality {
+namespace LampQuantity {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22652,10 +22628,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LampQuality::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampQuantity::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace LampQuality
+} // namespace LampQuantity
 namespace LampType {
 struct TypeInfo
 {
@@ -22685,9 +22661,9 @@ struct TypeInfo
 namespace LampRatedHours {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampRatedHours::Id; }
@@ -22697,9 +22673,9 @@ struct TypeInfo
 namespace LampBurnHours {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHours::Id; }
@@ -22721,9 +22697,9 @@ struct TypeInfo
 namespace LampBurnHoursTripPoint {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHoursTripPoint::Id; }
@@ -22769,22 +22745,20 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PhysicalMinLevel::TypeInfo::DecodableType physicalMinLevel               = static_cast<uint8_t>(0);
-        Attributes::PhysicalMaxLevel::TypeInfo::DecodableType physicalMaxLevel               = static_cast<uint8_t>(0);
-        Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus                     = static_cast<uint8_t>(0);
-        Attributes::MinLevel::TypeInfo::DecodableType minLevel                               = static_cast<uint8_t>(0);
-        Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                               = static_cast<uint8_t>(0);
-        Attributes::PowerOnLevel::TypeInfo::DecodableType powerOnLevel                       = static_cast<uint8_t>(0);
-        Attributes::PowerOnFadeTime::TypeInfo::DecodableType powerOnFadeTime                 = static_cast<uint16_t>(0);
-        Attributes::IntrinsicBallastFactor::TypeInfo::DecodableType intrinsicBallastFactor   = static_cast<uint8_t>(0);
-        Attributes::BallastFactorAdjustment::TypeInfo::DecodableType ballastFactorAdjustment = static_cast<uint8_t>(0);
-        Attributes::LampQuality::TypeInfo::DecodableType lampQuality                         = static_cast<uint8_t>(0);
+        Attributes::PhysicalMinLevel::TypeInfo::DecodableType physicalMinLevel = static_cast<uint8_t>(0);
+        Attributes::PhysicalMaxLevel::TypeInfo::DecodableType physicalMaxLevel = static_cast<uint8_t>(0);
+        Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus       = static_cast<uint8_t>(0);
+        Attributes::MinLevel::TypeInfo::DecodableType minLevel                 = static_cast<uint8_t>(0);
+        Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                 = static_cast<uint8_t>(0);
+        Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableType intrinsicBalanceFactor;
+        Attributes::BallastFactorAdjustment::TypeInfo::DecodableType ballastFactorAdjustment;
+        Attributes::LampQuantity::TypeInfo::DecodableType lampQuantity = static_cast<uint8_t>(0);
         Attributes::LampType::TypeInfo::DecodableType lampType;
         Attributes::LampManufacturer::TypeInfo::DecodableType lampManufacturer;
-        Attributes::LampRatedHours::TypeInfo::DecodableType lampRatedHours                 = static_cast<uint32_t>(0);
-        Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours                   = static_cast<uint32_t>(0);
-        Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode                   = static_cast<uint8_t>(0);
-        Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint = static_cast<uint32_t>(0);
+        Attributes::LampRatedHours::TypeInfo::DecodableType lampRatedHours;
+        Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours;
+        Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode = static_cast<uint8_t>(0);
+        Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

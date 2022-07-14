@@ -108,6 +108,25 @@
     return allOptionalData;
 }
 
++ (NSUInteger)generateRandomPIN
+{
+    do {
+        // Make sure the thing we generate is in the right range.
+        uint32_t setupPIN = arc4random_uniform(chip::kSetupPINCodeMaximumValue) + 1;
+        if (chip::SetupPayload::IsValidSetupPIN(setupPIN)) {
+            return setupPIN;
+        }
+
+        // We got pretty unlikely with our random number generation.  Just try
+        // again.  The chance that this loop does not terminate in a reasonable
+        // amount of time is astronomically low, assuming arc4random_uniform is not
+        // broken.
+    } while (1);
+
+    // Not reached.
+    return chip::kSetupPINCodeUndefinedValue;
+}
+
 #pragma mark - NSSecureCoding
 
 static NSString * const MTRSetupPayloadCodingKeyVersion = @"MTRSP.ck.version";
