@@ -371,19 +371,14 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         pktInfo->DestPort    = pcb->local_port;
     }
 
-    ep->Retain();
+    // TODO: add thread-safe reference counting for UDP endpoints
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
-        ep->Release();
     });
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
-    }
-    else
-    {
-        ep->Release();
     }
 }
 
