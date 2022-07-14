@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 
-#include "event-command-handler.h"
+#include "AllClustersCommandDelegate.h"
+
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -24,52 +25,117 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
-namespace {
+void AllClustersCommandDelegate::OnEventCommandReceived(const char * command)
+{
+    mCurrentCommand.assign(command);
 
-bool IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleEventCommand, reinterpret_cast<intptr_t>(this));
+}
+
+void AllClustersCommandDelegate::HandleEventCommand(intptr_t context)
+{
+    auto * self = reinterpret_cast<AllClustersCommandDelegate *>(context);
+
+    if (self->mCurrentCommand == "SoftwareFault")
+    {
+        self->OnSoftwareFaultEventHandler(Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id);
+    }
+    else if (self->mCurrentCommand == "HardwareFaultChange")
+    {
+        self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id);
+    }
+    else if (self->mCurrentCommand == "RadioFaultChange")
+    {
+        self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id);
+    }
+    else if (self->mCurrentCommand == "NetworkFaultChange")
+    {
+        self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id);
+    }
+    else if (self->mCurrentCommand == "SwitchLatched")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::SwitchLatched::Id);
+    }
+    else if (self->mCurrentCommand == "InitialPress")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::InitialPress::Id);
+    }
+    else if (self->mCurrentCommand == "LongPress")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::LongPress::Id);
+    }
+    else if (self->mCurrentCommand == "ShortRelease")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::ShortRelease::Id);
+    }
+    else if (self->mCurrentCommand == "LongRelease")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::LongRelease::Id);
+    }
+    else if (self->mCurrentCommand == "MultiPressOngoing")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::MultiPressOngoing::Id);
+    }
+    else if (self->mCurrentCommand == "MultiPressComplete")
+    {
+        self->OnSwitchEventHandler(Clusters::Switch::Events::MultiPressComplete::Id);
+    }
+    else if (self->mCurrentCommand == "PowerOnReboot")
+    {
+        self->OnRebootSignalHandler(BootReasonType::kPowerOnReboot);
+    }
+    else if (self->mCurrentCommand == "BrownOutReset")
+    {
+        self->OnRebootSignalHandler(BootReasonType::kBrownOutReset);
+    }
+    else if (self->mCurrentCommand == "SoftwareWatchdogReset")
+    {
+        self->OnRebootSignalHandler(BootReasonType::kSoftwareWatchdogReset);
+    }
+    else if (self->mCurrentCommand == "HardwareWatchdogReset")
+    {
+        self->OnRebootSignalHandler(BootReasonType::kHardwareWatchdogReset);
+    }
+    else if (self->mCurrentCommand == "SoftwareUpdateCompleted")
+    {
+        self->OnRebootSignalHandler(BootReasonType::kSoftwareUpdateCompleted);
+    }
+    else if (self->mCurrentCommand == "SoftwareReset")
+    {
+        self->OnRebootSignalHandler(BootReasonType::kSoftwareReset);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Unhandled command: Should never happens");
+    }
+}
+
+bool AllClustersCommandDelegate::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
 {
     EnabledEndpointsWithServerCluster enabledEndpoints(clusterId);
 
     return (enabledEndpoints.begin() != enabledEndpoints.end());
 }
 
-/**
- * Should be called when a software fault takes place on the Node.
- */
-void HandleSoftwareFaultEvent(uint32_t eventId)
+void AllClustersCommandDelegate::OnRebootSignalHandler(BootReasonType bootReason)
 {
-    VerifyOrReturn(eventId == Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id,
-                   ChipLogError(DeviceLayer, "Unknown software fault event received"));
-
-    if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
-        return;
-
-    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
-    char threadName[kMaxThreadNameLength + 1];
-
-    softwareFault.id = static_cast<uint64_t>(getpid());
-    Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
-
-    softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
-
-    std::time_t result = std::time(nullptr);
-    char * asctime     = std::asctime(std::localtime(&result));
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
-
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) != CHIP_NO_ERROR)
+    {
+        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to store boot reason:%d", static_cast<uint32_t>(bootReason));
+    }
 }
 
-/**
- * Should be called when a general fault takes place on the Node.
- */
-void HandleGeneralFaultEvent(uint32_t eventId)
+void AllClustersCommandDelegate::OnGeneralFaultEventHandler(uint32_t eventId)
 {
     if (!IsClusterPresentOnAnyEndpoint(Clusters::GeneralDiagnostics::Id))
         return;
@@ -126,14 +192,34 @@ void HandleGeneralFaultEvent(uint32_t eventId)
     }
     else
     {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", eventId);
+        ChipLogError(NotSpecified, "Unknow event ID:%d", eventId);
     }
 }
 
-/**
- * Should be called when a switch operation takes place on the Node.
- */
-void HandleSwitchEvent(uint32_t eventId)
+void AllClustersCommandDelegate::OnSoftwareFaultEventHandler(uint32_t eventId)
+{
+    VerifyOrReturn(eventId == Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id,
+                   ChipLogError(NotSpecified, "Unknown software fault event received"));
+
+    if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
+        return;
+
+    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
+    char threadName[kMaxThreadNameLength + 1];
+
+    softwareFault.id = static_cast<uint64_t>(getpid());
+    Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
+
+    softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
+
+    std::time_t result = std::time(nullptr);
+    char * asctime     = std::asctime(std::localtime(&result));
+    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
+
+    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+}
+
+void AllClustersCommandDelegate::OnSwitchEventHandler(uint32_t eventId)
 {
     EndpointId endpoint      = 1;
     uint8_t newPosition      = 20;
@@ -170,96 +256,6 @@ void HandleSwitchEvent(uint32_t eventId)
     }
     else
     {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", eventId);
-    }
-}
-
-void HandleRebootSignal(BootReasonType bootReason)
-{
-    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) != CHIP_NO_ERROR)
-    {
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Failed to store boot reason:%d", static_cast<uint32_t>(bootReason));
-    }
-}
-
-} // namespace
-
-void ProcessCommandRequest(const char * payload)
-{
-    if (strncmp("SoftwareFault", payload, strlen("SoftwareFault")) == 0)
-    {
-        HandleSoftwareFaultEvent(Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id);
-    }
-    else if (strncmp("HardwareFaultChange", payload, strlen("HardwareFaultChange")) == 0)
-    {
-        HandleGeneralFaultEvent(Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id);
-    }
-    else if (strncmp("RadioFaultChange", payload, strlen("RadioFaultChange")) == 0)
-    {
-        HandleGeneralFaultEvent(Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id);
-    }
-    else if (strncmp("NetworkFaultChange", payload, strlen("NetworkFaultChange")) == 0)
-    {
-        HandleGeneralFaultEvent(Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id);
-    }
-    else if (strncmp("SwitchLatched", payload, strlen("SwitchLatched")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::SwitchLatched::Id);
-    }
-    else if (strncmp("InitialPress", payload, strlen("InitialPress")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::InitialPress::Id);
-    }
-    else if (strncmp("LongPress", payload, strlen("LongPress")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::LongPress::Id);
-    }
-    else if (strncmp("ShortRelease", payload, strlen("ShortRelease")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::ShortRelease::Id);
-    }
-    else if (strncmp("LongRelease", payload, strlen("LongRelease")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::LongRelease::Id);
-    }
-    else if (strncmp("MultiPressOngoing", payload, strlen("MultiPressOngoing")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::MultiPressOngoing::Id);
-    }
-    else if (strncmp("MultiPressComplete", payload, strlen("MultiPressComplete")) == 0)
-    {
-        HandleSwitchEvent(Clusters::Switch::Events::MultiPressComplete::Id);
-    }
-    else if (strncmp("PowerOnReboot", payload, strlen("PowerOnReboot")) == 0)
-    {
-        HandleRebootSignal(BootReasonType::kPowerOnReboot);
-    }
-    else if (strncmp("BrownOutReset", payload, strlen("BrownOutReset")) == 0)
-    {
-        HandleRebootSignal(BootReasonType::kBrownOutReset);
-    }
-    else if (strncmp("SoftwareWatchdogReset", payload, strlen("SoftwareWatchdogReset")) == 0)
-    {
-        HandleRebootSignal(BootReasonType::kSoftwareWatchdogReset);
-    }
-    else if (strncmp("HardwareWatchdogReset", payload, strlen("HardwareWatchdogReset")) == 0)
-    {
-        HandleRebootSignal(BootReasonType::kHardwareWatchdogReset);
-    }
-    else if (strncmp("SoftwareUpdateCompleted", payload, strlen("SoftwareUpdateCompleted")) == 0)
-    {
-        HandleRebootSignal(BootReasonType::kSoftwareUpdateCompleted);
-    }
-    else if (strncmp("SoftwareReset", payload, strlen("SoftwareReset")) == 0)
-    {
-        HandleRebootSignal(BootReasonType::kSoftwareReset);
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unhandled command: Should never happens");
+        ChipLogError(NotSpecified, "Unknow event ID:%d", eventId);
     }
 }
