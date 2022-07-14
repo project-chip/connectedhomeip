@@ -208,8 +208,8 @@ source ./scripts/activate.sh
 ./examples/chef/chef.py --build_all --keep_going
 ```
 
-You may also use the Google Cloud Build local builder as detailed in the `README` of
-`integrations/cloudbuild/`.
+You may also use the Google Cloud Build local builder as detailed in the
+`README` of `integrations/cloudbuild/`.
 
 ## Adding new devices
 
