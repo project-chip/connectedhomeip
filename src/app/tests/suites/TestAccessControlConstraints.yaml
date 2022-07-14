@@ -195,7 +195,8 @@ tests:
                       FabricIndex: 1,
                       Privilege: 3,
                       AuthMode: 2,
-                      Subjects: null, # invalid subject
+                      Subjects: null,
+                      # Targets contains both endpoint and device type (invalid)
                       Targets:
                           [{ Cluster: null, Endpoint: 22, DeviceType: 33 }],
                   },
