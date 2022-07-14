@@ -33,21 +33,21 @@ tests:
       attribute: "acl"
       arguments:
           value:
-             [
-              {
-                fabricIndex: 1,
-                privilege: 5,
-                authMode: 2,
-                subjects: [112233],
-                targets: null
-              },
-              {
-                fabricIndex: 1,
-                privilege: 3,
-                authMode: 1,
-                subjects: [],
-                targets: null
-              }
-             ]
+              [
+                  {
+                      fabricIndex: 1,
+                      privilege: 5,
+                      authMode: 2,
+                      subjects: [112233],
+                      targets: null,
+                  },
+                  {
+                      fabricIndex: 1,
+                      privilege: 3,
+                      authMode: 1,
+                      subjects: [],
+                      targets: null,
+                  },
+              ]
       response:
           error: CONSTRAINT_ERROR
