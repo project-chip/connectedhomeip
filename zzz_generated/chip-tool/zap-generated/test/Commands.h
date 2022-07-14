@@ -53099,7 +53099,7 @@ class TestAccessControlConstraintsSuite : public TestCommand
 {
 public:
     TestAccessControlConstraintsSuite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestAccessControlConstraints", 8, credsIssuerConfig)
+        TestCommand("TestAccessControlConstraints", 7, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -53152,9 +53152,6 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         default:
@@ -53252,41 +53249,7 @@ private:
                                   chip::NullOptional, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Constraint error: Invalid provilege value (TC-ACL-2.4 step 32)");
-            ListFreer listFreer;
-            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
-
-            {
-                auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
-                listFreer.add(listHolder_0);
-
-                listHolder_0->mList[0].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
-                listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
-                listHolder_0->mList[0].subjects.SetNonNull();
-
-                {
-                    auto * listHolder_3 = new ListHolder<uint64_t>(1);
-                    listFreer.add(listHolder_3);
-                    listHolder_3->mList[0]                  = 112233ULL;
-                    listHolder_0->mList[0].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
-                }
-                listHolder_0->mList[0].targets.SetNull();
-                listHolder_0->mList[0].fabricIndex = 1U;
-
-                listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(6);
-                listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
-                listHolder_0->mList[1].subjects.SetNull();
-                listHolder_0->mList[1].targets.SetNull();
-                listHolder_0->mList[1].fabricIndex = 1U;
-
-                value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
-                    listHolder_0->mList, 2);
-            }
-            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
-                                  chip::NullOptional, chip::NullOptional);
-        }
-        case 4: {
-            LogStep(4, "Constraint error:  Invalid auth mode (TC-ACL-2.4 step 33)");
+            LogStep(3, "Constraint error:  Invalid auth mode (TC-ACL-2.4 step 33)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 
@@ -53321,8 +53284,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Constraint error:  Invalid subject (TC-ACL-2.4 step 34)");
+        case 4: {
+            LogStep(4, "Constraint error:  Invalid subject (TC-ACL-2.4 step 34)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 
@@ -53362,8 +53325,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6, "Constraint error:  Invalid target (TC-ACL-2.4 step 38)");
+        case 5: {
+            LogStep(5, "Constraint error:  Invalid target (TC-ACL-2.4 step 38)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 
@@ -53409,8 +53372,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 7: {
-            LogStep(7, "Constraint error:  target has both endpoint and device type (TC-ACL-2.4 step 42)");
+        case 6: {
+            LogStep(6, "Constraint error:  target has both endpoint and device type (TC-ACL-2.4 step 42)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 
