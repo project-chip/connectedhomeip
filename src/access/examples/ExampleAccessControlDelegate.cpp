@@ -114,7 +114,7 @@ public:
                 mNode = node;
                 return CHIP_NO_ERROR;
             }
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -126,7 +126,7 @@ public:
             mNode = node;
             return CHIP_NO_ERROR;
         }
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
 private:
@@ -167,7 +167,7 @@ public:
                 Encode(target);
                 return CHIP_NO_ERROR;
             }
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -179,7 +179,7 @@ public:
             Encode(target);
             return CHIP_NO_ERROR;
         }
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
 private:
