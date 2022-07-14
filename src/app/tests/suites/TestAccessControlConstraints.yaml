@@ -143,9 +143,13 @@ tests:
                       Subjects: [112233],
                       Targets: null,
                   },
-                  { FabricIndex: 1, Privilege: 3, AuthMode: 2, Subjects: [
-                              0,
-                          ], Targets: null }, # invalid subject
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 2,
+                      Subjects: [0],
+                      Targets: null,
+                  }, # invalid subject
               ]
       response:
           error: CONSTRAINT_ERROR
