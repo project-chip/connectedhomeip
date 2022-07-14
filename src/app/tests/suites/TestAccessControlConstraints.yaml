@@ -77,3 +77,217 @@ tests:
               ]
       response:
           error: CONSTRAINT_ERROR
+
+    - label: "Constraint error: Invalid provilege value (TC-ACL-2.4 step 32)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 6, # INVALID
+                      AuthMode: 3,  # Group
+                      Subjects: [],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid auth mode (TC-ACL-2.4 step 33)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 4,  # INVALID
+                      Subjects: [],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid subject (TC-ACL-2.4 step 34)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 2,
+                      Subjects: [0], # invalid subject
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid subject (TC-ACL-2.4 step 35)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 2,
+                      Subjects: [18446744073709551615], # invalid subject
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid subject (TC-ACL-2.4 step 36)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 2,
+                      Subjects: [42949672930000000], # invalid subject
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid subject (TC-ACL-2.4 step 37)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 2,
+                      Subjects: [18446744073709486080], # invalid subject
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  Invalid target (TC-ACL-2.4 step 38)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 2,
+                      Subjects: null, # invalid subject
+                      Targets:
+                        [
+                          {
+                            Cluster: null,
+                            Endpoint: null,
+                            DeviceType: null,
+                          }
+                        ]
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error:  target has both endpoint and device type (TC-ACL-2.4 step 42)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, 
+                      AuthMode: 2,
+                      Subjects: null, # invalid subject
+                      Targets:
+                        [
+                          {
+                            Cluster: null,
+                            Endpoint: 22,
+                            DeviceType: 33,
+                          }
+                        ]
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
