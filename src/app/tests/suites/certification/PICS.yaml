@@ -632,14 +632,6 @@ PICS:
     - label: "Does the device implement the Tolerance attribute?"
       id: A_TEMPERATURE_TOLERANCE
 
-    - label:
-          "Does the device implement the UnoccupiedCoolingSetpoint attribute?"
-      id: A_UNOCCUPIEDCOOLINGSETPOINT
-
-    - label:
-          "Does the device implement the UnoccupiedHeatingSetpoint attribute?"
-      id: A_UNOCCUPIEDHEATINGSETPOINT
-
     - label: "Does the device implement the LocalTemperature attribute?"
       id: TSTAT.S.A0000
 
