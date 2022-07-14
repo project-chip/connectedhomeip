@@ -425,10 +425,10 @@ void AmebaOTAImageProcessor::HandleApply(intptr_t context)
     ota_update_free(imageProcessor->pOtaTgtHdr);
 #endif
 
-    ChipLogProgress(SoftwareUpdate, "Rebooting in 2 seconds...");
+    ChipLogProgress(SoftwareUpdate, "Rebooting in 10 seconds...");
 
     // Delay action time before calling HandleRestart
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(2 * 1000), HandleRestart, nullptr);
+    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(10 * 1000), HandleRestart, nullptr);
 }
 
 void AmebaOTAImageProcessor::HandleRestart(chip::System::Layer * systemLayer, void * appState)
