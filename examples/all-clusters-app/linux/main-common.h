@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,20 +16,6 @@
  *    limitations under the License.
  */
 
-#include "AppMain.h"
-#include "AppOptions.h"
-#include "binding-handler.h"
-#include "main-common.h"
+#pragma once
 
-int main(int argc, char * argv[])
-{
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) == 0);
-    VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
-
-    LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
-
-    ChipLinuxAppMainLoop();
-    ApplicationExit();
-
-    return 0;
-}
+void ApplicationExit();
