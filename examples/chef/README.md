@@ -192,7 +192,7 @@ This will produce output archives prefixed `linux_x86` and
 `linux_arm_64_ipv6only` and will append the respective options to each build
 command for these targets.
 
-To test your configuration locally, you may employ a simmilar strategy as in CI:
+To test your configuration locally, you may employ a similar strategy as in CI:
 
 ```shell
 docker run -it --mount source=$(pwd),target=/workspace,type=bind connectedhomeip/chip-build-vscode:$VERSION
