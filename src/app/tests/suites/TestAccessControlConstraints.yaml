@@ -82,7 +82,7 @@ tests:
       # TODO: this test is disabled since the input is accepted. Test case
       #       says privilege value is invalid, but it is set to OPERATE | PROXY_VIEW
       #       so it is unclear what the behavior should be here.
-      disabled: true 
+      disabled: true
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
