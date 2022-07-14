@@ -930,6 +930,12 @@ typedef void (*ColorControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BallastConfigurationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BallastConfigurationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BallastConfigurationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*IlluminanceMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IlluminanceMeasurementAcceptedCommandListListAttributeCallback)(
@@ -6826,6 +6832,90 @@ public:
                                                                         MTRActionBlock action,
                                                                         SubscriptionEstablishedHandler establishedHandler) :
         MTRColorControlAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<BallastConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<BallastConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationAttributeListListAttributeCallback>
+{
+public:
+    MTRBallastConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<BallastConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
