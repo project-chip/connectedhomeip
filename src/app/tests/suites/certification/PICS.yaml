@@ -667,7 +667,6 @@ PICS:
     - label: "Does the device implement the PIHeatingDemand attribute?"
       id: TSTAT.S.A0008
 
-
     - label:
           "Does the device implement the HVACSystemTypeConfiguration attribute?"
       id: TSTAT.S.A0009
