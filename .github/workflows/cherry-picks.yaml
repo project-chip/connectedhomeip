@@ -14,6 +14,7 @@ jobs:
             (github.event.pull_request.merged == true)
             && (
                    (contains(github.event.pull_request.labels.*.name, 'sve'))
+                || (contains(github.event.pull_request.labels.*.name, 'integrations'))
                 || (contains(github.event.pull_request.labels.*.name, 'cert blocker'))
                 || (contains(github.event.pull_request.labels.*.name, 'spec'))
                 || (contains(github.event.pull_request.labels.*.name, 'platform'))
