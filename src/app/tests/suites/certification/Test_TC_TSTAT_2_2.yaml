@@ -31,44 +31,39 @@ tests:
     - label:
           "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
           that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       response:
-          value: 2600
           constraints:
               type: int16
               minValue: 1600
-              maxValue: 2600
+              maxValue: 3200
 
     - label:
           "Writes a value back that is different but valid for
           OccupiedCoolingSetpoint attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       arguments:
-          value: 2250
+          value: 2500
 
     - label:
           "Reads it back again to confirm the successful write of
           OccupiedCoolingSetpoint attribute"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       response:
-          value: 2250
+          value: 2500
 
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
-          MinCoolSetpointLimit"
-      optional: true
+          ABSMinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       arguments:
           value: 30
       response:
@@ -77,48 +72,50 @@ tests:
     - label:
           "Writes OccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       arguments:
           value: 4000
       response:
           error: CONSTRAINT_ERROR
 
-    # Disabled: This test makes no sense: It's setting OccupiedCoolingSetpoint
-    # to below OccupiedHeatingSetpoint.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
           attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01 && !TSTAT.S.F05
       arguments:
           value: 1600
 
     - label:
-          "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
-          attribute"
-      optional: true
+          "Writes the CoolingSetpoint below the HeatingSetpoint when auto is
+          enabled"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F05
       arguments:
-          value: 2600
+          value: 1600
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint
+          attribute"
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: TSTAT.S.F01
+      arguments:
+          value: 3200
 
     - label:
           "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies
           that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       response:
-          value: 2000
           constraints:
               type: int16
               minValue: 700
@@ -127,30 +124,27 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           OccupiedHeatingSetpoint attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 2100
 
     - label:
           "Reads it back again to confirm the successful write of
           OccupiedHeatingSetpoint attribute"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       response:
           value: 2100
 
     - label:
           "Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 600
       response:
@@ -159,10 +153,9 @@ tests:
     - label:
           "Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 4010
       response:
@@ -171,34 +164,47 @@ tests:
     - label:
           "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 700
 
-    # Disabled: This test makes no sense: It's setting OccupiedHeatingSetpoint
-    # to above OccupiedCoolingSetpoint.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Reads it back again to confirm the successful write of
+          OccupiedHeatingSetpoint attribute"
+      command: "readAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: TSTAT.S.F00
+      response:
+          value: 700
+
     - label:
           "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
           attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00 && !TSTAT.S.F05
       arguments:
           value: 3000
 
     - label:
+          "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
+          attribute"
+      command: "writeAttribute"
+      attribute: "OccupiedHeatingSetpoint"
+      PICS: TSTAT.S.F05
+      arguments:
+          value: 3000
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
           "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
           verifies that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       response:
           value: 2600
           constraints:
@@ -209,30 +215,27 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           UnoccupiedCoolingSetpoint attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       arguments:
           value: 2500
 
     - label:
           "Reads it back again to confirm the successful write of
           UnoccupiedCoolingSetpoint attribute"
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       response:
           value: 2500
 
     - label:
           "Writes UnoccupiedCoolingSetpoint to value below the
-          MinHeatSetpointLimit"
-      optional: true
+          MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       arguments:
           value: 1002
       response:
@@ -240,11 +243,10 @@ tests:
 
     - label:
           "Writes UnoccupiedCoolingSetpoint to value above the
-          MaxHeatSetpointLimit"
-      optional: true
+          MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       arguments:
           value: 4010
       response:
@@ -253,30 +255,27 @@ tests:
     - label:
           "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       arguments:
           value: 1800
 
     - label:
           "Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: A_UNOCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F01
       arguments:
           value: 3000
 
     - label:
           "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and
           verifies that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       response:
           value: 2000
           constraints:
@@ -287,30 +286,28 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           UnoccupiedHeatingSetpoint attribute"
-      optional: true
+
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       arguments:
           value: 2500
 
     - label:
           "Reads it back again to confirm the successful write of
           UnoccupiedHeatingSetpoint attribute"
-      optional: true
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       response:
           value: 2500
 
     - label:
           "Writes UnoccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       arguments:
           value: 500
       response:
@@ -319,10 +316,9 @@ tests:
     - label:
           "Writes UnoccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       arguments:
           value: 4010
       response:
@@ -331,30 +327,27 @@ tests:
     - label:
           "Writes the limit of MinHeatSetpointLimit to UnoccupiedHeatingSetpoint
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       arguments:
           value: 1800
 
     - label:
           "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: A_UNOCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F02 && TSTAT.S.F00
       arguments:
           value: 3000
 
     - label:
           "Reads MinHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
       response:
           value: 700
           constraints:
@@ -362,41 +355,39 @@ tests:
               minValue: 700
               maxValue: 3000
 
-    # Disabled: This test makes no sense: It's setting MinHeatSetpointLimit
-    # to above MinCoolSetpointLimit when AUTO is supported, which is not
-    # allowed.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes a value back that is different but valid for
           MinHeatSetpointLimit attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
       arguments:
-          value: 2000
+          value: 800
 
-    # Disabled: Because the previous set is disabled.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Reads it back again to confirm the successful write of
           MinHeatSetpointLimit attribute"
-      disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
       response:
+          value: 800
+
+    - label: "Writes a value back that is different but violates the deadband"
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      arguments:
           value: 2000
+      response:
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
       arguments:
           value: 650
       response:
@@ -405,10 +396,9 @@ tests:
     - label:
           "Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
       arguments:
           value: 4050
       response:
@@ -417,36 +407,27 @@ tests:
     - label:
           "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
       arguments:
           value: 700
 
-    # Disabled: This test makes no sense: It's setting MinHeatSetpointLimit
-    # to higher than what we have various cooling limits set to.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
           attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT && !TSTAT.S.F05
       arguments:
           value: 3000
 
-    # Disabled: Because the preceding write is disabled.
     - label:
           "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
-      disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
       response:
           value: 3000
           constraints:
@@ -455,32 +436,49 @@ tests:
               maxValue: 3000
 
     - label:
+          "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      arguments:
+          value: 700
+
+    - label:
+          "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "MinHeatSetpointLimit"
+      PICS: A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      arguments:
+          value: 3000
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
           "Writes a value back that is different but valid for
           MaxHeatSetpointLimit attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
       arguments:
-          value: 2000
+          value: 2900
 
     - label:
           "Reads it back again to confirm the successful write of
           MaxHeatSetpointLimit attribute"
-      optional: true
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
       response:
-          value: 2000
+          value: 2900
 
     - label:
           "Writes MaxHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 500
       response:
@@ -489,10 +487,9 @@ tests:
     - label:
           "Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 4000
       response:
@@ -501,34 +498,27 @@ tests:
     - label:
           "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 700
 
-    # Disabled: This test makes no sense: It's setting MaxHeatSetpointLimit to
-    # a value too close to MaxCoolSetpointLimit, ignoring deadband.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
           attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
       arguments:
           value: 3000
 
     - label:
           "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       response:
           value: 1600
           constraints:
@@ -539,30 +529,27 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           MinCoolSetpointLimit attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 2000
 
     - label:
           "Reads it back again to confirm the successful write of
           MinCoolSetpointLimit attribute"
-      optional: true
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       response:
           value: 2000
 
     - label:
           "Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1000
       response:
@@ -570,10 +557,9 @@ tests:
 
     - label:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 4000
       response:
@@ -582,30 +568,36 @@ tests:
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
     - label:
           "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
     - label:
+          "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit
+          attribute"
+      command: "writeAttribute"
+      attribute: "MinCoolSetpointLimit"
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      arguments:
+          value: 1600
+
+    - label:
           "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
       response:
           value: 3200
           constraints:
@@ -613,40 +605,30 @@ tests:
               minValue: 1600
               maxValue: 3200
 
-    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit to
-    # below what we just set MinCoolSetpointLimit to.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes a value back that is different but valid for
           MaxCoolSetpointLimit attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT && !TSTAT.S.F05
       arguments:
           value: 2000
 
-    # Disabled: Because the previous set is disabled.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Reads it back again to confirm the successful write of
           MaxCoolSetpointLimit attribute"
-      disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT && !TSTAT.S.F05
       response:
           value: 2000
 
     - label:
           "Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1000
       response:
@@ -654,82 +636,73 @@ tests:
 
     - label:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 4000
       response:
           error: CONSTRAINT_ERROR
 
-    # Disabled: This test makes no sense: It's setting MaxCoolSetpointLimit
-    # to below various heating setpoints.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
     - label:
           "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
     - label: "Writes (sets back) default value of MinHeatSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINHEATSETPOINTLIMIT
       arguments:
           value: 700
 
-    # Disabled: This test makes no sense: It's setting MaxHeatSetpointLimit to
-    # a value too close to MaxCoolSetpointLimit, ignoring deadband.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05
       arguments:
           value: 3000
 
+    - label: "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05
+      arguments:
+          value: 2950
+
     - label: "Writes (sets back) default value of MinCoolSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
     - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
-      optional: true
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
     - label:
           "Reads MinSetpointDeadBand attribute from Server DUT and verifies that
           the value is within range"
-      optional: true
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       response:
           value: 25
           constraints:
@@ -740,56 +713,50 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           MinSetpointDeadBand attribute"
-      optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       arguments:
           value: 5
 
     - label:
           "Reads it back again to confirm the successful write of
           MinSetpointDeadBand attribute"
-      optional: true
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       response:
           value: 5
 
     - label: "Writes the value below MinSetpointDeadBand"
-      optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       arguments:
           value: -1
       response:
           error: CONSTRAINT_ERROR
 
     - label: "Writes the value above MinSetpointDeadBand "
-      optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       arguments:
           value: 30
       response:
           error: CONSTRAINT_ERROR
 
     - label: "Writes the min limit of MinSetpointDeadBand"
-      optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       arguments:
           value: 0
 
     - label: "Writes the max limit of MinSetpointDeadBand"
-      optional: true
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: A_MINSETPOINTDEADBAND
+      PICS: TSTAT.S.F05
       arguments:
           value: 25
 
@@ -798,7 +765,7 @@ tests:
           the value is valid"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: A_CONTROLSEQUENCEOFOPERATION
+      PICS: TSTAT.S.F00 || TSTAT.S.F01
       response:
           value: 4
           constraints:
@@ -811,31 +778,42 @@ tests:
           valid value"
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: A_CONTROLSEQUENCEOFOPERATION
+      PICS: TSTAT.S.F00 || TSTAT.S.F01
       arguments:
           value: 2
 
     - label: "Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: A_CONTROLSEQUENCEOFOPERATION
+      PICS: TSTAT.S.F00 || TSTAT.S.F01
       response:
           value: 2
 
-    # Disabled: This test can't work because our setpoint limits are all messed up.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
+    - label:
+          "Writes MaxHeatSetpointLimit attribute to default value of 2950 to
+          meet deadband constraint"
+      command: "writeAttribute"
+      attribute: "MaxHeatSetpointLimit"
+      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      arguments:
+          value: 2950
+
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: TSTAT.S.F01
+      arguments:
+          value: 2600
+
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      optional: true
-      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    #issue #18545 SetpointRaise command is failing
-    - label: "Sends SetpointRaise Command"
-      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+    - label: "Sends SetpointRaise Command Heat Only"
+      PICS: TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -847,27 +825,21 @@ tests:
     - label:
           "Reads back OccupiedHeatingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       response:
-          value: -30
+          value: 1700
 
-    # Disabled: This test can't work because our setpoint limits are all messed up.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      optional: true
-      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    #issue #18545 SetpointRaise command is failing
-    - label: "Sends SetpointRaise Command"
-      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+    - label: "Sends SetpointRaise Command Heat Only"
+      PICS: TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -879,24 +851,14 @@ tests:
     - label:
           "Reads back OccupiedHeatingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F00
       response:
-          value: 30
+          value: 2300
 
-    - label: "Sets OccupiedCoolingSetpoint to default value"
-      optional: true
-      command: "writeAttribute"
-      attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
-      arguments:
-          value: 2600
-
-    #issue #18545 SetpointRaise command is failing
-    - label: "Sends SetpointRaise Command"
-      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+    - label: "Sends SetpointRaise Command Cool Only"
+      PICS: TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -908,24 +870,21 @@ tests:
     - label:
           "Reads back OccupiedCoolingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       response:
-          value: -30
+          value: 2300
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    #issue #18545 SetpointRaise command is failing
-    - label: "Sends SetpointRaise Command"
-      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+    - label: "Sends SetpointRaise Command Cool Only"
+      PICS: TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -937,35 +896,28 @@ tests:
     - label:
           "Reads back OccupiedCoolingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       response:
-          value: 30
+          value: 2900
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    # Disabled: This test can't work because our setpoint limits are all messed up.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      disabled: true
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    #issue #18545 SetpointRaise command is failing
-    - label: "Sends SetpointRaise Command"
-      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+    - label: "Sends SetpointRaise Command Heat & Cool"
+      PICS: TSTAT.S.F00 || TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -977,45 +929,37 @@ tests:
     - label:
           "Reads back OccupiedCoolingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: TSTAT.S.F01
       response:
-          value: -30
+          value: 2300
 
     - label:
           "Reads back OccupiedHeatingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       response:
-          value: -30
+          value: 1700
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
-      optional: true
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       arguments:
           value: 2600
 
-    # Disabled: This test can't work because our setpoint limits are all messed up.
-    # See https://github.com/CHIP-Specifications/chip-test-plans/issues/1379
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      optional: true
-      disabled: true
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       arguments:
           value: 2000
 
-    #issue #18545 SetpointRaise command is failing
-    - label: "Sends SetpointRaise Command"
-      PICS: PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower
+    - label: "Sends SetpointRaise Command Heat & Cool"
+      PICS: TSTAT.S.F00 || TSTAT.S.F01
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -1027,19 +971,17 @@ tests:
     - label:
           "Reads back OccupiedCoolingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT
+      PICS: TSTAT.S.F01
       response:
-          value: 30
+          value: 2900
 
     - label:
           "Reads back OccupiedHeatingSetpoint to confirm the success of the
           write"
-      optional: true
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT
+      PICS: TSTAT.S.F00
       response:
-          value: 30
+          value: 2300
