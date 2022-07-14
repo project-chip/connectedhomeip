@@ -29,8 +29,8 @@ tests:
           Verify on the TH Log:
 
           [1657193007.841105][5422:5427] CHIP:DMG:         ],
-          [1657193007.841137][5422:5427] CHIP:DMG:         
-          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true, 
+          [1657193007.841137][5422:5427] CHIP:DMG:
+          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true,
           [1657193007.841186][5422:5427] CHIP:DMG:         InteractionModelRevision = 1
           [1657193007.841209][5422:5427] CHIP:DMG: }
           [1657193007.841358][5422:5427] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
@@ -46,7 +46,7 @@ tests:
     - label: "TH subscribes to the ShutDown event on the DUT. Shutdown DUT."
       PICS: BINFO.S.E01
       verification: |
-          1. Launch chip-tool into interactive mode with the command 
+          1. Launch chip-tool into interactive mode with the command
 
           ./chip-tool interactive start
           basic subscribe-event shut-down 20 100 1 0

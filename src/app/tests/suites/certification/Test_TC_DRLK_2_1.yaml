@@ -198,7 +198,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-open-events 1 1  
+          ./chip-tool doorlock read door-open-events 1 1
 
           Verify on the TH Log:
 
@@ -218,9 +218,9 @@ tests:
     - label: "TH writes DoorOpenEvents attribute as 0"
       PICS: DRLK.S.A0004
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 4 10 1 1 
+          ./chip-tool doorlock write-by-id 4 10 1 1
 
           Verify on the TH Log:
 
@@ -244,7 +244,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-open-events 1 1  
+          ./chip-tool doorlock read door-open-events 1 1
 
           Verify on the TH Log:
 
@@ -266,7 +266,7 @@ tests:
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
-           ./chip-tool doorlock read door-closed-events 1 1 
+           ./chip-tool doorlock read door-closed-events 1 1
 
           Verify on the TH Log:
 
@@ -309,9 +309,9 @@ tests:
 
     - label: "TH reads DoorClosedEvents attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read door-closed-events 1 1 
+          ./chip-tool doorlock read door-closed-events 1 1
 
           Verify on the TH Log:
 
@@ -333,7 +333,7 @@ tests:
     - label: "TH reads OpenPeriod attribute from DUT"
       PICS: DRLK.S.F05 && DRLK.S.A0006
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read open-period 1 1
 
@@ -359,9 +359,9 @@ tests:
     - label: "TH writes OpenPeriod attribute as 2 minutes"
       PICS: DRLK.S.A0006
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 6 2 1 1 
+          ./chip-tool doorlock write-by-id 6 2 1 1
 
           Verify on the TH Log:
           [1653635643.566677][3165:3170] CHIP:DMG:                        StatusIB =
@@ -380,7 +380,7 @@ tests:
 
     - label: "TH reads OpenPeriod attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read open-period 1 1
 
@@ -895,7 +895,7 @@ tests:
           Current_LEDSettings value"
       PICS: DRLK.S.A0022
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock read ledsettings 1  1
 
@@ -915,9 +915,9 @@ tests:
 
     - label: "TH writes LEDSettings attribute as 2"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write ledsettings 1 1 1 
+          ./chip-tool doorlock write ledsettings 1 1 1
 
           Verify on the TH Log:
 
@@ -935,9 +935,9 @@ tests:
 
     - label: "TH reads LEDSettings attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read ledsettings 1 1 
+          ./chip-tool doorlock read ledsettings 1 1
 
           Verify on the TH Log:
 
@@ -1146,9 +1146,9 @@ tests:
     - label: "TH reads Default ConfigurationRegister attribute from DUT"
       PICS: DRLK.S.A0027
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read default-configuration-register 1 1 
+          ./chip-tool doorlock read default-configuration-register 1 1
 
           Verify on the TH Log:
 
@@ -1171,9 +1171,9 @@ tests:
           "TH writes Default ConfigurationRegister attribute as bit 0 is set to
           1"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 39 1 1 1  
+          ./chip-tool doorlock write-by-id 39 1 1 1
 
           Verify on the TH Log:
 
@@ -1189,9 +1189,9 @@ tests:
 
     - label: "TH reads Default ConfigurationRegister attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read default-configuration-register 1 1 
+          ./chip-tool doorlock read default-configuration-register 1 1
 
           Verify on the TH Log:
 
@@ -1215,9 +1215,9 @@ tests:
           values as Current_EnableLocal Programming value"
       PICS: DRLK.S.A0028
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-local-programming 1 1  
+          ./chip-tool doorlock read enable-local-programming 1 1
 
           Verify on the TH Log:
 
@@ -1234,9 +1234,9 @@ tests:
 
     - label: "TH writes EnableLocalProgramming attribute as false"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write enable-local-programming 0 1 1   
+          ./chip-tool doorlock write enable-local-programming 0 1 1
 
           Verify on the TH Log:
 
@@ -1253,9 +1253,9 @@ tests:
 
     - label: "TH reads EnableLocalProgramming attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-local-programming 1 1  
+          ./chip-tool doorlock read enable-local-programming 1 1
 
           Verify on the TH Log:
 
@@ -1315,9 +1315,9 @@ tests:
     - label: "TH reads EnableInside StatusLED attribute from DUT"
       PICS: DRLK.S.A002a
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-inside-status-led 1 1 
+          ./chip-tool doorlock read enable-inside-status-led 1 1
 
           Verify on the TH Log:
 
@@ -1337,9 +1337,9 @@ tests:
     - label: "TH writes EnableInsideStatusLED attribute as true"
       PICS: DRLK.S.A002a
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 42 1 1 1  
+          ./chip-tool doorlock write-by-id 42 1 1 1
 
           Verify on the TH Log:
 
@@ -1355,9 +1355,9 @@ tests:
 
     - label: "TH reads EnableInsideStatusLED attribute from DUT"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read enable-inside-status-led 1 1 
+          ./chip-tool doorlock read enable-inside-status-led 1 1
 
           Verify on the TH Log:
 
@@ -1422,9 +1422,9 @@ tests:
           values as Current_LocalProgramming Features value"
       PICS: DRLK.S.A002c
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read  local-programming-features 1 1  
+          ./chip-tool doorlock read  local-programming-features 1 1
 
           Verify on the TH Log:
 
@@ -1443,9 +1443,9 @@ tests:
 
     - label: "TH writes LocalProgramming Features attribute as true"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock write-by-id 44 1 1 1  
+          ./chip-tool doorlock write-by-id 44 1 1 1
 
           Verify on the TH Log:
 
@@ -1626,9 +1626,9 @@ tests:
           as Current_ExpiringUserTimeOut"
       PICS: DRLK.S.F08 && DRLK.S.A0035
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-          ./chip-tool doorlock read expiring-user-timeout 1 1  
+          ./chip-tool doorlock read expiring-user-timeout 1 1
 
           Verify on the TH Log:
 
@@ -1646,7 +1646,7 @@ tests:
 
     - label: "TH writes ExpiringUserTimeout attribute as 10 minutes"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
           ./chip-tool doorlock write-by-id 53 10 1 1
 
@@ -1664,9 +1664,9 @@ tests:
 
     - label: "TH reads ExpiringUserTimeout attribute"
       verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome 
+          This is an Optional attribute, so its not compulsory to get the expected outcome
 
-           ./chip-tool doorlock read expiring-user-timeout 1 1 
+           ./chip-tool doorlock read expiring-user-timeout 1 1
 
           Verify on the TH Log:
 

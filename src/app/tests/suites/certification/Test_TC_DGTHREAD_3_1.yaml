@@ -44,10 +44,10 @@ tests:
     - label: "DUT reads RoutingRole attribute value from TH"
       PICS: DGTHREAD.C.A0002
       verification: |
-          ./chip-tool threadnetworkdiagnostics read routing-role 65 0 
+          ./chip-tool threadnetworkdiagnostics read routing-role 65 0
 
           Verify on the TH Log:
-           
+
           [1649824620.074789][3232:3237] CHIP:DMG:        SuppressResponse = true,
           [1649824620.074852][3232:3237] CHIP:DMG:        InteractionModelRevision = 1
           [1649824620.074911][3232:3237] CHIP:DMG: }
@@ -61,7 +61,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read network-name 65 0
 
           Verify on the TH Log:
-           
+
           [1649823714.280544][3183:3188] CHIP:DMG:
           [1649823714.280605][3183:3188] CHIP:DMG:        SuppressResponse = true,
           [1649823714.280668][3183:3188] CHIP:DMG:        InteractionModelRevision = 1
@@ -90,7 +90,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read extended-pan-id 65 0
 
           Verify on the TH Log:
-           
+
           [1649824746.370824][3300:3305] CHIP:DMG:        SuppressResponse = true,
           [1649824746.370887][3300:3305] CHIP:DMG:        InteractionModelRevision = 1
           [1649824746.370946][3300:3305] CHIP:DMG: }
@@ -104,7 +104,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 65 0
 
           Verify on the TH Log:
-           
+
           [1649824777.961973][3306:3311] CHIP:DMG:        SuppressResponse = true,
           [1649824777.962035][3306:3311] CHIP:DMG:        InteractionModelRevision = 1
           [1649824777.962093][3306:3311] CHIP:DMG: }
@@ -115,10 +115,10 @@ tests:
     - label: "DUT reads OverrunCount attribute value from TH."
       PICS: DGTHREAD.C.A0007
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 65 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 65 0
 
           Verify on the TH Log:
-           
+
            [1649824808.714398][3314:3319] CHIP:DMG:        SuppressResponse = true,
           [1649824808.714482][3314:3319] CHIP:DMG:        InteractionModelRevision = 1
           [1649824808.714539][3314:3319] CHIP:DMG: }
@@ -132,7 +132,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read neighbor-table-list 65 0
 
           Verify on the TH Log:
-           
+
           [1649824841.785721][3322:3327] CHIP:DMG:        SuppressResponse = true,
           [1649824841.785783][3322:3327] CHIP:DMG:        InteractionModelRevision = 1
           [1649824841.785841][3322:3327] CHIP:DMG: }
@@ -173,7 +173,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read partition-id 65 0
 
           Verify on the TH Log:
-           
+
           [1649824939.713304][3339:3344] CHIP:DMG:        SuppressResponse = true,
           [1649824939.713366][3339:3344] CHIP:DMG:        InteractionModelRevision = 1
           [1649824939.713424][3339:3344] CHIP:DMG: }
@@ -187,7 +187,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read weighting 65 0
 
           Verify on the TH Log:
-           
+
           [1649824976.023194][3349:3354] CHIP:DMG:        SuppressResponse = true,
           [1649824976.023258][3349:3354] CHIP:DMG:        InteractionModelRevision = 1
           [1649824976.023318][3349:3354] CHIP:DMG: }
@@ -215,7 +215,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read stable-data-version 65 0
 
           Verify on the TH Log:
-           
+
 
           [1649825030.808949][3363:3368] CHIP:DMG:        SuppressResponse = true,
           [1649825030.809013][3363:3368] CHIP:DMG:        InteractionModelRevision = 1
@@ -230,7 +230,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read leader-router-id 65 0
 
           Verify on the TH Log:
-           
+
 
           [1649825375.599441][3380:3385] CHIP:DMG:        SuppressResponse = true,
           [1649825375.599484][3380:3385] CHIP:DMG:        InteractionModelRevision = 1
@@ -245,7 +245,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read detached-role-count 65 0
 
           Verify on the TH Log:
-           
+
           [1649825500.911386][3393:3398] CHIP:DMG:        SuppressResponse = true,
           [1649825500.911449][3393:3398] CHIP:DMG:        InteractionModelRevision = 1
           [1649825500.911506][3393:3398] CHIP:DMG: }
@@ -259,7 +259,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read child-role-count 65 0
 
           Verify on the TH Log:
-           
+
 
            [1649825527.705564][3399:3404] CHIP:DMG:        SuppressResponse = true,
           [1649825527.705628][3399:3404] CHIP:DMG:        InteractionModelRevision = 1
@@ -274,7 +274,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read router-role-count 65 0
 
           Verify on the TH Log:
-           
+
 
           [1649825557.312082][3406:3411] CHIP:DMG:        SuppressResponse = true,
           [1649825557.312107][3406:3411] CHIP:DMG:        InteractionModelRevision = 1
@@ -289,7 +289,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read leader-role-count 65 0
 
           Verify on the TH Log:
-           
+
           [1649825586.086657][3414:3419] CHIP:DMG:        SuppressResponse = true,
           [1649825586.086722][3414:3419] CHIP:DMG:        InteractionModelRevision = 1
           [1649825586.086781][3414:3419] CHIP:DMG: }
@@ -303,7 +303,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read attach-attempt-count 65 0
 
           Verify on the TH Log:
-           
+
            [1649825623.630934][3422:3427] CHIP:DMG:        SuppressResponse = true,
           [1649825623.630959][3422:3427] CHIP:DMG:        InteractionModelRevision = 1
           [1649825623.630982][3422:3427] CHIP:DMG: }
@@ -317,7 +317,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read partition-id-change-count 65 0
 
           Verify on the TH Log:
-           
+
           [1649825649.945786][3428:3433] CHIP:DMG:        SuppressResponse = true,
           [1649825649.945847][3428:3433] CHIP:DMG:        InteractionModelRevision = 1
           [1649825649.945903][3428:3433] CHIP:DMG: }
@@ -346,7 +346,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read parent-change-count 65 0
 
           Verify on the TH Log:
-           
+
           [1649825732.057481][3442:3447] CHIP:DMG:        SuppressResponse = true,
           [1649825732.057523][3442:3447] CHIP:DMG:        InteractionModelRevision = 1
           [1649825732.057562][3442:3447] CHIP:DMG: }
@@ -360,7 +360,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read active-timestamp 65 0
 
           Verify on the TH Log:
-           
+
           [1649825762.185133][3451:3456] CHIP:DMG:        SuppressResponse = true,
           [1649825762.185195][3451:3456] CHIP:DMG:        InteractionModelRevision = 1
           [1649825762.185253][3451:3456] CHIP:DMG: }
@@ -374,7 +374,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read pending-timestamp 65 0
 
           Verify on the TH Log:
-           
+
           [1649825790.438764][3458:3463] CHIP:DMG:        SuppressResponse = true,
           [1649825790.438826][3458:3463] CHIP:DMG:        InteractionModelRevision = 1
           [1649825790.438884][3458:3463] CHIP:DMG: }
@@ -388,7 +388,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read delay 65 0
 
           Verify on the TH Log:
-           
+
           [1649825817.908699][3465:3470] CHIP:DMG:        SuppressResponse = true,
           [1649825817.908762][3465:3470] CHIP:DMG:        InteractionModelRevision = 1
           [1649825817.908819][3465:3470] CHIP:DMG: }
@@ -420,7 +420,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read channel-mask 65 0
 
           Verify on the TH Log:
-           
+
           [1649825907.715226][3481:3486] CHIP:DMG:        SuppressResponse = true,
           [1649825907.715288][3481:3486] CHIP:DMG:        InteractionModelRevision = 1
           [1649825907.715346][3481:3486] CHIP:DMG: }
@@ -434,7 +434,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read operational-dataset-components 65 0
 
           Verify on the TH Log:
-           
+
 
           [1649825944.956668][3489:3494] CHIP:DMG:        SuppressResponse = true,
           [1649825944.956730][3489:3494] CHIP:DMG:        InteractionModelRevision = 1
@@ -463,7 +463,7 @@ tests:
           ./chip-tool threadnetworkdiagnostics read active-network-faults-list 65 0
 
           Verify on the TH Log:
-           
+
 
           [1649825973.752458][3495:3500] CHIP:DMG:        SuppressResponse = true,
           [1649825973.752521][3495:3500] CHIP:DMG:        InteractionModelRevision = 1

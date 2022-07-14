@@ -57,7 +57,7 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-           ./chip-tool any command-by-id 0x0003 3 1 1 0 
+           ./chip-tool any command-by-id 0x0003 3 1 1 0
 
           On TH, verify DUT responsds as unsuppported command  for the data sent in the above command
 
@@ -74,7 +74,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command 
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
 
@@ -93,7 +93,7 @@ tests:
           Invoke Request Message to the DUT with a valid and fabric-scoped
           CommandDataIB"
       verification: |
-          To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
+          To Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
@@ -114,12 +114,12 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
           sudo ./chip-tool generalcommissioning arm-fail-safe  1000 1  1 0
 
-          On TH,  Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and 
+          On TH,  Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and
           sends it to the TH for the data sent in the above command
 
           [1657091692.258118][5248:5253] CHIP:DMG: InvokeResponseMessage =
           [1657091692.258154][5248:5253] CHIP:DMG: {
-          [1657091692.258189][5248:5253] CHIP:DMG:         suppressResponse = false, 
+          [1657091692.258189][5248:5253] CHIP:DMG:         suppressResponse = false,
           [1657091692.258233][5248:5253] CHIP:DMG:         InvokeResponseIBs =
           [1657091692.258280][5248:5253] CHIP:DMG:         [
           [1657091692.258315][5248:5253] CHIP:DMG:                 InvokeResponseIB =
@@ -132,25 +132,25 @@ tests:
           [1657091692.258641][5248:5253] CHIP:DMG:                                         ClusterId = 0x30,
           [1657091692.258692][5248:5253] CHIP:DMG:                                         CommandId = 0x1,
           [1657091692.258739][5248:5253] CHIP:DMG:                                 },
-          [1657091692.258790][5248:5253] CHIP:DMG:                                 
-          [1657091692.258834][5248:5253] CHIP:DMG:                                 CommandFields = 
+          [1657091692.258790][5248:5253] CHIP:DMG:
+          [1657091692.258834][5248:5253] CHIP:DMG:                                 CommandFields =
           [1657091692.258886][5248:5253] CHIP:DMG:                                 {
-          [1657091692.258958][5248:5253] CHIP:DMG:                                         0x0 = 0, 
-          [1657091692.259011][5248:5253] CHIP:DMG:                                         0x1 = "", 
+          [1657091692.258958][5248:5253] CHIP:DMG:                                         0x0 = 0,
+          [1657091692.259011][5248:5253] CHIP:DMG:                                         0x1 = "",
           [1657091692.259061][5248:5253] CHIP:DMG:                                 },
           [1657091692.259107][5248:5253] CHIP:DMG:                         },
-          [1657091692.259162][5248:5253] CHIP:DMG:                         
+          [1657091692.259162][5248:5253] CHIP:DMG:
           [1657091692.259202][5248:5253] CHIP:DMG:                 },
-          [1657091692.259246][5248:5253] CHIP:DMG:                 
+          [1657091692.259246][5248:5253] CHIP:DMG:
           [1657091692.259280][5248:5253] CHIP:DMG:         ],
-          [1657091692.259323][5248:5253] CHIP:DMG:         
+          [1657091692.259323][5248:5253] CHIP:DMG:
           [1657091692.259358][5248:5253] CHIP:DMG:         InteractionModelRevision = 1
           [1657091692.259392][5248:5253] CHIP:DMG: },
           [1657091692.259477][5248:5253] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1657091692.259539][5248:5253] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1657091692.259610][5248:5253] CHIP:TOO:   ArmFailSafeResponse: {
           [1657091692.259656][5248:5253] CHIP:TOO:     errorCode: 0
-          [1657091692.259690][5248:5253] CHIP:TOO:     debugText: 
+          [1657091692.259690][5248:5253] CHIP:TOO:     debugText:
           [1657091692.259722][5248:5253] CHIP:TOO:    }
           [1657091692.259775][5248:5253] CHIP:DMG: ICR moving to [AwaitingDe]
           [1657091692.259841][5248:5253] CHIP:EM: Sending Standalone Ack for MessageCounter:215437814 on exchange 22331i
@@ -167,8 +167,8 @@ tests:
           "TH sends a Invoke Request Message to the DUT with the TimedRequest
           set as TRUE.(There should be no previous Timed Invoke action.)"
       verification: |
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
-           
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
           The cluster used in the below command is an example, User can use any supported chip cluster.

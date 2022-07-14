@@ -147,7 +147,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To  Setup the TH2 such that there is no accessing fabric, 1st we need to send below mentioned ACL command 
+          To  Setup the TH2 such that there is no accessing fabric, 1st we need to send below mentioned ACL command
            accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": null, "targets": [{"cluster": 0006 , "endpoint": 1 , "deviceType": null}]}]' 1 0
 
           The cluster used in the below command is an example, User can use any supported chip cluster.
@@ -193,7 +193,7 @@ tests:
           on a specific Endpoint for which it does not have access.
           AttributePath = [[ Endpoint = EndpointID ]]."
       verification: |
-          In case of chip tool, here is an example command to use  
+          In case of chip tool, here is an example command to use
 
            accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": null, "targets": [{"cluster": null , "endpoint": 1 , "deviceType": null}]}]' 1 0
 
@@ -216,18 +216,18 @@ tests:
           [1654862486.785998][32309:32314] CHIP:DMG:                                         Cluster = 0x204,
           [1654862486.786050][32309:32314] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1654862486.786099][32309:32314] CHIP:DMG:                                 }
-          [1654862486.786153][32309:32314] CHIP:DMG:                                         
+          [1654862486.786153][32309:32314] CHIP:DMG:
           [1654862486.786204][32309:32314] CHIP:DMG:                                 StatusIB =
           [1654862486.786253][32309:32314] CHIP:DMG:                                 {
           [1654862486.786302][32309:32314] CHIP:DMG:                                         status = 0x7e (UNSUPPORTED_ACCESS),
           [1654862486.786350][32309:32314] CHIP:DMG:                                 },
-          [1654862486.786399][32309:32314] CHIP:DMG:                                 
+          [1654862486.786399][32309:32314] CHIP:DMG:
           [1654862486.786441][32309:32314] CHIP:DMG:                         },
-          [1654862486.786489][32309:32314] CHIP:DMG:                         
+          [1654862486.786489][32309:32314] CHIP:DMG:
           [1654862486.786528][32309:32314] CHIP:DMG:                 },
-          [1654862486.786572][32309:32314] CHIP:DMG:                 
+          [1654862486.786572][32309:32314] CHIP:DMG:
           [1654862486.786606][32309:32314] CHIP:DMG:         ],
-          [1654862486.786650][32309:32314] CHIP:DMG:         
+          [1654862486.786650][32309:32314] CHIP:DMG:
           [1654862486.786685][32309:32314] CHIP:DMG:         InteractionModelRevision = 1
           [1654862486.786720][32309:32314] CHIP:DMG: }
           [1654862486.786862][32309:32314] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -363,7 +363,7 @@ tests:
 
            onoff subscribe on-time 500 100 1 1
 
-          On TH Verify that the DUT sends an error message 
+          On TH Verify that the DUT sends an error message
           [1657451028.957761][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733056 from RetransTable on exchange 33632i
           [1657451028.957867][11635:11640] CHIP:DMG: StatusResponseMessage =
           [1657451028.957963][11635:11640] CHIP:DMG: {

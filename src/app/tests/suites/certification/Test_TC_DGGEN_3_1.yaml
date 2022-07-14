@@ -216,7 +216,7 @@ tests:
           is possible option for this attribute."
       PICS: DGGEN.S.A0005
       verification: |
-          ./chip-tool generaldiagnostics read active-hardware-faults 1 0 
+          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
 
           Verify in TH all-clusters-app Log:
           [1650878034.133792][2385:2390] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 3419113433
@@ -228,7 +228,7 @@ tests:
           possible option for this attribute"
       PICS: DGGEN.S.A0006
       verification: |
-          ./chip-tool generaldiagnostics read active-radio-faults 1 0 
+          ./chip-tool generaldiagnostics read active-radio-faults 1 0
           Verify in TH all-clusters-app Log:
           [1650878056.266314][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 3419113433
           [1650878056.266428][2391:2396] CHIP:TOO:   ActiveRadioFaults: 0 entries
@@ -239,7 +239,7 @@ tests:
           is possible option for this attribute."
       PICS: DGGEN.S.A0007
       verification: |
-          ./chip-tool generaldiagnostics read active-network-faults 1 0 
+          ./chip-tool generaldiagnostics read active-network-faults 1 0
           Verify in TH all-clusters-app Log:
           [1650878077.694616][2399:2404] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 3419113433
           [1650878077.694781][2399:2404] CHIP:TOO:   ActiveNetworkFaults: 0 entries

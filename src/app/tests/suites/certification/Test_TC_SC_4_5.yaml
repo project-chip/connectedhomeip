@@ -36,7 +36,7 @@ tests:
       verification: |
           1. Proviosion the node(accessory/device) to thread network
 
-          2. Open the matter shell in the SDK and run resolve command, Verify if the device detects the published IP address and the Common Txt Key/Value Pairs , as advertised in the service. Ref below example. 
+          2. Open the matter shell in the SDK and run resolve command, Verify if the device detects the published IP address and the Common Txt Key/Value Pairs , as advertised in the service. Ref below example.
 
 
           uart:~$ matter dns resolve 9791300599901692208 10360380464321857174
