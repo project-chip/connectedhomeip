@@ -44,7 +44,7 @@ tests:
     - label: "Reads CurrentHeapUsed attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
-      PICS: DGSW.S.A0003
+      PICS: DGSW.S.A0002
       response:
           constraints:
               type: uint64
@@ -53,7 +53,7 @@ tests:
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
-      PICS: DGSW.S.A0004
+      PICS: DGSW.S.A0003
       response:
           constraints:
               type: uint64

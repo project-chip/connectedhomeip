@@ -33,7 +33,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       response:
           constraints:
               type: int16
@@ -45,7 +45,7 @@ tests:
           OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 2500
 
@@ -54,16 +54,16 @@ tests:
           OccupiedCoolingSetpoint attribute"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       response:
           value: 2500
 
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
-          ABSMinCoolSetpointLimit"
+          MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 30
       response:
@@ -74,7 +74,7 @@ tests:
           MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 4000
       response:
@@ -83,11 +83,21 @@ tests:
     - label:
           "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint
           attribute"
-      command: "writeAttribute"
-      attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01 && !TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat write occupied-cooling-setpoint 1600 1 1
+          [1653574006.162208][16728:16733] CHIP:DMG:                         StatusIB =
+          [1653574006.162227][16728:16733] CHIP:DMG:                         {
+          [1653574006.162245][16728:16733] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1653574006.162261][16728:16733] CHIP:DMG:                         }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0011
       arguments:
-          value: 1600
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Writes the CoolingSetpoint below the HeatingSetpoint when auto is
@@ -105,7 +115,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 3200
 
@@ -114,7 +124,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: TSTAT.S.A0012
       response:
           constraints:
               type: int16
@@ -126,7 +136,7 @@ tests:
           OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: TSTAT.S.A0012
       arguments:
           value: 2100
 
@@ -135,7 +145,7 @@ tests:
           OccupiedHeatingSetpoint attribute"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: TSTAT.S.A0012
       response:
           value: 2100
 
@@ -144,7 +154,7 @@ tests:
           MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: TSTAT.S.A0012
       arguments:
           value: 600
       response:
@@ -155,7 +165,7 @@ tests:
           MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: TSTAT.S.A0012
       arguments:
           value: 4010
       response:
@@ -166,7 +176,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: TSTAT.S.A0012
       arguments:
           value: 700
 
@@ -191,20 +201,26 @@ tests:
     - label:
           "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint
           attribute"
-      command: "writeAttribute"
-      attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat read occupied-heating-setpoint 1 1
+          [1650451168.922888][5386:5391] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0012 DataVersion: 1433129384
+          [1650451168.922971][5386:5391] CHIP:TOO:   occupied heating setpoint: 2000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0012
       arguments:
-          value: 3000
-      response:
-          error: CONSTRAINT_ERROR
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and
           verifies that the value is within range"
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       response:
           value: 2600
           constraints:
@@ -217,7 +233,7 @@ tests:
           UnoccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       arguments:
           value: 2500
 
@@ -226,16 +242,16 @@ tests:
           UnoccupiedCoolingSetpoint attribute"
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       response:
           value: 2500
 
     - label:
           "Writes UnoccupiedCoolingSetpoint to value below the
-          MinCoolSetpointLimit"
+          MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       arguments:
           value: 1002
       response:
@@ -243,10 +259,10 @@ tests:
 
     - label:
           "Writes UnoccupiedCoolingSetpoint to value above the
-          MaxCoolSetpointLimit"
+          MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       arguments:
           value: 4010
       response:
@@ -257,7 +273,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       arguments:
           value: 1800
 
@@ -266,7 +282,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F01
+      PICS: TSTAT.S.A0013
       arguments:
           value: 3000
 
@@ -275,7 +291,7 @@ tests:
           verifies that the value is within range"
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       response:
           value: 2000
           constraints:
@@ -286,10 +302,9 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           UnoccupiedHeatingSetpoint attribute"
-
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       arguments:
           value: 2500
 
@@ -298,7 +313,7 @@ tests:
           UnoccupiedHeatingSetpoint attribute"
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       response:
           value: 2500
 
@@ -307,7 +322,7 @@ tests:
           MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       arguments:
           value: 500
       response:
@@ -318,7 +333,7 @@ tests:
           MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       arguments:
           value: 4010
       response:
@@ -329,7 +344,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       arguments:
           value: 1800
 
@@ -338,7 +353,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F02 && TSTAT.S.F00
+      PICS: TSTAT.S.A0014
       arguments:
           value: 3000
 
@@ -347,7 +362,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0015
       response:
           value: 700
           constraints:
@@ -358,36 +373,65 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           MinHeatSetpointLimit attribute"
-      command: "writeAttribute"
-      attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
+      verification: |
+          ./chip-tool thermostat write min-heat-setpoint-limit 1500  1 1
+          [1651575873.602025][9521:9526] CHIP:DMG: WriteResponseMessage =
+          [1651575873.602056][9521:9526] CHIP:DMG: {
+          [1651575873.602078][9521:9526] CHIP:DMG:         AttributeStatusIBs =
+          [1651575873.602124][9521:9526] CHIP:DMG:         [
+          [1651575873.602160][9521:9526] CHIP:DMG:                 AttributeStatusIB =
+          [1651575873.602195][9521:9526] CHIP:DMG:                 {
+          [1651575873.602233][9521:9526] CHIP:DMG:                         AttributePathIB =
+          [1651575873.602278][9521:9526] CHIP:DMG:                         {
+          [1651575873.602316][9521:9526] CHIP:DMG:                                 Endpoint = 0x1,
+          [1651575873.602363][9521:9526] CHIP:DMG:                                 Cluster = 0x201,
+          [1651575873.602412][9521:9526] CHIP:DMG:                                 Attribute = 0x0000_0015,
+          [1651575873.602447][9521:9526] CHIP:DMG:                         }
+          [1651575873.602496][9521:9526] CHIP:DMG:
+          [1651575873.602537][9521:9526] CHIP:DMG:                         StatusIB =
+          [1651575873.602574][9521:9526] CHIP:DMG:                         {
+          [1651575873.602619][9521:9526] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1651575873.602660][9521:9526] CHIP:DMG:                         },
+          [1651575873.602697][9521:9526] CHIP:DMG:
+          [1651575873.602734][9521:9526] CHIP:DMG:                 },
+          [1651575873.602775][9521:9526] CHIP:DMG:
+          [1651575873.602801][9521:9526] CHIP:DMG:         ],
+          [1651575873.602840][9521:9526] CHIP:DMG:
+          [1651575873.602864][9521:9526] CHIP:DMG:         InteractionModelRevision = 1
+          [1651575873.602890][9521:9526] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0015
       arguments:
-          value: 800
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads it back again to confirm the successful write of
           MinHeatSetpointLimit attribute"
-      command: "readAttribute"
-      attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
-      response:
-          value: 800
-
-    - label: "Writes a value back that is different but violates the deadband"
-      command: "writeAttribute"
-      attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat read min-heat-setpoint-limit    1 1
+          [1650451588.651448][5452:5457] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0015 DataVersion: 1433129384
+          [1650451588.651531][5452:5457] CHIP:TOO:   min heat setpoint limit: 1500
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0015
       arguments:
-          value: 2000
-      response:
-          error: CONSTRAINT_ERROR
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0015
       arguments:
           value: 650
       response:
@@ -398,7 +442,7 @@ tests:
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0015
       arguments:
           value: 4050
       response:
@@ -409,31 +453,91 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0015
       arguments:
           value: 700
 
     - label:
           "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit
           attribute"
-      command: "writeAttribute"
-      attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT && !TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat write min-heat-setpoint-limit 1000  1 1
+          [1651575767.881039][9507:9512] CHIP:DMG: WriteResponseMessage =
+          [1651575767.881065][9507:9512] CHIP:DMG: {
+          [1651575767.881088][9507:9512] CHIP:DMG:         AttributeStatusIBs =
+          [1651575767.881128][9507:9512] CHIP:DMG:         [
+          [1651575767.881154][9507:9512] CHIP:DMG:                 AttributeStatusIB =
+          [1651575767.881183][9507:9512] CHIP:DMG:                 {
+          [1651575767.881210][9507:9512] CHIP:DMG:                         AttributePathIB =
+          [1651575767.881243][9507:9512] CHIP:DMG:                         {
+          [1651575767.881277][9507:9512] CHIP:DMG:                                 Endpoint = 0x1,
+          [1651575767.881312][9507:9512] CHIP:DMG:                                 Cluster = 0x201,
+          [1651575767.881350][9507:9512] CHIP:DMG:                                 Attribute = 0x0000_0015,
+          [1651575767.881383][9507:9512] CHIP:DMG:                         }
+          [1651575767.881420][9507:9512] CHIP:DMG:
+          [1651575767.881452][9507:9512] CHIP:DMG:                         StatusIB =
+          [1651575767.881485][9507:9512] CHIP:DMG:                         {
+          [1651575767.881520][9507:9512] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1651575767.881553][9507:9512] CHIP:DMG:                         },
+          [1651575767.881589][9507:9512] CHIP:DMG:
+          [1651575767.881618][9507:9512] CHIP:DMG:                 },
+          [1651575767.881651][9507:9512] CHIP:DMG:
+          [1651575767.881677][9507:9512] CHIP:DMG:         ],
+          [1651575767.881708][9507:9512] CHIP:DMG:
+          [1651575767.881732][9507:9512] CHIP:DMG:         InteractionModelRevision = 1
+          [1651575767.881757][9507:9512] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0015
       arguments:
-          value: 3000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
-      command: "readAttribute"
-      attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
-      response:
-          value: 3000
-          constraints:
-              type: int16
-              minValue: 700
-              maxValue: 3000
+      verification: |
+          ./chip-tool thermostat read  max-heat-setpoint-limit  1 1
+          [1651575563.660840][9476:9481] CHIP:DMG: ReportDataMessage =
+          [1651575563.660870][9476:9481] CHIP:DMG: {
+          [1651575563.660892][9476:9481] CHIP:DMG:         AttributeReportIBs =
+          [1651575563.660929][9476:9481] CHIP:DMG:         [
+          [1651575563.660954][9476:9481] CHIP:DMG:                 AttributeReportIB =
+          [1651575563.660994][9476:9481] CHIP:DMG:                 {
+          [1651575563.661023][9476:9481] CHIP:DMG:                         AttributeDataIB =
+          [1651575563.661059][9476:9481] CHIP:DMG:                         {
+          [1651575563.661096][9476:9481] CHIP:DMG:                                 DataVersion = 0x366e43c8,
+          [1651575563.661132][9476:9481] CHIP:DMG:                                 AttributePathIB =
+          [1651575563.661169][9476:9481] CHIP:DMG:                                 {
+          [1651575563.661208][9476:9481] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651575563.661248][9476:9481] CHIP:DMG:                                         Cluster = 0x201,
+          [1651575563.661287][9476:9481] CHIP:DMG:                                         Attribute = 0x0000_0016,
+          [1651575563.661322][9476:9481] CHIP:DMG:                                 }
+          [1651575563.661358][9476:9481] CHIP:DMG:
+          [1651575563.661399][9476:9481] CHIP:DMG:                                         Data = 3000,
+          [1651575563.661436][9476:9481] CHIP:DMG:                         },
+          [1651575563.661473][9476:9481] CHIP:DMG:
+          [1651575563.661502][9476:9481] CHIP:DMG:                 },
+          [1651575563.661536][9476:9481] CHIP:DMG:
+          [1651575563.661559][9476:9481] CHIP:DMG:         ],
+          [1651575563.661590][9476:9481] CHIP:DMG:
+          [1651575563.661615][9476:9481] CHIP:DMG:         SuppressResponse = true,
+          [1651575563.661642][9476:9481] CHIP:DMG:         InteractionModelRevision = 1
+          [1651575563.661667][9476:9481] CHIP:DMG: }
+          [1651575563.661803][9476:9481] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0016 DataVersion: 913195976
+          [1651575563.661866][9476:9481] CHIP:TOO:   max heat setpoint limit: 3000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0016
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit
@@ -460,7 +564,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.A0016
       arguments:
           value: 2900
 
@@ -469,7 +573,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.A0016
       response:
           value: 2900
 
@@ -478,7 +582,7 @@ tests:
           AbsMinHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0016
       arguments:
           value: 500
       response:
@@ -489,7 +593,7 @@ tests:
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0016
       arguments:
           value: 4000
       response:
@@ -500,25 +604,55 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0016
       arguments:
           value: 700
 
     - label:
           "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit
           attribute"
-      command: "writeAttribute"
-      attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat write  max-heat-setpoint-limit 1000 1 1
+          [1651575678.144963][9488:9493] CHIP:DMG: WriteResponseMessage =
+          [1651575678.144990][9488:9493] CHIP:DMG: {
+          [1651575678.145012][9488:9493] CHIP:DMG:         AttributeStatusIBs =
+          [1651575678.145045][9488:9493] CHIP:DMG:         [
+          [1651575678.145071][9488:9493] CHIP:DMG:                 AttributeStatusIB =
+          [1651575678.145107][9488:9493] CHIP:DMG:                 {
+          [1651575678.145136][9488:9493] CHIP:DMG:                         AttributePathIB =
+          [1651575678.145169][9488:9493] CHIP:DMG:                         {
+          [1651575678.145204][9488:9493] CHIP:DMG:                                 Endpoint = 0x1,
+          [1651575678.145242][9488:9493] CHIP:DMG:                                 Cluster = 0x201,
+          [1651575678.145278][9488:9493] CHIP:DMG:                                 Attribute = 0x0000_0016,
+          [1651575678.145314][9488:9493] CHIP:DMG:                         }
+          [1651575678.145353][9488:9493] CHIP:DMG:
+          [1651575678.145384][9488:9493] CHIP:DMG:                         StatusIB =
+          [1651575678.145418][9488:9493] CHIP:DMG:                         {
+          [1651575678.145450][9488:9493] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1651575678.145483][9488:9493] CHIP:DMG:                         },
+          [1651575678.145516][9488:9493] CHIP:DMG:
+          [1651575678.145543][9488:9493] CHIP:DMG:                 },
+          [1651575678.145576][9488:9493] CHIP:DMG:
+          [1651575678.145603][9488:9493] CHIP:DMG:         ],
+          [1651575678.145633][9488:9493] CHIP:DMG:
+          [1651575678.145658][9488:9493] CHIP:DMG:         InteractionModelRevision = 1
+          [1651575678.145683][9488:9493] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0016
       arguments:
-          value: 3000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads MinCoolSetpointLimit attribute from Server DUT and verifies
           that the value is within range"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       response:
           value: 1600
           constraints:
@@ -531,7 +665,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       arguments:
           value: 2000
 
@@ -540,7 +674,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       response:
           value: 2000
 
@@ -549,7 +683,7 @@ tests:
           AbsMinCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       arguments:
           value: 1000
       response:
@@ -559,7 +693,7 @@ tests:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       arguments:
           value: 4000
       response:
@@ -570,7 +704,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       arguments:
           value: 1600
 
@@ -579,7 +713,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       arguments:
           value: 3200
 
@@ -597,7 +731,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0018
       response:
           value: 3200
           constraints:
@@ -608,27 +742,91 @@ tests:
     - label:
           "Writes a value back that is different but valid for
           MaxCoolSetpointLimit attribute"
-      command: "writeAttribute"
-      attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT && !TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat write max-cool-setpoint-limit 3000 1 1
+          [1651577904.824284][9656:9661] CHIP:DMG: WriteResponseMessage =
+          [1651577904.824317][9656:9661] CHIP:DMG: {
+          [1651577904.824347][9656:9661] CHIP:DMG:         AttributeStatusIBs =
+          [1651577904.824387][9656:9661] CHIP:DMG:         [
+          [1651577904.824420][9656:9661] CHIP:DMG:                 AttributeStatusIB =
+          [1651577904.824457][9656:9661] CHIP:DMG:                 {
+          [1651577904.824492][9656:9661] CHIP:DMG:                         AttributePathIB =
+          [1651577904.824541][9656:9661] CHIP:DMG:                         {
+          [1651577904.824587][9656:9661] CHIP:DMG:                                 Endpoint = 0x1,
+          [1651577904.824628][9656:9661] CHIP:DMG:                                 Cluster = 0x201,
+          [1651577904.824674][9656:9661] CHIP:DMG:                                 Attribute = 0x0000_0018,
+          [1651577904.824711][9656:9661] CHIP:DMG:                         }
+          [1651577904.824757][9656:9661] CHIP:DMG:
+          [1651577904.824797][9656:9661] CHIP:DMG:                         StatusIB =
+          [1651577904.824840][9656:9661] CHIP:DMG:                         {
+          [1651577904.824878][9656:9661] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1651577904.824919][9656:9661] CHIP:DMG:                         },
+          [1651577904.824957][9656:9661] CHIP:DMG:
+          [1651577904.824993][9656:9661] CHIP:DMG:                 },
+          [1651577904.825035][9656:9661] CHIP:DMG:
+          [1651577904.825067][9656:9661] CHIP:DMG:         ],
+          [1651577904.825106][9656:9661] CHIP:DMG:
+          [1651577904.825138][9656:9661] CHIP:DMG:         InteractionModelRevision = 1
+          [1651577904.825169][9656:9661] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0018
       arguments:
-          value: 2000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Reads it back again to confirm the successful write of
           MaxCoolSetpointLimit attribute"
-      command: "readAttribute"
-      attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT && !TSTAT.S.F05
-      response:
-          value: 2000
+      verification: |
+          ./chip-tool thermostat read max-cool-setpoint-limit 1 1
+          [1651576122.935621][9559:9564] CHIP:DMG: ReportDataMessage =
+          [1651576122.935665][9559:9564] CHIP:DMG: {
+          [1651576122.935701][9559:9564] CHIP:DMG:         AttributeReportIBs =
+          [1651576122.935751][9559:9564] CHIP:DMG:         [
+          [1651576122.935791][9559:9564] CHIP:DMG:                 AttributeReportIB =
+          [1651576122.935857][9559:9564] CHIP:DMG:                 {
+          [1651576122.935900][9559:9564] CHIP:DMG:                         AttributeDataIB =
+          [1651576122.935953][9559:9564] CHIP:DMG:                         {
+          [1651576122.936006][9559:9564] CHIP:DMG:                                 DataVersion = 0x366e43cd,
+          [1651576122.936059][9559:9564] CHIP:DMG:                                 AttributePathIB =
+          [1651576122.936114][9559:9564] CHIP:DMG:                                 {
+          [1651576122.936170][9559:9564] CHIP:DMG:                                         Endpoint = 0x1,
+          [1651576122.936233][9559:9564] CHIP:DMG:                                         Cluster = 0x201,
+          [1651576122.936296][9559:9564] CHIP:DMG:                                         Attribute = 0x0000_0018,
+          [1651576122.936354][9559:9564] CHIP:DMG:                                 }
+          [1651576122.936415][9559:9564] CHIP:DMG:
+          [1651576122.936477][9559:9564] CHIP:DMG:                                         Data = 3000,
+          [1651576122.936525][9559:9564] CHIP:DMG:                         },
+          [1651576122.936578][9559:9564] CHIP:DMG:
+          [1651576122.936622][9559:9564] CHIP:DMG:                 },
+          [1651576122.936675][9559:9564] CHIP:DMG:
+          [1651576122.936714][9559:9564] CHIP:DMG:         ],
+          [1651576122.936763][9559:9564] CHIP:DMG:
+          [1651576122.936804][9559:9564] CHIP:DMG:         SuppressResponse = true,
+          [1651576122.936849][9559:9564] CHIP:DMG:         InteractionModelRevision = 1
+          [1651576122.936888][9559:9564] CHIP:DMG: }
+          [1651576122.937081][9559:9564] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0018 DataVersion: 913195981
+          [1651576122.937166][9559:9564] CHIP:TOO:   max cool setpoint limit: 3000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0018
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0018
       arguments:
           value: 1000
       response:
@@ -638,7 +836,7 @@ tests:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0018
       arguments:
           value: 4000
       response:
@@ -647,34 +845,74 @@ tests:
     - label:
           "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
-      command: "writeAttribute"
-      attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      verification: |
+          ./chip-tool thermostat write max-cool-setpoint-limit 700 1 1
+          [1651577904.824284][9656:9661] CHIP:DMG: WriteResponseMessage =
+          [1651577904.824317][9656:9661] CHIP:DMG: {
+          [1651577904.824347][9656:9661] CHIP:DMG:         AttributeStatusIBs =
+          [1651577904.824387][9656:9661] CHIP:DMG:         [
+          [1651577904.824420][9656:9661] CHIP:DMG:                 AttributeStatusIB =
+          [1651577904.824457][9656:9661] CHIP:DMG:                 {
+          [1651577904.824492][9656:9661] CHIP:DMG:                         AttributePathIB =
+          [1651577904.824541][9656:9661] CHIP:DMG:                         {
+          [1651577904.824587][9656:9661] CHIP:DMG:                                 Endpoint = 0x1,
+          [1651577904.824628][9656:9661] CHIP:DMG:                                 Cluster = 0x201,
+          [1651577904.824674][9656:9661] CHIP:DMG:                                 Attribute = 0x0000_0018,
+          [1651577904.824711][9656:9661] CHIP:DMG:                         }
+          [1651577904.824757][9656:9661] CHIP:DMG:
+          [1651577904.824797][9656:9661] CHIP:DMG:                         StatusIB =
+          [1651577904.824840][9656:9661] CHIP:DMG:                         {
+          [1651577904.824878][9656:9661] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1651577904.824919][9656:9661] CHIP:DMG:                         },
+          [1651577904.824957][9656:9661] CHIP:DMG:
+          [1651577904.824993][9656:9661] CHIP:DMG:                 },
+          [1651577904.825035][9656:9661] CHIP:DMG:
+          [1651577904.825067][9656:9661] CHIP:DMG:         ],
+          [1651577904.825106][9656:9661] CHIP:DMG:
+          [1651577904.825138][9656:9661] CHIP:DMG:         InteractionModelRevision = 1
+          [1651577904.825169][9656:9661] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0018
       arguments:
-          value: 1600
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit
           attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0018
       arguments:
           value: 3200
 
     - label: "Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.A0015
       arguments:
           value: 700
 
     - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
-      command: "writeAttribute"
-      attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05
+      verification: |
+          ./chip-tool thermostat write max-heat-setpoint-limit 3000 1 1
+          CHIP:ZCL:   status: Success                (0x0000)
+          CHIP:TOO: Default Success Response
+          CHIP:DMG: WriteClient moving to [Uninitiali]
+          CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 12610i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0016
       arguments:
-          value: 3000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
@@ -686,14 +924,14 @@ tests:
     - label: "Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0017
       arguments:
           value: 1600
 
     - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.A0018
       arguments:
           value: 3200
 
@@ -702,7 +940,7 @@ tests:
           the value is within range"
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       response:
           value: 25
           constraints:
@@ -715,7 +953,7 @@ tests:
           MinSetpointDeadBand attribute"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       arguments:
           value: 5
 
@@ -724,14 +962,14 @@ tests:
           MinSetpointDeadBand attribute"
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       response:
           value: 5
 
     - label: "Writes the value below MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       arguments:
           value: -1
       response:
@@ -740,7 +978,7 @@ tests:
     - label: "Writes the value above MinSetpointDeadBand "
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       arguments:
           value: 30
       response:
@@ -749,14 +987,14 @@ tests:
     - label: "Writes the min limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       arguments:
           value: 0
 
     - label: "Writes the max limit of MinSetpointDeadBand"
       command: "writeAttribute"
       attribute: "MinSetpointDeadBand"
-      PICS: TSTAT.S.F05
+      PICS: TSTAT.S.A0019
       arguments:
           value: 25
 
@@ -765,7 +1003,7 @@ tests:
           the value is valid"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.A001b
       response:
           value: 4
           constraints:
@@ -778,14 +1016,14 @@ tests:
           valid value"
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.A001b
       arguments:
           value: 2
 
     - label: "Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.A001b
       response:
           value: 2
 
@@ -806,14 +1044,25 @@ tests:
           value: 2600
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      command: "writeAttribute"
-      attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      verification: |
+          ./chip-tool thermostat write occupied-heating-setpoint -30 1 1
+          [1653575015.985079][16976:16981] CHIP:DMG:                         StatusIB =
+          [1653575015.985098][16976:16981] CHIP:DMG:                         {
+          [1653575015.985115][16976:16981] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1653575015.985131][16976:16981] CHIP:DMG:                         }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0012
       arguments:
-          value: 2000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Sends SetpointRaise Command Heat Only"
-      PICS: TSTAT.S.F00
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -827,19 +1076,31 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012
       response:
           value: 1700
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      command: "writeAttribute"
-      attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      verification: |
+          ./chip-tool thermostat write occupied-heating-setpoint 2000 1 1
+          CHIP:ZCL: WriteResponse:
+          CHIP:ZCL:   status: Success                (0x0000)
+          CHIP:TOO: Default Success Response
+          CHIP:DMG: WriteClient moving to [Uninitiali]
+          CHIP:EM: Sending Standalone Ack for MessageCounter:1 on exchange 11247i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0012
       arguments:
-          value: 2000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Sends SetpointRaise Command Heat Only"
-      PICS: TSTAT.S.F00
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -853,12 +1114,20 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012
       response:
-          value: 2300
+          value: 30
 
-    - label: "Sends SetpointRaise Command Cool Only"
-      PICS: TSTAT.S.F01
+    - label: "Sets OccupiedCoolingSetpoint to default value"
+      command: "writeAttribute"
+      attribute: "OccupiedCoolingSetpoint"
+      PICS: TSTAT.S.A0011
+      arguments:
+          value: 2600
+
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -872,19 +1141,20 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011
       response:
           value: 2300
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 2600
 
-    - label: "Sends SetpointRaise Command Cool Only"
-      PICS: TSTAT.S.F01
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -898,26 +1168,39 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011
       response:
           value: 2900
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 2600
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      command: "writeAttribute"
-      attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      verification: |
+          ./chip-tool thermostat read occupied-heating-setpoint 2000 1 1
+          CHIP:ZCL: ReadAttributesResponse:
+          CHIP:ZCL:   ClusterId: 0x0000_0201
+          CHIP:ZCL:   attributeId: 0x0000_0012
+          CHIP:ZCL:   status: Success                (0x0000)
+          CHIP:ZCL:   attribute TLV Type: 0x00
+          CHIP:TOO: Int16s attribute Response: 2000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0012
       arguments:
-          value: 2000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Sends SetpointRaise Command Heat & Cool"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -931,7 +1214,7 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011
       response:
           value: 2300
 
@@ -940,26 +1223,39 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012
       response:
           value: 1700
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: TSTAT.S.A0011
       arguments:
           value: 2600
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
-      command: "writeAttribute"
-      attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      verification: |
+          ./chip-tool thermostat read occupied-heating-setpoint 2000 1 1
+          CHIP:ZCL: ReadAttributesResponse:
+          CHIP:ZCL:   ClusterId: 0x0000_0201
+          CHIP:ZCL:   attributeId: 0x0000_0012
+          CHIP:ZCL:   status: Success                (0x0000)
+          CHIP:ZCL:   attribute TLV Type: 0x00
+          CHIP:TOO: Int16s attribute Response: 2000
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TSTAT.S.A0012
       arguments:
-          value: 2000
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Sends SetpointRaise Command Heat & Cool"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+    #issue #18545 SetpointRaise command is failing
+    - label: "Sends SetpointRaise Command"
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00
       command: "SetpointRaiseLower"
       arguments:
           values:
@@ -973,7 +1269,7 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.F01
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011
       response:
           value: 2900
 
@@ -982,6 +1278,6 @@ tests:
           write"
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.F00
+      PICS: PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012
       response:
           value: 2300
