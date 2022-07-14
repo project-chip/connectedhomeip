@@ -69,7 +69,7 @@ namespace Controller {
 
 struct DeviceControllerSystemStateParams
 {
-    using OperationalDevicePool = OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
+    using OperationalDevicePool = OperationalSessionSetupPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
     using CASEClientPool        = chip::CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS>;
 
     // Params that can outlive the DeviceControllerSystemState

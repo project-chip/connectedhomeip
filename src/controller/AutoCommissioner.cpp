@@ -469,7 +469,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             ReleasePAI();
             ReleaseDAC();
             mCommissioneeDeviceProxy = nullptr;
-            mOperationalDeviceProxy  = nullptr;
+            mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
             return CHIP_NO_ERROR;
         default:
@@ -493,9 +493,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
     DeviceProxy * proxy = mCommissioneeDeviceProxy;
     if (nextStage == CommissioningStage::kSendComplete ||
-        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))
+        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy.ConnectionReady()))
     {
-        proxy = mOperationalDeviceProxy;
+        proxy = &mOperationalDeviceProxy;
     }
 
     if (proxy == nullptr)

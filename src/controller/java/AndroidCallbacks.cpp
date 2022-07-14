@@ -57,7 +57,8 @@ GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
     env->DeleteGlobalRef(mJavaCallbackRef);
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
+void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                                     SessionHandle & sessionHandle)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
@@ -78,6 +79,11 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Operational
     VerifyOrReturn(successMethod != nullptr, ChipLogError(Controller, "Could not find onDeviceConnected method"));
 
     static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a Java handle");
+
+    // TODO (#) This is a memory leak since as of today this is never freed. Either we need to make sure this is free
+    // after the java side is done with this pointer, or we need to refactor how this is used so that the the on
+    // connected callback lives only in the cpp side and we use the SessionHandle immediately for what we intend.
+    OperationalDeviceProxy * device = new OperationalDeviceProxy(&exchangeMgr, sessionHandle);
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, successMethod, reinterpret_cast<jlong>(device));
 }

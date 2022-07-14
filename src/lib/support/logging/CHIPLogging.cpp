@@ -115,7 +115,7 @@ const char ModuleNames[] = "-\0\0" // None
                            "DIS"   // Discovery
                            "IM\0"  // InteractionModel
                            "TST"   // Test
-                           "ODP"   // OperationalDeviceProxy
+                           "OSS"   // OperationalSessionSetup
                            "ATM"   // Automation
                            "CSM"   // CASESessionManager
     ;

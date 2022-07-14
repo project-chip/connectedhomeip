@@ -24,7 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>

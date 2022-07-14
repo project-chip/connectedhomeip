@@ -17,44 +17,47 @@
 
 #pragma once
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/CASESessionManager.h>
+#include <app/OperationalSessionSetup.h>
 #include <lib/support/Pool.h>
 #include <transport/SessionHandle.h>
 
 namespace chip {
 
-class OperationalDeviceProxyPoolDelegate
+class OperationalSessionSetupPoolDelegate
 {
 public:
-    virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId) = 0;
+    virtual OperationalSessionSetup * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId,
+                                               OperationalSessionReleaseDelegate * releaseDelegate) = 0;
 
-    virtual void Release(OperationalDeviceProxy * device) = 0;
+    virtual void Release(OperationalSessionSetup * device) = 0;
 
-    virtual OperationalDeviceProxy * FindDevice(ScopedNodeId peerId) = 0;
+    virtual OperationalSessionSetup * FindDevice(ScopedNodeId peerId) = 0;
 
     virtual void ReleaseDevicesForFabric(FabricIndex fabricIndex) = 0;
 
     virtual void ReleaseAllDevices() = 0;
 
-    virtual ~OperationalDeviceProxyPoolDelegate() {}
+    virtual ~OperationalSessionSetupPoolDelegate() {}
 };
 
 template <size_t N>
-class OperationalDeviceProxyPool : public OperationalDeviceProxyPoolDelegate
+class OperationalSessionSetupPool : public OperationalSessionSetupPoolDelegate
 {
 public:
-    ~OperationalDeviceProxyPool() override { mDevicePool.ReleaseAll(); }
+    ~OperationalSessionSetupPool() override { mDevicePool.ReleaseAll(); }
 
-    OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId) override
+    OperationalSessionSetup * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId,
+                                       OperationalSessionReleaseDelegate * releaseDelegate) override
     {
-        return mDevicePool.CreateObject(params, peerId);
+        return mDevicePool.CreateObject(params, peerId, releaseDelegate);
     }
 
-    void Release(OperationalDeviceProxy * device) override { mDevicePool.ReleaseObject(device); }
+    void Release(OperationalSessionSetup * device) override { mDevicePool.ReleaseObject(device); }
 
-    OperationalDeviceProxy * FindDevice(ScopedNodeId peerId) override
+    OperationalSessionSetup * FindDevice(ScopedNodeId peerId) override
     {
-        OperationalDeviceProxy * foundDevice = nullptr;
+        OperationalSessionSetup * foundDevice = nullptr;
         mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
             if (activeDevice->GetPeerId() == peerId)
             {
@@ -87,7 +90,7 @@ public:
     }
 
 private:
-    ObjectPool<OperationalDeviceProxy, N> mDevicePool;
+    ObjectPool<OperationalSessionSetup, N> mDevicePool;
 };
 
 }; // namespace chip
