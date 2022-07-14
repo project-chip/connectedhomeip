@@ -168,8 +168,9 @@ tests:
                       Privilege: 3,
                       AuthMode: 2,
                       Subjects: null,
-                      ? Targets # target not valid
-                      : [{ Cluster: null, Endpoint: null, DeviceType: null }],
+                      # Targets contains an invalid target
+                      Targets:
+                          [{ Cluster: null, Endpoint: null, DeviceType: null }],
                   },
               ]
       response:
