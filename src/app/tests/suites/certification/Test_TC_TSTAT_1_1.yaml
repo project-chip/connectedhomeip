@@ -37,9 +37,6 @@ tests:
               type: uint16
 
     - label: "Read the optional global attribute constraints: FeatureMap"
-      PICS:
-          TSTAT.S.F00 || TSTAT.S.F01 || TSTAT.S.F02 || TSTAT.S.F03 ||
-          TSTAT.S.F04 || TSTAT.S.F05
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

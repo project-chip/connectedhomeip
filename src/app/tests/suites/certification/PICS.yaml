@@ -604,12 +604,18 @@ PICS:
     - label: "Does the device implement the ResetWaterMarks command?"
       id: DGSW.S.C00
 
-    # Thermostat cluster
-    - label: "Does the device implement the OccupiedCoolingSetpoint attribute"
-      id: A_OCCUPIEDCOOLINGSETPOINT
+      # Thermostat cluster
+    - label: "Does the device implement the Heating feature"
+      id: TSTAT.S.F00
 
-    - label: "Does the device implement the OccupiedHeatingSetpoint attribute"
-      id: A_OCCUPIEDHEATINGSETPOINT
+    - label: "Does the device implement the Cooling feature"
+      id: TSTAT.S.F01
+
+    - label: "Does the device implement the Occupancy feature"
+      id: TSTAT.S.F02
+
+    - label: "Does the device implement the Auto feature"
+      id: TSTAT.S.F05
 
     - label: "Does the device implement the MinHeatSetpointLimit attribute"
       id: A_MINHEATSETPOINTLIMIT
@@ -623,24 +629,8 @@ PICS:
     - label: "Does the device implement the MaxCoolSetpointLimit attribute"
       id: A_MAXCOOLSETPOINTLIMIT
 
-    - label:
-          "Does the device implement the ControlSequenceOfOperation attribute"
-      id: A_CONTROLSEQUENCEOFOPERATION
-
-    - label:
-          "Does the device implement receiving the SetpointRaiseLower command?"
-      id: CR_SetpointRaiseLower
-
-    - label:
-          "Does the device implement the UnoccupiedCoolingSetpoint attribute?"
-      id: A_UNOCCUPIEDCOOLINGSETPOINT
-
-    - label:
-          "Does the device implement the UnoccupiedHeatingSetpoint attribute?"
-      id: A_UNOCCUPIEDHEATINGSETPOINT
-
-    - label: "Does the device implement the MinSetpointDeadBand attribute?"
-      id: A_MINSETPOINTDEADBAND
+    - label: "Does the device implement the Tolerance attribute?"
+      id: A_TEMPERATURE_TOLERANCE
 
     - label: "Does the device implement the LocalTemperature attribute?"
       id: TSTAT.S.A0000
