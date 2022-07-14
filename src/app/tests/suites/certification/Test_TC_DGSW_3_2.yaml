@@ -27,7 +27,7 @@ tests:
       disabled: true
 
     - label: "TH sends ResetWatermarks to DUT"
-      PICS: DGSW.S.C00
+      PICS: DGSW.S.C00.Rsp
       verification: |
           ./chip-tool softwarediagnostics reset-watermarks 1 0
 

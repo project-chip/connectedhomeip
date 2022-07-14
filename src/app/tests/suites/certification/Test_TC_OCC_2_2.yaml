@@ -29,71 +29,25 @@ tests:
     - label: "DUT reads from the TH the (0x0000) Occupancy attribute"
       PICS: OCC.C.A0000
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read occupancy 1 1
 
-          DUT:
+          Verify in TH all-clusters-app log
 
           [1648461864.548948][9281:9286] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 3082917122
           [1648461864.549008][9281:9286] CHIP:TOO:   occupancy: 0
-
-          TH:
-
-          [1651145623.970719][2336:2336] CHIP:IM: Received Read request
-          [1651145623.970774][2336:2336] CHIP:DMG: ReadRequestMessage =
-          [1651145623.970800][2336:2336] CHIP:DMG: {
-          [1651145623.970821][2336:2336] CHIP:DMG:         AttributePathIBs =
-          [1651145623.970847][2336:2336] CHIP:DMG:         [
-          [1651145623.970871][2336:2336] CHIP:DMG:                 AttributePathIB =
-          [1651145623.970902][2336:2336] CHIP:DMG:                 {
-          [1651145623.970931][2336:2336] CHIP:DMG:                         Endpoint = 0x1,
-          [1651145623.970964][2336:2336] CHIP:DMG:                         Cluster = 0x406,
-          [1651145623.970998][2336:2336] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1651145623.971030][2336:2336] CHIP:DMG:                 }
-          [1651145623.971060][2336:2336] CHIP:DMG:
-          [1651145623.971087][2336:2336] CHIP:DMG:         ],
-          [1651145623.971138][2336:2336] CHIP:DMG:
-          [1651145623.971166][2336:2336] CHIP:DMG:         isFabricFiltered = true,
-          [1651145623.971191][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
-          [1651145623.971214][2336:2336] CHIP:DMG: },
-          [1651145623.971285][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1651145623.971367][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1651145623.971394][2336:2336] CHIP:DMG: <RE:Run> Cluster 406, Attribute 0 is dirty
-          [1651145623.971415][2336:2336] CHIP:DMG: Reading attribute: Cluster=0x0000_0406 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
-          [1651145623.971445][2336:2336] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0406 e=1 p=v
-          [1651145623.971480][2336:2336] CHIP:DMG: AccessControl: allowed
       disabled: true
 
-    - label: "TH reads from the DUT the (0x0001) OccupancySensorType attribute"
+    - label: "DUT reads from the TH the (0x0001) OccupancySensorType attribute"
       PICS: OCC.C.A0001
       verification: |
-          ./chip-tool occupancysensing read occupancy-sensor-type 1 1
+          verify on Reference app receives the right response for the data sent in the below commands
+           ./chip-tool occupancysensing read occupancy-sensor-type 1 1
 
-          DUT:
+          Verify in TH all-clusters-app log
 
           [1648461870.566809][9287:9292] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 3082917122
           [1648461870.566882][9287:9292] CHIP:TOO:   occupancy sensor type: 0
-
-          TH:
-
-          [1651145797.858621][2336:2336] CHIP:IM: Received Read request
-          [1651145797.858677][2336:2336] CHIP:DMG: ReadRequestMessage =
-          [1651145797.858703][2336:2336] CHIP:DMG: {
-          [1651145797.858725][2336:2336] CHIP:DMG:         AttributePathIBs =
-          [1651145797.858753][2336:2336] CHIP:DMG:         [
-          [1651145797.858777][2336:2336] CHIP:DMG:                 AttributePathIB =
-          [1651145797.858808][2336:2336] CHIP:DMG:                 {
-          [1651145797.858838][2336:2336] CHIP:DMG:                         Endpoint = 0x1,
-          [1651145797.858869][2336:2336] CHIP:DMG:                         Cluster = 0x406,
-          [1651145797.858900][2336:2336] CHIP:DMG:                         Attribute = 0x0000_0001,
-          [1651145797.858929][2336:2336] CHIP:DMG:                 }
-          [1651145797.858958][2336:2336] CHIP:DMG:
-          [1651145797.858985][2336:2336] CHIP:DMG:         ],
-          [1651145797.859015][2336:2336] CHIP:DMG:
-          [1651145797.859040][2336:2336] CHIP:DMG:         isFabricFiltered = true,
-          [1651145797.859065][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
-          [1651145797.859088][2336:2336] CHIP:DMG: },
-          [1651145797.859186][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1651145797.859273][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label:
@@ -101,35 +55,14 @@ tests:
           attribute"
       PICS: OCC.C.A0002
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read occupancy-sensor-type-bitmap 1 1
 
-          DUT:
+          Verify in TH all-clusters-app log
+
 
           [1648461876.157687][9293:9298] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0002 DataVersion: 3082917122
           [1648461876.157778][9293:9298] CHIP:TOO:   occupancy sensor type bitmap: 1
-
-          TH:
-
-          [1651145985.006057][2336:2336] CHIP:EM: Handling via exchange: 48378r, Delegate: 0xaaaaaf5c5098
-          [1651145985.006150][2336:2336] CHIP:IM: Received Read request
-          [1651145985.006231][2336:2336] CHIP:DMG: ReadRequestMessage =
-          [1651145985.006259][2336:2336] CHIP:DMG: {
-          [1651145985.006282][2336:2336] CHIP:DMG:         AttributePathIBs =
-          [1651145985.006336][2336:2336] CHIP:DMG:         [
-          [1651145985.006395][2336:2336] CHIP:DMG:                 AttributePathIB =
-          [1651145985.006509][2336:2336] CHIP:DMG:                 {
-          [1651145985.006544][2336:2336] CHIP:DMG:                         Endpoint = 0x1,
-          [1651145985.006580][2336:2336] CHIP:DMG:                         Cluster = 0x406,
-          [1651145985.006616][2336:2336] CHIP:DMG:                         Attribute = 0x0000_0002,
-          [1651145985.006643][2336:2336] CHIP:DMG:                 }
-          [1651145985.006672][2336:2336] CHIP:DMG:
-          [1651145985.006694][2336:2336] CHIP:DMG:         ],
-          [1651145985.006719][2336:2336] CHIP:DMG:
-          [1651145985.006744][2336:2336] CHIP:DMG:         isFabricFiltered = true,
-          [1651145985.006769][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
-          [1651145985.006793][2336:2336] CHIP:DMG: },
-          [1651145985.006860][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1651145985.006952][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label:
@@ -137,7 +70,13 @@ tests:
           optional attribute, if PIR sensor"
       PICS: OCC.C.A0010
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read pir-occupied-to-unoccupied-delay 1 1
+
+          Verify in TH all-clusters-app log
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
@@ -146,75 +85,123 @@ tests:
           optional attribute, if PIR sensor"
       PICS: OCC.C.A0011
       verification: |
-          ./chip-tool occupancysensing read  pir-unoccupied-to-occupied-delay  1 1
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          verify on Reference app receives the right response for the data sent in the below commands
+           ./chip-tool occupancysensing read  pir-unoccupied-to-occupied-delay  1 1
+
+          Verify in TH all-clusters-app log
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0011) PIRUnoccupiedToOccupiedThreshold
+          "DUT reads from the TH the (0x0012) PIRUnoccupiedToOccupiedThreshold
           optional attribute, if PIR sensor"
       PICS: OCC.C.A0012
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read pir-unoccupied-to-occupied-threshold  1 1
+
+          Verify in TH all-clusters-app log
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0010)
+          "DUT reads from the TH the (0x0020)
           UltrasonicOccupiedToUnoccupiedDelay optional attribute, if ultrasonic
           sensor"
       PICS: OCC.C.A0020
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read ultrasonic-occupied-to-unoccupied-delay  1 1
+
+          Verify in TH all-clusters-app log
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0011)
+          "DUT reads from the TH the (0x0021)
           UltrasonicUnoccupiedToOccupiedDelay optional attribute, if ultrasonic
           sensor"
       PICS: OCC.C.A0021
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read  ultrasonic-unoccupied-to-occupied-delay 1 1
+
+          Verify in TH all-clusters-app log
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0011)
+          "DUT reads from the TH the (0x0022)
           UltrasonicUnoccupiedToOccupiedThreshold optional attribute, if
           ultrasonic sensor"
       PICS: OCC.C.A0022
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read ultrasonic-unoccupied-to-occupied-threshold 1 1
+
+          Verify in TH all-clusters-app log
+
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0010)
+          "DUT reads from the TH the (0x0030)
           PhysicalContactOccupiedToUnoccupiedDelay optional attribute, if
           Physical Contact sensor"
       PICS: OCC.C.A0030
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read physical-contact-occupied-to-unoccupied-delay 1 1
+
+          Verify in TH all-clusters-app log
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0011)
+          "DUT reads from the TH the (0x0031)
           PhysicalContactUnoccupiedToOccupiedDelay optional attribute, if
           Physical Contact sensor"
       PICS: OCC.C.A0031
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read physical-contact-unoccupied-to-occupied-delay 1 1
+
+          Verify in TH all-clusters-app log
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
     - label:
-          "DUT reads from the TH the (0x0011)
+          "DUT reads from the TH the (0x0032)
           PhysicalContactUnoccupiedToOccupiedThreshold optional attribute, if
           Physical Contact sensor"
       PICS: OCC.C.A0032
       verification: |
+          This is an Optional attribute, so its not compulsory to get the expected outcome
+
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool occupancysensing read  physical-contact-unoccupied-to-occupied-threshold 1 1
+
+          Verify in TH all-clusters-app log
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
