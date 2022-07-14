@@ -17,7 +17,7 @@
  */
 
 #include "main-common.h"
-#include "event-command-handler.h"
+#include "AllClustersCommandDelegate.h"
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -32,8 +32,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <signal.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
@@ -51,43 +49,16 @@
 
 #include <Options.h>
 
-static constexpr const size_t kChipEventCmdBufSize     = 80;
-static constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_cluster_fifo_";
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 namespace {
-static LowPowerManager lowPowerManager;
-pthread_t gChipEventCommandListener;
-std::string gChipEventFifoPath;
 
-void * EventCommandListenerTask(void * arg)
-{
-    char readbuf[kChipEventCmdBufSize];
-
-    for (;;)
-    {
-        int fd = open(gChipEventFifoPath.c_str(), O_RDONLY);
-        if (fd == -1)
-        {
-            ChipLogError(Zcl, "Failed to open Event FIFO");
-            break;
-        }
-
-        ssize_t readBytes  = read(fd, readbuf, kChipEventCmdBufSize);
-        readbuf[readBytes] = '\0';
-        ChipLogProgress(Zcl, "Received payload: \"%s\" and length is %ld\n", readbuf, readBytes);
-
-        // Process the received command request from event fifo
-        ProcessCommandRequest(readbuf);
-
-        close(fd);
-    }
-
-    return nullptr;
-}
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_cluster_fifo_";
+LowPowerManager sLowPowerManager;
+NamedPipeCommands sChipNamedPipeCommands;
+AllClustersCommandDelegate sAllClustersCommandDelegate;
 
 // TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
 
@@ -271,43 +242,25 @@ void ApplicationInit()
         sEthernetNetworkCommissioningInstance.Init();
     }
 
-    gChipEventFifoPath = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 
-    // Creating the named file(FIFO)
-    if ((mkfifo(gChipEventFifoPath.c_str(), 0666) == -1) && (errno != EEXIST))
+    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Could not create Event FIFO");
-        exit(1);
-    }
-
-    if (pthread_create(&gChipEventCommandListener, nullptr, EventCommandListenerTask, nullptr) != 0)
-    {
-        ChipLogError(Zcl, "Could not create EventCommandListenerTask");
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
     }
 }
 
 void ApplicationExit()
 {
-    if (pthread_cancel(gChipEventCommandListener) != 0)
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to cancel EventCommandListenerTask");
-        exit(1);
-    }
-
-    // Wait further for the thread to terminate if we had previously created it.
-    if (pthread_join(gChipEventCommandListener, nullptr) != 0)
-    {
-        ChipLogError(Zcl, "Failed to terminate EventCommandListenerTask");
-    }
-
-    if (unlink(gChipEventFifoPath.c_str()) != 0)
-    {
-        ChipLogError(Zcl, "Failed to delete Event FIFO");
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
     }
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    ChipLogProgress(NotSpecified, "TV Linux App: LowPower::SetDefaultDelegate");
+    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }
