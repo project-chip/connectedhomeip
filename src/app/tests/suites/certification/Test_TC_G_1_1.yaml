@@ -28,7 +28,7 @@ tests:
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
-          ./chip-tool groups read cluster-revision 1 1 
+          ./chip-tool groups read cluster-revision 1 1
 
           Verify on the TH Log:
 
@@ -38,7 +38,7 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
-          ./chip-tool groups read feature-map 1 1 
+          ./chip-tool groups read feature-map 1 1
 
           Verify on the TH Log:
 
@@ -48,7 +48,7 @@ tests:
 
     - label: "TH reads AttributeList from DUT"
       verification: |
-          ./chip-tool groups read attribute-list 1 1 
+          ./chip-tool groups read attribute-list 1 1
 
           Verify on the TH Log:
 

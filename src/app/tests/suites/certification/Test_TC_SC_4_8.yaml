@@ -28,7 +28,7 @@ tests:
           1. Provision the device using 1st controller chip-tool (as example commissioner) on the raspi (use above instructions)
 
 
-          ./chip-tool pairing onnetwork 2 20202021 
+          ./chip-tool pairing onnetwork 2 20202021
 
           Assigned compressed fabric ID: 0xF3C001637A30CEEC
           Assigned compressed fabric ID: 0xBE320A8460153487
@@ -39,7 +39,7 @@ tests:
       verification: |
           Using your DUT Controller connect to the accessory.
 
-          Below is the example when using chip tool as controller 
+          Below is the example when using chip tool as controller
 
           ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
 
@@ -86,7 +86,7 @@ tests:
 
           ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
 
-          ./chip-tool pairing onnetwork 2 20202021 
+          ./chip-tool pairing onnetwork 2 20202021
 
           Assigned compressed fabric ID: 0xF3C001637A30CEEC
           Assigned compressed fabric ID: 0xBE320A8460153487

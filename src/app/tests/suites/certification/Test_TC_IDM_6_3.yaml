@@ -26,7 +26,7 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
-           
+
           On TH verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
 
 

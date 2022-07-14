@@ -36,13 +36,13 @@ tests:
           [1649229224.437366][22196:22201] CHIP:DMG:                                 {
           [1649229224.437574][22196:22201] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1649229224.437744][22196:22201] CHIP:DMG:                                 },
-          [1649229224.437859][22196:22201] CHIP:DMG:                                 
+          [1649229224.437859][22196:22201] CHIP:DMG:
           [1649229224.438046][22196:22201] CHIP:DMG:                         },
-          [1649229224.438207][22196:22201] CHIP:DMG:                         
+          [1649229224.438207][22196:22201] CHIP:DMG:
           [1649229224.438349][22196:22201] CHIP:DMG:                 },
-          [1649229224.438500][22196:22201] CHIP:DMG:                 
+          [1649229224.438500][22196:22201] CHIP:DMG:
           [1649229224.438640][22196:22201] CHIP:DMG:         ],
-          [1649229224.438790][22196:22201] CHIP:DMG:         
+          [1649229224.438790][22196:22201] CHIP:DMG:
           [1649229224.438857][22196:22201] CHIP:DMG:         InteractionModelRevision = 1
           [1649229224.438998][22196:22201] CHIP:DMG: },
           [1649229224.439236][22196:22201] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0035 Command=0x0000_0000 Status=0x0
@@ -53,7 +53,7 @@ tests:
     - label: "DUT reads OverrunCount attribute from TH"
       PICS: DGTHREAD.C.A0007
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 180 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 180 0
            Verify on the TH Log:
 
           [1649827143.462761][3767:3772] CHIP:DMG:        SuppressResponse = true,

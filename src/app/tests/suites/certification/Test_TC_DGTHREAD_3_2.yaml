@@ -44,7 +44,7 @@ tests:
       PICS: DGTHREAD.C.A0018
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-unicast-count 65 0
-           
+
           Verify on the TH Log:
 
           [1649826032.959906][3511:3516] CHIP:DMG:        SuppressResponse = true,
@@ -72,7 +72,7 @@ tests:
       PICS: DGTHREAD.C.A001a
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 65 0
-           
+
           Verify on the TH Log:
 
           [1649826091.335485][3525:3530] CHIP:DMG:        SuppressResponse = true,
@@ -101,7 +101,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 65 0
           Verify on the TH Log:
-           
+
           [1649826152.539898][3540:3545] CHIP:DMG:        SuppressResponse = true,
           [1649826152.539960][3540:3545] CHIP:DMG:        InteractionModelRevision = 1
           [1649826152.540017][3540:3545] CHIP:DMG: }
@@ -127,7 +127,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 65 0
           Verify on the TH Log:
-           
+
           [1649826215.573121][3553:3558] CHIP:DMG:        SuppressResponse = true,
           [1649826215.573185][3553:3558] CHIP:DMG:        InteractionModelRevision = 1
           [1649826215.573242][3553:3558] CHIP:DMG: }
@@ -153,7 +153,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 65 0
           Verify on the TH Log:
-           
+
           [1649826283.345936][3568:3573] CHIP:DMG:        SuppressResponse = true,
           [1649826283.345998][3568:3573] CHIP:DMG:        InteractionModelRevision = 1
           [1649826283.346055][3568:3573] CHIP:DMG: }
@@ -179,7 +179,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-retry-count 65 0
           Verify on the TH Log:
-           
+
           [1649826365.526774][3584:3589] CHIP:DMG:        SuppressResponse = true,
           [1649826365.526838][3584:3589] CHIP:DMG:        InteractionModelRevision = 1
           [1649826365.526915][3584:3589] CHIP:DMG: }
@@ -244,7 +244,7 @@ tests:
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 65 0
           Verify on the TH Log:
-           
+
           [1649826519.384125][3621:3626] CHIP:DMG:        SuppressResponse = true,
           [1649826519.384189][3621:3626] CHIP:DMG:        InteractionModelRevision = 1
           [1649826519.384269][3621:3626] CHIP:DMG: }

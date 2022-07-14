@@ -28,7 +28,7 @@ tests:
           device for a single attribute of any data type supported."
       verification: |
           In the case of chip tool as a client, here is an example command the client can subscribe to the TH
-           
+
           onoff subscribe on-off  10 80 1 1
 
           On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
@@ -159,7 +159,7 @@ tests:
           Verify DUT is responsds with  status response  for the data sent in the all below commands
           On TH (On the reference app)
 
-          any subscribe-by-id 0x0008 0x0010 10 100  1 1 
+          any subscribe-by-id 0x0008 0x0010 10 100  1 1
           [1657448410.108491][11525:11525] CHIP:EM: Removed CHIP MessageCounter:11055857 from RetransTable on exchange 33616r
           [1657448410.108543][11525:11525] CHIP:DMG: StatusResponseMessage =
           [1657448410.108571][11525:11525] CHIP:DMG: {
@@ -316,7 +316,7 @@ tests:
       verification: |
           In the case of chip tool as a client, here is an example command the client can subscribe to the TH
 
-          onoff  subscribe on-off   10 100  1 
+          onoff  subscribe on-off   10 100  1
           [1657461297.413790][12604:12609] CHIP:DMG: ReportDataMessage =
           [1657461297.413859][12604:12609] CHIP:DMG: {
           [1657461297.413895][12604:12609] CHIP:DMG:      SubscriptionId = 0x4a7b129e,

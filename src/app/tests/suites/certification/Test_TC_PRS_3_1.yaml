@@ -25,7 +25,7 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above commands 
+          verify on Reference app receives the right response for the data sent in the above commands
 
           ./chip-tool pressuremeasurement read measured-value 1 1
 
@@ -42,10 +42,10 @@ tests:
           [1653992317.047657][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992317.047695][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1653992317.047725][2347:2347] CHIP:DMG:                 }
-          [1653992317.047774][2347:2347] CHIP:DMG:                         
+          [1653992317.047774][2347:2347] CHIP:DMG:
           [1653992317.047803][2347:2347] CHIP:DMG:         ],
-          [1653992317.047831][2347:2347] CHIP:DMG:                 
-          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992317.047831][2347:2347] CHIP:DMG:
+          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992317.047884][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992317.047908][2347:2347] CHIP:DMG: },
           [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -65,10 +65,10 @@ tests:
           [1653992385.759781][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992385.759859][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653992385.759918][2347:2347] CHIP:DMG:                 }
-          [1653992385.759971][2347:2347] CHIP:DMG:                         
+          [1653992385.759971][2347:2347] CHIP:DMG:
           [1653992385.760000][2347:2347] CHIP:DMG:         ],
-          [1653992385.760049][2347:2347] CHIP:DMG:                 
-          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992385.760049][2347:2347] CHIP:DMG:
+          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992385.760125][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992385.760168][2347:2347] CHIP:DMG: },
 
@@ -88,10 +88,10 @@ tests:
           [1653992415.580674][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992415.580713][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653992415.580746][2347:2347] CHIP:DMG:                 }
-          [1653992415.580786][2347:2347] CHIP:DMG:                         
+          [1653992415.580786][2347:2347] CHIP:DMG:
           [1653992415.580812][2347:2347] CHIP:DMG:         ],
-          [1653992415.580852][2347:2347] CHIP:DMG:                 
-          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992415.580852][2347:2347] CHIP:DMG:
+          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992415.580913][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992415.580936][2347:2347] CHIP:DMG: },
       disabled: true
@@ -130,7 +130,7 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          verify on Reference app receives the right response for the data sent in the above 
+          verify on Reference app receives the right response for the data sent in the above
 
            ./chip-tool pressuremeasurement read attribute-list  1 1
 
@@ -163,10 +163,10 @@ tests:
           [1653992317.047657][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992317.047695][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1653992317.047725][2347:2347] CHIP:DMG:                 }
-          [1653992317.047774][2347:2347] CHIP:DMG:                         
+          [1653992317.047774][2347:2347] CHIP:DMG:
           [1653992317.047803][2347:2347] CHIP:DMG:         ],
-          [1653992317.047831][2347:2347] CHIP:DMG:                 
-          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992317.047831][2347:2347] CHIP:DMG:
+          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992317.047884][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992317.047908][2347:2347] CHIP:DMG: },
           [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -186,10 +186,10 @@ tests:
           [1653992385.759781][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992385.759859][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653992385.759918][2347:2347] CHIP:DMG:                 }
-          [1653992385.759971][2347:2347] CHIP:DMG:                         
+          [1653992385.759971][2347:2347] CHIP:DMG:
           [1653992385.760000][2347:2347] CHIP:DMG:         ],
-          [1653992385.760049][2347:2347] CHIP:DMG:                 
-          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992385.760049][2347:2347] CHIP:DMG:
+          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992385.760125][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992385.760168][2347:2347] CHIP:DMG: },
 
@@ -209,10 +209,10 @@ tests:
           [1653992415.580674][2347:2347] CHIP:DMG:                         Cluster = 0x403,
           [1653992415.580713][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653992415.580746][2347:2347] CHIP:DMG:                 }
-          [1653992415.580786][2347:2347] CHIP:DMG:                         
+          [1653992415.580786][2347:2347] CHIP:DMG:
           [1653992415.580812][2347:2347] CHIP:DMG:         ],
-          [1653992415.580852][2347:2347] CHIP:DMG:                 
-          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true, 
+          [1653992415.580852][2347:2347] CHIP:DMG:
+          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true,
           [1653992415.580913][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
           [1653992415.580936][2347:2347] CHIP:DMG: },"
       disabled: true
