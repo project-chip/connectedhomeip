@@ -54,6 +54,9 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
     char destStr[Inet::IPAddress::kMaxStringLength];
 #endif
 
+    if (ep->mState == State::kClosed)
+        return;
+
     if (msgLen > System::PacketBuffer::kMaxSizeWithoutReserve)
     {
         ChipLogError(Inet, "UDP message too long, discarding. Size received %d", msgLen);
@@ -258,6 +261,19 @@ void UDPEndPointImplOT::CloseImpl()
     if (otUdpIsOpen(mOTInstance, &mSocket))
     {
         otUdpClose(mOTInstance, &mSocket);
+
+        // In case that there is a UDPEndPointImplOT::handleUdpReceive event
+        // pending in the event queue (SystemLayer::ScheduleLambda), we
+        // schedule a release call to the end of the queue, to ensure that the
+        // queued pointer to UDPEndPointImplOT is not dangling.
+        Retain();
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
+            // There is nothing we can do here, accept the chance of racing
+            Release();
+        }
     }
     UnlockOpenThread();
 }
