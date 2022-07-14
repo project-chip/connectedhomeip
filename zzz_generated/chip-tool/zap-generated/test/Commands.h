@@ -53274,10 +53274,8 @@ private:
                 listHolder_0->mList[0].fabricIndex = 1U;
 
                 listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(6);
-                listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
-                listHolder_0->mList[1].subjects.SetNonNull();
-
-                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>();
+                listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+                listHolder_0->mList[1].subjects.SetNull();
                 listHolder_0->mList[1].targets.SetNull();
                 listHolder_0->mList[1].fabricIndex = 1U;
 

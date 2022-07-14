@@ -93,9 +93,9 @@ tests:
                   },
                   {
                       FabricIndex: 1,
-                      Privilege: 6, # INVALID
-                      AuthMode: 3, # Group
-                      Subjects: [],
+                      Privilege: 6,
+                      AuthMode: 2,
+                      Subjects: null,
                       Targets: null,
                   },
               ]
