@@ -178,13 +178,11 @@ void AmebaOTAImageProcessor::HandleAbort(intptr_t context)
     // Abort OTA procedure
 #if defined(CONFIG_PLATFORM_8721D)
     ChipLogProgress(SoftwareUpdate, "Erasing target partition...");
-    erase_ota_target_flash(imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr,
-                           imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgLen);
+    erase_ota_target_flash(imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr, imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgLen);
     ChipLogProgress(SoftwareUpdate, "Erased partition OTA%d", imageProcessor->ota_target_index + 1);
 #elif defined(CONFIG_PLATFORM_8710C)
     ChipLogProgress(SoftwareUpdate, "Erasing partition");
-    imageProcessor->NewFWBlkSize =
-        ((0x1AC000 - 1) / 4096) + 1; // Use a fixed image length of 0x1AC000, change in the future
+    imageProcessor->NewFWBlkSize = ((0x1AC000 - 1) / 4096) + 1; // Use a fixed image length of 0x1AC000, change in the future
     ChipLogProgress(SoftwareUpdate, "Erasing %d sectors", imageProcessor->NewFWBlkSize);
     device_mutex_lock(RT_DEV_LOCK_FLASH);
     for (int i = 0; i < imageProcessor->NewFWBlkSize; i++)
