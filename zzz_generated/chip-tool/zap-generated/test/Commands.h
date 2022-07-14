@@ -781,7 +781,7 @@ private:
             }
             break;
         case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -802,7 +802,7 @@ private:
             }
             break;
         case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -823,7 +823,7 @@ private:
             }
             break;
         case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -844,7 +844,7 @@ private:
             }
             break;
         case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -865,7 +865,7 @@ private:
             }
             break;
         case 13:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -886,7 +886,7 @@ private:
             }
             break;
         case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 1));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
