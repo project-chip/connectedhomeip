@@ -328,9 +328,9 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
+        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor()));
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
-        MatterPostCommandReceivedCallback(concretePath);
+        MatterPostCommandReceivedCallback(concretePath, GetSubjectDescriptor());
     }
 
 exit:
@@ -432,12 +432,11 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                 continue;
             }
         }
-
-        if ((err = MatterPreCommandReceivedCallback(concretePath)) == CHIP_NO_ERROR)
+        if ((err = MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
-            MatterPostCommandReceivedCallback(concretePath);
+            MatterPostCommandReceivedCallback(concretePath, GetSubjectDescriptor());
         }
         else
         {
@@ -675,8 +674,10 @@ void CommandHandler::Abort()
 } // namespace app
 } // namespace chip
 
-CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath)
+CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                                                  const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     return CHIP_NO_ERROR;
 }
-void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath) {}
+void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                                             const chip::Access::SubjectDescriptor & subjectDescriptor) {}
