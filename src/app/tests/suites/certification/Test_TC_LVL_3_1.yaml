@@ -111,7 +111,7 @@ tests:
               type: uint16
 
     - label: "sends a Move to level command"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0010
+      PICS: LVL.S.C00.Rsp && LVL.S.M.VarRate
       command: "MoveToLevel"
       arguments:
           values:
@@ -170,14 +170,14 @@ tests:
                 value: 1000
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 64
 
     - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "MoveToLevel"
       arguments:
           values:

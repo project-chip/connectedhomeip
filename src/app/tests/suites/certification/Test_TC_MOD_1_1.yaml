@@ -37,12 +37,22 @@ tests:
               type: uint16
 
     - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS: MOD.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 1
           constraints:
-              type: map8
+              type: map32
+
+    - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS: " !MOD.S.F00 "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
 
     - label: "TH reads the AttributeList attribute from the DUT"
       command: "readAttribute"
@@ -51,6 +61,27 @@ tests:
           constraints:
               type: list
               contains: [0, 1, 2, 3, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "TH reads the optional attribute(StartUpMode) in AttributeList from
+          the DUT"
+      PICS: MOD.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label:
+          "TH reads the optional attribute(OnMode) in AttributeList from the DUT"
+      PICS: MOD.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
