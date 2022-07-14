@@ -29,24 +29,25 @@ tests:
                 value: nodeId
 
     - label: "Constraint error: PASE reserved for future"
+      cluster: "Access Control"
       command: "writeAttribute"
-      attribute: "acl"
+      attribute: "ACL"
       arguments:
           value:
               [
                   {
-                      fabricIndex: 1,
-                      privilege: 5,
-                      authMode: 2,
-                      subjects: [112233],
-                      targets: null,
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
                   },
                   {
-                      fabricIndex: 1,
-                      privilege: 3,
-                      authMode: 1,
-                      subjects: [],
-                      targets: null,
+                      FabricIndex: 1,
+                      Privilege: 3,
+                      AuthMode: 1,  # PASE
+                      Subjects: [],
+                      Targets: null,
                   },
               ]
       response:
