@@ -24,16 +24,17 @@ namespace chip {
 namespace Messaging {
 
 /** @brief
- *      This provides a wrapper around ExchangeContext that automatically manages
- *      cleaning up the EC without any extra involvement. This is meant to be used
- *      by application and protocol logic code that would otherwise need to closely
- *      manange their internal pointers to an ExchangeContext and correctly
+ *      This provides a RAII'fied wrapper for an ExchangeContext that automatically manages
+ *      cleaning up the EC when the holder ceases to exist, or acquires a new exchange. This is
+ *      meant to be used by application and protocol logic code that would otherwise need to closely
+ *      manage their internal pointers to an ExchangeContext and correctly
  *      null-it out/abort it depending on the circumstances. This relies on clear rules
  *      established by ExchangeContext and the transfer of ownership at various points
  *      in its lifetime.
  *
- *      It does this by listening in on OnExchangeClosing and looking at the various
- *      states the exchange might be in to decide amongst a couple of different tactics.
+ *      It does this by intercepting OnExchangeClosing and looking at the various
+ *      states the exchange might be in to decide how best to correctly shutdown the exchange.
+ *      (see AbortIfNeeded()).
  *
  *      This is a delegate forwarder - consumers can still register to be an ExchangeDelegate
  *      and get notified of all relevant happenings on that delegate interface.
@@ -42,37 +43,60 @@ namespace Messaging {
 class ExchangeHolder : public ExchangeDelegate
 {
 public:
+    /**
+     * @brief
+     *
+     * Constructor that takes an ExchangeDelegate that is forwarded all relevant
+     * calls from the underlying exchange.
+     */
     ExchangeHolder(ExchangeDelegate & delegate) : mpExchangeDelegate(delegate) {}
 
-    virtual ~ExchangeHolder() { AbortIfNeeded(); }
+    virtual ~ExchangeHolder() { Release(); }
 
     bool Contains(const ExchangeContext * exchange) const { return mpExchangeCtx == exchange; }
 
-    /*
-     *  Aborts any previously tracked exchange and
-     *  re-acquires the provided exchange. As part of that,
-     *  this will set itself as the delegate on that exchange (and forward
-     *  calls to the registered delegate on this object).
+    /**
+     * @brief
      *
+     * Replaces the held exchange and associated delegate to instead track the given ExchangeContext, aborting
+     * and dereferencing any previously held exchange as necessary. This method should be called whenever protocol logic
+     * that is managing this holder is transitioning from an outdated Exchange to a new one, often during
+     * the start of a new transaction.
      */
     void Grab(ExchangeContext * exchange)
     {
-        AbortIfNeeded();
+        Release();
 
         mpExchangeCtx = exchange;
         mpExchangeCtx->SetDelegate(this);
     }
 
     /*
-     *  Releases any previously tracked exchanges by nulling
-     *  out ourselves as a delegate and then, our reference to that
-     *  exchange
+     * @brief
+     *
+     * This shuts down the exchange (if a valid one is being tracked) and releases our reference to it.
      */
     void Release()
     {
         if (mpExchangeCtx)
         {
             mpExchangeCtx->SetDelegate(nullptr);
+
+            /**
+             * Shutting down the exchange requires calling Abort() on the exchange selectively in the following scenarios:
+             *      1. The exchange is currently awaiting a response. This would have happened if our consumer just sent a message
+             * on the exchange and is awaiting a response. Since we no longer have an interest in this exchange anymore, we should
+             * abort it to release our reference.
+             *
+             *      2. Our consumer has signaled an interest in sending a message. This could have been signaled right at exchange
+             * creation time as the initiator, or when handling a message and the consumer intends to send a response, albeit,
+             * asynchronously. In both cases, the stack expects the exchange consumer to close/abort the EC if it no longer has
+             * interest in it.
+             */
+            if (mpExchangeCtx->IsResponseExpected() || mpExchangeCtx->IsSendExpected())
+            {
+                mpExchangeCtx->Abort();
+            }
         }
 
         mpExchangeCtx = nullptr;
@@ -88,32 +112,6 @@ public:
     }
 
 private:
-    /*
-     * This asseses if an Abort() needs to be called on the exchange. This method is only called when the holder itself
-     * is being destroyed and it's still holding onto to a reference to an exchange. It then calls Abort() only if:
-     *      1. The exchange is currently awaiting a response. This would have happened if our consumer just sent a message on the
-     * exchange and is awaiting a response. Consequently, we should go ahead and Abort() it given destruction of the holder
-     * indicates a lack of further interest in this exchange.
-     *
-     *      2. Our consumer has signaled an interest in sending a message. This could have been signaled right at exchange creation
-     * time as the initiator, or when handling a message and the consumer intends to send a response, albeit, asynchronously.
-     *
-     */
-    void AbortIfNeeded()
-    {
-        if (mpExchangeCtx)
-        {
-            mpExchangeCtx->SetDelegate(nullptr);
-
-            if (mpExchangeCtx->IsResponseExpected() || mpExchangeCtx->IsSendExpected())
-            {
-                mpExchangeCtx->Abort();
-            }
-        }
-
-        mpExchangeCtx = nullptr;
-    }
-
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override
     {
@@ -124,7 +122,12 @@ private:
 
     void OnExchangeClosing(ExchangeContext * ec) override
     {
-        Release();
+        if (mpExchangeCtx)
+        {
+            mpExchangeCtx->SetDelegate(nullptr);
+            mpExchangeCtx = nullptr;
+        }
+
         mpExchangeDelegate.OnExchangeClosing(ec);
     }
 
