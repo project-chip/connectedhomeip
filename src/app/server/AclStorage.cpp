@@ -52,7 +52,7 @@ CHIP_ERROR Convert(AuthMode from, StagingAuthMode & to)
         to = StagingAuthMode::kGroup;
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     return CHIP_NO_ERROR;
 }
@@ -71,7 +71,7 @@ CHIP_ERROR Convert(StagingAuthMode from, AuthMode & to)
         to = AuthMode::kGroup;
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     return CHIP_NO_ERROR;
 }
@@ -96,7 +96,7 @@ CHIP_ERROR Convert(Privilege from, StagingPrivilege & to)
         to = StagingPrivilege::kAdminister;
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     return CHIP_NO_ERROR;
 }
@@ -142,7 +142,7 @@ CHIP_ERROR Convert(NodeId from, StagingSubject & to)
     }
     else
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     return CHIP_NO_ERROR;
 }
@@ -163,7 +163,7 @@ CHIP_ERROR Convert(StagingSubject from, NodeId & to)
         to = NodeIdFromGroupId(static_cast<GroupId>(from.nodeId));
         break;
     default:
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     return CHIP_NO_ERROR;
 }
