@@ -48,14 +48,12 @@ constexpr uint8_t kUpdateTokenLen = 32;
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
         _selectedCandidate.updateToken = [self generateUpdateToken];
         if (params.requestorCanConsent.integerValue == 1) {
-            _selectedCandidate.userConsentNeeded = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
+            _selectedCandidate.userConsentNeeded
+                = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
             NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
-        }
-        else
-        {
+        } else {
             NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState);
-            switch (_userConsentState)
-            {
+            switch (_userConsentState) {
             case OTAProviderUserGranted:
                 NSLog(@"User Consent Granted");
                 _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
@@ -74,12 +72,13 @@ constexpr uint8_t kUpdateTokenLen = 32;
             }
             _selectedCandidate.status = @(_queryImageStatus);
         }
-    }
-    else
-    {
+    } else {
         NSLog(@"Unable to select OTA Image.");
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
-        error = [[NSError alloc] initWithDomain:@"OTAProviderDomain" code:MTRErrorCodeInvalidState userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unable to select Candidate.", nil) }];
+        error = [[NSError alloc]
+            initWithDomain:@"OTAProviderDomain"
+                      code:MTRErrorCodeInvalidState
+                  userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Unable to select Candidate.", nil) }];
     }
     completionHandler(_selectedCandidate, error);
 }
@@ -88,7 +87,8 @@ constexpr uint8_t kUpdateTokenLen = 32;
                completionHandler:(void (^_Nonnull)(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
 {
-    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponsePrams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
+    MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * applyUpdateResponsePrams =
+        [[MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
     applyUpdateResponsePrams.action = @(MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed);
     completionHandler(applyUpdateResponsePrams, nil);
 }
@@ -128,10 +128,8 @@ constexpr uint8_t kUpdateTokenLen = 32;
                 [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue])
             && ([requestorSoftwareVersion unsignedLongValue] <=
                 [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue])
-            && ([requestorVendorID unsignedIntValue] ==
-                [candidate.deviceModelData.vendorId unsignedIntValue])
-            && ([requestorProductID unsignedIntValue] ==
-                [candidate.deviceModelData.productId unsignedIntValue])) {
+            && ([requestorVendorID unsignedIntValue] == [candidate.deviceModelData.vendorId unsignedIntValue])
+            && ([requestorProductID unsignedIntValue] == [candidate.deviceModelData.productId unsignedIntValue])) {
             candidateFound = true;
             _selectedCandidate = candidate;
             _selectedCandidate.imageURI = [NSString

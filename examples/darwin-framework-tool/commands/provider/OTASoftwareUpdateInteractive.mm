@@ -161,7 +161,7 @@ CHIP_ERROR OTASoftwareUpdateBase::SetUserConsentStatus(char * _Nonnull otaSTatus
     } else if (strcmp(otaSTatus, "denied") == 0) {
         mOTADelegate.userConsentState = OTAProviderUserDenied;
     } else {
-         ChipLogError(chipTool, "Only accepts the following: granted, obtaining, and denied.");
+        ChipLogError(chipTool, "Only accepts the following: granted, obtaining, and denied.");
         error = CHIP_ERROR_INTERNAL;
     }
     return error;
