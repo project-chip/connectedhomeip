@@ -348,7 +348,7 @@ tests:
                   },
               ]
       response:
-          error: CONSTRAINT_ERROR
+          error: FAILURE
 
     - label: "Verify"
       command: "readAttribute"
@@ -407,7 +407,7 @@ tests:
                   },
               ]
       response:
-          error: CONSTRAINT_ERROR
+          error: FAILURE
 
     - label: "Verify"
       command: "readAttribute"
