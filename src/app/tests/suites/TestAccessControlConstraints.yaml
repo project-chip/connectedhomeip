@@ -147,9 +147,9 @@ tests:
                       FabricIndex: 1,
                       Privilege: 3,
                       AuthMode: 2,
-                      Subjects: [0],
+                      Subjects: [0], # invalid subject
                       Targets: null,
-                  }, # invalid subject
+                  },
               ]
       response:
           error: CONSTRAINT_ERROR
@@ -171,8 +171,8 @@ tests:
                       FabricIndex: 1,
                       Privilege: 3,
                       AuthMode: 2,
-                      Subjects: null, # invalid subject
-                      Targets:
+                      Subjects: null, 
+                      Targets: # target not valid
                           [{ Cluster: null, Endpoint: null, DeviceType: null }],
                   },
               ]
