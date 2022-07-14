@@ -199,6 +199,7 @@ public:
         printf("TestConfigVariables\n");
         printf("TestDescriptorCluster\n");
         printf("TestBasicInformation\n");
+        printf("TestFabricRemovalWhileSubscribed\n");
         printf("TestGeneralCommissioning\n");
         printf("TestIdentifyCluster\n");
         printf("TestOperationalCredentialsCluster\n");
@@ -50269,6 +50270,179 @@ private:
     }
 };
 
+class TestFabricRemovalWhileSubscribedSuite : public TestCommand
+{
+public:
+    TestFabricRemovalWhileSubscribedSuite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestFabricRemovalWhileSubscribed", 8, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("payload", &mPayload);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~TestFabricRemovalWhileSubscribedSuite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
+    chip::Optional<chip::CharSpan> mPayload;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::FabricIndex ourFabricIndex;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("commissionedFabrics", value, 1U));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::FabricIndex value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                ourFabricIndex = value;
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                    value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read number of commissioned fabrics");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                                 OperationalCredentials::Attributes::CommissionedFabrics::Id, true, chip::NullOptional);
+        }
+        case 2: {
+            LogStep(2, "Read current fabric index");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                                 OperationalCredentials::Attributes::CurrentFabricIndex::Id, true, chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "Open commissioning window from alpha");
+            ListFreer listFreer;
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
+            value.commissioningTimeout = 180U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 4: {
+            LogStep(4, "Commission from beta");
+            ListFreer listFreer;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
+            value.nodeId  = 74565ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            return PairWithCode(kIdentityBeta, value);
+        }
+        case 5: {
+            LogStep(5, "Wait for the commissioned device to be retrieved for beta");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = 74565ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
+        }
+        case 6: {
+            LogStep(6, "Subscribe Fabrics Attribute from beta");
+            return SubscribeAttribute(kIdentityBeta, GetEndpoint(0), OperationalCredentials::Id,
+                                      OperationalCredentials::Attributes::Fabrics::Id, 2, 5, true, chip::NullOptional,
+                                      chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Remove single own fabric");
+            ListFreer listFreer;
+            chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type value;
+            value.fabricIndex = ourFabricIndex;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                               OperationalCredentials::Commands::RemoveFabric::Id, value, chip::NullOptional
+
+            );
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class TestGeneralCommissioningSuite : public TestCommand
 {
 public:
@@ -87631,6 +87805,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestConfigVariablesSuite>(credsIssuerConfig),
         make_unique<TestDescriptorClusterSuite>(credsIssuerConfig),
         make_unique<TestBasicInformationSuite>(credsIssuerConfig),
+        make_unique<TestFabricRemovalWhileSubscribedSuite>(credsIssuerConfig),
         make_unique<TestGeneralCommissioningSuite>(credsIssuerConfig),
         make_unique<TestIdentifyClusterSuite>(credsIssuerConfig),
         make_unique<TestOperationalCredentialsClusterSuite>(credsIssuerConfig),
