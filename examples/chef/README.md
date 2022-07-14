@@ -91,7 +91,7 @@ execute builds for all devices specified in `ci_allow_list` defined in
 `cicd_config.json` (so long as these devices are also in `/devices`) on the
 specified platform.
 
-CI jos also call the function `bundle_$PLATFORM` at the end of each example
+CI jobs also call the function `bundle_$PLATFORM` at the end of each example
 build. This function should copy or move build output files from the build
 output location into `_CD_STAGING_DIR`. Typically, the set of files touched is
 the minimal set of files needed to flash a device. See the function
@@ -208,7 +208,7 @@ source ./scripts/activate.sh
 ./examples/chef/chef.py --build_all --keep_going
 ```
 
-You may also use the GCB local builder as detailed in the `README` of
+You may also use the Google Cloud Build local builder as detailed in the `README` of
 `integrations/cloudbuild/`.
 
 ## Adding new devices
