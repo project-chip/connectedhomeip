@@ -20,8 +20,8 @@
  *          Open IOT SDK platform adaptation file
  */
 
-#include "cmsis_os2.h"
 #include <time.h>
+#include "OpenIoTSDKArchUtils.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -50,7 +50,7 @@ void SetTick(uint64_t newTick)
 }
 
 /* Time to kernel ticks */
-static uint32_t ms2tick(uint32_t ms)
+uint32_t ms2tick(uint32_t ms)
 {
     if (ms == 0U) {
         return (osWaitForever);
@@ -67,7 +67,7 @@ static uint32_t ms2tick(uint32_t ms)
     return (ms);
 }
 
-static uint32_t us2tick(uint32_t usec)
+uint32_t us2tick(uint32_t usec)
 {
     if (usec == 0U) {
         return osWaitForever;

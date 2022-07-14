@@ -28,6 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "OpenIoTSDKArchUtils.h"
 #include "cmsis_os2.h"
 
 namespace chip {
@@ -43,9 +44,6 @@ ClockImpl gClockImpl;
 const uint32_t TICKS_PER_SECOND = osKernelGetTickFreq();
 const uint32_t US_PER_TICK      = 1000000 / TICKS_PER_SECOND;
 const uint32_t MS_PER_TICK      = US_PER_TICK / 1000;
-
-extern "C" uint64_t GetTick(void);
-extern "C" void SetTick(uint64_t newTick);
 
 Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
