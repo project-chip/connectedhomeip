@@ -36,6 +36,6 @@ static_library("access") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
-    "${chip_root}/src/protocols:im_status", # For protocol error codes
+    "${chip_root}/src/protocols:im_status",  # For protocol error codes
   ]
 }
