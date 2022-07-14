@@ -15,13 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "AccessControl.h"
 
 // Included for the default AccessControlDelegate logging enables/disables.
 // See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
 // the levels available.
 #include <app/AppBuildConfig.h>
-
-#include "AccessControl.h"
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace {
 
@@ -204,7 +204,7 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 
     VerifyOrReturnError((count + 1) <= maxCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!IsValid(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
     size_t i = 0;
     ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
@@ -319,7 +319,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+                            (result == CHIP_NO_ERROR)                  ? "allowed"
+                                : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied"
+                                                                       : "error");
 #else
             if (result != CHIP_NO_ERROR)
             {
