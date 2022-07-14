@@ -30,7 +30,7 @@ tests:
 
     #issue #13648
     - label: "Sends ResetCounts command"
-      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.C00
+      PICS: PICS_SKIP_SAMPLE_APP && DGETH.S.C00.Rsp
       command: "ResetCounts"
 
     - label: "Read the PacketRxCount attribute"

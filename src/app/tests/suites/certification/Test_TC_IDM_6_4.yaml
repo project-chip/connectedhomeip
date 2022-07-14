@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    21.6.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH.
+    3.6.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH.
     [{DUT_Client}]
 
 config:
@@ -26,52 +26,64 @@ tests:
     - label:
           "DUT sends Subscribe Request Message to the TH for a supported event."
       verification: |
-          sudo  ./chip-tool basic subscribe-event start-up 100 1000 1 0
-          [1655981582.711841][1637:1637] CHIP:IM: Received Subscribe request
-          [1655981582.712024][1637:1637] CHIP:DMG: SubscribeRequestMessage =
-          [1655981582.712110][1637:1637] CHIP:DMG: {
-          [1655981582.712167][1637:1637] CHIP:DMG:         KeepSubscriptions = false,
-          [1655981582.712231][1637:1637] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1655981582.712316][1637:1637] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1655981582.712375][1637:1637] CHIP:DMG:         EventPathIBs =
-          [1655981582.712458][1637:1637] CHIP:DMG:         [
-          [1655981582.712516][1637:1637] CHIP:DMG:                 EventPath =
-          [1655981582.712601][1637:1637] CHIP:DMG:                 {
-          [1655981582.712668][1637:1637] CHIP:DMG:                         Endpoint = 0x0,
-          [1655981582.712764][1637:1637] CHIP:DMG:                         Cluster = 0x28,
-          [1655981582.712860][1637:1637] CHIP:DMG:                         Event = 0x0,
-          [1655981582.712930][1637:1637] CHIP:DMG:                 },
-          [1655981582.713020][1637:1637] CHIP:DMG:
-          [1655981582.713079][1637:1637] CHIP:DMG:         ],
-          [1655981582.713125][1637:1637] CHIP:DMG:
-          [1655981582.713149][1637:1637] CHIP:DMG:         isFabricFiltered = true,
-          [1655981582.713182][1637:1637] CHIP:DMG:         InteractionModelRevision = 1
-          [1655981582.713205][1637:1637] CHIP:DMG: },
-          [1655981582.713270][1637:1637] CHIP:DMG: Final negotiated min/max parameters: Min = 100s, Max = 1000s
-          [1655981582.713359][1637:1637] CHIP:DMG: IM RH moving to [GeneratingReports]
+          The cluster used in the below command is an example, User can use any supported chip cluster.
+          basic subscribe-event start-up 10 100 1 0
+
+          On TH (On the reference app), On reference app verify that  the subscription message received has the all fields which mentioned in expected outcome
+
+          colId (0, 1) and MessageCounter:190733237 on exchange 33689r
+          [1657455555.193832][11525:11525] CHIP:EM: Handling via exchange: 33689r, Delegate: 0xaaaae00c1430
+          [1657455555.193912][11525:11525] CHIP:IM: Received Subscribe request
+          [1657455555.194063][11525:11525] CHIP:IM: Deleting previous subscription from NodeId: 000000000001B669, FabricIndex: 1
+          [1657455555.194186][11525:11525] CHIP:DMG: SubscribeRequestMessage =
+          [1657455555.194252][11525:11525] CHIP:DMG: {
+          [1657455555.194312][11525:11525] CHIP:DMG:      KeepSubscriptions = false,
+          [1657455555.194395][11525:11525] CHIP:DMG:      MinIntervalFloorSeconds = 0xa,
+          [1657455555.194461][11525:11525] CHIP:DMG:      MaxIntervalCeilingSeconds = 0x64,
+          [1657455555.194522][11525:11525] CHIP:DMG:      EventPathIBs =
+          [1657455555.194586][11525:11525] CHIP:DMG:      [
+          [1657455555.194646][11525:11525] CHIP:DMG:              EventPath =
+          [1657455555.194708][11525:11525] CHIP:DMG:              {
+          [1657455555.194776][11525:11525] CHIP:DMG:                      Endpoint = 0x0,
+          [1657455555.194853][11525:11525] CHIP:DMG:                      Cluster = 0x28,
+          [1657455555.194931][11525:11525] CHIP:DMG:                      Event = 0x0,
+          [1657455555.195002][11525:11525] CHIP:DMG:              },
+          [1657455555.195075][11525:11525] CHIP:DMG:
+          [1657455555.195135][11525:11525] CHIP:DMG:      ],
+          [1657455555.195202][11525:11525] CHIP:DMG:
+          [1657455555.195263][11525:11525] CHIP:DMG:      isFabricFiltered = true,
+          [1657455555.195325][11525:11525] CHIP:DMG:      InteractionModelRevision = 1
+          [1657455555.195382][11525:11525] CHIP:DMG: },
+          [1657455555.195593][11525:11525] CHIP:DMG: Final negotiated min/max parameters: Min = 10s, Max = 100s
+          [1657455555.195766][11525:11525] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657455555.195955][11525:11525] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label:
           "DUT sends Subscribe Request Message to the TH. TH sends Report Data
           message to DUT."
       verification: |
-          sudo ./chip-tool basic subscribe-event-by-id 0x000 20 400 1 0
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          [1655981705.663905][1637:1637] CHIP:EM: Removed CHIP MessageCounter:153423939 from RetransTable on exchange 36114r
-          [1655981705.663961][1637:1637] CHIP:DMG: StatusResponseMessage =
-          [1655981705.663988][1637:1637] CHIP:DMG: {
-          [1655981705.664011][1637:1637] CHIP:DMG:         Status = 0x00 (SUCCESS),
-          [1655981705.664046][1637:1637] CHIP:DMG:         InteractionModelRevision = 1
-          [1655981705.664069][1637:1637] CHIP:DMG: }
-          [1655981705.664104][1637:1637] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
-          [1655981705.664150][1637:1637] CHIP:DMG: Refresh Subscribe Sync Timer with max 400 seconds
+          basic subscribe-event-by-id 0x000 20 400 1 0
+          Verify DUT is responsds with  status response  for the data sent in the above command
+          On TH (On the reference app)
+          6 from Retrans Table on exchange 33690r
+          [1657455691.695355][11525:11525] CHIP:EM: Removed CHIP MessageCounter:11056066 from RetransTable on exchange 33690r
+          [1657455691.695430][11525:11525] CHIP:DMG: StatusResponseMessage =
+          [1657455691.695483][11525:11525] CHIP:DMG: {
+          [1657455691.695510][11525:11525] CHIP:DMG:      Status = 0x00 (SUCCESS),
+          [1657455691.695549][11525:11525] CHIP:DMG:      InteractionModelRevision = 1
+          [1657455691.695574][11525:11525] CHIP:DMG: }
+          [1657455691.695600][11525:11525] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+          [1657455691.695643][11525:11525] CHIP:DMG: Refresh Subscribe Sync Timer with max 400 seconds
       disabled: true
 
     - label:
           "DUT sends Subscribe Request Message to the TH and TH does not respond
           with Report Data message to DUT."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test. his test step to be removed from the manual execution.
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
 
     - label:
@@ -79,14 +91,14 @@ tests:
           message to DUT. DUT sends Status Response Message to the TH. TH does
           not respond with Subscribe Response message to DUT."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test. This test step to be removed from the manual execution.
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
 
     - label:
           "With an active Event subscription from DUT to TH, TH sends Report
           Data message to DUT with an inactive SubscriptionId."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test.This test step to be removed from the manual execution.
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
 
     - label:
@@ -94,63 +106,5 @@ tests:
           Data message to DUT after the maximum interval from the last Report
           Data."
       verification: |
-          This is not testable in normal scenario, and needs to be tested as part of Unit test. This test step to be removed from the manual execution.
-      disabled: true
-
-    - label:
-          "DUT sends Subscribe Request Message to TH with EventRequests set to a
-          specific event. Once the subscription is active, reboot the DUT. On
-          the TH, perform actions to trigger the event. (Trigger it multiple
-          times). DUT resubscribes to the same event after bootup to the TH."
-      verification: |
-          ./chip-tool softwarediagnostics read-event software-fault 1 0
-
-          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true,
-          [1655375196.291478][35133:35138] CHIP:DMG:         InteractionModelRevision = 1
-          [1655375196.291527][35133:35138] CHIP:DMG: }
-          [1655375196.291829][35133:35138] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1655375196.291882][35133:35138] CHIP:TOO:          Event number: 6
-          [1655375196.291931][35133:35138] CHIP:TOO:          Priority: Info
-          [1655375196.291978][35133:35138] CHIP:TOO:          Timestamp: 6164894
-          [1655375196.292119][35133:35138] CHIP:TOO:   SoftwareFault: {
-          [1655375196.292173][35133:35138] CHIP:TOO:     SoftwareFault: {
-          [1655375196.292235][35133:35138] CHIP:TOO:       Id: 2677
-          [1655375196.292287][35133:35138] CHIP:TOO:       Name: 2677
-          [1655375196.292341][35133:35138] CHIP:TOO:       FaultRecording: 546875204A756E2031362031303A32363A313420323032320A
-          [1655375196.292391][35133:35138] CHIP:TOO:      }
-          [1655375196.292438][35133:35138] CHIP:TOO:    }
-
-
-          Provision DUT and TH.
-
-          To generate the software fault event, execute the following
-          1. Get the PID of the DUT & KIll it .
-                      ps  -aef|grep all-clusters-app
-                      sudo kill -SIGUSR1 <PID of DUT>
-
-          After killing the DUT , you may observe the following log in the DUT
-
-          [1655198519.293098][2883:2883] CHIP:ZCL: SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected
-          [1655198519.293180][2883:2883] CHIP:EVL: LogEvent event number: 0x0000000000010006 priority: 1, endpoint id:  0x0 cluster id: 0x0000_0034 event id: 0x0 Sys timestamp: 0x00000000010DDA64
-
-
-
-          On  TH Send the below command
-
-          ./chip-tool softwarediagnostics read-event software-fault 1 0
-
-          [1655375196.291424][35133:35138] CHIP:DMG:         SuppressResponse = true,
-          [1655375196.291478][35133:35138] CHIP:DMG:         InteractionModelRevision = 1
-          [1655375196.291527][35133:35138] CHIP:DMG: }
-          [1655375196.291829][35133:35138] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1655375196.291882][35133:35138] CHIP:TOO:          Event number: 6
-          [1655375196.291931][35133:35138] CHIP:TOO:          Priority: Info
-          [1655375196.291978][35133:35138] CHIP:TOO:          Timestamp: 6164894
-          [1655375196.292119][35133:35138] CHIP:TOO:   SoftwareFault: {
-          [1655375196.292173][35133:35138] CHIP:TOO:     SoftwareFault: {
-          [1655375196.292235][35133:35138] CHIP:TOO:       Id: 2677
-          [1655375196.292287][35133:35138] CHIP:TOO:       Name: 2677
-          [1655375196.292341][35133:35138] CHIP:TOO:       FaultRecording: 546875204A756E2031362031303A32363A313420323032320A
-          [1655375196.292391][35133:35138] CHIP:TOO:      }
-          [1655375196.292438][35133:35138] CHIP:TOO:    }
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
