@@ -27,12 +27,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace PowerConfiguration {
-} // namespace PowerConfiguration
-
-namespace DeviceTemperatureConfiguration {
-} // namespace DeviceTemperatureConfiguration
-
 namespace Identify {
 
 // Need to convert consumers to using the new enum classes, so we
@@ -208,73 +202,8 @@ enum class LevelControlFeature : uint32_t
 };
 } // namespace LevelControl
 
-namespace Alarms {
-} // namespace Alarms
-
-namespace Time {
-} // namespace Time
-
 namespace BinaryInputBasic {
 } // namespace BinaryInputBasic
-
-namespace PowerProfile {
-} // namespace PowerProfile
-
-namespace ApplianceControl {
-
-// Enum for ApplianceStatus
-enum class ApplianceStatus : uint8_t
-{
-    kOff                      = 0x01,
-    kStandBy                  = 0x02,
-    kProgrammed               = 0x03,
-    kProgrammedWaitingToStart = 0x04,
-    kRunning                  = 0x05,
-    kPause                    = 0x06,
-    kEndProgrammed            = 0x07,
-    kFailure                  = 0x08,
-    kProgrammeInterrupted     = 0x09,
-    kIdle                     = 0x0A,
-    kRinseHold                = 0x0B,
-    kService                  = 0x0C,
-    kSuperfreezing            = 0x0D,
-    kSupercooling             = 0x0E,
-    kSuperheating             = 0x0F,
-};
-
-// Enum for CommandIdentification
-enum class CommandIdentification : uint8_t
-{
-    kStart                = 0x01,
-    kStop                 = 0x02,
-    kPause                = 0x03,
-    kStartSuperfreezing   = 0x04,
-    kStopSuperfreezing    = 0x05,
-    kStartSupercooling    = 0x06,
-    kStopSupercooling     = 0x07,
-    kDisableGas           = 0x08,
-    kEnableGas            = 0x09,
-    kEnableEnergyControl  = 0x0A,
-    kDisableEnergyControl = 0x0B,
-};
-
-// Enum for WarningEvent
-enum class WarningEvent : uint8_t
-{
-    kWarning1OverallPowerAboveAvailablePowerLevel                                      = 0x00,
-    kWarning2OverallPowerAbovePowerThresholdLevel                                      = 0x01,
-    kWarning3OverallPowerBackBelowTheAvailablePowerLevel                               = 0x02,
-    kWarning4OverallPowerBackBelowThePowerThresholdLevel                               = 0x03,
-    kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
-};
-
-// Bitmap for RemoteEnableFlagsAndDeviceStatus2
-enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
-{
-    kRemoteEnableFlags      = 0xF,
-    kDeviceStatus2Structure = 0xF0,
-};
-} // namespace ApplianceControl
 
 namespace PulseWidthModulation {
 } // namespace PulseWidthModulation
@@ -313,9 +242,6 @@ enum class Privilege : uint8_t
     kAdminister = 0x05,
 };
 } // namespace AccessControl
-
-namespace PollControl {
-} // namespace PollControl
 
 namespace BridgedActions {
 
@@ -981,9 +907,6 @@ enum class ModeSelectFeature : uint32_t
     kDeponoff = 0x1,
 };
 } // namespace ModeSelect
-
-namespace ShadeConfiguration {
-} // namespace ShadeConfiguration
 
 namespace DoorLock {
 
@@ -1666,9 +1589,6 @@ enum class WindSupportMask : uint8_t
 };
 } // namespace FanControl
 
-namespace DehumidificationControl {
-} // namespace DehumidificationControl
-
 namespace ThermostatUserInterfaceConfiguration {
 } // namespace ThermostatUserInterfaceConfiguration
 
@@ -1847,96 +1767,6 @@ namespace RelativeHumidityMeasurement {
 
 namespace OccupancySensing {
 } // namespace OccupancySensing
-
-namespace CarbonMonoxideConcentrationMeasurement {
-} // namespace CarbonMonoxideConcentrationMeasurement
-
-namespace CarbonDioxideConcentrationMeasurement {
-} // namespace CarbonDioxideConcentrationMeasurement
-
-namespace EthyleneConcentrationMeasurement {
-} // namespace EthyleneConcentrationMeasurement
-
-namespace EthyleneOxideConcentrationMeasurement {
-} // namespace EthyleneOxideConcentrationMeasurement
-
-namespace HydrogenConcentrationMeasurement {
-} // namespace HydrogenConcentrationMeasurement
-
-namespace HydrogenSulphideConcentrationMeasurement {
-} // namespace HydrogenSulphideConcentrationMeasurement
-
-namespace NitricOxideConcentrationMeasurement {
-} // namespace NitricOxideConcentrationMeasurement
-
-namespace NitrogenDioxideConcentrationMeasurement {
-} // namespace NitrogenDioxideConcentrationMeasurement
-
-namespace OxygenConcentrationMeasurement {
-} // namespace OxygenConcentrationMeasurement
-
-namespace OzoneConcentrationMeasurement {
-} // namespace OzoneConcentrationMeasurement
-
-namespace SulfurDioxideConcentrationMeasurement {
-} // namespace SulfurDioxideConcentrationMeasurement
-
-namespace DissolvedOxygenConcentrationMeasurement {
-} // namespace DissolvedOxygenConcentrationMeasurement
-
-namespace BromateConcentrationMeasurement {
-} // namespace BromateConcentrationMeasurement
-
-namespace ChloraminesConcentrationMeasurement {
-} // namespace ChloraminesConcentrationMeasurement
-
-namespace ChlorineConcentrationMeasurement {
-} // namespace ChlorineConcentrationMeasurement
-
-namespace FecalColiformAndEColiConcentrationMeasurement {
-} // namespace FecalColiformAndEColiConcentrationMeasurement
-
-namespace FluorideConcentrationMeasurement {
-} // namespace FluorideConcentrationMeasurement
-
-namespace HaloaceticAcidsConcentrationMeasurement {
-} // namespace HaloaceticAcidsConcentrationMeasurement
-
-namespace TotalTrihalomethanesConcentrationMeasurement {
-} // namespace TotalTrihalomethanesConcentrationMeasurement
-
-namespace TotalColiformBacteriaConcentrationMeasurement {
-} // namespace TotalColiformBacteriaConcentrationMeasurement
-
-namespace TurbidityConcentrationMeasurement {
-} // namespace TurbidityConcentrationMeasurement
-
-namespace CopperConcentrationMeasurement {
-} // namespace CopperConcentrationMeasurement
-
-namespace LeadConcentrationMeasurement {
-} // namespace LeadConcentrationMeasurement
-
-namespace ManganeseConcentrationMeasurement {
-} // namespace ManganeseConcentrationMeasurement
-
-namespace SulfateConcentrationMeasurement {
-} // namespace SulfateConcentrationMeasurement
-
-namespace BromodichloromethaneConcentrationMeasurement {
-} // namespace BromodichloromethaneConcentrationMeasurement
-
-namespace BromoformConcentrationMeasurement {
-} // namespace BromoformConcentrationMeasurement
-
-namespace ChlorodibromomethaneConcentrationMeasurement {
-} // namespace ChlorodibromomethaneConcentrationMeasurement
-
-namespace ChloroformConcentrationMeasurement {
-} // namespace ChloroformConcentrationMeasurement
-
-namespace SodiumConcentrationMeasurement {
-} // namespace SodiumConcentrationMeasurement
 
 namespace WakeOnLan {
 } // namespace WakeOnLan
@@ -2239,43 +2069,6 @@ enum class ApplicationStatusEnum : uint8_t
 
 namespace AccountLogin {
 } // namespace AccountLogin
-
-namespace ApplianceIdentification {
-} // namespace ApplianceIdentification
-
-namespace MeterIdentification {
-} // namespace MeterIdentification
-
-namespace ApplianceEventsAndAlert {
-
-// Enum for EventIdentification
-enum class EventIdentification : uint8_t
-{
-    kEndOfCycle         = 0x01,
-    kTemperatureReached = 0x04,
-    kEndOfCooking       = 0x05,
-    kSwitchingOff       = 0x06,
-    kWrongData          = 0x07,
-};
-
-// Bitmap for AlertCount
-enum class AlertCount : uint8_t
-{
-    kNumberOfAlerts = 0xF,
-    kTypeOfAlert    = 0xF0,
-};
-
-// Bitmap for AlertStructure
-enum class AlertStructure : uint32_t
-{
-    kAlertId          = 0xFF,
-    kCategory         = 0xF00,
-    kPresenceRecovery = 0x3000,
-};
-} // namespace ApplianceEventsAndAlert
-
-namespace ApplianceStatistics {
-} // namespace ApplianceStatistics
 
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement

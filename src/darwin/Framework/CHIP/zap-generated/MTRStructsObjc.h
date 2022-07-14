@@ -35,33 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRPowerProfileClusterPowerProfileRecord : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull powerProfileId;
-@property (strong, nonatomic) NSNumber * _Nonnull energyPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull powerProfileRemoteControl;
-@property (strong, nonatomic) NSNumber * _Nonnull powerProfileState;
-- (instancetype)init;
-
-@end
-
-@interface MTRPowerProfileClusterScheduledPhase : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull energyPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull scheduledTime;
-- (instancetype)init;
-
-@end
-
-@interface MTRPowerProfileClusterTransferredPhase : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull energyPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull macroPhaseId;
-@property (strong, nonatomic) NSNumber * _Nonnull expectedDuration;
-@property (strong, nonatomic) NSNumber * _Nonnull peakPower;
-@property (strong, nonatomic) NSNumber * _Nonnull energy;
-@property (strong, nonatomic) NSNumber * _Nonnull maxActivationDelay;
-- (instancetype)init;
-
-@end
-
 @interface MTRDescriptorClusterDeviceType : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSNumber * _Nonnull revision;

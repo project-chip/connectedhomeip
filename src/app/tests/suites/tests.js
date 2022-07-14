@@ -808,6 +808,7 @@ function getTests() {
         "TestConfigVariables",
         "TestDescriptorCluster",
         "TestBasicInformation",
+        "TestFabricRemovalWhileSubscribed",
         "TestGeneralCommissioning",
         "TestIdentifyCluster",
         "TestOperationalCredentialsCluster",

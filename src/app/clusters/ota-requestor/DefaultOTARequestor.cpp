@@ -638,12 +638,14 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
     {
     case OTADownloader::State::kComplete:
         mOtaRequestorDriver->UpdateDownloaded();
+        mBdxMessenger.Reset();
         break;
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
         }
+        mBdxMessenger.Reset();
         break;
     default:
         break;
@@ -823,15 +825,25 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(OperationalDeviceProxy & devicePro
     Optional<SessionHandle> session = deviceProxy.GetSecureSession();
     VerifyOrReturnError(session.HasValue(), CHIP_ERROR_INCORRECT_STATE);
 
-    mExchangeCtx = exchangeMgr->NewContext(session.Value(), &mBdxMessenger);
-    VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    chip::Messaging::ExchangeContext * exchangeCtx = exchangeMgr->NewContext(session.Value(), &mBdxMessenger);
+    VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    mBdxMessenger.Init(mBdxDownloader, mExchangeCtx);
+    mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
 
-    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec));
-    return mBdxDownloader->BeginPrepareDownload();
+    CHIP_ERROR err = mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mBdxDownloader->BeginPrepareDownload();
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        mBdxMessenger.Reset();
+    }
+
+    return err;
 }
 
 CHIP_ERROR DefaultOTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy)

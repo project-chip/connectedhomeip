@@ -25,12 +25,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace PowerConfiguration {
-static constexpr ClusterId Id = 0x00000001;
-} // namespace PowerConfiguration
-namespace DeviceTemperatureConfiguration {
-static constexpr ClusterId Id = 0x00000002;
-} // namespace DeviceTemperatureConfiguration
 namespace Identify {
 static constexpr ClusterId Id = 0x00000003;
 } // namespace Identify
@@ -49,21 +43,9 @@ static constexpr ClusterId Id = 0x00000007;
 namespace LevelControl {
 static constexpr ClusterId Id = 0x00000008;
 } // namespace LevelControl
-namespace Alarms {
-static constexpr ClusterId Id = 0x00000009;
-} // namespace Alarms
-namespace Time {
-static constexpr ClusterId Id = 0x0000000A;
-} // namespace Time
 namespace BinaryInputBasic {
 static constexpr ClusterId Id = 0x0000000F;
 } // namespace BinaryInputBasic
-namespace PowerProfile {
-static constexpr ClusterId Id = 0x0000001A;
-} // namespace PowerProfile
-namespace ApplianceControl {
-static constexpr ClusterId Id = 0x0000001B;
-} // namespace ApplianceControl
 namespace PulseWidthModulation {
 static constexpr ClusterId Id = 0x0000001C;
 } // namespace PulseWidthModulation
@@ -76,9 +58,6 @@ static constexpr ClusterId Id = 0x0000001E;
 namespace AccessControl {
 static constexpr ClusterId Id = 0x0000001F;
 } // namespace AccessControl
-namespace PollControl {
-static constexpr ClusterId Id = 0x00000020;
-} // namespace PollControl
 namespace BridgedActions {
 static constexpr ClusterId Id = 0x00000025;
 } // namespace BridgedActions
@@ -169,9 +148,6 @@ static constexpr ClusterId Id = 0x00000045;
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
-namespace ShadeConfiguration {
-static constexpr ClusterId Id = 0x00000100;
-} // namespace ShadeConfiguration
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
@@ -190,9 +166,6 @@ static constexpr ClusterId Id = 0x00000201;
 namespace FanControl {
 static constexpr ClusterId Id = 0x00000202;
 } // namespace FanControl
-namespace DehumidificationControl {
-static constexpr ClusterId Id = 0x00000203;
-} // namespace DehumidificationControl
 namespace ThermostatUserInterfaceConfiguration {
 static constexpr ClusterId Id = 0x00000204;
 } // namespace ThermostatUserInterfaceConfiguration
@@ -220,96 +193,6 @@ static constexpr ClusterId Id = 0x00000405;
 namespace OccupancySensing {
 static constexpr ClusterId Id = 0x00000406;
 } // namespace OccupancySensing
-namespace CarbonMonoxideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000040C;
-} // namespace CarbonMonoxideConcentrationMeasurement
-namespace CarbonDioxideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000040D;
-} // namespace CarbonDioxideConcentrationMeasurement
-namespace EthyleneConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000040E;
-} // namespace EthyleneConcentrationMeasurement
-namespace EthyleneOxideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000040F;
-} // namespace EthyleneOxideConcentrationMeasurement
-namespace HydrogenConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000410;
-} // namespace HydrogenConcentrationMeasurement
-namespace HydrogenSulphideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000411;
-} // namespace HydrogenSulphideConcentrationMeasurement
-namespace NitricOxideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000412;
-} // namespace NitricOxideConcentrationMeasurement
-namespace NitrogenDioxideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000413;
-} // namespace NitrogenDioxideConcentrationMeasurement
-namespace OxygenConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000414;
-} // namespace OxygenConcentrationMeasurement
-namespace OzoneConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000415;
-} // namespace OzoneConcentrationMeasurement
-namespace SulfurDioxideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000416;
-} // namespace SulfurDioxideConcentrationMeasurement
-namespace DissolvedOxygenConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000417;
-} // namespace DissolvedOxygenConcentrationMeasurement
-namespace BromateConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000418;
-} // namespace BromateConcentrationMeasurement
-namespace ChloraminesConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000419;
-} // namespace ChloraminesConcentrationMeasurement
-namespace ChlorineConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000041A;
-} // namespace ChlorineConcentrationMeasurement
-namespace FecalColiformAndEColiConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000041B;
-} // namespace FecalColiformAndEColiConcentrationMeasurement
-namespace FluorideConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000041C;
-} // namespace FluorideConcentrationMeasurement
-namespace HaloaceticAcidsConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000041D;
-} // namespace HaloaceticAcidsConcentrationMeasurement
-namespace TotalTrihalomethanesConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000041E;
-} // namespace TotalTrihalomethanesConcentrationMeasurement
-namespace TotalColiformBacteriaConcentrationMeasurement {
-static constexpr ClusterId Id = 0x0000041F;
-} // namespace TotalColiformBacteriaConcentrationMeasurement
-namespace TurbidityConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000420;
-} // namespace TurbidityConcentrationMeasurement
-namespace CopperConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000421;
-} // namespace CopperConcentrationMeasurement
-namespace LeadConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000422;
-} // namespace LeadConcentrationMeasurement
-namespace ManganeseConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000423;
-} // namespace ManganeseConcentrationMeasurement
-namespace SulfateConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000424;
-} // namespace SulfateConcentrationMeasurement
-namespace BromodichloromethaneConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000425;
-} // namespace BromodichloromethaneConcentrationMeasurement
-namespace BromoformConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000426;
-} // namespace BromoformConcentrationMeasurement
-namespace ChlorodibromomethaneConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000427;
-} // namespace ChlorodibromomethaneConcentrationMeasurement
-namespace ChloroformConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000428;
-} // namespace ChloroformConcentrationMeasurement
-namespace SodiumConcentrationMeasurement {
-static constexpr ClusterId Id = 0x00000429;
-} // namespace SodiumConcentrationMeasurement
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan
@@ -346,18 +229,6 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
-namespace ApplianceIdentification {
-static constexpr ClusterId Id = 0x00000B00;
-} // namespace ApplianceIdentification
-namespace MeterIdentification {
-static constexpr ClusterId Id = 0x00000B01;
-} // namespace MeterIdentification
-namespace ApplianceEventsAndAlert {
-static constexpr ClusterId Id = 0x00000B02;
-} // namespace ApplianceEventsAndAlert
-namespace ApplianceStatistics {
-static constexpr ClusterId Id = 0x00000B03;
-} // namespace ApplianceStatistics
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement

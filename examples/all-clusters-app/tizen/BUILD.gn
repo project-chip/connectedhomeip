@@ -60,7 +60,7 @@ executable("chip-all-clusters-app") {
 
 tizen_sdk_package("chip-all-clusters-app:tpk") {
   deps = [ ":chip-all-clusters-app" ]
-  manifest = rebase_path("tizen-manifest.xml")
+  manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
 }
 

@@ -218,14 +218,6 @@ server cluster Scenes = 5 {
   command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
 }
 
-server cluster Alarms = 9 {
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 server cluster Descriptor = 29 {
   struct DeviceType {
     devtype_id type = 0;
@@ -1853,14 +1845,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
-  }
-
-  server cluster Alarms {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster Descriptor {
