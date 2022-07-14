@@ -33,8 +33,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -45,7 +44,7 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 3,
-                      AuthMode: 1,  # PASE
+                      AuthMode: 1, # PASE
                       Subjects: [],
                       Targets: null,
                   },
@@ -53,13 +52,14 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Constraint error: Invalid combination administer + group (TC-ACL-2.4 step 31)"
+    - label:
+          "Constraint error: Invalid combination administer + group (TC-ACL-2.4
+          step 31)"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -70,7 +70,7 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
-                      AuthMode: 3,  # Group
+                      AuthMode: 3, # Group
                       Subjects: [],
                       Targets: null,
                   },
@@ -83,8 +83,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -95,7 +94,7 @@ tests:
                   {
                       FabricIndex: 1,
                       Privilege: 6, # INVALID
-                      AuthMode: 3,  # Group
+                      AuthMode: 3, # Group
                       Subjects: [],
                       Targets: null,
                   },
@@ -108,8 +107,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -119,8 +117,8 @@ tests:
                   },
                   {
                       FabricIndex: 1,
-                      Privilege: 3, 
-                      AuthMode: 4,  # INVALID
+                      Privilege: 3,
+                      AuthMode: 4, # INVALID
                       Subjects: [],
                       Targets: null,
                   },
@@ -133,8 +131,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -142,13 +139,9 @@ tests:
                       Subjects: [112233],
                       Targets: null,
                   },
-                  {
-                      FabricIndex: 1,
-                      Privilege: 3, 
-                      AuthMode: 2,
-                      Subjects: [0], # invalid subject
-                      Targets: null,
-                  },
+                  { FabricIndex: 1, Privilege: 3, AuthMode: 2, Subjects: [
+                              0,
+                          ], Targets: null }, # invalid subject
               ]
       response:
           error: CONSTRAINT_ERROR
@@ -158,8 +151,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -167,13 +159,9 @@ tests:
                       Subjects: [112233],
                       Targets: null,
                   },
-                  {
-                      FabricIndex: 1,
-                      Privilege: 3, 
-                      AuthMode: 2,
-                      Subjects: [18446744073709551615], # invalid subject
-                      Targets: null,
-                  },
+                  { FabricIndex: 1, Privilege: 3, AuthMode: 2, Subjects: [
+                              18446744073709551615,
+                          ], Targets: null }, # invalid subject
               ]
       response:
           error: CONSTRAINT_ERROR
@@ -183,8 +171,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -192,13 +179,9 @@ tests:
                       Subjects: [112233],
                       Targets: null,
                   },
-                  {
-                      FabricIndex: 1,
-                      Privilege: 3, 
-                      AuthMode: 2,
-                      Subjects: [42949672930000000], # invalid subject
-                      Targets: null,
-                  },
+                  { FabricIndex: 1, Privilege: 3, AuthMode: 2, Subjects: [
+                              42949672930000000,
+                          ], Targets: null }, # invalid subject
               ]
       response:
           error: CONSTRAINT_ERROR
@@ -208,8 +191,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -217,13 +199,9 @@ tests:
                       Subjects: [112233],
                       Targets: null,
                   },
-                  {
-                      FabricIndex: 1,
-                      Privilege: 3, 
-                      AuthMode: 2,
-                      Subjects: [18446744073709486080], # invalid subject
-                      Targets: null,
-                  },
+                  { FabricIndex: 1, Privilege: 3, AuthMode: 2, Subjects: [
+                              18446744073709486080,
+                          ], Targets: null }, # invalid subject
               ]
       response:
           error: CONSTRAINT_ERROR
@@ -233,8 +211,7 @@ tests:
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -244,29 +221,24 @@ tests:
                   },
                   {
                       FabricIndex: 1,
-                      Privilege: 3, 
+                      Privilege: 3,
                       AuthMode: 2,
                       Subjects: null, # invalid subject
                       Targets:
-                        [
-                          {
-                            Cluster: null,
-                            Endpoint: null,
-                            DeviceType: null,
-                          }
-                        ]
+                          [{ Cluster: null, Endpoint: null, DeviceType: null }],
                   },
               ]
       response:
           error: CONSTRAINT_ERROR
 
-    - label: "Constraint error:  target has both endpoint and device type (TC-ACL-2.4 step 42)"
+    - label:
+          "Constraint error:  target has both endpoint and device type
+          (TC-ACL-2.4 step 42)"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
-          value:
-              [
+          value: [
                   {
                       FabricIndex: 1,
                       Privilege: 5, # Administer
@@ -276,17 +248,11 @@ tests:
                   },
                   {
                       FabricIndex: 1,
-                      Privilege: 3, 
+                      Privilege: 3,
                       AuthMode: 2,
                       Subjects: null, # invalid subject
                       Targets:
-                        [
-                          {
-                            Cluster: null,
-                            Endpoint: 22,
-                            DeviceType: 33,
-                          }
-                        ]
+                          [{ Cluster: null, Endpoint: 22, DeviceType: 33 }],
                   },
               ]
       response:
