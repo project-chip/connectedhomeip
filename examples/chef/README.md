@@ -182,10 +182,10 @@ configuration should follow the following schema:
 Take note of the configuration for `linux`:
 
 ```json
-        "linux": {
-            "linux_x86": ["--cpu_type", "x64"],
-            "linux_arm64_ipv6only": ["--cpu_type", "arm64", "--ipv6only"]
-        },
+"linux": {
+    "linux_x86": ["--cpu_type", "x64"],
+    "linux_arm64_ipv6only": ["--cpu_type", "arm64", "--ipv6only"]
+},
 ```
 
 This will produce output archives prefixed `linux_x86` and
