@@ -28,7 +28,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Constraint error: PASE reserved for future"
+    - label: "Constraint error: PASE reserved for future (TC-ACL-2.4 step 29)"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
@@ -46,6 +46,31 @@ tests:
                       FabricIndex: 1,
                       Privilege: 3,
                       AuthMode: 1,  # PASE
+                      Subjects: [],
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Constraint error: Invalid combination administer + group (TC-ACL-2.4 step 31)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 3,  # Group
                       Subjects: [],
                       Targets: null,
                   },
