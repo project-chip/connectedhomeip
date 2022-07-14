@@ -19,6 +19,7 @@
 #include "ExampleAccessControlDelegate.h"
 
 #include <lib/core/CHIPConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -949,7 +950,17 @@ CHIP_ERROR Copy(const Entry & entry, EntryStorage & storage)
         return CHIP_NO_ERROR;
     }
 #endif
-    return CopyViaInterface(entry, storage);
+    CHIP_ERROR err = CopyViaInterface(entry, storage);
+
+    if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        // Invalid data received. We convert this to constraint error for
+        // the purpose of IM error codes.
+        ChipLogError(DataManagement, "ACL copy failed: %" CHIP_ERROR_FORMAT, err.Format());
+        err = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    return err;
 }
 
 class AccessControlDelegate : public AccessControl::Delegate
