@@ -76,8 +76,8 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
             break;
         }
 
-        ssize_t readBytes  = read(fd, readbuf, kChipEventCmdBufSize);
-        readbuf[readBytes-1] = '\0';
+        ssize_t readBytes      = read(fd, readbuf, kChipEventCmdBufSize);
+        readbuf[readBytes - 1] = '\0';
         ChipLogProgress(NotSpecified, "Received payload: \"%s\" and length is %ld\n", readbuf, readBytes);
 
         // Process the received command request from event fifo
