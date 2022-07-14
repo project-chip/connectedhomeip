@@ -22,12 +22,6 @@
 
 #include <app/util/basic-types.h>
 
-// Definitions for cluster: Power Configuration
-static constexpr chip::ClusterId ZCL_POWER_CONFIG_CLUSTER_ID = 0x0001;
-
-// Definitions for cluster: Device Temperature Configuration
-static constexpr chip::ClusterId ZCL_DEVICE_TEMP_CLUSTER_ID = 0x0002;
-
 // Definitions for cluster: Identify
 static constexpr chip::ClusterId ZCL_IDENTIFY_CLUSTER_ID = 0x0003;
 
@@ -46,20 +40,8 @@ static constexpr chip::ClusterId ZCL_ON_OFF_SWITCH_CONFIG_CLUSTER_ID = 0x0007;
 // Definitions for cluster: Level Control
 static constexpr chip::ClusterId ZCL_LEVEL_CONTROL_CLUSTER_ID = 0x0008;
 
-// Definitions for cluster: Alarms
-static constexpr chip::ClusterId ZCL_ALARM_CLUSTER_ID = 0x0009;
-
-// Definitions for cluster: Time
-static constexpr chip::ClusterId ZCL_TIME_CLUSTER_ID = 0x000A;
-
 // Definitions for cluster: Binary Input (Basic)
 static constexpr chip::ClusterId ZCL_BINARY_INPUT_BASIC_CLUSTER_ID = 0x000F;
-
-// Definitions for cluster: Power Profile
-static constexpr chip::ClusterId ZCL_POWER_PROFILE_CLUSTER_ID = 0x001A;
-
-// Definitions for cluster: Appliance Control
-static constexpr chip::ClusterId ZCL_APPLIANCE_CONTROL_CLUSTER_ID = 0x001B;
 
 // Definitions for cluster: Pulse Width Modulation
 static constexpr chip::ClusterId ZCL_PWM_CLUSTER_ID = 0x001C;
@@ -72,9 +54,6 @@ static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0x001E;
 
 // Definitions for cluster: Access Control
 static constexpr chip::ClusterId ZCL_ACCESS_CONTROL_CLUSTER_ID = 0x001F;
-
-// Definitions for cluster: Poll Control
-static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
 
 // Definitions for cluster: Bridged Actions
 static constexpr chip::ClusterId ZCL_BRIDGED_ACTIONS_CLUSTER_ID = 0x0025;
@@ -166,9 +145,6 @@ static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
 // Definitions for cluster: Mode Select
 static constexpr chip::ClusterId ZCL_MODE_SELECT_CLUSTER_ID = 0x0050;
 
-// Definitions for cluster: Shade Configuration
-static constexpr chip::ClusterId ZCL_SHADE_CONFIG_CLUSTER_ID = 0x0100;
-
 // Definitions for cluster: Door Lock
 static constexpr chip::ClusterId ZCL_DOOR_LOCK_CLUSTER_ID = 0x0101;
 
@@ -186,9 +162,6 @@ static constexpr chip::ClusterId ZCL_THERMOSTAT_CLUSTER_ID = 0x0201;
 
 // Definitions for cluster: Fan Control
 static constexpr chip::ClusterId ZCL_FAN_CONTROL_CLUSTER_ID = 0x0202;
-
-// Definitions for cluster: Dehumidification Control
-static constexpr chip::ClusterId ZCL_DEHUMID_CONTROL_CLUSTER_ID = 0x0203;
 
 // Definitions for cluster: Thermostat User Interface Configuration
 static constexpr chip::ClusterId ZCL_THERMOSTAT_UI_CONFIG_CLUSTER_ID = 0x0204;
@@ -216,96 +189,6 @@ static constexpr chip::ClusterId ZCL_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_ID = 
 
 // Definitions for cluster: Occupancy Sensing
 static constexpr chip::ClusterId ZCL_OCCUPANCY_SENSING_CLUSTER_ID = 0x0406;
-
-// Definitions for cluster: Carbon Monoxide Concentration Measurement
-static constexpr chip::ClusterId ZCL_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x040C;
-
-// Definitions for cluster: Carbon Dioxide Concentration Measurement
-static constexpr chip::ClusterId ZCL_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x040D;
-
-// Definitions for cluster: Ethylene Concentration Measurement
-static constexpr chip::ClusterId ZCL_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x040E;
-
-// Definitions for cluster: Ethylene Oxide Concentration Measurement
-static constexpr chip::ClusterId ZCL_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x040F;
-
-// Definitions for cluster: Hydrogen Concentration Measurement
-static constexpr chip::ClusterId ZCL_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0410;
-
-// Definitions for cluster: Hydrogen Sulphide Concentration Measurement
-static constexpr chip::ClusterId ZCL_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0411;
-
-// Definitions for cluster: Nitric Oxide Concentration Measurement
-static constexpr chip::ClusterId ZCL_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0412;
-
-// Definitions for cluster: Nitrogen Dioxide Concentration Measurement
-static constexpr chip::ClusterId ZCL_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0413;
-
-// Definitions for cluster: Oxygen Concentration Measurement
-static constexpr chip::ClusterId ZCL_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0414;
-
-// Definitions for cluster: Ozone Concentration Measurement
-static constexpr chip::ClusterId ZCL_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0415;
-
-// Definitions for cluster: Sulfur Dioxide Concentration Measurement
-static constexpr chip::ClusterId ZCL_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0416;
-
-// Definitions for cluster: Dissolved Oxygen Concentration Measurement
-static constexpr chip::ClusterId ZCL_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0417;
-
-// Definitions for cluster: Bromate Concentration Measurement
-static constexpr chip::ClusterId ZCL_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0418;
-
-// Definitions for cluster: Chloramines Concentration Measurement
-static constexpr chip::ClusterId ZCL_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0419;
-
-// Definitions for cluster: Chlorine Concentration Measurement
-static constexpr chip::ClusterId ZCL_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x041A;
-
-// Definitions for cluster: Fecal coliform and E. Coli Concentration Measurement
-static constexpr chip::ClusterId ZCL_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x041B;
-
-// Definitions for cluster: Fluoride Concentration Measurement
-static constexpr chip::ClusterId ZCL_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x041C;
-
-// Definitions for cluster: Haloacetic Acids Concentration Measurement
-static constexpr chip::ClusterId ZCL_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x041D;
-
-// Definitions for cluster: Total Trihalomethanes Concentration Measurement
-static constexpr chip::ClusterId ZCL_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x041E;
-
-// Definitions for cluster: Total Coliform Bacteria Concentration Measurement
-static constexpr chip::ClusterId ZCL_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x041F;
-
-// Definitions for cluster: Turbidity Concentration Measurement
-static constexpr chip::ClusterId ZCL_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0420;
-
-// Definitions for cluster: Copper Concentration Measurement
-static constexpr chip::ClusterId ZCL_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0421;
-
-// Definitions for cluster: Lead Concentration Measurement
-static constexpr chip::ClusterId ZCL_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0422;
-
-// Definitions for cluster: Manganese Concentration Measurement
-static constexpr chip::ClusterId ZCL_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0423;
-
-// Definitions for cluster: Sulfate Concentration Measurement
-static constexpr chip::ClusterId ZCL_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0424;
-
-// Definitions for cluster: Bromodichloromethane Concentration Measurement
-static constexpr chip::ClusterId ZCL_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0425;
-
-// Definitions for cluster: Bromoform Concentration Measurement
-static constexpr chip::ClusterId ZCL_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0426;
-
-// Definitions for cluster: Chlorodibromomethane Concentration Measurement
-static constexpr chip::ClusterId ZCL_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0427;
-
-// Definitions for cluster: Chloroform Concentration Measurement
-static constexpr chip::ClusterId ZCL_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0428;
-
-// Definitions for cluster: Sodium Concentration Measurement
-static constexpr chip::ClusterId ZCL_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_ID = 0x0429;
 
 // Definitions for cluster: Wake on LAN
 static constexpr chip::ClusterId ZCL_WAKE_ON_LAN_CLUSTER_ID = 0x0503;
@@ -342,18 +225,6 @@ static constexpr chip::ClusterId ZCL_APPLICATION_BASIC_CLUSTER_ID = 0x050D;
 
 // Definitions for cluster: Account Login
 static constexpr chip::ClusterId ZCL_ACCOUNT_LOGIN_CLUSTER_ID = 0x050E;
-
-// Definitions for cluster: Appliance Identification
-static constexpr chip::ClusterId ZCL_APPLIANCE_IDENTIFICATION_CLUSTER_ID = 0x0B00;
-
-// Definitions for cluster: Meter Identification
-static constexpr chip::ClusterId ZCL_METER_IDENTIFICATION_CLUSTER_ID = 0x0B01;
-
-// Definitions for cluster: Appliance Events and Alert
-static constexpr chip::ClusterId ZCL_APPLIANCE_EVENTS_AND_ALERT_CLUSTER_ID = 0x0B02;
-
-// Definitions for cluster: Appliance Statistics
-static constexpr chip::ClusterId ZCL_APPLIANCE_STATISTICS_CLUSTER_ID = 0x0B03;
 
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;

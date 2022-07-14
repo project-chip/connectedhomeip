@@ -1633,46 +1633,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("PowerProfileId", indent + 1, value.powerProfileId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerProfileId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerProfileRemoteControl", indent + 1, value.powerProfileRemoteControl);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerProfileRemoteControl'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerProfileState", indent + 1, value.powerProfileState);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerProfileState'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value)
@@ -1788,30 +1748,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LinkEstablished'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ScheduledTime", indent + 1, value.scheduledTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ScheduledTime'");
             return err;
         }
     }
@@ -2320,62 +2256,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StackSize'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PowerProfile::Structs::TransferredPhase::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MacroPhaseId", indent + 1, value.macroPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MacroPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExpectedDuration", indent + 1, value.expectedDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExpectedDuration'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PeakPower", indent + 1, value.peakPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeakPower'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Energy", indent + 1, value.energy);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Energy'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxActivationDelay", indent + 1, value.maxActivationDelay);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxActivationDelay'");
             return err;
         }
     }
