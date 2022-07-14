@@ -43,7 +43,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
 {
     NSError * error;
     _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
-    
+
     if ([self SelectOTACandidate:params.vendorId rPID:params.productId rSV:params.softwareVersion]) {
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
         _selectedCandidate.updateToken = [self generateUpdateToken];
@@ -51,13 +51,13 @@ constexpr uint8_t kUpdateTokenLen = 32;
             _selectedCandidate.userConsentNeeded = (_userConsentState == OTAProviderUserUnknown || _userConsentState == OTAProviderUserDenied) ? @(1) : @(0);
             NSLog(@"User Consent Needed: %@", _selectedCandidate.userConsentNeeded);
         }
-        else 
+        else
         {
-            NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState); 
+            NSLog(@"Requestor cannot obtain user consent. Our State: %hhu", _userConsentState);
             switch (_userConsentState)
             {
             case OTAProviderUserGranted:
-                NSLog(@"User Consent Granted"); 
+                NSLog(@"User Consent Granted");
                 _queryImageStatus = MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable;
                 break;
 
@@ -75,7 +75,7 @@ constexpr uint8_t kUpdateTokenLen = 32;
             _selectedCandidate.status = @(_queryImageStatus);
         }
     }
-    else 
+    else
     {
         NSLog(@"Unable to select OTA Image.");
         _selectedCandidate.status = @(MTROtaSoftwareUpdateProviderOTAQueryStatusNotAvailable);
@@ -128,9 +128,9 @@ constexpr uint8_t kUpdateTokenLen = 32;
                 [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue])
             && ([requestorSoftwareVersion unsignedLongValue] <=
                 [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue])
-            && ([requestorVendorID unsignedIntValue] == 
+            && ([requestorVendorID unsignedIntValue] ==
                 [candidate.deviceModelData.vendorId unsignedIntValue])
-            && ([requestorProductID unsignedIntValue] == 
+            && ([requestorProductID unsignedIntValue] ==
                 [candidate.deviceModelData.productId unsignedIntValue])) {
             candidateFound = true;
             _selectedCandidate = candidate;
