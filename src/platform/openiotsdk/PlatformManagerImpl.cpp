@@ -22,6 +22,7 @@
  *          for Open IOT SDK platform.
  */
 
+#include "OpenIoTSDKArchUtils.h"
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 #include <platform/internal/testing/ConfigUnitTest.h>
 
@@ -41,9 +42,10 @@ namespace DeviceLayer {
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     // Members are initialized by the stack
+    osMutexAttr_t mut_att = { .attr_bits = osMutexRecursive };
 
     // Reinitialize the Mutexes
-    mChipStackMutex = osMutexNew(nullptr);
+    mChipStackMutex = osMutexNew(&mut_att);
     mEventTaskMutex = osMutexNew(nullptr);
     mPlatformFlags  = osEventFlagsNew(nullptr);
     mQueue          = osMessageQueueNew(CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE, sizeof(ChipDeviceEvent), nullptr);
@@ -135,44 +137,44 @@ void PlatformManagerImpl::RunEventLoopInternal()
     uint32_t flags = 0;
     while (true)
     {
-        flags =
-            osEventFlagsWait(mPlatformFlags, kPostEventFlag | kTimerEventFlag | kTaskStopEventFlag, osFlagsWaitAny, osWaitForever);
+        flags = osEventFlagsWait(mPlatformFlags, kPostEventFlag | kTimerEventFlag | kTaskStopEventFlag,
+                                 osFlagsWaitAny | osFlagsNoClear, ms2tick(1000));
+
+        // in case of error we still need to know the value of flags we're not waiting for
+        if (flags & osFlagsError)
+        {
+            flags = osEventFlagsGet(mPlatformFlags);
+        }
+
         if (flags & kTimerEventFlag)
         {
+            osEventFlagsClear(mPlatformFlags, kTimerEventFlag);
             HandleTimerEvent();
         }
 
         if (flags & kPostEventFlag)
         {
+            osEventFlagsClear(mPlatformFlags, kPostEventFlag);
             HandlePostEvent();
         }
 
         if (flags & kTaskStopEventFlag)
         {
+            osEventFlagsClear(mPlatformFlags, kTaskStopEventFlag);
+            osEventFlagsClear(mPlatformFlags, kTaskRunningEventFlag);
+            break;
+        }
+
+        if ((flags & kTaskRunningEventFlag) == 0)
+        {
             break;
         }
     }
-
-    osEventFlagsClear(mPlatformFlags, kTaskRunningEventFlag);
 }
 
 void PlatformManagerImpl::_RunEventLoop()
 {
-    // this mutex only needed to guard against multiple launches
-    {
-        osMutexAcquire(mEventTaskMutex, osWaitForever);
-
-        if (kTaskRunningEventFlag & osEventFlagsGet(mPlatformFlags))
-        {
-            // already running
-            osMutexRelease(mEventTaskMutex);
-            return;
-        }
-
-        osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
-
-        osMutexRelease(mEventTaskMutex);
-    }
+    osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
 
     RunEventLoopInternal();
 }
@@ -202,6 +204,9 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
             .priority   = osPriorityNormal,
 
         };
+
+        osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
+
         // this thread is self terminating
         osThreadId_t mEventTask = osThreadNew(EventLoopTask, NULL, &tread_attr);
 
@@ -210,8 +215,6 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
             osMutexRelease(mEventTaskMutex);
             return CHIP_ERROR_INTERNAL;
         }
-
-        osEventFlagsSet(mPlatformFlags, kTaskRunningEventFlag);
 
         osMutexRelease(mEventTaskMutex);
     }
