@@ -254,6 +254,16 @@ config CHIP_DEVICE_ROTATING_DEVICE_UID
 	  A device rotating id unique id which will be generated if
 	  this config is not set in prj.conf file.
 
+config CHIP_DEVICE_ENABLE_KEY
+	string "Enable Key for triggering test actions on device"
+	default "00112233445566778899AABBCCDDEEFF"
+	help
+	  The Enable Key is a 128-bit value that triggers test action 
+	  while invoking the TestEventTrigger Command. 
+	  Pattern: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	  This value is used during Certification Tests,
+	  and should not be present on production devices.
+
 config CHIP_CERTIFICATION_DECLARATION_STORAGE
 	bool "Enable storing Certification Declaration"
 	depends on CHIP_FACTORY_DATA
@@ -273,5 +283,6 @@ config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
 	  for sending it via OTA Software Update purposes.
 
 endif
+
 
 endif
