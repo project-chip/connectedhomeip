@@ -13,7 +13,8 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 20.6.1. [TC-IDM-6.1] Events Read Interaction from TH to DUT
+name:
+    21.6.1. [TC-IDM-6.1] Events Read Interaction from TH to DUT. [{DUT_Server}]
 
 config:
     nodeId: 0x12344321
@@ -24,9 +25,11 @@ tests:
     - label:
           "TH sends Read Request Message to DUT with EventRequests set to a
           specific event from a specific cluster on a specific endpoint on a
-          specific node i.e. [Node = Specific, Endpoint = Specific, Cluster =
-          Specific, Event = Specific]."
+          specific node that is, [Node = Specific, Endpoint = Specific, Cluster
+          = Specific, Event = Specific]."
       verification: |
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool basic read-event start-up 1  0
 
           [1653051591.078855][11664:11669] CHIP:DMG: ReportDataMessage =
@@ -72,8 +75,8 @@ tests:
     - label:
           "TH sends Read Request Message to DUT with EventRequests set to all
           events from a specific cluster on a specific endpoint on a specific
-          node i.e. [Node = Specific, Endpoint = Specific, Cluster = Specific,
-          Event = Wildcard]."
+          node that is, [Node = Specific, Endpoint = Specific, Cluster =
+          Specific, Event = Wildcard]."
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -122,8 +125,8 @@ tests:
     - label:
           "TH sends Read Request Message to DUT with EventRequests set to all
           events from all clusters on a specific endpoint on a specific node
-          i.e. [Node = Specific, Endpoint = Specific, Cluster = Wildcard, Event
-          = Wildcard]."
+          that is, [Node = Specific, Endpoint = Specific, Cluster = Wildcard,
+          Event = Wildcard]."
       verification: |
           In case of chip tool, here is an example command to use
 
@@ -165,9 +168,11 @@ tests:
     - label:
           "TH sends Read Request Message to DUT with EventRequests set to a
           specific event from a specific cluster on all endpoints on a specific
-          node i.e. [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
-          Event = Specific]."
+          node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
+          Specific, Event = Specific]."
       verification: |
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool basic read-event start-up 1  0xFFFF
 
           [1653051642.744722][11676:11681] CHIP:DMG: ReportDataMessage =
@@ -213,9 +218,11 @@ tests:
     - label:
           "TH sends Read Request Message to DUT with EventRequests set to all
           events from a specific cluster on all endpoints on a specific node
-          i.e. [Node = Specific, Endpoint = Wildcard, Cluster = Specific, Event
-          = Wildcard]."
+          that is, [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
+          Event = Wildcard]."
       verification: |
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool basic read-event-by-id 0xFFFFFFFF 1  0xFFFF
           [1653051699.893049][11691:11696] CHIP:DMG: ReportDataMessage =
           [1653051699.893068][11691:11696] CHIP:DMG: {
@@ -259,10 +266,12 @@ tests:
 
     - label:
           "TH sends Read Request Message to DUT with EventRequests set to all
-          events from all clusters on all endpoints on a specific node i.e.
+          events from all clusters on all endpoints on a specific node that is,
           [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1  0xFFFF
 
           [1653051769.144914][11706:11711] CHIP:DMG: ReportDataMessage =
@@ -399,6 +408,8 @@ tests:
           which requires a privilege that is not granted for the cluster in the
           path."
       verification: |
+          In case of chip tool, here is an example command to use
+
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
            ./chip-tool any read-event-by-id 0x28 0 1 0
           [1653054249.514825][12265:12270] CHIP:DMG: ReportDataMessage =
@@ -453,52 +464,62 @@ tests:
           EventMin field set to a number less than what was received in the
           previous step."
       verification: |
-          ./chip-tool softwarediagnostics read-by-id 0x0 1 0
+          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+          [1655986008.400642][4813:4818] CHIP:DMG: }
+          [1655986008.400859][4813:4818] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655986008.400893][4813:4818] CHIP:TOO:          Event number: 0
+          [1655986008.400923][4813:4818] CHIP:TOO:          Priority: Critical
+          [1655986008.400952][4813:4818] CHIP:TOO:          Timestamp: 4896714
+          [1655986008.401039][4813:4818] CHIP:TOO:   StartUp: {
+          [1655986008.401083][4813:4818] CHIP:TOO:     SoftwareVersion: 1
+          [1655986008.401116][4813:4818] CHIP:TOO:    }
+          [1655986008.401259][4813:4818] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655986008.401291][4813:4818] CHIP:TOO:          Event number: 1
+          [1655986008.401321][4813:4818] CHIP:TOO:          Priority: Info
+          [1655986008.401425][4813:4818] CHIP:TOO:          Timestamp: 4971265
+          [1655986008.401494][4813:4818] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655986008.401529][4813:4818] CHIP:TOO:     AdminNodeID: null
+          [1655986008.401561][4813:4818] CHIP:TOO:     AdminPasscodeID: 0
+          [1655986008.401592][4813:4818] CHIP:TOO:     ChangeType: 1
+          [1655986008.401623][4813:4818] CHIP:TOO:     LatestValue: {
+          [1655986008.401648][4813:4818] CHIP:TOO:       Privilege: 5
+          [1655986008.401675][4813:4818] CHIP:TOO:       AuthMode: 2
+          [1655986008.401712][4813:4818] CHIP:TOO:       Subjects: 1 entries
+          [1655986008.401750][4813:4818] CHIP:TOO:         [1]: 112233
+          [1655986008.401786][4813:4818] CHIP:TOO:       Targets: null
+          [1655986008.401816][4813:4818] CHIP:TOO:       FabricIndex: 1
+          [1655986008.401845][4813:4818] CHIP:TOO:      }
+          [1655986008.401876][4813:4818] CHIP:TOO:     AdminFabricIndex: 1
+          [1655986008.401906][4813:4818] CHIP:TOO:    }
+          [1655986008.402045][4813:4818] CHIP:EM: Sending Standalone Ack for MessageCounter:51662085 on exchange 4386i
 
-          [1651583857.832820][2932:2937] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 440941735
-          [1651583857.832964][2932:2937] CHIP:TOO:   ThreadMetrics: 6 entries
-          [1651583857.833044][2932:2937] CHIP:TOO:     [1]: {
-          [1651583857.833093][2932:2937] CHIP:TOO:       Id: 2357
-          [1651583857.833125][2932:2937] CHIP:TOO:       Name: 2357
-          [1651583857.833157][2932:2937] CHIP:TOO:       StackFreeCurrent: 0
-          [1651583857.833188][2932:2937] CHIP:TOO:       StackFreeMinimum: 0
-          [1651583857.833219][2932:2937] CHIP:TOO:       StackSize: 0
-          [1651583857.833250][2932:2937] CHIP:TOO:      }
-          [1651583857.833292][2932:2937] CHIP:TOO:     [2]: {
-          [1651583857.833324][2932:2937] CHIP:TOO:       Id: 2356
-          [1651583857.833353][2932:2937] CHIP:TOO:       Name: 2356
-          [1651583857.833382][2932:2937] CHIP:TOO:       StackFreeCurrent: 0
-          [1651583857.833412][2932:2937] CHIP:TOO:       StackFreeMinimum: 0
-          [1651583857.833442][2932:2937] CHIP:TOO:       StackSize: 0
-          [1651583857.833471][2932:2937] CHIP:TOO:      }
-          [1651583857.833511][2932:2937] CHIP:TOO:     [3]: {
-          [1651583857.833624][2932:2937] CHIP:TOO:       Id: 2355
-          [1651583857.833657][2932:2937] CHIP:TOO:       Name: 2355
-          [1651583857.833687][2932:2937] CHIP:TOO:       StackFreeCurrent: 0
-          [1651583857.833718][2932:2937] CHIP:TOO:       StackFreeMinimum: 0
-          [1651583857.833748][2932:2937] CHIP:TOO:       StackSize: 0
-          [1651583857.833777][2932:2937] CHIP:TOO:      }
-          [1651583857.833819][2932:2937] CHIP:TOO:     [4]: {
-          [1651583857.833851][2932:2937] CHIP:TOO:       Id: 2354
-          [1651583857.833880][2932:2937] CHIP:TOO:       Name: 2354
-          [1651583857.833909][2932:2937] CHIP:TOO:       StackFreeCurrent: 0
-          [1651583857.833939][2932:2937] CHIP:TOO:       StackFreeMinimum: 0
-          [1651583857.833969][2932:2937] CHIP:TOO:       StackSize: 0
-          [1651583857.833998][2932:2937] CHIP:TOO:      }
-          [1651583857.834037][2932:2937] CHIP:TOO:     [5]: {
-          [1651583857.834068][2932:2937] CHIP:TOO:       Id: 2353
-          [1651583857.834097][2932:2937] CHIP:TOO:       Name: 2353
-          [1651583857.834126][2932:2937] CHIP:TOO:       StackFreeCurrent: 0
-          [1651583857.834156][2932:2937] CHIP:TOO:       StackFreeMinimum: 0
-          [1651583857.834186][2932:2937] CHIP:TOO:       StackSize: 0
-          [1651583857.834215][2932:2937] CHIP:TOO:      }
-          [1651583857.834254][2932:2937] CHIP:TOO:     [6]: {
-          [1651583857.834284][2932:2937] CHIP:TOO:       Id: 2352
-          [1651583857.834313][2932:2937] CHIP:TOO:       Name: 2352
-          [1651583857.834343][2932:2937] CHIP:TOO:       StackFreeCurrent: 0
-          [1651583857.834372][2932:2937] CHIP:TOO:       StackFreeMinimum: 0
-          [1651583857.834402][2932:2937] CHIP:TOO:       StackSize: 0
-          [1651583857.834431][2932:2937] CHIP:TOO:      }
+          sudo ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF --event-min 0
+          [1655986113.735628][4843:4848] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655986113.735661][4843:4848] CHIP:TOO:          Event number: 0
+          [1655986113.735690][4843:4848] CHIP:TOO:          Priority: Critical
+          [1655986113.735718][4843:4848] CHIP:TOO:          Timestamp: 4896714
+          [1655986113.735803][4843:4848] CHIP:TOO:   StartUp: {
+          [1655986113.735848][4843:4848] CHIP:TOO:     SoftwareVersion: 1
+          [1655986113.735878][4843:4848] CHIP:TOO:    }
+          [1655986113.736018][4843:4848] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655986113.736049][4843:4848] CHIP:TOO:          Event number: 1
+          [1655986113.736078][4843:4848] CHIP:TOO:          Priority: Info
+          [1655986113.736106][4843:4848] CHIP:TOO:          Timestamp: 4971265
+          [1655986113.736168][4843:4848] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655986113.736200][4843:4848] CHIP:TOO:     AdminNodeID: null
+          [1655986113.736231][4843:4848] CHIP:TOO:     AdminPasscodeID: 0
+          [1655986113.736261][4843:4848] CHIP:TOO:     ChangeType: 1
+          [1655986113.736291][4843:4848] CHIP:TOO:     LatestValue: {
+          [1655986113.736320][4843:4848] CHIP:TOO:       Privilege: 5
+          [1655986113.736348][4843:4848] CHIP:TOO:       AuthMode: 2
+          [1655986113.736384][4843:4848] CHIP:TOO:       Subjects: 1 entries
+          [1655986113.736420][4843:4848] CHIP:TOO:         [1]: 112233
+          [1655986113.736454][4843:4848] CHIP:TOO:       Targets: null
+          [1655986113.736483][4843:4848] CHIP:TOO:       FabricIndex: 1
+          [1655986113.736511][4843:4848] CHIP:TOO:      }
+          [1655986113.736540][4843:4848] CHIP:TOO:     AdminFabricIndex: 1
+          [1655986113.736568][4843:4848] CHIP:TOO:    }
+          [1655986113.736707][4843:4848] CHIP:EM: Sending Standalone Ack for MessageCounter:245457747 on exchange 9028i
       disabled: true
 
     - label:
@@ -524,5 +545,13 @@ tests:
           event data. For every chunked data message received, DUT sends a
           status response."
       verification: |
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1365
+          tried in doorlock app,I Sent wildcard read-event command from TH to DUT to verify this test-step,
+           ./chip-tool any read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+          The message flow I would expect here is:
+            TH -> DUT ReadRequest
+              DUT -> TH ReportData, not last chunk
+              TH -> DUT StatusResponse
+              Possibly repeat steps 2 & 3 a few times
+              DUT -> TH ReportData, last chunk, SuppressResponse set to true
+              TH -> DUT standalone ack
       disabled: true

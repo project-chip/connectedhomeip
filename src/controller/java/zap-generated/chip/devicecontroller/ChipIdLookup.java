@@ -157,6 +157,9 @@ public final class ChipIdLookup {
     if (clusterId == 768L) {
       return "ColorControl";
     }
+    if (clusterId == 769L) {
+      return "BallastConfiguration";
+    }
     if (clusterId == 1024L) {
       return "IlluminanceMeasurement";
     }
@@ -788,64 +791,64 @@ public final class ChipIdLookup {
         return "ActiveWiredFaults";
       }
       if (attributeId == 11L) {
-        return "BatteryVoltage";
+        return "BatVoltage";
       }
       if (attributeId == 12L) {
-        return "BatteryPercentRemaining";
+        return "BatPercentRemaining";
       }
       if (attributeId == 13L) {
-        return "BatteryTimeRemaining";
+        return "BatTimeRemaining";
       }
       if (attributeId == 14L) {
-        return "BatteryChargeLevel";
+        return "BatChargeLevel";
       }
       if (attributeId == 15L) {
-        return "BatteryReplacementNeeded";
+        return "BatReplacementNeeded";
       }
       if (attributeId == 16L) {
-        return "BatteryReplaceability";
+        return "BatReplaceability";
       }
       if (attributeId == 17L) {
-        return "BatteryPresent";
+        return "BatPresent";
       }
       if (attributeId == 18L) {
-        return "ActiveBatteryFaults";
+        return "ActiveBatFaults";
       }
       if (attributeId == 19L) {
-        return "BatteryReplacementDescription";
+        return "BatReplacementDescription";
       }
       if (attributeId == 20L) {
-        return "BatteryCommonDesignation";
+        return "BatCommonDesignation";
       }
       if (attributeId == 21L) {
-        return "BatteryANSIDesignation";
+        return "BatANSIDesignation";
       }
       if (attributeId == 22L) {
-        return "BatteryIECDesignation";
+        return "BatIECDesignation";
       }
       if (attributeId == 23L) {
-        return "BatteryApprovedChemistry";
+        return "BatApprovedChemistry";
       }
       if (attributeId == 24L) {
-        return "BatteryCapacity";
+        return "BatCapacity";
       }
       if (attributeId == 25L) {
-        return "BatteryQuantity";
+        return "BatQuantity";
       }
       if (attributeId == 26L) {
-        return "BatteryChargeState";
+        return "BatChargeState";
       }
       if (attributeId == 27L) {
-        return "BatteryTimeToFullCharge";
+        return "BatTimeToFullCharge";
       }
       if (attributeId == 28L) {
-        return "BatteryFunctionalWhileCharging";
+        return "BatFunctionalWhileCharging";
       }
       if (attributeId == 29L) {
-        return "BatteryChargingCurrent";
+        return "BatChargingCurrent";
       }
       if (attributeId == 30L) {
-        return "ActiveBatteryChargeFaults";
+        return "ActiveBatChargeFaults";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -2226,6 +2229,66 @@ public final class ChipIdLookup {
       }
       return "";
     }
+    if (clusterId == 769L) {
+      if (attributeId == 0L) {
+        return "PhysicalMinLevel";
+      }
+      if (attributeId == 1L) {
+        return "PhysicalMaxLevel";
+      }
+      if (attributeId == 2L) {
+        return "BallastStatus";
+      }
+      if (attributeId == 16L) {
+        return "MinLevel";
+      }
+      if (attributeId == 17L) {
+        return "MaxLevel";
+      }
+      if (attributeId == 20L) {
+        return "IntrinsicBalanceFactor";
+      }
+      if (attributeId == 21L) {
+        return "BallastFactorAdjustment";
+      }
+      if (attributeId == 32L) {
+        return "LampQuantity";
+      }
+      if (attributeId == 48L) {
+        return "LampType";
+      }
+      if (attributeId == 49L) {
+        return "LampManufacturer";
+      }
+      if (attributeId == 50L) {
+        return "LampRatedHours";
+      }
+      if (attributeId == 51L) {
+        return "LampBurnHours";
+      }
+      if (attributeId == 52L) {
+        return "LampAlarmMode";
+      }
+      if (attributeId == 53L) {
+        return "LampBurnHoursTripPoint";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
     if (clusterId == 1024L) {
       if (attributeId == 0L) {
         return "MeasuredValue";
@@ -3324,6 +3387,9 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 768L) {
+      return "";
+    }
+    if (clusterId == 769L) {
       return "";
     }
     if (clusterId == 1024L) {

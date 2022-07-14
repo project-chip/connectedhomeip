@@ -32,6 +32,7 @@
 #include <new>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <signal.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>

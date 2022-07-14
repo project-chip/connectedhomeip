@@ -89,7 +89,7 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) MTRDeviceController * chipController;
-@property (nonatomic, strong) MTRNetworkCommissioning * cluster;
+@property (nonatomic, strong) MTRBaseClusterNetworkCommissioning * cluster;
 
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
 @property (strong, nonatomic) MTRSetupPayload * setupPayload;
@@ -478,7 +478,7 @@
 - (void)setVendorIDOnAccessory
 {
     NSLog(@"Call to setVendorIDOnAccessory");
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable device, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
             if (!device) {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

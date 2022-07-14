@@ -266,3 +266,6 @@
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
 	branch = master
 	platforms = efr32
+[submodule "editline"]
+	path = third_party/editline/repo
+	url = https://github.com/troglobit/editline.git

@@ -85,6 +85,7 @@ tests:
       disabled: true
 
     - label: "TH reads the MaxNetworks attribute from the DUT"
+      PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
 
@@ -104,19 +105,20 @@ tests:
       disabled: true
 
     - label: "TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
-          [1653483289.382372][28210:28215] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 3189790698
-          [1653483289.382458][28210:28215] CHIP:TOO:   Networks: 1 entries
-          [1653483289.382507][28210:28215] CHIP:TOO:     [1]: {
-          [1653483289.382537][28210:28215] CHIP:TOO:       NetworkID: 65746830
-          [1653483289.382561][28210:28215] CHIP:TOO:       Connected: TRUE
-          [1653483289.382584][28210:28215] CHIP:TOO:      }
-          [1653483289.382684][28210:28215] CHIP:EM: Sending Standalone Ack for MessageCounter:13711908 on exchange 32535i
+          [1654076774.294361][33659:33664] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 609053543
+          [1654076774.294505][33659:33664] CHIP:TOO:   Networks: 1 entries
+          [1654076774.294625][33659:33664] CHIP:TOO:     [1]: {
+          [1654076774.294679][33659:33664] CHIP:TOO:       NetworkID: 6368697035
+          [1654076774.294726][33659:33664] CHIP:TOO:       Connected: TRUE
+          [1654076774.294774][33659:33664] CHIP:TOO:      }
       disabled: true
 
     - label: "TH reads InterfaceEnabled attribute from the DUT"
+      PICS: CNET.S.A0004
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 1 0
 
@@ -130,6 +132,7 @@ tests:
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-networking-status 1 0
 
@@ -144,15 +147,16 @@ tests:
     - label:
           "TH reads the LastNetworkID attribute from the DUT TH reads the
           Networks attribute from the DUT"
+      PICS: CNET.S.A0006
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1 0
 
-          [1653483162.950672][28180:28185] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 3189790698
-          [1653483162.950726][28180:28185] CHIP:TOO:   LastNetworkID: null
-          [1653483162.950827][28180:28185] CHIP:EM: Sending Standalone Ack for MessageCounter:13275609 on exchange 15586i
+          [1654076802.288579][33669:33674] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 609053543
+          [1654076802.288708][33669:33674] CHIP:TOO:   LastNetworkID: 6368697035
       disabled: true
 
     - label: "TH reads the LastConnectErrorValue attribute from the DUT"
+      PICS: CNET.S.A0007
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-connect-error-value 1 0
 

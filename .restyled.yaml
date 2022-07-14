@@ -1,0 +1,218 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# Do anything at all
+enabled: true
+
+# Push the style fixes directly to the original PR
+auto: false
+
+# Open Restyle PRs?
+pull_requests: true
+
+# Add labels to any created Restyle PRs
+labels:
+    - restyled
+
+# Labels to ignore
+ignore_labels:
+    - restyled-ignore
+
+# Leave comments on the original PR linking to the Restyle PR?
+comments: false
+
+# Request review on the Restyle PR
+request_review: none
+
+# Patterns to exclude from all Restylers
+exclude:
+    - ".github/workflows/**/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/workflows/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/**/*" # https://github.com/restyled-io/restyler/issues/73
+    - ".github/*" # https://github.com/restyled-io/restyler/issues/73
+    - "*/**/third_party/*" # https://github.com/restyled-io/restyled.io/issues/213
+    - "*/**/third_party/**" # https://github.com/restyled-io/restyled.io/issues/213
+    - "*/**/third_party/**/*" # https://github.com/restyled-io/restyled.io/issues/213
+    - "third_party/android/**/*"
+    - "third_party/inipp/repo/**/*"
+    - "third_party/jlink/**/*"
+    - "third_party/lwip/repo/**/*"
+    - "third_party/nlbuild-autotools/repo/**/*"
+    - "third_party/nlbuild-autotools/repo/.**/*" # "**/*" doesn't include directories that start with "."
+    - "third_party/nlassert/repo/**/*" # from here down built with $ awk '/path =/ {print $3 "/**/*"}' .gitmodules
+    - "third_party/nlfaultinjection/repo/**/*"
+    - "third_party/nlio/repo/**/*"
+    - "third_party/nlunit-test/repo/**/*"
+    - "third_party/mbedtls/repo/**/*"
+    - "examples/common/QRCode/repo/**/*"
+    - "examples/common/m5stack-tft/repo/**/*"
+    - "third_party/pigweed/repo/**/*"
+    - "third_party/openthread/repo/**/*"
+    - "third_party/ot-br-posix/repo/**/*"
+    - "third_party/bluez/repo/**/*"
+    - "third_party/cirque/repo/**/*"
+    - "third_party/nanopb/repo/**/*"
+    - "src/android/CHIPTool/gradlew" # gradle wrapper generated file
+    - "third_party/android_deps/gradlew" # gradle wrapper generated file
+    - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
+    - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
+    - "scripts/idl/tests/outputs/**/*" # Matches generated output 1:1
+    - "examples/chef/sample_app_util/test_files/*.yaml"
+    - "examples/chef/zzz_generated/**/*"
+    - "src/darwin/Framework/CHIP/zap-generated/MTRBaseClusters.mm" # https://github.com/project-chip/connectedhomeip/issues/20236
+
+
+changed_paths:
+  maximum: 100000
+  outcome: error
+
+# Restylers to run, and how
+restylers:
+    - name: whitespace
+      enabled: true
+      image: restyled/restyler-whitespace:v0.1.0.1
+      command:
+          - whitespace
+      arguments: []
+      include:
+          - "**/Dockerfile"
+          - ".**/Dockerfile"
+          - "**/*.yml"
+          - "**/*.yaml"
+          - ".**/*.yml"
+          - ".**/*.yaml"
+          - "**/*.sh"
+          - "**/*.c"
+          - "**/*.cc"
+          - "**/*.cpp"
+          - "**/*.cxx"
+          - "**/*.c++"
+          - "**/*.C"
+          - "**/*.cs"
+          - "**/*.h"
+          - "**/*.hh"
+          - "**/*.hpp"
+          - "**/*.hxx"
+          - "**/*.h++"
+          - "**/*.H"
+          - "**/*.java"
+          - "**/*.js"
+          - "**/*.json"
+          - ".**/*.js"
+          - ".**/*.json"
+          - "**/*.m"
+          - "**/*.mm"
+    - name: google-java-format
+      enabled: true
+      # Update https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/zap/generate.py if this version changes.
+      image: restyled/restyler-google-java-format:v1.6
+      command:
+          - google-java-format
+          - "--replace"
+      arguments: []
+      include:
+          - "**/*.java"
+      interpreters: []
+    - name: clang-format
+      enabled: true
+      image: restyled/restyler-clang-format:v9.0.0
+      command:
+          - clang-format
+          - "-i"
+      arguments: []
+      include:
+          - "**/*.c"
+          - "**/*.cc"
+          - "**/*.cpp"
+          - "**/*.cxx"
+          - "**/*.c++"
+          - "**/*.C"
+          - "**/*.cs"
+          - "**/*.h"
+          - "**/*.hh"
+          - "**/*.hpp"
+          - "**/*.hxx"
+          - "**/*.h++"
+          - "**/*.H"
+          - "**/*.js"
+          - "**/*.m"
+          - "**/*.mm"
+      interpreters: []
+    - name: gn
+      image: restyled/restyler-gn:v1
+      enabled: true
+      include:
+          - "**/*.gn"
+          - "**/*.gni"
+    - name: prettier-json
+      image: restyled/restyler-prettier:v1.19.1-2
+      enabled: true
+      command:
+          - prettier
+          - "--write"
+      arguments: []
+      include:
+          - "**/*.json"
+          - ".**/*.json"
+      interpreters: []
+    - name: prettier-markdown
+      image: restyled/restyler-prettier:v1.19.1-2
+      command:
+          - prettier
+          - "--write"
+      arguments: []
+      enabled: true
+      include:
+          - "**/*.md"
+          - "**/*.markdown"
+    - name: prettier-yaml
+      image: restyled/restyler-prettier:v1.19.1-2
+      enabled: true
+      include:
+          - "**/*.yml"
+          - "**/*.yaml"
+    - name: shellharden
+      image: restyled/restyler-shellharden:v4.1.1-2
+      enabled: true
+      include:
+          - "**/*.sh"
+          - "**/*.bash"
+    - name: shfmt
+      image: restyled/restyler-shfmt:v3.0.1
+      enabled: true
+      command:
+          - shfmt
+          - "-w"
+      arguments:
+          - "-i"
+          - "4"
+          - "-ci"
+      interpreters:
+          - sh
+          - bash
+      include:
+          - "**/*.sh"
+          - "**/*.bash"
+    - name: autopep8
+      image: 'restyled/restyler-autopep8:v1.5.7'
+      command:
+        - autopep8
+        - '--in-place'
+      arguments: []
+      include:
+        - '**/*.py'
+      interpreters:
+        - python

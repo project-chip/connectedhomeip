@@ -259,6 +259,10 @@ def HostTargets():
         app_targets.append(target.Extend('tv-casting-app', app=HostApp.TV_CASTING))
         app_targets.append(target.Extend('bridge', app=HostApp.BRIDGE))
 
+        nodeps_args = dict(enable_ble=False, enable_wifi=False, enable_thread=False, use_clang=True)
+        app_targets.append(target.Extend('chip-tool-nodeps', app=HostApp.CHIP_TOOL, **nodeps_args))
+        app_targets.append(target.Extend('all-clusters-app-nodeps', app=HostApp.ALL_CLUSTERS, **nodeps_args))
+
     builder = VariantBuilder()
 
     # Possible build variants. Note that number of potential
@@ -270,6 +274,7 @@ def HostTargets():
     builder.AppendVariant(name="ipv6only", enable_ipv4=False),
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
+    builder.AppendVariant(name="no-thread", enable_thread=False),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
@@ -277,7 +282,6 @@ def HostTargets():
     builder.AppendVariant(name="clang", use_clang=True),
     builder.AppendVariant(name="test", extra_tests=True),
 
-    builder.WhitelistVariantNameForGlob('no-interactive-ipv6only')
     builder.WhitelistVariantNameForGlob('ipv6only')
 
     for target in app_targets:
@@ -288,12 +292,11 @@ def HostTargets():
             builder.targets.append(target)
 
     for target in builder.AllVariants():
-        if cross_compile and 'chip-tool' in target.name and 'arm64' in target.name and '-no-interactive' not in target.name:
-            # Interactive builds will not compile by default on arm cross compiles
-            # because libreadline is not part of the default sysroot
-            yield target.GlobBlacklist('Arm crosscompile does not support libreadline-dev')
-        else:
-            yield target
+        yield target
+
+    # limited subset for coverage
+    yield target_native.Extend('all-clusters-coverage', app=HostApp.ALL_CLUSTERS, use_coverage=True)
+    yield target_native.Extend('chip-tool-coverage', app=HostApp.CHIP_TOOL, use_coverage=True)
 
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
@@ -305,10 +308,12 @@ def HostTargets():
     yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
                                use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
+    yield target_native.Extend('tests', app=HostApp.TESTS)
+    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True)
+    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True)
+
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    for board in [HostBoard.NATIVE, HostBoard.FAKE]:
-        yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
-        yield test_target.Extend(board.BoardName() + '-tests-clang', board=board, app=HostApp.TESTS, use_clang=True)
+    yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
 
 
 def Esp32Targets():
@@ -413,7 +418,7 @@ def NrfTargets():
     ]
 
     # Enable nrf52840dongle for all-clusters and lighting app only
-    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS)
+    yield target.Extend('nrf52840dongle-all-clusters', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS).GlobBlacklist('Out of flash when linking')
     yield target.Extend('nrf52840dongle-all-clusters-minimal', board=NrfBoard.NRF52840DONGLE, app=NrfApp.ALL_CLUSTERS_MINIMAL)
     yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
@@ -448,12 +453,12 @@ def AndroidTargets():
     yield target.Extend('androidstudio-arm64-chip-tool', board=AndroidBoard.AndroidStudio_ARM64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
-    yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('x86-chip-tvserver', board=AndroidBoard.X86, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('x64-chip-tvserver', board=AndroidBoard.X64, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('arm64-chip-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TV_CASTING_APP)
-    yield target.Extend('arm-chip-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TV_CASTING_APP)
+    yield target.Extend('arm64-tv-server', board=AndroidBoard.ARM64, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm-tv-server', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
+    yield target.Extend('x86-tv-server', board=AndroidBoard.X86, app=AndroidApp.TV_SERVER)
+    yield target.Extend('x64-tv-server', board=AndroidBoard.X64, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm64-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
 
 
 def MbedTargets():
@@ -558,6 +563,8 @@ def TizenTargets():
 
     target = Target('tizen-arm', TizenBuilder, board=TizenBoard.ARM)
 
+    builder.targets.append(target.Extend('all-clusters', app=TizenApp.ALL_CLUSTERS))
+    builder.targets.append(target.Extend('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL))
     builder.targets.append(target.Extend('chip-tool', app=TizenApp.CHIP_TOOL))
     builder.targets.append(target.Extend('light', app=TizenApp.LIGHT))
 

@@ -1474,85 +1474,85 @@ namespace ActiveWiredFaults {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace ActiveWiredFaults
 
-namespace BatteryVoltage {
+namespace BatVoltage {
 static constexpr AttributeId Id = 0x0000000B;
-} // namespace BatteryVoltage
+} // namespace BatVoltage
 
-namespace BatteryPercentRemaining {
+namespace BatPercentRemaining {
 static constexpr AttributeId Id = 0x0000000C;
-} // namespace BatteryPercentRemaining
+} // namespace BatPercentRemaining
 
-namespace BatteryTimeRemaining {
+namespace BatTimeRemaining {
 static constexpr AttributeId Id = 0x0000000D;
-} // namespace BatteryTimeRemaining
+} // namespace BatTimeRemaining
 
-namespace BatteryChargeLevel {
+namespace BatChargeLevel {
 static constexpr AttributeId Id = 0x0000000E;
-} // namespace BatteryChargeLevel
+} // namespace BatChargeLevel
 
-namespace BatteryReplacementNeeded {
+namespace BatReplacementNeeded {
 static constexpr AttributeId Id = 0x0000000F;
-} // namespace BatteryReplacementNeeded
+} // namespace BatReplacementNeeded
 
-namespace BatteryReplaceability {
+namespace BatReplaceability {
 static constexpr AttributeId Id = 0x00000010;
-} // namespace BatteryReplaceability
+} // namespace BatReplaceability
 
-namespace BatteryPresent {
+namespace BatPresent {
 static constexpr AttributeId Id = 0x00000011;
-} // namespace BatteryPresent
+} // namespace BatPresent
 
-namespace ActiveBatteryFaults {
+namespace ActiveBatFaults {
 static constexpr AttributeId Id = 0x00000012;
-} // namespace ActiveBatteryFaults
+} // namespace ActiveBatFaults
 
-namespace BatteryReplacementDescription {
+namespace BatReplacementDescription {
 static constexpr AttributeId Id = 0x00000013;
-} // namespace BatteryReplacementDescription
+} // namespace BatReplacementDescription
 
-namespace BatteryCommonDesignation {
+namespace BatCommonDesignation {
 static constexpr AttributeId Id = 0x00000014;
-} // namespace BatteryCommonDesignation
+} // namespace BatCommonDesignation
 
-namespace BatteryANSIDesignation {
+namespace BatANSIDesignation {
 static constexpr AttributeId Id = 0x00000015;
-} // namespace BatteryANSIDesignation
+} // namespace BatANSIDesignation
 
-namespace BatteryIECDesignation {
+namespace BatIECDesignation {
 static constexpr AttributeId Id = 0x00000016;
-} // namespace BatteryIECDesignation
+} // namespace BatIECDesignation
 
-namespace BatteryApprovedChemistry {
+namespace BatApprovedChemistry {
 static constexpr AttributeId Id = 0x00000017;
-} // namespace BatteryApprovedChemistry
+} // namespace BatApprovedChemistry
 
-namespace BatteryCapacity {
+namespace BatCapacity {
 static constexpr AttributeId Id = 0x00000018;
-} // namespace BatteryCapacity
+} // namespace BatCapacity
 
-namespace BatteryQuantity {
+namespace BatQuantity {
 static constexpr AttributeId Id = 0x00000019;
-} // namespace BatteryQuantity
+} // namespace BatQuantity
 
-namespace BatteryChargeState {
+namespace BatChargeState {
 static constexpr AttributeId Id = 0x0000001A;
-} // namespace BatteryChargeState
+} // namespace BatChargeState
 
-namespace BatteryTimeToFullCharge {
+namespace BatTimeToFullCharge {
 static constexpr AttributeId Id = 0x0000001B;
-} // namespace BatteryTimeToFullCharge
+} // namespace BatTimeToFullCharge
 
-namespace BatteryFunctionalWhileCharging {
+namespace BatFunctionalWhileCharging {
 static constexpr AttributeId Id = 0x0000001C;
-} // namespace BatteryFunctionalWhileCharging
+} // namespace BatFunctionalWhileCharging
 
-namespace BatteryChargingCurrent {
+namespace BatChargingCurrent {
 static constexpr AttributeId Id = 0x0000001D;
-} // namespace BatteryChargingCurrent
+} // namespace BatChargingCurrent
 
-namespace ActiveBatteryChargeFaults {
+namespace ActiveBatChargeFaults {
 static constexpr AttributeId Id = 0x0000001E;
-} // namespace ActiveBatteryChargeFaults
+} // namespace ActiveBatChargeFaults
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3886,25 +3886,17 @@ namespace MaxLevel {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace MaxLevel
 
-namespace PowerOnLevel {
-static constexpr AttributeId Id = 0x00000012;
-} // namespace PowerOnLevel
-
-namespace PowerOnFadeTime {
-static constexpr AttributeId Id = 0x00000013;
-} // namespace PowerOnFadeTime
-
-namespace IntrinsicBallastFactor {
+namespace IntrinsicBalanceFactor {
 static constexpr AttributeId Id = 0x00000014;
-} // namespace IntrinsicBallastFactor
+} // namespace IntrinsicBalanceFactor
 
 namespace BallastFactorAdjustment {
 static constexpr AttributeId Id = 0x00000015;
 } // namespace BallastFactorAdjustment
 
-namespace LampQuality {
+namespace LampQuantity {
 static constexpr AttributeId Id = 0x00000020;
-} // namespace LampQuality
+} // namespace LampQuantity
 
 namespace LampType {
 static constexpr AttributeId Id = 0x00000030;
@@ -5948,32 +5940,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace AccountLogin
-
-namespace Messaging {
-namespace Attributes {
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace Messaging
 
 namespace ApplianceIdentification {
 namespace Attributes {

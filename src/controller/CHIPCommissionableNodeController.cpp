@@ -39,13 +39,13 @@ CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryF
         ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
 #endif
         mDNSResolver.SetCommissioningDelegate(this);
-        return mDNSResolver.FindCommissioners(discoveryFilter);
+        return mDNSResolver.DiscoverCommissioners(discoveryFilter);
     }
 
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(mResolver->Init(DeviceLayer::UDPEndPointManager()));
 #endif
-    return mResolver->FindCommissioners(discoveryFilter);
+    return mResolver->DiscoverCommissioners(discoveryFilter);
 }
 
 CommissionableNodeController::~CommissionableNodeController()

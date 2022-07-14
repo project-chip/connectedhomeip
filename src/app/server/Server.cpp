@@ -179,9 +179,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         deviceInfoprovider->SetStorageDelegate(mDeviceStorage);
     }
 
-    // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler(&mExchangeMgr);
-
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
@@ -247,12 +244,22 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
+    // This initializes clusters, so should come after lower level initialization.
+    InitDataModelHandler(&mExchangeMgr);
+
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
 #endif
 
-    app::DnssdServer::Instance().SetSecuredPort(mOperationalServicePort);
+    //
+    // We need to advertise the port that we're listening to for unsolicited messages over UDP. However, we have both a IPv4
+    // and IPv6 endpoint to pick from. Given that the listen port passed in may be set to 0 (which then has the kernel select
+    // a valid port at bind time), that will result in two possible ports being provided back from the resultant endpoint
+    // initializations. Since IPv6 is POR for Matter, let's go ahead and pick that port.
+    //
+    app::DnssdServer::Instance().SetSecuredPort(mTransports.GetTransport().GetImplAtIndex<0>().GetBoundPort());
+
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
 

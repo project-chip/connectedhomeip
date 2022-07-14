@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Reads NetworkInterface structure attribute from DUT"
+      PICS: DGWIFI.S.A0000
       cluster: "General Diagnostics"
       command: "readAttribute"
       attribute: "NetworkInterfaces"
@@ -38,6 +39,7 @@ tests:
 
     #issue #13645
     - label: "Reads SecurityType attribute constraints"
+      PICS: DGWIFI.S.A0001
       command: "readAttribute"
       attribute: "SecurityType"
       response:
@@ -45,6 +47,7 @@ tests:
               type: enum
 
     - label: "Reads WiFiVersion attribute constraints"
+      PICS: DGWIFI.S.A0002
       command: "readAttribute"
       attribute: "WiFiVersion"
       response:
@@ -54,6 +57,7 @@ tests:
               maxValue: 5
 
     - label: "Reads ChannelNumber attribute constraints"
+      PICS: DGWIFI.S.A0003
       command: "readAttribute"
       attribute: "ChannelNumber"
       response:
@@ -61,6 +65,7 @@ tests:
               type: uint16
 
     - label: "Reads RSSI attribute constraints"
+      PICS: DGWIFI.S.A0004
       command: "readAttribute"
       attribute: "RSSI"
       response:
@@ -70,7 +75,7 @@ tests:
               maxValue: 0
 
     - label: "Reads BeaconLostCount attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0005
       command: "readAttribute"
       attribute: "BeaconLostCount"
       response:
@@ -78,6 +83,7 @@ tests:
               type: uint32
 
     - label: "Reads BeaconRxCount attribute constraints"
+      PICS: DGWIFI.S.A0006
       command: "readAttribute"
       attribute: "BeaconRxCount"
       response:
@@ -85,7 +91,7 @@ tests:
               type: uint32
 
     - label: "Reads PacketMulticastRxCount attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0007
       command: "readAttribute"
       attribute: "PacketMulticastRxCount"
       response:
@@ -93,7 +99,7 @@ tests:
               type: uint32
 
     - label: "Reads PacketMulticastTxCount attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0008
       command: "readAttribute"
       attribute: "PacketMulticastTxCount"
       response:
@@ -101,7 +107,7 @@ tests:
               type: uint32
 
     - label: "Reads PacketUnicastRxCount attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0009
       command: "readAttribute"
       attribute: "PacketUnicastRxCount"
       response:
@@ -109,7 +115,7 @@ tests:
               type: uint32
 
     - label: "Reads PacketUnicastTxCount attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000a
       command: "readAttribute"
       attribute: "PacketUnicastTxCount"
       response:
@@ -117,7 +123,7 @@ tests:
               type: uint32
 
     - label: "Reads CurrentMaxRate attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000b
       command: "readAttribute"
       attribute: "CurrentMaxRate"
       response:
@@ -125,7 +131,7 @@ tests:
               type: uint64
 
     - label: "Reads OverrunCount attribute constraints"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000c
       command: "readAttribute"
       attribute: "OverrunCount"
       response:

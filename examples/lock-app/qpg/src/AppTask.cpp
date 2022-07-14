@@ -37,6 +37,7 @@
 
 #include <inet/EndPointStateOpenThread.h>
 
+#include <DeviceInfoProviderImpl.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -68,6 +69,8 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -131,6 +134,10 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;

@@ -16,13 +16,13 @@
  */
 
 #import "MTRDeviceConnectionBridge.h"
-#import "MTRDevice_Internal.h"
+#import "MTRBaseDevice_Internal.h"
 #import "MTRError_Internal.h"
 
 void MTRDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDeviceProxy * device)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
-    MTRDevice * chipDevice = [[MTRDevice alloc] initWithDevice:device];
+    MTRBaseDevice * chipDevice = [[MTRBaseDevice alloc] initWithDevice:device];
     dispatch_async(object->mQueue, ^{
         object->mCompletionHandler(chipDevice, nil);
         object->Release();

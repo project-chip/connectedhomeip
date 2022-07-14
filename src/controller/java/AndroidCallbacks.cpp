@@ -448,6 +448,10 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
     readerForJavaTLV.Init(*apData);
     readerForJson.Init(*apData);
 
+    jlong eventNumber   = static_cast<jlong>(aEventHeader.mEventNumber);
+    jlong priorityLevel = static_cast<jint>(aEventHeader.mPriorityLevel);
+    jlong timestamp     = static_cast<jlong>(aEventHeader.mTimestamp.mValue);
+
     jobject value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
     // If we don't know this event, just skip it.
     VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
@@ -481,9 +485,10 @@ void ReportEventCallback::OnEventData(const app::EventHeader & aEventHeader, TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find EventState class"));
     VerifyOrReturn(eventStateCls != nullptr, ChipLogError(Controller, "Could not find EventState class"));
     chip::JniClass eventStateJniCls(eventStateCls);
-    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(Ljava/lang/Object;[BLjava/lang/String;)V");
+    jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIJLjava/lang/Object;[BLjava/lang/String;)V");
     VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"));
-    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
+    jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestamp, value,
+                                           jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"));
 
     // Add EventState to NodeState

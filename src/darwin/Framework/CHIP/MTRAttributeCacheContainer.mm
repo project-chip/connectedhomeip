@@ -18,9 +18,9 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRAttributeCacheContainer_Internal.h"
+#import "MTRBaseDevice_Internal.h"
 #import "MTRCluster.h"
 #import "MTRDeviceControllerXPCConnection.h"
-#import "MTRDevice_Internal.h"
 #import "MTRError.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging.h"

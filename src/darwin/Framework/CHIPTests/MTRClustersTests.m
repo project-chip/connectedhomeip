@@ -139,13 +139,13 @@ static MTRDeviceController * sController = nil;
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:nodeId
-                    queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable device, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            [connectionExpectation fulfill];
-            connectionExpectation = nil;
-        }];
+    [controller getBaseDevice:nodeId
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable device, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [connectionExpectation fulfill];
+                connectionExpectation = nil;
+            }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 }
 
@@ -166,22 +166,22 @@ static MTRDeviceController * sController = nil;
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
-    __block MTRDevice * device;
+    __block MTRBaseDevice * device;
     __block XCTestExpectation * connectionExpectation = [self expectationWithDescription:@"CASE established"];
-    [controller getDevice:nodeId
-                    queue:dispatch_get_main_queue()
-        completionHandler:^(MTRDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
-            XCTAssertEqual(error.code, 0);
-            [connectionExpectation fulfill];
-            connectionExpectation = nil;
-            device = retrievedDevice;
-        }];
+    [controller getBaseDevice:nodeId
+                        queue:dispatch_get_main_queue()
+            completionHandler:^(MTRBaseDevice * _Nullable retrievedDevice, NSError * _Nullable error) {
+                XCTAssertEqual(error.code, 0);
+                [connectionExpectation fulfill];
+                connectionExpectation = nil;
+                device = retrievedDevice;
+            }];
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 
     XCTestExpectation * expectation = [self expectationWithDescription:@"ReuseMTRClusterObjectFirstCall"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    MTRTestCluster * cluster = [[MTRTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    MTRBaseClusterTestCluster * cluster = [[MTRBaseClusterTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster testWithCompletionHandler:^(NSError * err) {

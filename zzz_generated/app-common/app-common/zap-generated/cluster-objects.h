@@ -9052,8 +9052,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const BatChargeFaultType> current;
-    DataModel::List<const BatChargeFaultType> previous;
+    DataModel::List<const BatChargeFault> current;
+    DataModel::List<const BatChargeFault> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -9063,8 +9063,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<BatChargeFaultType> current;
-    DataModel::DecodableList<BatChargeFaultType> previous;
+    DataModel::DecodableList<BatChargeFault> current;
+    DataModel::DecodableList<BatChargeFault> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -9082,8 +9082,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const BatFaultType> current;
-    DataModel::List<const BatFaultType> previous;
+    DataModel::List<const BatFault> current;
+    DataModel::List<const BatFault> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -9093,8 +9093,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<BatFaultType> current;
-    DataModel::DecodableList<BatFaultType> previous;
+    DataModel::DecodableList<BatFault> current;
+    DataModel::DecodableList<BatFault> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -9112,8 +9112,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const WiredFaultType> current;
-    DataModel::List<const WiredFaultType> previous;
+    DataModel::List<const WiredFault> current;
+    DataModel::List<const WiredFault> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -9123,8 +9123,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<WiredFaultType> current;
-    DataModel::DecodableList<WiredFaultType> previous;
+    DataModel::DecodableList<WiredFault> current;
+    DataModel::DecodableList<WiredFault> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -9139,9 +9139,9 @@ namespace Attributes {
 namespace Status {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::PowerSourceStatus;
+    using DecodableType    = chip::app::Clusters::PowerSource::PowerSourceStatus;
+    using DecodableArgType = chip::app::Clusters::PowerSource::PowerSourceStatus;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -9176,9 +9176,9 @@ struct TypeInfo
 namespace WiredAssessedInputVoltage {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputVoltage::Id; }
@@ -9188,9 +9188,9 @@ struct TypeInfo
 namespace WiredAssessedInputFrequency {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputFrequency::Id; }
@@ -9200,9 +9200,9 @@ struct TypeInfo
 namespace WiredCurrentType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::WiredCurrentType;
+    using DecodableType    = chip::app::Clusters::PowerSource::WiredCurrentType;
+    using DecodableArgType = chip::app::Clusters::PowerSource::WiredCurrentType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
@@ -9212,9 +9212,9 @@ struct TypeInfo
 namespace WiredAssessedCurrent {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedCurrent::Id; }
@@ -9260,88 +9260,64 @@ struct TypeInfo
 namespace ActiveWiredFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint8_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFault>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveWiredFaults
-namespace BatteryVoltage {
+namespace BatVoltage {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatVoltage::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryVoltage
-namespace BatteryPercentRemaining {
+} // namespace BatVoltage
+namespace BatPercentRemaining {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentRemaining::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatPercentRemaining::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryPercentRemaining
-namespace BatteryTimeRemaining {
+} // namespace BatPercentRemaining
+namespace BatTimeRemaining {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeRemaining::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatTimeRemaining::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryTimeRemaining
-namespace BatteryChargeLevel {
+} // namespace BatTimeRemaining
+namespace BatChargeLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::BatChargeLevel;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeLevel;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeLevel;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatChargeLevel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryChargeLevel
-namespace BatteryReplacementNeeded {
-struct TypeInfo
-{
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementNeeded::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace BatteryReplacementNeeded
-namespace BatteryReplaceability {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplaceability::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace BatteryReplaceability
-namespace BatteryPresent {
+} // namespace BatChargeLevel
+namespace BatReplacementNeeded {
 struct TypeInfo
 {
     using Type             = bool;
@@ -9349,23 +9325,47 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPresent::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatReplacementNeeded::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryPresent
-namespace ActiveBatteryFaults {
+} // namespace BatReplacementNeeded
+namespace BatReplaceability {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint8_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::Clusters::PowerSource::BatReplaceability;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatReplaceability;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatReplaceability;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryFaults::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatReplaceability::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveBatteryFaults
-namespace BatteryReplacementDescription {
+} // namespace BatReplaceability
+namespace BatPresent {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatPresent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace BatPresent
+namespace ActiveBatFaults {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFault>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveBatFaults
+namespace BatReplacementDescription {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -9373,12 +9373,12 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementDescription::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatReplacementDescription::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 60; }
 };
-} // namespace BatteryReplacementDescription
-namespace BatteryCommonDesignation {
+} // namespace BatReplacementDescription
+namespace BatCommonDesignation {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -9386,11 +9386,11 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCommonDesignation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatCommonDesignation::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryCommonDesignation
-namespace BatteryANSIDesignation {
+} // namespace BatCommonDesignation
+namespace BatANSIDesignation {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -9398,12 +9398,12 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryANSIDesignation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatANSIDesignation::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 20; }
 };
-} // namespace BatteryANSIDesignation
-namespace BatteryIECDesignation {
+} // namespace BatANSIDesignation
+namespace BatIECDesignation {
 struct TypeInfo
 {
     using Type             = chip::CharSpan;
@@ -9411,12 +9411,12 @@ struct TypeInfo
     using DecodableArgType = chip::CharSpan;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryIECDesignation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatIECDesignation::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
     static constexpr size_t MaxLength() { return 20; }
 };
-} // namespace BatteryIECDesignation
-namespace BatteryApprovedChemistry {
+} // namespace BatIECDesignation
+namespace BatApprovedChemistry {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -9424,11 +9424,11 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryApprovedChemistry::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatApprovedChemistry::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryApprovedChemistry
-namespace BatteryCapacity {
+} // namespace BatApprovedChemistry
+namespace BatCapacity {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -9436,11 +9436,11 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCapacity::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatCapacity::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryCapacity
-namespace BatteryQuantity {
+} // namespace BatCapacity
+namespace BatQuantity {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -9448,35 +9448,35 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatQuantity::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryQuantity
-namespace BatteryChargeState {
+} // namespace BatQuantity
+namespace BatChargeState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::PowerSource::BatChargeState;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeState;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeState;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatChargeState::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryChargeState
-namespace BatteryTimeToFullCharge {
+} // namespace BatChargeState
+namespace BatTimeToFullCharge {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeToFullCharge::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatTimeToFullCharge::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryTimeToFullCharge
-namespace BatteryFunctionalWhileCharging {
+} // namespace BatTimeToFullCharge
+namespace BatFunctionalWhileCharging {
 struct TypeInfo
 {
     using Type             = bool;
@@ -9484,34 +9484,34 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryFunctionalWhileCharging::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatFunctionalWhileCharging::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryFunctionalWhileCharging
-namespace BatteryChargingCurrent {
+} // namespace BatFunctionalWhileCharging
+namespace BatChargingCurrent {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargingCurrent::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::BatChargingCurrent::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace BatteryChargingCurrent
-namespace ActiveBatteryChargeFaults {
+} // namespace BatChargingCurrent
+namespace ActiveBatChargeFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint8_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFault>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryChargeFaults::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatChargeFaults::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveBatteryChargeFaults
+} // namespace ActiveBatChargeFaults
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -9551,37 +9551,41 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Status::TypeInfo::DecodableType status = static_cast<uint8_t>(0);
+        Attributes::Status::TypeInfo::DecodableType status = static_cast<chip::app::Clusters::PowerSource::PowerSourceStatus>(0);
         Attributes::Order::TypeInfo::DecodableType order   = static_cast<uint8_t>(0);
         Attributes::Description::TypeInfo::DecodableType description;
-        Attributes::WiredAssessedInputVoltage::TypeInfo::DecodableType wiredAssessedInputVoltage     = static_cast<uint32_t>(0);
-        Attributes::WiredAssessedInputFrequency::TypeInfo::DecodableType wiredAssessedInputFrequency = static_cast<uint16_t>(0);
-        Attributes::WiredCurrentType::TypeInfo::DecodableType wiredCurrentType                       = static_cast<uint8_t>(0);
-        Attributes::WiredAssessedCurrent::TypeInfo::DecodableType wiredAssessedCurrent               = static_cast<uint32_t>(0);
-        Attributes::WiredNominalVoltage::TypeInfo::DecodableType wiredNominalVoltage                 = static_cast<uint32_t>(0);
-        Attributes::WiredMaximumCurrent::TypeInfo::DecodableType wiredMaximumCurrent                 = static_cast<uint32_t>(0);
-        Attributes::WiredPresent::TypeInfo::DecodableType wiredPresent                               = static_cast<bool>(0);
+        Attributes::WiredAssessedInputVoltage::TypeInfo::DecodableType wiredAssessedInputVoltage;
+        Attributes::WiredAssessedInputFrequency::TypeInfo::DecodableType wiredAssessedInputFrequency;
+        Attributes::WiredCurrentType::TypeInfo::DecodableType wiredCurrentType =
+            static_cast<chip::app::Clusters::PowerSource::WiredCurrentType>(0);
+        Attributes::WiredAssessedCurrent::TypeInfo::DecodableType wiredAssessedCurrent;
+        Attributes::WiredNominalVoltage::TypeInfo::DecodableType wiredNominalVoltage = static_cast<uint32_t>(0);
+        Attributes::WiredMaximumCurrent::TypeInfo::DecodableType wiredMaximumCurrent = static_cast<uint32_t>(0);
+        Attributes::WiredPresent::TypeInfo::DecodableType wiredPresent               = static_cast<bool>(0);
         Attributes::ActiveWiredFaults::TypeInfo::DecodableType activeWiredFaults;
-        Attributes::BatteryVoltage::TypeInfo::DecodableType batteryVoltage                     = static_cast<uint32_t>(0);
-        Attributes::BatteryPercentRemaining::TypeInfo::DecodableType batteryPercentRemaining   = static_cast<uint8_t>(0);
-        Attributes::BatteryTimeRemaining::TypeInfo::DecodableType batteryTimeRemaining         = static_cast<uint32_t>(0);
-        Attributes::BatteryChargeLevel::TypeInfo::DecodableType batteryChargeLevel             = static_cast<uint8_t>(0);
-        Attributes::BatteryReplacementNeeded::TypeInfo::DecodableType batteryReplacementNeeded = static_cast<bool>(0);
-        Attributes::BatteryReplaceability::TypeInfo::DecodableType batteryReplaceability       = static_cast<uint8_t>(0);
-        Attributes::BatteryPresent::TypeInfo::DecodableType batteryPresent                     = static_cast<bool>(0);
-        Attributes::ActiveBatteryFaults::TypeInfo::DecodableType activeBatteryFaults;
-        Attributes::BatteryReplacementDescription::TypeInfo::DecodableType batteryReplacementDescription;
-        Attributes::BatteryCommonDesignation::TypeInfo::DecodableType batteryCommonDesignation = static_cast<uint32_t>(0);
-        Attributes::BatteryANSIDesignation::TypeInfo::DecodableType batteryANSIDesignation;
-        Attributes::BatteryIECDesignation::TypeInfo::DecodableType batteryIECDesignation;
-        Attributes::BatteryApprovedChemistry::TypeInfo::DecodableType batteryApprovedChemistry = static_cast<uint32_t>(0);
-        Attributes::BatteryCapacity::TypeInfo::DecodableType batteryCapacity                   = static_cast<uint32_t>(0);
-        Attributes::BatteryQuantity::TypeInfo::DecodableType batteryQuantity                   = static_cast<uint8_t>(0);
-        Attributes::BatteryChargeState::TypeInfo::DecodableType batteryChargeState             = static_cast<uint8_t>(0);
-        Attributes::BatteryTimeToFullCharge::TypeInfo::DecodableType batteryTimeToFullCharge   = static_cast<uint32_t>(0);
-        Attributes::BatteryFunctionalWhileCharging::TypeInfo::DecodableType batteryFunctionalWhileCharging = static_cast<bool>(0);
-        Attributes::BatteryChargingCurrent::TypeInfo::DecodableType batteryChargingCurrent = static_cast<uint32_t>(0);
-        Attributes::ActiveBatteryChargeFaults::TypeInfo::DecodableType activeBatteryChargeFaults;
+        Attributes::BatVoltage::TypeInfo::DecodableType batVoltage;
+        Attributes::BatPercentRemaining::TypeInfo::DecodableType batPercentRemaining;
+        Attributes::BatTimeRemaining::TypeInfo::DecodableType batTimeRemaining;
+        Attributes::BatChargeLevel::TypeInfo::DecodableType batChargeLevel =
+            static_cast<chip::app::Clusters::PowerSource::BatChargeLevel>(0);
+        Attributes::BatReplacementNeeded::TypeInfo::DecodableType batReplacementNeeded = static_cast<bool>(0);
+        Attributes::BatReplaceability::TypeInfo::DecodableType batReplaceability =
+            static_cast<chip::app::Clusters::PowerSource::BatReplaceability>(0);
+        Attributes::BatPresent::TypeInfo::DecodableType batPresent = static_cast<bool>(0);
+        Attributes::ActiveBatFaults::TypeInfo::DecodableType activeBatFaults;
+        Attributes::BatReplacementDescription::TypeInfo::DecodableType batReplacementDescription;
+        Attributes::BatCommonDesignation::TypeInfo::DecodableType batCommonDesignation = static_cast<uint32_t>(0);
+        Attributes::BatANSIDesignation::TypeInfo::DecodableType batANSIDesignation;
+        Attributes::BatIECDesignation::TypeInfo::DecodableType batIECDesignation;
+        Attributes::BatApprovedChemistry::TypeInfo::DecodableType batApprovedChemistry = static_cast<uint32_t>(0);
+        Attributes::BatCapacity::TypeInfo::DecodableType batCapacity                   = static_cast<uint32_t>(0);
+        Attributes::BatQuantity::TypeInfo::DecodableType batQuantity                   = static_cast<uint8_t>(0);
+        Attributes::BatChargeState::TypeInfo::DecodableType batChargeState =
+            static_cast<chip::app::Clusters::PowerSource::BatChargeState>(0);
+        Attributes::BatTimeToFullCharge::TypeInfo::DecodableType batTimeToFullCharge;
+        Attributes::BatFunctionalWhileCharging::TypeInfo::DecodableType batFunctionalWhileCharging = static_cast<bool>(0);
+        Attributes::BatChargingCurrent::TypeInfo::DecodableType batChargingCurrent;
+        Attributes::ActiveBatChargeFaults::TypeInfo::DecodableType activeBatChargeFaults;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -22592,55 +22596,31 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxLevel
-namespace PowerOnLevel {
+namespace IntrinsicBalanceFactor {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBalanceFactor::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace PowerOnLevel
-namespace PowerOnFadeTime {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnFadeTime::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerOnFadeTime
-namespace IntrinsicBallastFactor {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace IntrinsicBallastFactor
+} // namespace IntrinsicBalanceFactor
 namespace BallastFactorAdjustment {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastFactorAdjustment::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BallastFactorAdjustment
-namespace LampQuality {
+namespace LampQuantity {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -22648,10 +22628,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LampQuality::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LampQuantity::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace LampQuality
+} // namespace LampQuantity
 namespace LampType {
 struct TypeInfo
 {
@@ -22681,9 +22661,9 @@ struct TypeInfo
 namespace LampRatedHours {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampRatedHours::Id; }
@@ -22693,9 +22673,9 @@ struct TypeInfo
 namespace LampBurnHours {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHours::Id; }
@@ -22717,9 +22697,9 @@ struct TypeInfo
 namespace LampBurnHoursTripPoint {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHoursTripPoint::Id; }
@@ -22765,22 +22745,20 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::PhysicalMinLevel::TypeInfo::DecodableType physicalMinLevel               = static_cast<uint8_t>(0);
-        Attributes::PhysicalMaxLevel::TypeInfo::DecodableType physicalMaxLevel               = static_cast<uint8_t>(0);
-        Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus                     = static_cast<uint8_t>(0);
-        Attributes::MinLevel::TypeInfo::DecodableType minLevel                               = static_cast<uint8_t>(0);
-        Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                               = static_cast<uint8_t>(0);
-        Attributes::PowerOnLevel::TypeInfo::DecodableType powerOnLevel                       = static_cast<uint8_t>(0);
-        Attributes::PowerOnFadeTime::TypeInfo::DecodableType powerOnFadeTime                 = static_cast<uint16_t>(0);
-        Attributes::IntrinsicBallastFactor::TypeInfo::DecodableType intrinsicBallastFactor   = static_cast<uint8_t>(0);
-        Attributes::BallastFactorAdjustment::TypeInfo::DecodableType ballastFactorAdjustment = static_cast<uint8_t>(0);
-        Attributes::LampQuality::TypeInfo::DecodableType lampQuality                         = static_cast<uint8_t>(0);
+        Attributes::PhysicalMinLevel::TypeInfo::DecodableType physicalMinLevel = static_cast<uint8_t>(0);
+        Attributes::PhysicalMaxLevel::TypeInfo::DecodableType physicalMaxLevel = static_cast<uint8_t>(0);
+        Attributes::BallastStatus::TypeInfo::DecodableType ballastStatus       = static_cast<uint8_t>(0);
+        Attributes::MinLevel::TypeInfo::DecodableType minLevel                 = static_cast<uint8_t>(0);
+        Attributes::MaxLevel::TypeInfo::DecodableType maxLevel                 = static_cast<uint8_t>(0);
+        Attributes::IntrinsicBalanceFactor::TypeInfo::DecodableType intrinsicBalanceFactor;
+        Attributes::BallastFactorAdjustment::TypeInfo::DecodableType ballastFactorAdjustment;
+        Attributes::LampQuantity::TypeInfo::DecodableType lampQuantity = static_cast<uint8_t>(0);
         Attributes::LampType::TypeInfo::DecodableType lampType;
         Attributes::LampManufacturer::TypeInfo::DecodableType lampManufacturer;
-        Attributes::LampRatedHours::TypeInfo::DecodableType lampRatedHours                 = static_cast<uint32_t>(0);
-        Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours                   = static_cast<uint32_t>(0);
-        Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode                   = static_cast<uint8_t>(0);
-        Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint = static_cast<uint32_t>(0);
+        Attributes::LampRatedHours::TypeInfo::DecodableType lampRatedHours;
+        Attributes::LampBurnHours::TypeInfo::DecodableType lampBurnHours;
+        Attributes::LampAlarmMode::TypeInfo::DecodableType lampAlarmMode = static_cast<uint8_t>(0);
+        Attributes::LampBurnHoursTripPoint::TypeInfo::DecodableType lampBurnHoursTripPoint;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
@@ -29627,367 +29605,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace AccountLogin
-namespace Messaging {
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace DisplayMessage {
-struct Type;
-struct DecodableType;
-} // namespace DisplayMessage
-
-namespace GetLastMessage {
-struct Type;
-struct DecodableType;
-} // namespace GetLastMessage
-
-namespace CancelMessage {
-struct Type;
-struct DecodableType;
-} // namespace CancelMessage
-
-namespace MessageConfirmation {
-struct Type;
-struct DecodableType;
-} // namespace MessageConfirmation
-
-namespace DisplayProtectedMessage {
-struct Type;
-struct DecodableType;
-} // namespace DisplayProtectedMessage
-
-namespace GetMessageCancellation {
-struct Type;
-struct DecodableType;
-} // namespace GetMessageCancellation
-
-namespace CancelAllMessages {
-struct Type;
-struct DecodableType;
-} // namespace CancelAllMessages
-
-} // namespace Commands
-
-namespace Commands {
-namespace DisplayMessage {
-enum class Fields
-{
-    kMessageId                      = 0,
-    kMessageControl                 = 1,
-    kStartTime                      = 2,
-    kDurationInMinutes              = 3,
-    kMessage                        = 4,
-    kOptionalExtendedMessageControl = 5,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::DisplayMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                                 = static_cast<uint32_t>(0);
-    chip::BitMask<MessagingControlMask> messageControl = static_cast<chip::BitMask<MessagingControlMask>>(0);
-    uint32_t startTime                                 = static_cast<uint32_t>(0);
-    uint16_t durationInMinutes                         = static_cast<uint16_t>(0);
-    chip::CharSpan message;
-    chip::BitMask<MessagingExtendedControlMask> optionalExtendedMessageControl =
-        static_cast<chip::BitMask<MessagingExtendedControlMask>>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::DisplayMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                                 = static_cast<uint32_t>(0);
-    chip::BitMask<MessagingControlMask> messageControl = static_cast<chip::BitMask<MessagingControlMask>>(0);
-    uint32_t startTime                                 = static_cast<uint32_t>(0);
-    uint16_t durationInMinutes                         = static_cast<uint16_t>(0);
-    chip::CharSpan message;
-    chip::BitMask<MessagingExtendedControlMask> optionalExtendedMessageControl =
-        static_cast<chip::BitMask<MessagingExtendedControlMask>>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace DisplayMessage
-namespace GetLastMessage {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetLastMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetLastMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetLastMessage
-namespace CancelMessage {
-enum class Fields
-{
-    kMessageId      = 0,
-    kMessageControl = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CancelMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                                 = static_cast<uint32_t>(0);
-    chip::BitMask<MessagingControlMask> messageControl = static_cast<chip::BitMask<MessagingControlMask>>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CancelMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                                 = static_cast<uint32_t>(0);
-    chip::BitMask<MessagingControlMask> messageControl = static_cast<chip::BitMask<MessagingControlMask>>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CancelMessage
-namespace MessageConfirmation {
-enum class Fields
-{
-    kMessageId                  = 0,
-    kConfirmationTime           = 1,
-    kMessageConfirmationControl = 2,
-    kMessageResponse            = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MessageConfirmation::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                 = static_cast<uint32_t>(0);
-    uint32_t confirmationTime          = static_cast<uint32_t>(0);
-    uint8_t messageConfirmationControl = static_cast<uint8_t>(0);
-    chip::ByteSpan messageResponse;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MessageConfirmation::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                 = static_cast<uint32_t>(0);
-    uint32_t confirmationTime          = static_cast<uint32_t>(0);
-    uint8_t messageConfirmationControl = static_cast<uint8_t>(0);
-    chip::ByteSpan messageResponse;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MessageConfirmation
-namespace DisplayProtectedMessage {
-enum class Fields
-{
-    kMessageId                      = 0,
-    kMessageControl                 = 1,
-    kStartTime                      = 2,
-    kDurationInMinutes              = 3,
-    kMessage                        = 4,
-    kOptionalExtendedMessageControl = 5,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::DisplayProtectedMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                                 = static_cast<uint32_t>(0);
-    chip::BitMask<MessagingControlMask> messageControl = static_cast<chip::BitMask<MessagingControlMask>>(0);
-    uint32_t startTime                                 = static_cast<uint32_t>(0);
-    uint16_t durationInMinutes                         = static_cast<uint16_t>(0);
-    chip::CharSpan message;
-    chip::BitMask<MessagingExtendedControlMask> optionalExtendedMessageControl =
-        static_cast<chip::BitMask<MessagingExtendedControlMask>>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::DisplayProtectedMessage::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t messageId                                 = static_cast<uint32_t>(0);
-    chip::BitMask<MessagingControlMask> messageControl = static_cast<chip::BitMask<MessagingControlMask>>(0);
-    uint32_t startTime                                 = static_cast<uint32_t>(0);
-    uint16_t durationInMinutes                         = static_cast<uint16_t>(0);
-    chip::CharSpan message;
-    chip::BitMask<MessagingExtendedControlMask> optionalExtendedMessageControl =
-        static_cast<chip::BitMask<MessagingExtendedControlMask>>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace DisplayProtectedMessage
-namespace GetMessageCancellation {
-enum class Fields
-{
-    kEarliestImplementationTime = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetMessageCancellation::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t earliestImplementationTime = static_cast<uint32_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetMessageCancellation::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t earliestImplementationTime = static_cast<uint32_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetMessageCancellation
-namespace CancelAllMessages {
-enum class Fields
-{
-    kImplementationDateTime = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CancelAllMessages::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t implementationDateTime = static_cast<uint32_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CancelAllMessages::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-    uint32_t implementationDateTime = static_cast<uint32_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CancelAllMessages
-} // namespace Commands
-
-namespace Attributes {
-
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-};
-} // namespace AcceptedCommandList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace Messaging
 namespace ApplianceIdentification {
 
 namespace Attributes {

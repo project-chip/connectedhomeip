@@ -163,8 +163,6 @@ tests:
       PICS: CC.S.A4005
       response:
           saveAs: ColorLoopStartEnhancedHueValue
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -290,8 +288,6 @@ tests:
       PICS: CC.S.A4006
       response:
           saveAs: ColorLoopStoredEnhancedHueValue
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT."
       command: "readAttribute"

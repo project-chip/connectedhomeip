@@ -67,7 +67,7 @@ BOOL CHIPClearAllDomain(NSString * domain)
 
 - (BOOL)setStorageData:(NSData *)value forKey:(NSString *)key
 {
-    return CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    return MTRSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
 }
 
 - (BOOL)removeStorageDataForKey:(NSString *)key

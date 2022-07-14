@@ -63,6 +63,11 @@ tools:
 ############################################################
 #  Tests
 ############################################################
+tests:
+    - src/app/tests/*
+    - src/app/tests/suites/*
+    - src/app/tests/suites/certification/*
+
 test driver:
     - src/test_driver/*
 
@@ -126,6 +131,11 @@ setup payload:
 ############################################################
 platform:
     - src/platform/*
+    - config/tizen/chip-gn/platform/*
+    - examples/platform/*
+    - scripts/tools/memory/platform/*
+    - src/include/platform/*
+    - src/lib/dnssd/platform/*
 
 darwin:
     - src/platform/Darwin/*

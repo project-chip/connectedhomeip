@@ -134,7 +134,7 @@
     [scanner scanUnsignedLongLong:&nodeId];
 
     // TODO Binding Support was removed from ObjC Clusters.h
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
                 NSLog(resultString, nil);
@@ -150,7 +150,7 @@
 
 - (IBAction)unbind:(id)sender
 {
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 NSString * resultString = [NSString stringWithFormat:@"Not Supported"];
                 NSLog(resultString, nil);

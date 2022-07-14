@@ -59,8 +59,9 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
-          regulatory information in the Commissionee."
+          "Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.DD.WIRELESS
       verification: |
           On DUT:
           CHIP:CTL: Setting Regulatory Config
@@ -375,10 +376,11 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
-          regulatory information in the Commissionee."
+          "Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.DD.WIRELESS
       verification: |
-          Need chip-tool implementation
+          Need test step review, potentially not a hard requirement so would not be required in test case
       disabled: true
 
     - label:

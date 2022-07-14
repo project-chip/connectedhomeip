@@ -7440,65 +7440,65 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ActiveWiredFaults::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, activeWiredFaults));
         break;
-    case Attributes::BatteryVoltage::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryVoltage));
+    case Attributes::BatVoltage::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batVoltage));
         break;
-    case Attributes::BatteryPercentRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPercentRemaining));
+    case Attributes::BatPercentRemaining::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batPercentRemaining));
         break;
-    case Attributes::BatteryTimeRemaining::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryTimeRemaining));
+    case Attributes::BatTimeRemaining::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batTimeRemaining));
         break;
-    case Attributes::BatteryChargeLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargeLevel));
+    case Attributes::BatChargeLevel::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batChargeLevel));
         break;
-    case Attributes::BatteryReplacementNeeded::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplacementNeeded));
+    case Attributes::BatReplacementNeeded::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batReplacementNeeded));
         break;
-    case Attributes::BatteryReplaceability::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplaceability));
+    case Attributes::BatReplaceability::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batReplaceability));
         break;
-    case Attributes::BatteryPresent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryPresent));
+    case Attributes::BatPresent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batPresent));
         break;
-    case Attributes::ActiveBatteryFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryFaults));
+    case Attributes::ActiveBatFaults::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatFaults));
         break;
-    case Attributes::BatteryReplacementDescription::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryReplacementDescription));
+    case Attributes::BatReplacementDescription::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batReplacementDescription));
         break;
-    case Attributes::BatteryCommonDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryCommonDesignation));
+    case Attributes::BatCommonDesignation::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batCommonDesignation));
         break;
-    case Attributes::BatteryANSIDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryANSIDesignation));
+    case Attributes::BatANSIDesignation::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batANSIDesignation));
         break;
-    case Attributes::BatteryIECDesignation::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryIECDesignation));
+    case Attributes::BatIECDesignation::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batIECDesignation));
         break;
-    case Attributes::BatteryApprovedChemistry::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryApprovedChemistry));
+    case Attributes::BatApprovedChemistry::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batApprovedChemistry));
         break;
-    case Attributes::BatteryCapacity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryCapacity));
+    case Attributes::BatCapacity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batCapacity));
         break;
-    case Attributes::BatteryQuantity::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryQuantity));
+    case Attributes::BatQuantity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batQuantity));
         break;
-    case Attributes::BatteryChargeState::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargeState));
+    case Attributes::BatChargeState::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batChargeState));
         break;
-    case Attributes::BatteryTimeToFullCharge::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryTimeToFullCharge));
+    case Attributes::BatTimeToFullCharge::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batTimeToFullCharge));
         break;
-    case Attributes::BatteryFunctionalWhileCharging::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryFunctionalWhileCharging));
+    case Attributes::BatFunctionalWhileCharging::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batFunctionalWhileCharging));
         break;
-    case Attributes::BatteryChargingCurrent::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, batteryChargingCurrent));
+    case Attributes::BatChargingCurrent::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, batChargingCurrent));
         break;
-    case Attributes::ActiveBatteryChargeFaults::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatteryChargeFaults));
+    case Attributes::ActiveBatChargeFaults::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeBatChargeFaults));
         break;
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
@@ -17051,20 +17051,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::MaxLevel::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, maxLevel));
         break;
-    case Attributes::PowerOnLevel::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, powerOnLevel));
-        break;
-    case Attributes::PowerOnFadeTime::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, powerOnFadeTime));
-        break;
-    case Attributes::IntrinsicBallastFactor::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBallastFactor));
+    case Attributes::IntrinsicBalanceFactor::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, intrinsicBalanceFactor));
         break;
     case Attributes::BallastFactorAdjustment::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, ballastFactorAdjustment));
         break;
-    case Attributes::LampQuality::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, lampQuality));
+    case Attributes::LampQuantity::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, lampQuantity));
         break;
     case Attributes::LampType::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, lampType));
@@ -21603,359 +21597,6 @@ namespace Events {
 } // namespace Events
 
 } // namespace AccountLogin
-namespace Messaging {
-
-namespace Commands {
-namespace DisplayMessage {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageId)), messageId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageControl)), messageControl));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStartTime)), startTime));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDurationInMinutes)), durationInMinutes));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessage)), message));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalExtendedMessageControl)),
-                                           optionalExtendedMessageControl));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMessageId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageId));
-            break;
-        case to_underlying(Fields::kMessageControl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageControl));
-            break;
-        case to_underlying(Fields::kStartTime):
-            ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
-            break;
-        case to_underlying(Fields::kDurationInMinutes):
-            ReturnErrorOnFailure(DataModel::Decode(reader, durationInMinutes));
-            break;
-        case to_underlying(Fields::kMessage):
-            ReturnErrorOnFailure(DataModel::Decode(reader, message));
-            break;
-        case to_underlying(Fields::kOptionalExtendedMessageControl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalExtendedMessageControl));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace DisplayMessage.
-namespace GetLastMessage {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace GetLastMessage.
-namespace CancelMessage {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageId)), messageId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageControl)), messageControl));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMessageId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageId));
-            break;
-        case to_underlying(Fields::kMessageControl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageControl));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace CancelMessage.
-namespace MessageConfirmation {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageId)), messageId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kConfirmationTime)), confirmationTime));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageConfirmationControl)), messageConfirmationControl));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageResponse)), messageResponse));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMessageId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageId));
-            break;
-        case to_underlying(Fields::kConfirmationTime):
-            ReturnErrorOnFailure(DataModel::Decode(reader, confirmationTime));
-            break;
-        case to_underlying(Fields::kMessageConfirmationControl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageConfirmationControl));
-            break;
-        case to_underlying(Fields::kMessageResponse):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageResponse));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MessageConfirmation.
-namespace DisplayProtectedMessage {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageId)), messageId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessageControl)), messageControl));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStartTime)), startTime));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kDurationInMinutes)), durationInMinutes));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMessage)), message));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kOptionalExtendedMessageControl)),
-                                           optionalExtendedMessageControl));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMessageId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageId));
-            break;
-        case to_underlying(Fields::kMessageControl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageControl));
-            break;
-        case to_underlying(Fields::kStartTime):
-            ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
-            break;
-        case to_underlying(Fields::kDurationInMinutes):
-            ReturnErrorOnFailure(DataModel::Decode(reader, durationInMinutes));
-            break;
-        case to_underlying(Fields::kMessage):
-            ReturnErrorOnFailure(DataModel::Decode(reader, message));
-            break;
-        case to_underlying(Fields::kOptionalExtendedMessageControl):
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalExtendedMessageControl));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace DisplayProtectedMessage.
-namespace GetMessageCancellation {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEarliestImplementationTime)), earliestImplementationTime));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kEarliestImplementationTime):
-            ReturnErrorOnFailure(DataModel::Decode(reader, earliestImplementationTime));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace GetMessageCancellation.
-namespace CancelAllMessages {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kImplementationDateTime)), implementationDateTime));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(reader.GetTag()))
-        {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kImplementationDateTime):
-            ReturnErrorOnFailure(DataModel::Decode(reader, implementationDateTime));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace CancelAllMessages.
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, generatedCommandList));
-        break;
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptedCommandList));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace Messaging
 namespace ApplianceIdentification {
 
 namespace Commands {

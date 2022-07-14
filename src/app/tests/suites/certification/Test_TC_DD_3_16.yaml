@@ -24,8 +24,9 @@ config:
 
 tests:
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the 11-digit Manual Pairing Code from
-          the Commissionee to the DUT in any format supported by DUT"
+          "Provide the 11-digit Manual Pairing Code from the Commissionee to the
+          DUT in any format supported by DUT"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 0 --capabilities 4 --discriminator 3840 --passcode 20202021
 
@@ -41,14 +42,15 @@ tests:
           [1651180718.960671][13218:13218] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651180718.960729][13218:13218] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
           [1651180718.960760][13218:13218] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651180718.960781][13218:13218] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
+          [1651180718.960781][13218:13218] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
           [1651180718.960814][13218:13218] CHIP:SVR: Manual pairing code: [34970112332]
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), VERSION: Using the manual code from Step 1,
-          generate a new manual code but substituting out the current VERSION
-          with an invalid VERSION: 2"
+          "VERSION: Using the manual code from Step 1, generate a new manual
+          code but substituting out the current VERSION with an invalid VERSION:
+          2"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $ ./out/chip-tool/chip-tool payload verhoeff-generate 8497011233
           [1651186243492] [13415:349553] CHIP: [SPL] Generating Character for: 84970112331
@@ -57,32 +59,31 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the Manual Pairing Code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
+          "Provide the Manual Pairing Code, generated in the previous step, to
+          the DUT in any format supported by the DUT"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 84970112331
+          $  ./out/chip-tool/chip-tool pairing  code 1 84970112331
 
-          [1651186653578] [13468:355000] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
-          [1651186653600] [13468:354997] CHIP: [BLE] CBManagerState: ON
-          [1651186653601] [13468:354997] CHIP: [BLE] CBManagerState: RESETTING
-          [1651186655771] [13468:354997] CHIP: [BLE] CBManagerState: ON
-          Illegal instruction: 4
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), VID_PID_PRESENT: Using the manual code from
-          Step 1, generate a new manual code but substituting out the current
-          VID_PID_PRESENT with an invalid VID_PID_PRESENT set to 1"
+          "VID_PID_PRESENT: Using the manual code from Step 1, generate a new
+          manual code but substituting out the current VID_PID_PRESENT with an
+          invalid VID_PID_PRESENT set to 1"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 2 --force-short-code 1
           [1651181048462] [11611:269469] CHIP: [TOO] Manual Code: 74970112334
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the Manual Pairing Code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
+          "Provide the Manual Pairing Code, generated in the previous step, to
+          the DUT in any format supported by the DUT"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 74970112334
+          $  ./out/chip-tool/chip-tool pairing code 1 74970112334
 
           [1651184274318] [12512:321250] CHIP: [SPL] Failed decoding base10. Input length 10 was not expected length 20
           ...
@@ -90,43 +91,39 @@ tests:
       disabled: true
 
     - label:
-          'If (PICS_11_MANUAL_PC), SHORT DISCRIMINATOR: Using the manual code
-          from Step 1, generate a new manual code but substituting out the
-          current SHORT DISCRIMINATOR string with a discriminator value that
-          makes the generated manual code differ from Step 1s manual code (i.e.
-          Choose a discriminator value that changes any of the 4
-          most-significant bits of Step 1s 12-bit discriminator value and
-          adheres to rules of section 5.1.1.5. "Discriminator value")'
+          'SHORT DISCRIMINATOR: Using the manual code from Step 1, generate a
+          new manual code but substituting out the current SHORT DISCRIMINATOR
+          string with a discriminator value that makes the generated manual code
+          differ from Step 1s manual code (i.e. Choose a discriminator value
+          that changes any of the 4 most-significant bits of Step 1s 12-bit
+          discriminator value and adheres to rules of section 5.1.1.5.
+          "Discriminator value")'
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          $ ./out/chip-tool/chip-tool payload verhoeff-generate 8497011233
-          [1651186243492] [13415:349553] CHIP: [SPL] Generating Character for: 8497011233
-          [1651186243492] [13415:349553] CHIP: [SPL] Generated Char: 1
-          Manual Code: 84970112331
+          Manual Code: 33331712336
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the Manual Pairing Code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
+          "Provide the Manual Pairing Code, generated in the previous step, to
+          the DUT in any format supported by the DUT"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 33331712336
+          $  ./out/chip-tool/chip-tool pairing code 1 33331712336
 
-          [1651184172578] [12458:318862] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
-          [1651184172578] [12458:318862] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
-          [1651184172603] [12458:318861] CHIP: [BLE] CBManagerState: ON
-          [1651184172605] [12458:318862] CHIP: [BLE] CBManagerState: RESETTING
-          [1651184174769] [12458:318861] CHIP: [BLE] CBManagerState: ON
-          Illegal instruction: 4
+          [1654001605.517505][3200:3205] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:748: CHIP Error 0x0000002D: Not Implemented at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:450
+          [1654001605.517563][3200:3205] CHIP:CTL: Stopping commissioning discovery over DNS-SD
+          [1654001605.517619][3200:3205] CHIP:TOO: Secure Pairing Failed
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Passcode: Using the manual code from Step 1,
-          generate a new manual code using all the same Onboarding Payload
-          components except for the Passcode. For each Passcode in the following
-          list, set the Passcode component to one of the invalid Passcode and
-          generate a new manual code using all the same Onboarding Payload
-          components and one Passcode from the list: 00000000, 11111111,
-          22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888,
-          99999999, 12345678, 87654321"
+          "Passcode: Using the manual code from Step 1, generate a new manual
+          code using all the same Onboarding Payload components except for the
+          Passcode. For each Passcode in the following list, set the Passcode
+          component to one of the invalid Passcode and generate a new manual
+          code using all the same Onboarding Payload components and one Passcode
+          from the list: 00000000, 11111111, 22222222, 33333333, 44444444,
+          55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           1. Use these as examples of how to generate manual codes with invalid passcodes
 
@@ -180,86 +177,76 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide each of the Manual Pairing Codes,
-          generated in the previous step, to the DUT in any format supported by
-          the DUT"
+          "Provide each of the Manual Pairing Codes, generated in the previous
+          step, to the DUT in any format supported by the DUT"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           (00000000)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 34915200008
-          [1651182596491] [12006:288954] CHIP: [SPL] Failed decoding base10. SetUpPINCode was 0.
+          $  ./out/chip-tool/chip-tool pairing code 1 34915200008
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (11111111)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35191106788
-          [1651182622501] [12009:289307] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182622501] [12009:289307] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35191106788
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (22222222)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35467013565
-          [1651182688251] [12026:292039] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182688251] [12026:292039] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35467013565
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (33333333)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35742920344
-          [1651182749249] [12037:293713] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182749249] [12037:293713] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35742920344
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (44444444)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 36018827124
-          [1651182769619] [12045:294912] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182769619] [12045:294912] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 36018827124
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (55555555)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 36294733900
-          [1651182788383] [12053:296042] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182788383] [12053:296042] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 36294733900
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (66666666)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 34932240691
-          [1651182816133] [12067:297210] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182816133] [12067:297210] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 34932240691
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (77777777)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35208147474
-          [1651182833101] [12080:298444] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182833101] [12080:298444] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35208147474
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (88888888)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35484054250
-          [1651182850431] [12086:299484] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182850431] [12086:299484] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35484054250
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (99999999)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35759961037
-          [1651182873582] [12092:300725] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182873582] [12092:300725] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35759961037
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (12345678)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 35767807533
-          [1651182902418] [12113:302157] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182902418] [12113:302157] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 35767807533
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
 
           (87654321)
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 36545753496
-          [1651182919123] [12125:303345] CHIP: [SC] Failed during PASE session setup. ../../examples/chip-tool/third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1352: CHIP Error 0x000000AC: Internal error
-          [1651182919123] [12125:303345] CHIP: [TOO] Secure Pairing Failed
+          $  ./out/chip-tool/chip-tool pairing code 1 36545753496
+          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), CHECK_DIGIT: Using the manual code from Step
-          1, generate a new manual code but substituting out the current
-          CHECK_DIGIT with an invalid CHECK_DIGIT (i.e. Any different
-          CHECK_DIGIT than the commissionees CHECK_DIGIT while following Table
-          38. Encoding Method without Vendor and Product IDs (VID_PID_Present ==
-          0))"
+          "CHECK_DIGIT: Using the manual code from Step 1, generate a new manual
+          code but substituting out the current CHECK_DIGIT with an invalid
+          CHECK_DIGIT (i.e. Any different CHECK_DIGIT than the commissionees
+          CHECK_DIGIT while following Table 38. Encoding Method without Vendor
+          and Product IDs (VID_PID_Present == 0))"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
           Manual Code: 34970112331
       disabled: true
 
     - label:
-          "If (PICS_11_MANUAL_PC), Provide the Manual Pairing Code, generated in
-          the previous step, to the DUT in any format supported by the DUT"
+          "Provide the Manual Pairing Code, generated in the previous step, to
+          the DUT in any format supported by the DUT"
+      PICS: MCORE.DD.11_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 34970112331
+          $  ./out/chip-tool/chip-tool pairing  code 1 34970112331
 
           [1651184084907] [12271:316118] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
       disabled: true

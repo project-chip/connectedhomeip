@@ -58,8 +58,9 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
-          regulatory information in the Commissionee."
+          "Commissioner SHALL configure regulatory information in the
+          Commissionee."
+      PICS: MCORE.DD.WIRELESS
       verification: |
           Need chip-tool implementation
       disabled: true

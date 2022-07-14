@@ -29,11 +29,11 @@ tests:
 
           ./chip-tool onoff on 1 20
 
-          verify TH is responsds with unsuppported endpoint  with the data sent in the below command
+          verify DUT is responsds with unsuppported endpoint  for the data sent in the above command
 
-          [1654076784.679791][13733:13738] CHIP:DMG: Received Command Response Status for Endpoint=20 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7f
-          [1654076784.679818][13733:13738] CHIP:TOO: Error: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
-          [1654076784.679871][13733:13738] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1655718065.882392][4587:4592] CHIP:DMG: Received Command Response Status for Endpoint=20 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7f
+          [1655718065.882440][4587:4592] CHIP:TOO: Error: IM Error 0x0000057F: General error: 0x7f (UNSUPPORTED_ENDPOINT)
+          [1655718065.882491][4587:4592] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
@@ -44,10 +44,11 @@ tests:
 
           ./chip-tool any command-by-id 0x0003 0 1 1 2
 
-          verify TH is responsds with unsuppported cluster  with the data sent in the below command
-          [1654076811.947575][13740:13745] CHIP:DMG: Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
-          [1654076811.947587][13740:13745] CHIP:TOO: Error: IM Error 0x000005C3: General error: 0xc3 (UNSUPPORTED_CLUSTER)
-          [1654076811.947602][13740:13745] CHIP:DMG: ICR moving to [AwaitingDe]
+          verify DUT is responsds with unsuppported cluster for the data sent in the above command
+
+          [1655718144.692503][4602:4607] CHIP:DMG: Received Command Response Status for Endpoint=2 Cluster=0x0000_0003 Command=0x0000_0000 Status=0xc3
+          [1655718144.692570][4602:4607] CHIP:TOO: Error: IM Error 0x000005C3: General error: 0xc3 (UNSUPPORTED_CLUSTER)
+          [1655718144.692627][4602:4607] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
@@ -55,7 +56,11 @@ tests:
           indicates a specific command that is unsupported."
       verification: |
           In case of chip tool, here is an example command to use
+
            ./chip-tool any command-by-id 0x0003 3 1 1 0
+
+          verify DUT is responsds with unsuppported command  for the data sent in the above command
+
           [1654076838.936184][13752:13757] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0003 Command=0x0000_0003 Status=0x81
           [1654076838.936215][13752:13757] CHIP:TOO: Error: IM Error 0x00000581: General error: 0x81 (UNSUPPORTED_COMMAND)
           [1654076838.936258][13752:13757] CHIP:DMG: ICR moving to [AwaitingDe]
@@ -68,8 +73,14 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
            ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
-           ./chip-tool onoff on 1 1
+
+          ./chip-tool onoff on 1 1
+
+          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
+
           [1654079683.774619][14540:14546] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x7e
           [1654079683.774630][14540:14546] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1654079683.774643][14540:14546] CHIP:DMG: ICR moving to [AwaitingDe]
@@ -82,10 +93,14 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          To get UNSUPPORTED_ACCESS 1st we need to send below mentioned ACL command and then
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
-          ./chip-tool  generalcommissioning    commissioning-complete  1 0
+          ./chip-tool  generalcommissioning commissioning-complete  1 0
+
+          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
+
           [1654079608.667986][14525:14530] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0004 Status=0x7e
           [1654079608.668000][14525:14530] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1654079608.668011][14525:14530] CHIP:DMG: ICR moving to [AwaitingDe]
@@ -98,50 +113,56 @@ tests:
           In case of chip tool, here is an example command to use
           sudo ./chip-tool generalcommissioning arm-fail-safe  1000 1  1 0
 
+          Verify  DUT generates an InvokeResponseIB with a valid CommandDataIB and
+          sends it to the TH for the data sent in the above command
 
-          [1653559028.744923][13424:13429] CHIP:DMG: InvokeResponseMessage =
-          [1653559028.744944][13424:13429] CHIP:DMG: {
-          [1653559028.744963][13424:13429] CHIP:DMG:         suppressResponse = false,
-          [1653559028.744985][13424:13429] CHIP:DMG:         InvokeResponseIBs =
-          [1653559028.745020][13424:13429] CHIP:DMG:         [
-          [1653559028.745041][13424:13429] CHIP:DMG:                 InvokeResponseIB =
-          [1653559028.745073][13424:13429] CHIP:DMG:                 {
-          [1653559028.745092][13424:13429] CHIP:DMG:                         CommandDataIB =
-          [1653559028.745113][13424:13429] CHIP:DMG:                         {
-          [1653559028.745140][13424:13429] CHIP:DMG:                                 CommandPathIB =
-          [1653559028.745167][13424:13429] CHIP:DMG:                                 {
-          [1653559028.745192][13424:13429] CHIP:DMG:                                         EndpointId = 0x0,
-          [1653559028.745217][13424:13429] CHIP:DMG:                                         ClusterId = 0x30,
-          [1653559028.745244][13424:13429] CHIP:DMG:                                         CommandId = 0x1,
-          [1653559028.745268][13424:13429] CHIP:DMG:                                 },
-          [1653559028.745299][13424:13429] CHIP:DMG:
-          [1653559028.745322][13424:13429] CHIP:DMG:                                 CommandData =
-          [1653559028.745348][13424:13429] CHIP:DMG:                                 {
-          [1653559028.745399][13424:13429] CHIP:DMG:                                         0x0 = 0,
-          [1653559028.745425][13424:13429] CHIP:DMG:                                         0x1 = "",
-          [1653559028.745447][13424:13429] CHIP:DMG:                                 },
-          [1653559028.745468][13424:13429] CHIP:DMG:                         },
-          [1653559028.745501][13424:13429] CHIP:DMG:
-          [1653559028.745524][13424:13429] CHIP:DMG:                 },
-          [1653559028.745557][13424:13429] CHIP:DMG:
-          [1653559028.745579][13424:13429] CHIP:DMG:         ],
-          [1653559028.745614][13424:13429] CHIP:DMG:
-          [1653559028.745636][13424:13429] CHIP:DMG:         InteractionModelRevision = 1
-          [1653559028.745656][13424:13429] CHIP:DMG: },
-          [1653559028.745741][13424:13429] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1653559028.745793][13424:13429] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1653559028.745851][13424:13429] CHIP:TOO:   ArmFailSafeResponse: {
-          [1653559028.745884][13424:13429] CHIP:TOO:     errorCode: 0
-          [1653559028.745907][13424:13429] CHIP:TOO:     debugText:
-          [1653559028.745930][13424:13429] CHIP:TOO:    }
+          On TH
+          [1655718690.469392][4629:4634] CHIP:DMG: },
+          [1655718690.469476][4629:4634] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1655718690.469541][4629:4634] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1655718690.469615][4629:4634] CHIP:TOO:   ArmFailSafeResponse: {
+          [1655718690.469664][4629:4634] CHIP:TOO:     errorCode: 0
+          [1655718690.469698][4629:4634] CHIP:TOO:     debugText:
+          [1655718690.469733][4629:4634] CHIP:TOO:    }
+          [1655718690.469787][4629:4634] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1655718690.469859][4629:4634] CHIP:EM: Sending Standalone Ack for MessageCounter:60280704 on exchange 4731i
+
+
+          On DUT
+          [1655718690.417352][10909:10909] CHIP:DMG: InvokeRequestMessage =
+          [1655718690.417401][10909:10909] CHIP:DMG: {
+          [1655718690.417436][10909:10909] CHIP:DMG:         suppressResponse = false,
+          [1655718690.417484][10909:10909] CHIP:DMG:         timedRequest = false,
+          [1655718690.417529][10909:10909] CHIP:DMG:         InvokeRequests =
+          [1655718690.417587][10909:10909] CHIP:DMG:         [
+          [1655718690.417633][10909:10909] CHIP:DMG:                 CommandDataIB =
+          [1655718690.417683][10909:10909] CHIP:DMG:                 {
+          [1655718690.417730][10909:10909] CHIP:DMG:                         CommandPathIB =
+          [1655718690.417793][10909:10909] CHIP:DMG:                         {
+          [1655718690.417852][10909:10909] CHIP:DMG:                                 EndpointId = 0x0,
+          [1655718690.417914][10909:10909] CHIP:DMG:                                 ClusterId = 0x30,
+          [1655718690.417973][10909:10909] CHIP:DMG:                                 CommandId = 0x0,
+          [1655718690.418030][10909:10909] CHIP:DMG:                         },
+          [1655718690.418087][10909:10909] CHIP:DMG:
+          [1655718690.418140][10909:10909] CHIP:DMG:                         CommandFields =
+          [1655718690.418202][10909:10909] CHIP:DMG:                         {
+          [1655718690.418261][10909:10909] CHIP:DMG:                                 0x0 = 1000,
+          [1655718690.418322][10909:10909] CHIP:DMG:                                 0x1 = 1,
+          [1655718690.418381][10909:10909] CHIP:DMG:                         },
+          [1655718690.418433][10909:10909] CHIP:DMG:                 },
+          [1655718690.418487][10909:10909] CHIP:DMG:
+          [1655718690.418531][10909:10909] CHIP:DMG:         ],
+          [1655718690.418586][10909:10909] CHIP:DMG:
+          [1655718690.418630][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
+          [1655718690.418673][10909:10909] CHIP:DMG: },
+          [1655718690.418779][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0030 e=0 p=a
       disabled: true
 
     - label:
           "TH sends the Invoke Request Message to the DUT with a valid
           CommandDataIB and SuppressResponse set to True"
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/8043
-           Out of Scope for V1.0
+          Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -150,9 +171,12 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
            ./chip-tool any command-by-id 0x0003 0 1  1 0 --timedInteractionTimeoutMs 500
 
+          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
           [1654079573.921236][14516:14521] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0003 Command=0x0000_0000 Status=0x7e
           [1654079573.921251][14516:14521] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
@@ -166,6 +190,8 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0
+
+          verify DUT is responsds with NEEDS_TIMED_INTERACTION for the data sent in the above command
 
           [1654077001.606235][13788:13793] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0xc6
           [1654077001.606268][13788:13793] CHIP:TOO: Error: IM Error 0x000005C6: General error: 0xc6 (NEEDS_TIMED_INTERACTION)

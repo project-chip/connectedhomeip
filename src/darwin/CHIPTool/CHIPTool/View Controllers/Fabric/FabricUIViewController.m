@@ -217,11 +217,12 @@
 - (void)fetchCommissionedFabricsNumber
 {
     NSLog(@"Fetching the commissioned fabrics attribute");
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
-                                                                                               endpoint:0
-                                                                                                  queue:dispatch_get_main_queue()];
+                MTRBaseClusterOperationalCredentials * cluster =
+                    [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
+                                                                        endpoint:0
+                                                                           queue:dispatch_get_main_queue()];
                 [cluster
                     readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                         if (!error) {
@@ -265,11 +266,12 @@
 - (void)fetchFabricsList
 {
     NSLog(@"Request to fetchFabricsList");
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
-                                                                                               endpoint:0
-                                                                                                  queue:dispatch_get_main_queue()];
+                MTRBaseClusterOperationalCredentials * cluster =
+                    [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
+                                                                        endpoint:0
+                                                                           queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
                 MTRReadParams * params = [[MTRReadParams alloc] init];
                 params.fabricFiltered = @NO;
@@ -320,7 +322,7 @@
         actionWithTitle:@"Remove"
                   style:UIAlertActionStyleDefault
                 handler:^(UIAlertAction * action) {
-                    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+                    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                             if (!chipDevice) {
                                 [self
                                     updateResult:[NSString
@@ -328,10 +330,10 @@
                                          isError:YES];
                             }
 
-                            MTROperationalCredentials * opCredsCluster =
-                                [[MTROperationalCredentials alloc] initWithDevice:chipDevice
-                                                                         endpoint:0
-                                                                            queue:dispatch_get_main_queue()];
+                            MTRBaseClusterOperationalCredentials * opCredsCluster =
+                                [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
+                                                                                    endpoint:0
+                                                                                       queue:dispatch_get_main_queue()];
 
                             dispatch_group_t removeGroup = dispatch_group_create();
                             // Loop over the list of all fabrics and for each, call remove
@@ -398,11 +400,12 @@
     NSLog(@"Request to updateFabricLabel %@", label);
     [self.updateFabricLabelTextField resignFirstResponder];
 
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                MTROperationalCredentials * cluster = [[MTROperationalCredentials alloc] initWithDevice:chipDevice
-                                                                                               endpoint:0
-                                                                                                  queue:dispatch_get_main_queue()];
+                MTRBaseClusterOperationalCredentials * cluster =
+                    [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
+                                                                        endpoint:0
+                                                                           queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
                 __auto_type * params = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
                 params.label = label;
@@ -451,12 +454,14 @@
 {
     NSNumber * fabricIndex = @([_removeFabricTextField.text intValue]);
     NSLog(@"Request to fabric at index %@", fabricIndex);
-    if (MTRGetConnectedDevice(^(MTRDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 [self updateResult:[NSString stringWithFormat:@"removeFabric command sent for fabricIndex %@.", fabricIndex]
                            isError:NO];
-                MTROperationalCredentials * opCredsCluster =
-                    [[MTROperationalCredentials alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+                MTRBaseClusterOperationalCredentials * opCredsCluster =
+                    [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
+                                                                        endpoint:0
+                                                                           queue:dispatch_get_main_queue()];
                 MTROperationalCredentialsClusterRemoveFabricParams * params =
                     [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
                 params.fabricIndex = fabricIndex;

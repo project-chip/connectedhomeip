@@ -37,14 +37,14 @@ tests:
               type: uint16
 
     - label: "Read the global attribute constraints : FeatureMap"
-      PICS:
-          PICS_SKIP_SAMPLE_APP && (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)
+      PICS: (CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: map32
+              minValue: 0
+              maxValue: 31
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

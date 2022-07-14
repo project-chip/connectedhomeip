@@ -192,7 +192,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Create Week Day schedule with 0 days mask"
       command: "SetWeekDaySchedule"
@@ -488,7 +488,7 @@ tests:
               - name: "userIndex"
                 value: 2
               - name: "status"
-                value: 0x8B
+                value: 0x01
 
     #
     # Excercise SetYearDay schedules with invalid parameters
@@ -566,7 +566,7 @@ tests:
               - name: "localEndTime"
                 value: 12345689
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Create Year Day schedule with start hour later that end hour"
       command: "SetYearDaySchedule"
@@ -581,7 +581,7 @@ tests:
               - name: "localEndTime"
                 value: 12345688
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Make sure that previous operations did not create a schedule"
       command: "GetYearDaySchedule"
@@ -686,7 +686,7 @@ tests:
               - name: "userIndex"
                 value: 2
               - name: "status"
-                value: 0x8B
+                value: 0x01
 
     #
     # Excercise Set Holiday schedules with invalid parameters
@@ -962,7 +962,7 @@ tests:
               - name: "userIndex"
                 value: 2
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Make sure that week day schedule was not deleted"
       command: "GetWeekDaySchedule"
@@ -1087,7 +1087,7 @@ tests:
               - name: "userIndex"
                 value: 2
       response:
-          error: NOT_FOUND
+          error: FAILURE
 
     - label: "Make sure that week day schedule was not deleted"
       command: "GetWeekDaySchedule"
@@ -1799,7 +1799,7 @@ tests:
               - name: "userIndex"
                 value: 1
               - name: "status"
-                value: 0x8B
+                value: 0x01
 
     - label: "Make sure clearing first user also cleared year day schedules"
       command: "GetYearDaySchedule"
@@ -1816,7 +1816,7 @@ tests:
               - name: "userIndex"
                 value: 1
               - name: "status"
-                value: 0x8B
+                value: 0x01
 
     - label: "Make sure clearing second user also cleared week day schedules"
       command: "GetWeekDaySchedule"
@@ -1833,7 +1833,7 @@ tests:
               - name: "userIndex"
                 value: 2
               - name: "status"
-                value: 0x8B
+                value: 0x01
 
     - label: "Make sure clearing second user also cleared year day schedules"
       command: "GetYearDaySchedule"
@@ -1850,7 +1850,7 @@ tests:
               - name: "userIndex"
                 value: 2
               - name: "status"
-                value: 0x8B
+                value: 0x01
 
     # Make sure that all the manipulations did not affect the holiday schedules
     - label: "Make sure that first holiday schedule was not deleted"

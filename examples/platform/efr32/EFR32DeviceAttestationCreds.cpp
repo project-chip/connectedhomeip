@@ -74,8 +74,8 @@ public:
         uint8_t signature[64] = { 0 };
         size_t signature_size = sizeof(signature);
 
-        psa_status_t err = psa_sign_hash(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest_to_sign.data(), digest_to_sign.size(),
-                                         signature, signature_size, &signature_size);
+        psa_status_t err = psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), digest_to_sign.data(), digest_to_sign.size(),
+                                            signature, signature_size, &signature_size);
         VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
 
         return CopySpanToMutableSpan(ByteSpan(signature, signature_size), out_buffer);

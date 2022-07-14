@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 20.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH.
+name: 21.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH. [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -26,6 +26,10 @@ tests:
           a given cluster and endpoint. On receipt of this message, DUT should
           send a write response action."
       verification: |
+          In case of chip tool, here is an example command to use
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           ./chip-tool levelcontrol write on-level 2 1 1
 
           [1653026683.396666][6229:6234] CHIP:DMG: WriteResponseMessage =
@@ -65,7 +69,7 @@ tests:
           all endpoints. On receipt of this message, DUT should send a Write
           Response action"
       verification: |
-          V1 out of scope
+          Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -73,6 +77,8 @@ tests:
           attribute of data type bool."
       verification: |
           In case of chip tool, here is an example command to use
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
           sudo ./chip-tool basic write local-config-disabled 1 1 0
           [1655201045.952849][3550:3555] CHIP:DMG: WriteResponseMessage =
@@ -115,37 +121,40 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          sudo ./chip-tool basic write node-label 1 1 0
-          [1649152505.885287][16202:16208] CHIP:DMG: WriteResponseMessage =
-          [1649152505.885339][16202:16208] CHIP:DMG: {
-          [1649152505.885378][16202:16208] CHIP:DMG:         AttributeStatusIBs =
-          [1649152505.885415][16202:16208] CHIP:DMG:         [
-          [1649152505.885454][16202:16208] CHIP:DMG:                 AttributeStatusIB =
-          [1649152505.885499][16202:16208] CHIP:DMG:                 {
-          [1649152505.885530][16202:16208] CHIP:DMG:                         AttributePathIB =
-          [1649152505.885575][16202:16208] CHIP:DMG:                         {
-          [1649152505.885616][16202:16208] CHIP:DMG:                                 Endpoint = 0x0,
-          [1649152505.885668][16202:16208] CHIP:DMG:                                 Cluster = 0x28,
-          [1649152505.885720][16202:16208] CHIP:DMG:                                 Attribute = 0x0000_0005,
-          [1649152505.885759][16202:16208] CHIP:DMG:                         }
-          [1649152505.885810][16202:16208] CHIP:DMG:
-          [1649152505.885855][16202:16208] CHIP:DMG:                         StatusIB =
-          [1649152505.885892][16202:16208] CHIP:DMG:                         {
-          [1649152505.885942][16202:16208] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1649152505.885988][16202:16208] CHIP:DMG:                         },
-          [1649152505.886024][16202:16208] CHIP:DMG:
-          [1649152505.886065][16202:16208] CHIP:DMG:                 },
-          [1649152505.886102][16202:16208] CHIP:DMG:
-          [1649152505.886139][16202:16208] CHIP:DMG:         ],
-          [1649152505.886174][16202:16208] CHIP:DMG:
-          [1649152505.886213][16202:16208] CHIP:DMG:         InteractionModelRevision = 1
-          [1649152505.886240][16202:16208] CHIP:DMG: }
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
+          ./chip-tool basic write node-label new 1 0
+          [1655806131.663097][7241:7246] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1655806131.663177][7241:7246] CHIP:DMG: WriteResponseMessage =
+          [1655806131.663215][7241:7246] CHIP:DMG: {
+          [1655806131.663259][7241:7246] CHIP:DMG:         AttributeStatusIBs =
+          [1655806131.663305][7241:7246] CHIP:DMG:         [
+          [1655806131.663353][7241:7246] CHIP:DMG:                 AttributeStatusIB =
+          [1655806131.663402][7241:7246] CHIP:DMG:                 {
+          [1655806131.663453][7241:7246] CHIP:DMG:                         AttributePathIB =
+          [1655806131.663511][7241:7246] CHIP:DMG:                         {
+          [1655806131.663561][7241:7246] CHIP:DMG:                                 Endpoint = 0x0,
+          [1655806131.663621][7241:7246] CHIP:DMG:                                 Cluster = 0x28,
+          [1655806131.663672][7241:7246] CHIP:DMG:                                 Attribute = 0x0000_0005,
+          [1655806131.663735][7241:7246] CHIP:DMG:                         }
+          [1655806131.663791][7241:7246] CHIP:DMG:
+          [1655806131.663839][7241:7246] CHIP:DMG:                         StatusIB =
+          [1655806131.663889][7241:7246] CHIP:DMG:                         {
+          [1655806131.663935][7241:7246] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1655806131.663980][7241:7246] CHIP:DMG:                         },
+          [1655806131.664024][7241:7246] CHIP:DMG:
+          [1655806131.664063][7241:7246] CHIP:DMG:                 },
+          [1655806131.664106][7241:7246] CHIP:DMG:
+          [1655806131.664141][7241:7246] CHIP:DMG:         ],
+          [1655806131.664208][7241:7246] CHIP:DMG:
+          [1655806131.664243][7241:7246] CHIP:DMG:         InteractionModelRevision = 1
+          [1655806131.664278][7241:7246] CHIP:DMG: }
+          [1655806131.664372][7241:7246] CHIP:DMG: WriteClient moving to [AwaitingDe]
 
           ./chip-tool basic read node-label  1 0
-
-          [1655201181.791246][3568:3574] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 1458477848
-          [1655201181.791297][3568:3574] CHIP:TOO:   NodeLabel: 1
-          [1655201181.791421][3568:3574] CHIP:EM: Sending Standalone Ack for MessageCounter:200651197 on exchange 45925i
+          [1655806189.835517][7250:7255] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 1238808428
+          [1655806189.835566][7250:7255] CHIP:TOO:   NodeLabel: new
+          [1655806189.835689][7250:7255] CHIP:EM: Sending Standalone Ack for MessageCounter:194887570 on exchange 10216i
       disabled: true
 
     - label:
@@ -154,7 +163,9 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          sudo ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
+          sudo Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
+          ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
           [1649152567.635323][16212:16217] CHIP:DMG: WriteResponseMessage =
           [1649152567.635361][16212:16217] CHIP:DMG: {
           [1649152567.635394][16212:16217] CHIP:DMG:         AttributeStatusIBs =
@@ -229,6 +240,8 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           sudo ./chip-tool any write-by-id 0x0204 0  1  1 1
           [1649152707.514290][16226:16231] CHIP:DMG: WriteResponseMessage =
           [1649152707.514324][16226:16231] CHIP:DMG: {
@@ -269,6 +282,8 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           sudo ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
 
           [1649152768.817940][16237:16242] CHIP:DMG: WriteResponseMessage =
@@ -308,7 +323,7 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write any attribute on
           an unsupported node. DUT responds with the Write Response action"
       verification: |
-          V1 out of scope
+          Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -319,6 +334,7 @@ tests:
 
           sudo ./chip-tool levelcontrol write on-level 2 1 20
 
+          Verify DUT is responsds with  UNSUPPORTED_ENDPOINT for the data sent in the above command
 
           1649153009.582466][16268:16273] CHIP:DMG: WriteResponseMessage =
           [1649153009.582507][16268:16273] CHIP:DMG: {
@@ -357,6 +373,8 @@ tests:
 
           sudo ./chip-tool thermostat write  unoccupied-heating-setpoint 1200  1 0
 
+          Verify DUT is responsds with UNSUPPORTED_CLUSTER for the data sent in the above command
+
           [1650618880.286103][2741:2746] CHIP:DMG: WriteResponseMessage =
           [1650618880.286161][2741:2746] CHIP:DMG: {
           [1650618880.286210][2741:2746] CHIP:DMG:         AttributeStatusIBs =
@@ -389,8 +407,11 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write an unsupported
           attribute DUT responds with the Write Response action"
       verification: |
+          In case of chip tool, here is an example command to use
+
           sudo ./chip-tool thermostat write  unoccupied-heating-setpoint 1200  1 1
 
+          Verify DUT is responsds with UNSUPPORTED_ATTRIBUTE for the data sent in the above command
 
           [1650618819.921180][2730:2735] CHIP:DMG: WriteResponseMessage =
           [1650618819.921212][2730:2735] CHIP:DMG: {
@@ -424,31 +445,35 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write an attribute
           which is not writable. DUT responds with the Write Response action"
       verification: |
-          ./chip-tool basic write-by-id 0x7 2 1 0
+          In case of chip tool, here is an example command to use
+
+           ./chip-tool basic write-by-id 0x7 2 1 0
+
+          Verify DUT is responsds with UNSUPPORTED_WRITE for the data sent in the above command
 
           [1655201693.989436][3767:3772] CHIP:DMG: WriteResponseMessage =
           [1655201693.989472][3767:3772] CHIP:DMG: {
-          [1655201693.989504][3767:3772] CHIP:DMG: 	AttributeStatusIBs =
-          [1655201693.989548][3767:3772] CHIP:DMG: 	[
-          [1655201693.989584][3767:3772] CHIP:DMG: 		AttributeStatusIB =
-          [1655201693.989673][3767:3772] CHIP:DMG: 		{
-          [1655201693.989715][3767:3772] CHIP:DMG: 			AttributePathIB =
-          [1655201693.989762][3767:3772] CHIP:DMG: 			{
-          [1655201693.989810][3767:3772] CHIP:DMG: 				Endpoint = 0x0,
-          [1655201693.989859][3767:3772] CHIP:DMG: 				Cluster = 0x28,
-          [1655201693.989912][3767:3772] CHIP:DMG: 				Attribute = 0x0000_0007,
-          [1655201693.989962][3767:3772] CHIP:DMG: 			}
+          [1655201693.989504][3767:3772] CHIP:DMG:         AttributeStatusIBs =
+          [1655201693.989548][3767:3772] CHIP:DMG:         [
+          [1655201693.989584][3767:3772] CHIP:DMG:                 AttributeStatusIB =
+          [1655201693.989673][3767:3772] CHIP:DMG:                 {
+          [1655201693.989715][3767:3772] CHIP:DMG:                         AttributePathIB =
+          [1655201693.989762][3767:3772] CHIP:DMG:                         {
+          [1655201693.989810][3767:3772] CHIP:DMG:                                 Endpoint = 0x0,
+          [1655201693.989859][3767:3772] CHIP:DMG:                                 Cluster = 0x28,
+          [1655201693.989912][3767:3772] CHIP:DMG:                                 Attribute = 0x0000_0007,
+          [1655201693.989962][3767:3772] CHIP:DMG:                         }
           [1655201693.990012][3767:3772] CHIP:DMG:
-          [1655201693.990058][3767:3772] CHIP:DMG: 			StatusIB =
-          [1655201693.990105][3767:3772] CHIP:DMG: 			{
-          [1655201693.990149][3767:3772] CHIP:DMG: 				status = 0x88 (UNSUPPORTED_WRITE),
-          [1655201693.990196][3767:3772] CHIP:DMG: 			},
+          [1655201693.990058][3767:3772] CHIP:DMG:                         StatusIB =
+          [1655201693.990105][3767:3772] CHIP:DMG:                         {
+          [1655201693.990149][3767:3772] CHIP:DMG:                                 status = 0x88 (UNSUPPORTED_WRITE),
+          [1655201693.990196][3767:3772] CHIP:DMG:                         },
           [1655201693.990240][3767:3772] CHIP:DMG:
-          [1655201693.990277][3767:3772] CHIP:DMG: 		},
+          [1655201693.990277][3767:3772] CHIP:DMG:                 },
           [1655201693.990320][3767:3772] CHIP:DMG:
-          [1655201693.990355][3767:3772] CHIP:DMG: 	],
+          [1655201693.990355][3767:3772] CHIP:DMG:         ],
           [1655201693.990398][3767:3772] CHIP:DMG:
-          [1655201693.990433][3767:3772] CHIP:DMG: 	InteractionModelRevision = 1
+          [1655201693.990433][3767:3772] CHIP:DMG:         InteractionModelRevision = 1
           [1655201693.990467][3767:3772] CHIP:DMG: }
           [1655201693.990561][3767:3772] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1655201693.990608][3767:3772] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
@@ -460,9 +485,16 @@ tests:
           in the path that requires a privilege that is not granted for the
           cluster in the path. DUT responds with the Write Response action"
       verification: |
+          In case of chip tool, here is an example command to use
+
+          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
-          "sudo ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 2 1 1
+          sudo ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 2 1 1
+
+          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
+
           [1650552778.852950][17227:17232] CHIP:DMG: WriteResponseMessage =
           [1650552778.852981][17227:17232] CHIP:DMG: {
           [1650552778.853009][17227:17232] CHIP:DMG:         AttributeStatusIBs =
@@ -495,6 +527,10 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to write one attribute on
           a given cluster and endpoint. Repeat the above steps 3 times."
       verification: |
+          In case of chip tool, here is an example command to use
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           sudo  ./chip-tool levelcontrol write on-level 2 1 1
 
           [1653028376.099679][6518:6523] CHIP:DMG: WriteResponseMessage =
@@ -552,6 +588,10 @@ tests:
           [1653028474.240393][6540:6545] CHIP:DMG: }
           [1653028474.240473][6540:6545] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 3301562285
           [1653028474.240815][6540:6545] CHIP:TOO:   on level: 2
+
+
+
+
             ./chip-tool levelcontrol write on-level 3 1 1
             ./chip-tool levelcontrol write on-level 1 1 1
       disabled: true
@@ -560,29 +600,28 @@ tests:
           "TH sends the WriteRequestMessage to the DUT to modify the value of
           one attribute on a given cluster and endpoint to null."
       verification: |
-          V1 out of scope(15999)
+          Out of Scope for V1.0
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to append an attribute
           value"
       verification: |
-          V1 out of scope
+          Out of Scope for V1.0
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to delete an attribute
           value"
       verification: |
-          V1 out of scope
+          Out of Scope for V1.0
       disabled: true
 
     - label:
           "TH sends the WriteRequestMessage to the DUT to modify the value of
           one attribute and Set SuppressResponse to True."
       verification: |
-          https://github.com/project-chip/connectedhomeip/issues/8043
-           Out of Scope for V1.0
+          Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -592,6 +631,11 @@ tests:
           WriteRequestMessage to the DUT to modify the value of one attribute
           with the DataVersion field set to the one received in the prior step."
       verification: |
+          In case of chip tool, here is an example command to use
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
+
           ./chip-tool levelcontrol read on-level 1 1
 
           [1653028897.525838][6605:6611] CHIP:DMG: ReportDataMessage =
@@ -666,6 +710,10 @@ tests:
           DUT to modify the value of an attribute with the dataversion field set
           to the value received earlier."
       verification: |
+          In case of chip tool, here is an example command to use
+
+          Verify DUT is responsds with DATA_VERSION_MISMATCH for the second Write request.
+
           ./chip-tool levelcontrol read on-level 1 1
 
           [1653029048.535610][6634:6639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 3301562287

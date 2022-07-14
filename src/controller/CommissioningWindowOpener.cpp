@@ -72,6 +72,11 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
 
     if (setupPIN.HasValue())
     {
+        if (!SetupPayload::IsValidSetupPIN(setupPIN.Value()))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
         mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
         mSetupPayload.setUpPINCode = setupPIN.Value();
     }

@@ -165,6 +165,7 @@ class PersistentStorage:
 
     def DeleteSdkKey(self, key: str):
         del(self.jsonData['sdk-config'][key])
+        self.Sync()
 
     def GetUnderlyingStorageAdapter(self):
         return self._storageAdapterObj

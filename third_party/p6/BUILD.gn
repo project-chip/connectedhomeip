@@ -26,22 +26,25 @@ assert(p6_target_project != "", "p6_target_project must be specified")
 config("p6_sdk_config") {
   # Pull out includes from generated json
   # Treat these includes as system includes, so warnings in them are not fatal.
-  _include_dirs = []
-  foreach(inc, mtb_json.includes) {
+  _system_include_dirs = []
+  foreach(include_dir, mtb_json.includes) {
     # Strip off leading -I part
-    _include_dirs += [ "/" + rebase_path(string_replace(inc, "-I", "", 1),
-                                         "/",
-                                         "${p6_sdk_build_root}/p6_sdk/") ]
+    include_dir = string_replace(include_dir, "-I", "", 1)
+
+    # Path is relative to SDK
+    include_dir = "${p6_sdk_root}/${include_dir}"
+
+    _system_include_dirs += [ include_dir ]
+  }
+
+  cflags = []
+  foreach(include_dir, _system_include_dirs) {
+    cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
   }
 
   # Also add project include path (passed in from project build)
   proj_path = get_label_info(p6_target_project, "dir")
-  _include_dirs += [ "/" + rebase_path("${proj_path}/include", "/", ".") ]
-
-  cflags = []
-  foreach(include_dir, _include_dirs) {
-    cflags += [ "-isystem" + include_dir ]
-  }
+  include_dirs = [ "${proj_path}/include" ]
 
   # Pull out defines from generated json
   defines = []
@@ -53,7 +56,10 @@ config("p6_sdk_config") {
   # Pull out static libs (.a files) from generated json
   libs = []
   foreach(lib, mtb_json.libs) {
-    libs += [ "/" + rebase_path(lib, "/", "${p6_sdk_build_root}/p6_sdk/") ]
+    # Path is relative to SDK
+    lib = "${p6_sdk_root}/${lib}"
+
+    libs += [ lib ]
   }
 
   cflags_c = mtb_json.cflags
@@ -65,10 +71,14 @@ config("p6_sdk_config") {
   # OTA app provides it's own linker script
   if (!chip_enable_ota_requestor) {
     linker_script_flags = filter_include(mtb_json.ldflags, [ "-T*" ])
-    foreach(flag, linker_script_flags) {
-      ldflags += [ "-T/" + rebase_path(string_replace(flag, "-T", "", 1),
-                                       "/",
-                                       "${p6_sdk_build_root}/p6_sdk/") ]
+    foreach(linker_script, linker_script_flags) {
+      # Strip off leading -T part
+      linker_script = string_replace(linker_script, "-T", "", 1)
+
+      # Path is relative to SDK
+      linker_script = "${p6_sdk_root}/${linker_script}"
+
+      ldflags += [ "-T" + rebase_path(linker_script, root_build_dir) ]
     }
   }
 

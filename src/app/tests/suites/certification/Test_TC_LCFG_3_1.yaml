@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    101.3.1. [TC-LCFG-3.1] Localization Configuration Cluster
+    99.3.1. [TC-LCFG-3.1] Localization Configuration Cluster
     Attributes[DUT-Client]
 
 config:
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "DUT reads SupportedLocales attribute from TH"
+      PICS: LCFG.C.A0001
       verification: |
           ./chip-tool localizationconfiguration read supported-locales 1 0
 
@@ -49,6 +50,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ActiveLocale attribute from the TH"
+      PICS: LCFG.C.A0000
       verification: |
           ./chip-tool localizationconfiguration read active-locale 1 0
 

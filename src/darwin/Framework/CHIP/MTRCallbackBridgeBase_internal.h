@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRError_Internal.h"
-#import "zap-generated/MTRClustersObjc.h"
+#import "zap-generated/MTRBaseClusters.h"
 
 #include <app/data-model/NullObject.h>
 #include <platform/CHIPDeviceLayer.h>

@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT reads Occupancy attribute from TH"
+      PICS: OCC.C.A0000
       verification: |
           ./chip-tool occupancysensing read occupancy  1 1
 
@@ -50,11 +51,13 @@ tests:
       disabled: true
 
     - label: "Operate on TH to change the occupancy status"
+      PICS: OCC.M.OccupancyChange
       verification: |
-          Logs will be device specific
+          Logs will be device specific[Dut Action needed]
       disabled: true
 
     - label: "after a few seconds, DUT reads Occupancy attribute from TH"
+      PICS: OCC.C.A0000
       verification: |
           ./chip-tool occupancysensing read occupancy  1 1
 

@@ -93,9 +93,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
             thread->id = taskStatusArray[x].xTaskNumber;
 
             thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
-            /* Unsupported metrics */
-            // thread->stackSize;
-            // thread->stackFreeCurrent;
+            thread->stackSize.Emplace(uxTaskGetStackSize(taskStatusArray[x].xHandle));
+            thread->stackFreeCurrent.Emplace(uxTaskGetFreeStackSize(taskStatusArray[x].xHandle));
 
             thread->Next = head;
             head         = thread;

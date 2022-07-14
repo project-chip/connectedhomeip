@@ -13,7 +13,9 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 20.6.2. [TC-IDM-6.2] Events Subscribe Interaction from TH to DUT
+name:
+    21.6.2. [TC-IDM-6.2] Events Subscribe Interaction from TH to DUT.
+    [{DUT_Server}]
 
 config:
     nodeId: 0x12344321
@@ -24,330 +26,368 @@ tests:
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to a
           specific event from a specific cluster on a specific endpoint on a
-          specific node i.e. [Node = Specific, Endpoint = Specific, Cluster =
-          Specific, Event = Specific]."
+          specific node that is, [Node = Specific, Endpoint = Specific, Cluster
+          = Specific, Event = Specific]."
       verification: |
           In case of chip tool, here is an example command to use
 
-          sudo ./chip-tool any subscribe-event-by-id 0x0033 0x01 0 100  1 1
+          sudo ./chip-tool basic subscribe-event  start-up  20 100 1 0
           on TH
-          [1651585153.535829][2998:3003] CHIP:DMG: ReportDataMessage =
-          [1651585153.535860][2998:3003] CHIP:DMG: {
-          [1651585153.535888][2998:3003] CHIP:DMG:         SubscriptionId = 0x2e08688819c6e7af,
-          [1651585153.535918][2998:3003] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.535945][2998:3003] CHIP:DMG: }
-          [1651585153.535990][2998:3003] CHIP:DMG: MoveToState ReadClient[0xffff98002e10]: Moving to [AwaitingSu]
-          [1651585153.536039][2998:3003] CHIP:EM: Piggybacking Ack for MessageCounter:12695913 on exchange: 56366i
-          [1651585153.536099][2998:3003] CHIP:IN: Prepared secure message 0xaaaad8552488 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 56366i with MessageCounter:12866229.
-          [1651585153.536139][2998:3003] CHIP:IN: Sending encrypted msg 0xaaaad8552488 with MessageCounter:12866229 to 0x0000000000000001 (1) at monotonic time: 00000000005716CD msec
-          [1651585153.537541][2998:3003] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:12695914 on exchange 56366i
-          [1651585153.537579][2998:3003] CHIP:EM: Found matching exchange: 56366i, Delegate: 0xffff98002e10
-          [1651585153.537614][2998:3003] CHIP:EM: Rxd Ack; Removing MessageCounter:12866229 from Retrans Table on exchange 56366i
-          [1651585153.537641][2998:3003] CHIP:EM: Removed CHIP MessageCounter:12866229 from RetransTable on exchange 56366i
-          [1651585153.537688][2998:3003] CHIP:DMG: SubscribeResponseMessage =
-          [1651585153.537718][2998:3003] CHIP:DMG: {
-          [1651585153.537749][2998:3003] CHIP:DMG:         SubscriptionId = 0x2e08688819c6e7af,
-          [1651585153.537805][2998:3003] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
-          [1651585153.537861][2998:3003] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
-          [1651585153.537916][2998:3003] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.537967][2998:3003] CHIP:DMG: }
-
-
-          DUT side
-          [1651585153.529075][2352:2352] CHIP:DMG: SubscribeRequestMessage =
-          [1651585153.529112][2352:2352] CHIP:DMG: {
-          [1651585153.529158][2352:2352] CHIP:DMG:         KeepSubscriptions = false,
-          [1651585153.529193][2352:2352] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
-          [1651585153.529228][2352:2352] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
-          [1651585153.529275][2352:2352] CHIP:DMG:         EventPathIBs =
-          [1651585153.529311][2352:2352] CHIP:DMG:         [
-          [1651585153.529355][2352:2352] CHIP:DMG:                 EventPath =
-          [1651585153.529395][2352:2352] CHIP:DMG:                 {
-          [1651585153.529502][2352:2352] CHIP:DMG:                         Endpoint = 0x1,
-          [1651585153.529560][2352:2352] CHIP:DMG:                         Cluster = 0x33,
-          [1651585153.529603][2352:2352] CHIP:DMG:                         Event = 0x1,
-          [1651585153.529652][2352:2352] CHIP:DMG:                 },
-          [1651585153.529694][2352:2352] CHIP:DMG:
-          [1651585153.529739][2352:2352] CHIP:DMG:         ],
-          [1651585153.529778][2352:2352] CHIP:DMG:
-          [1651585153.529825][2352:2352] CHIP:DMG:         isFabricFiltered = true,
-          [1651585153.529861][2352:2352] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.529905][2352:2352] CHIP:DMG: },
-          [1651585153.529989][2352:2352] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
-          [1651585153.530085][2352:2352] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1651585153.530195][2352:2352] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1651585153.530365][2352:2352] CHIP:DMG: Fetched 0 events
-          [1651585153.530403][2352:2352] CHIP:DMG: <RE> Sending report (payload has 15 bytes)...
-          [1651585153.530435][2352:2352] CHIP:DMG: IM RH moving to [AwaitingReportResponse]
-          [1651585153.530472][2352:2352] CHIP:EM: Piggybacking Ack for MessageCounter:12866228 on exchange: 56366r
-          [1651585153.530547][2352:2352] CHIP:IN: Prepared secure message 0xaaaabeacb650 to 0x000000000001B669 (1)  of type 0x5 and protocolId (0, 1) on exchange 56366r with MessageCounter:12695913.
-          [1651585153.530596][2352:2352] CHIP:IN: Sending encrypted msg 0xaaaabeacb650 with MessageCounter:12695913 to 0x000000000001B669 (1) at monotonic time: 00000000005729DD msec
-          [1651585153.530947][2352:2352] CHIP:DMG: <RE> ReportsInFlight = 3 with readHandler 0, RE has no more messages
-          [1651585153.530988][2352:2352] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
-          [1651585153.532011][2352:2352] CHIP:EM: Received message of type 0x1 with protocolId (0, 1) and MessageCounter:12866229 on exchange 56366r
-          [1651585153.532053][2352:2352] CHIP:EM: Found matching exchange: 56366r, Delegate: 0xaaaabfc22d00
-          [1651585153.532098][2352:2352] CHIP:EM: Rxd Ack; Removing MessageCounter:12695913 from Retrans Table on exchange 56366r
-          [1651585153.532129][2352:2352] CHIP:EM: Removed CHIP MessageCounter:12695913 from RetransTable on exchange 56366r
-          [1651585153.532185][2352:2352] CHIP:DMG: StatusResponseMessage =
-          [1651585153.532236][2352:2352] CHIP:DMG: {
-          [1651585153.532268][2352:2352] CHIP:DMG:         Status = 0x00 (SUCCESS),
-          [1651585153.532305][2352:2352] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.532351][2352:2352] CHIP:DMG: }
+          [1655977276.638991][4311:4316] CHIP:DMG: ReportDataMessage =
+          [1655977276.639038][4311:4316] CHIP:DMG: {
+          [1655977276.639092][4311:4316] CHIP:DMG:         SubscriptionId = 0x64e994d3,
+          [1655977276.639135][4311:4316] CHIP:DMG:         EventReportIBs =
+          [1655977276.639201][4311:4316] CHIP:DMG:         [
+          [1655977276.639243][4311:4316] CHIP:DMG:                 EventReportIB =
+          [1655977276.639316][4311:4316] CHIP:DMG:                 {
+          [1655977276.639360][4311:4316] CHIP:DMG:                         EventDataIB =
+          [1655977276.639425][4311:4316] CHIP:DMG:                         {
+          [1655977276.639486][4311:4316] CHIP:DMG:                                 EventPath =
+          [1655977276.639542][4311:4316] CHIP:DMG:                                 {
+          [1655977276.639613][4311:4316] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655977276.639684][4311:4316] CHIP:DMG:                                         Cluster = 0x28,
+          [1655977276.639741][4311:4316] CHIP:DMG:                                         Event = 0x0,
+          [1655977276.639810][4311:4316] CHIP:DMG:                                 },
+          [1655977276.639880][4311:4316] CHIP:DMG:
+          [1655977276.639933][4311:4316] CHIP:DMG:                                 EventNumber = 0x0,
+          [1655977276.640009][4311:4316] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1655977276.640078][4311:4316] CHIP:DMG:                                 SystemTimestamp = 0x4ab7ca,
+          [1655977276.640131][4311:4316] CHIP:DMG:                                 EventData =
+          [1655977276.640198][4311:4316] CHIP:DMG:                                 {
+          [1655977276.640298][4311:4316] CHIP:DMG:                                         0x0 = 1,
+          [1655977276.640368][4311:4316] CHIP:DMG:                                 },
+          [1655977276.640419][4311:4316] CHIP:DMG:                         },
+          [1655977276.640490][4311:4316] CHIP:DMG:
+          [1655977276.640532][4311:4316] CHIP:DMG:                 },
+          [1655977276.640597][4311:4316] CHIP:DMG:
+          [1655977276.640636][4311:4316] CHIP:DMG:         ],
+          [1655977276.640702][4311:4316] CHIP:DMG:
+          [1655977276.640757][4311:4316] CHIP:DMG:         InteractionModelRevision = 1
+          [1655977276.640797][4311:4316] CHIP:DMG: }
+          [1655977276.641042][4311:4316] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655977276.641086][4311:4316] CHIP:TOO:          Event number: 0
+          [1655977276.641122][4311:4316] CHIP:TOO:          Priority: Critical
+          [1655977276.641158][4311:4316] CHIP:TOO:          Timestamp: 4896714
+          [1655977276.641276][4311:4316] CHIP:TOO:   StartUp: {
+          [1655977276.641344][4311:4316] CHIP:TOO:     SoftwareVersion: 1
+          [1655977276.641385][4311:4316] CHIP:TOO:    }
+          [1655977276.641461][4311:4316] CHIP:DMG: MoveToState ReadClient[0xffff9c006f50]: Moving to [AwaitingSu]
+          [1655977276.641553][4311:4316] CHIP:EM: Piggybacking Ack for MessageCounter:264495416 on exchange: 5419i
+          [1655977276.641656][4311:4316] CHIP:IN: Prepared secure message 0xaaaac9574fd8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 5419i with MessageCounter:38634004.
+          [1655977276.641716][4311:4316] CHIP:IN: Sending encrypted msg 0xaaaac9574fd8 with MessageCounter:38634004 to 0x0000000000000001 (1) at monotonic time: 0000000000FA0882 msec
+          [1655977276.642731][4311:4316] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:264495417 on exchange 5419i
+          [1655977276.642784][4311:4316] CHIP:EM: Found matching exchange: 5419i, Delegate: 0xffff9c006f50
+          [1655977276.642836][4311:4316] CHIP:EM: Rxd Ack; Removing MessageCounter:38634004 from Retrans Table on exchange 5419i
+          [1655977276.642875][4311:4316] CHIP:EM: Removed CHIP MessageCounter:38634004 from RetransTable on exchange 5419i
+          [1655977276.642967][4311:4316] CHIP:DMG: SubscribeResponseMessage =
+          [1655977276.643030][4311:4316] CHIP:DMG: {
+          [1655977276.643069][4311:4316] CHIP:DMG:         SubscriptionId = 0x64e994d3,
+          [1655977276.643127][4311:4316] CHIP:DMG:         MaxInterval = 0x64,
+          [1655977276.643168][4311:4316] CHIP:DMG:         InteractionModelRevision = 1
+          [1655977276.643220][4311:4316] CHIP:DMG: }
+          [1655977276.643263][4311:4316] CHIP:DMG: Subscription established with SubscriptionID = 0x64e994d3 MinInterval = 20s MaxInterval = 100s Peer = 01:0000000000000001
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
           all events from a specific cluster on a specific endpoint on a
-          specific node i.e. [Node = Specific, Endpoint = Specific, Cluster =
-          Specific, Event = Wildcard]."
+          specific node that is, [Node = Specific, Endpoint = Specific, Cluster
+          = Specific, Event = Wildcard]."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
-
-          basic subscribe-event-by-id 0xFFFFFFFF 100 1000 1 0
-
-          [1653477346.830909][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653477346.830930][21558:21563] CHIP:TOO:          Event number: 0
-          [1653477346.830947][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477346.830963][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653477346.831045][21558:21563] CHIP:TOO:   StartUp: {
-          [1653477346.831374][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653477346.831401][21558:21563] CHIP:TOO:    }
-          [1653477346.831540][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc002be0]: Moving to [AwaitingSu]
-          [1653477346.831599][21558:21563] CHIP:EM: Piggybacking Ack for MessageCounter:15912670 on exchange: 43248i
-          [1653477346.831656][21558:21563] CHIP:IN: Prepared secure message 0x5604e6136648 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43248i with MessageCounter:16478636.
-          [1653477346.831692][21558:21563] CHIP:IN: Sending encrypted msg 0x5604e6136648 with MessageCounter:16478636 to 0x0000000000000001 (1) at monotonic time: 00000000015D2104 msec
-          [1653477346.836230][21558:21563] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15912671 on exchange 43248i
-          [1653477346.836245][21558:21563] CHIP:EM: Found matching exchange: 43248i, Delegate: 0x7f35bc002be0
-          [1653477346.836256][21558:21563] CHIP:EM: Rxd Ack; Removing MessageCounter:16478636 from Retrans Table on exchange 43248i
-          [1653477346.836262][21558:21563] CHIP:EM: Removed CHIP MessageCounter:16478636 from RetransTable on exchange 43248i
-          [1653477346.836277][21558:21563] CHIP:DMG: SubscribeResponseMessage =
-          [1653477346.836284][21558:21563] CHIP:DMG: {
-          [1653477346.836290][21558:21563] CHIP:DMG:         SubscriptionId = 0x1e5c8a80,
-          [1653477346.836296][21558:21563] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653477346.836302][21558:21563] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653477346.836308][21558:21563] CHIP:DMG:         InteractionModelRevision = 1
-          [1653477346.836313][21558:21563] CHIP:DMG: }
+          sudo ./chip-tool basic subscribe-event-by-id 0xFFFFFFFF 100 1000 1 0
+          [1655977531.386194][4337:4342] CHIP:DMG: ReportDataMessage =
+          [1655977531.386222][4337:4342] CHIP:DMG: {
+          [1655977531.386247][4337:4342] CHIP:DMG:         SubscriptionId = 0x317286e5,
+          [1655977531.386271][4337:4342] CHIP:DMG:         EventReportIBs =
+          [1655977531.386303][4337:4342] CHIP:DMG:         [
+          [1655977531.386327][4337:4342] CHIP:DMG:                 EventReportIB =
+          [1655977531.386360][4337:4342] CHIP:DMG:                 {
+          [1655977531.386385][4337:4342] CHIP:DMG:                         EventDataIB =
+          [1655977531.386420][4337:4342] CHIP:DMG:                         {
+          [1655977531.386449][4337:4342] CHIP:DMG:                                 EventPath =
+          [1655977531.386482][4337:4342] CHIP:DMG:                                 {
+          [1655977531.386517][4337:4342] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655977531.386552][4337:4342] CHIP:DMG:                                         Cluster = 0x28,
+          [1655977531.386585][4337:4342] CHIP:DMG:                                         Event = 0x0,
+          [1655977531.386619][4337:4342] CHIP:DMG:                                 },
+          [1655977531.386653][4337:4342] CHIP:DMG:
+          [1655977531.386684][4337:4342] CHIP:DMG:                                 EventNumber = 0x0,
+          [1655977531.386717][4337:4342] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1655977531.386749][4337:4342] CHIP:DMG:                                 SystemTimestamp = 0x4ab7ca,
+          [1655977531.386780][4337:4342] CHIP:DMG:                                 EventData =
+          [1655977531.386812][4337:4342] CHIP:DMG:                                 {
+          [1655977531.386865][4337:4342] CHIP:DMG:                                         0x0 = 1,
+          [1655977531.386898][4337:4342] CHIP:DMG:                                 },
+          [1655977531.386973][4337:4342] CHIP:DMG:                         },
+          [1655977531.387010][4337:4342] CHIP:DMG:
+          [1655977531.387037][4337:4342] CHIP:DMG:                 },
+          [1655977531.387067][4337:4342] CHIP:DMG:
+          [1655977531.387091][4337:4342] CHIP:DMG:         ],
+          [1655977531.387122][4337:4342] CHIP:DMG:
+          [1655977531.387146][4337:4342] CHIP:DMG:         InteractionModelRevision = 1
+          [1655977531.387168][4337:4342] CHIP:DMG: }
+          [1655977531.387299][4337:4342] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655977531.387325][4337:4342] CHIP:TOO:          Event number: 0
+          [1655977531.387346][4337:4342] CHIP:TOO:          Priority: Critical
+          [1655977531.387368][4337:4342] CHIP:TOO:          Timestamp: 4896714
+          [1655977531.387435][4337:4342] CHIP:TOO:   StartUp: {
+          [1655977531.387470][4337:4342] CHIP:TOO:     SoftwareVersion: 1
+          [1655977531.387494][4337:4342] CHIP:TOO:    }
+          [1655977531.387541][4337:4342] CHIP:DMG: MoveToState ReadClient[0xffff68007030]: Moving to [AwaitingSu]
+          [1655977531.387593][4337:4342] CHIP:EM: Piggybacking Ack for MessageCounter:103226132 on exchange: 14818i
+          [1655977531.387651][4337:4342] CHIP:IN: Prepared secure message 0xaaaae64957e8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 14818i with MessageCounter:195745808.
+          [1655977531.387686][4337:4342] CHIP:IN: Sending encrypted msg 0xaaaae64957e8 with MessageCounter:195745808 to 0x0000000000000001 (1) at monotonic time: 0000000000FDEB9C msec
+          [1655977531.388695][4337:4342] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:103226133 on exchange 14818i
+          [1655977531.388759][4337:4342] CHIP:EM: Found matching exchange: 14818i, Delegate: 0xffff68007030
+          [1655977531.388821][4337:4342] CHIP:EM: Rxd Ack; Removing MessageCounter:195745808 from Retrans Table on exchange 14818i
+          [1655977531.388871][4337:4342] CHIP:EM: Removed CHIP MessageCounter:195745808 from RetransTable on exchange 14818i
+          [1655977531.388950][4337:4342] CHIP:DMG: SubscribeResponseMessage =
+          [1655977531.389004][4337:4342] CHIP:DMG: {
+          [1655977531.389054][4337:4342] CHIP:DMG:         SubscriptionId = 0x317286e5,
+          [1655977531.389107][4337:4342] CHIP:DMG:         MaxInterval = 0x3e8,
+          [1655977531.389160][4337:4342] CHIP:DMG:         InteractionModelRevision = 1
+          [1655977531.389208][4337:4342] CHIP:DMG: }
+          [1655977531.389261][4337:4342] CHIP:DMG: Subscription established with SubscriptionID = 0x317286e5 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
           all events from all clusters on a specific endpoint on a specific node
-          i.e. [Node = Specific, Endpoint = Specific, Cluster = Wildcard, Event
-          = Wildcard]."
+          that is, [Node = Specific, Endpoint = Specific, Cluster = Wildcard,
+          Event = Wildcard]."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
-          any  subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 0 100  1 0
+          sudo ./chip-tool any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 20 100  1 0
 
-          [1653477454.958220][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653477454.958253][21558:21563] CHIP:TOO:          Event number: 0
-          [1653477454.958270][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477454.958288][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653477454.958322][21558:21563] CHIP:TOO:   StartUp: {
-          [1653477454.958353][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653477454.958376][21558:21563] CHIP:TOO:    }
-          [1653477454.958487][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
-          [1653477454.958505][21558:21563] CHIP:TOO:          Event number: 1
-          [1653477454.958520][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477454.958536][21558:21563] CHIP:TOO:          Timestamp: 2525141
-          [1653477454.958559][21558:21563] CHIP:TOO:   BootReason: {
-          [1653477454.958578][21558:21563] CHIP:TOO:     BootReason: 0
-          [1653477454.958594][21558:21563] CHIP:TOO:    }
-          [1653477454.958726][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1653477454.958742][21558:21563] CHIP:TOO:          Event number: 2
-          [1653477454.958756][21558:21563] CHIP:TOO:          Priority: Info
-          [1653477454.958771][21558:21563] CHIP:TOO:          Timestamp: 2533827
-          [1653477454.959176][21558:21563] CHIP:TOO:   AccessControlEntryChanged: {
-          [1653477454.959201][21558:21563] CHIP:TOO:     AdminNodeID: null
-          [1653477454.959221][21558:21563] CHIP:TOO:     AdminPasscodeID: 0
-          [1653477454.959237][21558:21563] CHIP:TOO:     ChangeType: 1
-          [1653477454.959252][21558:21563] CHIP:TOO:     LatestValue: {
-          [1653477454.959267][21558:21563] CHIP:TOO:       Privilege: 5
-          [1653477454.959284][21558:21563] CHIP:TOO:       AuthMode: 2
-          [1653477454.959304][21558:21563] CHIP:TOO:       Subjects: 1 entries
-          [1653477454.959326][21558:21563] CHIP:TOO:         [1]: 112233
-          [1653477454.959344][21558:21563] CHIP:TOO:       Targets: null
-          [1653477454.959360][21558:21563] CHIP:TOO:       FabricIndex: 1
-          [1653477454.959375][21558:21563] CHIP:TOO:      }
-          [1653477454.959391][21558:21563] CHIP:TOO:     AdminFabricIndex: 1
-          [1653477454.959407][21558:21563] CHIP:TOO:    }
-          [1653477454.959510][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc0035d0]: Moving to [AwaitingSu]
+          [1655978025.631905][4361:4366] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655978025.631939][4361:4366] CHIP:TOO:          Event number: 0
+          [1655978025.631968][4361:4366] CHIP:TOO:          Priority: Critical
+          [1655978025.631997][4361:4366] CHIP:TOO:          Timestamp: 4896714
+          [1655978025.632083][4361:4366] CHIP:TOO:   StartUp: {
+          [1655978025.632126][4361:4366] CHIP:TOO:     SoftwareVersion: 1
+          [1655978025.632158][4361:4366] CHIP:TOO:    }
+          [1655978025.632299][4361:4366] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655978025.632330][4361:4366] CHIP:TOO:          Event number: 1
+          [1655978025.632359][4361:4366] CHIP:TOO:          Priority: Info
+          [1655978025.632388][4361:4366] CHIP:TOO:          Timestamp: 4971265
+          [1655978025.632450][4361:4366] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655978025.632483][4361:4366] CHIP:TOO:     AdminNodeID: null
+          [1655978025.632513][4361:4366] CHIP:TOO:     AdminPasscodeID: 0
+          [1655978025.632544][4361:4366] CHIP:TOO:     ChangeType: 1
+          [1655978025.632573][4361:4366] CHIP:TOO:     LatestValue: {
+          [1655978025.632602][4361:4366] CHIP:TOO:       Privilege: 5
+          [1655978025.632631][4361:4366] CHIP:TOO:       AuthMode: 2
+          [1655978025.632668][4361:4366] CHIP:TOO:       Subjects: 1 entries
+          [1655978025.632706][4361:4366] CHIP:TOO:         [1]: 112233
+          [1655978025.632740][4361:4366] CHIP:TOO:       Targets: null
+          [1655978025.632770][4361:4366] CHIP:TOO:       FabricIndex: 1
+          [1655978025.632799][4361:4366] CHIP:TOO:      }
+          [1655978025.632829][4361:4366] CHIP:TOO:     AdminFabricIndex: 1
+          [1655978025.632859][4361:4366] CHIP:TOO:    }
+          [1655978025.632952][4361:4366] CHIP:DMG: MoveToState ReadClient[0xaaaacb9f11e0]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to a
           specific event from a specific cluster on all endpoints on a specific
-          node i.e. [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
-          Event = Specific]."
+          node that is, [Node = Specific, Endpoint = Wildcard, Cluster =
+          Specific, Event = Specific]."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
+          sudo ./chip-tool basic subscribe-event-by-id 0x00 10 700 1 0xFFFF
 
-          basic subscribe-event-by-id 0x00 100 1000 1 0xFFFF
-
-
-
-          [1653477546.644801][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653477546.644809][21558:21563] CHIP:TOO:          Event number: 0
-          [1653477546.644816][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477546.644832][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653477546.644842][21558:21563] CHIP:TOO:   StartUp: {
-          [1653477546.644851][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653477546.644859][21558:21563] CHIP:TOO:    }
-          [1653477546.644879][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc002260]: Moving to [AwaitingSu]
-          [1653477546.644899][21558:21563] CHIP:EM: Piggybacking Ack for MessageCounter:15912674 on exchange: 43250i
-          [1653477546.644922][21558:21563] CHIP:IN: Prepared secure message 0x5604e6136648 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43250i with MessageCounter:16478642.
-          [1653477546.644936][21558:21563] CHIP:IN: Sending encrypted msg 0x5604e6136648 with MessageCounter:16478642 to 0x0000000000000001 (1) at monotonic time: 0000000001602D89 msec
-          [1653477546.650168][21558:21563] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15912675 on exchange 43250i
-          [1653477546.650196][21558:21563] CHIP:EM: Found matching exchange: 43250i, Delegate: 0x7f35bc002260
-          [1653477546.650215][21558:21563] CHIP:EM: Rxd Ack; Removing MessageCounter:16478642 from Retrans Table on exchange 43250i
-          [1653477546.650229][21558:21563] CHIP:EM: Removed CHIP MessageCounter:16478642 from RetransTable on exchange 43250i
-          [1653477546.650252][21558:21563] CHIP:DMG: SubscribeResponseMessage =
-          [1653477546.650261][21558:21563] CHIP:DMG: {
-          [1653477546.650269][21558:21563] CHIP:DMG:         SubscriptionId = 0xee971ed7,
-          [1653477546.650277][21558:21563] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653477546.650285][21558:21563] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653477546.650292][21558:21563] CHIP:DMG:         InteractionModelRevision = 1
-          [1653477546.650299][21558:21563] CHIP:DMG: }
-          [1653477546.650310][21558:21563] CHIP:DMG: Subscription established with SubscriptionID = 0xee971ed7 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+          [1655978108.922718][4380:4385] CHIP:DMG: ReportDataMessage =
+          [1655978108.922755][4380:4385] CHIP:DMG: {
+          [1655978108.922788][4380:4385] CHIP:DMG:         SubscriptionId = 0x6d4c1b90,
+          [1655978108.922822][4380:4385] CHIP:DMG:         EventReportIBs =
+          [1655978108.922865][4380:4385] CHIP:DMG:         [
+          [1655978108.922898][4380:4385] CHIP:DMG:                 EventReportIB =
+          [1655978108.922980][4380:4385] CHIP:DMG:                 {
+          [1655978108.923019][4380:4385] CHIP:DMG:                         EventDataIB =
+          [1655978108.923062][4380:4385] CHIP:DMG:                         {
+          [1655978108.923102][4380:4385] CHIP:DMG:                                 EventPath =
+          [1655978108.923145][4380:4385] CHIP:DMG:                                 {
+          [1655978108.923191][4380:4385] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655978108.923238][4380:4385] CHIP:DMG:                                         Cluster = 0x28,
+          [1655978108.923284][4380:4385] CHIP:DMG:                                         Event = 0x0,
+          [1655978108.923327][4380:4385] CHIP:DMG:                                 },
+          [1655978108.923369][4380:4385] CHIP:DMG:
+          [1655978108.923411][4380:4385] CHIP:DMG:                                 EventNumber = 0x0,
+          [1655978108.923460][4380:4385] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1655978108.923508][4380:4385] CHIP:DMG:                                 SystemTimestamp = 0x4ab7ca,
+          [1655978108.923551][4380:4385] CHIP:DMG:                                 EventData =
+          [1655978108.923594][4380:4385] CHIP:DMG:                                 {
+          [1655978108.923671][4380:4385] CHIP:DMG:                                         0x0 = 1,
+          [1655978108.923721][4380:4385] CHIP:DMG:                                 },
+          [1655978108.923758][4380:4385] CHIP:DMG:                         },
+          [1655978108.923805][4380:4385] CHIP:DMG:
+          [1655978108.923839][4380:4385] CHIP:DMG:                 },
+          [1655978108.923883][4380:4385] CHIP:DMG:
+          [1655978108.923914][4380:4385] CHIP:DMG:         ],
+          [1655978108.923956][4380:4385] CHIP:DMG:
+          [1655978108.923988][4380:4385] CHIP:DMG:         InteractionModelRevision = 1
+          [1655978108.924019][4380:4385] CHIP:DMG: }
+          [1655978108.924188][4380:4385] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655978108.924222][4380:4385] CHIP:TOO:          Event number: 0
+          [1655978108.924252][4380:4385] CHIP:TOO:          Priority: Critical
+          [1655978108.924281][4380:4385] CHIP:TOO:          Timestamp: 4896714
+          [1655978108.924367][4380:4385] CHIP:TOO:   StartUp: {
+          [1655978108.924412][4380:4385] CHIP:TOO:     SoftwareVersion: 1
+          [1655978108.924444][4380:4385] CHIP:TOO:    }
+          [1655978108.924507][4380:4385] CHIP:DMG: MoveToState ReadClient[0xffff7c0040a0]: Moving to [AwaitingSu]
+          [1655978108.924573][4380:4385] CHIP:EM: Piggybacking Ack for MessageCounter:198149325 on exchange: 7153i
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
           all events from a specific cluster on all endpoints on a specific node
-          i.e. [Node = Specific, Endpoint = Wildcard, Cluster = Specific, Event
-          = Wildcard]."
+          that is, [Node = Specific, Endpoint = Wildcard, Cluster = Specific,
+          Event = Wildcard]."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
-          basic subscribe-event-by-id 0xFFFFFFFF 100 1000 1 0xFFFF
+          sudo ./chip-tool basic subscribe-event-by-id 0xFFFFFFFF 100 1000 1 0xFFFF
 
-          [1653477615.136932][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653477615.136942][21558:21563] CHIP:TOO:          Event number: 0
-          [1653477615.136952][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477615.136960][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653477615.136975][21558:21563] CHIP:TOO:   StartUp: {
-          [1653477615.136986][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653477615.136996][21558:21563] CHIP:TOO:    }
-          [1653477615.137024][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc003ab0]: Moving to [AwaitingSu]
-          [1653477615.137046][21558:21563] CHIP:EM: Piggybacking Ack for MessageCounter:15912676 on exchange: 43251i
-          [1653477615.137070][21558:21563] CHIP:IN: Prepared secure message 0x5604e6136648 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43251i with MessageCounter:16478645.
-          [1653477615.137088][21558:21563] CHIP:IN: Sending encrypted msg 0x5604e6136648 with MessageCounter:16478645 to 0x0000000000000001 (1) at monotonic time: 0000000001613915 msec
-          [1653477615.161863][21558:21563] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15912677 on exchange 43251i
-          [1653477615.161915][21558:21563] CHIP:EM: Found matching exchange: 43251i, Delegate: 0x7f35bc003ab0
-          [1653477615.161947][21558:21563] CHIP:EM: Rxd Ack; Removing MessageCounter:16478645 from Retrans Table on exchange 43251i
-          [1653477615.161965][21558:21563] CHIP:EM: Removed CHIP MessageCounter:16478645 from RetransTable on exchange 43251i
-          [1653477615.162016][21558:21563] CHIP:DMG: SubscribeResponseMessage =
-          [1653477615.162034][21558:21563] CHIP:DMG: {
-          [1653477615.162047][21558:21563] CHIP:DMG:         SubscriptionId = 0x4f8636e3,
-          [1653477615.162061][21558:21563] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653477615.162075][21558:21563] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653477615.162091][21558:21563] CHIP:DMG:         InteractionModelRevision = 1
-          [1653477615.162106][21558:21563] CHIP:DMG: }
-          [1653477615.162131][21558:21563] CHIP:DMG: Subscription established with SubscriptionID = 0x4f8636e3 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+          [1655978154.819363][4396:4401] CHIP:DMG: ReportDataMessage =
+          [1655978154.819402][4396:4401] CHIP:DMG: {
+          [1655978154.819438][4396:4401] CHIP:DMG:         SubscriptionId = 0x35c8f49e,
+          [1655978154.819474][4396:4401] CHIP:DMG:         EventReportIBs =
+          [1655978154.819520][4396:4401] CHIP:DMG:         [
+          [1655978154.819557][4396:4401] CHIP:DMG:                 EventReportIB =
+          [1655978154.819607][4396:4401] CHIP:DMG:                 {
+          [1655978154.819645][4396:4401] CHIP:DMG:                         EventDataIB =
+          [1655978154.819697][4396:4401] CHIP:DMG:                         {
+          [1655978154.819740][4396:4401] CHIP:DMG:                                 EventPath =
+          [1655978154.819789][4396:4401] CHIP:DMG:                                 {
+          [1655978154.819838][4396:4401] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655978154.819888][4396:4401] CHIP:DMG:                                         Cluster = 0x28,
+          [1655978154.819939][4396:4401] CHIP:DMG:                                         Event = 0x0,
+          [1655978154.819991][4396:4401] CHIP:DMG:                                 },
+          [1655978154.820044][4396:4401] CHIP:DMG:
+          [1655978154.820090][4396:4401] CHIP:DMG:                                 EventNumber = 0x0,
+          [1655978154.820139][4396:4401] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1655978154.820187][4396:4401] CHIP:DMG:                                 SystemTimestamp = 0x4ab7ca,
+          [1655978154.820238][4396:4401] CHIP:DMG:                                 EventData =
+          [1655978154.820285][4396:4401] CHIP:DMG:                                 {
+          [1655978154.820362][4396:4401] CHIP:DMG:                                         0x0 = 1,
+          [1655978154.820412][4396:4401] CHIP:DMG:                                 },
+          [1655978154.820457][4396:4401] CHIP:DMG:                         },
+          [1655978154.820506][4396:4401] CHIP:DMG:
+          [1655978154.820546][4396:4401] CHIP:DMG:                 },
+          [1655978154.820592][4396:4401] CHIP:DMG:
+          [1655978154.820627][4396:4401] CHIP:DMG:         ],
+          [1655978154.820673][4396:4401] CHIP:DMG:
+          [1655978154.820709][4396:4401] CHIP:DMG:         InteractionModelRevision = 1
+          [1655978154.820743][4396:4401] CHIP:DMG: }
+          [1655978154.820927][4396:4401] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655978154.820964][4396:4401] CHIP:TOO:          Event number: 0
+          [1655978154.820997][4396:4401] CHIP:TOO:          Priority: Critical
+          [1655978154.821029][4396:4401] CHIP:TOO:          Timestamp: 4896714
+          [1655978154.821122][4396:4401] CHIP:TOO:   StartUp: {
+          [1655978154.821170][4396:4401] CHIP:TOO:     SoftwareVersion: 1
+          [1655978154.821204][4396:4401] CHIP:TOO:    }
+          [1655978154.821272][4396:4401] CHIP:DMG: MoveToState ReadClient[0xffff68004370]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
-          all events from all clusters on all endpoints on a specific node i.e.
-          [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
+          all events from all clusters on all endpoints on a specific node that
+          is, [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
-           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
+          sudo ./chip-tool  any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
 
-          [1653477656.896724][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653477656.896745][21558:21563] CHIP:TOO:          Event number: 0
-          [1653477656.896762][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477656.896779][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653477656.896808][21558:21563] CHIP:TOO:   StartUp: {
-          [1653477656.896865][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653477656.896896][21558:21563] CHIP:TOO:    }
-          [1653477656.897017][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
-          [1653477656.897036][21558:21563] CHIP:TOO:          Event number: 1
-          [1653477656.897053][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653477656.897066][21558:21563] CHIP:TOO:          Timestamp: 2525141
-          [1653477656.897090][21558:21563] CHIP:TOO:   BootReason: {
-          [1653477656.897111][21558:21563] CHIP:TOO:     BootReason: 0
-          [1653477656.897129][21558:21563] CHIP:TOO:    }
-          [1653477656.897285][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1653477656.897303][21558:21563] CHIP:TOO:          Event number: 2
-          [1653477656.897319][21558:21563] CHIP:TOO:          Priority: Info
-          [1653477656.897335][21558:21563] CHIP:TOO:          Timestamp: 2533827
-          [1653477656.897386][21558:21563] CHIP:TOO:   AccessControlEntryChanged: {
-          [1653477656.897406][21558:21563] CHIP:TOO:     AdminNodeID: null
-          [1653477656.897427][21558:21563] CHIP:TOO:     AdminPasscodeID: 0
-          [1653477656.897446][21558:21563] CHIP:TOO:     ChangeType: 1
-          [1653477656.897463][21558:21563] CHIP:TOO:     LatestValue: {
-          [1653477656.897481][21558:21563] CHIP:TOO:       Privilege: 5
-          [1653477656.897499][21558:21563] CHIP:TOO:       AuthMode: 2
-          [1653477656.897522][21558:21563] CHIP:TOO:       Subjects: 1 entries
-          [1653477656.897546][21558:21563] CHIP:TOO:         [1]: 112233
-          [1653477656.897566][21558:21563] CHIP:TOO:       Targets: null
-          [1653477656.897584][21558:21563] CHIP:TOO:       FabricIndex: 1
-          [1653477656.897602][21558:21563] CHIP:TOO:      }
-          [1653477656.897620][21558:21563] CHIP:TOO:     AdminFabricIndex: 1
-          [1653477656.897638][21558:21563] CHIP:TOO:    }
-          [1653477656.897753][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc002260]: Moving to [AwaitingSu]
-          [1653477656.897804][21558:21563] CHIP:EM: Piggybacking Ack for MessageCounter:15912678 on exchange: 43252i
-          [1653477656.897865][21558:21563] CHIP:IN: Prepared secure message 0x5604e6136648 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43252i with MessageCounter:16478648.
-          [1653477656.897901][21558:21563] CHIP:IN: Sending encrypted msg 0x5604e6136648 with MessageCounter:16478648 to 0x0000000000000001 (1) at monotonic time: 000000000161DC36 msec
-          [1653477656.905754][21558:21563] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15912679 on exchange 43252i
-          [1653477656.905777][21558:21563] CHIP:EM: Found matching exchange: 43252i, Delegate: 0x7f35bc002260
-          [1653477656.905797][21558:21563] CHIP:EM: Rxd Ack; Removing MessageCounter:16478648 from Retrans Table on exchange 43252i
-          [1653477656.905806][21558:21563] CHIP:EM: Removed CHIP MessageCounter:16478648 from RetransTable on exchange 43252i
-          [1653477656.905861][21558:21563] CHIP:DMG: SubscribeResponseMessage =
-          [1653477656.905871][21558:21563] CHIP:DMG: {
-          [1653477656.905880][21558:21563] CHIP:DMG:         SubscriptionId = 0x12b3d340,
-          [1653477656.905891][21558:21563] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653477656.905903][21558:21563] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653477656.905913][21558:21563] CHIP:DMG:         InteractionModelRevision = 1
-          [1653477656.905922][21558:21563] CHIP:DMG: }
-          [1653477656.905936][21558:21563] CHIP:DMG: Subscription established with SubscriptionID = 0x12b3d340 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+          [1655978294.671160][4411:4416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655978294.671200][4411:4416] CHIP:TOO:          Event number: 0
+          [1655978294.671233][4411:4416] CHIP:TOO:          Priority: Critical
+          [1655978294.671266][4411:4416] CHIP:TOO:          Timestamp: 4896714
+          [1655978294.671358][4411:4416] CHIP:TOO:   StartUp: {
+          [1655978294.671406][4411:4416] CHIP:TOO:     SoftwareVersion: 1
+          [1655978294.671440][4411:4416] CHIP:TOO:    }
+          [1655978294.671595][4411:4416] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655978294.671630][4411:4416] CHIP:TOO:          Event number: 1
+          [1655978294.671663][4411:4416] CHIP:TOO:          Priority: Info
+          [1655978294.671695][4411:4416] CHIP:TOO:          Timestamp: 4971265
+          [1655978294.671763][4411:4416] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655978294.671800][4411:4416] CHIP:TOO:     AdminNodeID: null
+          [1655978294.671835][4411:4416] CHIP:TOO:     AdminPasscodeID: 0
+          [1655978294.671869][4411:4416] CHIP:TOO:     ChangeType: 1
+          [1655978294.671902][4411:4416] CHIP:TOO:     LatestValue: {
+          [1655978294.671935][4411:4416] CHIP:TOO:       Privilege: 5
+          [1655978294.671968][4411:4416] CHIP:TOO:       AuthMode: 2
+          [1655978294.672007][4411:4416] CHIP:TOO:       Subjects: 1 entries
+          [1655978294.672050][4411:4416] CHIP:TOO:         [1]: 112233
+          [1655978294.672088][4411:4416] CHIP:TOO:       Targets: null
+          [1655978294.672121][4411:4416] CHIP:TOO:       FabricIndex: 1
+          [1655978294.672154][4411:4416] CHIP:TOO:      }
+          [1655978294.672187][4411:4416] CHIP:TOO:     AdminFabricIndex: 1
+          [1655978294.672219][4411:4416] CHIP:TOO:    }
+          [1655978294.672320][4411:4416] CHIP:DMG: MoveToState ReadClient[0xffff94004410]: Moving to [AwaitingSu]
+          [1655978294.672390][4411:4416] CHIP:EM: Piggybacking Ack for MessageCounter:9582248 on exchange: 63074i
+          [1655978294.672469][4411:4416] CHIP:IN: Prepared secure message 0xaaaaaf336c48 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 63074i with MessageCounter:265102197.
+          [1655978294.672521][4411:4416] CHIP:IN: Sending encrypted msg 0xaaaaaf336c48 with MessageCounter:265102197 to 0x0000000000000001 (1) at monotonic time: 0000000001099131 msec
+          [1655978294.673483][4411:4416] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:9582249 on exchange 63074i
+          [1655978294.673530][4411:4416] CHIP:EM: Found matching exchange: 63074i, Delegate: 0xffff94004410
+          [1655978294.673576][4411:4416] CHIP:EM: Rxd Ack; Removing MessageCounter:265102197 from Retrans Table on exchange 63074i
+          [1655978294.673611][4411:4416] CHIP:EM: Removed CHIP MessageCounter:265102197 from RetransTable on exchange 63074i
+          [1655978294.673667][4411:4416] CHIP:DMG: SubscribeResponseMessage =
+          [1655978294.673706][4411:4416] CHIP:DMG: {
+          [1655978294.673740][4411:4416] CHIP:DMG:         SubscriptionId = 0xb01feb58,
+          [1655978294.673778][4411:4416] CHIP:DMG:         MaxInterval = 0x3e8,
+          [1655978294.673815][4411:4416] CHIP:DMG:         InteractionModelRevision = 1
+          [1655978294.673849][4411:4416] CHIP:DMG: }
+          [1655978294.673887][4411:4416] CHIP:DMG: Subscription established with SubscriptionID = 0xb01feb58 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
-          all events from all clusters on all endpoints on a specific node i.e.
-          [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
+          all events from all clusters on all endpoints on a specific node that
+          is, [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
           Test step repeated
       disabled: true
 
     - label:
-          "Activate Event subscription from TH to DUT and change the attribute
-          value to create subscribed event before minimum interval."
+          "Activate Event subscription from TH to DUT and trigger the subscribed
+          event on the DUT before minimum interval."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
-          basic subscribe-event-by-id 0x000 100 1000 1 0
-
-          [1653478391.003351][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653478391.003375][21558:21563] CHIP:TOO:          Event number: 0
-          [1653478391.003395][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653478391.003415][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653478391.003447][21558:21563] CHIP:TOO:   StartUp: {
-          [1653478391.003475][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653478391.003498][21558:21563] CHIP:TOO:    }
-          [1653478391.003565][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc003d90]: Moving to [AwaitingSu]
-          [1653478391.003619][21558:21563] CHIP:EM: Piggybacking Ack for MessageCounter:15912689 on exchange: 43259i
-          [1653478391.003706][21558:21563] CHIP:IN: Prepared secure message 0x5604e6136648 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43259i with MessageCounter:16478666.
-          [1653478391.003766][21558:21563] CHIP:IN: Sending encrypted msg 0x5604e6136648 with MessageCounter:16478666 to 0x0000000000000001 (1) at monotonic time: 00000000016D0FD0 msec
-          [1653478391.012173][21558:21563] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15912690 on exchange 43259i
-          [1653478391.012194][21558:21563] CHIP:EM: Found matching exchange: 43259i, Delegate: 0x7f35bc003d90
-          [1653478391.012210][21558:21563] CHIP:EM: Rxd Ack; Removing MessageCounter:16478666 from Retrans Table on exchange 43259i
-          [1653478391.012219][21558:21563] CHIP:EM: Removed CHIP MessageCounter:16478666 from RetransTable on exchange 43259i
-          [1653478391.012241][21558:21563] CHIP:DMG: SubscribeResponseMessage =
-          [1653478391.012249][21558:21563] CHIP:DMG: {
-          [1653478391.012257][21558:21563] CHIP:DMG:         SubscriptionId = 0x6b28cc4d,
-          [1653478391.012264][21558:21563] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653478391.012272][21558:21563] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653478391.012280][21558:21563] CHIP:DMG:         InteractionModelRevision = 1
-          [1653478391.012286][21558:21563] CHIP:DMG: }
-          [1653478391.012297][21558:21563] CHIP:DMG: Subscription established with SubscriptionID = 0x6b28cc4d MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+          sudo ./chip-tool basic subscribe-event-by-id 0x000 100 1000 1 0
+          [1655978403.942817][4421:4426] CHIP:DMG: ReportDataMessage =
+          [1655978403.942856][4421:4426] CHIP:DMG: {
+          [1655978403.942888][4421:4426] CHIP:DMG:         SubscriptionId = 0xd8a1d921,
+          [1655978403.942913][4421:4426] CHIP:DMG:         EventReportIBs =
+          [1655978403.943012][4421:4426] CHIP:DMG:         [
+          [1655978403.943037][4421:4426] CHIP:DMG:                 EventReportIB =
+          [1655978403.943070][4421:4426] CHIP:DMG:                 {
+          [1655978403.943106][4421:4426] CHIP:DMG:                         EventDataIB =
+          [1655978403.943139][4421:4426] CHIP:DMG:                         {
+          [1655978403.943176][4421:4426] CHIP:DMG:                                 EventPath =
+          [1655978403.943218][4421:4426] CHIP:DMG:                                 {
+          [1655978403.943252][4421:4426] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655978403.943295][4421:4426] CHIP:DMG:                                         Cluster = 0x28,
+          [1655978403.943337][4421:4426] CHIP:DMG:                                         Event = 0x0,
+          [1655978403.943370][4421:4426] CHIP:DMG:                                 },
+          [1655978403.943413][4421:4426] CHIP:DMG:
+          [1655978403.943452][4421:4426] CHIP:DMG:                                 EventNumber = 0x0,
+          [1655978403.943487][4421:4426] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1655978403.943530][4421:4426] CHIP:DMG:                                 SystemTimestamp = 0x4ab7ca,
+          [1655978403.943571][4421:4426] CHIP:DMG:                                 EventData =
+          [1655978403.943607][4421:4426] CHIP:DMG:                                 {
+          [1655978403.943674][4421:4426] CHIP:DMG:                                         0x0 = 1,
+          [1655978403.943717][4421:4426] CHIP:DMG:                                 },
+          [1655978403.943747][4421:4426] CHIP:DMG:                         },
+          [1655978403.943780][4421:4426] CHIP:DMG:
+          [1655978403.943815][4421:4426] CHIP:DMG:                 },
+          [1655978403.943847][4421:4426] CHIP:DMG:
+          [1655978403.943879][4421:4426] CHIP:DMG:         ],
+          [1655978403.943912][4421:4426] CHIP:DMG:
+          [1655978403.943944][4421:4426] CHIP:DMG:         InteractionModelRevision = 1
+          [1655978403.943968][4421:4426] CHIP:DMG: }
+          [1655978403.944242][4421:4426] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655978403.944296][4421:4426] CHIP:TOO:          Event number: 0
+          [1655978403.944343][4421:4426] CHIP:TOO:          Priority: Critical
+          [1655978403.944389][4421:4426] CHIP:TOO:          Timestamp: 4896714
+          [1655978403.944531][4421:4426] CHIP:TOO:   StartUp: {
+          [1655978403.944598][4421:4426] CHIP:TOO:     SoftwareVersion: 1
+          [1655978403.944664][4421:4426] CHIP:TOO:    }
+          [1655978403.944762][4421:4426] CHIP:DMG: MoveToState ReadClient[0xffff94006630]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
@@ -356,126 +396,198 @@ tests:
           is set to True for a particular event path in the EventPathIB in the
           SubscribeRequestMessage."
       verification: |
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1451
+          Use interactive mode to verify this
+          basic subscribe-event start-up  30 100 1 0 --is-urgent true
+
+          On DUT
+          [1655979158.361200][1637:1637] CHIP:IM: Received Subscribe request
+          [1655979158.361388][1637:1637] CHIP:DMG: SubscribeRequestMessage =
+          [1655979158.361444][1637:1637] CHIP:DMG: {
+          [1655979158.361512][1637:1637] CHIP:DMG:         KeepSubscriptions = false,
+          [1655979158.361568][1637:1637] CHIP:DMG:         MinIntervalFloorSeconds = 0x1e,
+          [1655979158.361623][1637:1637] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
+          [1655979158.361673][1637:1637] CHIP:DMG:         EventPathIBs =
+          [1655979158.361727][1637:1637] CHIP:DMG:         [
+          [1655979158.361796][1637:1637] CHIP:DMG:                 EventPath =
+          [1655979158.361852][1637:1637] CHIP:DMG:                 {
+          [1655979158.361928][1637:1637] CHIP:DMG:                         Endpoint = 0x0,
+          [1655979158.362016][1637:1637] CHIP:DMG:                         Cluster = 0x28,
+          [1655979158.362082][1637:1637] CHIP:DMG:                         Event = 0x0,
+          [1655979158.362161][1637:1637] CHIP:DMG:                         isUrgent = true,
+          [1655979158.362220][1637:1637] CHIP:DMG:                 },
+          [1655979158.362299][1637:1637] CHIP:DMG:
+          [1655979158.362350][1637:1637] CHIP:DMG:         ],
+          [1655979158.362425][1637:1637] CHIP:DMG:
+          [1655979158.362477][1637:1637] CHIP:DMG:         isFabricFiltered = true,
+          [1655979158.362546][1637:1637] CHIP:DMG:         InteractionModelRevision = 1
+          [1655979158.362638][1637:1637] CHIP:DMG: },
+          [1655979158.362788][1637:1637] CHIP:DMG: Final negotiated min/max parameters: Min = 30s, Max = 100s
+
+
+          On TH
+          [1655979158.364976][4496:4501] CHIP:DMG: ReportDataMessage =
+          [1655979158.365035][4496:4501] CHIP:DMG: {
+          [1655979158.365087][4496:4501] CHIP:DMG:         SubscriptionId = 0x10275693,
+          [1655979158.365139][4496:4501] CHIP:DMG:         EventReportIBs =
+          [1655979158.365207][4496:4501] CHIP:DMG:         [
+          [1655979158.365259][4496:4501] CHIP:DMG:                 EventReportIB =
+          [1655979158.365331][4496:4501] CHIP:DMG:                 {
+          [1655979158.365386][4496:4501] CHIP:DMG:                         EventDataIB =
+          [1655979158.365452][4496:4501] CHIP:DMG:                         {
+          [1655979158.365514][4496:4501] CHIP:DMG:                                 EventPath =
+          [1655979158.365584][4496:4501] CHIP:DMG:                                 {
+          [1655979158.365661][4496:4501] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655979158.365737][4496:4501] CHIP:DMG:                                         Cluster = 0x28,
+          [1655979158.365803][4496:4501] CHIP:DMG:                                         Event = 0x0,
+          [1655979158.365873][4496:4501] CHIP:DMG:                                 },
+          [1655979158.365939][4496:4501] CHIP:DMG:
+          [1655979158.366005][4496:4501] CHIP:DMG:                                 EventNumber = 0x0,
+          [1655979158.366082][4496:4501] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1655979158.366152][4496:4501] CHIP:DMG:                                 SystemTimestamp = 0x4ab7ca,
+          [1655979158.366221][4496:4501] CHIP:DMG:                                 EventData =
+          [1655979158.366314][4496:4501] CHIP:DMG:                                 {
+          [1655979158.366390][4496:4501] CHIP:DMG:                                         0x0 = 1,
+          [1655979158.366464][4496:4501] CHIP:DMG:                                 },
+          [1655979158.366528][4496:4501] CHIP:DMG:                         },
+          [1655979158.366600][4496:4501] CHIP:DMG:
+          [1655979158.366654][4496:4501] CHIP:DMG:                 },
+          [1655979158.366721][4496:4501] CHIP:DMG:
+          [1655979158.366772][4496:4501] CHIP:DMG:         ],
+          [1655979158.366839][4496:4501] CHIP:DMG:
+          [1655979158.366891][4496:4501] CHIP:DMG:         InteractionModelRevision = 1
+          [1655979158.367002][4496:4501] CHIP:DMG: }
+          [1655979158.367266][4496:4501] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1655979158.367320][4496:4501] CHIP:TOO:          Event number: 0
+          [1655979158.367368][4496:4501] CHIP:TOO:          Priority: Critical
+          [1655979158.367417][4496:4501] CHIP:TOO:          Timestamp: 4896714
+          [1655979158.367545][4496:4501] CHIP:TOO:   StartUp: {
+          [1655979158.367612][4496:4501] CHIP:TOO:     SoftwareVersion: 1
+          [1655979158.367662][4496:4501] CHIP:TOO:    }
+          [1655979158.367759][4496:4501] CHIP:DMG: MoveToState ReadClient[0xffff70007140]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
           "Activate Event subscription from TH to DUT with no change in event
           triggering attribute values before maximum interval."
       verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool any subscribe-event-by-id 0x0033 0x01 0 100  1 1
-          on TH
-          [1651585153.535829][2998:3003] CHIP:DMG: ReportDataMessage =
-          [1651585153.535860][2998:3003] CHIP:DMG: {
-          [1651585153.535888][2998:3003] CHIP:DMG:         SubscriptionId = 0x2e08688819c6e7af,
-          [1651585153.535918][2998:3003] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.535945][2998:3003] CHIP:DMG: }
-          [1651585153.535990][2998:3003] CHIP:DMG: MoveToState ReadClient[0xffff98002e10]: Moving to [AwaitingSu]
-          [1651585153.536039][2998:3003] CHIP:EM: Piggybacking Ack for MessageCounter:12695913 on exchange: 56366i
-          [1651585153.536099][2998:3003] CHIP:IN: Prepared secure message 0xaaaad8552488 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 56366i with MessageCounter:12866229.
-          [1651585153.536139][2998:3003] CHIP:IN: Sending encrypted msg 0xaaaad8552488 with MessageCounter:12866229 to 0x0000000000000001 (1) at monotonic time: 00000000005716CD msec
-          [1651585153.537541][2998:3003] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:12695914 on exchange 56366i
-          [1651585153.537579][2998:3003] CHIP:EM: Found matching exchange: 56366i, Delegate: 0xffff98002e10
-          [1651585153.537614][2998:3003] CHIP:EM: Rxd Ack; Removing MessageCounter:12866229 from Retrans Table on exchange 56366i
-          [1651585153.537641][2998:3003] CHIP:EM: Removed CHIP MessageCounter:12866229 from RetransTable on exchange 56366i
-          [1651585153.537688][2998:3003] CHIP:DMG: SubscribeResponseMessage =
-          [1651585153.537718][2998:3003] CHIP:DMG: {
-          [1651585153.537749][2998:3003] CHIP:DMG:         SubscriptionId = 0x2e08688819c6e7af,
-          [1651585153.537805][2998:3003] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
-          [1651585153.537861][2998:3003] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
-          [1651585153.537916][2998:3003] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.537967][2998:3003] CHIP:DMG: }
-
-
-          DUT side
-          [1651585153.529075][2352:2352] CHIP:DMG: SubscribeRequestMessage =
-          [1651585153.529112][2352:2352] CHIP:DMG: {
-          [1651585153.529158][2352:2352] CHIP:DMG:         KeepSubscriptions = false,
-          [1651585153.529193][2352:2352] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
-          [1651585153.529228][2352:2352] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
-          [1651585153.529275][2352:2352] CHIP:DMG:         EventPathIBs =
-          [1651585153.529311][2352:2352] CHIP:DMG:         [
-          [1651585153.529355][2352:2352] CHIP:DMG:                 EventPath =
-          [1651585153.529395][2352:2352] CHIP:DMG:                 {
-          [1651585153.529502][2352:2352] CHIP:DMG:                         Endpoint = 0x1,
-          [1651585153.529560][2352:2352] CHIP:DMG:                         Cluster = 0x33,
-          [1651585153.529603][2352:2352] CHIP:DMG:                         Event = 0x1,
-          [1651585153.529652][2352:2352] CHIP:DMG:                 },
-          [1651585153.529694][2352:2352] CHIP:DMG:
-          [1651585153.529739][2352:2352] CHIP:DMG:         ],
-          [1651585153.529778][2352:2352] CHIP:DMG:
-          [1651585153.529825][2352:2352] CHIP:DMG:         isFabricFiltered = true,
-          [1651585153.529861][2352:2352] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.529905][2352:2352] CHIP:DMG: },
-          [1651585153.529989][2352:2352] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
-          [1651585153.530085][2352:2352] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1651585153.530195][2352:2352] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1651585153.530365][2352:2352] CHIP:DMG: Fetched 0 events
-          [1651585153.530403][2352:2352] CHIP:DMG: <RE> Sending report (payload has 15 bytes)...
-          [1651585153.530435][2352:2352] CHIP:DMG: IM RH moving to [AwaitingReportResponse]
-          [1651585153.530472][2352:2352] CHIP:EM: Piggybacking Ack for MessageCounter:12866228 on exchange: 56366r
-          [1651585153.530547][2352:2352] CHIP:IN: Prepared secure message 0xaaaabeacb650 to 0x000000000001B669 (1)  of type 0x5 and protocolId (0, 1) on exchange 56366r with MessageCounter:12695913.
-          [1651585153.530596][2352:2352] CHIP:IN: Sending encrypted msg 0xaaaabeacb650 with MessageCounter:12695913 to 0x000000000001B669 (1) at monotonic time: 00000000005729DD msec
-          [1651585153.530947][2352:2352] CHIP:DMG: <RE> ReportsInFlight = 3 with readHandler 0, RE has no more messages
-          [1651585153.530988][2352:2352] CHIP:DMG: All ReadHandler-s are clean, clear GlobalDirtySet
-          [1651585153.532011][2352:2352] CHIP:EM: Received message of type 0x1 with protocolId (0, 1) and MessageCounter:12866229 on exchange 56366r
-          [1651585153.532053][2352:2352] CHIP:EM: Found matching exchange: 56366r, Delegate: 0xaaaabfc22d00
-          [1651585153.532098][2352:2352] CHIP:EM: Rxd Ack; Removing MessageCounter:12695913 from Retrans Table on exchange 56366r
-          [1651585153.532129][2352:2352] CHIP:EM: Removed CHIP MessageCounter:12695913 from RetransTable on exchange 56366r
-          [1651585153.532185][2352:2352] CHIP:DMG: StatusResponseMessage =
-          [1651585153.532236][2352:2352] CHIP:DMG: {
-          [1651585153.532268][2352:2352] CHIP:DMG:         Status = 0x00 (SUCCESS),
-          [1651585153.532305][2352:2352] CHIP:DMG:         InteractionModelRevision = 1
-          [1651585153.532351][2352:2352] CHIP:DMG: }
+          ./chip-tool basic subscribe-event  start-up  20 100 1 0
+          [1656586853.121700][3433:3438] CHIP:EM: Removed CHIP MessageCounter:63910370 from RetransTable on exchange 37869i
+          [1656586853.121777][3433:3438] CHIP:DMG: ReportDataMessage =
+          [1656586853.121815][3433:3438] CHIP:DMG: {
+          [1656586853.121850][3433:3438] CHIP:DMG:         SubscriptionId = 0x9657c553,
+          [1656586853.121886][3433:3438] CHIP:DMG:         EventReportIBs =
+          [1656586853.121933][3433:3438] CHIP:DMG:         [
+          [1656586853.121969][3433:3438] CHIP:DMG:                 EventReportIB =
+          [1656586853.122019][3433:3438] CHIP:DMG:                 {
+          [1656586853.122057][3433:3438] CHIP:DMG:                         EventDataIB =
+          [1656586853.122105][3433:3438] CHIP:DMG:                         {
+          [1656586853.122150][3433:3438] CHIP:DMG:                                 EventPath =
+          [1656586853.122204][3433:3438] CHIP:DMG:                                 {
+          [1656586853.122254][3433:3438] CHIP:DMG:                                         Endpoint = 0x0,
+          [1656586853.122310][3433:3438] CHIP:DMG:                                         Cluster = 0x28,
+          [1656586853.122355][3433:3438] CHIP:DMG:                                         Event = 0x0,
+          [1656586853.122434][3433:3438] CHIP:DMG:                                 },
+          [1656586853.122485][3433:3438] CHIP:DMG:
+          [1656586853.122531][3433:3438] CHIP:DMG:                                 EventNumber = 0x0,
+          [1656586853.122581][3433:3438] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1656586853.122629][3433:3438] CHIP:DMG:                                 SystemTimestamp = 0x8b5ff,
+          [1656586853.122675][3433:3438] CHIP:DMG:                                 EventData =
+          [1656586853.122721][3433:3438] CHIP:DMG:                                 {
+          [1656586853.122797][3433:3438] CHIP:DMG:                                         0x0 = 1,
+          [1656586853.122852][3433:3438] CHIP:DMG:                                 },
+          [1656586853.122893][3433:3438] CHIP:DMG:                         },
+          [1656586853.122944][3433:3438] CHIP:DMG:
+          [1656586853.122984][3433:3438] CHIP:DMG:                 },
+          [1656586853.123030][3433:3438] CHIP:DMG:
+          [1656586853.123065][3433:3438] CHIP:DMG:         ],
+          [1656586853.123113][3433:3438] CHIP:DMG:
+          [1656586853.123149][3433:3438] CHIP:DMG:         InteractionModelRevision = 1
+          [1656586853.123184][3433:3438] CHIP:DMG: }
+          [1656586853.123380][3433:3438] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1656586853.123417][3433:3438] CHIP:TOO:          Event number: 0
+          [1656586853.123450][3433:3438] CHIP:TOO:          Priority: Critical
+          [1656586853.123483][3433:3438] CHIP:TOO:          Timestamp: 570879
+          [1656586853.123571][3433:3438] CHIP:TOO:   StartUp: {
+          [1656586853.123634][3433:3438] CHIP:TOO:     SoftwareVersion: 1
+          [1656586853.123670][3433:3438] CHIP:TOO:    }
+          [1656586853.123739][3433:3438] CHIP:DMG: MoveToState ReadClient[0xffff8c004000]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
           "With an active Event subscription from TH to DUT, TH sends another
           Subscribe Request Message to DUT with KeepSubscriptions as False."
       verification: |
+          ./chip-tool basic subscribe-event-by-id 0x000 100 1000 1 0
 
+          [1656586584.993544][3416:3421] CHIP:DMG: }
+          [1656586584.993743][3416:3421] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1656586584.993781][3416:3421] CHIP:TOO:          Event number: 0
+          [1656586584.993815][3416:3421] CHIP:TOO:          Priority: Critical
+          [1656586584.993851][3416:3421] CHIP:TOO:          Timestamp: 570879
+          [1656586584.993938][3416:3421] CHIP:TOO:   StartUp: {
+          [1656586584.994000][3416:3421] CHIP:TOO:     SoftwareVersion: 1
+          [1656586584.994036][3416:3421] CHIP:TOO:    }
+          [1656586584.994105][3416:3421] CHIP:DMG: MoveToState ReadClient[0xffff84005da0]: Moving to [AwaitingSu]
+          [1656586584.994171][3416:3421] CHIP:EM: Piggybacking Ack for MessageCounter:201398118 on exchange: 37980i
+          [1656586584.994250][3416:3421] CHIP:IN: Prepared secure message 0xaaaae80fa2a8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 37980i with MessageCounter:65866683.
+          [1656586584.994302][3416:3421] CHIP:IN: Sending encrypted msg 0xaaaae80fa2a8 with MessageCounter:65866683 to 0x0000000000000001 (1) at monotonic time: 0000000001409EBB msec
+          [1656586584.995316][3416:3421] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:201398119 on exchange 37980i
+          [1656586584.995363][3416:3421] CHIP:EM: Found matching exchange: 37980i, Delegate: 0xffff84005da0
+          [1656586584.995409][3416:3421] CHIP:EM: Rxd Ack; Removing MessageCounter:65866683 from Retrans Table on exchange 37980i
+          [1656586584.995444][3416:3421] CHIP:EM: Removed CHIP MessageCounter:65866683 from RetransTable on exchange 37980i
+          [1656586584.995501][3416:3421] CHIP:DMG: SubscribeResponseMessage =
+          [1656586584.995541][3416:3421] CHIP:DMG: {
+          [1656586584.995576][3416:3421] CHIP:DMG:         SubscriptionId = 0x2f62924f,
+          [1656586584.995616][3416:3421] CHIP:DMG:         MaxInterval = 0x3e8,
+          [1656586584.995653][3416:3421] CHIP:DMG:         InteractionModelRevision = 1
+          [1656586584.995687][3416:3421] CHIP:DMG: }
+          [1656586584.995724][3416:3421] CHIP:DMG: Subscription established with SubscriptionID = 0x2f62924f MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+
+
+           ./chip-tool basic subscribe-event-by-id 0x000 100 1000 1 0 --keepSubscriptions 0
+          [1656586592.481229][3423:3428] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1656586592.481265][3423:3428] CHIP:TOO:          Event number: 0
+          [1656586592.481299][3423:3428] CHIP:TOO:          Priority: Critical
+          [1656586592.481331][3423:3428] CHIP:TOO:          Timestamp: 570879
+          [1656586592.481420][3423:3428] CHIP:TOO:   StartUp: {
+          [1656586592.481483][3423:3428] CHIP:TOO:     SoftwareVersion: 1
+          [1656586592.481519][3423:3428] CHIP:TOO:    }
+          [1656586592.481588][3423:3428] CHIP:DMG: MoveToState ReadClient[0xffff98002f00]: Moving to [AwaitingSu]
+          [1656586592.481653][3423:3428] CHIP:EM: Piggybacking Ack for MessageCounter:193147231 on exchange: 54998i
+          [1656586592.481731][3423:3428] CHIP:IN: Prepared secure message 0xaaaaf7795938 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 54998i with MessageCounter:224157172.
+          [1656586592.481785][3423:3428] CHIP:IN: Sending encrypted msg 0xaaaaf7795938 with MessageCounter:224157172 to 0x0000000000000001 (1) at monotonic time: 000000000140BBFB msec
+          [1656586592.483234][3423:3428] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:193147232 on exchange 54998i
+          [1656586592.483282][3423:3428] CHIP:EM: Found matching exchange: 54998i, Delegate: 0xffff98002f00
+          [1656586592.483327][3423:3428] CHIP:EM: Rxd Ack; Removing MessageCounter:224157172 from Retrans Table on exchange 54998i
+          [1656586592.483361][3423:3428] CHIP:EM: Removed CHIP MessageCounter:224157172 from RetransTable on exchange 54998i
+          [1656586592.483418][3423:3428] CHIP:DMG: SubscribeResponseMessage =
+          [1656586592.483456][3423:3428] CHIP:DMG: {
+          [1656586592.483490][3423:3428] CHIP:DMG:         SubscriptionId = 0xc9446e32,
+          [1656586592.483532][3423:3428] CHIP:DMG:         MaxInterval = 0x3e8,
+          [1656586592.483569][3423:3428] CHIP:DMG:         InteractionModelRevision = 1
+          [1656586592.483602][3423:3428] CHIP:DMG: }
+          [1656586592.483639][3423:3428] CHIP:DMG: Subscription established with SubscriptionID = 0xc9446e32 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
       disabled: true
 
     - label:
-          "TH sends Subscribe Request Message to DUT. DUT sends Report Data
+          "TH sends Subscribe Request Message to DUT + DUT sends Report Data
           message to DUT. TH sends Status Response Message with a success Status
           code."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
+          sudo ./chip-tool basic subscribe-event-by-id 0x000 20 400 1 0
 
-          basic subscribe-event-by-id 0x000 100 1000 1 0
-
-          [1653478391.003351][21558:21563] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653478391.003375][21558:21563] CHIP:TOO:          Event number: 0
-          [1653478391.003395][21558:21563] CHIP:TOO:          Priority: Critical
-          [1653478391.003415][21558:21563] CHIP:TOO:          Timestamp: 2525140
-          [1653478391.003447][21558:21563] CHIP:TOO:   StartUp: {
-          [1653478391.003475][21558:21563] CHIP:TOO:     SoftwareVersion: 1
-          [1653478391.003498][21558:21563] CHIP:TOO:    }
-          [1653478391.003565][21558:21563] CHIP:DMG: MoveToState ReadClient[0x7f35bc003d90]: Moving to [AwaitingSu]
-          [1653478391.003619][21558:21563] CHIP:EM: Piggybacking Ack for MessageCounter:15912689 on exchange: 43259i
-          [1653478391.003706][21558:21563] CHIP:IN: Prepared secure message 0x5604e6136648 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 43259i with MessageCounter:16478666.
-          [1653478391.003766][21558:21563] CHIP:IN: Sending encrypted msg 0x5604e6136648 with MessageCounter:16478666 to 0x0000000000000001 (1) at monotonic time: 00000000016D0FD0 msec
-          [1653478391.012173][21558:21563] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15912690 on exchange 43259i
-          [1653478391.012194][21558:21563] CHIP:EM: Found matching exchange: 43259i, Delegate: 0x7f35bc003d90
-          [1653478391.012210][21558:21563] CHIP:EM: Rxd Ack; Removing MessageCounter:16478666 from Retrans Table on exchange 43259i
-          [1653478391.012219][21558:21563] CHIP:EM: Removed CHIP MessageCounter:16478666 from RetransTable on exchange 43259i
-          [1653478391.012241][21558:21563] CHIP:DMG: SubscribeResponseMessage =
-          [1653478391.012249][21558:21563] CHIP:DMG: {
-          [1653478391.012257][21558:21563] CHIP:DMG:         SubscriptionId = 0x6b28cc4d,
-          [1653478391.012264][21558:21563] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653478391.012272][21558:21563] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653478391.012280][21558:21563] CHIP:DMG:         InteractionModelRevision = 1
-          [1653478391.012286][21558:21563] CHIP:DMG: }
-          [1653478391.012297][21558:21563] CHIP:DMG: Subscription established with SubscriptionID = 0x6b28cc4d MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+          [1655979596.078821][4557:4562] CHIP:DMG: SubscribeResponseMessage =
+          [1655979596.078861][4557:4562] CHIP:DMG: {
+          [1655979596.078897][4557:4562] CHIP:DMG:         SubscriptionId = 0x6a61af41,
+          [1655979596.078955][4557:4562] CHIP:DMG:         MaxInterval = 0x190,
+          [1655979596.078995][4557:4562] CHIP:DMG:         InteractionModelRevision = 1
+          [1655979596.079030][4557:4562] CHIP:DMG: }
+          [1655979596.079069][4557:4562] CHIP:DMG: Subscription established with SubscriptionID = 0x6a61af41 MinInterval = 20s MaxInterval = 400s Peer = 01:0000000000000001
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT. DUT sends Report Data
-          message to DUT . TH sends Status Response Message with an error
+          message to DUT + TH sends Status Response Message with an error
           Status."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.This test step to be removed from the manual execution.
@@ -485,7 +597,7 @@ tests:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
           path which indicates a cluster event that is not supported."
       verification: |
-          cannot be executed with V1.0 SDK.
+          Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -553,33 +665,201 @@ tests:
           information field matching the node indicated in the path and EventMin
           field."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
-          basic subscribe-event-by-id 0 100 1000 3 0
+          sudo ./chip-tool accesscontrol subscribe-event access-control-entry-changed 5 10 1 0
+          [1655979825.174136][4566:4571] CHIP:DMG: ReportDataMessage =
+          [1655979825.174177][4566:4571] CHIP:DMG: {
+          [1655979825.174213][4566:4571] CHIP:DMG:         SubscriptionId = 0xd263227e,
+          [1655979825.174249][4566:4571] CHIP:DMG:         EventReportIBs =
+          [1655979825.174303][4566:4571] CHIP:DMG:         [
+          [1655979825.174339][4566:4571] CHIP:DMG:                 EventReportIB =
+          [1655979825.174396][4566:4571] CHIP:DMG:                 {
+          [1655979825.174434][4566:4571] CHIP:DMG:                         EventDataIB =
+          [1655979825.174481][4566:4571] CHIP:DMG:                         {
+          [1655979825.174524][4566:4571] CHIP:DMG:                                 EventPath =
+          [1655979825.174578][4566:4571] CHIP:DMG:                                 {
+          [1655979825.174628][4566:4571] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655979825.174681][4566:4571] CHIP:DMG:                                         Cluster = 0x1f,
+          [1655979825.174732][4566:4571] CHIP:DMG:                                         Event = 0x0,
+          [1655979825.174784][4566:4571] CHIP:DMG:                                 },
+          [1655979825.174835][4566:4571] CHIP:DMG:
+          [1655979825.174883][4566:4571] CHIP:DMG:                                 EventNumber = 0x1,
+          [1655979825.174944][4566:4571] CHIP:DMG:                                 PriorityLevel = 0x1,
+          [1655979825.174995][4566:4571] CHIP:DMG:                                 SystemTimestamp = 0x4bdb01,
+          [1655979825.175041][4566:4571] CHIP:DMG:                                 EventData =
+          [1655979825.175089][4566:4571] CHIP:DMG:                                 {
+          [1655979825.175162][4566:4571] CHIP:DMG:                                         0x1 = NULL
+          [1655979825.175216][4566:4571] CHIP:DMG:                                         0x2 = 0,
+          [1655979825.175267][4566:4571] CHIP:DMG:                                         0x3 = 1,
+          [1655979825.175312][4566:4571] CHIP:DMG:                                         0x4 =
+          [1655979825.175360][4566:4571] CHIP:DMG:                                         {
+          [1655979825.175470][4566:4571] CHIP:DMG:                                                 0x1 = 5,
+          [1655979825.175529][4566:4571] CHIP:DMG:                                                 0x2 = 2,
+          [1655979825.175584][4566:4571] CHIP:DMG:                                                 0x3 = [
+          [1655979825.175653][4566:4571] CHIP:DMG:                                                                 112233,
+          [1655979825.175754][4566:4571] CHIP:DMG:                                                 ],
+          [1655979825.175809][4566:4571] CHIP:DMG:                                                 0x4 = NULL
+          [1655979825.175865][4566:4571] CHIP:DMG:                                                 0xfe = 1,
+          [1655979825.175918][4566:4571] CHIP:DMG:                                         },
+          [1655979825.175968][4566:4571] CHIP:DMG:                                         0xfe = 1,
+          [1655979825.176018][4566:4571] CHIP:DMG:                                 },
+          [1655979825.176059][4566:4571] CHIP:DMG:                         },
+          [1655979825.176115][4566:4571] CHIP:DMG:
+          [1655979825.176155][4566:4571] CHIP:DMG:                 },
+          [1655979825.176208][4566:4571] CHIP:DMG:
+          [1655979825.176243][4566:4571] CHIP:DMG:         ],
+          [1655979825.176326][4566:4571] CHIP:DMG:
+          [1655979825.176364][4566:4571] CHIP:DMG:         InteractionModelRevision = 1
+          [1655979825.176399][4566:4571] CHIP:DMG: }
+          [1655979825.176631][4566:4571] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655979825.176668][4566:4571] CHIP:TOO:          Event number: 1
+          [1655979825.176701][4566:4571] CHIP:TOO:          Priority: Info
+          [1655979825.176733][4566:4571] CHIP:TOO:          Timestamp: 4971265
+          [1655979825.176857][4566:4571] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655979825.176896][4566:4571] CHIP:TOO:     AdminNodeID: null
+          [1655979825.176945][4566:4571] CHIP:TOO:     AdminPasscodeID: 0
+          [1655979825.176982][4566:4571] CHIP:TOO:     ChangeType: 1
+          [1655979825.177016][4566:4571] CHIP:TOO:     LatestValue: {
+          [1655979825.177049][4566:4571] CHIP:TOO:       Privilege: 5
+          [1655979825.177083][4566:4571] CHIP:TOO:       AuthMode: 2
+          [1655979825.177125][4566:4571] CHIP:TOO:       Subjects: 1 entries
+          [1655979825.177168][4566:4571] CHIP:TOO:         [1]: 112233
+          [1655979825.177206][4566:4571] CHIP:TOO:       Targets: null
+          [1655979825.177242][4566:4571] CHIP:TOO:       FabricIndex: 1
+          [1655979825.177276][4566:4571] CHIP:TOO:      }
+          [1655979825.177310][4566:4571] CHIP:TOO:     AdminFabricIndex: 1
+          [1655979825.177344][4566:4571] CHIP:TOO:    }
+          [1655979825.177433][4566:4571] CHIP:DMG: MoveToState ReadClient[0xffff84006d40]: Moving to [AwaitingSu]
 
-          [1653656063.055701][14377:14382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
-          [1653656063.055723][14377:14382] CHIP:TOO:          Event number: 65536
-          [1653656063.055741][14377:14382] CHIP:TOO:          Priority: Critical
-          [1653656063.055758][14377:14382] CHIP:TOO:          Timestamp: 127594
-          [1653656063.055811][14377:14382] CHIP:TOO:   StartUp: {
-          [1653656063.055838][14377:14382] CHIP:TOO:     SoftwareVersion: 1
-          [1653656063.055859][14377:14382] CHIP:TOO:    }
-          [1653656063.055918][14377:14382] CHIP:DMG: MoveToState ReadClient[0x7f4f68002260]: Moving to [AwaitingSu]
-          [1653656063.055970][14377:14382] CHIP:EM: Piggybacking Ack for MessageCounter:5873379 on exchange: 39762i
-          [1653656063.056029][14377:14382] CHIP:IN: Prepared secure message 0x55ccea0fc878 to 0x0000000000000003 (1)  of type 0x1 and protocolId (0, 1) on exchange 39762i with MessageCounter:3741292.
-          [1653656063.056240][14377:14382] CHIP:IN: Sending encrypted msg 0x55ccea0fc878 with MessageCounter:3741292 to 0x0000000000000003 (1) at monotonic time: 0000000001BE791F msec
-          [1653656063.069994][14377:14382] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:5873380 on exchange 39762i
-          [1653656063.070016][14377:14382] CHIP:EM: Found matching exchange: 39762i, Delegate: 0x7f4f68002260
-          [1653656063.070032][14377:14382] CHIP:EM: Rxd Ack; Removing MessageCounter:3741292 from Retrans Table on exchange 39762i
-          [1653656063.070039][14377:14382] CHIP:EM: Removed CHIP MessageCounter:3741292 from RetransTable on exchange 39762i
-          [1653656063.070063][14377:14382] CHIP:DMG: SubscribeResponseMessage =
-          [1653656063.070074][14377:14382] CHIP:DMG: {
-          [1653656063.070083][14377:14382] CHIP:DMG:         SubscriptionId = 0x49bb06f8,
-          [1653656063.070091][14377:14382] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653656063.070100][14377:14382] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653656063.070108][14377:14382] CHIP:DMG:         InteractionModelRevision = 1
-          [1653656063.070115][14377:14382] CHIP:DMG: }
-          [1653656063.070127][14377:14382] CHIP:DMG: Subscription established with SubscriptionID = 0x49bb06f8 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000003
+
+
+           sudo ./chip-tool accesscontrol subscribe-event access-control-entry-changed 5 10 1 0 --event-min 0
+          [1655979915.863156][4607:4612] CHIP:DMG: ReportDataMessage =
+          [1655979915.863196][4607:4612] CHIP:DMG: {
+          [1655979915.863232][4607:4612] CHIP:DMG:         SubscriptionId = 0xeb39dedd,
+          [1655979915.863268][4607:4612] CHIP:DMG:         EventReportIBs =
+          [1655979915.863321][4607:4612] CHIP:DMG:         [
+          [1655979915.863357][4607:4612] CHIP:DMG:                 EventReportIB =
+          [1655979915.863412][4607:4612] CHIP:DMG:                 {
+          [1655979915.863450][4607:4612] CHIP:DMG:                         EventDataIB =
+          [1655979915.863496][4607:4612] CHIP:DMG:                         {
+          [1655979915.863538][4607:4612] CHIP:DMG:                                 EventPath =
+          [1655979915.863586][4607:4612] CHIP:DMG:                                 {
+          [1655979915.863636][4607:4612] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655979915.863692][4607:4612] CHIP:DMG:                                         Cluster = 0x1f,
+          [1655979915.863743][4607:4612] CHIP:DMG:                                         Event = 0x0,
+          [1655979915.863790][4607:4612] CHIP:DMG:                                 },
+          [1655979915.863845][4607:4612] CHIP:DMG:
+          [1655979915.863892][4607:4612] CHIP:DMG:                                 EventNumber = 0x1,
+          [1655979915.863942][4607:4612] CHIP:DMG:                                 PriorityLevel = 0x1,
+          [1655979915.863990][4607:4612] CHIP:DMG:                                 SystemTimestamp = 0x4bdb01,
+          [1655979915.864036][4607:4612] CHIP:DMG:                                 EventData =
+          [1655979915.864083][4607:4612] CHIP:DMG:                                 {
+          [1655979915.864149][4607:4612] CHIP:DMG:                                         0x1 = NULL
+          [1655979915.864201][4607:4612] CHIP:DMG:                                         0x2 = 0,
+          [1655979915.864252][4607:4612] CHIP:DMG:                                         0x3 = 1,
+          [1655979915.864300][4607:4612] CHIP:DMG:                                         0x4 =
+          [1655979915.864348][4607:4612] CHIP:DMG:                                         {
+          [1655979915.864399][4607:4612] CHIP:DMG:                                                 0x1 = 5,
+          [1655979915.864454][4607:4612] CHIP:DMG:                                                 0x2 = 2,
+          [1655979915.864505][4607:4612] CHIP:DMG:                                                 0x3 = [
+          [1655979915.864571][4607:4612] CHIP:DMG:                                                                 112233,
+          [1655979915.864631][4607:4612] CHIP:DMG:                                                 ],
+          [1655979915.864685][4607:4612] CHIP:DMG:                                                 0x4 = NULL
+          [1655979915.864738][4607:4612] CHIP:DMG:                                                 0xfe = 1,
+          [1655979915.864791][4607:4612] CHIP:DMG:                                         },
+          [1655979915.864841][4607:4612] CHIP:DMG:                                         0xfe = 1,
+          [1655979915.864889][4607:4612] CHIP:DMG:                                 },
+          [1655979915.864934][4607:4612] CHIP:DMG:                         },
+          [1655979915.864989][4607:4612] CHIP:DMG:
+          [1655979915.865025][4607:4612] CHIP:DMG:                 },
+          [1655979915.865076][4607:4612] CHIP:DMG:
+          [1655979915.865111][4607:4612] CHIP:DMG:         ],
+          [1655979915.865163][4607:4612] CHIP:DMG:
+          [1655979915.865198][4607:4612] CHIP:DMG:         InteractionModelRevision = 1
+          [1655979915.865232][4607:4612] CHIP:DMG: }
+          [1655979915.865462][4607:4612] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655979915.865497][4607:4612] CHIP:TOO:          Event number: 1
+          [1655979915.865530][4607:4612] CHIP:TOO:          Priority: Info
+          [1655979915.865562][4607:4612] CHIP:TOO:          Timestamp: 4971265
+          [1655979915.865683][4607:4612] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655979915.865720][4607:4612] CHIP:TOO:     AdminNodeID: null
+          [1655979915.865767][4607:4612] CHIP:TOO:     AdminPasscodeID: 0
+          [1655979915.865802][4607:4612] CHIP:TOO:     ChangeType: 1
+          [1655979915.865835][4607:4612] CHIP:TOO:     LatestValue: {
+          [1655979915.865867][4607:4612] CHIP:TOO:       Privilege: 5
+          [1655979915.865899][4607:4612] CHIP:TOO:       AuthMode: 2
+          [1655979915.865939][4607:4612] CHIP:TOO:       Subjects: 1 entries
+          [1655979915.865981][4607:4612] CHIP:TOO:         [1]: 112233
+          [1655979915.866018][4607:4612] CHIP:TOO:       Targets: null
+          [1655979915.866052][4607:4612] CHIP:TOO:       FabricIndex: 1
+          [1655979915.866084][4607:4612] CHIP:TOO:      }
+          [1655979915.866116][4607:4612] CHIP:TOO:     AdminFabricIndex: 1
+          [1655979915.866148][4607:4612] CHIP:TOO:    }
+          [1655979915.866233][4607:4612] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
+
+          [1655979915.863156][4607:4612] CHIP:DMG: ReportDataMessage =
+          [1655979915.863196][4607:4612] CHIP:DMG: {
+          [1655979915.863232][4607:4612] CHIP:DMG:         SubscriptionId = 0xeb39dedd,
+          [1655979915.863268][4607:4612] CHIP:DMG:         EventReportIBs =
+          [1655979915.863321][4607:4612] CHIP:DMG:         [
+          [1655979915.863357][4607:4612] CHIP:DMG:                 EventReportIB =
+          [1655979915.863412][4607:4612] CHIP:DMG:                 {
+          [1655979915.863450][4607:4612] CHIP:DMG:                         EventDataIB =
+          [1655979915.863496][4607:4612] CHIP:DMG:                         {
+          [1655979915.863538][4607:4612] CHIP:DMG:                                 EventPath =
+          [1655979915.863586][4607:4612] CHIP:DMG:                                 {
+          [1655979915.863636][4607:4612] CHIP:DMG:                                         Endpoint = 0x0,
+          [1655979915.863692][4607:4612] CHIP:DMG:                                         Cluster = 0x1f,
+          [1655979915.863743][4607:4612] CHIP:DMG:                                         Event = 0x0,
+          [1655979915.863790][4607:4612] CHIP:DMG:                                 },
+          [1655979915.863845][4607:4612] CHIP:DMG:
+          [1655979915.863892][4607:4612] CHIP:DMG:                                 EventNumber = 0x1,
+          [1655979915.863942][4607:4612] CHIP:DMG:                                 PriorityLevel = 0x1,
+          [1655979915.863990][4607:4612] CHIP:DMG:                                 SystemTimestamp = 0x4bdb01,
+          [1655979915.864036][4607:4612] CHIP:DMG:                                 EventData =
+          [1655979915.864083][4607:4612] CHIP:DMG:                                 {
+          [1655979915.864149][4607:4612] CHIP:DMG:                                         0x1 = NULL
+          [1655979915.864201][4607:4612] CHIP:DMG:                                         0x2 = 0,
+          [1655979915.864252][4607:4612] CHIP:DMG:                                         0x3 = 1,
+          [1655979915.864300][4607:4612] CHIP:DMG:                                         0x4 =
+          [1655979915.864348][4607:4612] CHIP:DMG:                                         {
+          [1655979915.864399][4607:4612] CHIP:DMG:                                                 0x1 = 5,
+          [1655979915.864454][4607:4612] CHIP:DMG:                                                 0x2 = 2,
+          [1655979915.864505][4607:4612] CHIP:DMG:                                                 0x3 = [
+          [1655979915.864571][4607:4612] CHIP:DMG:                                                                 112233,
+          [1655979915.864631][4607:4612] CHIP:DMG:                                                 ],
+          [1655979915.864685][4607:4612] CHIP:DMG:                                                 0x4 = NULL
+          [1655979915.864738][4607:4612] CHIP:DMG:                                                 0xfe = 1,
+          [1655979915.864791][4607:4612] CHIP:DMG:                                         },
+          [1655979915.864841][4607:4612] CHIP:DMG:                                         0xfe = 1,
+          [1655979915.864889][4607:4612] CHIP:DMG:                                 },
+          [1655979915.864934][4607:4612] CHIP:DMG:                         },
+          [1655979915.864989][4607:4612] CHIP:DMG:
+          [1655979915.865025][4607:4612] CHIP:DMG:                 },
+          [1655979915.865076][4607:4612] CHIP:DMG:
+          [1655979915.865111][4607:4612] CHIP:DMG:         ],
+          [1655979915.865163][4607:4612] CHIP:DMG:
+          [1655979915.865198][4607:4612] CHIP:DMG:         InteractionModelRevision = 1
+          [1655979915.865232][4607:4612] CHIP:DMG: }
+          [1655979915.865462][4607:4612] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1655979915.865497][4607:4612] CHIP:TOO:          Event number: 1
+          [1655979915.865530][4607:4612] CHIP:TOO:          Priority: Info
+          [1655979915.865562][4607:4612] CHIP:TOO:          Timestamp: 4971265
+          [1655979915.865683][4607:4612] CHIP:TOO:   AccessControlEntryChanged: {
+          [1655979915.865720][4607:4612] CHIP:TOO:     AdminNodeID: null
+          [1655979915.865767][4607:4612] CHIP:TOO:     AdminPasscodeID: 0
+          [1655979915.865802][4607:4612] CHIP:TOO:     ChangeType: 1
+          [1655979915.865835][4607:4612] CHIP:TOO:     LatestValue: {
+          [1655979915.865867][4607:4612] CHIP:TOO:       Privilege: 5
+          [1655979915.865899][4607:4612] CHIP:TOO:       AuthMode: 2
+          [1655979915.865939][4607:4612] CHIP:TOO:       Subjects: 1 entries
+          [1655979915.865981][4607:4612] CHIP:TOO:         [1]: 112233
+          [1655979915.866018][4607:4612] CHIP:TOO:       Targets: null
+          [1655979915.866052][4607:4612] CHIP:TOO:       FabricIndex: 1
+          [1655979915.866084][4607:4612] CHIP:TOO:      }
+          [1655979915.866116][4607:4612] CHIP:TOO:     AdminFabricIndex: 1
+          [1655979915.866148][4607:4612] CHIP:TOO:    }
+          [1655979915.866233][4607:4612] CHIP:DMG: MoveToState ReadClient[0xffffa0005710]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
@@ -587,60 +867,192 @@ tests:
           information field matching the node indicated in the path and the
           event number is less than the EventMin field."
       verification: |
-          Use interactive mode to verify this
-          ./chip-tool start interactive mood
+          sudo ./chip-tool basic subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
 
-          basic subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
 
           On TH
-          [1653479609.999143][22515:22520] CHIP:DMG: ReportDataMessage =
-          [1653479609.999186][22515:22520] CHIP:DMG: {
-          [1653479609.999216][22515:22520] CHIP:DMG:         SubscriptionId = 0x8ee91d0c,
-          [1653479609.999243][22515:22520] CHIP:DMG:         InteractionModelRevision = 1
-          [1653479609.999269][22515:22520] CHIP:DMG: }
-          [1653479609.999321][22515:22520] CHIP:DMG: MoveToState ReadClient[0x7fecd8003370]: Moving to [AwaitingSu]
-
-          On TH
-          [1653479609.997019][1507:1507] CHIP:IM: Received Subscribe request
-          [1653479609.997218][1507:1507] CHIP:DMG: SubscribeRequestMessage =
-          [1653479609.997284][1507:1507] CHIP:DMG: {
-          [1653479609.997338][1507:1507] CHIP:DMG:         KeepSubscriptions = false,
-          [1653479609.997401][1507:1507] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1653479609.997466][1507:1507] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1653479609.997526][1507:1507] CHIP:DMG:         EventPathIBs =
-          [1653479609.997590][1507:1507] CHIP:DMG:         [
-          [1653479609.997649][1507:1507] CHIP:DMG:                 EventPath =
-          [1653479609.997714][1507:1507] CHIP:DMG:                 {
-          [1653479609.997780][1507:1507] CHIP:DMG:                         Endpoint = 0x0,
-          [1653479609.997858][1507:1507] CHIP:DMG:                         Cluster = 0x28,
-          [1653479609.997933][1507:1507] CHIP:DMG:                         Event = 0x0,
-          [1653479609.998005][1507:1507] CHIP:DMG:                 },
-          [1653479609.998073][1507:1507] CHIP:DMG:
-          [1653479609.998132][1507:1507] CHIP:DMG:         ],
-          [1653479609.998200][1507:1507] CHIP:DMG:
-          [1653479609.998256][1507:1507] CHIP:DMG:         EventFilterIBs =
-          [1653479609.998327][1507:1507] CHIP:DMG:         [
-          [1653479609.998386][1507:1507] CHIP:DMG:                 EventFilterIB =
-          [1653479609.998451][1507:1507] CHIP:DMG:                 {
-          [1653479609.998514][1507:1507] CHIP:DMG:                         EventMin = 0x1,
-          [1653479609.998577][1507:1507] CHIP:DMG:                 },
-          [1653479609.998642][1507:1507] CHIP:DMG:
-          [1653479609.998699][1507:1507] CHIP:DMG:         ],
-          [1653479609.998764][1507:1507] CHIP:DMG:
-          [1653479609.998823][1507:1507] CHIP:DMG:         isFabricFiltered = true,
-          [1653479609.998883][1507:1507] CHIP:DMG:         InteractionModelRevision = 1
-          [1653479609.998939][1507:1507] CHIP:DMG: },
-          [1653479609.999107][1507:1507] CHIP:DMG: Final negotiated min/max parameters: Min = 100s, Max = 1000s
-          [1653479609.999296][1507:1507] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1653479609.999467][1507:1507] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1653479609.999772][1507:1507] CHIP:DMG: Fetched 0 events
+          [1655980488.281744][4665:4671] CHIP:EM: Removed CHIP MessageCounter:255017723 from RetransTable on exchange 3120i
+          [1655980488.281823][4665:4671] CHIP:DMG: ReportDataMessage =
+          [1655980488.281891][4665:4671] CHIP:DMG: {
+          [1655980488.281938][4665:4671] CHIP:DMG:         SubscriptionId = 0x1b82bfe6,
+          [1655980488.282000][4665:4671] CHIP:DMG:         InteractionModelRevision = 1
+          [1655980488.282046][4665:4671] CHIP:DMG: }
+          [1655980488.282129][4665:4671] CHIP:DMG: MoveToState ReadClient[0xffff94006ea0]: Moving to [AwaitingSu]
+          [1655980488.282222][4665:4671] CHIP:EM: Piggybacking Ack for MessageCounter:7910071 on exchange: 3120i
       disabled: true
 
     - label:
           "With an active Event subscription from TH to DUT, change attribute
           values on DUT to create events multiple times."
       verification: |
+          Provision DUT and TH.
 
+          To generate the software fault event, execute the following
+          1. Get the PID of the DUT & KIll it .
+                      ps  -aef|grep all-clusters-app
+                      sudo kill -SIGUSR1 <PID of DUT>
+
+          After killing the DUT , you may observe the following log in the DUT
+          [1656509949.322396][1609:1609] CHIP:IM: Received Subscribe request
+          [1656509949.322534][1609:1609] CHIP:DMG: SubscribeRequestMessage =
+          [1656509949.322582][1609:1609] CHIP:DMG: {
+          [1656509949.322626][1609:1609] CHIP:DMG:         KeepSubscriptions = false,
+          [1656509949.322674][1609:1609] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
+          [1656509949.322723][1609:1609] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
+          [1656509949.322767][1609:1609] CHIP:DMG:         EventPathIBs =
+          [1656509949.322814][1609:1609] CHIP:DMG:         [
+          [1656509949.322858][1609:1609] CHIP:DMG:                 EventPath =
+          [1656509949.322906][1609:1609] CHIP:DMG:                 {
+          [1656509949.322957][1609:1609] CHIP:DMG:                         Endpoint = 0x0,
+          [1656509949.323022][1609:1609] CHIP:DMG:                         Cluster = 0x34,
+          [1656509949.323085][1609:1609] CHIP:DMG:                         Event = 0x0,
+          [1656509949.323142][1609:1609] CHIP:DMG:                 },
+          [1656509949.323197][1609:1609] CHIP:DMG:
+          [1656509949.323240][1609:1609] CHIP:DMG:         ],
+          [1656509949.323290][1609:1609] CHIP:DMG:
+          [1656509949.323335][1609:1609] CHIP:DMG:         isFabricFiltered = true,
+          [1656509949.323381][1609:1609] CHIP:DMG:         InteractionModelRevision = 1
+          [1656509949.323424][1609:1609] CHIP:DMG: },
+          [1656509949.323535][1609:1609] CHIP:DMG: Final negotiated min/max parameters: Min = 100s, Max = 1000s
+
+          [1656509949.326403][1609:1609] CHIP:DMG: Fetched 14 events
+          [1656509949.326451][1609:1609] CHIP:DMG: <RE> Sending report (payload has 984 bytes)...
+
+
+
+
+          On  TH Send the below command
+
+          ./chip-tool softwarediagnostics subscribe-event software-fault 1 0
+          [1656509949.252105][1593:1598] CHIP:DMG:         InteractionModelRevision = 1
+          [1656509949.252131][1593:1598] CHIP:DMG: }
+          [1656509949.252482][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.252514][1593:1598] CHIP:TOO:          Event number: 7
+          [1656509949.252540][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.252564][1593:1598] CHIP:TOO:          Timestamp: 1667389
+          [1656509949.252673][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.252726][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.252755][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.252785][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33343A353220323032320A
+          [1656509949.252812][1593:1598] CHIP:TOO:    }
+          [1656509949.252919][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.252946][1593:1598] CHIP:TOO:          Event number: 8
+          [1656509949.252970][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.252994][1593:1598] CHIP:TOO:          Timestamp: 1668865
+          [1656509949.253028][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.253054][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.253079][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.253106][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33343A353420323032320A
+          [1656509949.253131][1593:1598] CHIP:TOO:    }
+          [1656509949.253235][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.253262][1593:1598] CHIP:TOO:          Event number: 9
+          [1656509949.253286][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.253310][1593:1598] CHIP:TOO:          Timestamp: 1671097
+          [1656509949.253343][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.253370][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.253394][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.253420][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33343A353620323032320A
+          [1656509949.253445][1593:1598] CHIP:TOO:    }
+          [1656509949.253552][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.253578][1593:1598] CHIP:TOO:          Event number: 10
+          [1656509949.253602][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.253626][1593:1598] CHIP:TOO:          Timestamp: 1899745
+          [1656509949.253658][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.253685][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.253708][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.253734][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343520323032320A
+          [1656509949.253755][1593:1598] CHIP:TOO:    }
+          [1656509949.253856][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.253883][1593:1598] CHIP:TOO:          Event number: 11
+          [1656509949.253904][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.253924][1593:1598] CHIP:TOO:          Timestamp: 1901573
+          [1656509949.253954][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.253977][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.253997][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.254020][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343620323032320A
+          [1656509949.254042][1593:1598] CHIP:TOO:    }
+          [1656509949.254132][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.254155][1593:1598] CHIP:TOO:          Event number: 12
+          [1656509949.254176][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.254196][1593:1598] CHIP:TOO:          Timestamp: 1903174
+          [1656509949.254225][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.254247][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.254268][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.254291][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343820323032320A
+          [1656509949.254313][1593:1598] CHIP:TOO:    }
+          [1656509949.254403][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.254426][1593:1598] CHIP:TOO:          Event number: 13
+          [1656509949.254447][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.254468][1593:1598] CHIP:TOO:          Timestamp: 1904273
+          [1656509949.254496][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.254519][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.254540][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.254563][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343920323032320A
+          [1656509949.254584][1593:1598] CHIP:TOO:    }
+          [1656509949.254674][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.254697][1593:1598] CHIP:TOO:          Event number: 14
+          [1656509949.254718][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.254739][1593:1598] CHIP:TOO:          Timestamp: 1905286
+          [1656509949.254766][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.254789][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.254810][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.254833][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353020323032320A
+          [1656509949.254854][1593:1598] CHIP:TOO:    }
+          [1656509949.254945][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.254967][1593:1598] CHIP:TOO:          Event number: 15
+          [1656509949.254988][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.255008][1593:1598] CHIP:TOO:          Timestamp: 1907173
+          [1656509949.255036][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.255059][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.255080][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.255103][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353220323032320A
+          [1656509949.255125][1593:1598] CHIP:TOO:    }
+          [1656509949.255214][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.255236][1593:1598] CHIP:TOO:          Event number: 16
+          [1656509949.255257][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.255277][1593:1598] CHIP:TOO:          Timestamp: 1908021
+          [1656509949.255305][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.255328][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.255349][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.255372][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353320323032320A
+          [1656509949.255393][1593:1598] CHIP:TOO:    }
+          [1656509949.255484][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.255506][1593:1598] CHIP:TOO:          Event number: 17
+          [1656509949.255527][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.255548][1593:1598] CHIP:TOO:          Timestamp: 1908798
+          [1656509949.255575][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.255598][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.255618][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.255641][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353420323032320A
+          [1656509949.255663][1593:1598] CHIP:TOO:    }
+          [1656509949.255752][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.255774][1593:1598] CHIP:TOO:          Event number: 18
+          [1656509949.255796][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.255816][1593:1598] CHIP:TOO:          Timestamp: 1909478
+          [1656509949.255844][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.255866][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.255887][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.255910][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353420323032320A
+          [1656509949.255931][1593:1598] CHIP:TOO:    }
+          [1656509949.256022][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.256044][1593:1598] CHIP:TOO:          Event number: 19
+          [1656509949.256065][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.256086][1593:1598] CHIP:TOO:          Timestamp: 1910178
+          [1656509949.256114][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.256136][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.256157][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.256193][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353520323032320A
+          [1656509949.256216][1593:1598] CHIP:TOO:    }
+          [1656509949.256306][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
+          [1656509949.256328][1593:1598] CHIP:TOO:          Event number: 20
+          [1656509949.256349][1593:1598] CHIP:TOO:          Priority: Info
+          [1656509949.256370][1593:1598] CHIP:TOO:          Timestamp: 1911229
+          [1656509949.256398][1593:1598] CHIP:TOO:   SoftwareFault: {
+          [1656509949.256420][1593:1598] CHIP:TOO:     Id: 1609
+          [1656509949.256442][1593:1598] CHIP:TOO:     Name: 1609
+          [1656509949.256464][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353620323032320A
+          [1656509949.256486][1593:1598] CHIP:TOO:    }
+          [1656509949.256679][1593:1598] CHIP:DMG: MoveToState ReadClient[0xffff74004470]: Moving to [AwaitingSu]
       disabled: true
 
     - label:
