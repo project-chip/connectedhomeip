@@ -6735,11 +6735,9 @@ private:
 | * BallastStatus                                                     | 0x0002 |
 | * MinLevel                                                          | 0x0010 |
 | * MaxLevel                                                          | 0x0011 |
-| * PowerOnLevel                                                      | 0x0012 |
-| * PowerOnFadeTime                                                   | 0x0013 |
-| * IntrinsicBallastFactor                                            | 0x0014 |
+| * IntrinsicBalanceFactor                                            | 0x0014 |
 | * BallastFactorAdjustment                                           | 0x0015 |
-| * LampQuality                                                       | 0x0020 |
+| * LampQuantity                                                      | 0x0020 |
 | * LampType                                                          | 0x0030 |
 | * LampManufacturer                                                  | 0x0031 |
 | * LampRatedHours                                                    | 0x0032 |
@@ -13954,11 +13952,9 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
         make_unique<ReadAttribute>(Id, "ballast-status", Attributes::BallastStatus::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                                //
-        make_unique<ReadAttribute>(Id, "power-on-level", Attributes::PowerOnLevel::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "power-on-fade-time", Attributes::PowerOnFadeTime::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "intrinsic-ballast-factor", Attributes::IntrinsicBallastFactor::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "intrinsic-balance-factor", Attributes::IntrinsicBalanceFactor::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "ballast-factor-adjustment", Attributes::BallastFactorAdjustment::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "lamp-quality", Attributes::LampQuality::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "lamp-quantity", Attributes::LampQuantity::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "lamp-type", Attributes::LampType::Id, credsIssuerConfig),                                //
         make_unique<ReadAttribute>(Id, "lamp-manufacturer", Attributes::LampManufacturer::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "lamp-rated-hours", Attributes::LampRatedHours::Id, credsIssuerConfig),                   //
@@ -13973,38 +13969,32 @@ void registerClusterBallastConfiguration(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                    //
         make_unique<WriteAttribute<uint8_t>>(Id, "min-level", 0, UINT8_MAX, Attributes::MinLevel::Id, credsIssuerConfig),        //
         make_unique<WriteAttribute<uint8_t>>(Id, "max-level", 0, UINT8_MAX, Attributes::MaxLevel::Id, credsIssuerConfig),        //
-        make_unique<WriteAttribute<uint8_t>>(Id, "power-on-level", 0, UINT8_MAX, Attributes::PowerOnLevel::Id,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "power-on-fade-time", 0, UINT16_MAX, Attributes::PowerOnFadeTime::Id,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "intrinsic-ballast-factor", 0, UINT8_MAX, Attributes::IntrinsicBallastFactor::Id,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "ballast-factor-adjustment", 0, UINT8_MAX, Attributes::BallastFactorAdjustment::Id,
-                                             credsIssuerConfig),                                                   //
-        make_unique<WriteAttribute<chip::CharSpan>>(Id, "lamp-type", Attributes::LampType::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+            Id, "intrinsic-balance-factor", 0, UINT8_MAX, Attributes::IntrinsicBalanceFactor::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+            Id, "ballast-factor-adjustment", 0, UINT8_MAX, Attributes::BallastFactorAdjustment::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::CharSpan>>(Id, "lamp-type", Attributes::LampType::Id, credsIssuerConfig),      //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "lamp-manufacturer", Attributes::LampManufacturer::Id,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "lamp-rated-hours", 0, UINT32_MAX, Attributes::LampRatedHours::Id,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "lamp-burn-hours", 0, UINT32_MAX, Attributes::LampBurnHours::Id,
-                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "lamp-rated-hours", 0, UINT32_MAX,
+                                                                              Attributes::LampRatedHours::Id, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "lamp-burn-hours", 0, UINT32_MAX,
+                                                                              Attributes::LampBurnHours::Id, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "lamp-alarm-mode", 0, UINT8_MAX, Attributes::LampAlarmMode::Id,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "lamp-burn-hours-trip-point", 0, UINT32_MAX,
-                                              Attributes::LampBurnHoursTripPoint::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                         //
-        make_unique<SubscribeAttribute>(Id, "physical-min-level", Attributes::PhysicalMinLevel::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "physical-max-level", Attributes::PhysicalMaxLevel::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "ballast-status", Attributes::BallastStatus::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "power-on-level", Attributes::PowerOnLevel::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "power-on-fade-time", Attributes::PowerOnFadeTime::Id, credsIssuerConfig),  //
-        make_unique<SubscribeAttribute>(Id, "intrinsic-ballast-factor", Attributes::IntrinsicBallastFactor::Id,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
+            Id, "lamp-burn-hours-trip-point", 0, UINT32_MAX, Attributes::LampBurnHoursTripPoint::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "physical-min-level", Attributes::PhysicalMinLevel::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "physical-max-level", Attributes::PhysicalMaxLevel::Id, credsIssuerConfig),  //
+        make_unique<SubscribeAttribute>(Id, "ballast-status", Attributes::BallastStatus::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "min-level", Attributes::MinLevel::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "max-level", Attributes::MaxLevel::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "intrinsic-balance-factor", Attributes::IntrinsicBalanceFactor::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "ballast-factor-adjustment", Attributes::BallastFactorAdjustment::Id,
                                         credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, "lamp-quality", Attributes::LampQuality::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "lamp-quantity", Attributes::LampQuantity::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "lamp-type", Attributes::LampType::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "lamp-manufacturer", Attributes::LampManufacturer::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "lamp-rated-hours", Attributes::LampRatedHours::Id, credsIssuerConfig),    //
