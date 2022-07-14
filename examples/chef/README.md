@@ -173,10 +173,9 @@ Finally, add the new platform to `cd_platforms` in `cicd_config.json`. The
 configuration should follow the following schema:
 
 ```json
-$PLATFORM: {
-    "archive_output_prefix_1": ["option_1", "option_2"...],
+"$PLATFORM": {
+    "archive_output_prefix_1": ["option_1", "option_2"],
     "archive_output_prefix_2": [],
-    ...
 }
 ```
 
@@ -217,9 +216,9 @@ You may also use the GCB local builder as detailed in the `README` of
 To add new devices for chef:
 
 -   Execute `python sample_app_util.py zap <zap_file> --rename-file` to rename
-    the example and place the new file in `examples/chef/devices`
+    the example and place the new file in `examples/chef/devices`.
     -   See the `README` in `examples/chef/sample_app_util/` for more info.
 -   Execute `scripts/tools/zap_regen_all.py`, commit `zzz_generated` and
-    `examples/chef/devices`
-    -   This is gated by the workflow in `.github/workflows/zap_templates.yaml`
+    `examples/chef/devices`.
+    -   This is gated by the workflow in `.github/workflows/zap_templates.yaml`.
 -   All devices added to the repository are built in CD.
