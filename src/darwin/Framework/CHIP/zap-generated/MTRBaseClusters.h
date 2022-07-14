@@ -22072,51 +22072,6 @@ typedef NS_OPTIONS(uint32_t, MTRLevelControlFeature) {
     MTRLevelControlFeatureFrequency = 0x4,
 };
 
-typedef NS_ENUM(uint8_t, MTRApplianceControlApplianceStatus) {
-    MTRApplianceControlApplianceStatusOff = 0x01,
-    MTRApplianceControlApplianceStatusStandBy = 0x02,
-    MTRApplianceControlApplianceStatusProgrammed = 0x03,
-    MTRApplianceControlApplianceStatusProgrammedWaitingToStart = 0x04,
-    MTRApplianceControlApplianceStatusRunning = 0x05,
-    MTRApplianceControlApplianceStatusPause = 0x06,
-    MTRApplianceControlApplianceStatusEndProgrammed = 0x07,
-    MTRApplianceControlApplianceStatusFailure = 0x08,
-    MTRApplianceControlApplianceStatusProgrammeInterrupted = 0x09,
-    MTRApplianceControlApplianceStatusIdle = 0x0A,
-    MTRApplianceControlApplianceStatusRinseHold = 0x0B,
-    MTRApplianceControlApplianceStatusService = 0x0C,
-    MTRApplianceControlApplianceStatusSuperfreezing = 0x0D,
-    MTRApplianceControlApplianceStatusSupercooling = 0x0E,
-    MTRApplianceControlApplianceStatusSuperheating = 0x0F,
-};
-
-typedef NS_ENUM(uint8_t, MTRApplianceControlCommandIdentification) {
-    MTRApplianceControlCommandIdentificationStart = 0x01,
-    MTRApplianceControlCommandIdentificationStop = 0x02,
-    MTRApplianceControlCommandIdentificationPause = 0x03,
-    MTRApplianceControlCommandIdentificationStartSuperfreezing = 0x04,
-    MTRApplianceControlCommandIdentificationStopSuperfreezing = 0x05,
-    MTRApplianceControlCommandIdentificationStartSupercooling = 0x06,
-    MTRApplianceControlCommandIdentificationStopSupercooling = 0x07,
-    MTRApplianceControlCommandIdentificationDisableGas = 0x08,
-    MTRApplianceControlCommandIdentificationEnableGas = 0x09,
-    MTRApplianceControlCommandIdentificationEnableEnergyControl = 0x0A,
-    MTRApplianceControlCommandIdentificationDisableEnergyControl = 0x0B,
-};
-
-typedef NS_ENUM(uint8_t, MTRApplianceControlWarningEvent) {
-    MTRApplianceControlWarningEventWarning1OverallPowerAboveAvailablePowerLevel = 0x00,
-    MTRApplianceControlWarningEventWarning2OverallPowerAbovePowerThresholdLevel = 0x01,
-    MTRApplianceControlWarningEventWarning3OverallPowerBackBelowTheAvailablePowerLevel = 0x02,
-    MTRApplianceControlWarningEventWarning4OverallPowerBackBelowThePowerThresholdLevel = 0x03,
-    MTRApplianceControlWarningEventWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
-};
-
-typedef NS_OPTIONS(uint8_t, MTRApplianceControlRemoteEnableFlagsAndDeviceStatus2) {
-    MTRApplianceControlRemoteEnableFlagsAndDeviceStatus2RemoteEnableFlags = 0xF,
-    MTRApplianceControlRemoteEnableFlagsAndDeviceStatus2DeviceStatus2Structure = 0xF0,
-};
-
 typedef NS_ENUM(uint8_t, MTRAccessControlAuthMode) {
     MTRAccessControlAuthModePASE = 0x01,
     MTRAccessControlAuthModeCASE = 0x02,
@@ -23393,25 +23348,6 @@ typedef NS_ENUM(uint8_t, MTRApplicationBasicApplicationStatus) {
     MTRApplicationBasicApplicationStatusActiveVisibleFocus = 0x01,
     MTRApplicationBasicApplicationStatusActiveHidden = 0x02,
     MTRApplicationBasicApplicationStatusActiveVisibleNotFocus = 0x03,
-};
-
-typedef NS_ENUM(uint8_t, MTRApplianceEventsAndAlertEventIdentification) {
-    MTRApplianceEventsAndAlertEventIdentificationEndOfCycle = 0x01,
-    MTRApplianceEventsAndAlertEventIdentificationTemperatureReached = 0x04,
-    MTRApplianceEventsAndAlertEventIdentificationEndOfCooking = 0x05,
-    MTRApplianceEventsAndAlertEventIdentificationSwitchingOff = 0x06,
-    MTRApplianceEventsAndAlertEventIdentificationWrongData = 0x07,
-};
-
-typedef NS_OPTIONS(uint8_t, MTRApplianceEventsAndAlertAlertCount) {
-    MTRApplianceEventsAndAlertAlertCountNumberOfAlerts = 0xF,
-    MTRApplianceEventsAndAlertAlertCountTypeOfAlert = 0xF0,
-};
-
-typedef NS_OPTIONS(uint32_t, MTRApplianceEventsAndAlertAlertStructure) {
-    MTRApplianceEventsAndAlertAlertStructureAlertId = 0xFF,
-    MTRApplianceEventsAndAlertAlertStructureCategory = 0xF00,
-    MTRApplianceEventsAndAlertAlertStructurePresenceRecovery = 0x3000,
 };
 
 typedef NS_ENUM(uint8_t, MTRTestClusterSimple) {
