@@ -59,7 +59,10 @@ executable("chip-all-clusters-minimal-app") {
 }
 
 tizen_sdk_package("chip-all-clusters-minimal-app:tpk") {
-  deps = [ ":chip-all-clusters-minimal-app" ]
+  deps = [
+    ":chip-all-clusters-minimal-app",
+    "${chip_root}/examples/platform/tizen:author-certificate-CHIP",
+  ]
   manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
 }

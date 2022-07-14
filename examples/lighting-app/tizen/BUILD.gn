@@ -40,7 +40,10 @@ executable("chip-lighting-app") {
 }
 
 tizen_sdk_package("chip-lighting-app:tpk") {
-  deps = [ ":chip-lighting-app" ]
+  deps = [
+    ":chip-lighting-app",
+    "${chip_root}/examples/platform/tizen:author-certificate-CHIP",
+  ]
   manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
 }
