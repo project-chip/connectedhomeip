@@ -30,7 +30,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
         pairingCode = [controller openPairingWindowWithPIN:mNodeId
                                                   duration:mCommissioningWindowTimeoutMs
                                              discriminator:mDiscriminator
-                                                  setupPIN:arc4random()
+                                                  setupPIN:[MTRSetupPayload generateRandomPIN]
                                                      error:&error];
     }
 

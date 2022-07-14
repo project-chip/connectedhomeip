@@ -123,7 +123,7 @@ config CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE
 	  factory data.
 
 # Use default certificates without generating or providing them
-config CHIP_FACTORY_DATA_USE_DEFAULTS_CERTS
+config CHIP_FACTORY_DATA_USE_DEFAULT_CERTS
 	bool "Use default certificates located in Matter repository"
 	default y
 	help
@@ -253,5 +253,36 @@ config CHIP_DEVICE_ROTATING_DEVICE_UID
 	help
 	  A device rotating id unique id which will be generated if
 	  this config is not set in prj.conf file.
+
+config CHIP_DEVICE_ENABLE_KEY
+	string "Enable Key for triggering test actions on device"
+	default "00112233445566778899AABBCCDDEEFF"
+	help
+	  The Enable Key is a 128-bit value that triggers test action 
+	  while invoking the TestEventTrigger Command. 
+	  Pattern: "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+	  This value is used during Certification Tests,
+	  and should not be present on production devices.
+
+config CHIP_CERTIFICATION_DECLARATION_STORAGE
+	bool "Enable storing Certification Declaration"
+	depends on CHIP_FACTORY_DATA
+	help
+	  Enables storing Certification Declaration in Zephyr settings
+	  instead of using hardcoded value from firmware. It also adds
+	  support for including new Certification Declaration into a firmware
+	  update image package sent via OTA Software Update.
+
+if CHIP_CERTIFICATION_DECLARATION_STORAGE
+
+config CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID
+	int "Certification declaration OTA image id"
+	default 205 #0xcd
+	help
+	  The image id of Certification Declaration image
+	  for sending it via OTA Software Update purposes.
+
+endif
+
 
 endif

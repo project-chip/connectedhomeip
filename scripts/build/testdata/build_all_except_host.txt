@@ -988,6 +988,9 @@ mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/
 # Generating mbed-CY8CPROTO_062_4343W-shell-release
 cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
 
+# Generating mw320-all-clusters-app
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/nxp/mw320 {out}/mw320-all-clusters-app
+
 # Generating nrf-native-posix-64-tests
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR";
@@ -2212,6 +2215,9 @@ bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-release/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-shell-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-release
+
+# Building mw320-all-clusters-app
+ninja -C {out}/mw320-all-clusters-app
 
 # Building nrf-native-posix-64-tests
 ninja -C {out}/nrf-native-posix-64-tests

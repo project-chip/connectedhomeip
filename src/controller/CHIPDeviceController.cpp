@@ -466,6 +466,8 @@ void DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
+    mSetUpCodePairer.CommissionerShuttingDown();
+
     // Check to see if pairing in progress before shutting down
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
     if (device != nullptr && device->IsSessionSetupInProgress())

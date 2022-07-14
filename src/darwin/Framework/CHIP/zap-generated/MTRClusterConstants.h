@@ -130,7 +130,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterApplicationLauncherID = 0x0000050C,
     MTRClusterApplicationBasicID = 0x0000050D,
     MTRClusterAccountLoginID = 0x0000050E,
-    MTRClusterMessagingID = 0x00000703,
     MTRClusterApplianceIdentificationID = 0x00000B00,
     MTRClusterMeterIdentificationID = 0x00000B01,
     MTRClusterApplianceEventsAndAlertID = 0x00000B02,
@@ -1137,11 +1136,9 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterBallastConfigurationAttributeBallastStatusID = 0x00000002,
     MTRClusterBallastConfigurationAttributeMinLevelID = 0x00000010,
     MTRClusterBallastConfigurationAttributeMaxLevelID = 0x00000011,
-    MTRClusterBallastConfigurationAttributePowerOnLevelID = 0x00000012,
-    MTRClusterBallastConfigurationAttributePowerOnFadeTimeID = 0x00000013,
-    MTRClusterBallastConfigurationAttributeIntrinsicBallastFactorID = 0x00000014,
+    MTRClusterBallastConfigurationAttributeIntrinsicBalanceFactorID = 0x00000014,
     MTRClusterBallastConfigurationAttributeBallastFactorAdjustmentID = 0x00000015,
-    MTRClusterBallastConfigurationAttributeLampQualityID = 0x00000020,
+    MTRClusterBallastConfigurationAttributeLampQuantityID = 0x00000020,
     MTRClusterBallastConfigurationAttributeLampTypeID = 0x00000030,
     MTRClusterBallastConfigurationAttributeLampManufacturerID = 0x00000031,
     MTRClusterBallastConfigurationAttributeLampRatedHoursID = 0x00000032,
@@ -1698,13 +1695,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterAccountLoginAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterAccountLoginAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterAccountLoginAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster Messaging attributes
-    MTRClusterMessagingAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterMessagingAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterMessagingAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterMessagingAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterMessagingAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ApplianceIdentification attributes
     MTRClusterApplianceIdentificationAttributeBasicIdentificationID = 0x00000000,
@@ -2311,15 +2301,6 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterAccountLoginCommandGetSetupPINResponseID = 0x00000001,
     MTRClusterAccountLoginCommandLoginID = 0x00000002,
     MTRClusterAccountLoginCommandLogoutID = 0x00000003,
-
-    // Cluster Messaging commands
-    MTRClusterMessagingCommandDisplayMessageID = 0x00000000,
-    MTRClusterMessagingCommandGetLastMessageID = 0x00000000,
-    MTRClusterMessagingCommandCancelMessageID = 0x00000001,
-    MTRClusterMessagingCommandMessageConfirmationID = 0x00000001,
-    MTRClusterMessagingCommandDisplayProtectedMessageID = 0x00000002,
-    MTRClusterMessagingCommandGetMessageCancellationID = 0x00000002,
-    MTRClusterMessagingCommandCancelAllMessagesID = 0x00000003,
 
     // Cluster ApplianceEventsAndAlert commands
     MTRClusterApplianceEventsAndAlertCommandGetAlertsID = 0x00000000,

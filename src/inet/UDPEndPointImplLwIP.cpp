@@ -241,6 +241,19 @@ void UDPEndPointImplLwIP::CloseImpl()
         udp_remove(mUDP);
         mUDP              = nullptr;
         mLwIPEndPointType = LwIPEndPointType::Unknown;
+
+        // In case that there is a UDPEndPointImplLwIP::LwIPReceiveUDPMessage
+        // event pending in the event queue (SystemLayer::ScheduleLambda), we
+        // schedule a release call to the end of the queue, to ensure that the
+        // queued pointer to UDPEndPointImplLwIP is not dangling.
+        Retain();
+        CHIP_ERROR err = GetSystemLayer().ScheduleLambda([this] { Release(); });
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Inet, "Unable scedule lambda: %" CHIP_ERROR_FORMAT, err.Format());
+            // There is nothing we can do here, accept the chance of racing
+            Release();
+        }
     }
 
     // Unlock LwIP stack
@@ -342,6 +355,10 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
     IPPacketInfo * pktInfo         = nullptr;
     System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
+
+    if (ep->mState == State::kClosed)
+        return;
+
     if (buf->HasChainedBuffer())
     {
         // Try the simple expedient of flattening in-place.
@@ -371,19 +388,14 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
         pktInfo->DestPort    = pcb->local_port;
     }
 
-    ep->Retain();
+    // TODO: add thread-safe reference counting for UDP endpoints
     CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
-        ep->Release();
     });
     if (err == CHIP_NO_ERROR)
     {
         // If ScheduleLambda() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
         static_cast<void>(std::move(buf).UnsafeRelease());
-    }
-    else
-    {
-        ep->Release();
     }
 }
 

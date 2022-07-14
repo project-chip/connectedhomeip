@@ -406,23 +406,21 @@ limitations under the License.
     <define>BALLAST_CONFIGURATION_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
-    <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0x01" optional="true">physical min level</attribute>
-    <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0xFE" optional="true">physical max level</attribute>
-    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BITMAP8" min="0x00" max="0x03" writable="false" default="0x00" optional="false">ballast status</attribute>
-    <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="true">min level</attribute>
-    <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="true">max level</attribute>
-    <attribute side="server" code="0x0012" define="POWER_ON_LEVEL" type="INT8U" min="0x00" max="0xFE" writable="true" default="0xFE" optional="true">power on level</attribute>
-    <attribute side="server" code="0x0013" define="POWER_ON_FADE_TIME" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">power on fade time</attribute>
-    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" min="0x00" max="0xFE" writable="true" optional="true">intrinsic ballast factor</attribute>
-    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFF" optional="true">ballast factor adjustment</attribute>
-    <attribute side="server" code="0x0020" define="LAMP_QUALITY" type="INT8U" min="0x00" max="0xFE" writable="false" optional="true">lamp quality</attribute>
-    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="CHAR_STRING" length="16" writable="true" optional="true">lamp type</attribute>
-    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">lamp manufacturer</attribute>
-    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" default="0xFFFFFF" optional="true">lamp rated hours</attribute>
-    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" default="0x000000" optional="true">lamp burn hours</attribute>
-    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">lamp alarm mode</attribute>
-    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" default="0xFFFFFF" optional="true">lamp burn hours trip point</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0x01" optional="false">PhysicalMinLevel</attribute>
+    <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0xFE" optional="false">PhysicalMaxLevel</attribute>
+    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BITMAP8" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
+    <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">MinLevel</attribute>
+    <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">MaxLevel</attribute>
+    <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" writable="true" isNullable="true" optional="true">IntrinsicBalanceFactor</attribute>
+    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFE" isNullable="true" optional="true">BallastFactorAdjustment</attribute>
+    <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="INT8U" writable="false" optional="false">LampQuantity</attribute>
+    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="CHAR_STRING" length="16" writable="true" optional="true">LampType</attribute>
+    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">LampManufacturer</attribute>
+    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampRatedHours</attribute>
+    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="INT24U" writable="true" default="0x000000" isNullable="true" optional="true">LampBurnHours</attribute>
+    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
+    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampBurnHoursTripPoint</attribute>
   </cluster>
   <cluster>
     <name>Occupancy Sensing</name>

@@ -55,7 +55,6 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 254
           saveAs: CurrentLevelValue
           constraints:
               type: uint8
@@ -65,12 +64,11 @@ tests:
       command: "readAttribute"
       attribute: "remaining time"
       response:
-          value: 0
           constraints:
               type: uint16
 
     - label: "Reads the MinLevel attribute"
-      PICS: LVL.S.A0002
+      PICS: LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -78,11 +76,9 @@ tests:
           saveAs: MinLevelValue
           constraints:
               type: uint8
-              minValue: 0
-              maxValue: 1
 
     - label: "Reads the MinLevel attribute"
-      PICS: LVL.S.A0002
+      PICS: LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -93,7 +89,7 @@ tests:
               maxValue: 1
 
     - label: "Reads the MaxLevel attribute"
-      PICS: LVL.S.A0003
+      PICS: LVL.S.A0003 && LVL.S.F01
       command: "readAttribute"
       attribute: "max level"
       response:
@@ -101,18 +97,17 @@ tests:
           saveAs: MaxLevelValue
           constraints:
               type: uint8
-              minValue: 1
-              maxValue: 254
+              minValue: MinLevelValue
 
     - label: "Reads the MaxLevel attribute"
-      PICS: LVL.S.A0003
+      PICS: LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "max level"
       response:
           saveAs: MaxLevelValue1
           constraints:
               type: uint8
-              minValue: 1
+              minValue: MinLevelValue1
               maxValue: 254
 
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
@@ -162,7 +157,7 @@ tests:
               type: uint16
 
     - label: "Step 7b & 7C Reads the CurrentFrequency attribute"
-      PICS: LVL.S.A0004 && LVL.S.A0005
+      PICS: LVL.S.A0004 && LVL.S.A0005 && LVL.S.A0006
       command: "readAttribute"
       attribute: "current frequency"
       response:
@@ -181,7 +176,7 @@ tests:
               type: uint16
 
     - label: "Reads the OnLevel attribute "
-      PICS: LVL.S.F01
+      PICS: LVL.S.F01 && LVL.S.A0011
       command: "readAttribute"
       attribute: "on level"
       response:
@@ -191,7 +186,7 @@ tests:
               maxValue: MaxLevelValue
 
     - label: "Reads the OnLevel attribute "
-      PICS: " !LVL.S.F01 "
+      PICS: LVL.S.A0011 && !LVL.S.F01
       command: "readAttribute"
       attribute: "on level"
       response:

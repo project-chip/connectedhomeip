@@ -21,8 +21,6 @@
 #import "MTRError_Utils.h"
 #import <Matter/Matter.h>
 
-#include <lib/support/UnitTestUtils.h>
-
 #include "ModelCommandBridge.h"
 
 class ClusterCommand : public ModelCommand {
@@ -97,7 +95,7 @@ public:
                                      }];
 
             if (mRepeatDelayInMs.HasValue()) {
-                chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
+                [NSThread sleepForTimeInterval:((double) mRepeatDelayInMs.Value()) / 1000];
             }
         }
         return CHIP_NO_ERROR;

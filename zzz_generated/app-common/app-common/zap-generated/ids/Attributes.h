@@ -3886,25 +3886,17 @@ namespace MaxLevel {
 static constexpr AttributeId Id = 0x00000011;
 } // namespace MaxLevel
 
-namespace PowerOnLevel {
-static constexpr AttributeId Id = 0x00000012;
-} // namespace PowerOnLevel
-
-namespace PowerOnFadeTime {
-static constexpr AttributeId Id = 0x00000013;
-} // namespace PowerOnFadeTime
-
-namespace IntrinsicBallastFactor {
+namespace IntrinsicBalanceFactor {
 static constexpr AttributeId Id = 0x00000014;
-} // namespace IntrinsicBallastFactor
+} // namespace IntrinsicBalanceFactor
 
 namespace BallastFactorAdjustment {
 static constexpr AttributeId Id = 0x00000015;
 } // namespace BallastFactorAdjustment
 
-namespace LampQuality {
+namespace LampQuantity {
 static constexpr AttributeId Id = 0x00000020;
-} // namespace LampQuality
+} // namespace LampQuantity
 
 namespace LampType {
 static constexpr AttributeId Id = 0x00000030;
@@ -5948,32 +5940,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace AccountLogin
-
-namespace Messaging {
-namespace Attributes {
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace Messaging
 
 namespace ApplianceIdentification {
 namespace Attributes {
