@@ -2264,7 +2264,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readWiredAssessedInputVoltageAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.PowerSourceCluster.WiredAssessedInputVoltageAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPowerSourceWiredAssessedInputVoltageCommandParams);
@@ -2278,7 +2279,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readWiredAssessedInputFrequencyAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.PowerSourceCluster.WiredAssessedInputFrequencyAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceWiredAssessedInputFrequencyCommandParams);
@@ -2303,7 +2305,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readWiredAssessedCurrentAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readWiredAssessedCurrentAttribute(
+                      (ChipClusters.PowerSourceCluster.WiredAssessedCurrentAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPowerSourceWiredAssessedCurrentCommandParams);
@@ -2364,283 +2368,276 @@ public class ClusterReadMapping {
             readPowerSourceActiveWiredFaultsCommandParams);
     readPowerSourceInteractionInfo.put(
         "readActiveWiredFaultsAttribute", readPowerSourceActiveWiredFaultsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryVoltageCommandParams =
+    Map<String, CommandParameterInfo> readPowerSourceBatVoltageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryVoltageAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatVoltageAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryVoltageAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readBatVoltageAttribute(
+                      (ChipClusters.PowerSourceCluster.BatVoltageAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryVoltageCommandParams);
+            readPowerSourceBatVoltageCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryVoltageAttribute", readPowerSourceBatteryVoltageAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryPercentRemainingCommandParams =
+        "readBatVoltageAttribute", readPowerSourceBatVoltageAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatPercentRemainingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryPercentRemainingAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatPercentRemainingAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryPercentRemainingAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                  .readBatPercentRemainingAttribute(
+                      (ChipClusters.PowerSourceCluster.BatPercentRemainingAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readPowerSourceBatteryPercentRemainingCommandParams);
+            readPowerSourceBatPercentRemainingCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryPercentRemainingAttribute",
-        readPowerSourceBatteryPercentRemainingAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryTimeRemainingCommandParams =
+        "readBatPercentRemainingAttribute",
+        readPowerSourceBatPercentRemainingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatTimeRemainingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryTimeRemainingAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatTimeRemainingAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryTimeRemainingAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readBatTimeRemainingAttribute(
+                      (ChipClusters.PowerSourceCluster.BatTimeRemainingAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryTimeRemainingCommandParams);
+            readPowerSourceBatTimeRemainingCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryTimeRemainingAttribute",
-        readPowerSourceBatteryTimeRemainingAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryChargeLevelCommandParams =
+        "readBatTimeRemainingAttribute", readPowerSourceBatTimeRemainingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatChargeLevelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryChargeLevelAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatChargeLevelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryChargeLevelAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                  .readBatChargeLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readPowerSourceBatteryChargeLevelCommandParams);
+            readPowerSourceBatChargeLevelCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryChargeLevelAttribute",
-        readPowerSourceBatteryChargeLevelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryReplacementNeededCommandParams =
+        "readBatChargeLevelAttribute", readPowerSourceBatChargeLevelAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatReplacementNeededCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryReplacementNeededAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatReplacementNeededAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryReplacementNeededAttribute(
+                  .readBatReplacementNeededAttribute(
                       (ChipClusters.BooleanAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-            readPowerSourceBatteryReplacementNeededCommandParams);
+            readPowerSourceBatReplacementNeededCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryReplacementNeededAttribute",
-        readPowerSourceBatteryReplacementNeededAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryReplaceabilityCommandParams =
+        "readBatReplacementNeededAttribute",
+        readPowerSourceBatReplacementNeededAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatReplaceabilityCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryReplaceabilityAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatReplaceabilityAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryReplaceabilityAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                  .readBatReplaceabilityAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readPowerSourceBatteryReplaceabilityCommandParams);
+            readPowerSourceBatReplaceabilityCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryReplaceabilityAttribute",
-        readPowerSourceBatteryReplaceabilityAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryPresentCommandParams =
+        "readBatReplaceabilityAttribute", readPowerSourceBatReplaceabilityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatPresentCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryPresentAttributeInteractionInfo =
+    InteractionInfo readPowerSourceBatPresentAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryPresentAttribute((ChipClusters.BooleanAttributeCallback) callback);
+                  .readBatPresentAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-            readPowerSourceBatteryPresentCommandParams);
+            readPowerSourceBatPresentCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readBatteryPresentAttribute", readPowerSourceBatteryPresentAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceActiveBatteryFaultsCommandParams =
+        "readBatPresentAttribute", readPowerSourceBatPresentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceActiveBatFaultsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceActiveBatteryFaultsAttributeInteractionInfo =
+    InteractionInfo readPowerSourceActiveBatFaultsAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readActiveBatteryFaultsAttribute(
-                      (ChipClusters.PowerSourceCluster.ActiveBatteryFaultsAttributeCallback)
+                  .readActiveBatFaultsAttribute(
+                      (ChipClusters.PowerSourceCluster.ActiveBatFaultsAttributeCallback) callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedPowerSourceClusterActiveBatFaultsAttributeCallback(),
+            readPowerSourceActiveBatFaultsCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readActiveBatFaultsAttribute", readPowerSourceActiveBatFaultsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatReplacementDescriptionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatReplacementDescriptionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatReplacementDescriptionAttribute(
+                      (ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readPowerSourceBatReplacementDescriptionCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatReplacementDescriptionAttribute",
+        readPowerSourceBatReplacementDescriptionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatCommonDesignationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatCommonDesignationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatCommonDesignationAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPowerSourceBatCommonDesignationCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatCommonDesignationAttribute",
+        readPowerSourceBatCommonDesignationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatANSIDesignationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatANSIDesignationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatANSIDesignationAttribute(
+                      (ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readPowerSourceBatANSIDesignationCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatANSIDesignationAttribute",
+        readPowerSourceBatANSIDesignationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatIECDesignationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatIECDesignationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatIECDesignationAttribute(
+                      (ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readPowerSourceBatIECDesignationCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatIECDesignationAttribute", readPowerSourceBatIECDesignationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatApprovedChemistryCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatApprovedChemistryAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatApprovedChemistryAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPowerSourceBatApprovedChemistryCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatApprovedChemistryAttribute",
+        readPowerSourceBatApprovedChemistryAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatCapacityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatCapacityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatCapacityAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPowerSourceBatCapacityCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatCapacityAttribute", readPowerSourceBatCapacityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatQuantityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatQuantityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatQuantityAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPowerSourceBatQuantityCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatQuantityAttribute", readPowerSourceBatQuantityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatChargeStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatChargeStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatChargeStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readPowerSourceBatChargeStateCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatChargeStateAttribute", readPowerSourceBatChargeStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatTimeToFullChargeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatTimeToFullChargeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatTimeToFullChargeAttribute(
+                      (ChipClusters.PowerSourceCluster.BatTimeToFullChargeAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPowerSourceBatTimeToFullChargeCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatTimeToFullChargeAttribute",
+        readPowerSourceBatTimeToFullChargeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatFunctionalWhileChargingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatFunctionalWhileChargingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatFunctionalWhileChargingAttribute(
+                      (ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readPowerSourceBatFunctionalWhileChargingCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatFunctionalWhileChargingAttribute",
+        readPowerSourceBatFunctionalWhileChargingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceBatChargingCurrentCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceBatChargingCurrentAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readBatChargingCurrentAttribute(
+                      (ChipClusters.PowerSourceCluster.BatChargingCurrentAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPowerSourceBatChargingCurrentCommandParams);
+    readPowerSourceInteractionInfo.put(
+        "readBatChargingCurrentAttribute",
+        readPowerSourceBatChargingCurrentAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPowerSourceActiveBatChargeFaultsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPowerSourceActiveBatChargeFaultsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PowerSourceCluster) cluster)
+                  .readActiveBatChargeFaultsAttribute(
+                      (ChipClusters.PowerSourceCluster.ActiveBatChargeFaultsAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterActiveBatteryFaultsAttributeCallback(),
-            readPowerSourceActiveBatteryFaultsCommandParams);
+                    .DelegatedPowerSourceClusterActiveBatChargeFaultsAttributeCallback(),
+            readPowerSourceActiveBatChargeFaultsCommandParams);
     readPowerSourceInteractionInfo.put(
-        "readActiveBatteryFaultsAttribute",
-        readPowerSourceActiveBatteryFaultsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryReplacementDescriptionCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryReplacementDescriptionAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryReplacementDescriptionAttribute(
-                      (ChipClusters.CharStringAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readPowerSourceBatteryReplacementDescriptionCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryReplacementDescriptionAttribute",
-        readPowerSourceBatteryReplacementDescriptionAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryCommonDesignationCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryCommonDesignationAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryCommonDesignationAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryCommonDesignationCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryCommonDesignationAttribute",
-        readPowerSourceBatteryCommonDesignationAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryANSIDesignationCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryANSIDesignationAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryANSIDesignationAttribute(
-                      (ChipClusters.CharStringAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readPowerSourceBatteryANSIDesignationCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryANSIDesignationAttribute",
-        readPowerSourceBatteryANSIDesignationAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryIECDesignationCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryIECDesignationAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryIECDesignationAttribute(
-                      (ChipClusters.CharStringAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readPowerSourceBatteryIECDesignationCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryIECDesignationAttribute",
-        readPowerSourceBatteryIECDesignationAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryApprovedChemistryCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryApprovedChemistryAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryApprovedChemistryAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryApprovedChemistryCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryApprovedChemistryAttribute",
-        readPowerSourceBatteryApprovedChemistryAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryCapacityCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryCapacityAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryCapacityAttribute((ChipClusters.LongAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryCapacityCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryCapacityAttribute", readPowerSourceBatteryCapacityAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryQuantityCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryQuantityAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryQuantityAttribute((ChipClusters.IntegerAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readPowerSourceBatteryQuantityCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryQuantityAttribute", readPowerSourceBatteryQuantityAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryChargeStateCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryChargeStateAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryChargeStateAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readPowerSourceBatteryChargeStateCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryChargeStateAttribute",
-        readPowerSourceBatteryChargeStateAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryTimeToFullChargeCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryTimeToFullChargeAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryTimeToFullChargeAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryTimeToFullChargeCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryTimeToFullChargeAttribute",
-        readPowerSourceBatteryTimeToFullChargeAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryFunctionalWhileChargingCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryFunctionalWhileChargingAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryFunctionalWhileChargingAttribute(
-                      (ChipClusters.BooleanAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-            readPowerSourceBatteryFunctionalWhileChargingCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryFunctionalWhileChargingAttribute",
-        readPowerSourceBatteryFunctionalWhileChargingAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceBatteryChargingCurrentCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceBatteryChargingCurrentAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatteryChargingCurrentAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-            readPowerSourceBatteryChargingCurrentCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readBatteryChargingCurrentAttribute",
-        readPowerSourceBatteryChargingCurrentAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readPowerSourceActiveBatteryChargeFaultsCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readPowerSourceActiveBatteryChargeFaultsAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.PowerSourceCluster) cluster)
-                  .readActiveBatteryChargeFaultsAttribute(
-                      (ChipClusters.PowerSourceCluster.ActiveBatteryChargeFaultsAttributeCallback)
-                          callback);
-            },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterActiveBatteryChargeFaultsAttributeCallback(),
-            readPowerSourceActiveBatteryChargeFaultsCommandParams);
-    readPowerSourceInteractionInfo.put(
-        "readActiveBatteryChargeFaultsAttribute",
-        readPowerSourceActiveBatteryChargeFaultsAttributeInteractionInfo);
+        "readActiveBatChargeFaultsAttribute",
+        readPowerSourceActiveBatChargeFaultsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readPowerSourceGeneratedCommandListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readPowerSourceGeneratedCommandListAttributeInteractionInfo =

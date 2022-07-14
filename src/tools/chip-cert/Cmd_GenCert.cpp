@@ -140,6 +140,7 @@ const char * const gCmdOptionHelp =
     "           x509-pem  - X.509 PEM format\n"
     "           x509-der  - X.509 DER format\n"
     "           chip      - raw CHIP TLV format\n"
+    "           chip-hex  - hex encoded CHIP TLV format\n"
     "           chip-b64  - base-64 encoded CHIP TLV format (default)\n"
     "\n"
     "   -V, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]\n"
@@ -458,6 +459,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gOutCertFormat = kCertFormat_Chip_Base64;
             gOutKeyFormat  = kKeyFormat_Chip_Base64;
+        }
+        else if (strcmp(arg, "chip-hex") == 0)
+        {
+            gOutCertFormat = kCertFormat_Chip_Hex;
+            gOutKeyFormat  = kKeyFormat_Chip_Hex;
         }
         else
         {

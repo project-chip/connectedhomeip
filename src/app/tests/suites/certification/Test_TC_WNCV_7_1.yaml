@@ -29,6 +29,7 @@ tests:
 
     - label:
           "If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT"
+      PICS: WNCV.C.C05.Tx && WNCV.S.F00 && WNCV.S.F02
       verification: |
           On TestHarnes (all-cluster-app) a received GoToLift for WindowCovering looks like this
 
@@ -71,6 +72,7 @@ tests:
 
     - label:
           "If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT"
+      PICS: WNCV.C.C08.Tx && WNCV.S.F01 && WNCV.S.F04
       verification: |
           On TestHarnes (all-cluster-app) a received GoToTilt for WindowCovering looks like this
 

@@ -49,6 +49,16 @@ Note:
 2. "source third_party/connectedhomeip/scripts/activate.sh" can be omitted if
    your environment is already setup without issues.
 
+Tinycrypt ECC operations:
+
+Note: This solution is temporary.
+
+In order to use the tinycrypt ecc operations, use the following build arguments:
+
+```
+$ gn gen out/debug --args='treat_warnings_as_errors=false mbedtls_repo="//third_party/connectedhomeip/third_party/nxp/libs/mbedtls" mbedtls_use_tinycrypt=true'
+```
+
 <a name="flashdebug"></a>
 
 ## Flashing

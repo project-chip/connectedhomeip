@@ -22,9 +22,11 @@ config:
 
 tests:
     - label:
-          "- Read Descriptor cluster of endpoint 0 - Read Descriptor cluster of
-          all endpoints listed in the PartsList attribute in the Descriptor
-          cluster of endpoint 0"
+          "Read PartsList attribute of the Descriptor cluster of endpoint 0 For
+          each endpoint listed in the PartsList attribute of the Descriptor
+          cluster of endpoint 0: read the PartsList attribute of the Descriptor
+          cluster at that endpoint"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
@@ -62,19 +64,23 @@ tests:
           [1635666145.012850][3692:3697] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 48783i
       disabled: true
 
-    - label: "- Determine which endpoint has a device type of Aggregator"
+    - label:
+          "Determine which of those endpoints has a device type of Aggregator"
+      PICS: MCORE.BRIDGE
       verification: |
 
       disabled: true
 
     - label:
           "Add a bridged device (using a method indicated by the manufacturer)"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
 
     - label:
-          "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
+          "Read the PartsList attribute of the Descriptor cluster on endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
@@ -112,7 +118,8 @@ tests:
           [1635666145.012850][3692:3697] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 48783i
       disabled: true
 
-    - label: "Repeat step 2b for endpoint found in step 1b"
+    - label: "Repeat step 2b for endpoint found in step 1b (the Aggregator EP)"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
@@ -153,6 +160,7 @@ tests:
     - label:
           "Read Descriptor cluster of all other endpoints listed in the
           PartsList attribute in the Descriptor cluster of endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           read EP <n> . Descriptor . Partslist
       disabled: true
@@ -160,6 +168,7 @@ tests:
     - label:
           "Perform step 6 (for an actuator) resp. step 7 (for a sensor) of
           TC-BR-1 for the bridged device added in step 2"
+      PICS: MCORE.BRIDGE
       verification: |
 
       disabled: true
@@ -167,14 +176,15 @@ tests:
     - label:
           "Remove one of the bridged devices (but not the one which was added in
           step 2) (using a method indicated by the manufacturer)"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
 
     - label:
           "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
-
           ./chip-tool descriptor read parts-list 1 0
 
           CHIP:DMG: ReportData =
@@ -211,7 +221,8 @@ tests:
           [1635668330.266741][3951:3956] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 35287i
       disabled: true
 
-    - label: "Repeat step 4b for endpoint found in step 1b"
+    - label: "Repeat step 4b for endpoint found in step 1b (the Aggregator EP)"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
@@ -252,6 +263,7 @@ tests:
     - label:
           "Read Descriptor cluster of all other endpoints listed in the
           PartsList attribute in the Descriptor cluster of endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           read EP <n> . Descriptor . Partslist
       disabled: true
@@ -259,12 +271,14 @@ tests:
     - label:
           "Re-add the bridged device which was removed in the previous step
           (using a method indicated by the manufacturer)"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
 
     - label:
           "Read the PartsList attribute in the Descriptor cluster on endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
@@ -302,7 +316,8 @@ tests:
           [1635668360.032686][3959:3964] CHIP:EM: Piggybacking Ack for MessageCounter:1 on exchange: 8102i
       disabled: true
 
-    - label: "Repeat step 5b for endpoint found in step 1b"
+    - label: "Repeat step 5b for endpoint found in step 1b (the Aggregator EP)"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read parts-list 1 0
 
@@ -343,6 +358,7 @@ tests:
     - label:
           "Read Descriptor cluster of all other endpoints listed in the
           PartsList attribute in the Descriptor cluster of endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           read EP <n> . Descriptor . Partslist
       disabled: true

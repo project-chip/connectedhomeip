@@ -31,20 +31,20 @@ if ({{source}}.IsNull()) {
       {{>decode_value target=(concat ../target "_" (asLowerCamelCase label)) source=(concat ../source "." (asLowerCamelCase label)) cluster=../cluster depth=(incrementDepth ../depth) omitDeclaration=false earlyReturn=../earlyReturn}}
     {{/zcl_struct_items_by_struct_name}}
 
-    jclass {{asLowerCamelCase type}}StructClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}", {{asLowerCamelCase type}}StructClass);
+    jclass {{asLowerCamelCase type}}StructClass_{{depth}};
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}", {{asLowerCamelCase type}}StructClass_{{depth}});
     if (err != CHIP_NO_ERROR) {
       ChipLogError(Zcl, "Could not find class ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}}");
       return {{earlyReturn}};
     }
-    jmethodID {{asLowerCamelCase type}}StructCtor = env->GetMethodID({{asLowerCamelCase type}}StructClass, "<init>"
+    jmethodID {{asLowerCamelCase type}}StructCtor_{{depth}} = env->GetMethodID({{asLowerCamelCase type}}StructClass_{{depth}}, "<init>"
         , "({{#zcl_struct_items_by_struct_name type}}{{asJniSignature type null ../cluster true}}{{/zcl_struct_items_by_struct_name}})V");
-    if ({{asLowerCamelCase type}}StructCtor == nullptr) {
+    if ({{asLowerCamelCase type}}StructCtor_{{depth}} == nullptr) {
       ChipLogError(Zcl, "Could not find ChipStructs${{cluster}}Cluster{{asUpperCamelCase type}} constructor");
       return {{earlyReturn}};
     }
 
-    {{target}} = env->NewObject({{asLowerCamelCase type}}StructClass, {{asLowerCamelCase type}}StructCtor
+    {{target}} = env->NewObject({{asLowerCamelCase type}}StructClass_{{depth}}, {{asLowerCamelCase type}}StructCtor_{{depth}}
       {{#zcl_struct_items_by_struct_name type}}
       , {{../target}}_{{asLowerCamelCase label}}
       {{/zcl_struct_items_by_struct_name}}

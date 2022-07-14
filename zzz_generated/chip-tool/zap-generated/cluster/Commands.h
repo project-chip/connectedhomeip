@@ -140,7 +140,6 @@
 | ApplicationLauncher                                                 | 0x050C |
 | ApplicationBasic                                                    | 0x050D |
 | AccountLogin                                                        | 0x050E |
-| Messaging                                                           | 0x0703 |
 | ApplianceIdentification                                             | 0x0B00 |
 | MeterIdentification                                                 | 0x0B01 |
 | ApplianceEventsAndAlert                                             | 0x0B02 |
@@ -3122,26 +3121,26 @@ private:
 | * WiredMaximumCurrent                                               | 0x0008 |
 | * WiredPresent                                                      | 0x0009 |
 | * ActiveWiredFaults                                                 | 0x000A |
-| * BatteryVoltage                                                    | 0x000B |
-| * BatteryPercentRemaining                                           | 0x000C |
-| * BatteryTimeRemaining                                              | 0x000D |
-| * BatteryChargeLevel                                                | 0x000E |
-| * BatteryReplacementNeeded                                          | 0x000F |
-| * BatteryReplaceability                                             | 0x0010 |
-| * BatteryPresent                                                    | 0x0011 |
-| * ActiveBatteryFaults                                               | 0x0012 |
-| * BatteryReplacementDescription                                     | 0x0013 |
-| * BatteryCommonDesignation                                          | 0x0014 |
-| * BatteryANSIDesignation                                            | 0x0015 |
-| * BatteryIECDesignation                                             | 0x0016 |
-| * BatteryApprovedChemistry                                          | 0x0017 |
-| * BatteryCapacity                                                   | 0x0018 |
-| * BatteryQuantity                                                   | 0x0019 |
-| * BatteryChargeState                                                | 0x001A |
-| * BatteryTimeToFullCharge                                           | 0x001B |
-| * BatteryFunctionalWhileCharging                                    | 0x001C |
-| * BatteryChargingCurrent                                            | 0x001D |
-| * ActiveBatteryChargeFaults                                         | 0x001E |
+| * BatVoltage                                                        | 0x000B |
+| * BatPercentRemaining                                               | 0x000C |
+| * BatTimeRemaining                                                  | 0x000D |
+| * BatChargeLevel                                                    | 0x000E |
+| * BatReplacementNeeded                                              | 0x000F |
+| * BatReplaceability                                                 | 0x0010 |
+| * BatPresent                                                        | 0x0011 |
+| * ActiveBatFaults                                                   | 0x0012 |
+| * BatReplacementDescription                                         | 0x0013 |
+| * BatCommonDesignation                                              | 0x0014 |
+| * BatANSIDesignation                                                | 0x0015 |
+| * BatIECDesignation                                                 | 0x0016 |
+| * BatApprovedChemistry                                              | 0x0017 |
+| * BatCapacity                                                       | 0x0018 |
+| * BatQuantity                                                       | 0x0019 |
+| * BatChargeState                                                    | 0x001A |
+| * BatTimeToFullCharge                                               | 0x001B |
+| * BatFunctionalWhileCharging                                        | 0x001C |
+| * BatChargingCurrent                                                | 0x001D |
+| * ActiveBatChargeFaults                                             | 0x001E |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -8636,118 +8635,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster Messaging                                                   | 0x0703 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * GetLastMessage                                                    |   0x00 |
-| * MessageConfirmation                                               |   0x01 |
-| * GetMessageCancellation                                            |   0x02 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * GeneratedCommandList                                              | 0xFFF8 |
-| * AcceptedCommandList                                               | 0xFFF9 |
-| * AttributeList                                                     | 0xFFFB |
-| * FeatureMap                                                        | 0xFFFC |
-| * ClusterRevision                                                   | 0xFFFD |
-|------------------------------------------------------------------------------|
-| Events:                                                             |        |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command GetLastMessage
- */
-class MessagingGetLastMessage : public ClusterCommand
-{
-public:
-    MessagingGetLastMessage(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-last-message", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000000, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000000) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000000, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Messaging::Commands::GetLastMessage::Type mRequest;
-};
-
-/*
- * Command MessageConfirmation
- */
-class MessagingMessageConfirmation : public ClusterCommand
-{
-public:
-    MessagingMessageConfirmation(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("message-confirmation", credsIssuerConfig)
-    {
-        AddArgument("MessageId", 0, UINT32_MAX, &mRequest.messageId);
-        AddArgument("ConfirmationTime", 0, UINT32_MAX, &mRequest.confirmationTime);
-        AddArgument("MessageConfirmationControl", 0, UINT8_MAX, &mRequest.messageConfirmationControl);
-        AddArgument("MessageResponse", &mRequest.messageResponse);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000001, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000001) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Messaging::Commands::MessageConfirmation::Type mRequest;
-};
-
-/*
- * Command GetMessageCancellation
- */
-class MessagingGetMessageCancellation : public ClusterCommand
-{
-public:
-    MessagingGetMessageCancellation(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-message-cancellation", credsIssuerConfig)
-    {
-        AddArgument("EarliestImplementationTime", 0, UINT32_MAX, &mRequest.earliestImplementationTime);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on endpoint %u", endpointIds.at(0));
-
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), 0x00000703, 0x00000002, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000703) command (0x00000002) on Group %u", groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, 0x00000703, 0x00000002, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Messaging::Commands::GetMessageCancellation::Type mRequest;
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster ApplianceIdentification                                     | 0x0B00 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -11620,50 +11507,45 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "wired-assessed-input-voltage", Attributes::WiredAssessedInputVoltage::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "wired-assessed-input-frequency", Attributes::WiredAssessedInputFrequency::Id,
-                                   credsIssuerConfig),                                                                           //
-        make_unique<ReadAttribute>(Id, "wired-current-type", Attributes::WiredCurrentType::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "wired-assessed-current", Attributes::WiredAssessedCurrent::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "wired-nominal-voltage", Attributes::WiredNominalVoltage::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "wired-maximum-current", Attributes::WiredMaximumCurrent::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "wired-present", Attributes::WiredPresent::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "active-wired-faults", Attributes::ActiveWiredFaults::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "battery-voltage", Attributes::BatteryVoltage::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "battery-percent-remaining", Attributes::BatteryPercentRemaining::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "battery-time-remaining", Attributes::BatteryTimeRemaining::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "battery-charge-level", Attributes::BatteryChargeLevel::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "battery-replacement-needed", Attributes::BatteryReplacementNeeded::Id,
-                                   credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "battery-replaceability", Attributes::BatteryReplaceability::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "battery-present", Attributes::BatteryPresent::Id, credsIssuerConfig),               //
-        make_unique<ReadAttribute>(Id, "active-battery-faults", Attributes::ActiveBatteryFaults::Id, credsIssuerConfig),    //
-        make_unique<ReadAttribute>(Id, "battery-replacement-description", Attributes::BatteryReplacementDescription::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "battery-common-designation", Attributes::BatteryCommonDesignation::Id,
-                                   credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "battery-ansidesignation", Attributes::BatteryANSIDesignation::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "battery-iecdesignation", Attributes::BatteryIECDesignation::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "battery-approved-chemistry", Attributes::BatteryApprovedChemistry::Id,
-                                   credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "battery-capacity", Attributes::BatteryCapacity::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "battery-quantity", Attributes::BatteryQuantity::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "battery-charge-state", Attributes::BatteryChargeState::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "battery-time-to-full-charge", Attributes::BatteryTimeToFullCharge::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "battery-functional-while-charging", Attributes::BatteryFunctionalWhileCharging::Id,
-                                   credsIssuerConfig),                                                                         //
-        make_unique<ReadAttribute>(Id, "battery-charging-current", Attributes::BatteryChargingCurrent::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "active-battery-charge-faults", Attributes::ActiveBatteryChargeFaults::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                            //
-        make_unique<SubscribeAttribute>(Id, "status", Attributes::Status::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "order", Attributes::Order::Id, credsIssuerConfig),                            //
-        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "wired-current-type", Attributes::WiredCurrentType::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "wired-assessed-current", Attributes::WiredAssessedCurrent::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "wired-nominal-voltage", Attributes::WiredNominalVoltage::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "wired-maximum-current", Attributes::WiredMaximumCurrent::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "wired-present", Attributes::WiredPresent::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "active-wired-faults", Attributes::ActiveWiredFaults::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "bat-voltage", Attributes::BatVoltage::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "bat-percent-remaining", Attributes::BatPercentRemaining::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "bat-time-remaining", Attributes::BatTimeRemaining::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "bat-charge-level", Attributes::BatChargeLevel::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "bat-replacement-needed", Attributes::BatReplacementNeeded::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "bat-replaceability", Attributes::BatReplaceability::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "bat-present", Attributes::BatPresent::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "active-bat-faults", Attributes::ActiveBatFaults::Id, credsIssuerConfig),           //
+        make_unique<ReadAttribute>(Id, "bat-replacement-description", Attributes::BatReplacementDescription::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "bat-common-designation", Attributes::BatCommonDesignation::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "bat-ansidesignation", Attributes::BatANSIDesignation::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "bat-iecdesignation", Attributes::BatIECDesignation::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "bat-approved-chemistry", Attributes::BatApprovedChemistry::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "bat-capacity", Attributes::BatCapacity::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "bat-quantity", Attributes::BatQuantity::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "bat-charge-state", Attributes::BatChargeState::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "bat-time-to-full-charge", Attributes::BatTimeToFullCharge::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "bat-functional-while-charging", Attributes::BatFunctionalWhileCharging::Id,
+                                   credsIssuerConfig),                                                                        //
+        make_unique<ReadAttribute>(Id, "bat-charging-current", Attributes::BatChargingCurrent::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),    //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                               //
+        make_unique<SubscribeAttribute>(Id, "status", Attributes::Status::Id, credsIssuerConfig),                             //
+        make_unique<SubscribeAttribute>(Id, "order", Attributes::Order::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "description", Attributes::Description::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "wired-assessed-input-voltage", Attributes::WiredAssessedInputVoltage::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "wired-assessed-input-frequency", Attributes::WiredAssessedInputFrequency::Id,
@@ -11674,35 +11556,28 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "wired-maximum-current", Attributes::WiredMaximumCurrent::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "wired-present", Attributes::WiredPresent::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "active-wired-faults", Attributes::ActiveWiredFaults::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "battery-voltage", Attributes::BatteryVoltage::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "battery-percent-remaining", Attributes::BatteryPercentRemaining::Id,
+        make_unique<SubscribeAttribute>(Id, "bat-voltage", Attributes::BatVoltage::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "bat-percent-remaining", Attributes::BatPercentRemaining::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "bat-time-remaining", Attributes::BatTimeRemaining::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "bat-charge-level", Attributes::BatChargeLevel::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "bat-replacement-needed", Attributes::BatReplacementNeeded::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "bat-replaceability", Attributes::BatReplaceability::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "bat-present", Attributes::BatPresent::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "active-bat-faults", Attributes::ActiveBatFaults::Id, credsIssuerConfig),           //
+        make_unique<SubscribeAttribute>(Id, "bat-replacement-description", Attributes::BatReplacementDescription::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "battery-time-remaining", Attributes::BatteryTimeRemaining::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-charge-level", Attributes::BatteryChargeLevel::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "battery-replacement-needed", Attributes::BatteryReplacementNeeded::Id,
-                                        credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, "battery-replaceability", Attributes::BatteryReplaceability::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-present", Attributes::BatteryPresent::Id, credsIssuerConfig),               //
-        make_unique<SubscribeAttribute>(Id, "active-battery-faults", Attributes::ActiveBatteryFaults::Id, credsIssuerConfig),    //
-        make_unique<SubscribeAttribute>(Id, "battery-replacement-description", Attributes::BatteryReplacementDescription::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-common-designation", Attributes::BatteryCommonDesignation::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-ansidesignation", Attributes::BatteryANSIDesignation::Id,
-                                        credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, "battery-iecdesignation", Attributes::BatteryIECDesignation::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-approved-chemistry", Attributes::BatteryApprovedChemistry::Id,
+        make_unique<SubscribeAttribute>(Id, "bat-common-designation", Attributes::BatCommonDesignation::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "bat-ansidesignation", Attributes::BatANSIDesignation::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "bat-iecdesignation", Attributes::BatIECDesignation::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "bat-approved-chemistry", Attributes::BatApprovedChemistry::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "bat-capacity", Attributes::BatCapacity::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "bat-quantity", Attributes::BatQuantity::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "bat-charge-state", Attributes::BatChargeState::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "bat-time-to-full-charge", Attributes::BatTimeToFullCharge::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "bat-functional-while-charging", Attributes::BatFunctionalWhileCharging::Id,
                                         credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "battery-capacity", Attributes::BatteryCapacity::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "battery-quantity", Attributes::BatteryQuantity::Id, credsIssuerConfig),        //
-        make_unique<SubscribeAttribute>(Id, "battery-charge-state", Attributes::BatteryChargeState::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-time-to-full-charge", Attributes::BatteryTimeToFullCharge::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-functional-while-charging", Attributes::BatteryFunctionalWhileCharging::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "battery-charging-current", Attributes::BatteryChargingCurrent::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "active-battery-charge-faults", Attributes::ActiveBatteryChargeFaults::Id,
+        make_unique<SubscribeAttribute>(Id, "bat-charging-current", Attributes::BatChargingCurrent::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -16329,45 +16204,6 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterMessaging(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
-{
-    using namespace chip::app::Clusters::Messaging;
-
-    const char * clusterName = "Messaging";
-
-    commands_list clusterCommands = {
-        //
-        // Commands
-        //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),              //
-        make_unique<MessagingGetLastMessage>(credsIssuerConfig),         //
-        make_unique<MessagingMessageConfirmation>(credsIssuerConfig),    //
-        make_unique<MessagingGetMessageCancellation>(credsIssuerConfig), //
-        //
-        // Attributes
-        //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                      //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),      //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                     //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                           //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                 //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                   //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        //
-        // Events
-        //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
 void registerClusterApplianceIdentification(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ApplianceIdentification;
@@ -17356,6 +17192,7 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<SubscribeAttribute>(credsIssuerConfig), //
         make_unique<ReadEvent>(credsIssuerConfig),          //
         make_unique<SubscribeEvent>(credsIssuerConfig),     //
+        make_unique<ReadAll>(credsIssuerConfig),            //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -17471,7 +17308,6 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplicationLauncher(commands, credsIssuerConfig);
     registerClusterApplicationBasic(commands, credsIssuerConfig);
     registerClusterAccountLogin(commands, credsIssuerConfig);
-    registerClusterMessaging(commands, credsIssuerConfig);
     registerClusterApplianceIdentification(commands, credsIssuerConfig);
     registerClusterMeterIdentification(commands, credsIssuerConfig);
     registerClusterApplianceEventsAndAlert(commands, credsIssuerConfig);

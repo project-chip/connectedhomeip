@@ -69,6 +69,15 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+ *
+ * A uint32_t identifying the software version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
  * A string identifying the software version running on the device.
@@ -107,13 +116,6 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
- *
- * Enable Thread CLI interface at initialisation.
- */
-#define CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI 1
 
 /**
  *  @def CHIP_CONFIG_MAX_FABRICS

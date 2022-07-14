@@ -24,10 +24,11 @@ config:
 
 tests:
     - label:
-          "If (PICS_DT_BLE), Standard Commissioning Flow: Use a Commissionee
-          with a QR code that has the Custom Flow field set to 0 and supports
-          BLE for its Discovery Capability. Ensure the Version bit string
-          follows the current Matter spec. documentation."
+          "Standard Commissioning Flow: Use a Commissionee with a QR code that
+          has the Custom Flow field set to 0 and supports BLE for its Discovery
+          Capability. Ensure the Version bit string follows the current Matter
+          spec. documentation."
+      PICS: MCORE.DD.DT_BLE
       verification: |
           $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2
           ...
@@ -43,7 +44,7 @@ tests:
           [1651101335.733693][22353:22353] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651101335.734598][22353:22353] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
           [1651101335.735182][22353:22353] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651101335.735618][22353:22353] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1651101335.735618][22353:22353] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
 
 
           ubuntu@ubuntu:~/apps$ ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00
@@ -57,17 +58,17 @@ tests:
           [1653562354.037378][4312:4312] CHIP:SPL: Passcode:      20202021
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
-          the DUT."
+    - label: "Scan the QR code from the previous step using the DUT."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_DT_BLE), Using the DUT, parse the THs QR code and follow any
-          steps needed for the Commissioner/Commissionee to complete the
-          commissioning process using BLE"
+          "Using the DUT, parse the THs QR code and follow any steps needed for
+          the Commissioner/Commissionee to complete the commissioning process
+          using BLE"
+      PICS: MCORE.DD.DT_BLE
       verification: |
           TH Commissionee:
 
@@ -86,11 +87,12 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_DT_IP), Standard Commissioning Flow: Use a Commissionee with
-          a QR code that has the Custom Flow field set to 0, supports IP Network
-          for its Discovery Capability and is already on the same IP network as
-          the DUT commissioner. Ensure the Version bit string follows the
-          current Matter spec. documentation."
+          "Standard Commissioning Flow: Use a Commissionee with a QR code that
+          has the Custom Flow field set to 0, supports IP Network for its
+          Discovery Capability and is already on the same IP network as the DUT
+          commissioner. Ensure the Version bit string follows the current Matter
+          spec. documentation."
+      PICS: MCORE.DD.DT_IP
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 0 --capabilities 4
 
@@ -119,17 +121,17 @@ tests:
           ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
-          the DUT."
+    - label: "Scan the QR code from the previous step using the DUT."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_DT_IP), Using the DUT, parse the THs QR code and follow any
-          steps needed for the Commissioner/Commissionee to complete the
-          commissioning process using IP Network"
+          "Using the DUT, parse the THs QR code and follow any steps needed for
+          the Commissioner/Commissionee to complete the commissioning process
+          using IP Network"
+      PICS: MCORE.DD.DT_IP
       verification: |
           TH Commissionee:
 
@@ -148,25 +150,26 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_DT_SOFTAP), Standard Commissioning Flow: Use a Commissionee
-          with a QR code that has the Custom Flow field set to 0 and supports
-          SoftAP for its Discovery Capability. Ensure the Version bit string
-          follows the current Matter spec. documentation."
+          "Standard Commissioning Flow: Use a Commissionee with a QR code that
+          has the Custom Flow field set to 0 and supports SoftAP for its
+          Discovery Capability. Ensure the Version bit string follows the
+          current Matter spec. documentation."
+      PICS: MCORE.DD.DT_SOFTAP
       verification: |
           BLOCKED: SoftAP commissioning not currently supported
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan the QR code from the previous step using
-          the DUT."
+    - label: "Scan the QR code from the previous step using the DUT."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
-          "If (PICS_DT_SOFTAP), Using the DUT, parse the THs QR code and follow
-          any steps needed for the Commissioner/Commissionee to complete the
-          commissioning process using SoftAP"
+          "Using the DUT, parse the THs QR code and follow any steps needed for
+          the Commissioner/Commissionee to complete the commissioning process
+          using SoftAP"
+      PICS: MCORE.DD.DT_SOFTAP
       verification: |
           BLOCKED: SoftAP commissioning not currently supported
       disabled: true

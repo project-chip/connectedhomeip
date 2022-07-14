@@ -94,6 +94,7 @@ protected:
     System::Clock::Timeout mPollFreq;
     static constexpr System::Clock::Timeout kDefaultPollFreq    = System::Clock::Milliseconds32(500);
     static constexpr System::Clock::Timeout kImmediatePollDelay = System::Clock::Milliseconds32(1);
+    bool mStopPolling                                           = false;
 };
 
 /**

@@ -354,9 +354,9 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
     {
     case Attributes::ControlMode::Id: {
         PumpControlMode controlMode;
-        NumericAttributeTraits<PumpControlMode>::StorageType storage;
-        memcpy(&storage, value, size);
-        controlMode = NumericAttributeTraits<PumpControlMode>::StorageToWorking(storage);
+        NumericAttributeTraits<PumpControlMode>::StorageType tmp;
+        memcpy(&tmp, value, size);
+        controlMode = NumericAttributeTraits<PumpControlMode>::StorageToWorking(tmp);
         switch (controlMode)
         {
         case PumpControlMode::kConstantFlow:
@@ -389,8 +389,31 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         }
     }
     break;
+
     case Attributes::OperationMode::Id:
-        // TODO: Implement checks on the Operation Mode values
+        PumpOperationMode operationMode;
+        NumericAttributeTraits<PumpOperationMode>::StorageType tmp;
+        memcpy(&tmp, value, size);
+        operationMode = NumericAttributeTraits<PumpOperationMode>::StorageToWorking(tmp);
+
+        switch (operationMode)
+        {
+        case PumpOperationMode::kMinimum:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpOperationMode::kMaximum:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinConstSpeed::Get, Attributes::MaxConstSpeed::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        default:
+            status = Protocols::InteractionModel::Status::Success;
+        }
+
         break;
     default:
         status = Protocols::InteractionModel::Status::Success;

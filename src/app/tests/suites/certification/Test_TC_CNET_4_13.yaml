@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.13. [TC-CNET-4.13] [Wi-Fi] Verification for ReorderNetwork command
+    11.4.11. [TC-CNET-4.13] [Wi-Fi] Verification for ReorderNetwork command
     [DUT-Server]
 
 config:
@@ -23,22 +23,27 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH sends ArmFailSafe command to the DUT"
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 900"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
-          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
-          argument value as 'Userwifi_ssid1', Credentials argument value as
-          'Userwifi_Credentials' and Breadcrumb argument value as 1"
+          "TH reads Networks attribute from the DUT and saves the number of
+          entries as 'NumNetworks'"
+      PICS: CNET.S.A0001
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads MaxNetworks attribute from the DUT"
+    - label:
+          "TH calculates the number of remaining network slots as
+          'MaxNetworksVal ue' - 'NumNetworks' and saves as 'RemainingNetwor
+          kSlots'"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
@@ -54,25 +59,144 @@ tests:
       disabled: true
 
     - label:
-          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
-          argument value as 'Userwifi_ssid3', Credentials argument value as
-          'Userwifi_Credentials' and Breadcrumb argument value as 1"
+          "TH calculates the midpoint of the network list as floor(('MaxNetwor
+          ksValue' + 1)/2) and saves as 'Midpoint'"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
-          "TH sends ReorderNetwork Command to the DUT with the following
-          arguments: NetworkID argument value as 'Userwifi_ssid1' NetworkIndex
-          argument value as 'Userwifi_netidx3' Breadcrumb argument value as 1"
+          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
+          field set to 900"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label:
+          "TH sends AddOrUpdateWiFi Network command to the DUT. This step should
+          be repeated 'RemainingNetwor kSlots' times using DIFFERENT SSID and
+          credential values and the Breadcrumb field set to 1. Note that these
+          credentials are NOT required to be connectable."
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Networks attribute from the DUT and saves the list as
+          'OriginalNetworkL ist'"
+      PICS: CNET.S.A0001
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "TH sends ReorderNetwo rk Command to the DUT with the following
+          fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI NT_SSID 2.
+          NetworkIn dex is 'MaxNetwo rksValue' 3. Breadcrum b is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ReorderNetwo rk Command to the DUT with the following
+          fields: 1. NetworkID is a NetworkID value NOT present in 'OriginalNe
+          tworkList' 2. NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ReorderNetwo rk Command to the DUT with the following
+          fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI NT_SSID 2.
+          NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 0"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 900"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends AddOrUpdateWiFi Network command to the DUT. This step should
+          be repeated 'RemainingNetwor kSlots' times using DIFFERENT SSID and
+          credential values and Breadcrumb field set to 1. Note that these
+          credentials are NOT required to be connectable."
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ReorderNetwo rk Command to the DUT with the following
+          fields: 1. NetworkID is PIXIT.CNET .WIFI_1ST_ ACCESSPOI NT_SSID 2.
+          NetworkIn dex is 'Midpoint' 3. Breadcrum b is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends the CommissioningCo mplete command to the DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 0"
+      verification: |
+
+      disabled: true
+
+    - label: "TH reads Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
       disabled: true

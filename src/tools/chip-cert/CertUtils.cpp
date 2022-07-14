@@ -36,6 +36,7 @@ using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
 using namespace chip::TLV;
+using namespace chip::Encoding;
 
 bool ToolChipDN::SetCertName(X509_NAME * name) const
 {
@@ -173,6 +174,8 @@ CertFormat DetectCertFormat(uint8_t * cert, uint32_t certLen)
     static const uint8_t chipRawPrefix[] = { 0x15, 0x30, 0x01 };
     static const char * chipB64Prefix    = "FTAB";
     static const size_t chipB64PrefixLen = strlen(chipB64Prefix);
+    static const char * chipHexPrefix    = "153001";
+    static const size_t chipHexPrefixLen = strlen(chipHexPrefix);
     static const char * pemMarker        = "-----BEGIN CERTIFICATE-----";
 
     if (certLen > sizeof(chipRawPrefix) && memcmp(cert, chipRawPrefix, sizeof(chipRawPrefix)) == 0)
@@ -183,6 +186,11 @@ CertFormat DetectCertFormat(uint8_t * cert, uint32_t certLen)
     if (certLen > chipB64PrefixLen && memcmp(cert, chipB64Prefix, chipB64PrefixLen) == 0)
     {
         return kCertFormat_Chip_Base64;
+    }
+
+    if (certLen > chipHexPrefixLen && memcmp(cert, chipHexPrefix, chipHexPrefixLen) == 0)
+    {
+        return kCertFormat_Chip_Hex;
     }
 
     if (ContainsPEMMarker(pemMarker, cert, certLen))
@@ -547,12 +555,20 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
             ReportOpenSSLErrorAndExit("d2i_X509", res = false);
         }
     }
-    // Otherwise, it is either CHIP TLV or CHIP TLV Base64 encoded.
+    // Otherwise, it is either CHIP TLV in raw, Base64, or hex encoded format.
     else
     {
         if (certFmt == kCertFormat_Chip_Base64)
         {
             res = Base64Decode(certBuf.get(), certLen, certBuf.get(), certLen, certLen);
+            VerifyTrueOrExit(res);
+        }
+        else if (certFmt == kCertFormat_Chip_Hex)
+        {
+            const char * certChars = reinterpret_cast<const char *>(certBuf.get());
+
+            certLen = static_cast<uint32_t>(Encoding::HexToBytes(certChars, certLen, certBuf.get(), certLen));
+            res     = (certLen > 0);
             VerifyTrueOrExit(res);
         }
 
@@ -684,26 +700,38 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
             ReportOpenSSLErrorAndExit("i2d_X509_fp", res = false);
         }
     }
-    else if (certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64)
+    else if (certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64 || certFmt == kCertFormat_Chip_Hex)
     {
-        uint8_t * certToWrite      = nullptr;
-        size_t certToWriteLen      = 0;
-        uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(kMaxCHIPCertLength);
-        std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
+        uint8_t * certToWrite = nullptr;
+        size_t certToWriteLen = 0;
+        uint32_t certLen;
+        uint32_t chipCertDecodedLen = HEX_ENCODED_LENGTH(kMaxCHIPCertLength);
+        std::unique_ptr<uint8_t[]> chipCertDecoded(new uint8_t[chipCertDecodedLen]);
         uint8_t chipCertBuf[kMaxCHIPCertLength];
         MutableByteSpan chipCert(chipCertBuf);
 
         res = X509ToChipCert(cert, chipCert);
         VerifyTrueOrExit(res);
+        certLen = static_cast<uint32_t>(chipCert.size());
 
         if (certFmt == kCertFormat_Chip_Base64)
         {
-            res = Base64Encode(chipCert.data(), static_cast<uint32_t>(chipCert.size()), chipCertBase64.get(), chipCertBase64Len,
-                               chipCertBase64Len);
+            chipCertDecodedLen = BASE64_ENCODED_LEN(certLen);
+            res = Base64Encode(chipCert.data(), certLen, chipCertDecoded.get(), chipCertDecodedLen, chipCertDecodedLen);
             VerifyTrueOrExit(res);
 
-            certToWrite    = chipCertBase64.get();
-            certToWriteLen = chipCertBase64Len;
+            certToWrite    = chipCertDecoded.get();
+            certToWriteLen = chipCertDecodedLen;
+        }
+        else if (certFmt == kCertFormat_Chip_Hex)
+        {
+            char * certHex = reinterpret_cast<char *>(chipCertDecoded.get());
+
+            chipCertDecodedLen = HEX_ENCODED_LENGTH(certLen);
+            SuccessOrExit(Encoding::BytesToLowercaseHexBuffer(chipCert.data(), certLen, certHex, chipCertDecodedLen));
+
+            certToWrite    = chipCertDecoded.get();
+            certToWriteLen = chipCertDecodedLen;
         }
         else
         {
@@ -718,6 +746,8 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
         }
     }
 
+    printf("\r\n");
+
 exit:
     CloseFile(file);
     return res;
@@ -728,20 +758,32 @@ bool WriteChipCert(const char * fileName, const ByteSpan & chipCert, CertFormat 
     bool res                    = true;
     FILE * file                 = nullptr;
     const uint8_t * certToWrite = nullptr;
+    uint32_t certLen            = static_cast<uint32_t>(chipCert.size());
     size_t certToWriteLen       = 0;
-    uint32_t chipCertBase64Len  = BASE64_ENCODED_LEN(static_cast<uint32_t>(chipCert.size()));
-    std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
+    uint32_t chipCertDecodedLen = HEX_ENCODED_LENGTH(kMaxCHIPCertLength); // Maximum possible encoding size
+    std::unique_ptr<uint8_t[]> chipCertDecoded(new uint8_t[chipCertDecodedLen]);
 
-    VerifyOrReturnError(certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64, false);
+    VerifyOrReturnError(certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64 || certFmt == kCertFormat_Chip_Hex,
+                        false);
 
     if (certFmt == kCertFormat_Chip_Base64)
     {
-        res = Base64Encode(chipCert.data(), static_cast<uint32_t>(chipCert.size()), chipCertBase64.get(), chipCertBase64Len,
-                           chipCertBase64Len);
+        chipCertDecodedLen = BASE64_ENCODED_LEN(certLen);
+        res                = Base64Encode(chipCert.data(), certLen, chipCertDecoded.get(), chipCertDecodedLen, chipCertDecodedLen);
         VerifyTrueOrExit(res);
 
-        certToWrite    = chipCertBase64.get();
-        certToWriteLen = chipCertBase64Len;
+        certToWrite    = chipCertDecoded.get();
+        certToWriteLen = chipCertDecodedLen;
+    }
+    else if (certFmt == kCertFormat_Chip_Hex)
+    {
+        char * certHex     = reinterpret_cast<char *>(chipCertDecoded.get());
+        chipCertDecodedLen = HEX_ENCODED_LENGTH(certLen);
+
+        SuccessOrExit(Encoding::BytesToLowercaseHexBuffer(chipCert.data(), certLen, certHex, chipCertDecodedLen));
+
+        certToWrite    = chipCertDecoded.get();
+        certToWriteLen = chipCertDecodedLen;
     }
     else
     {

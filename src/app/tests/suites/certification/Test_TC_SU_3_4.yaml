@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.13.1. [TC-SU-3.4] Tests the scenarios on when a software update should be
-    applied by the OTA-R
+    3.9.1. [TC-SU-3.4] Handling different ApplyUpdateResponse scenarios on
+    Provider
 
 config:
     nodeId: 0x12344321
@@ -35,11 +35,11 @@ tests:
       disabled: true
 
     - label:
-          "OTA-R/TH on completion of image download sends an ApplyUpdateRequest
+          'OTA-R/TH on completion of image download sends an ApplyUpdateRequest
           command to the DUT. DUT responds with the ApplyUpdateResponse with
-          Action set to 'AwaitNextAction', DelayedActionTime set to 3 minutes.
+          Action set to "AwaitNextAction", DelayedActionTime set to 3 minutes.
           On the subsequent ApplyUpdateRequest command, DUT sends a
-          ApplyUpdateResponse back to DUT. Action is set to Proceed."
+          ApplyUpdateResponse back to DUT. Action is set to Proceed.'
       verification: |
           Run the OTA Requestor App using command
 
@@ -61,10 +61,10 @@ tests:
       disabled: true
 
     - label:
-          "OTA-R/TH on completion of image download sends an ApplyUpdateRequest
+          'OTA-R/TH on completion of image download sends an ApplyUpdateRequest
           command to the DUT. DUT responds with the ApplyUpdateResponse with
-          Action set to 'Discontinue'. Initiate another QueryImage Command from
-          OTA-R/TH to the DUT."
+          Action set to "Discontinue". Initiate another QueryImage Command from
+          OTA-R/TH to the DUT.'
       verification: |
           Run the OTA Requestor App using command
 

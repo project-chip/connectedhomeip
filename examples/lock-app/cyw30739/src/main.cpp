@@ -52,6 +52,7 @@ using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
+using namespace CYW30739DoorLock::LockInitParams;
 
 wiced_bool_t syncClusterToButtonAction = false;
 
@@ -62,6 +63,7 @@ static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
 static void ActionInitiated(LockManager::Action_t aAction, int32_t aActor);
 static void ActionCompleted(LockManager::Action_t aAction);
 static void WriteClusterState(uint8_t value);
+static void UpdateClusterState(intptr_t context);
 
 #ifndef _countof
 #define _countof(a) (sizeof(a) / sizeof(a[0]))
@@ -84,20 +86,20 @@ APPLICATION_START()
     wiced_result_t result;
     uint32_t i;
 
-    printf("\nChipLock App starting\n");
+    ChipLogProgress(Zcl, "ChipLock App starting");
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR MemoryInit %ld\n", err.AsInteger());
+        ChipLogError(Zcl, "ERROR MemoryInit %ld", err.AsInteger());
     }
 
     result = app_button_init();
     if (result != WICED_SUCCESS)
     {
-        printf("ERROR app_button_init %d\n", result);
+        ChipLogError(Zcl, "ERROR app_button_init %d", result);
     }
 
     /* Init. LED Manager. */
@@ -105,44 +107,44 @@ APPLICATION_START()
     {
         result = wiced_led_manager_init(&chip_lighting_led_config[i]);
         if (result != WICED_SUCCESS)
-            printf("wiced_led_manager_init fail i=%ld, (%d)\n", i, result);
+            ChipLogError(Zcl, "wiced_led_manager_init fail i=%ld, (%d)", i, result);
     }
 
-    printf("Initializing CHIP\n");
+    ChipLogProgress(Zcl, "Initializing CHIP");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR InitChipStack %ld\n", err.AsInteger());
+        ChipLogError(Zcl, "ERROR InitChipStack %ld", err.AsInteger());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    printf("Initializing OpenThread stack\n");
+    ChipLogProgress(Zcl, "Initializing OpenThread stack");
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR InitThreadStack %ld\n", err.AsInteger());
+        ChipLogError(Zcl, "ERROR InitThreadStack %ld", err.AsInteger());
     }
 #endif
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR SetThreadDeviceType %ld\n", err.AsInteger());
+        ChipLogError(Zcl, "ERROR SetThreadDeviceType %ld", err.AsInteger());
     }
 
-    printf("Starting event loop task\n");
+    ChipLogProgress(Zcl, "Starting event loop task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR StartEventLoopTask %ld\n", err.AsInteger());
+        ChipLogError(Zcl, "ERROR StartEventLoopTask %ld", err.AsInteger());
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    printf("Starting thread task\n");
+    ChipLogProgress(Zcl, "Starting thread task");
     err = ThreadStackMgr().StartThreadTask();
     if (err != CHIP_NO_ERROR)
     {
-        printf("ERROR StartThreadTask %ld\n", err.AsInteger());
+        ChipLogError(Zcl, "ERROR StartThreadTask %ld", err.AsInteger());
     }
 #endif
 
@@ -151,7 +153,7 @@ APPLICATION_START()
     const int ret = Engine::Root().Init();
     if (!chip::ChipError::IsSuccess(ret))
     {
-        printf("ERROR Shell Init %d\n", ret);
+        ChipLogError(Zcl, "ERROR Shell Init %d", ret);
     }
     RegisterAppShellCommands();
     Engine::Root().RunMainLoop();
@@ -161,8 +163,7 @@ APPLICATION_START()
 
 void InitApp(intptr_t args)
 {
-    ConfigurationMgr().LogDeviceConfig();
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
     /* Start CHIP datamodel server */
@@ -185,24 +186,71 @@ void InitApp(intptr_t args)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
 
-    uint8_t maxCredentialsPerUser = 0;
-    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, maxCredentialsPerUser))
+    uint8_t numberOfCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
     {
         ChipLogError(Zcl,
                      "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
                      "[endpointId=%d]",
                      endpointId);
-        maxCredentialsPerUser = 5;
+        numberOfCredentialsPerUser = 5;
     }
+
+    uint16_t numberOfUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfUsers = 10;
+    }
+
+    uint8_t numberOfWeekdaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfWeekdaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfYeardaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfYeardaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfHolidaySchedules = 0;
+    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfHolidaySchedules = 10;
+    }
+
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    CHIP_ERROR err = LockMgr().Init(state, maxCredentialsPerUser);
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("LockMgr().Init() failed\n");
-    }
+    err = LockMgr().Init(state,
+                         ParamBuilder()
+                             .SetNumberOfUsers(numberOfUsers)
+                             .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                             .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                             .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                             .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                             .GetLockParam());
 
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+
+    ConfigurationMgr().LogDeviceConfig();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTAConfig::Init();
@@ -229,11 +277,11 @@ void ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     // and start flashing the LEDs rapidly to indicate action initiation.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        printf("Lock Action has been initiated\n");
+        ChipLogDetail(Zcl, "Lock Action has been initiated");
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        printf("Unlock Action has been initiated\n");
+        ChipLogDetail(Zcl, "Unlock Action has been initiated");
     }
 
     if (aActor == LockManager::ACTOR_BUTTON)
@@ -244,12 +292,12 @@ void ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
     // Action initiated, update the light led
     if (aAction == LockManager::LOCK_ACTION)
     {
-        printf("Lock Action has been initiated");
+        ChipLogDetail(Zcl, "Lock Action has been initiated");
         wiced_led_manager_disable_led(PLATFORM_LED_2);
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        printf("Unlock Action has been initiated");
+        ChipLogDetail(Zcl, "Unlock Action has been initiated");
         wiced_led_manager_enable_led(PLATFORM_LED_2);
     }
 }
@@ -267,7 +315,7 @@ void UpdateClusterState(intptr_t context)
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        printf("ERR: updating lock state %x", status);
+        ChipLogError(Zcl, "ERR: updating lock state %x", status);
     }
 }
 
@@ -278,11 +326,11 @@ void ActionCompleted(LockManager::Action_t aAction)
     // Turn off the lock LED if in an UNLOCKED state.
     if (aAction == LockManager::LOCK_ACTION)
     {
-        printf("Lock Action has been completed\n");
+        ChipLogDetail(Zcl, "Lock Action has been completed");
     }
     else if (aAction == LockManager::UNLOCK_ACTION)
     {
-        printf("Unlock Action has been completed\n");
+        ChipLogDetail(Zcl, "Unlock Action has been completed");
     }
 
     if (syncClusterToButtonAction)

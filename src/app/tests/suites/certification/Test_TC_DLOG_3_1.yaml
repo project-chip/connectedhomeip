@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT sends RetrieveLogsRequest Command to TH"
+      PICS: DLOG.C.C00.Tx
       verification: |
           ./chip-tool diagnosticlogs retrieve-logs-request 0 0 "test.txt" 1 0
 

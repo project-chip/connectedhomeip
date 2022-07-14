@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    90.5. [TC-CGEN-2.4] Verification For CommissioningError on response message
-    [DUT - Server]
+    90.2.4. [TC-CGEN-2.4] Verification For CommissioningError on response
+    message [DUT - Server]
 
 config:
     nodeId: 0x12344321
@@ -29,119 +29,46 @@ tests:
       disabled: true
 
     - label:
-          "During PASE Session TH1 sends CommissionComplete command to the DUT"
+          "During PASE Session, TH1 sends CommissionComplete command to the DUT"
+      PICS: CGEN.S.C04.Rsp && CGEN.S.C05.Tx
+      verification: |
+          Not testable as the execution is in PASE session
+      disabled: true
+
+    - label: "Complete the Commission for TH1 and DUT"
       verification: |
 
       disabled: true
 
     - label:
-          "TH1 sends ArmFailSafe command to the DUT with ExpiryLengthSeconds
-          value as 'commission_timeout' and the Breadcrumb value as 0"
+          "TH1 sends SetRegulatoryConfig command to the DUT with
+          NewRegulatoryConfig data value as greater than '3', Breadcrumb as 0
+          and CountryCode value as 'User_countryCode'"
+      PICS: CGEN.S.C02.Rsp && CGEN.S.C03.Tx
       verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning arm-fail-safe 60 0 60 1 0
+          ./chip-tool generalcommissioning set-regulatory-config 4 new 0 1 0
 
 
-          [1646202957.619162][2956:2961] CHIP:DMG:        InteractionModelRevision = 1
-          [1646202957.619205][2956:2961] CHIP:DMG: },
-          [1646202957.619299][2956:2961] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1646202957.619369][2956:2961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1646202957.619461][2956:2961] CHIP:TOO:   ArmFailSafeResponse: {
-          [1646202957.619522][2956:2961] CHIP:TOO:     errorCode: 0
-          [1646202957.619556][2956:2961] CHIP:TOO:     debugText:
-          [1646202957.619591][2956:2961] CHIP:TOO:    }
-          [1646202957.619634][2956:2961] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646202957.619712][2956:2961] CHIP:EM: Sending Standalone Ack for MessageCounter:5531048 on exchange 43022i
+          [1653996382.940789][7220:7225] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0003
+          [1653996382.940900][7220:7225] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
+          [1653996382.941033][7220:7225] CHIP:TOO:   SetRegulatoryConfigResponse: {
+          [1653996382.941119][7220:7225] CHIP:TOO:     errorCode: 1
+          [1653996382.941171][7220:7225] CHIP:TOO:     debugText: new
+          [1653996382.941220][7220:7225] CHIP:TOO:    }
+          [1653996382.941317][7220:7225] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
-          "TH1 sends SetRegulatoryConfig command to the DUT with Location
-          attribute value as '3'"
+          "After Fail-Safe timer expires, TH1 Sends the CommissionComplete
+          command to the DUT"
+      PICS: CGEN.S.C00.Rsp && CGEN.S.C01.Tx
       verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning set-regulatory-config 3 0 0 60 1 0
-
-          [1646204704.308373][6252:6257] CHIP:DMG:        InteractionModelRevision = 1
-          [1646204704.308415][6252:6257] CHIP:DMG: },
-          [1646204704.308526][6252:6257] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0003
-          [1646204704.308602][6252:6257] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
-          [1646204704.308703][6252:6257] CHIP:TOO:   SetRegulatoryConfigResponse: {
-          [1646204704.308763][6252:6257] CHIP:TOO:     errorCode: 0
-          [1646204704.308806][6252:6257] CHIP:TOO:     debugText:
-          [1646204704.308847][6252:6257] CHIP:TOO:    }
-          [1646204704.308899][6252:6257] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646204704.308974][6252:6257] CHIP:EM: Sending Standalone Ack for MessageCounter:2793138 on exchange 35617i
-      disabled: true
-
-    - label:
-          "TH1 sends SetRegulatoryConfig command to the DUT with Location
-          attribute"
-      verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning set-regulatory-config 0 0 0 60 1 0
-
-          [1646203091.878703][2973:2978] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0003
-          [1646203091.878782][2973:2978] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0003
-          [1646203091.878888][2973:2978] CHIP:TOO:   SetRegulatoryConfigResponse: {
-          [1646203091.878950][2973:2978] CHIP:TOO:     errorCode: 0
-          [1646203091.878994][2973:2978] CHIP:TOO:     debugText:
-          [1646203091.879063][2973:2978] CHIP:TOO:    }
-          [1646203091.879114][2973:2978] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646203091.879197][2973:2978] CHIP:EM: Sending Standalone Ack for MessageCounter:7339336 on exchange 13158i
-      disabled: true
-
-    - label: "TH1 sends AttestationRequest command to the DUT"
-      verification: |
-          For the 5.5 commissioning flow the steps are added. Not required to verify on GC test plan verification, because it's verified in another test plan.
-      disabled: true
-
-    - label: "TH1 sends CSRRequest command to the DUT"
-      verification: |
-          For the 5.5 commissioning flow the steps are added. Not required to verify on GC test plan verification, because it's verified in another test plan.
-      disabled: true
-
-    - label: "TH1 sends AddNOC command to the DUT"
-      verification: |
-          For the 5.5 commissioning flow the steps are added. Not required to verify on GC test plan verification, because it's verified in another test plan.
-      disabled: true
-
-    - label: "TH1 Sends CommissionComplete command to the DUT"
-      verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning commissioning-complete 1 0
-
-          [1646203451.094771][3006:3011] CHIP:DMG:        InteractionModelRevision = 1
-          [1646203451.094813][3006:3011] CHIP:DMG: },
-          [1646203451.094921][3006:3011] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1646203451.094997][3006:3011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
-          [1646203451.095097][3006:3011] CHIP:TOO:   CommissioningCompleteResponse: {
-          [1646203451.095157][3006:3011] CHIP:TOO:     errorCode: 0
-          [1646203451.095200][3006:3011] CHIP:TOO:     debugText:
-          [1646203451.095242][3006:3011] CHIP:TOO:    }
-          [1646203451.095293][3006:3011] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646203451.095375][3006:3011] CHIP:EM: Sending Standalone Ack for MessageCounter:14415629 on exchange 59296i
-      disabled: true
-
-    - label:
-          "TH1 reads Breadcrumb value from the DUT NOTE: Reading an attribute is
-          to confirm that commissioning successfully completed"
-      verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning read breadcrumb 1 0
-
-          [1646205172.305272][6395:6400] CHIP:DMG:        SuppressResponse = true,
-          [1646205172.305305][6395:6400] CHIP:DMG:        InteractionModelRevision = 1
-          [1646205172.305336][6395:6400] CHIP:DMG: }
-          [1646205172.305511][6395:6400] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000DataVersion: 1894223167
-          [1646205172.305586][6395:6400] CHIP:TOO:   Breadcrumb: 0
-          [1646205172.305747][6395:6400] CHIP:EM: Sending Standalone Ack for MessageCounter:10552439 on exchange 39551i
-      disabled: true
-
-    - label: "TH1 Sends CommissionComplete command to the DUT"
-      verification: |
-          ubuntu@ubuntu:~/apps$ sudo ./chip-tool generalcommissioning commissioning-complete 1 0
-
-          [1646205216.257281][6409:6414] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
-          [1646205216.257341][6409:6414] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
-          [1646205216.257418][6409:6414] CHIP:TOO:   CommissioningCompleteResponse: {
-          [1646205216.257463][6409:6414] CHIP:TOO:     errorCode: 0
-          [1646205216.257495][6409:6414] CHIP:TOO:     debugText:
-          [1646205216.257531][6409:6414] CHIP:TOO:    }
-          [1646205216.257578][6409:6414] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1646205216.257725][6409:6414] CHIP:EM: Sending Standalone Ack for MessageCounter:13393976 on exchange 5554i
+          ubuntu@ubuntu:~/apps$ ./chip-tool generalcommissioning commissioning-complete 1 0
+          [1653996461.207051][7229:7234] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1653996461.207140][7229:7234] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
+          [1653996461.207228][7229:7234] CHIP:TOO:   CommissioningCompleteResponse: {
+          [1653996461.207281][7229:7234] CHIP:TOO:     errorCode: 3
+          [1653996461.207319][7229:7234] CHIP:TOO:     debugText:
+          [1653996461.207357][7229:7234] CHIP:TOO:    }
+          [1653996461.207416][7229:7234] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

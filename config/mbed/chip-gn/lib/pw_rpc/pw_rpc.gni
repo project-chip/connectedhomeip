@@ -21,6 +21,7 @@ pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/mbed/pw_sys_io:pw_sys_io_mbed"
 pw_rpc_system_server_BACKEND =
     "${chip_root}/examples/common/pigweed:system_rpc_server"
+pw_span_ENABLE_STD_SPAN_POLYFILL = false
 
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",

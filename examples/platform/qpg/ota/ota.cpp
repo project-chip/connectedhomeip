@@ -50,6 +50,19 @@ OTAImageProcessorImpl gImageProcessor;
  *                    Application Function Definitions
  *****************************************************************************/
 
+bool OtaHeaderValidationCb(qvCHIP_Ota_ImageHeader_t imageHeader)
+{
+    // Check that the image matches vendor and product ID and that the version is higher than what we currently have
+    if (imageHeader.vendorId != CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID ||
+        imageHeader.productId != CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID ||
+        imageHeader.softwareVersion <= CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 void InitializeOTARequestor(void)
 {
     // Initialize and interconnect the Requestor and Image Processor objects
@@ -60,6 +73,9 @@ void InitializeOTARequestor(void)
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    // Initialize OTA image validation callback
+    qvCHIP_OtaSetHeaderValidationCb(OtaHeaderValidationCb);
 }
 
 void TriggerOTAQuery(void)

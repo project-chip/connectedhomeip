@@ -21,8 +21,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -112,9 +111,6 @@ WindowApp::Cover * WindowApp::GetCover(chip::EndpointId endpoint)
 
 CHIP_ERROR WindowApp::Init()
 {
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
     ConfigurationMgr().LogDeviceConfig();
 
     // Timers

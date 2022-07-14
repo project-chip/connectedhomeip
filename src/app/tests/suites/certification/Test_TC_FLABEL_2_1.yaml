@@ -30,6 +30,7 @@ tests:
           [1654000813.726531][7713:7718] CHIP:DMG: WriteClient moving to [AwaitingDe]
           [1654000813.726603][7713:7718] CHIP:TOO: Response Failure: IM Error 0x00000588: General error: 0x88 (UNSUPPORTED_WRITE)
           [1654000813.726707][7713:7718] CHIP:EM: Sending Standalone Ack for MessageCounter:11245962 on exchange 35967i
+      PICS: FLABEL.S.A0000
       disabled: true
 
     - label: "TH reads LabelList from the DUT"
@@ -55,4 +56,5 @@ tests:
           [1651124649.821008][2819:2824] CHIP:TOO:       Value: up
           [1651124649.821039][2819:2824] CHIP:TOO:      }
           [1651124649.821193][2819:2824] CHIP:EM: Sending Standalone Ack for MessageCounter:2439070 on exchange 10798i
+      PICS: FLABEL.S.A0000
       disabled: true

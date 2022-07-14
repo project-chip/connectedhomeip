@@ -141,9 +141,12 @@
     <string name="endpoint_id_label">Endpoint ID</string>
     <string name="cluster_id_label">Cluster ID</string>
     <string name="attribute_id_label">Attribute ID</string>
+    <string name="event_id_label">Event ID</string>
     <string name="wildcard_help_label">Leave blank for wildcard</string>
     <string name="wildcard_subscribe_btn_text">Subscribe</string>
     <string name="wildcard_read_btn_text">Read</string>
+    <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
+    <string name="wildcard_read_event_btn_text">Read Event</string>
 
     <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
     <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>

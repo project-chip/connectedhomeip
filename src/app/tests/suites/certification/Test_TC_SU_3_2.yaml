@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.11.1. [TC-SU-3.2] Tests if the DUT is sending the correct
-    QueryImageResponse to the OTA-R
+    3.7.2. [TC-SU-3.2] Handling different QueryImageResponse scenarios on
+    Provider
 
 config:
     nodeId: 0x12344321
@@ -24,11 +24,11 @@ config:
 
 tests:
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. UserConsentNeeded
-          field is set to False. DUT responds with the QueryImageResponse to the
-          OTA-R/TH."
+          "OTA-R/TH sends a QueryImage Command to the DUT. RequestorCanConsent
+          field can be set to either True or False in the QueryImage Command.
+          DUT responds with the QueryImageResponse to the OTA-R/TH."
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -51,9 +51,9 @@ tests:
           OTA-R/TH. OTA-R/TH sends a QueryImage Command to the DUT. DUT responds
           with the QueryImageResponse to the OTA-R/TH."
       verification: |
-          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q updateNotAvailable
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q updateNotAvailable
 
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -71,7 +71,7 @@ tests:
           field should list BDX. DUT responds with the QueryImageResponse to the
           OTA-R/TH."
       verification: |
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -92,23 +92,24 @@ tests:
       disabled: true
 
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. ProtocolSupported
-          field should list 'https'. DUT responds with a QueryImageResponse to
-          the OTA-R/TH."
+          'OTA-R/TH sends a QueryImage Command to the DUT. ProtocolSupported
+          field should list "https". DUT responds with a QueryImageResponse to
+          the OTA-R/TH.'
       verification: |
           Out of scope for V1.0
       disabled: true
 
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. DUT responds with the
-          QueryImageResponse with QueryStatus set to 'Busy', DelayedActionTime
+          'OTA-R/TH sends a QueryImage Command to the DUT. DUT responds with the
+          QueryImageResponse with QueryStatus set to "Busy", DelayedActionTime
           set to 3 minutes. On the subsequent QueryImage command, DUT sends a
           QueryImageResponse back to OTA-R/TH. QueryStatus is set to
-          'UpdateAvailable'."
+          "UpdateAvailable".'
+      PICS: OTAS.S.M.DelayedActionTime
       verification: |
-          out/chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy
 
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 

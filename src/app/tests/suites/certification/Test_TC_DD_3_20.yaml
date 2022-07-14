@@ -42,8 +42,8 @@ tests:
           [1651109580.413525][31207:31207] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan THs QR code using the DUT Commissioner."
+    - label: "Scan THs QR code using the DUT Commissioner."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
@@ -102,8 +102,8 @@ tests:
           [1651110721.112838][31791:31791] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan THs QR code using the DUT Commissioner."
+    - label: "Scan THs QR code using the DUT Commissioner."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true

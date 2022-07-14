@@ -27,6 +27,7 @@ tests:
           "TH sends the AddOrUpdateThreadNetwork command to the DUT with the
           following argument: OperationalDataset argument value as 'Userth_op'
           Breadcrumb argument value as 1"
+      PICS: CNET.S.C03.Rsp
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning add-or-update-thread-network 1232034768527434274  51 0
 
@@ -39,6 +40,7 @@ tests:
     - label:
           "TH sends RemoveNetwork command to the DUT with NetworkID argument
           value as 'Userth_op' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C04.Rsp
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning remove-network 1232034768527434274 51 0
 
@@ -51,6 +53,7 @@ tests:
     - label:
           "TH sends ConnectNetwork command to the DUT with NetworkID argument
           value as 'Userth_op' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C06.Rsp
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning connect-network 1232034768527434274 51 0
 

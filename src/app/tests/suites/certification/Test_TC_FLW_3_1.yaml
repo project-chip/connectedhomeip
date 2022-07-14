@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 30.3.1. [TC-FLW-3.1] Attributes with client as DUT
+name: 31.3.1. [TC-FLW-3.1] Attributes with Client as DUT
 
 config:
     nodeId: 0x12344321
@@ -164,6 +164,26 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          ./chip-tool flowmeasurement read attribute-list 1 1
+
+          [1656478164937] [49517:5732586] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFB DataVersion: 3423686907
+          [1656478164937] [49517:5732586] CHIP: [TOO]   AttributeList: 8 entries
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [1]: 0
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [2]: 1
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [3]: 2
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [4]: 65528
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [5]: 65529
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [6]: 65531
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [7]: 65532
+          [1656478164937] [49517:5732586] CHIP: [TOO]     [8]: 65533
+
+          ./chip-tool flowmeasurement read feature-map 1 1
+
+          [1656478242820] [49526:5733040] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0404 Attribute 0x0000_FFFC DataVersion: 3423686907
+          [1656478242820] [49526:5733040] CHIP: [TOO]   FeatureMap: 0
+
+
+
           ./chip-tool flowmeasurement read measured-value 1 1
           Verify on TestHarnes (all-cluster-app) a received read of measured-value printing the cluster ID endpoint used and attribute ID which is read in logs
 
@@ -255,7 +275,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          chip-tool flowmeasurement read tolerance 1 1
+          ./chip-tool flowmeasurement read tolerance 1 1
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 

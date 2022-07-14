@@ -17,7 +17,7 @@
  */
 
 #pragma once
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <map>
@@ -67,9 +67,9 @@ protected:
     void SetIdentity(const char * identity);
 
     // This method returns the commissioner instance to be used for running the command.
-    CHIPDeviceController * CurrentCommissioner();
+    MTRDeviceController * CurrentCommissioner();
 
-    CHIPDeviceController * GetCommissioner(const char * identity);
+    MTRDeviceController * GetCommissioner(const char * identity);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -106,10 +106,10 @@ private:
     void MaybeTearDownStack();
 
     // Our three controllers: alpha, beta, gamma.
-    static std::map<std::string, CHIPDeviceController *> mControllers;
+    static std::map<std::string, MTRDeviceController *> mControllers;
 
     // The current controller; the one the current command should be using.
-    CHIPDeviceController * mCurrentController;
+    MTRDeviceController * mCurrentController;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;

@@ -26,6 +26,7 @@ tests:
     - label:
           "If (PICS_DT_CTRL_CONCATENATED_QR_CODE_1), scan larger QR code that
           will support the commissioning of all the devices"
+      PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
           '' ./chip-all-clusters-app
 
@@ -60,6 +61,7 @@ tests:
       disabled: true
 
     - label: "If (PICS_DT_CTRL_CONCATENATED_QR_CODE_1)"
+      PICS: MCORE.DD.CTRL_CONCATENATED_QR_CODE_1
       verification: |
           Vendor specific field testcase
       disabled: true
@@ -67,6 +69,9 @@ tests:
     - label:
           "If !(PICS_DT_CTRL_CONCATENATED_QR_CODE_1) &&
           PICS_DT_CTRL_CONCATENATED_QR_CODE_2"
+      PICS:
+          "!MCORE.DD.CTRL_CONCATENATED_QR_CODE_1 &&
+          MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
       verification: |
           Vendor specific field testcase
       disabled: true
@@ -74,6 +79,9 @@ tests:
     - label:
           "If !(PICS_DT_CTRL_CONCATENATED_QR_CODE_1) &&
           !(PICS_DT_CTRL_CONCATENATED_QR_CODE_2)"
+      PICS:
+          "!MCORE.DD.CTRL_CONCATENATED_QR_CODE_1 &&
+          !MCORE.DD.CTRL_CONCATENATED_QR_CODE_2"
       verification: |
           Vendor specific field testcase
       disabled: true

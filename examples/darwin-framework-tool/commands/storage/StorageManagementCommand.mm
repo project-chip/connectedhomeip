@@ -20,6 +20,8 @@
 
 #include "StorageManagementCommand.h"
 
+#import <Matter/Matter.h>
+
 static CHIPToolPersistentStorageDelegate * storage = nil;
 
 CHIP_ERROR StorageClearAll::Run()

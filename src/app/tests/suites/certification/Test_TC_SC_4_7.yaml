@@ -63,10 +63,22 @@ tests:
           "By any means, TH adds an unknown key/value pair in the advertised
           data(e.g. AB=12345)"
       verification: |
-          Not in Scope of TE8
+          avahi-publish-service --subtype=_S3._sub._matterc._udp --subtype=_L840._sub._matterc._udp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._udp _matterc._udp 11111 D=840 CM=2  INVALID_TEST=40
       disabled: true
 
     - label: "Scan for DNS-SD commissioner advertisements from TH"
       verification: |
-          Not in Scope of TE8
+          ubuntu@ubuntu:~$ avahi-browse -rt _matterc._udp
+          +   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
+          +   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
+          =   eth0 IPv6 DD200C20D25AE5F7                              _matterc._udp        local
+             hostname = [ubuntu-4.local]
+             address = [fd00::9e]
+             port = [11111]
+             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
+          =   eth0 IPv4 DD200C20D25AE5F7                              _matterc._udp        local
+             hostname = [ubuntu-4.local]
+             address = [192.168.1.47]
+             port = [11111]
+             txt = ["INVALID_TEST=40" "CM=2" "D=840"]
       disabled: true

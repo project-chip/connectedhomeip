@@ -87,8 +87,8 @@ public:
      * Spec 8.5.1 A publisher SHALL always ensure that every fabric the node is commissioned into can create at least three
      * subscriptions to the publisher and that each subscription SHALL support at least 3 attribute/event paths.
      */
-    static constexpr size_t kMinSupportedSubscriptionsPerFabric = 2;
-    static constexpr size_t kMinSupportedPathsPerSubscription   = 2;
+    static constexpr size_t kMinSupportedSubscriptionsPerFabric = 3;
+    static constexpr size_t kMinSupportedPathsPerSubscription   = 3;
     static constexpr size_t kMinSupportedPathsPerReadRequest    = 9;
     static constexpr size_t kMinSupportedReadRequestsPerFabric  = 1;
     static constexpr size_t kReadHandlerPoolSize                = CHIP_IM_MAX_NUM_SUBSCRIPTIONS + CHIP_IM_MAX_NUM_READS;
@@ -260,7 +260,13 @@ public:
      */
     bool TrimFabricForRead(FabricIndex aFabricIndex);
 
-    uint16_t GetMinSubscriptionsPerFabric() const;
+    /**
+     * Returns the minimal value of guaranteed subscriptions per fabic. UINT16_MAX will be returned if current app is configured to
+     * use heap for the object pools used by interaction model engine.
+     *
+     * @retval the minimal value of guaranteed subscriptions per fabic.
+     */
+    uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //

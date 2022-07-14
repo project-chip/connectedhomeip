@@ -1,0 +1,149 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.2. [TC-DGGEN-2.2] Event functionality test with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Induce a DUT hardware failure two times as addressed in HardwareFault
+          ENUM table 11.11.6.1. (Ex. Pull the DUT power plug off causing power
+          source failure, and rejoin DUT back to previous TH fabric. Next,
+          repeat power plug off and rejoining DUT back to previous TH fabric one
+          more time.)"
+      PICS: DGGEN.S.E00
+      verification: |
+          ./chip-tool generaldiagnostics read-event hardware-fault-change 1 0
+
+          CHIP:DMG: ReportDataMessage =
+          [1651562132.028543][7867:7872] CHIP:DMG: {
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
+          [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
+          [1651562132.028675][7867:7872] CHIP:DMG: }
+          [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
+      disabled: true
+
+    - label: "TH initiates the subscription of HardwareFault event from DUT."
+      PICS: DGGEN.S.E00
+      verification: |
+          sudo ./chip-tool generaldiagnostics subscribe-event hardware-fault-change 100 1000 1 0
+
+          [1653659428.373913][242542:242547] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:15916168 on exchange 65448i
+          [1653659428.373971][242542:242547] CHIP:EM: Found matching exchange: 65448i, Delegate: 0x7ff474004ae0
+          [1653659428.374015][242542:242547] CHIP:EM: Rxd Ack; Removing MessageCounter:7607034 from Retrans Table on exchange 65448i
+          [1653659428.374041][242542:242547] CHIP:EM: Removed CHIP MessageCounter:7607034 from RetransTable on exchange 65448i
+          [1653659428.374100][242542:242547] CHIP:DMG: SubscribeResponseMessage =
+          [1653659428.374122][242542:242547] CHIP:DMG: {
+          [1653659428.374146][242542:242547] CHIP:DMG:         SubscriptionId = 0xc90581ad3918815d,
+          [1653659428.374168][242542:242547] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
+          [1653659428.374189][242542:242547] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
+          [1653659428.374209][242542:242547] CHIP:DMG:         InteractionModelRevision = 1
+          [1653659428.374228][242542:242547] CHIP:DMG: }
+          [1653659428.374257][242542:242547] CHIP:DMG: Subscription established with SubscriptionID = 0xC90581AD3918815D MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000002
+      disabled: true
+
+    - label:
+          "Induce a DUT radio failure two times as addressed in RadioFault ENUM
+          table 11.11.6.2. (Ex. Put the DUT under metalic cover causing WiFi
+          failure. Uncover DUT and make DUT rejoining DUT back to previous TH
+          fabric. Repeat the radio failure one more time and rejoin DUT back to
+          previous TH fabric."
+      PICS: DGGEN.S.E01
+      verification: |
+          ./chip-tool generaldiagnostics read-event radio-fault-change 1 0
+
+          CHIP:DMG: ReportDataMessage =
+          [1651562132.028543][7867:7872] CHIP:DMG: {
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
+          [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
+          [1651562132.028675][7867:7872] CHIP:DMG: }
+          [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
+      disabled: true
+
+    - label: "TH initiates the subscription of RadioFault event from DUT."
+      PICS: DGGEN.S.E01
+      verification: |
+          sudo ./chip-tool generaldiagnostics subscribe-event radio-fault-change 100 1000 1 0
+
+          [1653659768.885436][242582:242587] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:13730082 on exchange 33170i
+          [1653659768.885490][242582:242587] CHIP:EM: Found matching exchange: 33170i, Delegate: 0x7f1d40006300
+          [1653659768.885520][242582:242587] CHIP:EM: Rxd Ack; Removing MessageCounter:6045655 from Retrans Table on exchange 33170i
+          [1653659768.885539][242582:242587] CHIP:EM: Removed CHIP MessageCounter:6045655 from RetransTable on exchange 33170i
+          [1653659768.885591][242582:242587] CHIP:DMG: SubscribeResponseMessage =
+          [1653659768.885609][242582:242587] CHIP:DMG: {
+          [1653659768.885623][242582:242587] CHIP:DMG:         SubscriptionId = 0x3487b97e17eb62c7,
+          [1653659768.885637][242582:242587] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
+          [1653659768.885651][242582:242587] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
+          [1653659768.885668][242582:242587] CHIP:DMG:         InteractionModelRevision = 1
+          [1653659768.885684][242582:242587] CHIP:DMG: }
+          [1653659768.885708][242582:242587] CHIP:DMG: Subscription established with SubscriptionID = 0x3487B97E17EB62C7 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000002
+      disabled: true
+
+    - label:
+          "Induce a DUT radio failure two times as addressed in NetworkFault
+          ENUM table 11.11.6.3. (Ex. Put the DUT under metalic cover causing
+          network failure. Uncover DUT and rejoin DUT back to previous TH
+          fabric. Pull the DUT power plug off causing power source failure.
+          rejoining DUT back to previous TH fabric.)"
+      PICS: DGGEN.S.E02
+      verification: |
+          ./chip-tool generaldiagnostics read-event network-fault-change 1 0
+
+          CHIP:DMG: ReportDataMessage =
+          [1651562132.028543][7867:7872] CHIP:DMG: {
+          [1651562132.028586][7867:7872] CHIP:DMG:         SuppressResponse = true,
+          [1651562132.028632][7867:7872] CHIP:DMG:         InteractionModelRevision = 1
+          [1651562132.028675][7867:7872] CHIP:DMG: }
+          [1651562132.028788][7867:7872] CHIP:EM: Sending Standalone Ack for MessageCounter:10343932 on exchange 65462i
+      disabled: true
+
+    - label: "TH initiates the subscription of NetworkFault event from DUT."
+      PICS: DGGEN.S.E02
+      verification: |
+          sudo ./chip-tool generaldiagnostics subscribe-event network-fault-change 100 1000 1 0
+          [1653659901.757441][242605:242610] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:11933575 on exchange 20223i
+          [1653659901.757513][242605:242610] CHIP:EM: Found matching exchange: 20223i, Delegate: 0x7fd058003950
+          [1653659901.757544][242605:242610] CHIP:EM: Rxd Ack; Removing MessageCounter:3369789 from Retrans Table on exchange 20223i
+          [1653659901.757564][242605:242610] CHIP:EM: Removed CHIP MessageCounter:3369789 from RetransTable on exchange 20223i
+          [1653659901.757618][242605:242610] CHIP:DMG: SubscribeResponseMessage =
+          [1653659901.757638][242605:242610] CHIP:DMG: {
+          [1653659901.757658][242605:242610] CHIP:DMG:         SubscriptionId = 0x17dc072d1130a3bd,
+          [1653659901.757676][242605:242610] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
+          [1653659901.757690][242605:242610] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
+          [1653659901.757708][242605:242610] CHIP:DMG:         InteractionModelRevision = 1
+          [1653659901.757721][242605:242610] CHIP:DMG: }
+          [1653659901.757746][242605:242610] CHIP:DMG: Subscription established with SubscriptionID = 0x17DC072D1130A3BD MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000002
+      disabled: true
+
+    - label:
+          "Reboot DUT with a normal reboot process. Rejoin DUT back to previous
+          TH fabric."
+      PICS: DGGEN.S.E03
+      verification: |
+          ./chip-tool generaldiagnostics read-event boot-reason 1 0
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Event 0x0000_0003
+          [1651562139.644134][7873:7878] CHIP:TOO:          Event number: 1
+          [1651562139.644157][7873:7878] CHIP:TOO:          Priority: Critical
+          [1651562139.644179][7873:7878] CHIP:TOO:          Timestamp: 8347991
+          [1651562139.644273][7873:7878] CHIP:TOO:   BootReason: {
+          [1651562139.644317][7873:7878] CHIP:TOO:     BootReason: 0
+          [1651562139.644343][7873:7878] CHIP:TOO:    }
+          [1651562139.644431][7873:7878] CHIP:EM: Sending Standalone Ack for MessageCounter:9685408 on exchange 6383i
+      disabled: true

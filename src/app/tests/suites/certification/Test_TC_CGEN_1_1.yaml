@@ -56,17 +56,17 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: [0, 2, 4]
           constraints:
               type: list
+              contains: [0, 2, 4]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: [1, 3, 5]
           constraints:
               type: list
+              contains: [1, 3, 5]
 
     #issue #15011
     - label:

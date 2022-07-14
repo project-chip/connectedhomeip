@@ -61,7 +61,14 @@ uint8_t expectedAttribute4[256]             = {
 enum ResponseDirective
 {
     kSendDataResponse,
-    kSendDataError
+    kSendManyDataResponses,          // Many data blocks, for a single concrete path
+                                     // read, simulating a malicious server.
+    kSendManyDataResponsesWrongPath, // Many data blocks, all using the wrong
+                                     // path, for a single concrete path
+                                     // read, simulating a malicious server.
+    kSendDataError,
+    kSendTwoDataErrors, // Multiple errors, for a single concrete path,
+                        // simulating a malicious server.
 };
 
 ResponseDirective responseDirective;
@@ -81,6 +88,28 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     if (aPath.mEndpointId >= Test::kMockEndpointMin)
     {
         return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
+    }
+
+    if (responseDirective == kSendManyDataResponses || responseDirective == kSendManyDataResponsesWrongPath)
+    {
+        if (aPath.mClusterId != Clusters::TestCluster::Id || aPath.mAttributeId != Clusters::TestCluster::Attributes::Boolean::Id)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        for (size_t i = 0; i < 4; ++i)
+        {
+            ConcreteAttributePath path(aPath);
+            // Use an incorrect attribute id for some of the responses.
+            path.mAttributeId = path.mAttributeId + (i / 2) + (responseDirective == kSendManyDataResponsesWrongPath);
+            AttributeValueEncoder::AttributeEncodeState state =
+                (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
+            AttributeValueEncoder valueEncoder(aAttributeReports, aSubjectDescriptor.fabricIndex, path,
+                                               kDataVersion /* data version */, aIsFabricFiltered, state);
+            ReturnErrorOnFailure(valueEncoder.Encode(true));
+        }
+
+        return CHIP_NO_ERROR;
     }
 
     if (responseDirective == kSendDataResponse)
@@ -164,20 +193,24 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
-    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-    ReturnErrorOnFailure(aAttributeReports.GetError());
-    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
-    AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePath.GetError());
+    for (size_t i = 0; i < (responseDirective == kSendTwoDataErrors ? 2 : 1); ++i)
+    {
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        ReturnErrorOnFailure(aAttributeReports.GetError());
+        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
+        attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
+        ReturnErrorOnFailure(attributePath.GetError());
 
-    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
-    ReturnErrorOnFailure(attributeStatus.GetError());
-    errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
-    attributeStatus.EndOfAttributeStatusIB();
-    ReturnErrorOnFailure(attributeStatus.GetError());
+        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
+        attributeStatus.EndOfAttributeStatusIB();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+        ReturnErrorOnFailure(attributeReport.EndOfAttributeReportIB().GetError());
+    }
 
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    return CHIP_NO_ERROR;
 }
 
 bool IsClusterDataVersionEqual(const app::ConcreteClusterPath & aConcreteClusterPath, DataVersion aRequiredVersion)
@@ -237,6 +270,9 @@ public:
     static void TestReadHandler_ParallelReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TooManyPaths(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -4116,6 +4152,108 @@ void TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths(nlT
     engine->SetForceHandlerQuota(false);
 }
 
+void TestReadInteraction::TestReadAttribute_ManyDataValues(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendManyDataResponses;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+
+        NL_TEST_ASSERT(apSuite, dataResponse);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
+                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 1);
+    NL_TEST_ASSERT(apSuite, failureCalls == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendManyDataResponsesWrongPath;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+
+        NL_TEST_ASSERT(apSuite, dataResponse);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
+                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendTwoDataErrors;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &successCalls](const app::ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
+        NL_TEST_ASSERT(apSuite, attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
+
+        NL_TEST_ASSERT(apSuite, dataResponse);
+        ++successCalls;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const app::ConcreteDataAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    Controller::ReadAttribute<TestCluster::Attributes::Boolean::TypeInfo>(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId,
+                                                                          onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -4148,6 +4286,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_ParallelReads", TestReadInteraction::TestReadHandler_ParallelReads),
     NL_TEST_DEF("TestReadHandler_TooManyPaths", TestReadInteraction::TestReadHandler_TooManyPaths),
     NL_TEST_DEF("TestReadHandler_TwoParallelReadsSecondTooManyPaths", TestReadInteraction::TestReadHandler_TwoParallelReadsSecondTooManyPaths),
+    NL_TEST_DEF("TestReadAttribute_ManyDataValues", TestReadInteraction::TestReadAttribute_ManyDataValues),
+    NL_TEST_DEF("TestReadAttribute_ManyDataValuesWrongPath", TestReadInteraction::TestReadAttribute_ManyDataValuesWrongPath),
+    NL_TEST_DEF("TestReadAttribute_ManyErrors", TestReadInteraction::TestReadAttribute_ManyErrors),
     NL_TEST_SENTINEL()
 };
 // clang-format on

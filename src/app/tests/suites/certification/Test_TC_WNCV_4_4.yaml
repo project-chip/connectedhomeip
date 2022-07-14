@@ -39,7 +39,7 @@ tests:
           DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           saveAs: attrCurrentPositionTiltPercent100ths
           constraints:
@@ -52,7 +52,7 @@ tests:
           CurrentPositionTiltPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f && WNCV.S.A0009
       response:
           value: attrCurrentPositionTiltPercent100ths / 100
           constraints:
@@ -68,7 +68,7 @@ tests:
 
     - label: "2b: TH sends GoToTiltPercentage command with BadParam to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "TiltPercent100thsValue"
@@ -82,7 +82,7 @@ tests:
     ### Step 3x -> Verify the GoToTiltPercentage with 10001 as param
     - label: "3a: TH sends GoToTiltPercentage command with 10001 to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "TiltPercent100thsValue"
@@ -96,7 +96,7 @@ tests:
     ### Step 4x -> Verify the GoToTiltPercentage with 0xFFFF as param
     - label: "4a: TH sends GoToTiltPercentage command with 0xFFFF to DUT"
       command: "GoToTiltPercentage"
-      PICS: WNCV_TL && WNCV_PA_TL || WNCV_TL && CR_GOTOTILTPERCENTAGE
+      PICS: WNCV.S.F01 && WNCV.S.F04 || WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "TiltPercent100thsValue"

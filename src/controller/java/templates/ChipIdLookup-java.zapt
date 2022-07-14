@@ -34,5 +34,23 @@ public final class ChipIdLookup {
     {{/chip_client_clusters}}
     return "";
   }
+
+  /**
+   * Translates cluster ID and event ID to an attribute name in upper camel case.
+   * If no matching IDs are found, returns an empty string.
+   */
+  public static String eventIdToName(long clusterId, long eventId) {
+    {{#chip_client_clusters}}
+    if (clusterId == {{code}}L) {
+      {{#chip_server_cluster_events}}
+      if (eventId == {{code}}L) {
+        return "{{asUpperCamelCase name}}";
+      }
+      {{/chip_server_cluster_events}}
+      return "";
+    }
+    {{/chip_client_clusters}}
+    return "";
+  }
 }
 {{/if}}

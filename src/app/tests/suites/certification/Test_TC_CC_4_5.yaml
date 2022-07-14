@@ -21,14 +21,10 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Test Step"
-      verification: |
-          Verification Steps
-      disabled: true
-
     - label:
           "DUT sends MoveToSaturation command to TH a Saturation with
-          _TransitionTime 300."
+          TransitionTime 300."
+      PICS: CC.C.C03.Rsp
       verification: |
           ./chip-tool colorcontrol move-to-saturation 200 300 0 0 1 1
 
@@ -69,6 +65,7 @@ tests:
     - label:
           "Over TransitionTime, DUT reads CurrentSaturation attribute from TH
           periodically."
+      PICS: CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
           [1646210970.309403][2190:2190] CHIP:IM: Received Read request
@@ -91,6 +88,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveSaturation command to TH"
+      PICS: CC.C.C04.Rsp
       verification: |
           ./chip-tool colorcontrol move-saturation 1 10 0 0 1 1
 
@@ -124,7 +122,8 @@ tests:
           [1646211062.546320][2190:2190] CHIP:DMG: },
       disabled: true
 
-    - label: "DUT reads CurrentSaturation attribute from TH several times."
+    - label: "DUT reads CurrentSaturation attribute from TH several Times."
+      PICS: CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
           [1646210970.309403][2190:2190] CHIP:IM: Received Read request
@@ -147,6 +146,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StepSaturation command to TH"
+      PICS: CC.C.C05.Rsp
       verification: |
           ./chip-tool colorcontrol step-saturation 1 10 200 0 0 1 1
           [1646211149.169696][2190:2190] CHIP:DMG: InvokeRequestMessage =
@@ -182,6 +182,52 @@ tests:
 
     - label:
           "Over TransitionTime, DUT reads CurrentSaturation attribute from TH."
+      PICS: CC.C.A0001
+      verification: |
+          ./chip-tool colorcontrol read current-saturation 1 1
+          [1646210970.309403][2190:2190] CHIP:IM: Received Read request
+          [1646210970.309465][2190:2190] CHIP:DMG: ReadRequestMessage =
+          [1646210970.309495][2190:2190] CHIP:DMG: {
+          [1646210970.309514][2190:2190] CHIP:DMG:        AttributePathIBs =
+          [1646210970.309541][2190:2190] CHIP:DMG:        [
+          [1646210970.309567][2190:2190] CHIP:DMG:                AttributePathIB =
+          [1646210970.309599][2190:2190] CHIP:DMG:                {
+          [1646210970.309629][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
+          [1646210970.309664][2190:2190] CHIP:DMG:                        Cluster = 0x300,
+          [1646210970.309691][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1646210970.309720][2190:2190] CHIP:DMG:                }
+          [1646210970.309750][2190:2190] CHIP:DMG:
+          [1646210970.309779][2190:2190] CHIP:DMG:        ],
+          [1646210970.309815][2190:2190] CHIP:DMG:
+          [1646210970.309844][2190:2190] CHIP:DMG:        isFabricFiltered = false,
+          [1646210970.309871][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
+          [1646210970.309892][2190:2190] CHIP:DMG: },
+      disabled: true
+
+    - label: "DUT sends MoveToHueAndSaturation command to TH."
+      PICS: CC.C.C06.Rsp
+      verification: |
+          ./chip-tool colorcontrol move-to-hue-and-saturation 100 200 200 0 0 1 1
+
+          [1649664783.987760][8866:8871] CHIP:DMG:                                StatusIB =
+          [1649664783.987823][8866:8871] CHIP:DMG:                                {
+          [1649664783.987888][8866:8871] CHIP:DMG:                                        status = 0x00 (SUCCESS),
+          [1649664783.987943][8866:8871] CHIP:DMG:                                },
+      disabled: true
+
+    - label: "Over TransitionTime, DUT reads CurrentHue attribute from TH."
+      PICS: CC.C.A0000
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+
+          [1649664795.474974][8872:8877] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087328778
+          [1649664795.475051][8872:8877] CHIP:TOO:    CurrentHue: 29
+          [1649664795.475150][8872:8877] CHIP:EM: Sending Standalone Ack for MessageCounter:4578193 on exchange 26597i
+      disabled: true
+
+    - label:
+          "Over TransitionTime, DUT reads CurrentSaturation attribute from DUT."
+      PICS: CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
           [1646210970.309403][2190:2190] CHIP:IM: Received Read request
@@ -204,6 +250,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
+      PICS: CC.C.C47.Rsp
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
           [1646211221.659999][2190:2190] CHIP:DMG: InvokeRequestMessage =

@@ -14,7 +14,8 @@
 
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
-
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_span/polyfill.gni")
 chip_device_platform = "esp32"
 
 chip_project_config_include = ""
@@ -38,3 +39,4 @@ custom_toolchain = "//third_party/connectedhomeip/config/esp32/toolchain:esp32"
 # whatever pigweed ships with
 pw_build_PIP_CONSTRAINTS =
     [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+pw_span_ENABLE_STD_SPAN_POLYFILL = false

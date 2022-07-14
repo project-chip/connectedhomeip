@@ -111,6 +111,12 @@ void SessionManager::Shutdown()
         mFabricTable->RemoveFabricDelegate(this);
         mFabricTable = nullptr;
     }
+
+    mSecureSessions.ForEachSession([&](auto session) {
+        session->MarkForEviction();
+        return Loop::Continue;
+    });
+
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
@@ -121,7 +127,7 @@ void SessionManager::Shutdown()
 
 /**
  * @brief Notification that a fabric was removed.
- *        This function doesn't call ExpireAllPairingsForFabric
+ *        This function doesn't call ExpireAllSessionsForFabric
  *        since the CASE session might still be open to send a response
  *        on the removed fabric.
  */
@@ -342,7 +348,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
+void SessionManager::ExpireAllSessions(const ScopedNodeId & node)
 {
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer() == node)
@@ -353,11 +359,11 @@ void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
     });
 }
 
-void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
+void SessionManager::ExpireAllSessionsForFabric(FabricIndex fabricIndex)
 {
-    ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
+    ChipLogDetail(Inet, "Expiring all sessions for fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetFabricIndex() == fabric)
+        if (session->GetFabricIndex() == fabricIndex)
         {
             session->MarkForEviction();
         }
@@ -365,9 +371,9 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
-void SessionManager::ExpireAllPASEPairings()
+void SessionManager::ExpireAllPASESessions()
 {
-    ChipLogDetail(Inet, "Expiring all PASE pairings");
+    ChipLogDetail(Inet, "Expiring all PASE sessions");
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {

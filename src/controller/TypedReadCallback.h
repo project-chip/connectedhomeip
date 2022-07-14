@@ -73,6 +73,12 @@ private:
     void OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const app::StatusIB & aStatus) override
     {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
+
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableAttributeType value;
 
@@ -97,7 +103,16 @@ private:
         }
     }
 
-    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
+
+        mOnError(nullptr, aError);
+    }
 
     void OnDone(app::ReadClient *) override { mOnDone(this); }
 
@@ -138,6 +153,8 @@ private:
     OnResubscriptionAttemptCallbackType mOnResubscriptionAttempt;
     app::BufferedReadCallback mBufferedReadAdapter;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    // For reads, we ensure that we make only one data/error callback to our consumer.
+    bool mCalledCallback = false;
 };
 
 template <typename DecodableEventType>
@@ -164,6 +181,12 @@ public:
 private:
     void OnEventData(const app::EventHeader & aEventHeader, TLV::TLVReader * apData, const app::StatusIB * apStatus) override
     {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
+
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventType value;
 
@@ -187,7 +210,16 @@ private:
         }
     }
 
-    void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
+    void OnError(CHIP_ERROR aError) override
+    {
+        if (mCalledCallback && mReadClient->IsReadType())
+        {
+            return;
+        }
+        mCalledCallback = true;
+
+        mOnError(nullptr, aError);
+    }
 
     void OnDone(app::ReadClient * apReadClient) override
     {
@@ -228,6 +260,8 @@ private:
     OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
     OnResubscriptionAttemptCallbackType mOnResubscriptionAttempt;
     Platform::UniquePtr<app::ReadClient> mReadClient;
+    // For reads, we ensure that we make only one data/error callback to our consumer.
+    bool mCalledCallback = false;
 };
 
 } // namespace Controller

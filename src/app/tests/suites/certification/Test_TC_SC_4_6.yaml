@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    13.4.6. [TC-SC-4.6] Commissioner Discovery - Commissioner [DUT -
+    3.4.6. [TC-SC-4.6] Commissioner Discovery - Commissioner [DUT -
     Commissioner]
 
 config:
@@ -32,36 +32,24 @@ tests:
 
     - label: "Check DNS-SD subtypes used by DUT"
       verification: |
-          ~$ avahi-browse -rt _matterc._udp
+          avahi-publish-service --subtype=_V123._sub._matterd._udp DD200C20D25AE5F7 _matterd._udp 33333 VP=123+456 DT=35 DN="Living Room TV"
 
-          =+   eth0 IPv6 6F14191BBD6759A2                              _matterc._udp        local
-          +   eth0 IPv6 24BE6DC784D2B8F0                              _matterc._udp        local
-          +   eth0 IPv6 E3E885474ABBD03C                              _matterc._udp        local
-          +   eth0 IPv6 C3184821E44C8228                              _matterc._udp        local
-          =   eth0 IPv6 6F14191BBD6759A2                              _matterc._udp        local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["PI=" "PH=33" "CM=1" "D=0" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
-          =   eth0 IPv6 24BE6DC784D2B8F0                              _matterc._udp        local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["PI=" "PH=33" "CM=1" "D=0" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
-          =   eth0 IPv6 E3E885474ABBD03C                              _matterc._udp        local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["PI=" "PH=33" "CM=1" "D=0" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
-          =   eth0 IPv6 C3184821E44C8228                              _matterc._udp        local
-             hostname = [E45F010EBE440000.local]
-             address = [fe80::e65f:1ff:fe0e:be44]
-             port = [5540]
-             txt = ["PI=" "PH=33" "CM=1" "D=0" "T=1" "CRA=300" "CRI=5000" "VP=65521+32769"]
+          ubuntu@ubuntu:~$ avahi-browse _matterd._udp -r
+
+          +   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+          +   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+          =   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [ubuntu-4.local]
+             address = [fd00::9e]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+          =   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [ubuntu-4.local]
+             address = [192.168.1.47]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
 
 
-          Service Domain 422F10CDC290A406.local
-          verify CM flag is 1
 
           to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp
           | grep _matterc

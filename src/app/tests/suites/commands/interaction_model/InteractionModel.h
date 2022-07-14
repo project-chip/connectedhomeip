@@ -107,6 +107,9 @@ protected:
                            const chip::Optional<bool> & keepSubscriptions        = chip::NullOptional,
                            const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional);
 
+    CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                       const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true));
+
     void Shutdown() { mReadClients.clear(); }
 
     void CleanupReadClient(chip::app::ReadClient * aReadClient);

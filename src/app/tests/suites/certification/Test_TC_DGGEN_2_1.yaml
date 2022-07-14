@@ -30,6 +30,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads NetworkInterfaces structure attribute from DUT."
+      PICS: DGGEN.S.A0000
       command: "readAttribute"
       attribute: "NetworkInterfaces"
       response:
@@ -37,19 +38,48 @@ tests:
               type: list
 
     - label: "TH reads a RebootCount attribute value from DUT."
+      PICS: DGGEN.S.A0001
       command: "readAttribute"
       attribute: "RebootCount"
       response:
           constraints:
               type: uint16
 
-    - label: "Reboot DUT (node)"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Reboot DUT (node)"
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -62,6 +92,7 @@ tests:
     - label:
           "DUT reboots and TH reads a UpTime attribute value of DUT since some
           arbitrary start time of DUT rebooting."
+      PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "UpTime"
       response:
@@ -69,15 +100,30 @@ tests:
               type: uint64
 
     - label: "TH reads a TotalOperationalHours attribute value from DUT."
+      PICS: DGGEN.S.A0003
       command: "readAttribute"
       attribute: "TotalOperationalHours"
       response:
           constraints:
               type: uint32
 
-    - label: "Reboot DUT (node)"
+    - label: "Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
+
+    - label: "Reboot target device(DUT)"
+      verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -88,6 +134,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads BootReason attribute value from DUT."
+      PICS: DGGEN.S.A0004
       command: "readAttribute"
       attribute: "BootReasons"
       response:
@@ -104,7 +151,7 @@ tests:
           [1654682785.894952][33006:33011] CHIP:EM: Sending Standalone Ack for MessageCounter:30803984 on exchange 62441i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGGEN.S.A0005
       arguments:
           values:
               - name: "message"
@@ -142,7 +189,7 @@ tests:
           [1654682933.933655][33037:33042] CHIP:DMG: Subscription established with SubscriptionID = 0xc5357d7e MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGGEN.S.A0006
       arguments:
           values:
               - name: "message"
@@ -159,7 +206,7 @@ tests:
           [1654683004.591526][33044:33049] CHIP:EM: Sending Standalone Ack for MessageCounter:113863817 on exchange 44900i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && DGGEN.S.A0007
       arguments:
           values:
               - name: "message"

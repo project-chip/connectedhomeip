@@ -55,6 +55,22 @@ public:
     CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
+
+#if SL_WIFI
+    CHIP_ERROR GetWiFiBssId(ByteSpan & BssId) override;
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+    CHIP_ERROR GetWiFiVersion(uint8_t & wifiVersion) override;
+    CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
+    CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
+    CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
+    CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount) override;
+    CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount) override;
+    CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
+    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
+    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
+#endif // SL_WIFI
 };
 
 } // namespace DeviceLayer

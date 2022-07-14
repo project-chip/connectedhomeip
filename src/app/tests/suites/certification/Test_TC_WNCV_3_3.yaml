@@ -37,6 +37,7 @@ tests:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     - label: "1b: TH Waits for 6-8 seconds movement(s) on the device"
       cluster: "DelayCommands"
@@ -50,6 +51,7 @@ tests:
           "1c: TH sends UpOrOpen command to preposition the DUT in the opposite
           direction"
       command: "UpOrOpen"
+      PICS: WNCV.S.C00.Rsp
 
     - label: "1d: TH Waits for 2 seconds movement(s) on the device"
       cluster: "DelayCommands"
@@ -74,6 +76,7 @@ tests:
     ### MANDATORY Command
     - label: "2a: TH sends a StopMotion command to DUT"
       command: "StopMotion"
+      PICS: WNCV.S.C02.Rsp
 
     ### DUT Slow down and stop
     - label:
@@ -93,6 +96,7 @@ tests:
           StopMotion"
       command: "waitForReport"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -109,6 +113,7 @@ tests:
     - label: "2e: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -122,7 +127,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           saveAs: attrCurrentPositionLift
           constraints:
@@ -136,7 +141,7 @@ tests:
           3c: it Must be equal with CurrentPositionLiftPercent100ths from DUT"
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b && WNCV.S.A000e
       response:
           value: attrCurrentPositionLift
 
@@ -150,7 +155,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000f
       response:
           saveAs: attrCurrentPositionTilt
           constraints:
@@ -164,6 +169,6 @@ tests:
           4c: it Must be equal with CurrentPositionTiltPercent100ths from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: WNCV_TL && WNCV_PA_TL
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000c && WNCV.S.A000f
       response:
           value: attrCurrentPositionTilt

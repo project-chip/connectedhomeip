@@ -107,6 +107,8 @@ static_library("support") {
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "IniEscaping.cpp",
+    "IniEscaping.h",
     "Iterators.h",
     "LifetimePersistedCounter.h",
     "ObjectLifeCycle.h",

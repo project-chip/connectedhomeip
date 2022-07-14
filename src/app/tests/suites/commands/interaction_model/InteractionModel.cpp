@@ -448,3 +448,37 @@ void InteractionModelReports::CleanupReadClient(ReadClient * aReadClient)
         std::remove_if(mReadClients.begin(), mReadClients.end(), [aReadClient](auto & item) { return item.get() == aReadClient; }),
         mReadClients.end());
 }
+
+CHIP_ERROR InteractionModelReports::ReadAll(DeviceProxy * device, std::vector<EndpointId> endpointIds,
+                                            const Optional<bool> & fabricFiltered)
+{
+    AttributePathParams attributePathParams[kMaxAllowedPaths];
+    EventPathParams eventPathParams[kMaxAllowedPaths];
+
+    auto pathsCount = endpointIds.size();
+    VerifyOrReturnError(pathsCount > 0 && pathsCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+
+    for (size_t i = 0; i < pathsCount; i++)
+    {
+        auto endpointId                    = endpointIds.at(i);
+        attributePathParams[i].mEndpointId = endpointId;
+        eventPathParams[i].mEndpointId     = endpointId;
+    }
+
+    ReadPrepareParams params(device->GetSecureSession().Value());
+    params.mpEventPathParamsList        = eventPathParams;
+    params.mEventPathParamsListSize     = pathsCount;
+    params.mpAttributePathParamsList    = attributePathParams;
+    params.mAttributePathParamsListSize = pathsCount;
+
+    if (fabricFiltered.HasValue())
+    {
+        params.mIsFabricFiltered = fabricFiltered.Value();
+    }
+
+    auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                               mBufferedReadAdapter, ReadClient::InteractionType::Read);
+    ReturnErrorOnFailure(client->SendRequest(params));
+    mReadClients.push_back(std::move(client));
+    return CHIP_NO_ERROR;
+}

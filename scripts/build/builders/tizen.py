@@ -14,30 +14,38 @@
 
 import logging
 import os
-from enum import Enum, auto
+from collections import namedtuple
+from enum import Enum
 from xml.etree import ElementTree as ET
 
 from .gn import GnBuilder
 
+App = namedtuple('App', ['name', 'source', 'outputs'])
+Board = namedtuple('Board', ['target_cpu'])
+
 
 class TizenApp(Enum):
 
-    CHIP_TOOL = auto()
-    LIGHT = auto()
-
-    def ExamplePath(self):
-        if self == TizenApp.CHIP_TOOL:
-            return 'chip-tool'
-        elif self == TizenApp.LIGHT:
-            return 'lighting-app/tizen'
-        else:
-            raise Exception('Unknown app type: %r' % self)
-
-    def AppName(self):
-        if self == TizenApp.LIGHT:
-            return 'chip-lighting-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+    ALL_CLUSTERS = App(
+        'chip-all-clusters-app',
+        'examples/all-clusters-app/tizen',
+        ('chip-all-clusters-app',
+         'chip-all-clusters-app.map'))
+    ALL_CLUSTERS_MINIMAL = App(
+        'chip-all-clusters-minimal-app',
+        'examples/all-clusters-minimal-app/tizen',
+        ('chip-all-clusters-minimal-app',
+         'chip-all-clusters-minimal-app.map'))
+    CHIP_TOOL = App(
+        'chip-tool',
+        'examples/chip-tool',
+        ('chip-tool',
+         'chip-tool.map'))
+    LIGHT = App(
+        'chip-lighting-app',
+        'examples/lighting-app/tizen',
+        ('chip-lighting-app',
+         'chip-lighting-app.map'))
 
     def PackageName(self):
         return self.manifest.get('package')
@@ -50,13 +58,8 @@ class TizenApp(Enum):
 
 
 class TizenBoard(Enum):
-    ARM = auto()
 
-    def TargetCpuName(self):
-        if self == TizenBoard.ARM:
-            return 'arm'
-        else:
-            raise Exception('Unknown board type: %r' % self)
+    ARM = Board('arm')
 
 
 class TizenBuilder(GnBuilder):
@@ -72,7 +75,7 @@ class TizenBuilder(GnBuilder):
                  use_tsan: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
-            root=os.path.join(root, 'examples', app.ExamplePath()),
+            root=os.path.join(root, app.value.source),
             runner=runner)
 
         self.app = app
@@ -107,22 +110,20 @@ class TizenBuilder(GnBuilder):
 
         return self.extra_gn_options + [
             'target_os="tizen"',
-            'target_cpu="%s"' % self.board.TargetCpuName(),
+            'target_cpu="%s"' % self.board.value.target_cpu,
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
             'tizen_sdk_sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
         ]
 
     def _generate_flashbundle(self):
         logging.info('Packaging %s', self.output_dir)
-        cmd = ['ninja', '-C', self.output_dir, self.app.AppName() + ':tpk']
+        cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
         self._Execute(cmd, title='Packaging ' + self.identifier)
 
     def build_outputs(self):
         return {
-            '%s' % self.app.AppName():
-                os.path.join(self.output_dir, self.app.AppName()),
-            '%s.map' % self.app.AppName():
-                os.path.join(self.output_dir, '%s.map' % self.app.AppName()),
+            output: os.path.join(self.output_dir, output)
+            for output in self.app.value.outputs
         }
 
     def flashbundle(self):

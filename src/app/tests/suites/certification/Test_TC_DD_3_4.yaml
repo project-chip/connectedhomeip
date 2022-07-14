@@ -13,9 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    3.3.4. [TC-DD-3.4] User Directed Commissioning - Commissioner [DUT -
-    Commissioner]
+name: 3.3.4. [TC-DD-3.4] User Directed Commissioning [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -25,581 +23,64 @@ config:
 tests:
     - label: "DUT is instructed to advertise Commissioner Discovery service"
       verification: |
-          DUT to advertsise commissioner discovery service, Ex: The TV app example in SDK is reference commissioner
+          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
 
-
-          '' ./chip-tv-app
-
-          CHIP:DL: AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>
-          CHIP:DL: AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>
-          CHIP:DL: AUDIT: * buf1: 990049D21B9116BA6C79CDAF106B9558
-          CHIP:DL: AUDIT: * buf2: 06D468BC4397CDD99A72C6E753E3D097
-          CHIP:DL: AUDIT: * r1: 0x9F437DC6 r2: 0xE5EBA97A
-          CHIP:DL: AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-mCbE1q)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/reboot-count = 8 (0x8)
-          CHIP:DL: Got Ethernet interface: eth0
-          CHIP:DL: Found the primary Ethernet interface:eth0
-          CHIP:DL: Got WiFi interface: wlan0
-          CHIP:DL: Failed to reset WiFi statistic counts
-          CHIP:DL: Device Configuration:
-          CHIP:DL:   Serial Number: TEST_SN
-          CHIP:DL:   Vendor Id: 9050 (0x235A)
-          CHIP:DL:   Product Id: 65279 (0xFEFF)
-          CHIP:DL:   Product Revision: 0
-          CHIP:DL:   Setup Pin Code: 20202021
-          CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          CHIP:DL:   Manufacturing Date: (not set)
-          CHIP:DL:   Device Type: 35 (0x23)
-          CHIP:SVR: SetupQRCode: [MT:YNJV7VSC00KA0648G00]
-          CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
-          CHIP:SVR: Manual pairing code: [34970112332]
-          CHIP:ZCL: Using ZAP configuration...
-          ] CHIP:ZCL: OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.
-          CHIP:DIS: Set the fabric pairing table delegate
-          CHIP:ZCL: OpCreds: Call to writeFabricsIntoFabricsListAttribute
-          CHIP:ZCL: OpCreds: Stored 0 fabrics in fabrics list attribute.
-          CHIP:ZCL: Failed to store mac address for endpoint: 1. Error:../include/endpoint-configuration/Endp
-          CHIP:ZCL: Failed to store application for endpoint: 3. Error:../include/endpoint-configuration/Endp
-          CHIP:ZCL: Failed to store application for endpoint: 4. Error:../include/endpoint-configuration/Endp
-          CHIP:ZCL: Failed to store application for endpoint: 5. Error:../include/endpoint-configuration/Endp
-          CHIP:DIS: Init fabric pairing table with server storage
-          CHIP:IN: UDP::Init bind&listen port=5540
-          CHIP:IN: UDP::Init bound to port=5540
-          CHIP:IN: UDP::Init bind&listen port=5540
-          CHIP:IN: UDP::Init bound to port=5540
-          CHIP:IN: TransportMgr initialized
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-aw9h7V)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/GlobalMCTR = 9000 (0x2328)
-          CHIP:DL: wpa_supplicant: _IsWiFiStationProvisioned: interface not connected
-          CHIP:DIS: Fabric 1 is not yet configured
-          CHIP:DIS: Fabric 2 is not yet configured
-          CHIP:DIS: Fabric 3 is not yet configured
-          CHIP:DIS: Fabric 4 is not yet configured
-          CHIP:DIS: Fabric 5 is not yet configured
-          CHIP:DIS: Fabric 6 is not yet configured
-          CHIP:DIS: Fabric 7 is not yet configured
-          CHIP:DIS: Fabric 8 is not yet configured
-          CHIP:DIS: Fabric 9 is not yet configured
-          CHIP:DIS: Fabric 10 is not yet configured
-          CHIP:DIS: Fabric 11 is not yet configured
-          CHIP:DIS: Fabric 12 is not yet configured
-          CHIP:DIS: Fabric 13 is not yet configured
-          CHIP:DIS: Fabric 14 is not yet configured
-          CHIP:DIS: Fabric 15 is not yet configured
-          CHIP:DIS: Fabric 16 is not yet configured
-          CHIP:SC: Assigned local session key ID 1
-          CHIP:SC: Waiting for PBKDF param request
-          CHIP:DIS: DNS-SD StartServer mode=1
-          CHIP:DL: MDNS failed to join multicast group on veth5731933 for address type IPv4: ../third_party/c
-          CHIP:DL: MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../third_party/c
-          CHIP:DL: MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../third_party/c
-          CHIP:DIS: CHIP minimal mDNS started advertising.
-          CHIP:DIS: Failed to find a valid admin pairing. Node ID unknown
-          CHIP:DIS: Start dns-sd server - no current nodeId
-          CHIP:DL: MAC is not known, using a default.
-          CHIP:DIS: Advertise commission parameter vendorID=9050 productID=65279 discriminator=3840/00
-          CHIP:DIS: CHIP minimal mDNS configured as 'Commissionable node device'.
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fd11:db8:1::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Scheduling Discovery timeout in secs=900
-          CHIP:DL: MAC is not known, using a default.
-          CHIP:DIS: Advertise commission parameter vendorID=9050 productID=65279 discriminator=3840/00
-          CHIP:DIS: CHIP minimal mDNS configured as 'Commissioner device'.
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fd11:db8:1::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: DNS-SD StartServer mode=0
-          CHIP:DL: MDNS failed to join multicast group on veth5731933 for address type IPv4: ../third_party/c
-          CHIP:DL: MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../third_party/c
-          CHIP:DL: MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../third_party/c
-          CHIP:DIS: CHIP minimal mDNS started advertising.
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fd11:db8:1::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Failed to find a valid admin pairing. Node ID unknown
-          CHIP:DIS: Start dns-sd server - no current nodeId
-          CHIP:DL: MAC is not known, using a default.
-          CHIP:DIS: Advertise commission parameter vendorID=9050 productID=65279 discriminator=3840/00
-          CHIP:DIS: CHIP minimal mDNS configured as 'Commissionable node device'.
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fd11:db8:1::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Scheduling Discovery timeout in secs=900
-          CHIP:DL: MAC is not known, using a default.
-          CHIP:DIS: Advertise commission parameter vendorID=9050 productID=65279 discriminator=3840/00
-          CHIP:DIS: CHIP minimal mDNS configured as 'Commissioner device'.
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 192.168.1.11
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.17.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.21.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.18.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.19.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 172.20.0.1
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from 2402:e280:2108:181:e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e65f:1ff:fe0e:bf41
-          CHIP:DIS: Broadcasting mDns reply for query from fd11:db8:1::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Failed to advertise records: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fd00:6d61:7474:6572::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::42:eeff:fec7:c619
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::1
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::907b:c7ff:fe3e:b49c
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::789d:4aff:fec4:2745
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:DIS: Broadcasting mDns reply for query from fe80::e8b9:daff:fee9:9934
-          CHIP:IN: CASE Server enabling CASE session setups
-          CHIP:SVR: Server Listening...
-          CHIP:DL: Device Configuration:
-          CHIP:DL:   Serial Number: TEST_SN
-          CHIP:DL:   Vendor Id: 9050 (0x235A)
-          CHIP:DL:   Product Id: 65279 (0xFEFF)
-          CHIP:DL:   Product Revision: 0
-          CHIP:DL:   Setup Pin Code: 20202021
-          CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          CHIP:DL:   Manufacturing Date: (not set)
-          CHIP:DL:   Device Type: 35 (0x23)
-          CHIP:SVR: SetupQRCode: [MT:YNJV7VSC00KA0648G00]
-          CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00KA0648G00
-          CHIP:SVR: Manual pairing code: [34970112332]
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:CTL: Generating NOC
-          CHIP:CTL: Generating ICAC
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:IN: UDP::Init bind&listen port=5542
-          CHIP:IN: UDP::Init bound to port=5542
-          CHIP:IN: UDP::Init bind&listen port=5542
-          CHIP:IN: UDP::Init bound to port=5542
-          CHIP:IN: TransportMgr initialized
-          CHIP:DIS: Init fabric pairing table with server storage
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-ZAecx4)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/GlobalMCTR = 10000 (0x2710)
-          CHIP:CTL: System State Initialized...
-          CHIP:ZCL: Using ZAP configuration...
-          CHIP:ZCL: Duplicate attribute override registration failed
-          CHIP:ZCL: Duplicate attribute override registration failed
-          CHIP:ZCL: OpCreds: Initiating OpCreds cluster by writing fabrics list from fabric table.
-          CHIP:ZCL: Duplicate attribute override registration failed
-          CHIP:DIS: Set the fabric pairing table delegate
-          CHIP:ZCL: OpCreds: Call to writeFabricsIntoFabricsListAttribute
-          CHIP:ZCL: OpCreds: Stored 0 fabrics in fabrics list attribute.
-          CHIP:ZCL: Duplicate attribute override registration failed
-          CHIP:ZCL: Duplicate attribute override registration failed
-          CHIP:ZCL: Duplicate attribute override registration failed
-          CHIP:ZCL: Failed to store mac address for endpoint: 1. Error:../include/endpoint-configuration/Endp
-          CHIP:ZCL: Failed to store application for endpoint: 3. Error:../include/endpoint-configuration/Endp
-          CHIP:ZCL: Failed to store application for endpoint: 4. Error:../include/endpoint-configuration/Endp
-          CHIP:ZCL: Failed to store application for endpoint: 5. Error:../include/endpoint-configuration/Endp
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:DIS: Verifying the received credentials
-          CHIP:DIS: Added new fabric at index: 1, Initialized: 0
-          CHIP:DIS: Assigned compressed fabric ID: 0x810A763DC0609539, node ID: 0xFFFFFFFEFFFFFFFF
-          CHIP:CTL: Joined the fabric at index 1. Compressed fabric ID is: 0x810A763DC0609539
-          CHIP:SVR: Retrieved value from server storage.
-          CHIP:IN: UDP::Init bind&listen port=5550
-          CHIP:IN: UDP::Init bound to port=5550
-          CHIP:IN: UDP::Init bind&listen port=5550
-          CHIP:IN: UDP::Init bound to port=5550
-          CHIP:IN: TransportMgr initialized
-          CHIP:DL: TRACE: Bluez mainloop starting Thread
-          CHIP:DL: TRACE: Bus acquired for name MATTER-3840
-          CHIP:DL: CREATE service object at /chipoble/17db/service
-          CHIP:DL: Create characteristic object at /chipoble/17db/service/c1
-          CHIP:DL: Create characteristic object at /chipoble/17db/service/c2
-          CHIP:DL: CHIP BTP C1 /chipoble/17db/service
-          CHIP:DL: CHIP BTP C2 /chipoble/17db/service
-          CHIP:DL: CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE
-          CHIP:DL: Create characteristic object at /chipoble/17db/service/c3
-          CHIP:DL: CHIP BTP C3 /chipoble/17db/service
-          CHIP:DL: PlatformBlueZInit init success
-          CHIP:DL: BluezPeripheralRegisterAppDone done
-          CHIP:DL: HandlePlatformSpecificBLEEvent 16392
-          CHIP:DL: Create adv object at /chipoble/17db/advertising
-          CHIP:DL: SET service data to {'0xFFF6': <[byte 0x00, 0x00, 0x0f, 0x5a, 0x23, 0xff, 0xfe]>}
-          CHIP:DL: HandlePlatformSpecificBLEEvent 16393
-          CHIP:DL: CHIPoBLE advertising config complete
-          CHIP:DL: RegisterAdvertisement complete
-          CHIP:DL: HandlePlatformSpecificBLEEvent 16394
-
-
-          2F: Invalid argument
-          07] CHIP:DL: Caught signal 2
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-1yqzCI)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/boot-reason = 6 (0x6)
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-9LKrPO)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          CHIP:DL: Inet Layer shutdown
-          CHIP:DL: BLE layer shutdown
-          CHIP:DL: System Layer shutdown
-          CHIP:CTL: Shutting down the System State, this will teardown the CHIP Stack
-          CHIP:DL: writing settings to file (/tmp/chip_counters.ini-Q5U5bp)
-          CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
-          CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          CHIP:DL: Inet Layer shutdown
-          CHIP:DL: BLE layer shutdown
-          CHIP:DL: System Layer shutdown
+          CHIP:DL: Using wifi MAC for hostname
+          CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
+          CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'.
+          CHIP:DIS: Broadcasting mDns reply for query from
       disabled: true
 
     - label:
           "TH start scanning for available commissioners using Commissioner
           Discovery"
       verification: |
-          On the second RPI start tv-casting-app
+          ubuntu@ubuntu:~/may23_cntrl/connectedhomeip/examples/chip-tool/out/debug$  avahi-browse -rt _matterd._udp
 
-          ubuntu@matter-te-6:~/connectedhomeip/examples/tv-casting-app/linux/out/debug$ ./chip-tv-casting-app
-
-
-
-          AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT START ====
-          AUDIT: * Validate buf1 and buf2 are <<<different every run/boot!>>>
-          AUDIT: * Validate r1 and r2 are <<<different every run/boot!>>>
-          AUDIT: * buf1: 8643126A627C1C289E7CBD1C0B59485B
-          AUDIT: * buf2: E9A8AB9589D71155E7B161FC3DBB66CE
-          AUDIT: * r1: 0x3A338FB7 r2: 0xCC480665
-          AUDIT: ===== RANDOM NUMBER GENERATOR AUDIT END ====
-          writing settings to file (/tmp/chip_counters.ini-oR46os)
-          renamed tmp file to file (/tmp/chip_counters.ini)
-          NVS set: chip-counters/reboot-count = 12 (0xC)
-          Got Ethernet interface: eth0
-          Found the primary Ethernet interface:eth0
-          Got WiFi interface: wlan0
-          Failed to reset WiFi statistic counts
-          MDNS failed to join multicast group on veth5731933 for address type IPv4: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:387: Inet Error 0x00000110: Address not found
-          MDNS failed to join multicast group on vethbf7bfa6 for address type IPv4: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:387: Inet Error 0x00000110: Address not found
-          MDNS failed to join multicast group on vethcf434e5 for address type IPv4: ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:387: Inet Error 0x00000110: Address not found
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
-           Attempt to mDNS broadcast failed:  ../third_party/connectedhomeip/src/inet/IPEndPointBasis.cpp:687: OS Error 0x02000065: Network is unreachable
-           Discovered Commissioner #1
-                Device Name: Test TV
-                Vendor ID: 9050
-                Product ID: 65279
-                Device Type: 35
-                Hostname: EEAABADABAD0DDCA
-                IP Address #1: 2402:e280:2108:181:dea6:32ff:fef9:f0a1
-                IP Address #2: fe80::dea6:32ff:fef9:f0a1
-                IP Address #3: 192.168.1.12
-                Port: 5550
-                Commissioning Mode: 0
-           1 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
+          +   eth0 IPv6 A0BF4D00BE973DEC                              _matterd._udp        local
+          +   eth0 IPv6 252FB62C79E2724B                              _matterd._udp        local
+          =   eth0 IPv6 A0BF4D00BE973DEC                              _matterd._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5650]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+          =   eth0 IPv6 252FB62C79E2724B                              _matterd._udp        local
+             hostname = [E45F010F27530000.local]
+             address = [fe80::e65f:1ff:fe0f:2755]
+             port = [5650]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
       disabled: true
 
     - label:
           "TH is instructed to start the commissioning procedure with the DUT
           found at step 2"
       verification: |
-          Select option 1 on TH
+          This particular step is Out of scope for V1.0
+
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1312
       disabled: true
 
     - label: "DUT verify the Identification Declaration message"
       verification: |
-          On DUT.
+          This particular step is Out of scope for V1.0
 
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
-           CHIP:SVR: UDC instance=420604DE2A8F19A2
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
-           CHIP:SVR: UDC instance=420604DE2A8F19A2
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
-           CHIP:SVR: UDC instance=420604DE2A8F19A2
-           CHIP:SVR: UserDirectedCommissioningServer::OnMessageReceived
-           CHIP:SVR: UDC instance=420604DE2A8F19A2
-           CHIP:SVR: OnCommissionableNodeFound instance: name=420604DE2A8F19A2 old_state=1 new_state=3
-           CHIP:CTL: ------PROMPT USER!! OnUserDirectedCommissioningRequest instance=420604DE2A8F19A2 deviceName=Test TV casting app
-           CHIP:SVR: UDC Client[0] instance=420604DE2A8F19A2 deviceName=Test TV casting app address=UDP:192.168.1.11:5540, disc=3840
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1312
       disabled: true
 
     - label: "By any means DUT prompt user for onboarding payload"
       verification: |
 
+      disabled: true
+
+    - label: "DUT start the commissioning procedure with TH"
+      verification: |
+          ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
+
+          [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
       disabled: true

@@ -1,0 +1,36 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Provision TH with EnableKey with 128 bit value provided and matched a
+          value chosen by the manufacturer and configured on the DUT using
+          manufacturer-specific means. EventTrigger value is configured and
+          SHALL indicate the test or test mode which TH wants to trigger the
+          testing use by manufacturers."
+      PICS: DGGEN.S.C00
+      verification: |
+          1. Read if TestEventTriggersEnabled attribute is set to true using ./chip-tool generaldiagnostics read test-event-triggers-enabled  1 0
+          2. when this attribute is false, do not need to verify rest of the below commands.
+          3. When this attribute is true, the Node has been configured with one or more test event triggers by virtue of the internally programmed EnableKey value by the product vendor
+          4. Use the manufacturer-provided EnableKey value and the EventTrigger value and send command using './chip-tool generaldiagnostics test-event-trigger <EnableKey> <EventTrigger destination-id> ' 1 0 and verify if the DUT generated the desired event.
+      disabled: true

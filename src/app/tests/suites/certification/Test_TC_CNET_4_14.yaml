@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.14. [TC-CNET-4.14] [Thread] Verification for ReorderNetwork command
+    11.4.12. [TC-CNET-4.14] [Thread] Verification for ReorderNetwork command
     [DUT-Server]
 
 config:
@@ -23,23 +23,175 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH sends ArmFailSafe command to the DUT"
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to
+          900"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
     - label:
-          "TH sends ReorderNetwork Command to the DUT with the following
-          arguments: NetworkID argument value as 'Userth_op1' NetworkIndex
-          argument value as 'Userth_netidx2' Breadcrumb argument value as 1"
+          "TH reads Networks attribute from the DUT and saves the number of
+          entries as 'NumNetworks'"
+      PICS: CNET.S.A0001
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
       disabled: true
 
-    - label: "TH reads Networks attribute list from the DUT"
+    - label:
+          "TH calculates thenumber ofremainingnetwork slots as'MaxNetworksValue'
+          -'NumNetworks'r and saves as'RemainingNetworkSlots'"
       verification: |
           The test case is not verifiable. As MaxNetworks value is 1 but expected is 4
           ( Pre-Condition)
+      disabled: true
+
+    - label:
+          "TH1 sends AddOrUpdateWiFiNetwork command to the DUT with SSID
+          argument value as 'Userwifi_ssid2', Credentials argument value as
+          'Userwifi_Credentials' and Breadcrumb argument value as 1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH calculates themidpoint of thenetwork list
+          asfloor(('MaxNetworksValue' + 1)/2)r and saves as'Midpoint'"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeco nds
+          field set to 900"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsAddOrUpdateWiFiNetworkcommand to theDUT. This stepshould
+          berepeatedr 'RemainingNetworkSlots' times usingDIFFERENT SSIDand
+          credentialvalues and ther Breadcrumb fieldset to 1. Note thatthese
+          credentialsare NOT requiredto be connectable."
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH readsNetworksattribute from theDUT and saves thelist
+          as'OriginalNetworkLr ist'"
+      PICS: CNET.S.A0001
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsReorderNetwork Commandto the DUTwith thefollowingfields:1.
+          NetworkIDr is theextendedPAN ID
+          ofPIXIT.CNET.THREAD_1ST_OPERATIONALDATASET2.r NetworkIndex
+          is'MaxNetworksValue'3.Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsReorderNetwork Commandto the DUTwith thefollowingfields:1.
+          NetworkIDr is aNetworkIDvalue NOTpresent
+          in'OriginalNetworkList'2.NetworkIndex is'Midpoint'3.Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads Breadcumb attribute from the General Commissioning Cluster"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsReorderNetwork Commandto the DUTwith thefollowingfields:1.
+          NetworkIDr is theextendedPAN ID
+          ofPIXIT.CNET.THREAD_1ST_OPERATIONALDATASET2.r NetworkIndex
+          is'Midpoint'3.Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label: "TH readsBreadcumbattribute from theGeneralCommissioningCluster"
+      verification: |
+
+      disabled: true
+
+    - label: "TH readsNetworksattribute list fromthe DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to 0"
+      verification: |
+
+      disabled: true
+
+    - label: "TH readsNetworksattribute list fromthe DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
+          to 900"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsAddOrUpdateThreadNetworkcommand to theDUT. This stepshould
+          berepeatedr 'RemainingNetworkSlots' times
+          usingDIFFERENTOperationalDataset values andBreadcrumb set to1. Note
+          that thesecredentials areNOT required tobe connectable"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsReorderNetwork Commandto the DUTwith thefollowingfields:1.
+          NetworkIDr is theextendedPAN ID
+          ofPIXIT.CNET.THREAD_1ST_OPERATIONALDATASET2.r NetworkIndex
+          is'Midpoint'3.Breadcrumb is 2"
+      PICS: CNET.S.C08.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends the CommissioningCo mplete command to the DUT"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to 0"
+      verification: |
+
+      disabled: true
+
+    - label: "TH readsNetworksattribute list fromthe DUT"
+      PICS: CNET.S.A0001
+      verification: |
+
       disabled: true

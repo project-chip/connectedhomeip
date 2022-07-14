@@ -18,9 +18,11 @@ import("${chip_root}/src/platform/bouffalolab/BL602/args.gni")
 bl602_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 pw_log_BACKEND = "${chip_root}/src/lib/support/pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log:check_backend"
+pw_assert_BACKEND = "$dir_pw_assert_log"
 
 chip_enable_openthread = false
+
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"
 
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder

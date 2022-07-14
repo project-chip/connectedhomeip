@@ -1,0 +1,169 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    22.6.2. [TC-LVL-7.1] Verification of MoveToClosestFrequency command (DUT as
+    Server)
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH reads the MinLevel attribute from the DUT"
+      PICS: LVL.S.A0002
+      verification: |
+          ./chip-tool levelcontrol read min-level 1 1
+
+          [1654065563.003862][10039:10044] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0002 DataVersion: 540248549
+          [1654065563.003916][10039:10044] CHIP:TOO:   min level: 0
+          [1654065563.003992][10039:10044] CHIP:EM: Sending Standalone Ack for MessageCounter:10228121 on exchange 38337i
+      disabled: true
+
+    - label: "TH reads the MaxLevel attribute from the DUT"
+      PICS: LVL.S.A0003
+      verification: |
+          ./chip-tool levelcontrol read max-level 1 1
+
+
+          [1654065684.869569][10048:10053] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0003 DataVersion: 540248549
+          [1654065684.869621][10048:10053] CHIP:TOO:   max level: 254
+          [1654065684.869737][10048:10053] CHIP:EM: Sending Standalone Ack for MessageCounter:9018536 on exchange 12814i
+      disabled: true
+
+    - label:
+          "TH sends a MoveToLevelWithOnOff command to DUT, with the Level field
+          set to a value between the MinLevel and MaxLevel values (if present,
+          otherwise between 0x01 and 0xFE) and the TransitionTime field set to
+          0x0000 (move immediately)."
+      PICS: LVL.S.C04.Rsp
+      verification: |
+          ./chip-tool levelcontrol move-to-level-with-on-off  253 0 1 1
+
+          [1654065833.084144][10181:10186] CHIP:DMG: InvokeResponseMessage =
+          [1654065833.084161][10181:10186] CHIP:DMG: {
+          [1654065833.084175][10181:10186] CHIP:DMG:         suppressResponse = false,
+          [1654065833.084188][10181:10186] CHIP:DMG:         InvokeResponseIBs =
+          [1654065833.084208][10181:10186] CHIP:DMG:         [
+          [1654065833.084237][10181:10186] CHIP:DMG:                 InvokeResponseIB =
+          [1654065833.084259][10181:10186] CHIP:DMG:                 {
+          [1654065833.084274][10181:10186] CHIP:DMG:                         CommandStatusIB =
+          [1654065833.084292][10181:10186] CHIP:DMG:                         {
+          [1654065833.084310][10181:10186] CHIP:DMG:                                 CommandPathIB =
+          [1654065833.084331][10181:10186] CHIP:DMG:                                 {
+          [1654065833.084352][10181:10186] CHIP:DMG:                                         EndpointId = 0x1,
+          [1654065833.084370][10181:10186] CHIP:DMG:                                         ClusterId = 0x8,
+          [1654065833.084386][10181:10186] CHIP:DMG:                                         CommandId = 0x4,
+          [1654065833.084404][10181:10186] CHIP:DMG:                                 },
+          [1654065833.084428][10181:10186] CHIP:DMG:
+          [1654065833.084445][10181:10186] CHIP:DMG:                                 StatusIB =
+          [1654065833.084467][10181:10186] CHIP:DMG:                                 {
+          [1654065833.084485][10181:10186] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1654065833.084503][10181:10186] CHIP:DMG:                                 },
+          [1654065833.084523][10181:10186] CHIP:DMG:
+          [1654065833.084540][10181:10186] CHIP:DMG:                         },
+          [1654065833.084563][10181:10186] CHIP:DMG:
+          [1654065833.084580][10181:10186] CHIP:DMG:                 },
+          [1654065833.084601][10181:10186] CHIP:DMG:
+          [1654065833.084617][10181:10186] CHIP:DMG:         ],
+          [1654065833.084640][10181:10186] CHIP:DMG:
+          [1654065833.084657][10181:10186] CHIP:DMG:         InteractionModelRevision = 1
+          [1654065833.084672][10181:10186] CHIP:DMG: },
+          [1654065833.084734][10181:10186] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0008 Command=0x0000_0004 Status=0x0
+      disabled: true
+
+    - label: "TH reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C04.Rsp && LVL.S.A0000
+      verification: |
+          ./chip-tool levelcontrol read current-level 1 1
+
+          [1654065859.401140][10188:10193] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 540248551
+          [1654065859.401197][10188:10193] CHIP:TOO:   current level: 253
+          [1654065859.401268][10188:10193] CHIP:EM: Sending Standalone Ack for MessageCounter:2942065 on exchange 21982i
+      disabled: true
+
+    - label: "TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.A0004
+      verification: |
+          ./chip-tool levelcontrol read current-frequency 1 1
+
+          [1654065889.927185][10196:10201] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0004 DataVersion: 540248551
+          [1654065889.927213][10196:10201] CHIP:TOO:   current frequency: 0
+          [1654065889.927247][10196:10201] CHIP:EM: Sending Standalone Ack for MessageCounter:9499985 on exchange 53579i
+      disabled: true
+
+    - label: "TH reads the MinFrequency attribute."
+      PICS: LVL.S.A0005
+      verification: |
+          ./chip-tool levelcontrol read min-frequency 1 1
+
+          [1654066011.412756][10228:10233] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0005 DataVersion: 540248551
+          [1654066011.412814][10228:10233] CHIP:TOO:   min frequency: 0
+          [1654066011.412890][10228:10233] CHIP:EM: Sending Standalone Ack for MessageCounter:4631273 on exchange 37550i
+      disabled: true
+
+    - label: "TH reads the MaxFrequency attribute."
+      PICS: LVL.S.A0006
+      verification: |
+          ./chip-tool levelcontrol read max-frequency 1 1
+
+          [1654066035.586373][10241:10246] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0006 DataVersion: 540248551
+          [1654066035.586435][10241:10246] CHIP:TOO:   max frequency: 0
+          [1654066035.586512][10241:10246] CHIP:EM: Sending Standalone Ack for MessageCounter:13631899 on exchange 38194i
+      disabled: true
+
+    - label:
+          "TH sends a MoveToClosestFrequency command to DUT, with the frequency
+          field set to a random value frand, chosen such that: fmin < frand <
+          fmax"
+      PICS: LVL.S.C08.Rsp
+      verification: |
+          Frequency feature for level control cluster is not supporting in chip-tool
+      disabled: true
+
+    - label: "TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004
+      verification: |
+          ./chip-tool levelcontrol read current-frequency 1 1
+      disabled: true
+
+    - label:
+          "TH sends a MoveToClosestFrequency command to DUT, with the frequency
+          field set to fmax + 1"
+      PICS: LVL.S.C08.Rsp
+      verification: |
+          Frequency feature for level control cluster is not supporting in chip-tool
+      disabled: true
+
+    - label: "TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004
+      verification: |
+          ./chip-tool levelcontrol read current-frequency 1 1
+      disabled: true
+
+    - label:
+          "TH sends a MoveToClosestFrequency command to DUT, with the frequency
+          field set to fmin - 1"
+      PICS: LVL.S.C08.Rsp
+      verification: |
+          Frequency feature for level control cluster is not supporting in chip-tool
+      disabled: true
+
+    - label: "TH reads the CurrentFrequency attribute."
+      PICS: LVL.S.C08.Rsp && LVL.S.A0004
+      verification: |
+          ./chip-tool levelcontrol read current-frequency 1 1
+      disabled: true

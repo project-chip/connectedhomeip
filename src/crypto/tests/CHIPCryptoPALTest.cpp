@@ -2260,6 +2260,16 @@ const uint8_t kGroupOperationalKey3[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYT
 const uint16_t kGroupSessionId1 = 0x6c80;
 const uint16_t kGroupSessionId2 = 0x0c48;
 
+static const uint8_t kGroupPrivacyKey1[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xb8, 0x27, 0x9f, 0x89, 0x62, 0x1e,
+                                                                                           0xd3, 0x27, 0xa9, 0xc3, 0x9f, 0x6a,
+                                                                                           0x27, 0x24, 0x73, 0x58 };
+static const uint8_t kGroupPrivacyKey2[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0xf7, 0x25, 0x70, 0xc3, 0xc0, 0x89,
+                                                                                           0xa0, 0xfe, 0x28, 0x75, 0x83, 0x57,
+                                                                                           0xaf, 0xff, 0xb8, 0xd2 };
+static const uint8_t kGroupPrivacyKey3[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0x01, 0xf8, 0xd1, 0x92, 0x71, 0x26,
+                                                                                           0xf1, 0x94, 0x08, 0x25, 0x72, 0xd4,
+                                                                                           0x9b, 0x1f, 0xdc, 0x73 };
+
 static void TestGroup_OperationalKeyDerivation(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t key_buffer[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
@@ -2303,6 +2313,31 @@ static void TestGroup_SessionIdDerivation(nlTestSuite * inSuite, void * inContex
     // Session ID 2
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupSessionId(operational_key2, session_id));
     NL_TEST_ASSERT(inSuite, kGroupSessionId2 == session_id);
+}
+
+static void TestGroup_PrivacyKeyDerivation(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t key_buffer[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
+    ByteSpan encryption_key;
+    MutableByteSpan privacy_key(key_buffer, sizeof(key_buffer));
+
+    // Invalid Epoch Key
+    NL_TEST_ASSERT(inSuite, CHIP_ERROR_INVALID_ARGUMENT == DeriveGroupPrivacyKey(ByteSpan(), privacy_key));
+
+    // Epoch Key 1
+    encryption_key = ByteSpan(kGroupOperationalKey1, sizeof(kGroupOperationalKey1));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupPrivacyKey(encryption_key, privacy_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(privacy_key.data(), kGroupPrivacyKey1, sizeof(kGroupPrivacyKey1)));
+
+    // Epoch Key 2
+    encryption_key = ByteSpan(kGroupOperationalKey2, sizeof(kGroupOperationalKey2));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupPrivacyKey(encryption_key, privacy_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(privacy_key.data(), kGroupPrivacyKey2, sizeof(kGroupPrivacyKey2)));
+
+    // Epoch Key 3 (example from spec)
+    encryption_key = ByteSpan(kGroupOperationalKey3, sizeof(kGroupOperationalKey3));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == DeriveGroupPrivacyKey(encryption_key, privacy_key));
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(privacy_key.data(), kGroupPrivacyKey3, sizeof(kGroupPrivacyKey3)));
 }
 
 /**
@@ -2370,6 +2405,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
     NL_TEST_DEF("Test Group Operation Key Derivation", TestGroup_OperationalKeyDerivation),
     NL_TEST_DEF("Test Group Session ID Derivation", TestGroup_SessionIdDerivation),
+    NL_TEST_DEF("Test Group Privacy Key Derivation", TestGroup_PrivacyKeyDerivation),
     NL_TEST_SENTINEL()
 };
 

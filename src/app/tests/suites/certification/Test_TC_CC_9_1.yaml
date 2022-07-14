@@ -223,8 +223,6 @@ tests:
       PICS: CC.S.A4005
       response:
           saveAs: ColorLoopStartEnhancedHue
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -287,8 +285,6 @@ tests:
       PICS: CC.S.A4006
       response:
           saveAs: ColorLoopStoredEnhancedHueValue1
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -372,8 +368,6 @@ tests:
       PICS: CC.S.A4005
       response:
           saveAs: ColorLoopStartEnhancedHue2
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -436,8 +430,6 @@ tests:
       PICS: CC.S.A4006
       response:
           saveAs: ColorLoopStoredEnhancedHueValue2
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -552,8 +544,6 @@ tests:
       PICS: CC.S.A4005
       response:
           saveAs: ColorLoopStartEnhancedHue3
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -616,8 +606,6 @@ tests:
       PICS: CC.S.A4006
       response:
           saveAs: ColorLoopStoredEnhancedHueValue3
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -701,8 +689,6 @@ tests:
       PICS: CC.S.A4005
       response:
           saveAs: ColorLoopStartEnhancedHue4
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -765,8 +751,6 @@ tests:
       PICS: CC.S.A4006
       response:
           saveAs: ColorLoopStoredEnhancedHue4
-          constraints:
-              type: uint16
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"

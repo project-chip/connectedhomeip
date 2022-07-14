@@ -27,42 +27,72 @@ tests:
           "Place TH1 into commissioning mode using the TH manufacturers means to
           be discovered by a commissioner"
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3840
+          After launching all-clusters-app using discriminator 3841 using below command
+          sudo ./chip-all-clusters-app --wifi --discriminator 3841
 
-          [1651109580.413197][31207:31207] CHIP:DL: Device Configuration:
-          [1651109580.413259][31207:31207] CHIP:DL:   Serial Number: TEST_SN
-          [1651109580.413294][31207:31207] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651109580.413327][31207:31207] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651109580.413358][31207:31207] CHIP:DL:   Hardware Version: 0
-          [1651109580.413380][31207:31207] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651109580.413401][31207:31207] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1651109580.413428][31207:31207] CHIP:DL:   Manufacturing Date: (not set)
-          [1651109580.413450][31207:31207] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651109580.413470][31207:31207] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1651109580.413525][31207:31207] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
+          ./chip-tool discover commissionables
+          [1654068872.283184][8000:8005] CHIP:DL: Avahi resolve found
+          [1654068872.283316][8000:8005] CHIP:DIS:         Hostname: E45F010F19FF0000
+          [1654068872.283374][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:19ff
+          [1654068872.283419][8000:8005] CHIP:DIS:         Port: 5540
+          [1654068872.283460][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1654068872.283503][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1654068872.283563][8000:8005] CHIP:DIS:         Vendor ID: 65521
+          [1654068872.283605][8000:8005] CHIP:DIS:         Product ID: 32769
+          [1654068872.283646][8000:8005] CHIP:DIS:         Long Discriminator: 3844
+          [1654068872.283687][8000:8005] CHIP:DIS:         Pairing Hint: 33
+          [1654068872.283728][8000:8005] CHIP:DIS:         Instance Name: C50FE94C4952D393
+          [1654068872.283768][8000:8005] CHIP:DIS:         Commissioning Mode: 1
+          [1654068872.285052][8000:8005] CHIP:DL: Avahi resolve found
+          [1654068872.285156][8000:8005] CHIP:DIS:         Hostname: E45F010F27530000
+          [1654068872.285211][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
+          [1654068872.285254][8000:8005] CHIP:DIS:         Port: 5540
+          [1654068872.285296][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1654068872.285337][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1654068872.285378][8000:8005] CHIP:DIS:         Vendor ID: 65521
+          [1654068872.285418][8000:8005] CHIP:DIS:         Product ID: 32769
+          [1654068872.285458][8000:8005] CHIP:DIS:         Long Discriminator: 3841
+          [1654068872.285498][8000:8005] CHIP:DIS:         Pairing Hint: 33
+          [1654068872.285538][8000:8005] CHIP:DIS:         Instance Name: DC47D37251924E87
+          [1654068872.285579][8000:8005] CHIP:DIS:         Commissioning Mode: 1
       disabled: true
 
     - label:
           "Place TH2 into commissioning mode using the TH manufacturers means to
           be discovered by a commissioner"
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3844
+          After launching all-clusters-app using discriminator 3844 using below command
+          sudo ./chip-all-clusters-app --wifi --discriminator 3844
 
-          [1651109859.015727][11588:11588] CHIP:DL: Device Configuration:
-          [1651109859.015789][11588:11588] CHIP:DL:   Serial Number: TEST_SN
-          [1651109859.015834][11588:11588] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651109859.015879][11588:11588] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651109859.015920][11588:11588] CHIP:DL:   Hardware Version: 0
-          [1651109859.015957][11588:11588] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651109859.015986][11588:11588] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3844 (0xF04)
-          [1651109859.016024][11588:11588] CHIP:DL:   Manufacturing Date: (not set)
-          [1651109859.016054][11588:11588] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651109859.016082][11588:11588] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1651109859.016147][11588:11588] CHIP:SVR: SetupQRCode: [MT:-24J04QI14KA0648G00]
+          ./chip-tool discover commissionables
+          [1654068872.283184][8000:8005] CHIP:DL: Avahi resolve found
+          [1654068872.283316][8000:8005] CHIP:DIS:         Hostname: E45F010F19FF0000
+          [1654068872.283374][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:19ff
+          [1654068872.283419][8000:8005] CHIP:DIS:         Port: 5540
+          [1654068872.283460][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1654068872.283503][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1654068872.283563][8000:8005] CHIP:DIS:         Vendor ID: 65521
+          [1654068872.283605][8000:8005] CHIP:DIS:         Product ID: 32769
+          [1654068872.283646][8000:8005] CHIP:DIS:         Long Discriminator: 3844
+          [1654068872.283687][8000:8005] CHIP:DIS:         Pairing Hint: 33
+          [1654068872.283728][8000:8005] CHIP:DIS:         Instance Name: C50FE94C4952D393
+          [1654068872.283768][8000:8005] CHIP:DIS:         Commissioning Mode: 1
+          [1654068872.285052][8000:8005] CHIP:DL: Avahi resolve found
+          [1654068872.285156][8000:8005] CHIP:DIS:         Hostname: E45F010F27530000
+          [1654068872.285211][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
+          [1654068872.285254][8000:8005] CHIP:DIS:         Port: 5540
+          [1654068872.285296][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
+          [1654068872.285337][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
+          [1654068872.285378][8000:8005] CHIP:DIS:         Vendor ID: 65521
+          [1654068872.285418][8000:8005] CHIP:DIS:         Product ID: 32769
+          [1654068872.285458][8000:8005] CHIP:DIS:         Long Discriminator: 3841
+          [1654068872.285498][8000:8005] CHIP:DIS:         Pairing Hint: 33
+          [1654068872.285538][8000:8005] CHIP:DIS:         Instance Name: DC47D37251924E87
+          [1654068872.285579][8000:8005] CHIP:DIS:         Commissioning Mode: 1
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan TH1s QR code using the DUT Commissioner."
+    - label: "Scan TH1s QR code using the DUT Commissioner."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true
@@ -87,8 +117,8 @@ tests:
           [1651109784376] [95553:65657838] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
-    - label:
-          "If (PICS_SCAN_QR_CODE), Scan TH2s QR code using the DUT Commissioner."
+    - label: "Scan TH2s QR code using the DUT Commissioner."
+      PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
       disabled: true

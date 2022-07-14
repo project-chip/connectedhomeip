@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "Read the mandatory attribute: MeasuredValue"
+      PICS: FLW.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
@@ -36,6 +37,7 @@ tests:
               type: uint16
 
     - label: "Read the mandatory attribute: MinMeasuredValue"
+      PICS: FLW.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -43,6 +45,7 @@ tests:
               type: uint16
 
     - label: "Read the mandatory attribute: MaxMeasuredValue"
+      PICS: FLW.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
@@ -50,7 +53,7 @@ tests:
               type: uint16
 
     - label: "read the optional attribute: Tolerance"
-      optional: true
+      PICS: FLW.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:

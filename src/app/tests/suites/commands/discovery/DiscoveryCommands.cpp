@@ -28,7 +28,7 @@ DiscoveryCommands::FindCommissionable(const char * identity,
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::FindCommissionableByShortDiscriminator(
@@ -39,7 +39,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionableByShortDiscriminator(
 
     uint64_t shortDiscriminator = static_cast<uint64_t>((value.value >> 8) & 0x0F);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kShortDiscriminator, shortDiscriminator);
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::FindCommissionableByLongDiscriminator(
@@ -49,7 +49,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionableByLongDiscriminator(
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kLongDiscriminator, value.value);
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::FindCommissionableByCommissioningMode(
@@ -59,7 +59,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionableByCommissioningMode(
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kCommissioningMode);
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::FindCommissionableByVendorId(
@@ -68,7 +68,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionableByVendorId(
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kVendorId, value.value);
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::FindCommissionableByDeviceType(
@@ -77,7 +77,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionableByDeviceType(
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kDeviceType, value.value);
-    return mDNSResolver.FindCommissionableNodes(filter);
+    return mDNSResolver.DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR
@@ -87,7 +87,7 @@ DiscoveryCommands::FindCommissioner(const char * identity,
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kCommissioner, 1);
-    return mDNSResolver.FindCommissioners(filter);
+    return mDNSResolver.DiscoverCommissioners(filter);
 }
 
 CHIP_ERROR
@@ -97,7 +97,7 @@ DiscoveryCommands::FindCommissionerByVendorId(
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kVendorId, value.value);
-    return mDNSResolver.FindCommissioners(filter);
+    return mDNSResolver.DiscoverCommissioners(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::FindCommissionerByDeviceType(
@@ -106,7 +106,7 @@ CHIP_ERROR DiscoveryCommands::FindCommissionerByDeviceType(
     ReturnErrorOnFailure(SetupDiscoveryCommands());
 
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kDeviceType, value.value);
-    return mDNSResolver.FindCommissioners(filter);
+    return mDNSResolver.DiscoverCommissioners(filter);
 }
 
 CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()

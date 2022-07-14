@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN

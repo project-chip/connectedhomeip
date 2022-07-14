@@ -435,11 +435,36 @@ public:
     CHIP_ERROR AddFabricDelegate(FabricTable::Delegate * delegate);
     void RemoveFabricDelegate(FabricTable::Delegate * delegate);
 
-    // Set the Fabric Label for the given fabricIndex. If a fabric add/update is pending,
-    // only the pending version will be updated, so that on fail-safe expiry, you would
-    // actually see the only fabric label if Update fails. If the fabric label is
-    // set before UpdateNOC, then the change is immediate.
+    /**
+     * @brief Set the Fabric Label for the fabric referred by `fabricIndex`.
+     *
+     * If a fabric add/update is pending, only the pending version will be updated,
+     * so that on fail-safe expiry, you would actually see the only fabric label if
+     * Update fails. If the fabric label is set before UpdateNOC, then the change is immediate.
+     *
+     * @param fabricIndex - Fabric Index for which to set the label
+     * @param fabricLabel - Label to set on the fabric
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if fabricIndex does not refer to an fabric in the table
+     * @retval CHIP_ERROR_INVALID_ARGUMENT on fabric label error (e.g. too large)
+     * @retval other CHIP_ERROR on internal errors
+     */
     CHIP_ERROR SetFabricLabel(FabricIndex fabricIndex, const CharSpan & fabricLabel);
+
+    /**
+     * @brief Get the Fabric Label for a given fabric
+     *
+     * NOTE: The outFabricLabel argument points to internal memory of the fabric info.
+     *       It may become invalid on the next FabricTable API call due to shadow
+     *       storage of data.
+     *
+     * @param fabricIndex - Fabric index for which to get the label
+     * @param outFabricLabel - char span that will be set to the label value
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX on error
+     * @retval other CHIP_ERROR on internal errors
+     */
+    CHIP_ERROR GetFabricLabel(FabricIndex fabricIndex, CharSpan & outFabricLabel);
 
     /**
      * Get the current Last Known Good Time.
@@ -562,6 +587,17 @@ public:
     CHIP_ERROR FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256PublicKey & outPublicKey) const;
 
     /**
+     * @brief Get the CASE Authenticated Tags from the NOC for the given `fabricIndex`.
+     *
+     * @param fabricIndex - Fabric for which to get the root public key (subject public key of RCAC)
+     * @param cats - CATValues struct to write the NOC CATs for the given fabric index
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if not found/available, or `fabricIndex` has a bad value
+     * @retval other CHIP_ERROR values on other invalid arguments or internal errors.
+     */
+    CHIP_ERROR FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const;
+
+    /**
      * @brief Sign a message with a given fabric's operational keypair. This is used for
      *        CASE and the only way the key should be used.
      *
@@ -681,10 +717,11 @@ public:
      * @param vendorId - VendorID to use for the new fabric
      * @param outNewFabricIndex - Pointer where the new fabric index for the fabric just added will be set. Cannot be nullptr.
      *
-     * @retval CHIP_NO_ERROR on success
-     * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order
-     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to make the fabric pending
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to make the fabric pending.
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
+     * @retval CHIP_ERROR_FABRIC_EXISTS if operational identity collides with one already present.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
     CHIP_ERROR AddNewPendingFabricWithOperationalKeystore(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,
@@ -714,10 +751,11 @@ public:
      *                                         copied using P256Keypair::Serialize/Deserialize and owned in heap of a FabricInfo.
      * @param outNewFabricIndex - Pointer where the new fabric index for the fabric just added will be set. Cannot be nullptr.
      *
-     * @retval CHIP_NO_ERROR on success
-     * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order
-     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to make the fabric pending
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order.
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to make the fabric pending.
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
+     * @retval CHIP_ERROR_FABRIC_EXISTS if operational identity collides with one already present.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
      */
     CHIP_ERROR AddNewPendingFabricWithProvidedOpKey(const ByteSpan & noc, const ByteSpan & icac, uint16_t vendorId,

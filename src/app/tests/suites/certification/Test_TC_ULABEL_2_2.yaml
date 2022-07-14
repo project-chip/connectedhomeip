@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH writes LabelList attribute from the DUT"
+      PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "label list"
       arguments:
@@ -41,6 +42,7 @@ tests:
               ]
 
     - label: "TH reads LabelList attribute from the DUT"
+      PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "label list"
       response:

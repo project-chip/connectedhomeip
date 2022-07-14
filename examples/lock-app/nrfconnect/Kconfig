@@ -15,6 +15,18 @@
 #
 mainmenu "Matter nRF Connect Lock Example Application"
 
+config LOCK_NUM_USERS
+	int "Maximum number of users supported by lock"
+	default 10
+
+config LOCK_NUM_CREDENTIALS
+	int "Maximum number of credentials supported by lock"
+	default 20
+
+config LOCK_NUM_CREDENTIALS_PER_USER
+	int "Maximum number of credentials per user supported by lock"
+	default 3
+
 config STATE_LEDS
 	bool "Use LEDs to indicate the device state"
 	default y

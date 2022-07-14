@@ -47,6 +47,8 @@ enum ResponseDirective
 {
     kSendAttributeSuccess,
     kSendAttributeError,
+    kSendMultipleSuccess,
+    kSendMultipleErrors,
 };
 
 ResponseDirective responseDirective;
@@ -150,6 +152,30 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
         return CHIP_NO_ERROR;
     }
 
+    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
+    {
+        InteractionModel::Status status;
+        if (responseDirective == kSendMultipleSuccess)
+        {
+            status = InteractionModel::Status::Success;
+        }
+        else if (responseDirective == kSendMultipleErrors)
+        {
+            status = InteractionModel::Status::Failure;
+        }
+        else
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        for (size_t i = 0; i < 4; ++i)
+        {
+            aWriteHandler->AddStatus(aPath, status);
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 } // namespace app
@@ -168,6 +194,8 @@ public:
     static void TestAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestFabricScopedAttributeWithoutFabricIndex(nlTestSuite * apSuite, void * apContext);
     static void TestWriteTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestMultipleSuccessResponses(nlTestSuite * apSuite, void * apContext);
+    static void TestMultipleFailureResponses(nlTestSuite * apSuite, void * apContext);
 };
 
 void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
@@ -368,6 +396,62 @@ void TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex(nlTestSui
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestWriteInteraction::TestMultipleSuccessResponses(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendMultipleSuccess;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&successCalls](const ConcreteAttributePath & attributePath) { ++successCalls; };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    chip::Controller::WriteAttribute<TestCluster::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true, onSuccessCb,
+                                                                                 onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 1);
+    NL_TEST_ASSERT(apSuite, failureCalls == 0);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestWriteInteraction::TestMultipleFailureResponses(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx   = *static_cast<TestContext *>(apContext);
+    auto sessionHandle  = ctx.GetSessionBobToAlice();
+    size_t successCalls = 0;
+    size_t failureCalls = 0;
+
+    responseDirective = kSendMultipleErrors;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&successCalls](const ConcreteAttributePath & attributePath) { ++successCalls; };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
+
+    chip::Controller::WriteAttribute<TestCluster::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true, onSuccessCb,
+                                                                                 onFailureCb);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, successCalls == 0);
+    NL_TEST_ASSERT(apSuite, failureCalls == 1);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -376,6 +460,8 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestDataResponseWithRejectedDataVersion", TestWriteInteraction::TestDataResponseWithRejectedDataVersion),
     NL_TEST_DEF("TestAttributeError", TestWriteInteraction::TestAttributeError),
     NL_TEST_DEF("TestWriteFabricScopedAttributeWithoutFabricIndex", TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex),
+    NL_TEST_DEF("TestMultipleSuccessResponses", TestWriteInteraction::TestMultipleSuccessResponses),
+    NL_TEST_DEF("TestMultipleFailureResponses", TestWriteInteraction::TestMultipleFailureResponses),
     NL_TEST_SENTINEL()
 };
 // clang-format on

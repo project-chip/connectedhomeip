@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 63.2.2. [TC-PSCFG-2.2] Primary functionality with server as DUT
+name: 64.2.2. [TC-PSCFG-2.2] Primary functionality with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -27,20 +27,30 @@ tests:
       disabled: true
 
     - label: "TH reads the Sources attribute from the DUT"
+      PICS: PSCFG.S.A0000
       verification: |
           ./chip-tool powersourceconfiguration read sources 1 0
 
           [...]
-          [1646157640.271321][44339:44344] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000DataVersion: 502821112
-          [1646157640.271401][44339:44344] CHIP:TOO:   Sources: 1 entries
-          [1646157640.271466][44339:44344] CHIP:TOO:     [1]: 1
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_0000DataVersion: 502821112
+          CHIP:TOO:   Sources: 3 entries
+          CHIP:TOO:     [1]: 2
+          CHIP:TOO:     [2]: 1
+          CHIP:TOO:     [3]: 0
       disabled: true
 
-    - label: "./chip-tool powersource read order 1 1"
+    - label: "For each enpoint number (eNr) in this list do"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH reads the Order attribute from Power Source Cluster at
+          Enpoint[eNr] of the DUT"
       verification: |
           ./chip-tool powersource read order 1 1
 
           [...]
-          [1646157759.345628][44355:44360] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0001DataVersion: 1844928386
-          [1646157759.345704][44355:44360] CHIP:TOO:   Order: 0
+          [1653564242.694964][36231:36236] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_002F Attribute 0x0000_0001 DataVersion: 4212858705
+          [1653564242.695038][36231:36236] CHIP:TOO:   Order: 2
       disabled: true

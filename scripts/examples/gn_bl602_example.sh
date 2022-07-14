@@ -17,27 +17,37 @@
 #
 
 set -e
-# Build script for GN BL602 examples GitHub workflow.
+
+BL602_BOARD=BL-HWC-G1
+
+# Build script for GN examples GitHub workflow.
+
+MATTER_ROOT=$(dirname "$0")/../../
+
 source "$(dirname "$0")/../../scripts/activate.sh"
 
-set -x
-env
+USAGE="./scripts/examples/gn_bl602_example.sh example_dir output_dir"
 
-# Build steps
-EXAMPLE_DIR=$1
+if [ $# -lt 2 ]; then
+    echo "Usage: $USAGE"
+    exit 1
+fi
+
+EXAMPLE_DIR=examples/$1/bouffalolab/bl602/
 shift
-OUTPUT_DIR=out/example_app
-BL602_BOARD=BL-HWC-G1
-MATTER_BL_ROOT=$PWD
-export BL602_SDK_ROOT="$MATTER_BL_ROOT"/third_party/bouffalolab/bl602_sdk/repo
-export PATH="$BL602_SDK_ROOT/toolchain/riscv/Linux/bin:$PATH"
+OUTPUT_DIR=$1
+shift
 
-if [[ ! -z "$1" ]]; then
-    OUTPUT_DIR=$1
-    shift
+export BL_IOT_SDK_PATH="$MATTER_ROOT"/third_party/bouffalolab/bl602_sdk/repo
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Linux/bin:$PATH"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    export PATH="$BL_IOT_SDK_PATH/toolchain/riscv/Darwin/bin:$PATH"
 fi
 
 GN_ARGS=()
+
 NINJA_ARGS=()
 
 for arg; do
@@ -58,6 +68,6 @@ for arg; do
     esac
 done
 
-#gn clean out/lighting_app_bl602
-gn gen "$OUTPUT_DIR" --root="$EXAMPLE_DIR" --args="${GN_ARGS[*]}"
+gn gen --fail-on-unused-args --root="$EXAMPLE_DIR" "$OUTPUT_DIR" --args="${GN_ARGS[*]}"
+
 ninja -C "$OUTPUT_DIR" "${NINJA_ARGS[@]}"

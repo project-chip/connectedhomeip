@@ -15,10 +15,7 @@
 import("//build_overrides/chip.gni")
 
 config("darwin_config") {
-  include_dirs = [
-    ".",
-    "..",
-  ]
+  include_dirs = [ "." ]
 
   cflags = [
     "-Wconversion",
@@ -29,61 +26,8 @@ config("darwin_config") {
 static_library("framework") {
   sources = [
     "${chip_root}/src/app/clusters/ota-provider/ota-provider.cpp",
-    "CHIP.h",
-    "CHIPAttestationTrustStoreBridge.mm",
-    "CHIPCluster.mm",
-    "CHIPCommissioningParameters.m",
-    "CHIPControllerAccessControl.h",
-    "CHIPControllerAccessControl.mm",
-    "CHIPDevice.h",
-    "CHIPDevice.mm",
-    "CHIPDeviceAttestationDelegateBridge.h",
-    "CHIPDeviceAttestationDelegateBridge.mm",
-    "CHIPDeviceConnectionBridge.mm",
-    "CHIPDeviceController.h",
-    "CHIPDeviceController.mm",
-    "CHIPDeviceControllerStartupParams.h",
-    "CHIPDeviceControllerStartupParams.mm",
-    "CHIPDeviceControllerStartupParams_Internal.h",
-    "CHIPDeviceController_Internal.h",
-    "CHIPDevicePairingDelegate.h",
-    "CHIPDevicePairingDelegateBridge.h",
-    "CHIPDevicePairingDelegateBridge.mm",
-    "CHIPDevice_Internal.h",
-    "CHIPError.h",
-    "CHIPError.mm",
-    "CHIPError_Internal.h",
-    "CHIPIMDispatch.mm",
-    "CHIPLogging.h",
-    "CHIPManualSetupPayloadParser.h",
-    "CHIPManualSetupPayloadParser.mm",
-    "CHIPOnboardingPayloadParser.m",
-    "CHIPOperationalCredentialsDelegate.mm",
-    "CHIPP256KeypairBridge.mm",
-    "CHIPPersistentStorageDelegate.h",
-    "CHIPPersistentStorageDelegateBridge.h",
-    "CHIPPersistentStorageDelegateBridge.mm",
-    "CHIPQRCodeSetupPayloadParser.h",
-    "CHIPQRCodeSetupPayloadParser.mm",
-    "CHIPSetupPayload.h",
-    "CHIPSetupPayload.mm",
-    "MTRCertificates.h",
-    "MTRCertificates.mm",
-    "MTRMemory.h",
-    "MTRMemory.mm",
-    "MatterControllerFactory.h",
-    "MatterControllerFactory.mm",
-    "MatterControllerFactory_Internal.h",
-    "zap-generated/CHIPAttributeTLVValueDecoder.mm",
-    "zap-generated/CHIPCallbackBridge.mm",
-    "zap-generated/CHIPClustersObjc.h",
-    "zap-generated/CHIPClustersObjc.mm",
-    "zap-generated/CHIPCommandPayloadsObjc.h",
-    "zap-generated/CHIPCommandPayloadsObjc.mm",
-    "zap-generated/CHIPEventTLVValueDecoder.mm",
-    "zap-generated/CHIPStructsObjc.h",
-    "zap-generated/CHIPStructsObjc.mm",
-    "zap-generated/MatterClusterConstants.h",
+    "MTRError.mm",
+    "MTRIMDispatch.mm",
   ]
 
   public_deps = [
@@ -101,6 +45,6 @@ static_library("framework") {
   public_configs = [ ":darwin_config" ]
 }
 
-group("CHIP") {
+group("static-matter") {
   public_deps = [ ":framework" ]
 }

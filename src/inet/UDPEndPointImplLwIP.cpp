@@ -410,13 +410,24 @@ CHIP_ERROR UDPEndPointImplLwIP::SetMulticastLoopback(IPVersion aIPVersion, bool 
 CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if LWIP_IPV4 && LWIP_IGMP
-    const auto method = join ? igmp_joingroup_netif : igmp_leavegroup_netif;
-
-    struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
     const ip4_addr_t lIPv4Address = aAddress.ToIPv4();
-    const err_t lStatus           = method(lNetif, &lIPv4Address);
+    err_t lStatus;
+
+    if (aInterfaceId.IsPresent())
+    {
+
+        struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+        VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+        lStatus = join ? igmp_joingroup_netif(lNetif, &lIPv4Address) //
+                       : igmp_leavegroup_netif(lNetif, &lIPv4Address);
+    }
+    else
+    {
+        lStatus = join ? igmp_joingroup(IP4_ADDR_ANY4, &lIPv4Address) //
+                       : igmp_leavegroup(IP4_ADDR_ANY4, &lIPv4Address);
+    }
+
     if (lStatus == ERR_MEM)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -431,13 +442,21 @@ CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInt
 CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #ifdef HAVE_IPV6_MULTICAST
-    const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
-
-    struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
-    VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
-
     const ip6_addr_t lIPv6Address = aAddress.ToIPv6();
-    const err_t lStatus           = method(lNetif, &lIPv6Address);
+    err_t lStatus;
+    if (aInterfaceId.IsPresent())
+    {
+        struct netif * const lNetif = FindNetifFromInterfaceId(aInterfaceId);
+        VerifyOrReturnError(lNetif != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+        lStatus = join ? mld6_joingroup_netif(lNetif, &lIPv6Address) //
+                       : mld6_leavegroup_netif(lNetif, &lIPv6Address);
+    }
+    else
+    {
+        lStatus = join ? mld6_joingroup(IP6_ADDR_ANY6, &lIPv6Address) //
+                       : mld6_leavegroup(IP6_ADDR_ANY6, &lIPv6Address);
+    }
+
     if (lStatus == ERR_MEM)
     {
         return CHIP_ERROR_NO_MEMORY;

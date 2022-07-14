@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.12. [TC-CNET-4.12] [Thread]Verification for ConnectNetwork Command
+    11.4.10. [TC-CNET-4.12] [Thread] Verification for ConnectNetwork Command
     [DUT-Server]
 
 config:
@@ -40,9 +40,9 @@ tests:
       disabled: true
 
     - label:
-          "During the commissioning process, TH sends AddOrUpdateThreadNetwork
-          command to the DUT with OperationalDataset argument value as
-          'Userth_op' and Breadcrumb argument value as 1"
+          "TH readsNetworksattribute from theDUT and saves thenumber of
+          entriesas 'NumNetworks'"
+      PICS: CNET.S.A0001
       verification: |
           Executed during the commissioning
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
@@ -60,15 +60,16 @@ tests:
       disabled: true
 
     - label:
-          "TH saves record current wall clock time with seconds resolution as
-          CT1"
+          "TH saves the indexof the Networkslist entry fromstep 2
+          asUserth_netidx"
       verification: |
           TH1 saves the timestamp as CT1
       disabled: true
 
     - label:
-          "TH sends ConnectNetwork command to the DUT with NetworkID argument
-          value as 'Userth_op' and Breadcrumb argument value as 1"
+          "TH sendsRemoveNetworkCommand to theDUT withNetworkID fieldset to
+          th_xpan andr Breadcrumb fieldset to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           Executed during the commissioning
 
@@ -78,15 +79,16 @@ tests:
       disabled: true
 
     - label:
-          "TH saves record current wall clock time with seconds resolution as
-          CT2"
+          "TH sendsAddOrUpdateThreadNetworkcommand to theDUT
+          withoperationaldataset field set
+          toPIXIT.CNET.THREAD_2ND_OPERATIONALDATASETand Breadcrumbfield set to 1"
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
       verification: |
           TH1 saves the timestamp as CT2
       disabled: true
 
-    - label:
-          "After commissioning completes, TH reads Networks attribute from the
-          DUT"
+    - label: "TH readsNetworksattribute from theDUT"
+      PICS: CNET.S.A0001
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 
@@ -100,4 +102,109 @@ tests:
           [1650389742.394958][9809:9814] CHIP:TOO:       Connected: TRUE
           [1645772651.446228][3856:3861] CHIP:TOO:      }
           [1645772651.446431][3856:3861] CHIP:EM: Sending Standalone Ack for MessageCounter:12695576 on exchange 11133i
+      disabled: true
+
+    - label:
+          "TH sendsConnectNetworkcommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.THREr AD_2ND_OPERATIONALDATASETand Breadcrumbfield set to
+          2"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH discovers andconnects to DUTon
+          thePIXIT.CNET.THREAD_2ND_OPERATIONALDATASETr operationalnetwork"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH readsBreadcrumbattribute from theGeneralCommissioningcluster of
+          the DUT"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to
+          0. Thisr forcibly disarmsthe fail-safe and isexpected to causethe
+          changes ofconfiguration toNetworkCommissioning cluster doneso far to
+          bereverted."
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH changes itsWiFi connection toPIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH discovers andconnects to DUTon
+          thePIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID operationalr network"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsArmFailSafecommand to theDUT withExpiryLengthSeconds set to
+          900"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsRemoveNetworkCommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 1ST_ACCESSPOINT_SSID andBreadcrumb fieldset to 1"
+      PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsAddOrUpdateWiFiNetworkcommand to theDUT with SSIDfield set
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID,Credentials fieldset
+          toPIXIT.CNET.WIFI_2ND_ACCESSPOINr T_CREDENTIALSand Breadcrumbfield set
+          to 1"
+      PICS: CNET.S.C02.Rsp && CNET.S.C05.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sendsConnectNetworkcommand to theDUT withNetworkID fieldset
+          toPIXIT.CNET.WIFI_r 2ND_ACCESSPOINT_SSID andBreadcrumb fieldset to 3"
+      PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH discovers andconnects to DUTon
+          thePIXIT.CNET.THREAD_2ND_OPERATIONALDATASETr operationalnetwork"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH readsBreadcrumbattribute from theGeneralCommissioningcluster of
+          the DUT"
+      PICS: CNET.S.C06.Rsp
+      verification: |
+
+      disabled: true
+
+    - label: "TH sends theCommissioningComplete commandto the DUT"
+      verification: |
+
+      disabled: true
+
+    - label: "TH readsNetworksattribute from theDUT"
+      PICS: CNET.S.A0001
+      verification: |
+
       disabled: true

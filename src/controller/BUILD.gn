@@ -26,10 +26,7 @@ config("config") {
 static_library("controller") {
   output_name = "libChipController"
 
-  sources = [
-    "CHIPCluster.cpp",
-    "CHIPCluster.h",
-  ]
+  sources = [ "CHIPCluster.h" ]
 
   if (chip_controller) {
     sources += [

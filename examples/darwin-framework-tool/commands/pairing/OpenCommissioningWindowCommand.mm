@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 
 #include "OpenCommissioningWindowCommand.h"
 

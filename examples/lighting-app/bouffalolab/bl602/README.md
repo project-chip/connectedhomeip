@@ -30,34 +30,19 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
     source ./scripts/activate.sh
     ```
 
-## Build the image
-
--   Build the example application:
-
-    ```
-    connectedhomeip$ ./scripts/build/build_examples.py --target bl602-light build
-    ```
-
-    Generated files
-
-    ```
-    connectedhomeip/out/bl602-light/chip-bl602-lighting-example.bin
-    ```
-
-    To delete generated executable, libraries and object files use:
-
-    ```
-    cd ~/connectedhomeip/
-    rm -rf out/
-    ```
-
-## Flash the board
+## Build the image and flash the board
 
 -   Build the
     [lighting-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/bouffalolab/bl602)
 
     ```
     ./scripts/build/build_examples.py --target bl602-light build
+    ```
+
+-   Build the lighting-app with Pigweed RPC:
+
+    ```
+    ./scripts/examples/gn_bl602_example.sh lighting-app ./out/bl602-light 'import("//with_pw_rpc.gni")'
     ```
 
 -   Connect the board to your flashing station (MacOS, Ubuntu, Windows).
@@ -94,7 +79,7 @@ The steps in this document were validated on Ubuntu 18.04 and 20.04.
 `/dev/ttyACM0`:
 
 ```
-picocom -b 2000000 /dev/ttyACM0
+picocom -b 115200 /dev/ttyACM0
 ```
 
 2.To reset the board, press the RESET button, and you will see the log in the
@@ -113,16 +98,16 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the BL602 lighting-app to commission it onto a Wi-Fi network:
 
-```
-$ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
+    ```
+    $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
 
- Parameters:
- 1. Discriminator: 3840
- 2. Setup-pin-code: 20202021
- 3. Node ID: 1
- 4. SSID : Wi-Fi SSID
- 5. PASSWORD : Wi-Fi Password
-```
+    Parameters:
+    1. Discriminator: 3840
+    2. Setup-pin-code: 20202021
+    3. Node ID: 1
+    4. SSID : Wi-Fi SSID
+    5. PASSWORD : Wi-Fi Password
+    ```
 
 ### Cluster control
 
@@ -139,3 +124,20 @@ $ sudo ./chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
     ```
     $ sudo ./chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 1 1
     ```
+
+### Running RPC Console
+
+-   Build chip-console following this
+    [guide](../../../common/pigweed/rpc_console/README.md)
+
+-   Start the console
+
+    ```
+    $ chip-console --device /dev/ttyUSB0 -b 2000000
+    ```
+
+-   Get or Set the light state
+
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128)`

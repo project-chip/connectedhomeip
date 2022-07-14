@@ -26,6 +26,7 @@
 
 #include "chip-cert.h"
 #include <lib/support/BufferWriter.h>
+#include <lib/support/BytesToHex.h>
 #include <protocols/Protocols.h>
 
 using namespace chip;
@@ -33,6 +34,7 @@ using namespace chip::Protocols;
 using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Crypto;
+using namespace chip::Encoding;
 
 namespace {
 
@@ -42,6 +44,9 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     static const char * ecPEMMarker          = "-----BEGIN EC PRIVATE KEY-----";
     static const char * pkcs8PEMMarker       = "-----BEGIN PRIVATE KEY-----";
     static const char * ecPUBPEMMarker       = "-----BEGIN PUBLIC KEY-----";
+    static const char * chipHexPrefix        = "04c2";
+    static const size_t chipHexPrefixLen     = strlen(chipHexPrefix);
+    static const size_t chipHexMinLen        = HEX_ENCODED_LENGTH(p256SerializedKeypairLen);
 
     if (keyLen == p256SerializedKeypairLen)
     {
@@ -61,6 +66,11 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     if (ContainsPEMMarker(ecPUBPEMMarker, key, keyLen))
     {
         return kKeyFormat_X509_PUBKEY_PEM;
+    }
+
+    if (keyLen >= chipHexMinLen && memcmp(key, chipHexPrefix, chipHexPrefixLen) == 0)
+    {
+        return kKeyFormat_Chip_Hex;
     }
 
     return kKeyFormat_X509_DER;
@@ -166,6 +176,16 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
 
         keyFormat = kKeyFormat_Chip_Raw;
     }
+    else if (keyFormat == kKeyFormat_Chip_Hex)
+    {
+        const char * keyChars = reinterpret_cast<const char *>(keyData.get());
+
+        keyDataLen = static_cast<uint32_t>(Encoding::HexToBytes(keyChars, keyDataLen, keyData.get(), keyDataLen));
+        res        = (keyDataLen > 0);
+        VerifyTrueOrExit(res);
+
+        keyFormat = kKeyFormat_Chip_Raw;
+    }
 
     if (keyFormat == kKeyFormat_Chip_Raw)
     {
@@ -267,10 +287,10 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     uint8_t * keyToWrite   = nullptr;
     uint32_t keyToWriteLen = 0;
     P256SerializedKeypair serializedKeypair;
-    uint32_t chipKeySize       = serializedKeypair.Capacity();
-    uint32_t chipKeyBase64Size = BASE64_ENCODED_LEN(chipKeySize);
+    uint32_t chipKeySize        = serializedKeypair.Capacity();
+    uint32_t chipKeyDecodedSize = HEX_ENCODED_LENGTH(chipKeySize);
     std::unique_ptr<uint8_t[]> chipKey(new uint8_t[chipKeySize]);
-    std::unique_ptr<uint8_t[]> chipKeyBase64(new uint8_t[chipKeyBase64Size]);
+    std::unique_ptr<uint8_t[]> chipKeyDecoded(new uint8_t[chipKeyDecodedSize]);
 
     VerifyOrExit(key != nullptr, res = false);
 
@@ -298,20 +318,29 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         }
         break;
     case kKeyFormat_Chip_Raw:
+    case kKeyFormat_Chip_Hex:
     case kKeyFormat_Chip_Base64:
         res = SerializeKeyPair(key, serializedKeypair);
         VerifyTrueOrExit(res);
 
         if (keyFmt == kKeyFormat_Chip_Base64)
         {
-            uint32_t chipKeyBase64Len;
-
-            res = Base64Encode(serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), chipKeyBase64.get(),
-                               chipKeyBase64Size, chipKeyBase64Len);
+            res = Base64Encode(serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), chipKeyDecoded.get(),
+                               chipKeyDecodedSize, chipKeyDecodedSize);
             VerifyTrueOrExit(res);
 
-            keyToWrite    = chipKeyBase64.get();
-            keyToWriteLen = chipKeyBase64Len;
+            keyToWrite    = chipKeyDecoded.get();
+            keyToWriteLen = chipKeyDecodedSize;
+        }
+        else if (keyFmt == kKeyFormat_Chip_Hex)
+        {
+            char * keyHex = reinterpret_cast<char *>(chipKeyDecoded.get());
+
+            SuccessOrExit(Encoding::BytesToLowercaseHexBuffer(
+                serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), keyHex, chipKeyDecodedSize));
+
+            keyToWrite    = chipKeyDecoded.get();
+            keyToWriteLen = chipKeyDecodedSize;
         }
         else
         {
@@ -329,6 +358,8 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         fprintf(stderr, "Unsupported private key format");
         ExitNow(res = false);
     }
+
+    printf("\r\n");
 
 exit:
     CloseFile(file);

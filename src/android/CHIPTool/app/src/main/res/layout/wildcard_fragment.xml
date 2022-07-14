@@ -20,7 +20,7 @@
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_marginTop="8dp"
-      app:constraint_referenced_ids="endpointIdLabel,endpointIdEd,clusterIdLabel,clusterIdEd,attributeIdLabel,attributeIdEd"
+      app:constraint_referenced_ids="endpointIdLabel,endpointIdEd,clusterIdLabel,clusterIdEd,attributeIdLabel,attributeIdEd,eventIdLabel,eventIdEd"
       app:flow_horizontalBias="0.0"
       app:flow_horizontalGap="8dp"
       app:flow_horizontalStyle="packed"
@@ -76,6 +76,21 @@
       android:inputType="number"
       android:hint="@string/wildcard_help_label"/>
 
+  <TextView
+      android:id="@+id/eventIdLabel"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:textSize="16sp"
+      android:text="@string/event_id_label" />
+
+  <EditText
+      android:id="@+id/eventIdEd"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_margin="16dp"
+      android:inputType="number"
+      android:hint="@string/wildcard_help_label"/>
   <Button
       android:id="@+id/readBtn"
       android:layout_width="wrap_content"
@@ -90,19 +105,47 @@
       app:layout_constraintEnd_toStartOf="@id/subscribeBtn"
       app:layout_constraintTop_toBottomOf="@id/flow"/>
 
-    <Button
-        android:id="@+id/subscribeBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:layout_gravity="center"
-        android:text="@string/wildcard_subscribe_btn_text"
-        android:textSize="16sp"
-        app:layout_constraintStart_toEndOf="@id/readBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/flow"/>
+  <Button
+      android:id="@+id/subscribeBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:text="@string/wildcard_subscribe_btn_text"
+      android:textSize="16sp"
+      app:layout_constraintStart_toEndOf="@id/readBtn"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/flow"/>
+
+  <Button
+      android:id="@+id/readEventBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:text="@string/wildcard_read_event_btn_text"
+      android:textSize="16sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/subscribeEventBtn"
+      app:layout_constraintTop_toBottomOf="@id/readBtn"/>
+
+  <Button
+      android:id="@+id/subscribeEventBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:text="@string/wildcard_subscribe_event_btn_text"
+      android:textSize="16sp"
+      app:layout_constraintStart_toEndOf="@id/readEventBtn"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/subscribeBtn"/>
 
   <ScrollView
       android:layout_width="match_parent"
@@ -110,7 +153,7 @@
       android:fadeScrollbars="false"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/subscribeBtn">
+      app:layout_constraintTop_toBottomOf="@id/subscribeEventBtn">
     <TextView
         android:id="@+id/outputTv"
         android:layout_width="match_parent"

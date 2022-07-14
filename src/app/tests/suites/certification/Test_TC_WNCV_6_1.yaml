@@ -27,6 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT sends UpOrOpen command to TH"
+      PICS: WNCV.C.C00.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received up-or-open for WindowCovering looks like this
 
@@ -68,6 +69,7 @@ tests:
       disabled: true
 
     - label: "DUT sends DownOrClose command to TH"
+      PICS: WNCV.C.C01.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received down-or-close for WindowCovering looks like this
           ./chip-tool windowcovering down-or-close 1 1
@@ -108,6 +110,7 @@ tests:
       disabled: true
 
     - label: "DUT sends a StopMotion command to TH"
+      PICS: WNCV.C.C02.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received stop-motion for WindowCovering looks like this
 

@@ -1,0 +1,66 @@
+{{> header}}
+
+#import "MTRCallbackBridge_internal.h"
+#import "MTRStructsObjc.h"
+#import "MTRCommandPayloadsObjc.h"
+
+#include <lib/support/TypeTraits.h>
+
+{{#>MTRCallbackBridge partial-type="Status"                         }}DefaultSuccessCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge partial-type="CommandStatus"                  }}CommandSuccessCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Octet_String" isNullable=false ns="chip"}}OctetStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Octet_String" isNullable=true  ns="chip"}}NullableOctetStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Char_String"  isNullable=false ns="chip"}}CharStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Char_String"  isNullable=true  ns="chip"}}NullableCharStringAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Boolean"      isNullable=false ns="chip"}}BooleanAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Boolean"      isNullable=true  ns="chip"}}NullableBooleanAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int8u"        isNullable=false ns="chip"}}Int8uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int8u"        isNullable=true  ns="chip"}}NullableInt8uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int8s"        isNullable=false ns="chip"}}Int8sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int8s"        isNullable=true  ns="chip"}}NullableInt8sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int16u"       isNullable=false ns="chip"}}Int16uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int16u"       isNullable=true  ns="chip"}}NullableInt16uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int16s"       isNullable=false ns="chip"}}Int16sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int16s"       isNullable=true  ns="chip"}}NullableInt16sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int32u"       isNullable=false ns="chip"}}Int32uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int32u"       isNullable=true  ns="chip"}}NullableInt32uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int32s"       isNullable=false ns="chip"}}Int32sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int32s"       isNullable=true  ns="chip"}}NullableInt32sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int64u"       isNullable=false ns="chip"}}Int64uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int64u"       isNullable=true  ns="chip"}}NullableInt64uAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int64s"       isNullable=false ns="chip"}}Int64sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Int64s"       isNullable=true  ns="chip"}}NullableInt64sAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Single"       isNullable=false ns="chip"}}FloatAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Single"       isNullable=true  ns="chip"}}NullableFloatAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Double"       isNullable=false ns="chip"}}DoubleAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="Double"       isNullable=true  ns="chip"}}NullableDoubleAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/MTRCallbackBridge}}
+
+{{#chip_client_clusters includeAll=true}}
+{{#chip_server_cluster_attributes}}
+{{#if isArray}}
+{{#>MTRCallbackBridge ns=parent.name                                }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}ListAttributeCallback{{/MTRCallbackBridge}}
+{{else}}
+  {{#if_is_struct type}}
+  {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}StructAttributeCallback{{/MTRCallbackBridge}}
+  {{/if_is_struct}}
+  {{#if_is_strongly_typed_bitmap type}}
+  {{#>MTRCallbackBridge ns=parent.name                              }}{{asUpperCamelCase ../../name}}{{asUpperCamelCase ../name}}AttributeCallback{{/MTRCallbackBridge}}
+  {{/if_is_strongly_typed_bitmap}}
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
+{{#chip_client_clusters includeAll=true}}
+{{#chip_cluster_responses}}
+{{#>MTRCallbackBridge partial-type="Command"                        }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/MTRCallbackBridge}}
+{{/chip_cluster_responses}}
+{{/chip_client_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_enums}}
+{{#>MTRCallbackBridge type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/MTRCallbackBridge}}
+{{#>MTRCallbackBridge type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/MTRCallbackBridge}}
+{{/zcl_enums}}
+{{/zcl_clusters}}

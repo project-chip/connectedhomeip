@@ -122,6 +122,9 @@ public:
     static constexpr Key kConfigKey_LockUserName       = EFR32ConfigKey(kMatterConfig_KeyBase, 0x12);
     static constexpr Key kConfigKey_CredentialData     = EFR32ConfigKey(kMatterConfig_KeyBase, 0x13);
     static constexpr Key kConfigKey_UserCredentials    = EFR32ConfigKey(kMatterConfig_KeyBase, 0x14);
+    static constexpr Key kConfigKey_WeekDaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x15);
+    static constexpr Key kConfigKey_YearDaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x16);
+    static constexpr Key kConfigKey_HolidaySchedules   = EFR32ConfigKey(kMatterConfig_KeyBase, 0x17);
 
     static constexpr Key kConfigKey_GroupKeyMax =
         EFR32ConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.

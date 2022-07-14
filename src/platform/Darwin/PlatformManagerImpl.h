@@ -49,6 +49,7 @@ public:
         {
             mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
             dispatch_suspend(mWorkQueue);
+            mIsWorkQueueSuspended = true;
         }
         return mWorkQueue;
     }
@@ -71,7 +72,7 @@ private:
     CHIP_ERROR _PostEvent(const ChipDeviceEvent * event);
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool _IsChipStackLockedByCurrentThread() const { return false; };
+    bool _IsChipStackLockedByCurrentThread() const;
 #endif
 
     // ===== Members for internal use by the following friends.
@@ -88,7 +89,11 @@ private:
     // Semaphore used to implement blocking behavior in _RunEventLoop.
     dispatch_semaphore_t mRunLoopSem;
 
-    bool mIsWorkQueueRunning = false;
+    bool mIsWorkQueueSuspended = false;
+    // TODO: mIsWorkQueueSuspensionPending might need to be an atomic and use
+    // atomic ops, if we're worried about calls to StopEventLoopTask() from
+    // multiple threads racing somehow...
+    bool mIsWorkQueueSuspensionPending = false;
 
     inline ImplClass * Impl() { return static_cast<PlatformManagerImpl *>(this); }
 };

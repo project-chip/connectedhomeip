@@ -23,6 +23,7 @@ config:
 tests:
     - label:
           "Read attribute DeviceTypeList of the Descriptor cluster on endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read device-list 1 1
 
@@ -35,6 +36,7 @@ tests:
       disabled: true
 
     - label: "Read attribute PartsList of the Descriptor cluster on endpoint 0"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read parts-list 1 1
 
@@ -75,6 +77,7 @@ tests:
     - label:
           "For each of the endpoints read in step 1b, read attribute
           DeviceTypeList of the Descriptor cluster on that endpoint"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read device-list 1 2
 
@@ -160,6 +163,7 @@ tests:
     - label:
           "Read attribute PartsList of the Descriptor cluster on endpoint found
           in step 1c"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool  descriptor read parts-list 1 1
 
@@ -202,6 +206,7 @@ tests:
           DeviceTypeList attribute in the Descriptor cluster on such endpoint,
           and select those endpoints which have (at least) a device type of
           Bridged Node in their DeviceTypeList"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
@@ -209,6 +214,7 @@ tests:
     - label:
           "For each of the endpoints for the bridged devices found in step 2b,
           perform the tests for Bridged Device Basic Information cluster"
+      PICS: MCORE.BRIDGE
       verification: |
           ref to test plan for Bridged Device Basic Information cluster
       disabled: true
@@ -219,14 +225,16 @@ tests:
           for this Power Source Configuration cluster plus the tests for the
           Power Source clusters at the endpoint(s) which this Power Source
           Configuration cluster refers to"
+      PICS: MCORE.BRIDGE && MCORE.BRIDGE.BatInfo
       verification: |
           ref to test plan for Power Source Configuration and Power Source clusters
       disabled: true
 
     - label:
           "For each of the endpoints found in step 2b, from the DeviceTypeList
-          attributute in their Descriptor cluster, derive the (application)
-          device type(s) of the bridged device"
+          attribute in their Descriptor cluster, derive the (application) device
+          type(s) of the bridged device"
+      PICS: MCORE.BRIDGE
       verification: |
           ./chip-tool descriptor read device-list 1 2
 
@@ -312,6 +320,7 @@ tests:
     - label:
           "From the list acquired in step 5, choose one of the bridged devices
           which is an actuator (e.g. light, window covering)"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
@@ -319,18 +328,21 @@ tests:
     - label:
           "Read the state of this bridged device (through Matter), e.g. on/off,
           brightness"
+      PICS: MCORE.BRIDGE
       verification: |
           read actuator state
       disabled: true
 
     - label:
           "Change the state of this bridged device (through Matter), e.g. change
-          its brightness"
+          its brightness or toggle its on/off state"
+      PICS: MCORE.BRIDGE
       verification: |
           update actuator state (e.g. command)
       disabled: true
 
     - label: "Read the state of this bridged device (through Matter), as in 6b"
+      PICS: MCORE.BRIDGE
       verification: |
           read actuator state
       disabled: true
@@ -339,6 +351,7 @@ tests:
           "From the list acquired in step 5, choose one of the bridged devices
           which is a sensor (e.g. occupancy sensor, contact sensor, temperature
           sensor)"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
@@ -346,6 +359,7 @@ tests:
     - label:
           "Read the state of this bridged device (through Matter), e.g.
           occupancy status, contact status, current temperature"
+      PICS: MCORE.BRIDGE
       verification: |
           read sensor state
       disabled: true
@@ -353,11 +367,13 @@ tests:
     - label:
           "Change the state of this sensor (e.g. cover the occupancy sensor,
           open the contact sensor, heat the temperature sensor)"
+      PICS: MCORE.BRIDGE
       verification: |
           no Matter messages for this step
       disabled: true
 
     - label: "Read the state of this bridged device again, as in 7b"
+      PICS: MCORE.BRIDGE
       verification: |
           read sensor state
       disabled: true

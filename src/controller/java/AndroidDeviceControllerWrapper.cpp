@@ -193,6 +193,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
+    // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
+    Crypto::P256Keypair ephemeralKey;
+
     if (rootCertificate != nullptr && intermediateCertificate != nullptr && nodeOperationalCertificate != nullptr &&
         keypairDelegate != nullptr)
     {
@@ -217,7 +220,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     else
     {
-        Crypto::P256Keypair ephemeralKey;
         *errInfoOnFailure = ephemeralKey.Initialize();
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {

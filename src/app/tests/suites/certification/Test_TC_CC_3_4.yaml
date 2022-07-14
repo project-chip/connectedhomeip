@@ -21,10 +21,10 @@ config:
     endpoint: 0
 
 tests:
-    - label:
-          "DUT sends MoveToHue command to TH an Hue with _TransitionTime 200."
+    - label: "DUT sends MoveToHue command to TH an Hue with TransitionTime 300."
+      PICS: CC.C.C00.Rsp
       verification: |
-          ./chip-tool colorcontrol move-to-hue 1 0 200 0 0 1 1
+          ./chip-tool colorcontrol move-to-hue 1 0 300 0 0 1 1
           [1646210342.550556][2190:2190] CHIP:DMG: InvokeRequestMessage =
           [1646210342.550627][2190:2190] CHIP:DMG: {
           [1646210342.550679][2190:2190] CHIP:DMG:        suppressResponse = false,
@@ -59,6 +59,7 @@ tests:
     - label:
           "Over TransitionTime, DUT reads CurrentHue attribute from TH
           periodically."
+      PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
           [1646210292.985313][2190:2190] CHIP:DMG: ReadRequestMessage =
@@ -80,6 +81,7 @@ tests:
       disabled: true
 
     - label: "DUT sends MoveHue command to TH"
+      PICS: CC.C.C01.Rsp
       verification: |
           ./chip-tool colorcontrol move-hue 1 10 0 0 1 1
           [1646210493.976737][2190:2190] CHIP:EM: Handling via exchange: 36870r, Delegate: 0xaaaad04530c8
@@ -113,7 +115,8 @@ tests:
           [1646210493.978595][2190:2190] CHIP:DMG: },
       disabled: true
 
-    - label: "DUT reads CurrentHue attribute from TH several times."
+    - label: "DUT reads CurrentHue attribute from TH several Times."
+      PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
           [1646210292.985313][2190:2190] CHIP:DMG: ReadRequestMessage =
@@ -135,6 +138,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StepHue command to TH"
+      PICS: CC.C.C02.Rsp
       verification: |
           ./chip-tool colorcontrol step-hue 1 10 200 0 0 1 1
           [1646210571.683401][2190:2190] CHIP:DMG: InvokeRequestMessage =
@@ -169,6 +173,7 @@ tests:
       disabled: true
 
     - label: "Over TransitionTime, DUT reads CurrentHue attribute from TH."
+      PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1  1
           [1646210292.985313][2190:2190] CHIP:DMG: ReadRequestMessage =
@@ -190,6 +195,7 @@ tests:
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
+      PICS: CC.C.C47.Rsp
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
           [1646210677.870562][2190:2190] CHIP:DMG: InvokeRequestMessage =

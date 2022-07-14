@@ -21,10 +21,6 @@ import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [ "include" ]
-}
-
 executable("chip-lighting-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
