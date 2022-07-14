@@ -159,6 +159,25 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
+        if (mNeedsNetworkSetup)
+        {
+            // if there is a WiFi or a Thread endpoint, then perform scan
+            if ((mParams.GetAttemptWiFiNetworkScan() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) ||
+                (mParams.GetAttemptThreadNetworkScan() && mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId))
+            {
+                return CommissioningStage::kScanNetworks;
+            }
+            else
+            {
+                ChipLogProgress(Controller, "No NetworkScan enabled or WiFi/Thread endpoint not specified, skipping ScanNetworks");
+            }
+        }
+        else
+        {
+            ChipLogProgress(Controller, "Not a BLE connection, skipping ScanNetworks");
+        }
+        // fall through if no network scan is called for
+    case CommissioningStage::kScanNetworks:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kSendPAICertificateRequest;

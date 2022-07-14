@@ -84,6 +84,7 @@ constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVI
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
+void OnScanNetworksFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
@@ -763,6 +764,9 @@ private:
     static void OnSetRegulatoryConfigResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void
+    OnScanNetworksResponse(void * context,
+                           const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
     static void
     OnNetworkConfigResponse(void * context,
                             const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
