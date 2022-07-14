@@ -680,4 +680,5 @@ CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::ap
     return CHIP_NO_ERROR;
 }
 void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                                             const chip::Access::SubjectDescriptor & subjectDescriptor) {}
+                                                             const chip::Access::SubjectDescriptor & subjectDescriptor)
+{}
