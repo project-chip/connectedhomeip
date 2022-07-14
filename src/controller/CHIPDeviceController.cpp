@@ -1724,20 +1724,24 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
+                        ChipLogError(Controller, "----- NetworkCommissioning Features: has WiFi.");
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
+                        ChipLogError(Controller, "----- NetworkCommissioning Features: has Thread.");
                         info.network.thread.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
+                        ChipLogError(Controller, "----- NetworkCommissioning Features: has Ethernet.");
                         info.network.eth.endpoint = path.mEndpointId;
                     }
                     else
                     {
+                        ChipLogError(Controller, "----- NetworkCommissioning Features: no features.");
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
                         if (info.network.thread.endpoint == kInvalidEndpointId)
                         {
@@ -1822,6 +1826,63 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     }
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
+}
+
+void OnScanNetworksFailure(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "Received ScanNetworks failure response %s\n", chip::ErrorStr(error));
+    // need to advance to next step
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    // clear error so that we don't abort the commissioning when ScanNetworks fails
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
+}
+
+void DeviceCommissioner::OnScanNetworksResponse(void * context,
+                                                const NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
+{
+    CommissioningDelegate::CommissioningReport report;
+
+    ChipLogProgress(Controller, "Received ScanNetwork response, networkingStatus=%u debugText=%s",
+                    to_underlying(data.networkingStatus),
+                    (data.debugText.HasValue() ? std::string(data.debugText.Value().data(), data.debugText.Value().size()).c_str()
+                                               : "none provided"));
+    if (data.networkingStatus == NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
+    {
+        if (data.wiFiScanResults.HasValue())
+        {
+            ChipLogProgress(Controller, "ScanNetwork response, has WiFi results");
+
+            auto iter_WiFiScanResultsInsideOptional_1 = data.wiFiScanResults.Value().begin();
+            while (iter_WiFiScanResultsInsideOptional_1.Next())
+            {
+                auto & entry_1 = iter_WiFiScanResultsInsideOptional_1.GetValue();
+                ChipLogProgress(Controller, "ScanNetwork response, next WiFi channel=%d", entry_1.channel);
+            }
+        }
+        else
+        {
+            ChipLogProgress(Controller, "ScanNetwork response, no WiFi results");
+        }
+        if (data.threadScanResults.HasValue())
+        {
+            ChipLogProgress(Controller, "ScanNetwork response, has Thread results");
+
+            auto iter_ThreadScanResultsInsideOptional_1 = data.threadScanResults.Value().begin();
+            while (iter_ThreadScanResultsInsideOptional_1.Next())
+            {
+                auto & entry_1 = iter_ThreadScanResultsInsideOptional_1.GetValue();
+                ChipLogProgress(Controller, "ScanNetwork response, next Thread network name=%s",
+                                std::string(entry_1.networkName.data(), entry_1.networkName.size()).c_str());
+            }
+        }
+        else
+        {
+            ChipLogProgress(Controller, "ScanNetwork response, no Thread results");
+        }
+    }
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    // clear error so that we don't abort the commissioning when ScanNetworks fails
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
@@ -1953,6 +2014,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         mReadClient     = std::move(readClient);
     }
     break;
+    case CommissioningStage::kScanNetworks: {
+        NetworkCommissioning::Commands::ScanNetworks::Type request;
+        if (params.GetWiFiCredentials().HasValue())
+        {
+            request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
+        }
+        request.breadcrumb.Emplace(breadcrumb);
+        SendCommand<NetworkCommissioningCluster>(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        break;
+    }
     case CommissioningStage::kConfigRegulatory: {
         // To set during config phase:
         // UTC time

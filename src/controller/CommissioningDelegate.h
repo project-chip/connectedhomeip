@@ -35,6 +35,7 @@ enum CommissioningStage : uint8_t
     kSecurePairing,
     kReadCommissioningInfo,
     kArmFailsafe,
+    kScanNetworks,
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -352,6 +353,20 @@ public:
 
     Credentials::DeviceAttestationDelegate * GetDeviceAttestationDelegate() const { return mDeviceAttestationDelegate; }
 
+    bool GetAttemptWiFiNetworkScan() const { return mAttemptWiFiNetworkScan; }
+    CommissioningParameters & SetAttemptWiFiNetworkScan(bool attemptWiFiNetworkScan)
+    {
+        mAttemptWiFiNetworkScan = attemptWiFiNetworkScan;
+        return *this;
+    }
+
+    bool GetAttemptThreadNetworkScan() const { return mAttemptThreadNetworkScan; }
+    CommissioningParameters & SetAttemptThreadNetworkScan(bool attemptThreadNetworkScan)
+    {
+        mAttemptThreadNetworkScan = attemptThreadNetworkScan;
+        return *this;
+    }
+
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
@@ -379,6 +394,8 @@ private:
     CompletionStatus completionStatus;
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
+    bool mAttemptWiFiNetworkScan   = false;
+    bool mAttemptThreadNetworkScan = true; // TODO: consider whether default value should be enabled or disabled
 };
 
 struct RequestedCertificate

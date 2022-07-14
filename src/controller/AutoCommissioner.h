@@ -38,6 +38,8 @@ public:
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
+    ReadCommissioningInfo GetReadCommissioningInfo() const { return mDeviceCommissioningInfo; }
+
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
