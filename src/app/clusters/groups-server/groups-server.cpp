@@ -68,6 +68,9 @@ using namespace app::Clusters;
 using namespace app::Clusters::Groups;
 using namespace chip::Credentials;
 
+/**
+ * @brief Checks if group-endpoint association exist for the given fabric
+ */
 static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -76,27 +79,38 @@ static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId 
     return provider->HasEndpoint(fabricIndex, groupId, endpointId);
 }
 
+/**
+ * @brief Checks if there are key set associated with the given GroupId
+ */
+static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    VerifyOrReturnError(nullptr != provider, false);
+    GroupDataProvider::GroupKey entry;
+
+    auto it    = provider->IterateGroupKeys(fabricIndex);
+    bool found = false;
+    while (it->Next(entry) && !found)
+    {
+        found = (entry.group_id == groupId);
+    }
+    it->Release();
+
+    if (found)
+    {
+        GroupDataProvider::KeySet keys;
+        found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
+    }
+    return found;
+}
+
 static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
     VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
-
-    // Check if there are key set associated with the given GroupId
-    auto it       = provider->IterateGroupKeys(fabricIndex);
-    bool keyFound = false;
-    GroupDataProvider::GroupKey entry;
-    GroupDataProvider::KeySet keys;
-
-    while (it->Next(entry) && !keyFound)
-    {
-        keyFound = (entry.group_id == groupId);
-    }
-    it->Release();
-    VerifyOrReturnError(keyFound, EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
-    VerifyOrReturnError(CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys),
-                        EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+    VerifyOrReturnError(KeyExists(fabricIndex, groupId), EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
 
     // Add a new entry to the GroupTable
     CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
