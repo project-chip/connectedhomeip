@@ -515,15 +515,8 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
                   mCurReadHandlerIdx, hasMoreChunks ? "more messages" : "no more messages");
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        //
-        // WillSendMessage() was called on this EC well before it got here (since there was an intention to generate reports, which
-        // occurs asynchronously. Consequently, if any error occurs, it's on us to close down the exchange.
-        //
-        apReadHandler->Abort();
-    }
-    else if ((apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks) || needCloseReadHandler)
+    if (err != CHIP_NO_ERROR || (apReadHandler->IsType(ReadHandler::InteractionType::Read) && !hasMoreChunks) ||
+        needCloseReadHandler)
     {
         //
         // In the case of successful report generation and we're on the last chunk of a read, we don't expect
