@@ -64,8 +64,8 @@ public:
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
 
-    [[deprecated("Use ContentLauncher_LaunchURL(..) instead")]]
-    CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
+    [[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] CHIP_ERROR
+    ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
                              std::function<void(CHIP_ERROR)> launchURLResponseCallback);
 
     chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
@@ -73,15 +73,17 @@ public:
     chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
     void SetDefaultFabricIndex();
 
-    CHIP_ERROR ContentLauncher_LaunchURL(const char * contentUrl, const char * contentDisplayStr,
-              chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
-              std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search, bool autoPlay,
-                             chip::Optional<chip::CharSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR ContentLauncher_LaunchURL(
+        const char * contentUrl, const char * contentDisplayStr,
+        chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+        std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+                                             bool autoPlay, chip::Optional<chip::CharSpan> data,
+                                             std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR LevelControl_Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime,
-                    uint8_t optionMask, uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
+                                 uint8_t optionMask, uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR LevelControl_MoveToLevel(uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
-                           std::function<void(CHIP_ERROR)> responseCallback);
+                                        std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_Pause(std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_StopPlayback(std::function<void(CHIP_ERROR)> responseCallback);
@@ -90,15 +92,15 @@ public:
     CHIP_ERROR MediaPlayback_SkipForward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR MediaPlayback_SkipBackward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
-                         chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
+                                             chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
-                       std::function<void(CHIP_ERROR)> responseCallback);
+                                           std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR ApplicationLauncher_HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
-                       std::function<void(CHIP_ERROR)> responseCallback);
+                                           std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR TargetNavigator_NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
-                              std::function<void(CHIP_ERROR)> responseCallback);
+                                              std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR KeypadInput_SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
-                       std::function<void(CHIP_ERROR)> responseCallback);
+                                   std::function<void(CHIP_ERROR)> responseCallback);
 
 private:
     CHIP_ERROR InitBindingHandlers();
