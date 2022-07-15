@@ -40,7 +40,6 @@ request_struct: "request"i struct
 response_struct: "response"i "struct"i id "=" positive_integer "{" (struct_field ";") * "}"
 
 command_attribute: "timed"i -> timed_command
-                 | "fabric_scoped"i -> fabric_scoped_command
 command_attributes: command_attribute*
 
 
