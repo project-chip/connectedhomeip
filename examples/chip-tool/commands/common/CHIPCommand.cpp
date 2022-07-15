@@ -165,16 +165,9 @@ void CHIPCommand::MaybeTearDownStack()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ShutdownCommissioner(kIdentityNull);
-    ShutdownCommissioner(kIdentityAlpha);
-    ShutdownCommissioner(kIdentityBeta);
-    ShutdownCommissioner(kIdentityGamma);
-
-    std::string name        = GetIdentity();
-    chip::FabricId fabricId = strtoull(name.c_str(), nullptr, 0);
-    if (fabricId >= kIdentityOtherFabricId)
+    for (auto it = mCommissioners.begin(); it != mCommissioners.end(); it++)
     {
-        ShutdownCommissioner(name);
+        ShutdownCommissioner(it->first);
     }
 
     StopTracing();
