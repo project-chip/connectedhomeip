@@ -26,9 +26,9 @@
  */
 
 #include "system/SystemClock.h"
+#include <app/DeviceProxy.h>
 #include <stdio.h>
 #include <system/SystemError.h>
-#include <app/DeviceProxy.h>
 
 using namespace chip;
 
@@ -36,14 +36,28 @@ static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python ass
 
 extern "C" {
 
-uint32_t pychip_DeviceProxy_ComputeRoundTripTimeout(DeviceProxy *device, uint32_t upperLayerProcessingTimeoutMs)
+/**
+ * @brief
+ *
+ * This computes the value for a timeout based on the round trip time it takes for a message to be sent to a peer,
+ * the message to be processed given the upperLayerProcessingTimeoutMs argument, and a response to come back.
+ *
+ * See Session::ComputeRoundTripTimeout for more specific details.
+ *
+ * A valid DeviceProxy pointer with a valid, established session is required for this method.
+ *
+ *
+ */
+uint32_t pychip_DeviceProxy_ComputeRoundTripTimeout(DeviceProxy * device, uint32_t upperLayerProcessingTimeoutMs)
 {
     VerifyOrDie(device != nullptr);
 
-    auto *deviceProxy = static_cast<DeviceProxy *>(device);
+    auto * deviceProxy = static_cast<DeviceProxy *>(device);
     VerifyOrDie(deviceProxy->GetSecureSession().HasValue());
 
-    return deviceProxy->GetSecureSession().Value()->ComputeRoundTripTimeout(System::Clock::Milliseconds32(upperLayerProcessingTimeoutMs)).count();
+    return deviceProxy->GetSecureSession()
+        .Value()
+        ->ComputeRoundTripTimeout(System::Clock::Milliseconds32(upperLayerProcessingTimeoutMs))
+        .count();
 }
-
 }

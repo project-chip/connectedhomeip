@@ -158,7 +158,10 @@ class AsyncCallableHandle:
 
         with self._cv:
             while self._finish is False:
-                self._cv.wait(timeout)
+                res = self._cv.wait(timeout)
+                if res is False:
+                    raise TimeoutError("Timed out waiting for task to finish executing on the Matter thread")
+
             if self._exc is not None:
                 raise self._exc
             return self._res

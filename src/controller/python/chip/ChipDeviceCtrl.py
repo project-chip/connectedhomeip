@@ -608,6 +608,19 @@ class ChipDeviceController():
             raise self._ChipStack.ErrorToException(returnErr)
         return returnDevice
 
+    def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
+        ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
+            receive a message, process it and send it back. This is computed based on the session type, the type of transport, sleepy
+            characteristics of the target and a caller-provided value for the time it takes to process a message at the upper layer on
+            the target For group sessions.
+
+            This will result in a session being established if one wasn't already.
+        '''
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
+            device, upperLayerProcessingTimeoutMs))
+        return res
+
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
