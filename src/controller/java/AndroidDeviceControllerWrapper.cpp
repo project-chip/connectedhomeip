@@ -145,6 +145,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     initParams.listenPort                      = listenPort;
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
+    setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
@@ -357,6 +358,13 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
     return err;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::UpdateNetworkCredentials(chip::Controller::CommissioningParameters & params)
+{
+    // this will wipe out any custom attestationNonce and csrNonce that was being used.
+    // however, Android APIs don't allow these to be set to custom values today.
+    return mAutoCommissioner.SetCommissioningParameters(params);
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -400,6 +408,225 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
         env->ReleaseByteArrayElements(operationalDatasetBytes, operationalDataset, 0);
         env->DeleteGlobalRef(operationalDatasetBytes);
     }
+}
+
+void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, chip::Controller::CommissioningStage stageCompleted,
+                                                                 CHIP_ERROR error)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID onCommissioningStatusUpdateMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate", "(JI)V",
+                                                             &onCommissioningStatusUpdateMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    UtfString jStageCompleted(env, StageToString(stageCompleted));
+    env->CallVoidMethod(mJavaObjectRef, onCommissioningStatusUpdateMethod, static_cast<jlong>(peerId.GetNodeId()),
+                        jStageCompleted.jniValue(), error.AsInteger());
+}
+
+void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
+    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    err = JniReferences::GetInstance().FindMethod(
+        env, mJavaObjectRef, "onScanNetworksSuccess",
+        "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject NetworkingStatus;
+    std::string NetworkingStatusClassName     = "java/lang/Integer";
+    std::string NetworkingStatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(),
+        static_cast<uint8_t>(dataResponse.networkingStatus), NetworkingStatus);
+    jobject DebugText;
+    if (!dataResponse.debugText.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, DebugText);
+    }
+    else
+    {
+        jobject DebugTextInsideOptional;
+        DebugTextInsideOptional =
+            env->NewStringUTF(std::string(dataResponse.debugText.Value().data(), dataResponse.debugText.Value().size()).c_str());
+        chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
+    }
+    jobject WiFiScanResults;
+    if (!dataResponse.wiFiScanResults.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, WiFiScanResults);
+    }
+    else
+    {
+        // TODO: use this
+        jobject WiFiScanResultsInsideOptional;
+        chip::JniReferences::GetInstance().CreateArrayList(WiFiScanResultsInsideOptional);
+
+        auto iter_WiFiScanResultsInsideOptional_1 = dataResponse.wiFiScanResults.Value().begin();
+        while (iter_WiFiScanResultsInsideOptional_1.Next())
+        {
+            auto & entry_1 = iter_WiFiScanResultsInsideOptional_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_security;
+            std::string newElement_1_securityClassName     = "java/lang/Integer";
+            std::string newElement_1_securityCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1_securityClassName.c_str(),
+                                                                          newElement_1_securityCtorSignature.c_str(),
+                                                                          entry_1.security.Raw(), newElement_1_security);
+            jobject newElement_1_ssid;
+            jbyteArray newElement_1_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry_1.ssid.size()));
+            env->SetByteArrayRegion(newElement_1_ssidByteArray, 0, static_cast<jsize>(entry_1.ssid.size()),
+                                    reinterpret_cast<const jbyte *>(entry_1.ssid.data()));
+            newElement_1_ssid = newElement_1_ssidByteArray;
+            jobject newElement_1_bssid;
+            jbyteArray newElement_1_bssidByteArray = env->NewByteArray(static_cast<jsize>(entry_1.bssid.size()));
+            env->SetByteArrayRegion(newElement_1_bssidByteArray, 0, static_cast<jsize>(entry_1.bssid.size()),
+                                    reinterpret_cast<const jbyte *>(entry_1.bssid.data()));
+            newElement_1_bssid = newElement_1_bssidByteArray;
+            jobject newElement_1_channel;
+            std::string newElement_1_channelClassName     = "java/lang/Integer";
+            std::string newElement_1_channelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_channelClassName.c_str(),
+                                                                           newElement_1_channelCtorSignature.c_str(),
+                                                                           entry_1.channel, newElement_1_channel);
+            jobject newElement_1_wiFiBand;
+            std::string newElement_1_wiFiBandClassName     = "java/lang/Integer";
+            std::string newElement_1_wiFiBandCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_wiFiBandClassName.c_str(), newElement_1_wiFiBandCtorSignature.c_str(),
+                static_cast<uint8_t>(entry_1.wiFiBand), newElement_1_wiFiBand);
+            jobject newElement_1_rssi;
+            std::string newElement_1_rssiClassName     = "java/lang/Integer";
+            std::string newElement_1_rssiCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(
+                newElement_1_rssiClassName.c_str(), newElement_1_rssiCtorSignature.c_str(), entry_1.rssi, newElement_1_rssi);
+
+            jclass wiFiInterfaceScanResultStructClass_2;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult",
+                wiFiInterfaceScanResultStructClass_2);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult");
+                return;
+            }
+            jmethodID wiFiInterfaceScanResultStructCtor_2 =
+                env->GetMethodID(wiFiInterfaceScanResultStructClass_2, "<init>",
+                                 "(Ljava/lang/Integer;[B[BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+            if (wiFiInterfaceScanResultStructCtor_2 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterWiFiInterfaceScanResult constructor");
+                return;
+            }
+
+            newElement_1 = env->NewObject(wiFiInterfaceScanResultStructClass_2, wiFiInterfaceScanResultStructCtor_2,
+                                          newElement_1_security, newElement_1_ssid, newElement_1_bssid, newElement_1_channel,
+                                          newElement_1_wiFiBand, newElement_1_rssi);
+            chip::JniReferences::GetInstance().AddToList(WiFiScanResultsInsideOptional, newElement_1);
+        }
+        chip::JniReferences::GetInstance().CreateOptional(WiFiScanResultsInsideOptional, WiFiScanResults);
+    }
+    jobject ThreadScanResults;
+    if (!dataResponse.threadScanResults.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, ThreadScanResults);
+    }
+    else
+    {
+        jobject ThreadScanResultsInsideOptional;
+        chip::JniReferences::GetInstance().CreateArrayList(ThreadScanResultsInsideOptional);
+
+        auto iter_ThreadScanResultsInsideOptional_1 = dataResponse.threadScanResults.Value().begin();
+        while (iter_ThreadScanResultsInsideOptional_1.Next())
+        {
+            auto & entry_1 = iter_ThreadScanResultsInsideOptional_1.GetValue();
+            jobject newElement_1;
+            jobject newElement_1_panId;
+            std::string newElement_1_panIdClassName     = "java/lang/Integer";
+            std::string newElement_1_panIdCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+                newElement_1_panIdClassName.c_str(), newElement_1_panIdCtorSignature.c_str(), entry_1.panId, newElement_1_panId);
+            jobject newElement_1_extendedPanId;
+            std::string newElement_1_extendedPanIdClassName     = "java/lang/Long";
+            std::string newElement_1_extendedPanIdCtorSignature = "(J)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(newElement_1_extendedPanIdClassName.c_str(),
+                                                                           newElement_1_extendedPanIdCtorSignature.c_str(),
+                                                                           entry_1.extendedPanId, newElement_1_extendedPanId);
+            jobject newElement_1_networkName;
+            newElement_1_networkName =
+                env->NewStringUTF(std::string(entry_1.networkName.data(), entry_1.networkName.size()).c_str());
+            jobject newElement_1_channel;
+            std::string newElement_1_channelClassName     = "java/lang/Integer";
+            std::string newElement_1_channelCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_1_channelClassName.c_str(),
+                                                                           newElement_1_channelCtorSignature.c_str(),
+                                                                           entry_1.channel, newElement_1_channel);
+            jobject newElement_1_version;
+            std::string newElement_1_versionClassName     = "java/lang/Integer";
+            std::string newElement_1_versionCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(newElement_1_versionClassName.c_str(),
+                                                                          newElement_1_versionCtorSignature.c_str(),
+                                                                          entry_1.version, newElement_1_version);
+            jobject newElement_1_extendedAddress;
+            jbyteArray newElement_1_extendedAddressByteArray =
+                env->NewByteArray(static_cast<jsize>(entry_1.extendedAddress.size()));
+            env->SetByteArrayRegion(newElement_1_extendedAddressByteArray, 0, static_cast<jsize>(entry_1.extendedAddress.size()),
+                                    reinterpret_cast<const jbyte *>(entry_1.extendedAddress.data()));
+            newElement_1_extendedAddress = newElement_1_extendedAddressByteArray;
+            jobject newElement_1_rssi;
+            std::string newElement_1_rssiClassName     = "java/lang/Integer";
+            std::string newElement_1_rssiCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<int8_t>(
+                newElement_1_rssiClassName.c_str(), newElement_1_rssiCtorSignature.c_str(), entry_1.rssi, newElement_1_rssi);
+            jobject newElement_1_lqi;
+            std::string newElement_1_lqiClassName     = "java/lang/Integer";
+            std::string newElement_1_lqiCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+                newElement_1_lqiClassName.c_str(), newElement_1_lqiCtorSignature.c_str(), entry_1.lqi, newElement_1_lqi);
+
+            jclass threadInterfaceScanResultStructClass_2;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult",
+                threadInterfaceScanResultStructClass_2);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult");
+                return;
+            }
+            jmethodID threadInterfaceScanResultStructCtor_2 =
+                env->GetMethodID(threadInterfaceScanResultStructClass_2, "<init>",
+                                 "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/"
+                                 "Integer;[BLjava/lang/Integer;Ljava/lang/Integer;)V");
+            if (threadInterfaceScanResultStructCtor_2 == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterThreadInterfaceScanResult constructor");
+                return;
+            }
+
+            newElement_1 =
+                env->NewObject(threadInterfaceScanResultStructClass_2, threadInterfaceScanResultStructCtor_2, newElement_1_panId,
+                               newElement_1_extendedPanId, newElement_1_networkName, newElement_1_channel, newElement_1_version,
+                               newElement_1_extendedAddress, newElement_1_rssi, newElement_1_lqi);
+            chip::JniReferences::GetInstance().AddToList(ThreadScanResultsInsideOptional, newElement_1);
+        }
+        chip::JniReferences::GetInstance().CreateOptional(ThreadScanResultsInsideOptional, ThreadScanResults);
+    }
+
+    env->CallVoidMethod(mJavaObjectRef, javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
+}
+
+void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+
+    CallJavaMethod("onScanNetworksFailure", static_cast<jint>(error.AsInteger()));
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

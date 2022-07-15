@@ -84,7 +84,6 @@ constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVI
 
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
-void OnScanNetworksFailure(void * context, CHIP_ERROR err);
 
 struct ControllerInitParams
 {
@@ -563,6 +562,18 @@ public:
 
     /**
      * @brief
+     *   This function puts the commissioner in a paused state to prevent advancing to the next stage.
+     * It is expected that a DevicePairingDelegate may call this method when processing the
+     * OnCommissioningStatusUpdate, for example, in order to obtain network credentials from the user based
+     * upon the results of the NetworkScan.
+     * Use ResumeCommissioning to continue the commissioning process.
+     *
+     */
+    void PauseCommissioning();
+    void ResumeCommissioning();
+
+    /**
+     * @brief
      * Sends CommissioningStepComplete report to the commissioning delegate. Function will fill in current step.
      * @params[in] err      error from the current step
      * @params[in] report   report to send. Current step will be filled in automatically
@@ -767,6 +778,7 @@ private:
     static void
     OnScanNetworksResponse(void * context,
                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
+    static void OnScanNetworksFailure(void * context, CHIP_ERROR err);
     static void
     OnNetworkConfigResponse(void * context,
                             const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
@@ -875,6 +887,8 @@ private:
     Platform::UniquePtr<app::ReadClient> mReadClient;
     Credentials::AttestationVerificationResult mAttestationResult;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+    bool mCommissioningPaused                                           = false;
+    CHIP_ERROR mCommissioningPausedErr                                  = CHIP_NO_ERROR;
 };
 
 } // namespace Controller

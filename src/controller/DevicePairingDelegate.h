@@ -75,6 +75,20 @@ public:
     {}
 
     virtual void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *  Called with the NetworkScanResponse returned from the target
+     */
+    virtual void OnScanNetworksSuccess(
+        const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
+    {}
+
+    /**
+     * @brief
+     *  Called when the NetworkScan request fails.
+     */
+    virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
 };
 
 } // namespace Controller

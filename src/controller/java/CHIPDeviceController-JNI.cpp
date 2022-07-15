@@ -378,6 +378,40 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
     }
 }
 
+JNI_METHOD(void, pauseCommissioning)
+(JNIEnv * env, jobject self, jlong handle)
+{
+    ChipLogProgress(Controller, "pauseCommissioning() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->Controller()->PauseCommissioning();
+}
+
+JNI_METHOD(void, resumeCommissioning)
+(JNIEnv * env, jobject self, jlong handle)
+{
+    ChipLogProgress(Controller, "resumeCommissioning() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->Controller()->ResumeCommissioning();
+}
+
+JNI_METHOD(void, updateCommissioningNetworkCredentials)
+(JNIEnv * env, jobject self, jlong handle, jobject networkCredentials)
+{
+    ChipLogProgress(Controller, "updateCommissioningNetworkCredentials() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    wrapper->Controller()->ResumeCommissioning();
+
+    CommissioningParameters commissioningParams = CommissioningParameters();
+    wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    wrapper->UpdateNetworkCredentials(commissioningParams);
+}
+
 JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
 (JNIEnv * env, jobject self, jbyteArray x509Cert)
 {
