@@ -158,12 +158,13 @@ struct CATValues
     bool CheckSubjectAgainstCATs(NodeId subject) const
     {
         VerifyOrReturnError(IsCASEAuthTag(subject), false);
+        CASEAuthTag candidate = CASEAuthTagFromNodeId(subject);
 
         for (auto cat : values)
         {
-
-            if ((cat != kUndefinedCAT) && ((cat & kTagIdentifierMask) == (subject & kTagIdentifierMask)) &&
-                ((cat & kTagVersionMask) >= (subject & kTagVersionMask)))
+            if ((cat != kUndefinedCAT) && (GetCASEAuthTagIdentifier(cat) == GetCASEAuthTagIdentifier(candidate)) &&
+                (GetCASEAuthTagVersion(candidate) > 0) &&
+                (GetCASEAuthTagVersion(cat) >= GetCASEAuthTagVersion(candidate)))
             {
                 return true;
             }
