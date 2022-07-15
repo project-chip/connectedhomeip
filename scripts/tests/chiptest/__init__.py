@@ -23,7 +23,7 @@ from .test_definition import ApplicationPaths, TestDefinition, TestTarget
 def target_for_name(name: str):
     if name.startswith("TV_") or name.startswith("Test_TC_MC_"):
         return TestTarget.TV
-    if name.startswith("DL_") or name.startswith("Test_TC_DLRK_"):
+    if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
         return TestTarget.LOCK
     if name.startswith("OTA_"):
         return TestTarget.OTA
