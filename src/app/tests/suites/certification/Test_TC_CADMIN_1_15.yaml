@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.15. [TC-CADMIN-1.15] Open commissioning window twice on DUT using BCM
+    24.1.13. [TC-CADMIN-1.15] Open commissioning window twice on DUT using BCM
     then ECM [DUT - Commissionee]
 
 config:
@@ -52,6 +52,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -82,6 +83,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -112,6 +114,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -122,6 +125,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0000
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -143,6 +147,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       fabricFiltered: false
+      PICS: OPCREDS.S.A0001
       response:
           value:
               [
@@ -166,6 +171,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0000
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -184,6 +190,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0000
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -205,6 +212,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       fabricFiltered: false
+      PICS: OPCREDS.S.A0001
       response:
           value:
               [
@@ -228,6 +236,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0000
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -246,6 +255,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0000
       arguments:
           values:
               - name: "CommissioningTimeout"

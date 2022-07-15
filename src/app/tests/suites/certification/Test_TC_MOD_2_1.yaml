@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 79.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
+name: 80.2.1. [TC-MOD-2.1] ChangeToMode Verification (DUT as Server)
 
 config:
     nodeId: 0x12344321
@@ -23,7 +23,10 @@ config:
 tests:
     - label: "TH reads the SupportedModes attribute from the DUT"
       verification: |
-          ./chip-tool modeselect read supported-modes 1 1
+          /chip-tool modeselect read supported-modes 1 1
+
+          Verify on the TH Log:
+
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
@@ -60,10 +63,11 @@ tests:
 
     - label:
           "TH sends a ChangeToMode command to the DUT with a integer from the
-          list in step 1."
+          list in step 1"
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
+          Verify on the TH Log:
 
 
           [1649677293.280207][10810:10815] CHIP:DMG:                                 StatusIB =
@@ -76,15 +80,21 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
+          Verify on the TH Log:
+
           [1649678800.298128][10854:10861] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 4277065073
+
           [1649678800.298279][10854:10861] CHIP:TOO:   CurrentMode: 4
       disabled: true
 
     - label:
           "TH sends a Change to Mode command to the DUT with a integer that is
-          not in the list in step 1."
+          not in the list in step 1"
       verification: |
           ./chip-tool modeselect change-to-mode 2 1 1
+
+          Verify on the TH Log:
+
           CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x85
           CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
       disabled: true
