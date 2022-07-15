@@ -423,11 +423,19 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    wrapper->Controller()->ResumeCommissioning();
-
     CommissioningParameters commissioningParams = CommissioningParameters();
-    wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
-    wrapper->UpdateNetworkCredentials(commissioningParams);
+    CHIP_ERROR err                              = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "ApplyNetworkCredentials failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+    err = wrapper->UpdateNetworkCredentials(commissioningParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "UpdateNetworkCredentials failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
 }
 
 JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
