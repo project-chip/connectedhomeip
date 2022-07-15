@@ -137,8 +137,8 @@ else
                 optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
                 shift
                 ;;
-            --chip_disable_wifi_ipv4)
-                optArgs+="chip_disable_wifi_ipv4=true "
+            --chip_enable_wifi_ipv4)
+                optArgs+="chip_enable_wifi_ipv4=true "
                 shift
                 ;;
             *)
