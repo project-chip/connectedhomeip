@@ -207,3 +207,29 @@ tests:
               ]
       response:
           error: CONSTRAINT_ERROR
+
+    - label:
+          "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_0000
+          (TC-ACL-2.4 step 35)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 3, # Operate
+                      AuthMode: 2, # CASE
+                      Subjects: ["18446744073709551615"],
+                      Targets: null
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
