@@ -190,6 +190,8 @@ class TestParser(unittest.TestCase):
                 command WithoutArg(): DefaultSuccess = 123;
                 command InOutStuff(InParam): OutParam = 222;
                 timed command TimedCommand(InParam): DefaultSuccess = 0xab;
+                fabric_scoped command FabricScopedCommand(InParam): DefaultSuccess = 0xac;
+                fabric_scoped Timed command FabricScopedTimedCommand(InParam): DefaultSuccess = 0xad;
             }
         """)
         expected = Idl(clusters=[
@@ -210,6 +212,12 @@ class TestParser(unittest.TestCase):
                         Command(name="TimedCommand", code=0xab,
                                 input_param="InParam", output_param="DefaultSuccess",
                                 attributes=set([CommandAttribute.TIMED_INVOKE])),
+                        Command(name="FabricScopedCommand", code=0xac,
+                                input_param="InParam", output_param="DefaultSuccess",
+                                attributes=set([CommandAttribute.FABRIC_SCOPED])),
+                        Command(name="FabricScopedTimedCommand", code=0xad,
+                                input_param="InParam", output_param="DefaultSuccess",
+                                attributes=set([CommandAttribute.TIMED_INVOKE, CommandAttribute.FABRIC_SCOPED])),
                     ],
                     )])
         self.assertEqual(actual, expected)

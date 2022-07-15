@@ -171,6 +171,9 @@ class MatterIdlTransformer(Transformer):
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
 
+    def fabric_scoped_command(self, _):
+        return CommandAttribute.FABRIC_SCOPED
+
     def command_attributes(self, attrs):
         # List because attrs is a tuple
         return set(list(attrs))

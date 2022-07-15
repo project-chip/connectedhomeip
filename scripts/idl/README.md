@@ -119,6 +119,12 @@ server cluster AccessControl = 31 {
 
   // command invocation can require timed invoke usage
   timed command RequiresTimedInvok(): DefaultSuccess = 4;
+
+  // commands may be fabric scoped
+  fabric_scoped command RequiresTimedInvok(): DefaultSuccess = 4;
+
+  // commands may have multiple attributes
+  fabric_scoped timed command RequiresTimedInvok(): DefaultSuccess = 4;
 }
 
 // A client cluster represents something that is used by an app

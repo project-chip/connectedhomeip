@@ -28,6 +28,7 @@ class FieldAttribute(enum.Enum):
 
 class CommandAttribute(enum.Enum):
     TIMED_INVOKE = enum.auto()
+    FABRIC_SCOPED = enum.auto()
 
 
 class AttributeTag(enum.Enum):
