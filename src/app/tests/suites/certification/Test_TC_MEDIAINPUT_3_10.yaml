@@ -50,7 +50,7 @@ tests:
           [1651055193.215585][155444:155449] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000
+      PICS: PICS_USER_PROMPT && MEDIAINPUT.S.A0000
       arguments:
           values:
               - name: "message"

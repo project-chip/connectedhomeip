@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the CurrentTarget attribute"
-      PICS: MC_TGTNAV.S.A0001
+      PICS: TGTNAV.S.A0001
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:
@@ -43,7 +43,7 @@ tests:
               type: uint8
 
     - label: "Reads the TargetList attribute"
-      PICS: MC_TGTNAV.S.A0000
+      PICS: TGTNAV.S.A0000
       command: "readAttribute"
       attribute: "TargetList"
       response:
@@ -52,7 +52,7 @@ tests:
               type: list
 
     - label: "Sends a NavigateTarget command"
-      PICS: MC_TGTNAV.S.C0000
+      PICS: TGTNAV.S.C0000
       command: "NavigateTarget"
       arguments:
           values:
@@ -60,7 +60,7 @@ tests:
                 value: targetvalue1
 
     - label: "Reads the CurrentTarget attribute"
-      PICS: MC_TGTNAV.S.A0001
+      PICS: TGTNAV.S.A0001
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:

@@ -26,7 +26,12 @@ tests:
           Bridged Device Basic Information cluster on the applicable endpoint"
       PICS: MCORE.BRIDGE && MCORE.BRIDGE.AllowDeviceRename
       verification: |
-          read EP  n . Bridged Device Basic Information . NodeLabel
+          Verify in TH Log
+
+          ./chip-tool bridgeddevicebasic read node-label 1 3
+
+          [1657013337.140125][5753:5758] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 3293551312
+          [1657013337.140235][5753:5758] CHIP:TOO:   NodeLabel: Light 1
       disabled: true
 
     - label:
@@ -34,7 +39,10 @@ tests:
           update the name of this bridged device"
       PICS: MCORE.BRIDGE && MCORE.BRIDGE.AllowDeviceRename
       verification: |
-          no Matter messages for this step
+          Press b in bridge-app
+
+          b
+          [1657013342.067936][16436:16443] CHIP:DL: Device[Light 1]: New Name="Light 1b"
       disabled: true
 
     - label:
@@ -42,7 +50,12 @@ tests:
           cluster on the same endpoint as in 1a"
       PICS: MCORE.BRIDGE && MCORE.BRIDGE.AllowDeviceRename
       verification: |
-          read EP  n . Bridged Device Basic Information . NodeLabel
+          Verify in TH Log
+
+          ./chip-tool bridgeddevicebasic read node-label 1 3
+
+          [1657013347.277584][5759:5764] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 3293551313
+          [1657013347.277631][5759:5764] CHIP:TOO:   NodeLabel: Light 1b
       disabled: true
 
     - label:
@@ -50,15 +63,21 @@ tests:
           non-Matter interface (example: bridge manufacturer provides an app
           which can change the state of the bridged devices, e.g. change a
           lights brightness)"
-      PICS: MCORE.BRIDGE & MCORE.BRIDGE.OtherControl
+      PICS: MCORE.BRIDGE && MCORE.BRIDGE.OtherControl
       verification: |
-          no Matter messages for this step
+          Choose on-off cluster
       disabled: true
 
     - label: "Read the state (e.g. on/off, brightness) of that bridged device"
       PICS: MCORE.BRIDGE & MCORE.BRIDGE.OtherControl
       verification: |
-          read device state
+          Verify in TH Log
+
+          ./chip-tool onoff read on-off 1 3
+
+
+          [1657004565.254591][4804:4809] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303316
+          [1657004565.254635][4804:4809] CHIP:TOO:   OnOff: TRUE
       disabled: true
 
     - label:
@@ -66,11 +85,16 @@ tests:
           with this "other" interface.'
       PICS: MCORE.BRIDGE & MCORE.BRIDGE.OtherControl
       verification: |
-          no Matter messages for this step
+          Press c on bridge-app to change the state
       disabled: true
 
     - label: "Read the state of that bridged device again (as in 2b)"
       PICS: MCORE.BRIDGE & MCORE.BRIDGE.OtherControl
       verification: |
-          read device state
+          Verify in TH Log
+
+          ./chip-tool onoff read on-off 1 3
+
+          [1657004454.213279][4792:4798] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 3808303315
+          [1657004454.213319][4792:4798] CHIP:TOO:   OnOff: FALSE
       disabled: true

@@ -385,6 +385,7 @@ public:
         printf("Test_TC_AUDIOOUTPUT_7_3\n");
         printf("Test_TC_AUDIOOUTPUT_7_4\n");
         printf("Test_TC_CONTENTLAUNCHER_10_3\n");
+        printf("Test_TC_CONTENTLAUNCHER_10_4\n");
         printf("Test_TC_CONTENTLAUNCHER_10_5\n");
         printf("Test_TC_CONTENTLAUNCHER_10_7\n");
         printf("Test_TC_MC_11_1\n");
@@ -556,6 +557,17 @@ public:
         printf("Test_TC_S_2_3\n");
         printf("Test_TC_S_3_1\n");
         printf("Test_TC_PCC_3_1\n");
+        printf("Test_TC_ACL_1_1\n");
+        printf("Test_TC_ACL_2_1\n");
+        printf("Test_TC_ACL_2_2\n");
+        printf("Test_TC_ACL_2_3\n");
+        printf("Test_TC_ACL_2_4\n");
+        printf("Test_TC_ACL_2_5\n");
+        printf("Test_TC_ACL_2_6\n");
+        printf("Test_TC_ACL_2_7\n");
+        printf("Test_TC_ACL_2_8\n");
+        printf("Test_TC_ACL_2_9\n");
+        printf("Test_TC_ACL_2_10\n");
 
         return CHIP_NO_ERROR;
     }
@@ -16351,8 +16363,8 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NV || MC_KEYPADINPUT.S.LK || MC_KEYPADINPUT.S.NK"),
+            LogStep(2, "Read the optional global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NV || KEYPADINPUT.S.LK || KEYPADINPUT.S.NK"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
@@ -16539,31 +16551,32 @@ private:
                                  ApplicationLauncher::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.AP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(2, "Read the optional global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.AP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::FeatureMap::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip(" !MC_APPLAUNCHER.S.AP "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip(" !APPLAUNCHER.S.AP "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::FeatureMap::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.A0000 && APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Read the optional attribute(CatalogList) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read the optional attribute(CurrentApp) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
@@ -16739,25 +16752,26 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(2, "Read the optional global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0000 && MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Read the optonal attribute(InputList) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Read the optonal attribute(CurrentInput) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
@@ -17101,31 +17115,33 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.CL || MC_CHANNEL.S.LI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(2, "Read the optional global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.CL || CHANNEL.S.LI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000 && CHANNEL.S.A0001 && CHANNEL.S.A0002"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Read the optional attribute(ChannelList): AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reading optional attribute(Lineup) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read the optional attribute(CurrentChannel): AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
@@ -17335,9 +17351,8 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.AS || MC_MEDIAPLAYBACK.S.VS"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(2, "Read the optional global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.AS || MEDIAPLAYBACK.S.VS"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -17348,37 +17363,37 @@ private:
         }
         case 4: {
             LogStep(4, "Read the optional attribute(StartTime) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Read the optional attribute(Duration) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read the optional attribute(SampledPosition) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Read the optional attribute(PlaybackSpeed) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Read the optional attribute(SeekRangeEnd) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Read the optional attribute(SeekRangeStart) in AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
                                  true, chip::NullOptional);
         }
@@ -17566,13 +17581,13 @@ private:
         }
         case 5: {
             LogStep(5, "Read the global attribute: GeneratedCommandList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read the global attribute: GeneratedCommandList");
-            VerifyOrDo(!ShouldSkip(" !MC_MEDIAINPUT.S.NU "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip(" !MEDIAINPUT.S.NU "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
@@ -17735,13 +17750,13 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip(" !MC_TGTNAV.S.A0001 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip(" !TGTNAV.S.A0001 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
@@ -17909,7 +17924,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0000 && MC_APBSC.S.A0001 && MC_APBSC.S.A0003"),
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0000 && APBSC.S.A0001 && APBSC.S.A0003"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AttributeList::Id, true, chip::NullOptional);
@@ -18090,38 +18105,39 @@ private:
                                  ContentLauncher::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.CS || MC_CONTENTLAUNCHER.S.UP"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(2, "Read the optional global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.CS || CONTENTLAUNCHER.S.UP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id, ContentLauncher::Attributes::FeatureMap::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0000 && CONTENTLAUNCHER.S.A0001"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Read the optional attribute(AcceptHeader): AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Read the optional attribute(SupportedStreamingProtocols): AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Read the optional command(LaunchContent) in AcceptedCommandList attribute");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.C.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.C.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Read the optional command(LaunchURL) in AcceptedCommandList attribute");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.C.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.C.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
@@ -18373,7 +18389,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends Sleep command to DUT");
-            VerifyOrDo(!ShouldSkip("MC_LOWPOWER.S"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LOWPOWER.S"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LowPower::Commands::Sleep::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
@@ -18465,7 +18481,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends CEC Settings Keys(0x0A) to DUT");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(10);
@@ -18476,7 +18492,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH sends CEC Home Keys(0x09) to DUT");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
@@ -18618,7 +18634,7 @@ private:
         }
         case 1: {
             LogStep(1, "Send Numbers1");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(33);
@@ -18629,7 +18645,7 @@ private:
         }
         case 2: {
             LogStep(2, "Send Numbers2");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(34);
@@ -18640,7 +18656,7 @@ private:
         }
         case 3: {
             LogStep(3, "Send Numbers3");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(35);
@@ -18651,7 +18667,7 @@ private:
         }
         case 4: {
             LogStep(4, "Send Numbers4");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(36);
@@ -18662,7 +18678,7 @@ private:
         }
         case 5: {
             LogStep(5, "Send Numbers5");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(37);
@@ -18673,7 +18689,7 @@ private:
         }
         case 6: {
             LogStep(6, "Send Numbers6");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(38);
@@ -18684,7 +18700,7 @@ private:
         }
         case 7: {
             LogStep(7, "Send Numbers7");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(39);
@@ -18695,7 +18711,7 @@ private:
         }
         case 8: {
             LogStep(8, "Send Numbers8");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(40);
@@ -18706,7 +18722,7 @@ private:
         }
         case 9: {
             LogStep(9, "Send Numbers9");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(41);
@@ -18791,7 +18807,7 @@ private:
             LogStep(1,
                     "TH reads CatalogList attribute from the DUT and where each entry in the list is a CSA-issued Vendor Id of "
                     "type unsigned 16 bit integer ranging between 0-65536 for the catalog");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18876,7 +18892,7 @@ private:
                     "TH reads CurrentApp attribute from the DUT and Verify the in-focus application attributes, which should "
                     "include the display Application ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no current "
                     "in-focus application");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18974,7 +18990,7 @@ private:
         }
         case 1: {
             LogStep(1, "Launch an app with the provided a application ID");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
@@ -18991,7 +19007,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH sends a LaunchApp command to DUT to launch an app which is not available");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
@@ -19095,7 +19111,7 @@ private:
         }
         case 1: {
             LogStep(1, "Stop an app with the provided application ID");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type value;
 
@@ -19202,7 +19218,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends HideApp command to DUT");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type value;
 
@@ -19294,7 +19310,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19387,7 +19403,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19397,7 +19413,7 @@ private:
         }
         case 2: {
             LogStep(2, "Select Input Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::SelectInput::Type value;
             value.index = 1U;
@@ -19408,7 +19424,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read current input list");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::CurrentInput::Id, true,
                                  chip::NullOptional);
         }
@@ -19496,13 +19512,13 @@ private:
         }
         case 1: {
             LogStep(1, "Read attribute media input list");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::InputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Hide Input Status Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value,
@@ -19512,7 +19528,7 @@ private:
         }
         case 3: {
             LogStep(3, "Show Input Status Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value,
@@ -19601,7 +19617,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19611,7 +19627,7 @@ private:
         }
         case 2: {
             LogStep(2, "Rename Input Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1U;
@@ -19623,7 +19639,7 @@ private:
         }
         case 3: {
             LogStep(3, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19707,7 +19723,7 @@ private:
             LogStep(1,
                     "TH reads the ChannelList attribute from the DUT and Verify that the response contains a list of the known TV "
                     "channels");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19812,13 +19828,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the ChannelList attribute");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::ChannelList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "TH sends a ChangeChannelByNumber command");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type value;
             value.majorNumber = mMajornumber.HasValue() ? mMajornumber.Value() : 9U;
@@ -19841,7 +19857,7 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the CurrentChannel attribute");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::CurrentChannel::Id, true,
                                  chip::NullOptional);
         }
@@ -19955,7 +19971,7 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the Lineup attribute from the DUT and Verify that the response contains a lineup info object");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19965,19 +19981,19 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the ChannelList attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::ChannelList::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the CurrentChannel attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::CurrentChannel::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Sends a SkipChannel command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::SkipChannel::Type value;
             value.count = 1U;
@@ -19999,7 +20015,7 @@ private:
         }
         case 6: {
             LogStep(6, "Reads the CurrentChannel attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::CurrentChannel::Id, true,
                                  chip::NullOptional);
         }
@@ -20149,7 +20165,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20159,13 +20175,13 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Sends a Play command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
@@ -20186,13 +20202,13 @@ private:
         }
         case 5: {
             LogStep(5, "Reads the playback state attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "sends a Pause command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20218,7 +20234,7 @@ private:
         }
         case 9: {
             LogStep(9, "Sends a Stop command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StopPlayback::Id, value,
@@ -20239,7 +20255,7 @@ private:
         }
         case 11: {
             LogStep(11, "Reads the playback state attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
@@ -20425,7 +20441,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20435,13 +20451,13 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Sends a Play command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
@@ -20462,13 +20478,13 @@ private:
         }
         case 5: {
             LogStep(5, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Sends a StartOver command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StartOver::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StartOver::Id, value,
@@ -20489,7 +20505,7 @@ private:
         }
         case 8: {
             LogStep(8, "Sends a Next command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Next::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Next::Id, value,
@@ -20510,7 +20526,7 @@ private:
         }
         case 10: {
             LogStep(10, "Sends a Previous command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Previous::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Previous::Id, value,
@@ -20531,7 +20547,7 @@ private:
         }
         case 12: {
             LogStep(12, "Sends a SkipForward command to the DUT ");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type value;
             value.deltaPositionMilliseconds = 10000ULL;
@@ -20553,13 +20569,13 @@ private:
         }
         case 14: {
             LogStep(14, "Reads the SampledPosition attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id,
                                  true, chip::NullOptional);
         }
         case 15: {
             LogStep(15, "Sends a SkipBackward command to the DUT ");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type value;
             value.deltaPositionMilliseconds = 10000ULL;
@@ -20581,7 +20597,7 @@ private:
         }
         case 17: {
             LogStep(17, "Reads the SampledPosition attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id,
                                  true, chip::NullOptional);
         }
@@ -20709,7 +20725,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20719,7 +20735,7 @@ private:
         }
         case 2: {
             LogStep(2, "Sends a Seek command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = 10000ULL;
@@ -20741,13 +20757,13 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the SampledPosition attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "TH reads the StartTime attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20757,7 +20773,7 @@ private:
         }
         case 6: {
             LogStep(6, "TH reads the SeekRangeEnd attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20767,7 +20783,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH reads the SeekRangeStart attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20777,7 +20793,7 @@ private:
         }
         case 8: {
             LogStep(8, "TH reads the Duration attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20787,7 +20803,7 @@ private:
         }
         case 9: {
             LogStep(9, "Sends a Seek command Position value beyond the furthest valid position");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = mSeekPosition.HasValue() ? mSeekPosition.Value() : 100000000ULL;
@@ -20986,7 +21002,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20996,19 +21012,19 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Sends a FastForward command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
@@ -21018,19 +21034,19 @@ private:
         }
         case 5: {
             LogStep(5, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Sends a FastForward command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
@@ -21040,13 +21056,13 @@ private:
         }
         case 8: {
             LogStep(8, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Sends a Rewind command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
@@ -21056,13 +21072,13 @@ private:
         }
         case 10: {
             LogStep(10, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
@@ -21073,7 +21089,7 @@ private:
         }
         case 12: {
             LogStep(12, "Sends a Rewind command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
@@ -21083,7 +21099,7 @@ private:
         }
         case 13: {
             LogStep(13, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
@@ -21094,7 +21110,7 @@ private:
         }
         case 14: {
             LogStep(14, "Sends a Play command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
@@ -21104,13 +21120,13 @@ private:
         }
         case 15: {
             LogStep(15, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 16: {
             LogStep(16, "Sends consecutive FastForward commands");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -21120,7 +21136,7 @@ private:
         }
         case 17: {
             LogStep(17, "Sends consecutive Rewind commands");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -21217,13 +21233,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the OutputList attribute");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Sends a SelectAudioOutput command");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
             value.index = 1U;
@@ -21234,7 +21250,7 @@ private:
         }
         case 3: {
             LogStep(3, "Reads the CurrentOutput attribute");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::CurrentOutput::Id, true,
                                  chip::NullOptional);
         }
@@ -21326,13 +21342,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the OutputList attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Sends a RenameOutput command");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
             value.index = 1U;
@@ -21346,7 +21362,7 @@ private:
             LogStep(3,
                     "Reads the OutputList attribute from the DUT Verify that the output at the index provided in step 2 has the "
                     "name CertTest");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -21461,19 +21477,19 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the CurrentTarget attribute");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads the TargetList attribute");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Attributes::TargetList::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Sends a NavigateTarget command");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
             value.target = mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1U;
@@ -21484,7 +21500,7 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the CurrentTarget attribute");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
@@ -21625,49 +21641,49 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the VendorName attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorName::Id,
                                  true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads the VendorID attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorID::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the ApplicationName attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ApplicationName::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads the ProductID attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::ProductID::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reads the Application attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::Application::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads the Status attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::Status::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Reads the ApplicationVersion attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ApplicationVersion::Id, true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Reads the AllowedVendorList attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AllowedVendorList::Id, true, chip::NullOptional);
         }
@@ -21757,13 +21773,13 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the AcceptHeader attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id, ContentLauncher::Attributes::AcceptHeader::Id,
                                  true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "TH reads the SupportedStreamingProtocols attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::SupportedStreamingProtocols::Id, true, chip::NullOptional);
         }
@@ -73900,6 +73916,63 @@ private:
     }
 };
 
+class Test_TC_CONTENTLAUNCHER_10_4Suite : public TestCommand
+{
+public:
+    Test_TC_CONTENTLAUNCHER_10_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_10_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CONTENTLAUNCHER_10_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_CONTENTLAUNCHER_10_5Suite : public TestCommand
 {
 public:
@@ -88994,6 +89067,622 @@ private:
     }
 };
 
+class Test_TC_ACL_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_3Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_4Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_5Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_6Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_6", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_6Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_7Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_7Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_8Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_8", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_8Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_9Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_9", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_9Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_10Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_10", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_10Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 #endif // CONFIG_ENABLE_YAML_TESTS
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -89344,6 +90033,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_AUDIOOUTPUT_7_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_AUDIOOUTPUT_7_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_CONTENTLAUNCHER_10_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_10_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_CONTENTLAUNCHER_10_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_CONTENTLAUNCHER_10_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_11_1Suite>(credsIssuerConfig),
@@ -89515,6 +90205,17 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_S_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_S_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_PCC_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_10Suite>(credsIssuerConfig),
 #endif // CONFIG_ENABLE_YAML_TESTS
     };
 
