@@ -78,6 +78,12 @@ public:
 
     /**
      * @brief
+     *  Called with the ReadCommissioningInfo returned from the target
+     */
+    virtual void OnReadCommissioningInfo(ReadCommissioningInfo info) {}
+
+    /**
+     * @brief
      *  Called with the NetworkScanResponse returned from the target
      */
     virtual void OnScanNetworksSuccess(

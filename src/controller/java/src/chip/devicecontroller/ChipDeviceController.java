@@ -241,6 +241,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
+    if (completionListener != null) {
+      completionListener.onReadCommissioningInfo(vendorId, productId, wifiEndpointId, threadEndpointId);
+    }
+  }
+
   public void onScanNetworksFailure(int errorCode) {
     if (completionListener != null) {
       completionListener.onScanNetworksFailure(errorCode);
@@ -647,6 +653,9 @@ public class ChipDeviceController {
 
     /** Notifies the completion of commissioning. */
     void onCommissioningComplete(long nodeId, int errorCode);
+
+    /** Notifies the completion of each stage of commissioning. */
+    void onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
 
     /** Notifies the completion of each stage of commissioning. */
     void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);

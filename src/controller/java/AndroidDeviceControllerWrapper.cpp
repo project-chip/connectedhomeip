@@ -431,6 +431,21 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
                         jStageCompleted.jniValue(), error.AsInteger());
 }
 
+void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(chip::Controller::ReadCommissioningInfo info)
+{
+    // calls: onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId)
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID onReadCommissioningInfoMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onReadCommissioningInfo", "(JI)V",
+                                                             &onReadCommissioningInfoMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->CallVoidMethod(mJavaObjectRef, onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
+                        static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
+                        static_cast<jint>(info.network.thread.endpoint));
+}
+
 void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
 {
