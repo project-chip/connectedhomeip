@@ -15,6 +15,7 @@ except:
 
     from matter_idl_types import *
 
+
 class SharedTag(enum.Enum):
     FABRIC_SCOPED = enum.auto()
 
@@ -216,14 +217,13 @@ class MatterIdlTransformer(Transformer):
 
         return init_args
 
-
     def command(self, args):
         # The command takes 5 arguments if no input argument, 6 if input
         # argument is provided
         if len(args) != 6:
             args.insert(3, None)
 
-        attr = args[1] # direct command attributes
+        attr = args[1]  # direct command attributes
         for shared_attr in args[0]:
             if shared_attr == SharedTag.FABRIC_SCOPED:
                 attr.add(CommandAttribute.FABRIC_SCOPED)
@@ -232,7 +232,7 @@ class MatterIdlTransformer(Transformer):
 
         return Command(
             attributes=attr,
-            input_param=args[3], output_param=args[4], code=args[5], 
+            input_param=args[3], output_param=args[4], code=args[5],
             **args[2]
         )
 

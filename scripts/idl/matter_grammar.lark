@@ -42,7 +42,6 @@ response_struct: "response"i "struct"i id "=" positive_integer "{" (struct_field
 command_attribute: "timed"i -> timed_command
 command_attributes: command_attribute*
 
-
 command_access: "access"i "(" ("invoke"i ":" access_privilege)? ")"
 
 command_with_access: "command"i command_access? id
