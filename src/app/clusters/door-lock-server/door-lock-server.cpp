@@ -228,6 +228,14 @@ bool DoorLockServer::GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpo
                         Attributes::NumberOfHolidaySchedulesSupported::Get, numberOfHolidaySchedules);
 }
 
+bool DoorLockServer::SendLockAlarmEvent(chip::EndpointId endpointId, DlAlarmCode alarmCode)
+{
+    Events::DoorLockAlarm::Type event { alarmCode };
+    SendEvent(endpointId, event);
+
+    return true;
+}
+
 void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)

@@ -31,6 +31,10 @@ public:
 
     bool InitEndpoint(chip::EndpointId endpointId);
 
+    bool ToggleDoorState(chip::EndpointId endpointId);
+
+    bool SendLockJammedAlarm(chip::EndpointId endpointId);
+
     bool Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     bool Unlock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
 

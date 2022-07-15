@@ -133,6 +133,30 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
     return true;
 }
 
+DlDoorState LockEndpoint::GetDoorState() const
+{
+    return mDoorState;
+}
+
+bool LockEndpoint::SetDoorState(DlDoorState newState)
+{
+    if (mDoorState != newState)
+    {
+        ChipLogProgress(Zcl, "Changing the door state to: %d [endpointId=%d,previousState=%d]", to_underlying(newState),
+                        mEndpointId, to_underlying(mDoorState));
+
+        mDoorState = newState;
+        return DoorLockServer::Instance().SetDoorState(mEndpointId, mDoorState);
+    }
+    return true;
+}
+
+bool LockEndpoint::SendLockJammedAlarm() const
+{
+    ChipLogProgress(Zcl, "Changing the Lock Jamed event [endpointId=%d]", mEndpointId);
+    return DoorLockServer::Instance().SendLockAlarmEvent(mEndpointId, DlAlarmCode::kLockJammed);
+}
+
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                                  EmberAfPluginDoorLockCredentialInfo & credential) const
 {

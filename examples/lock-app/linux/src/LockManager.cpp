@@ -112,6 +112,37 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     return true;
 }
 
+bool LockManager::ToggleDoorState(chip::EndpointId endpointId)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to toggle the door state - endpoint does not exist or not initialized [endpointId=%d]",
+                     endpointId);
+        return false;
+    }
+
+    auto currentState = lockEndpoint->GetDoorState();
+    if (currentState == DlDoorState::kDoorOpen)
+    {
+        return lockEndpoint->SetDoorState(DlDoorState::kDoorClosed);
+    }
+    // We assume that toggling the door state from any non-open state means completely opening it.
+    // The reason is that other states are optional for DPS feature and out of scope of this example.
+    return lockEndpoint->SetDoorState(DlDoorState::kDoorOpen);
+}
+
+bool LockManager::SendLockJammedAlarm(chip::EndpointId endpointId)
+{
+    auto lockEndpoint = getEndpoint(endpointId);
+    if (nullptr == lockEndpoint)
+    {
+        ChipLogError(Zcl, "Unable to send lock alarm - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
+        return false;
+    }
+    return lockEndpoint->SendLockJammedAlarm();
+}
+
 bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)
 {
     auto lockEndpoint = getEndpoint(endpointId);

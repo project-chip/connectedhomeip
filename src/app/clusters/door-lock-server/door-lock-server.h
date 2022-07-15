@@ -35,6 +35,7 @@
 #endif
 
 using chip::Optional;
+using chip::app::Clusters::DoorLock::DlAlarmCode;
 using chip::app::Clusters::DoorLock::DlCredentialRule;
 using chip::app::Clusters::DoorLock::DlCredentialType;
 using chip::app::Clusters::DoorLock::DlDataOperationType;
@@ -116,6 +117,8 @@ public:
     bool GetNumberOfYearDaySchedulesPerUserSupported(chip::EndpointId endpointId, uint8_t & numberOfYearDaySchedulesPerUser);
     bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
     bool GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpointId, uint8_t & numberOfHolidaySchedules);
+
+    bool SendLockAlarmEvent(chip::EndpointId endpointId, DlAlarmCode alarmCode);
 
     chip::BitFlags<DoorLockFeature> GetFeatures(chip::EndpointId endpointId);
 

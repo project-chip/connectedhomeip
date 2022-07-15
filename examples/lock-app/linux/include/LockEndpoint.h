@@ -47,7 +47,7 @@ public:
                  uint8_t weekDaySchedulesPerUser, uint8_t yearDaySchedulesPerUser, uint8_t numberOfCredentialsPerUser,
                  uint8_t numberOfHolidaySchedules) :
         mEndpointId{ endpointId },
-        mLockState{ DlLockState::kLocked }, mLockUsers(numberOfLockUsersSupported),
+        mLockState{ DlLockState::kLocked }, mDoorState{ DlDoorState::kDoorClosed }, mLockUsers(numberOfLockUsersSupported),
         mLockCredentials(numberOfCredentialsSupported + 1),
         mWeekDaySchedules(numberOfLockUsersSupported, std::vector<WeekDaysScheduleInfo>(weekDaySchedulesPerUser)),
         mYearDaySchedules(numberOfLockUsersSupported, std::vector<YearDayScheduleInfo>(yearDaySchedulesPerUser)),
@@ -57,7 +57,7 @@ public:
         {
             lockUser.credentials.reserve(numberOfCredentialsPerUser);
         }
-
+        DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
         DoorLockServer::Instance().SetLockState(endpointId, mLockState);
     }
 
@@ -70,6 +70,12 @@ public:
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
                  uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
                  const DlCredential * credentials, size_t totalCredentials);
+
+    bool SetDoorState(DlDoorState newState);
+
+    DlDoorState GetDoorState() const;
+
+    bool SendLockJammedAlarm() const;
 
     bool GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
@@ -94,6 +100,7 @@ private:
 
     chip::EndpointId mEndpointId;
     DlLockState mLockState;
+    DlDoorState mDoorState;
 
     // This is very naive implementation of users/credentials/schedules database and by no means the best practice. Proper storage
     // of those items is out of scope of this example.
