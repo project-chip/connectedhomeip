@@ -178,6 +178,16 @@ public class ChipDeviceController {
     resumeCommissioning(deviceControllerPtr);
   }
 
+  /**
+   * Update the network credentials held by the commissioner for the current 
+   * commissioning session. The updated values will be used by the commissioner
+   * if the network credentials haven't already been sent to the device.
+   * 
+   * Its expected that this method will be called in response to the NetworkScan
+   * or the ReadCommissioningInfo callbacks.
+   * 
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to use in commissioning
+   */
   public void updateCommissioningNetworkCredentials(
       NetworkCredentials networkCredentials) {
         updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);

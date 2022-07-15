@@ -1900,41 +1900,6 @@ void DeviceCommissioner::OnScanNetworksResponse(void * context,
                     to_underlying(data.networkingStatus),
                     (data.debugText.HasValue() ? std::string(data.debugText.Value().data(), data.debugText.Value().size()).c_str()
                                                : "none provided"));
-    if (data.networkingStatus == NetworkCommissioning::NetworkCommissioningStatus::kSuccess)
-    {
-        if (data.wiFiScanResults.HasValue())
-        {
-            ChipLogProgress(Controller, "ScanNetwork response, has WiFi results");
-
-            auto iter_WiFiScanResultsInsideOptional_1 = data.wiFiScanResults.Value().begin();
-            while (iter_WiFiScanResultsInsideOptional_1.Next())
-            {
-                auto & entry_1 = iter_WiFiScanResultsInsideOptional_1.GetValue();
-                ChipLogProgress(Controller, "ScanNetwork response, next WiFi channel=%d", entry_1.channel);
-            }
-        }
-        else
-        {
-            ChipLogProgress(Controller, "ScanNetwork response, no WiFi results");
-        }
-        if (data.threadScanResults.HasValue())
-        {
-            ChipLogProgress(Controller, "ScanNetwork response, has Thread results");
-
-            auto iter_ThreadScanResultsInsideOptional_1 = data.threadScanResults.Value().begin();
-            while (iter_ThreadScanResultsInsideOptional_1.Next())
-            {
-                auto & entry_1 = iter_ThreadScanResultsInsideOptional_1.GetValue();
-                ChipLogProgress(Controller, "ScanNetwork response, next Thread network name=%s",
-                                std::string(entry_1.networkName.data(), entry_1.networkName.size()).c_str());
-            }
-        }
-        else
-        {
-            ChipLogProgress(Controller, "ScanNetwork response, no Thread results");
-        }
-    }
-
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     if (commissioner->GetPairingDelegate() != nullptr)
