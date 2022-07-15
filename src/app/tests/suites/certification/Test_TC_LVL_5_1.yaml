@@ -28,6 +28,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition Send On Command"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
@@ -147,3 +160,16 @@ tests:
           values:
               - name: "ms"
                 value: 100
+
+    - label: "Precondition send Off Command"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

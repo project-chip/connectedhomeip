@@ -244,16 +244,14 @@ function getManualTests() {
         "Test_TC_CADMIN_1_22",
         "Test_TC_CADMIN_1_23",
         "Test_TC_CADMIN_1_24",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26",
-        "Test_TC_CADMIN_1_27",
-        "Test_TC_CADMIN_1_28",
         // Slow tests that should not run in CI because they take many minutes each
         "Test_TC_CADMIN_1_5",
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
         "Test_TC_CADMIN_1_15",
+        "Test_TC_CADMIN_1_25",
+        "Test_TC_CADMIN_1_26",
     ];
 
     const ModeSelect = [

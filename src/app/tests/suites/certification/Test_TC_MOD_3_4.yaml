@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 79.3.4. [TC-MOD-3.4] OnMode Overwriting StartUpMode (DUT as Server)
+name: 80.3.4. [TC-MOD-3.4] OnMode Overwriting StartUpMode (DUT as Server)
 
 config:
     nodeId: 0x12344321
@@ -22,32 +22,42 @@ config:
 
 tests:
     - label: "TH reads the StartUpMode attribute from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
+
+          Verify on the TH Log:
 
           [1651099663211] [82177:7560652] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 2609052118
           [1651099663212] [82177:7560652] CHIP: [TOO]   StartUpMode: 0
       disabled: true
 
     - label: "TH reads the OnMode attribute from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
+          Verify on the TH Log:
+
           [1654780979.979743][61542:61547] CHIP:DMG: }
           [1654780979.980040][61542:61547] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 235764160
-          [1654780979.980202][61542:61547] CHIP:TOO:   OnMode: null
+          [1654780979.980202][61542:61547] CHIP:TOO:   OnMode: 4
       disabled: true
 
     - label:
           "If the StartUpMode and OnMode attributes have the same value, proceed
-          to step 2c, Otherwise proceed to step 3."
+          to step 2c, Otherwise proceed to step 3"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           If the StartUpMode and OnMode attributes have the same value, proceed to step 2c,  Otherwise proceed to step 3.
       disabled: true
 
     - label: "TH reads the _SupportedModes attribute_ from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
+
+          Verify on the TH Log:
 
           [1654154058.284710][3492:3497] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 694763126
           [1654154058.284829][3492:3497] CHIP:TOO:   SupportedModes: 3 entries
@@ -84,8 +94,11 @@ tests:
           "Select a value from the list in step 2c with a different value than
           the _StartUpMode_ value read in step 1. TH sends a write command for
           _OnMode_ to the DUT with the selected value."
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
-          ./chip-tool modeselect write on-mode 4 1 1
+          ./chip-tool modeselect write on-mode 7 1 1
+
+          Verify on the TH Log:
 
           [1651099941884] [84269:7567211] CHIP: [DMG] WriteResponseMessage =
           [1651099941884] [84269:7567211] CHIP: [DMG] {
@@ -114,19 +127,24 @@ tests:
       disabled: true
 
     - label: "TH reads the _OnMode attribute_ from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
+          Verify on the TH Log:
+
           [1651100140426] [84609:7569911] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 2609052120
-          [1651100140426] [84609:7569911] CHIP: [TOO]   OnMode: 4
+          [1651100140426] [84609:7569911] CHIP: [TOO]   OnMode: 7
       disabled: true
 
     - label:
           "TH writes 1 to _StartUpOnOff attribute_ of the OnOff Cluster of the
           DUT"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           ./chip-tool onoff write start-up-on-off 1 1 1
 
+          Verify on the TH Log:
 
           [1651101661959] [90832:7598169] CHIP: [DMG] WriteResponseMessage =
           [1651101661959] [90832:7598169] CHIP: [DMG] {
@@ -154,14 +172,18 @@ tests:
           [1651101661960] [90832:7598169] CHIP: [DMG] }
       disabled: true
 
-    - label: "Physically power cycle the device."
+    - label: "Physically power cycle the device"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           Physically power cycle the device.
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0004 && MOD.S.A0005 && OO.S.A4003
       verification: |
           ./chip-tool modeselect read current-mode 1 1
+
+          Verify on the TH Log:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 2609052120
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4

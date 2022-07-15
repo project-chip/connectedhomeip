@@ -33,7 +33,7 @@ tests:
       command: "readAttribute"
       attribute: "on off transition time"
       response:
-          value: 0
+          saveAs: OnOffTransitionTimeValue
           constraints:
               type: uint16
 
@@ -52,6 +52,7 @@ tests:
           value: 10
           constraints:
               type: uint16
+              notValue: OnOffTransitionTimeValue
 
     - label: "Reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
@@ -67,14 +68,14 @@ tests:
       command: "writeAttribute"
       attribute: "on level"
       arguments:
-          value: 254
+          value: 5
 
     - label: "Reads the OnLevel attribute from the DUT"
       PICS: LVL.S.A0011
       command: "readAttribute"
       attribute: "on level"
       response:
-          value: 254
+          value: 5
           constraints:
               type: uint8
               notValue: OnLevelValue
@@ -93,14 +94,14 @@ tests:
       command: "writeAttribute"
       attribute: "on transition time"
       arguments:
-          value: 100
+          value: 5
 
     - label: "Reads the OnTransitionTime attribute from the DUT"
       PICS: LVL.S.A0012
       command: "readAttribute"
       attribute: "on transition time"
       response:
-          value: 100
+          value: 5
           constraints:
               type: uint16
               notValue: OnTransitionTimeValue
@@ -119,14 +120,14 @@ tests:
       command: "writeAttribute"
       attribute: "off transition time"
       arguments:
-          value: 100
+          value: 10
 
     - label: "Reads the OffTransitionTime attribute from the DUT"
       PICS: LVL.S.A0013
       command: "readAttribute"
       attribute: "off transition time"
       response:
-          value: 100
+          value: 10
           constraints:
               type: uint16
               notValue: OffTransitionTimeValue
@@ -136,7 +137,7 @@ tests:
       command: "readAttribute"
       attribute: "default move rate"
       response:
-          value: 50
+          saveAs: DefaultMoveRatevalue
           constraints:
               type: uint8
 
@@ -145,16 +146,17 @@ tests:
       command: "writeAttribute"
       attribute: "default move rate"
       arguments:
-          value: 100
+          value: 111
 
     - label: "Reads the DefaultMoveRate attribute from the DUT"
       PICS: LVL.S.A0014
       command: "readAttribute"
       attribute: "default move rate"
       response:
-          value: 100
+          value: 111
           constraints:
               type: uint8
+              notValue: DefaultMoveRatevalue
 
     - label: "Reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
@@ -170,14 +172,14 @@ tests:
       command: "writeAttribute"
       attribute: "start up current level"
       arguments:
-          value: 254
+          value: 5
 
     - label: "reads the StartUpCurrentLevel attribute from the DUT"
       PICS: LVL.S.A4000
       command: "readAttribute"
       attribute: "start up current level"
       response:
-          value: 254
+          value: 5
           constraints:
               type: uint8
               notValue: StartUpCurrentLevelValue

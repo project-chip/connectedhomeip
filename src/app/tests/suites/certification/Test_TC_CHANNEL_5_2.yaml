@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the ChannelList attribute"
-      PICS: MC_CHANNEL.S.A0000
+      PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
       response:
