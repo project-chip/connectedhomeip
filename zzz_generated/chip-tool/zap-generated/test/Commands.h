@@ -54460,7 +54460,7 @@ class TestAccessControlConstraintsSuite : public TestCommand
 {
 public:
     TestAccessControlConstraintsSuite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("TestAccessControlConstraints", 10, credsIssuerConfig)
+        TestCommand("TestAccessControlConstraints", 11, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -54522,6 +54522,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         default:
@@ -54792,7 +54795,41 @@ private:
                                   chip::NullOptional, chip::NullOptional);
         }
         case 7: {
-            LogStep(7, "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_FFFF (TC-ACL-2.4 step 35)");
+            LogStep(7, "Constraint error: Invalid privilege value step 32)");
+            ListFreer listFreer;
+            chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
+
+            {
+                auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+                listFreer.add(listHolder_0);
+
+                listHolder_0->mList[0].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+                listHolder_0->mList[0].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+                listHolder_0->mList[0].subjects.SetNonNull();
+
+                {
+                    auto * listHolder_3 = new ListHolder<uint64_t>(1);
+                    listFreer.add(listHolder_3);
+                    listHolder_3->mList[0]                  = 112233ULL;
+                    listHolder_0->mList[0].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 1);
+                }
+                listHolder_0->mList[0].targets.SetNull();
+                listHolder_0->mList[0].fabricIndex = 1U;
+
+                listHolder_0->mList[1].privilege = static_cast<chip::app::Clusters::AccessControl::Privilege>(6);
+                listHolder_0->mList[1].authMode  = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+                listHolder_0->mList[1].subjects.SetNull();
+                listHolder_0->mList[1].targets.SetNull();
+                listHolder_0->mList[1].fabricIndex = 1U;
+
+                value = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                    listHolder_0->mList, 2);
+            }
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
+                                  chip::NullOptional, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_FFFF (TC-ACL-2.4 step 35)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 
@@ -54832,8 +54869,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 8: {
-            LogStep(8, "Constraint error: invalid subject 0xFFFF_FFFD_0000_0000 (TC-ACL-2.4 step 36)");
+        case 9: {
+            LogStep(9, "Constraint error: invalid subject 0xFFFF_FFFD_0000_0000 (TC-ACL-2.4 step 36)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 
@@ -54873,8 +54910,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), AccessControl::Id, AccessControl::Attributes::Acl::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 9: {
-            LogStep(9, "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_0000 (TC-ACL-2.4 step 37)");
+        case 10: {
+            LogStep(10, "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_0000 (TC-ACL-2.4 step 37)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> value;
 

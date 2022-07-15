@@ -209,6 +209,32 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
+          "Constraint error: Invalid privilege value
+          step 32)"
+      cluster: "Access Control"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 1,
+                      Privilege: 5, # Administer
+                      AuthMode: 2, # CASE
+                      Subjects: [112233],
+                      Targets: null,
+                  },
+                  {
+                      FabricIndex: 1,
+                      Privilege: 6, # INVALID
+                      AuthMode: 2, # CASE
+                      Subjects: null,
+                      Targets: null,
+                  },
+              ]
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
           "Constraint error: invalid subject 0xFFFF_FFFF_FFFF_FFFF (TC-ACL-2.4
           step 35)"
       cluster: "Access Control"
