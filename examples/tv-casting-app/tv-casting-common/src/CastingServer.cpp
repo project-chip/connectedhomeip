@@ -178,7 +178,7 @@ void CastingServer::OnDescriptorReadFailureResponse(void * context, CHIP_ERROR e
     ChipLogError(AppServer, "Descriptor: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-[[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] 
+[[deprecated("Use ContentLauncher_LaunchURL(..) instead")]]
 CHIP_ERROR CastingServer::ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
                                         std::function<void(CHIP_ERROR)> launchURLResponseCallback)
 {

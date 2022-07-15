@@ -64,7 +64,7 @@ public:
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
 
-    [[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] 
+    [[deprecated("Use ContentLauncher_LaunchURL(..) instead")]]
     CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
                              std::function<void(CHIP_ERROR)> launchURLResponseCallback);
 
