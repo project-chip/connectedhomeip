@@ -21,7 +21,8 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR LaunchURLCommand::Invoke(const char * contentUrl, const char * contentDisplayStr, Optional<ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+CHIP_ERROR LaunchURLCommand::Invoke(const char * contentUrl, const char * contentDisplayStr,
+                                    Optional<ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
                                     std::function<void(CHIP_ERROR)> responseCallback)
 {
     ContentLauncher::Commands::LaunchURL::Type request;

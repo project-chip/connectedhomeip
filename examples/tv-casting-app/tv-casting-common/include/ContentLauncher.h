@@ -27,8 +27,9 @@ class LaunchURLCommand : public MediaCommandBase<chip::app::Clusters::ContentLau
 public:
     LaunchURLCommand() : MediaCommandBase(chip::app::Clusters::ContentLauncher::Id) {}
 
-    CHIP_ERROR Invoke(const char * contentUrl, const char * contentDisplayStr, chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
-                        std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(const char * contentUrl, const char * contentDisplayStr,
+                      chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+                      std::function<void(CHIP_ERROR)> responseCallback);
 };
 
 class LaunchContentCommand : public MediaCommandBase<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,

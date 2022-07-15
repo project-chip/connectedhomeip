@@ -18,23 +18,25 @@
 
 #include "MediaCommandBase.h"
 
-#include <zap-generated/CHIPClusters.h>
 #include <functional>
+#include <zap-generated/CHIPClusters.h>
 
-class StepCommand : public MediaCommandBase<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>
+class StepCommand
+    : public MediaCommandBase<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>
 {
-    public:
-        StepCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
+public:
+    StepCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
-        CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
-                                                   std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime,
+                      uint8_t optionMask, uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class MoveToLevelCommand : public MediaCommandBase<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>
+class MoveToLevelCommand
+    : public MediaCommandBase<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>
 {
-    public:
-        MoveToLevelCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
+public:
+    MoveToLevelCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
-        CHIP_ERROR Invoke(uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
-                                                   std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
+                      std::function<void(CHIP_ERROR)> responseCallback);
 };

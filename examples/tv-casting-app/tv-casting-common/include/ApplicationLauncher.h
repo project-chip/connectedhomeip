@@ -18,32 +18,36 @@
 
 #include "MediaCommandBase.h"
 
-#include <zap-generated/CHIPClusters.h>
 #include <functional>
+#include <zap-generated/CHIPClusters.h>
 
-class LaunchAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type, chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
+class LaunchAppCommand
+    : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,
+                              chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
 {
-    public:
-        LaunchAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
+public:
+    LaunchAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 
-        CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application, chip::Optional<chip::ByteSpan> data,
-                                                   std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                      chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class StopAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type, chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
+class StopAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type,
+                                               chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
 {
-    public:
-        StopAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
+public:
+    StopAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 
-        CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
-                                                   std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                      std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class HideAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type, chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
+class HideAppCommand : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type,
+                                               chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
 {
-    public:
-        HideAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
+public:
+    HideAppCommand() : MediaCommandBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 
-        CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
-                                                   std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                      std::function<void(CHIP_ERROR)> responseCallback);
 };

@@ -18,64 +18,68 @@
 
 #include "MediaCommandBase.h"
 
-#include <zap-generated/CHIPClusters.h>
 #include <functional>
+#include <zap-generated/CHIPClusters.h>
 
-class PlayCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Play::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class PlayCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Play::Type,
+                                            chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        PlayCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    PlayCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class PauseCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Pause::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class PauseCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Pause::Type,
+                                             chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        PauseCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    PauseCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class StopPlaybackCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class StopPlaybackCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type,
+                                                    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        StopPlaybackCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    StopPlaybackCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class NextCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Next::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class NextCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Next::Type,
+                                            chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        NextCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    NextCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class SeekCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Seek::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class SeekCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Seek::Type,
+                                            chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        SeekCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    SeekCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(uint64_t position,
-                            std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(uint64_t position, std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class SkipForwardCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class SkipForwardCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type,
+                                                   chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        SkipForwardCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    SkipForwardCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(uint64_t deltaPositionMilliseconds,
-                            std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
 };
 
-class SkipBackwardCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type, chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
+class SkipBackwardCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type,
+                                                    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
-    public:
-        SkipBackwardCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
+public:
+    SkipBackwardCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
-        CHIP_ERROR Invoke(uint64_t deltaPositionMilliseconds,
-                            std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR Invoke(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
 };

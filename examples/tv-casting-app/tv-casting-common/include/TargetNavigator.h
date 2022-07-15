@@ -21,12 +21,13 @@
 #include <functional>
 #include <zap-generated/CHIPClusters.h>
 
-class NavigateTargetCommand : public MediaCommandBase<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type,
-                                                 chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>
+class NavigateTargetCommand
+    : public MediaCommandBase<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type,
+                              chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>
 {
 public:
     NavigateTargetCommand() : MediaCommandBase(chip::app::Clusters::TargetNavigator::Id) {}
 
     CHIP_ERROR Invoke(const uint8_t target, const chip::Optional<chip::CharSpan> data,
-                        std::function<void(CHIP_ERROR)> responseCallback);
+                      std::function<void(CHIP_ERROR)> responseCallback);
 };

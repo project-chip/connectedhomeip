@@ -22,10 +22,10 @@ using namespace chip;
 using namespace chip::app::Clusters;
 
 CHIP_ERROR NavigateTargetCommand::Invoke(const uint8_t target, const Optional<chip::CharSpan> data,
-                                    std::function<void(CHIP_ERROR)> responseCallback)
+                                         std::function<void(CHIP_ERROR)> responseCallback)
 {
     TargetNavigator::Commands::NavigateTarget::Type request;
-    request.target          = target;
-    request.data       = data;
+    request.target = target;
+    request.data   = data;
     return MediaCommandBase::Invoke(request, responseCallback);
 }

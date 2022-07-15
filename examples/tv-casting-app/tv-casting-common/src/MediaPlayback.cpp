@@ -45,24 +45,21 @@ CHIP_ERROR NextCommand::Invoke(std::function<void(CHIP_ERROR)> responseCallback)
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR SeekCommand::Invoke(uint64_t position,
-                                std::function<void(CHIP_ERROR)> responseCallback)
+CHIP_ERROR SeekCommand::Invoke(uint64_t position, std::function<void(CHIP_ERROR)> responseCallback)
 {
     MediaPlayback::Commands::Seek::Type request;
     request.position = position;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR SkipForwardCommand::Invoke(uint64_t deltaPositionMilliseconds,
-                                std::function<void(CHIP_ERROR)> responseCallback)
+CHIP_ERROR SkipForwardCommand::Invoke(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback)
 {
     MediaPlayback::Commands::SkipForward::Type request;
     request.deltaPositionMilliseconds = deltaPositionMilliseconds;
     return MediaCommandBase::Invoke(request, responseCallback);
 }
 
-CHIP_ERROR SkipBackwardCommand::Invoke(uint64_t deltaPositionMilliseconds,
-                                std::function<void(CHIP_ERROR)> responseCallback)
+CHIP_ERROR SkipBackwardCommand::Invoke(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback)
 {
     MediaPlayback::Commands::SkipBackward::Type request;
     request.deltaPositionMilliseconds = deltaPositionMilliseconds;
