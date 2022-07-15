@@ -500,7 +500,7 @@ CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & 
 
 /**
  * Validate CHIP Root CA Certificate (RCAC) in ByteSpan TLV-encoded form.
- * This function performs RCAC parcing, checks SubjectDN validity, verifies that SubjectDN
+ * This function performs RCAC parsing, checks SubjectDN validity, verifies that SubjectDN
  * and IssuerDN are equal, verifies that SKID and AKID are equal, validates certificate signature.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
