@@ -169,6 +169,21 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort", "()I", &getUdpListenPort);
     SuccessOrExit(err);
 
+    jmethodID getFailsafeTimerSeconds;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getFailsafeTimerSeconds", "()I",
+                                                        &getFailsafeTimerSeconds);
+    SuccessOrExit(err);
+
+    jmethodID getAttemptNetworkScanWiFi;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttemptNetworkScanWiFi", "()Z",
+                                                        &getAttemptNetworkScanWiFi);
+    SuccessOrExit(err);
+
+    jmethodID getAttemptNetworkScanThread;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAttemptNetworkScanThread", "()Z",
+                                                        &getAttemptNetworkScanThread);
+    SuccessOrExit(err);
+
     jmethodID getKeypairDelegate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate",
                                                         "()Lchip/devicecontroller/KeypairDelegate;", &getKeypairDelegate);
@@ -199,13 +214,16 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
         jbyteArray operationalCertificate  = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
         jbyteArray ipk                     = (jbyteArray) env->CallObjectMethod(controllerParams, getIpk);
+        uint16_t failsafeTimerSeconds      = env->CallIntMethod(controllerParams, getFailsafeTimerSeconds);
+        bool attemptNetworkScanWiFi        = env->CallIntMethod(controllerParams, getAttemptNetworkScanWiFi);
+        bool attemptNetworkScanThread      = env->CallIntMethod(controllerParams, getAttemptNetworkScanThread);
 
         std::unique_ptr<chip::Controller::AndroidOperationalCredentialsIssuer> opCredsIssuer(
             new chip::Controller::AndroidOperationalCredentialsIssuer());
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
             DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, listenPort, &err);
+            operationalCertificate, ipk, listenPort, failsafeTimerSeconds, attemptNetworkScanWiFi, attemptNetworkScanThread, &err);
         SuccessOrExit(err);
     }
 
