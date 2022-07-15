@@ -21,7 +21,7 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR NavigateTargetCommand::Invoke(const uint8_t target, const Optional<chip::CharSpan> data, 
+CHIP_ERROR NavigateTargetCommand::Invoke(const uint8_t target, const Optional<chip::CharSpan> data,
                                     std::function<void(CHIP_ERROR)> responseCallback)
 {
     TargetNavigator::Commands::NavigateTarget::Type request;

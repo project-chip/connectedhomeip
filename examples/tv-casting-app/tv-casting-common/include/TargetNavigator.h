@@ -27,6 +27,6 @@ class NavigateTargetCommand : public MediaCommandBase<chip::app::Clusters::Targe
 public:
     NavigateTargetCommand() : MediaCommandBase(chip::app::Clusters::TargetNavigator::Id) {}
 
-    CHIP_ERROR Invoke(const uint8_t target, const chip::Optional<chip::CharSpan> data, 
+    CHIP_ERROR Invoke(const uint8_t target, const chip::Optional<chip::CharSpan> data,
                         std::function<void(CHIP_ERROR)> responseCallback);
 };

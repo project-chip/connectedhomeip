@@ -279,7 +279,7 @@ void CastingServer::SetDefaultFabricIndex()
     ChipLogError(AppServer, " -- No initialized fabrics with video players");
 }
 
-CHIP_ERROR CastingServer::LaunchURL(const char * contentUrl, const char * contentDisplayStr, chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation, 
+CHIP_ERROR CastingServer::LaunchURL(const char * contentUrl, const char * contentDisplayStr, chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
                                     std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mLaunchURLCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
@@ -356,21 +356,21 @@ CHIP_ERROR CastingServer::LaunchApp(chip::app::Clusters::ApplicationLauncher::St
     return mLaunchAppCommand.Invoke(application, data, responseCallback);
 }
 
-CHIP_ERROR CastingServer::StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application, 
+CHIP_ERROR CastingServer::StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                                    std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mStopAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
     return mStopAppCommand.Invoke(application, responseCallback);
 }
 
-CHIP_ERROR CastingServer::HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application, 
+CHIP_ERROR CastingServer::HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                                    std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mHideAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
     return mHideAppCommand.Invoke(application, responseCallback);
 }
 
-CHIP_ERROR CastingServer::NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data, 
+CHIP_ERROR CastingServer::NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
                         std::function<void(CHIP_ERROR)> responseCallback)
 {
     ReturnErrorOnFailure(mNavigateTargetCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));

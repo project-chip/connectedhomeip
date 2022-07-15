@@ -24,7 +24,7 @@ using namespace chip::app::Clusters;
 CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
                                                    std::function<void(CHIP_ERROR)> responseCallback)
 {
-    LevelControl::Commands::Step::Type request;    
+    LevelControl::Commands::Step::Type request;
     request.stepMode       = stepMode;
     request.stepSize        = stepSize;
     request.transitionTime = transitionTime;

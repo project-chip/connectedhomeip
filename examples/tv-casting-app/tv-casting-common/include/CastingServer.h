@@ -73,9 +73,9 @@ public:
     chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
     void SetDefaultFabricIndex();
 
-    CHIP_ERROR LaunchURL(const char * contentUrl, const char * contentDisplayStr, chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation, 
+    CHIP_ERROR LaunchURL(const char * contentUrl, const char * contentDisplayStr, chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
                             std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search, bool autoPlay, chip::Optional<chip::CharSpan> data, 
+    CHIP_ERROR LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search, bool autoPlay, chip::Optional<chip::CharSpan> data,
                              std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
                                                    std::function<void(CHIP_ERROR)> responseCallback);
@@ -90,11 +90,11 @@ public:
     CHIP_ERROR SkipBackward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application, chip::Optional<chip::ByteSpan> data,
                                                    std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application, 
+    CHIP_ERROR StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                                    std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application, 
+    CHIP_ERROR HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                                                    std::function<void(CHIP_ERROR)> responseCallback);
-    CHIP_ERROR NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data, 
+    CHIP_ERROR NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
                         std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode, std::function<void(CHIP_ERROR)> responseCallback);
 
