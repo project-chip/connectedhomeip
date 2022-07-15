@@ -1832,6 +1832,13 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     }
     mAttributeCache = nullptr;
     mReadClient     = nullptr;
+
+    // todo - callback for read commissioning info
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnReadCommissioningInfo(info);
+    }
+
     CommissioningDelegate::CommissioningReport report;
     report.Set<ReadCommissioningInfo>(info);
     CommissioningStageComplete(return_err, report);
