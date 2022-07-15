@@ -53,7 +53,7 @@ tests:
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify on the TH 
+          Verify on the TH
 
           [1654595268.854568][14400:14405] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595268.854678][14400:14405] CHIP:TOO:   SupportedModes: 3 entries
