@@ -433,26 +433,30 @@ CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
     // Map some common errors into an underlying IM error
     // Separate logging is done to not lose the original error location in case such
     // this are available.
+    CHIP_ERROR mappedError = err;
 
     if (err == CHIP_ERROR_INVALID_ARGUMENT)
     {
-        ChipLogError(DataManagement, "Processing error: %" CHIP_ERROR_FORMAT, err.Format());
-        err = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        mappedError = CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     else if (err == CHIP_ERROR_NOT_FOUND)
     {
         // Not found is generally also illegal argument: caused a lookup into an invalid location,
         // like invalid subjects or targets.
-        ChipLogError(DataManagement, "Processing error: %" CHIP_ERROR_FORMAT, err.Format());
-        err = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        mappedError = CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
     else if (err == CHIP_ERROR_NO_MEMORY)
     {
-        ChipLogError(DataManagement, "Processing error: %" CHIP_ERROR_FORMAT, err.Format());
-        err = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+        mappedError = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
     }
 
-    return err;
+    if (mappedError != err)
+    {
+        ChipLogError(DataManagement, "Re-mapped %" CHIP_ERROR_FORMAT " into %" CHIP_ERROR_FORMAT " for IM return codes",
+                     err.Format(), mappedError.Format());
+    }
+
+    return mappedError;
 }
 
 CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
