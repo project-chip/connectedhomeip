@@ -147,7 +147,7 @@ struct CATValues
     {
         for (auto candidate : values)
         {
-            uint16_t candidate_identifier = static_cast<uint16_t>((candidate & kTagIdentifierMask) >> kTagIdentifierShift);
+            uint16_t candidate_identifier = GetCASEAuthTagIdentifier(candidate);
             if ((candidate != kUndefinedCAT) && (identifier == candidate_identifier))
             {
                 return true;
