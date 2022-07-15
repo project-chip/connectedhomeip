@@ -52,16 +52,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
     switch (ret)
     {
-        case 0:
-            return CHIP_NO_ERROR;
-        case -6:
-            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        case -7:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        case -8:
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        default:
-            break;
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
     }
 
     return CHIP_ERROR_INTERNAL;
@@ -92,16 +92,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     int32_t ret = deleteKey(key, key);
     switch (ret)
     {
-        case 0:
-            return CHIP_NO_ERROR;
-        case -6:
-            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        case -7:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        case -8:
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        default:
-            break;
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
     }
 
     return CHIP_ERROR_INTERNAL;
