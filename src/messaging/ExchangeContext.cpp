@@ -449,6 +449,13 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
 
+    // mSession might be null if this timeout is due to the session being
+    // evicted.
+    if (mSession)
+    {
+        mSession->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+    }
+
     ExchangeDelegate * delegate = GetDelegate();
 
     // Call the user's timeout handler.
