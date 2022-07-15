@@ -55,7 +55,14 @@ class AccessControlAttribute : public AttributeAccessInterface, public EntryList
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
 
+    /// IM-level implementation of read
+    ///
+    /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    /// IM-level implementation of write
+    ///
+    /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 public:
@@ -63,6 +70,12 @@ public:
                         ChangeType changeType) override;
 
 private:
+    /// Business logic implementation of write, returns generic CHIP_ERROR.
+    CHIP_ERROR ReadImpl(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+
+    /// Business logic implementation of write, returns generic CHIP_ERROR.
+    CHIP_ERROR WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+
     CHIP_ERROR ReadAcl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
@@ -125,7 +138,7 @@ CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -205,7 +218,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
     });
 }
 
-CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -413,6 +426,43 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
 
 exit:
     ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
+{
+    // Map some common errors into an underlying IM error
+    // Separate logging is done to not lose the original error location in case such
+    // this are available.
+
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        ChipLogError(DataManagement, "Processing error: %" CHIP_ERROR_FORMAT, err.Format());
+        err = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    else if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        // Not found is generally also illegal argument: caused a lookup into an invalid location,
+        // like invalid subjects or targets.
+        ChipLogError(DataManagement, "Processing error: %" CHIP_ERROR_FORMAT, err.Format());
+        err = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    else if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        ChipLogError(DataManagement, "Processing error: %" CHIP_ERROR_FORMAT, err.Format());
+        err = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    return err;
+}
+
+CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    return ChipErrorToImErrorMap(ReadImpl(aPath, aEncoder));
+}
+
+CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    return ChipErrorToImErrorMap(WriteImpl(aPath, aDecoder));
 }
 
 } // namespace

@@ -15,13 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AccessControl.h"
 
 // Included for the default AccessControlDelegate logging enables/disables.
 // See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
 // the levels available.
 #include <app/AppBuildConfig.h>
-#include <protocols/interaction_model/StatusCode.h>
+
+#include "AccessControl.h"
 
 namespace chip {
 namespace Access {
@@ -214,7 +214,7 @@ CHIP_ERROR AccessControl::CreateEntry(const SubjectDescriptor * subjectDescripto
 
     VerifyOrReturnError((count + 1) <= maxCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ReturnErrorCodeIf(!IsValid(entry), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    ReturnErrorCodeIf(!IsValid(entry), CHIP_ERROR_INVALID_ARGUMENT);
 
     size_t i = 0;
     ReturnErrorOnFailure(mDelegate->CreateEntry(&i, entry, &fabric));
