@@ -120,6 +120,10 @@ struct CATValues
                 {
                     continue;
                 }
+                if (values[other_idx] == kUndefinedCAT)
+                {
+                    continue;
+                }
 
                 uint16_t other_identifier     = GetCASEAuthTagIdentifier(values[other_idx]);
                 uint16_t candidate_identifier = GetCASEAuthTagIdentifier(candidate);
@@ -158,12 +162,14 @@ struct CATValues
     bool CheckSubjectAgainstCATs(NodeId subject) const
     {
         VerifyOrReturnError(IsCASEAuthTag(subject), false);
-        CASEAuthTag candidate = CASEAuthTagFromNodeId(subject);
+        CASEAuthTag catFromSubject = CASEAuthTagFromNodeId(subject);
 
-        for (auto cat : values)
+        for (auto catFromNoc : values)
         {
-            if ((cat != kUndefinedCAT) && (GetCASEAuthTagIdentifier(cat) == GetCASEAuthTagIdentifier(candidate)) &&
-                (GetCASEAuthTagVersion(candidate) > 0) && (GetCASEAuthTagVersion(cat) >= GetCASEAuthTagVersion(candidate)))
+            if ((catFromNoc != kUndefinedCAT) &&
+                (GetCASEAuthTagIdentifier(catFromNoc) == GetCASEAuthTagIdentifier(catFromSubject)) &&
+                (GetCASEAuthTagVersion(catFromSubject) > 0) &&
+                (GetCASEAuthTagVersion(catFromNoc) >= GetCASEAuthTagVersion(catFromSubject)))
             {
                 return true;
             }
