@@ -163,8 +163,7 @@ struct CATValues
         for (auto cat : values)
         {
             if ((cat != kUndefinedCAT) && (GetCASEAuthTagIdentifier(cat) == GetCASEAuthTagIdentifier(candidate)) &&
-                (GetCASEAuthTagVersion(candidate) > 0) &&
-                (GetCASEAuthTagVersion(cat) >= GetCASEAuthTagVersion(candidate)))
+                (GetCASEAuthTagVersion(candidate) > 0) && (GetCASEAuthTagVersion(cat) >= GetCASEAuthTagVersion(candidate)))
             {
                 return true;
             }
