@@ -37,7 +37,7 @@ chip_inet_config_enable_dns_resolver = false
 chip_inet_config_enable_tun_endpoint = false
 chip_inet_config_enable_tcp_endpoint = true
 chip_inet_config_enable_udp_endpoint = true
-
+chip_detail_logging = false
 pw_build_LINK_DEPS = [
   "$dir_pw_assert:impl",
   "$dir_pw_log:impl",
