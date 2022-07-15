@@ -843,6 +843,7 @@ function getTests() {
         "TestArmFailSafe",
         "TestFanControl",
         "TestAccessControlConstraints",
+        "TestLevelControlWithOnOffDependency"
     ];
 
     const MultiAdmin = [
