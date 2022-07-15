@@ -55,7 +55,7 @@ declare_args() {
   disable_lcd = false
 
   # Argument to Disable IPv4 for wifi(rs911)
-  chip_disable_wifi_ipv4 = false
+  chip_enable_wifi_ipv4 = false
 }
 
 declare_args() {
@@ -206,8 +206,8 @@ efr32_executable("window_app") {
     sources += [ "${examples_plat_dir}/OTAConfig.cpp" ]
   }
 
-  if (chip_disable_wifi_ipv4) {
-    defines += [ "WIFI_IPV4_DISABLED" ]
+  if (chip_enable_wifi_ipv4) {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
   }
 
   # WiFi Settings
