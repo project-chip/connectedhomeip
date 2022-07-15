@@ -983,9 +983,7 @@ static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
 #endif
 
 #if CHIP_CRYPTO_BORINGSSL
-static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext)
-{
-}
+static void TestAddEntropySources(nlTestSuite * inSuite, void * inContext) {}
 #endif
 
 static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContext)

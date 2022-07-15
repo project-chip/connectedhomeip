@@ -66,12 +66,12 @@ namespace Crypto {
 #define BN_CTX_secure_new BN_CTX_new
 #define EC_GROUP_clear_free EC_GROUP_free
 using boringssl_size_t_openssl_int = size_t;
-using boringssl_uint_openssl_int = unsigned int;
-using libssl_err_type = uint32_t;
+using boringssl_uint_openssl_int   = unsigned int;
+using libssl_err_type              = uint32_t;
 #else
 using boringssl_size_t_openssl_int = int;
-using boringssl_uint_openssl_int = int;
-using libssl_err_type = unsigned long;
+using boringssl_uint_openssl_int   = int;
+using libssl_err_type              = unsigned long;
 #endif // CHIP_CRYPTO_BORINGSSL
 
 #define kKeyLengthInBits 256
@@ -148,7 +148,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
                            const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
-  #if CHIP_CRYPTO_BORINGSSL
+#if CHIP_CRYPTO_BORINGSSL
     EVP_AEAD_CTX * context = nullptr;
     size_t written_tag_len = 0;
     const EVP_AEAD * aead  = nullptr;
@@ -199,7 +199,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 #if CHIP_CRYPTO_BORINGSSL
     VerifyOrExit(tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, error = CHIP_ERROR_INVALID_ARGUMENT);
 #else
-    VerifyOrExit(tag_length == 8 || tag_length == 12 || tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag_length == 8 || tag_length == 12 || tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
 #endif // CHIP_CRYPTO_BORINGSSL
 
 #if CHIP_CRYPTO_BORINGSSL
@@ -327,7 +328,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
 #if CHIP_CRYPTO_BORINGSSL
     VerifyOrExit(tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, error = CHIP_ERROR_INVALID_ARGUMENT);
 #else
-    VerifyOrExit(tag_length == 8 || tag_length == 12 || tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(tag_length == 8 || tag_length == 12 || tag_length == CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                 error = CHIP_ERROR_INVALID_ARGUMENT);
 #endif // CHIP_CRYPTO_BORINGSSL
     VerifyOrExit(key != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length == kAES_CCM128_Key_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -344,7 +346,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
                                       aad_length);
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 #else
-    type                     = EVP_aes_128_ccm();
+    type = EVP_aes_128_ccm();
 
     context = EVP_CIPHER_CTX_new();
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_NO_MEMORY);
@@ -531,18 +533,21 @@ CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_len
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(secret_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    result = EVP_PKEY_CTX_set1_hkdf_key(context, Uint8::to_const_uchar(secret), static_cast<boringssl_size_t_openssl_int>(secret_length));
+    result = EVP_PKEY_CTX_set1_hkdf_key(context, Uint8::to_const_uchar(secret),
+                                        static_cast<boringssl_size_t_openssl_int>(secret_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     if (salt_length > 0 && salt != nullptr)
     {
         VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(salt_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-        result = EVP_PKEY_CTX_set1_hkdf_salt(context, Uint8::to_const_uchar(salt), static_cast<boringssl_size_t_openssl_int>(salt_length));
+        result = EVP_PKEY_CTX_set1_hkdf_salt(context, Uint8::to_const_uchar(salt),
+                                             static_cast<boringssl_size_t_openssl_int>(salt_length));
         VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
     }
 
     VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(info_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    result = EVP_PKEY_CTX_add1_hkdf_info(context, Uint8::to_const_uchar(info), static_cast<boringssl_size_t_openssl_int>(info_length));
+    result =
+        EVP_PKEY_CTX_add1_hkdf_info(context, Uint8::to_const_uchar(info), static_cast<boringssl_size_t_openssl_int>(info_length));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     result = EVP_PKEY_CTX_hkdf_mode(context, EVP_PKEY_HKDEF_MODE_EXTRACT_AND_EXPAND);
@@ -578,7 +583,8 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     VerifyOrExit(mac_ctx != nullptr, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<boringssl_size_t_openssl_int>(key_length), EVP_sha256(), nullptr);
+    error_openssl = HMAC_Init_ex(mac_ctx, Uint8::to_const_uchar(key), static_cast<boringssl_size_t_openssl_int>(key_length),
+                                 EVP_sha256(), nullptr);
     VerifyOrExit(error_openssl == 1, error = CHIP_ERROR_INTERNAL);
 
     error_openssl = HMAC_Update(mac_ctx, Uint8::to_const_uchar(message), message_length);
@@ -616,9 +622,10 @@ CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, c
     VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(slen), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(CanCastTo<boringssl_uint_openssl_int>(iteration_count), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(CanCastTo<boringssl_size_t_openssl_int>(key_length), error = CHIP_ERROR_INVALID_ARGUMENT);
-    result = PKCS5_PBKDF2_HMAC(Uint8::to_const_char(password), static_cast<boringssl_size_t_openssl_int>(plen), Uint8::to_const_uchar(salt),
-                               static_cast<boringssl_size_t_openssl_int>(slen), static_cast<boringssl_uint_openssl_int>(iteration_count), md, static_cast<boringssl_size_t_openssl_int>(key_length),
-                               Uint8::to_uchar(output));
+    result = PKCS5_PBKDF2_HMAC(Uint8::to_const_char(password), static_cast<boringssl_size_t_openssl_int>(plen),
+                               Uint8::to_const_uchar(salt), static_cast<boringssl_size_t_openssl_int>(slen),
+                               static_cast<boringssl_uint_openssl_int>(iteration_count), md,
+                               static_cast<boringssl_size_t_openssl_int>(key_length), Uint8::to_uchar(output));
 
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
@@ -1677,7 +1684,6 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     int seconds                                     = 0;
 
     VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-
 
     VerifyOrReturnError(!referenceCertificate.empty() && CanCastTo<long>(referenceCertificate.size()) &&
                             !toBeEvaluatedCertificate.empty() && CanCastTo<long>(toBeEvaluatedCertificate.size()),

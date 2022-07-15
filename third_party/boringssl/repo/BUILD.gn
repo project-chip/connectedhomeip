@@ -15,24 +15,24 @@
 import("BUILD.generated.gni")
 
 config("boringssl_config") {
-  include_dirs= [ "src/include" ]
+  include_dirs = [ "src/include" ]
 
-  cflags= [
+  cflags = [
     # TODO: What should we have here?
   ]
+
   # We want the basic crypto impl with no asm primitives until we hook-up platform-based
   # support to the build later.
-  defines= [ "OPENSSL_NO_ASM=1" ]
+  defines = [ "OPENSSL_NO_ASM=1" ]
 }
-all_sources= crypto_sources
+all_sources = crypto_sources
 
-all_headers= crypto_headers
+all_headers = crypto_headers
 
 static_library("boringssl") {
-  public= all_headers
+  public = all_headers
 
-  sources= all_sources
+  sources = all_sources
 
-  public_configs= [ ":boringssl_config" ]
-
+  public_configs = [ ":boringssl_config" ]
 }

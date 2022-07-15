@@ -59,7 +59,7 @@ if (chip_crypto == "openssl") {
   }
 } else if (chip_crypto == "boringssl") {
   import("//build_overrides/boringssl.gni")
-} else if (chip_crypto == "mbedtls"){
+} else if (chip_crypto == "mbedtls") {
   import("//build_overrides/mbedtls.gni")
 }
 
