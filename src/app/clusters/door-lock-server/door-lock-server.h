@@ -196,7 +196,7 @@ private:
                                    uint16_t & userIndex);
 
     bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, chip::ByteSpan credentialData,
-                                   uint16_t & userIndex, uint16_t & credentialIndex);
+                                   uint16_t & userIndex, uint16_t & credentialIndex, EmberAfPluginDoorLockUserInfo & userInfo);
 
     EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
