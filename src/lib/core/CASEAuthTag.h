@@ -36,6 +36,31 @@ static constexpr NodeId kTagVersionMask       = 0x0000'0000'0000'FFFFULL;
 // Maximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
 static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
 
+constexpr NodeId NodeIdFromCASEAuthTag(CASEAuthTag aCAT)
+{
+    return kMinCASEAuthTag | aCAT;
+}
+
+constexpr CASEAuthTag CASEAuthTagFromNodeId(NodeId aNodeId)
+{
+    return aNodeId & kMaskCASEAuthTag;
+}
+
+constexpr bool IsValidCASEAuthTag(CASEAuthTag aCAT)
+{
+    return (aCAT & kTagVersionMask) > 0;
+}
+
+constexpr uint16_t GetCASEAuthTagIdentifier(CASEAuthTag aCAT)
+{
+    return static_cast<uint16_t>((aCAT & kTagIdentifierMask) >> kTagIdentifierShift);
+}
+
+constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
+{
+    return static_cast<uint16_t>(aCAT & kTagVersionMask);
+}
+
 struct CATValues
 {
     std::array<CASEAuthTag, kMaxSubjectCATAttributeCount> values = { kUndefinedCAT };
@@ -73,6 +98,41 @@ struct CATValues
         return false;
     }
 
+    bool AreValid() const
+    {
+        for (size_t idx = 0; idx < size(); ++idx)
+        {
+            const auto & candidate = values[idx];
+            if (candidate == kUndefinedCAT)
+            {
+                continue;
+            }
+
+            // Every entry that is not empty must have version > 0
+            if (!IsValidCASEAuthTag(candidate))
+            {
+                return false;
+            }
+            // Identifiers cannot collide in set (there cannot be more than 1 version of an identifier)
+            for (size_t other_idx = 0; other_idx < size(); ++other_idx)
+            {
+                if (idx == other_idx)
+                {
+                    continue;
+                }
+
+                uint16_t other_identifier     = GetCASEAuthTagIdentifier(values[other_idx]);
+                uint16_t candidate_identifier = GetCASEAuthTagIdentifier(candidate);
+                if (other_identifier == candidate_identifier)
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @brief Returns true if this set contains any version of the `identifier`
      *
@@ -101,9 +161,8 @@ struct CATValues
 
         for (auto cat : values)
         {
-            // All valid CAT values are always in the beginning of the array followed by kUndefinedCAT values.
-            ReturnErrorCodeIf(cat == kUndefinedCAT, false);
-            if (((cat & kTagIdentifierMask) == (subject & kTagIdentifierMask)) &&
+
+            if ((cat != kUndefinedCAT) && ((cat & kTagIdentifierMask) == (subject & kTagIdentifierMask)) &&
                 ((cat & kTagVersionMask) >= (subject & kTagVersionMask)))
             {
                 return true;
@@ -114,9 +173,14 @@ struct CATValues
 
     bool operator==(const CATValues & other) const
     {
-        // Two sets of CATs confer equal permissions if the sets are exactly equal.
+        // Two sets of CATs confer equal permissions if the sets are exactly equal
+        // and the sets are valid.
         // Ignoring kUndefinedCAT values, evaluate this.
         if (this->GetNumTagsPresent() != other.GetNumTagsPresent())
+        {
+            return false;
+        }
+        if (!this->AreValid() || !other.AreValid())
         {
             return false;
         }
@@ -161,30 +225,5 @@ struct CATValues
 };
 
 static constexpr CATValues kUndefinedCATs = { { kUndefinedCAT } };
-
-constexpr NodeId NodeIdFromCASEAuthTag(CASEAuthTag aCAT)
-{
-    return kMinCASEAuthTag | aCAT;
-}
-
-constexpr CASEAuthTag CASEAuthTagFromNodeId(NodeId aNodeId)
-{
-    return aNodeId & kMaskCASEAuthTag;
-}
-
-constexpr bool IsValidCASEAuthTag(CASEAuthTag aCAT)
-{
-    return (aCAT & kTagVersionMask) > 0;
-}
-
-constexpr uint16_t GetCASEAuthTagIdentifier(CASEAuthTag aCAT)
-{
-    return static_cast<uint16_t>((aCAT & kTagIdentifierMask) >> kTagIdentifierShift);
-}
-
-constexpr uint16_t GetCASEAuthTagVersion(CASEAuthTag aCAT)
-{
-    return static_cast<uint16_t>(aCAT & kTagVersionMask);
-}
 
 } // namespace chip

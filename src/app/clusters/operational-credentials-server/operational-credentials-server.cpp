@@ -564,6 +564,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidNOC;
     }
+    if (err == CHIP_ERROR_WRONG_CERT_DN)
+    {
+        return OperationalCertStatus::kInvalidNOC;
+    }
     if (err == CHIP_ERROR_INCORRECT_STATE)
     {
         return OperationalCertStatus::kMissingCsr;
