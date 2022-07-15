@@ -208,9 +208,7 @@ tests:
       response:
           error: CONSTRAINT_ERROR
 
-    - label:
-          "Constraint error: Invalid privilege value
-          step 32)"
+    - label: "Constraint error: Invalid privilege value step 32)"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
