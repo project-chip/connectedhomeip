@@ -15434,7 +15434,7 @@ private:
             LogStep(6, "Wait 9000ms");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 9000UL;
+            value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {

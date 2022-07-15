@@ -94,7 +94,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 9000
+                value: 10000
 
     - label: "Reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0003
