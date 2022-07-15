@@ -134,18 +134,19 @@ def bundle(platform: str, device_name: str) -> None:
         platform: The platform to bundle.
         device_name: The example to bundle.
     """
+    bundler_name = f"bundle_{platform}"
     matter_file = f"{device_name}.matter"
     zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
     flush_print(f"Bundling {platform}", with_border=True)
     flush_print(f"Cleaning {_CD_STAGING_DIR}")
     shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
     os.mkdir(_CD_STAGING_DIR)
-    if platform == "linux":
-        bundle_linux(device_name)
-    elif platform == "nrfconnect":
-        bundle_nrfconnect(device_name)
-    elif platform == "esp32":
-        bundle_esp32(device_name)
+    flush_print(f"Checking for {bundler_name}")
+    chef_module = sys.modules[__name__]
+    if hasattr(chef_module, bundler_name):
+        flush_print(f"Found {bundler_name}")
+        bundler = getattr(chef_module, bundler_name)
+        bundler(device_name)
     else:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
