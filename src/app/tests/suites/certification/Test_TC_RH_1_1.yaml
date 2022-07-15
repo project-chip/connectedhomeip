@@ -36,6 +36,14 @@ tests:
           constraints:
               type: list
 
+    - label: "Read FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -59,14 +67,6 @@ tests:
           value: []
           constraints:
               type: list
-
-    - label: "Read FeatureMap attribute from the DUT and Verify that the DUT"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          value: 0
-          constraints:
-              type: map32
 
     - label:
           "Read EventList attribute from the DUT and Verify that the DUT
