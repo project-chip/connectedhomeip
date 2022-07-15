@@ -70,11 +70,21 @@ public:
      */
     CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
 
+    /**
+     * Update the network credentials used by the active device commissioner
+     */
+    CHIP_ERROR UpdateNetworkCredentials(chip::Controller::CommissioningParameters & params);
+
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
+    void OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted,
+                                     CHIP_ERROR error) override;
+    void OnScanNetworksSuccess(
+        const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
+    void OnScanNetworksFailure(CHIP_ERROR error) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
@@ -145,6 +155,8 @@ private:
     const char * password              = nullptr;
     jbyteArray operationalDatasetBytes = nullptr;
     jbyte * operationalDataset         = nullptr;
+
+    chip::Controller::AutoCommissioner mAutoCommissioner;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidOperationalCredentialsIssuerPtr opCredsIssuer) :
         mController(std::move(controller)), mOpCredsIssuer(std::move(opCredsIssuer))

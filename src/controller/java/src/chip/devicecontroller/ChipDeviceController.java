@@ -23,7 +23,9 @@ import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -168,6 +170,19 @@ public class ChipDeviceController {
     commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
   }
 
+  public void pauseCommissioning() {
+    pauseCommissioning(deviceControllerPtr);
+  }
+
+  public void resumeCommissioning() {
+    resumeCommissioning(deviceControllerPtr);
+  }
+
+  public void updateCommissioningNetworkCredentials(
+      NetworkCredentials networkCredentials) {
+        updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -217,6 +232,29 @@ public class ChipDeviceController {
   public void onCommissioningComplete(long nodeId, int errorCode) {
     if (completionListener != null) {
       completionListener.onCommissioningComplete(nodeId, errorCode);
+    }
+  }
+
+  public void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode) {
+    if (completionListener != null) {
+      completionListener.onCommissioningStatusUpdate(nodeId, stage, errorCode);
+    }
+  }
+
+  public void onScanNetworksFailure(int errorCode) {
+    if (completionListener != null) {
+      completionListener.onScanNetworksFailure(errorCode);
+    }
+  }
+
+  public void onScanNetworksSuccess(Integer networkingStatus,
+      Optional<String> debugText,
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+        wiFiScanResults,
+      Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+        threadScanResults) {
+    if (completionListener != null) {
+      completionListener.onScanNetworksSuccess(networkingStatus, debugText, wiFiScanResults, threadScanResults);
     }
   }
 
@@ -567,6 +605,13 @@ public class ChipDeviceController {
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
+  private native void pauseCommissioning(long deviceControllerPtr);
+
+  private native void resumeCommissioning(long deviceControllerPtr);
+
+  private native void updateCommissioningNetworkCredentials(long deviceControllerPtr, 
+      NetworkCredentials networkCredentials);
+
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
@@ -602,6 +647,20 @@ public class ChipDeviceController {
 
     /** Notifies the completion of commissioning. */
     void onCommissioningComplete(long nodeId, int errorCode);
+
+    /** Notifies the completion of each stage of commissioning. */
+    void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
+
+    /** Notifies when scan networks call fails. */
+    void onScanNetworksFailure(int errorCode);
+
+    void onScanNetworksSuccess(
+          Integer networkingStatus,
+          Optional<String> debugText,
+          Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+              wiFiScanResults,
+          Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+              threadScanResults);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

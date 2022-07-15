@@ -1557,6 +1557,41 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 }
 
+void DeviceCommissioner::PauseCommissioning()
+{
+    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
+    mCommissioningPaused = true;
+}
+
+void DeviceCommissioner::ResumeCommissioning()
+{
+    VerifyOrReturn(mCommissioningPaused);
+    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
+
+    NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
+    DeviceProxy * proxy      = mDeviceBeingCommissioned;
+    mDeviceBeingCommissioned = nullptr;
+    CommissioningDelegate::CommissioningReport report;
+
+    if (mCommissioningDelegate == nullptr)
+    {
+        return;
+    }
+    report.stageCompleted = mCommissioningStage;
+    CHIP_ERROR status     = mCommissioningDelegate->CommissioningStepFinished(mCommissioningPausedErr, report);
+    if (status != CHIP_NO_ERROR)
+    {
+        // Commissioning delegate will only return error if it failed to perform the appropriate commissioning step.
+        // In this case, we should complete the commissioning for it.
+        CompletionStatus completionStatus;
+        completionStatus.err         = status;
+        completionStatus.failedStage = MakeOptional(report.stageCompleted);
+        mCommissioningStage          = CommissioningStage::kCleanup;
+        mDeviceBeingCommissioned     = proxy;
+        CleanupCommissioning(proxy, nodeId, completionStatus);
+    }
+}
+
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
@@ -1568,6 +1603,13 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
+    }
+
+    if (mCommissioningPaused)
+    {
+        mDeviceBeingCommissioned = proxy;
+        mCommissioningPausedErr  = err;
+        return;
     }
     if (mCommissioningDelegate == nullptr)
     {
@@ -1828,11 +1870,16 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
     commissioner->CommissioningStageComplete(err, report);
 }
 
-void OnScanNetworksFailure(void * context, CHIP_ERROR error)
+void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
 {
     ChipLogProgress(Controller, "Received ScanNetworks failure response %s\n", chip::ErrorStr(error));
-    // need to advance to next step
+
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    if (commissioner->GetPairingDelegate() != nullptr)
+    {
+        commissioner->GetPairingDelegate()->OnScanNetworksFailure(error);
+    }
+    // need to advance to next step
     // clear error so that we don't abort the commissioning when ScanNetworks fails
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
@@ -1880,8 +1927,14 @@ void DeviceCommissioner::OnScanNetworksResponse(void * context,
             ChipLogProgress(Controller, "ScanNetwork response, no Thread results");
         }
     }
+
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
-    // clear error so that we don't abort the commissioning when ScanNetworks fails
+
+    if (commissioner->GetPairingDelegate() != nullptr)
+    {
+        commissioner->GetPairingDelegate()->OnScanNetworksSuccess(data);
+    }
+    // need to advance to next step
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR);
 }
 
