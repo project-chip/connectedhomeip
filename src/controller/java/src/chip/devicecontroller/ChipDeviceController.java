@@ -179,18 +179,17 @@ public class ChipDeviceController {
   }
 
   /**
-   * Update the network credentials held by the commissioner for the current
-   * commissioning session. The updated values will be used by the commissioner
-   * if the network credentials haven't already been sent to the device.
+   * Update the network credentials held by the commissioner for the current commissioning session.
+   * The updated values will be used by the commissioner if the network credentials haven't already
+   * been sent to the device.
    *
-   * Its expected that this method will be called in response to the NetworkScan
-   * or the ReadCommissioningInfo callbacks.
+   * <p>Its expected that this method will be called in response to the NetworkScan or the
+   * ReadCommissioningInfo callbacks.
    *
    * @param networkCredentials the credentials (Wi-Fi or Thread) to use in commissioning
    */
-  public void updateCommissioningNetworkCredentials(
-      NetworkCredentials networkCredentials) {
-        updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
+  public void updateCommissioningNetworkCredentials(NetworkCredentials networkCredentials) {
+    updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
   }
 
   public void unpairDevice(long deviceId) {
@@ -251,9 +250,11 @@ public class ChipDeviceController {
     }
   }
 
-  public void onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
+  public void onReadCommissioningInfo(
+      int vendorId, int productId, int wifiEndpointId, int threadEndpointId) {
     if (completionListener != null) {
-      completionListener.onReadCommissioningInfo(vendorId, productId, wifiEndpointId, threadEndpointId);
+      completionListener.onReadCommissioningInfo(
+          vendorId, productId, wifiEndpointId, threadEndpointId);
     }
   }
 
@@ -263,14 +264,16 @@ public class ChipDeviceController {
     }
   }
 
-  public void onScanNetworksSuccess(Integer networkingStatus,
+  public void onScanNetworksSuccess(
+      Integer networkingStatus,
       Optional<String> debugText,
       Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
-        wiFiScanResults,
+          wiFiScanResults,
       Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
-        threadScanResults) {
+          threadScanResults) {
     if (completionListener != null) {
-      completionListener.onScanNetworksSuccess(networkingStatus, debugText, wiFiScanResults, threadScanResults);
+      completionListener.onScanNetworksSuccess(
+          networkingStatus, debugText, wiFiScanResults, threadScanResults);
     }
   }
 
@@ -625,8 +628,8 @@ public class ChipDeviceController {
 
   private native void resumeCommissioning(long deviceControllerPtr);
 
-  private native void updateCommissioningNetworkCredentials(long deviceControllerPtr,
-      NetworkCredentials networkCredentials);
+  private native void updateCommissioningNetworkCredentials(
+      long deviceControllerPtr, NetworkCredentials networkCredentials);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
@@ -665,7 +668,8 @@ public class ChipDeviceController {
     void onCommissioningComplete(long nodeId, int errorCode);
 
     /** Notifies the completion of each stage of commissioning. */
-    void onReadCommissioningInfo(int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
+    void onReadCommissioningInfo(
+        int vendorId, int productId, int wifiEndpointId, int threadEndpointId);
 
     /** Notifies the completion of each stage of commissioning. */
     void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
@@ -674,12 +678,12 @@ public class ChipDeviceController {
     void onScanNetworksFailure(int errorCode);
 
     void onScanNetworksSuccess(
-          Integer networkingStatus,
-          Optional<String> debugText,
-          Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
-              wiFiScanResults,
-          Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
-              threadScanResults);
+        Integer networkingStatus,
+        Optional<String> debugText,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+            wiFiScanResults,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+            threadScanResults);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();
