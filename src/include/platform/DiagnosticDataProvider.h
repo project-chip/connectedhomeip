@@ -186,7 +186,7 @@ private:
 /**
  * Returns the public interface of the DiagnosticDataProvider singleton object.
  *
- * chip applications should use this to access features of the DiagnosticDataProvider object
+ * Matter applications should use this to access features of the DiagnosticDataProvider object
  * that are common to all platforms.
  */
 extern DiagnosticDataProvider & GetDiagnosticDataProvider();
