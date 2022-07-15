@@ -156,13 +156,18 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
-    readHandler.OnInitialRequest(std::move(readRequestbuf));
-    err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
 
-    ctx.DrainAndServiceIO();
+    {
+        app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+        readHandler.OnInitialRequest(std::move(readRequestbuf));
+        err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
 
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        ctx.DrainAndServiceIO();
+
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
+    InteractionModelEngine::GetInstance()->Shutdown();
 }
 
 void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
@@ -224,7 +229,7 @@ void TestReportingEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite
                        clusterInfo->mEndpointId == kInvalidEndpointId && clusterInfo->mClusterId == kInvalidClusterId &&
                            clusterInfo->mAttributeId == kInvalidAttributeId);
     }
-    InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+    InteractionModelEngine::GetInstance()->Shutdown();
 }
 
 bool TestReportingEngine::InsertToDirtySet(const AttributePathParams & aPath)
@@ -318,7 +323,7 @@ void TestReportingEngine::TestMergeAttributePathWhenDirtySetPoolExhausted(nlTest
                    VerifyDirtySetContent(AttributePathParams(kTestEndpointId, kInvalidClusterId),
                                          AttributePathParams(kTestEndpointId + 1, kTestClusterId + 1, 1)));
 
-    InteractionModelEngine::GetInstance()->GetReportingEngine().Shutdown();
+    InteractionModelEngine::GetInstance()->Shutdown();
 }
 
 } // namespace reporting
@@ -337,11 +342,24 @@ const nlTest sTests[] =
 // clang-format on
 
 // clang-format off
+
+/**
+ *  Set up the test suite.
+ */
+int Test_Setup(void * inContext)
+{
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    // The interaction model engine has been inited in AppContext::Init so shutdown it first.
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+
+    return SUCCESS;
+}
 nlTestSuite sSuite =
 {
     "TestReportingEngine",
     &sTests[0],
-    TestContext::Initialize,
+    &Test_Setup,
     TestContext::Finalize
 };
 // clang-format on

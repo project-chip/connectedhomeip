@@ -766,8 +766,16 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
                     "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
                     " Peer = %02x:" ChipLogFormatX64,
                     static_cast<long unsigned>(timeout.count()), mSubscriptionId, mFabricIndex, ChipLogValueX64(mPeerNodeId));
-    err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        timeout, OnLivenessTimeoutCallback, this);
+
+    auto exchangeMgr = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    if (exchangeMgr == nullptr)
+    {
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+    else
+    {
+        err = exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(timeout, OnLivenessTimeoutCallback, this);
+    }
 
     if (err != CHIP_NO_ERROR)
     {
@@ -779,14 +787,18 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
 void ReadClient::CancelLivenessCheckTimer()
 {
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        OnLivenessTimeoutCallback, this);
+    auto exchangeMgr = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    VerifyOrReturn(exchangeMgr != nullptr, ChipLogError(DataManagement, "InteractionModelEngine not running"));
+
+    exchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(OnLivenessTimeoutCallback, this);
 }
 
 void ReadClient::CancelResubscribeTimer()
 {
-    InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
-        OnResubscribeTimerCallback, this);
+    auto exchangeMgr = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    VerifyOrReturn(exchangeMgr != nullptr, ChipLogError(DataManagement, "InteractionModelEngine not running"));
+
+    exchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(OnResubscribeTimerCallback, this);
 }
 
 void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState)
@@ -991,8 +1003,19 @@ bool ReadClient::ResubscribeIfNeeded(uint32_t & aNextResubscribeIntervalMsec)
         ChipLogProgress(DataManagement, "Resubscribe has been stopped");
         return false;
     }
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Milliseconds32(intervalMsec), OnResubscribeTimerCallback, this);
+
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    auto exchangeMgr = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    if (exchangeMgr == nullptr)
+    {
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+    else
+    {
+        err = exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Milliseconds32(intervalMsec),
+                                                                          OnResubscribeTimerCallback, this);
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Fail to resubscribe with error %" CHIP_ERROR_FORMAT, err.Format());

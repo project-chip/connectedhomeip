@@ -2776,11 +2776,25 @@ const nlTest sTests[] =
 // clang-format on
 
 // clang-format off
+
+/**
+ *  Set up the test suite.
+ */
+int Test_Setup(void * inContext)
+{
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    // The interaction model engine has been inited in AppContext::Init so shutdown it first.
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+
+    return SUCCESS;
+}
+
 nlTestSuite sSuite =
 {
     "TestReadInteraction",
     &sTests[0],
-    TestContext::Initialize,
+    &Test_Setup,
     TestContext::Finalize
 };
 // clang-format on

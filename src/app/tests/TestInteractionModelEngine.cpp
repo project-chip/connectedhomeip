@@ -98,6 +98,8 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
 
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 0);
+
+    InteractionModelEngine::GetInstance()->Shutdown();
 }
 
 void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuite * apSuite, void * apContext)
@@ -221,6 +223,8 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(attributePathParamsList);
     NL_TEST_ASSERT(apSuite, GetAttributePathListLength(attributePathParamsList) == 2);
     InteractionModelEngine::GetInstance()->ReleaseAttributePathList(attributePathParamsList);
+
+    InteractionModelEngine::GetInstance()->Shutdown();
 }
 
 } // namespace app
@@ -238,11 +242,25 @@ const nlTest sTests[] =
 // clang-format on
 
 // clang-format off
+
+/**
+ *  Set up the test suite.
+ */
+int Test_Setup(void * inContext)
+{
+    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
+
+    // The interaction model engine has been inited in AppContext::Init so shutdown it first.
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+
+    return SUCCESS;
+}
+
 nlTestSuite sSuite =
 {
     "TestInteractionModelEngine",
     &sTests[0],
-    TestContext::Initialize,
+    &Test_Setup,
     TestContext::Finalize
 };
 // clang-format on

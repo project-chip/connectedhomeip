@@ -520,6 +520,9 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
+    // The interaction model engine has been inited in AppContext::Init so shutdown it first.
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -582,6 +585,7 @@ const nlTest sTests[] =
  */
 int Test_Setup(void * inContext)
 {
+    ChipLogError(chipTool, "Doing setup....");
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
     VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
