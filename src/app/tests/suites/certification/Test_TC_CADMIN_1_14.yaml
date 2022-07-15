@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.14. [TC-CADMIN-1.14] Open commissioning window on DUT twice using ECM
-    then BCM [DUT - Commissioner]
+    24.1.14. [TC-CADMIN-1.14] Open commissioning window twice on DUT using BCM
+    then ECM [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -24,17 +24,16 @@ config:
 
 tests:
     - label: "DUT_CR1 starts a commissioning process with TH_CE"
-      PICS: PICS_MF
       verification: |
-          "1. Provision the device using your DUT controller (use above instructions) ,
+          "1. Provision the device using your DUT controller (use above instructions) , 
           "
       disabled: true
 
     - label:
-          "DUT_CR1 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using ECM and TH_CR3 Commissions
-          with TH_CE"
-      PICS: PICS_MF
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM and
+          TH_CR3 Commissions with TH_CE"
+      PICS: CADMIN.C.C0000
       verification: |
           On your DUT controller, open commissioning window using ECM
 
@@ -63,10 +62,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using ECM and TH_CR2 Commissions
-          with TH_CE"
-      PICS: PICS_MF
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM and
+          TH_CR2 Commissions with TH_CE"
+      PICS: CADMIN.C.C0000
       verification: |
           On your DUT controller, open commissioning window using ECM
 
@@ -95,9 +94,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using ECM"
-      PICS: PICS_MF
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
+      PICS: CADMIN.C.C0000
       verification: |
           On your DUT controller, open commissioning window using ECM
 
@@ -117,10 +116,11 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
-          4, DUT_CR1 opens a 2nd commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using ECM"
-      PICS: PICS_MF
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
+          in step 4, DUT_CR1 sends command to TH_CE to open a 2nd commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using ECM"
+      PICS: CADMIN.C.C0000
       verification: |
           On your DUT controller, open commissioning window using ECM before the timer expiry from the above step
 
@@ -129,7 +129,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -142,27 +142,27 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:
+          [1650527622.374799][15824:15829] CHIP:DMG:                                 
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x1,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:
+          [1650527622.375426][15824:15829] CHIP:DMG:                                 
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:
+          [1650527622.375616][15824:15829] CHIP:DMG:                         
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:
+          [1650527622.375786][15824:15829] CHIP:DMG:                 
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:
+          [1650527622.375940][15824:15829] CHIP:DMG:         
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
           [1650527622.376278][15824:15829] CHIP:TOO: Error: IM Error 0x00000601: Cluster-specific error: 0x01
       disabled: true
 
-    - label: "DUT_CR1 reads the list of Fabrics on TH_CE"
-      PICS: PICS_MF && PICS_MF_BCM
+    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
+      PICS: OPCREDS.C.A0001
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -175,7 +175,7 @@ tests:
           [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
-          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label: 
           [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
           [1650527361.427376][15792:15797] CHIP:TOO:      }
           [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
@@ -183,7 +183,7 @@ tests:
           [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
-          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label: 
           [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
           [1650527361.427868][15792:15797] CHIP:TOO:      }
           [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
@@ -191,34 +191,34 @@ tests:
           [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
-          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label: 
           [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
           [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
 
     - label:
-          "Wait for the expiration of PIXIT_COMM_WIN seconds that was set in
-          step 5"
-      PICS: PICS_MF
+          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was
+          set in step 5"
       verification: |
           Wait for the expiration of PIXIT_COMM_WIN seconds
       disabled: true
 
     - label:
-          "DUT_CR1 re-opens a commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          "DUT_CR1 sends command to TH_CE to re-opens a commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -231,18 +231,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250241][11064:11069] CHIP:DMG:         
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -250,21 +250,22 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
-          8, TH_CR3 opens a 2nd commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
+          in step 8, TH_CR3 sends command to TH_CE to open a 2nd commissioning
+          window with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds
+          using BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On the 3rd controller using chip tool, open commissioning window using BCM before the timer expiry from above step
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 
 
 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG: 	suppressResponse = false,
+          [1650527622.373531][15824:15829] CHIP:DMG: 	suppressResponse = false, 
           [1650527622.373628][15824:15829] CHIP:DMG: 	InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG: 	[
           [1650527622.373817][15824:15829] CHIP:DMG: 		InvokeResponseIB =
@@ -277,19 +278,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG: 					ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG: 					CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG: 				},
-          [1650527622.374799][15824:15829] CHIP:DMG:
+          [1650527622.374799][15824:15829] CHIP:DMG: 				
           [1650527622.374896][15824:15829] CHIP:DMG: 				StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG: 				{
           [1650527622.375086][15824:15829] CHIP:DMG: 					status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG: 					cluster-status = 0x1,
           [1650527622.375320][15824:15829] CHIP:DMG: 				},
-          [1650527622.375426][15824:15829] CHIP:DMG:
+          [1650527622.375426][15824:15829] CHIP:DMG: 				
           [1650527622.375527][15824:15829] CHIP:DMG: 			},
-          [1650527622.375616][15824:15829] CHIP:DMG:
+          [1650527622.375616][15824:15829] CHIP:DMG: 			
           [1650527622.375704][15824:15829] CHIP:DMG: 		},
-          [1650527622.375786][15824:15829] CHIP:DMG:
+          [1650527622.375786][15824:15829] CHIP:DMG: 		
           [1650527622.375864][15824:15829] CHIP:DMG: 	],
-          [1650527622.375940][15824:15829] CHIP:DMG:
+          [1650527622.375940][15824:15829] CHIP:DMG: 	
           [1650527622.376000][15824:15829] CHIP:DMG: 	InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -297,15 +298,14 @@ tests:
       disabled: true
 
     - label:
-          "Wait for the expiration of PIXIT_COMM_WIN seconds that was set in
-          step 9"
-      PICS: PICS_MF
+          "Wait for the expiration of PIXIT.CADMIN.CwDuration seconds that was
+          set in step 9"
       verification: |
           Wait for the expiration of PIXIT_COMM_WIN seconds
       disabled: true
 
-    - label: "DUT_CR1 reads the list of Fabrics on TH_CE"
-      PICS: PICS_MF
+    - label: "DUT_CR1 sends command to TH_CE to read the list of Fabrics"
+      PICS: OPCREDS.C.A0001
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -318,7 +318,7 @@ tests:
           [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
-          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label: 
           [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
           [1650527361.427376][15792:15797] CHIP:TOO:      }
           [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
@@ -326,7 +326,7 @@ tests:
           [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
-          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label: 
           [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
           [1650527361.427868][15792:15797] CHIP:TOO:      }
           [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
@@ -334,24 +334,24 @@ tests:
           [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
-          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label: 
           [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
           [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
 
     - label:
-          "DUT_CR1 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller, open commissioning window using BCM
 
           Below is the example when using chip tool as controller
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -364,18 +364,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:
+          [1650278416.249430][11064:11069] CHIP:DMG:                                 
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:
+          [1650278416.249823][11064:11069] CHIP:DMG:                                 
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:
+          [1650278416.249969][11064:11069] CHIP:DMG:                         
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:
+          [1650278416.250113][11064:11069] CHIP:DMG:                 
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:
+          [1650278416.250241][11064:11069] CHIP:DMG:         
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -383,21 +383,22 @@ tests:
       disabled: true
 
     - label:
-          "Before the expiration of PIXIT_COMM_WIN seconds that was set in step
-          12, TH_CR2 opens a second commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          "Before the expiration of PIXIT.CADMIN.CwDuration seconds that was set
+          in step 12, TH_CR2 sends  command to open a second commissioning
+          window on TH_CE using a commissioning timeout of
+          PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On the 2nd controller using chip tool, open commissioning window using BCM before the timer expiry from above step
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000 
 
 
 
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG: 	suppressResponse = false,
+          [1650527622.373531][15824:15829] CHIP:DMG: 	suppressResponse = false, 
           [1650527622.373628][15824:15829] CHIP:DMG: 	InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG: 	[
           [1650527622.373817][15824:15829] CHIP:DMG: 		InvokeResponseIB =
@@ -410,19 +411,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG: 					ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG: 					CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG: 				},
-          [1650527622.374799][15824:15829] CHIP:DMG:
+          [1650527622.374799][15824:15829] CHIP:DMG: 				
           [1650527622.374896][15824:15829] CHIP:DMG: 				StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG: 				{
           [1650527622.375086][15824:15829] CHIP:DMG: 					status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG: 					cluster-status = 0x1,
           [1650527622.375320][15824:15829] CHIP:DMG: 				},
-          [1650527622.375426][15824:15829] CHIP:DMG:
+          [1650527622.375426][15824:15829] CHIP:DMG: 				
           [1650527622.375527][15824:15829] CHIP:DMG: 			},
-          [1650527622.375616][15824:15829] CHIP:DMG:
+          [1650527622.375616][15824:15829] CHIP:DMG: 			
           [1650527622.375704][15824:15829] CHIP:DMG: 		},
-          [1650527622.375786][15824:15829] CHIP:DMG:
+          [1650527622.375786][15824:15829] CHIP:DMG: 		
           [1650527622.375864][15824:15829] CHIP:DMG: 	],
-          [1650527622.375940][15824:15829] CHIP:DMG:
+          [1650527622.375940][15824:15829] CHIP:DMG: 	
           [1650527622.376000][15824:15829] CHIP:DMG: 	InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1

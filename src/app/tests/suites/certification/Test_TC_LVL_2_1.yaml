@@ -111,7 +111,7 @@ tests:
               maxValue: 254
 
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
-      PICS: LVL.S.F01
+      PICS: LVL.S.F01 && LVL.S.A0002 && LVL.S.A0003
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -121,7 +121,7 @@ tests:
               maxValue: MaxLevelValue
 
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
-      PICS: " !LVL.S.F01 "
+      PICS: LVL.S.A0002 && LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -171,7 +171,6 @@ tests:
       command: "readAttribute"
       attribute: "on off transition time"
       response:
-          value: 0
           constraints:
               type: uint16
 
