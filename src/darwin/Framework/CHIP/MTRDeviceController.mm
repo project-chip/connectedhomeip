@@ -21,10 +21,10 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRCommissioningParameters.h"
 #import "MTRControllerFactory_Internal.h"
-#import "MTRDevice_Internal.h"
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
 #import "MTRDevicePairingDelegateBridge.h"
+#import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging.h"
@@ -540,9 +540,10 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return YES;
 }
 
-- (MTRDevice *)deviceForDeviceID:(uint64_t)deviceID {
+- (MTRDevice *)deviceForDeviceID:(uint64_t)deviceID
+{
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice *deviceToReturn = self.deviceIDToDeviceMap[@(deviceID)];
+    MTRDevice * deviceToReturn = self.deviceIDToDeviceMap[@(deviceID)];
     if (deviceToReturn) {
         deviceToReturn = [[MTRDevice alloc] initWithDeviceID:deviceID deviceController:self queue:self.chipWorkQueue];
         self.deviceIDToDeviceMap[@(deviceID)] = deviceToReturn;
@@ -552,9 +553,10 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
     return deviceToReturn;
 }
 
-- (void)removeDevice:(MTRDevice *)device {
+- (void)removeDevice:(MTRDevice *)device
+{
     os_unfair_lock_lock(&_deviceMapLock);
-    MTRDevice *deviceToRemove = self.deviceIDToDeviceMap[@(device.deviceID)];
+    MTRDevice * deviceToRemove = self.deviceIDToDeviceMap[@(device.deviceID)];
     if (deviceToRemove == device) {
         self.deviceIDToDeviceMap[@(device.deviceID)] = nil;
     } else {
