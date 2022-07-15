@@ -95,8 +95,6 @@ server cluster AccessControl = 31 {
   attribute access(read: manage, write: administer) int32u customAcl = 3;
 
   // Attributes may be fabric-scoped as well by tagging them as `fabric`.
-  // Note this is different than fabric_scoped tag from commands, mainly due to
-  // desire of more parsing speed
   fabric readonly attribute int16u myFabricAttr = 22;
   fabric attribute(read: view, write: administer) int16u someFabricRWAttribute = 33;
 
@@ -127,10 +125,10 @@ server cluster AccessControl = 31 {
   timed command RequiresTimedInvok(): DefaultSuccess = 5;
 
   // commands may be fabric scoped
-  fabric_scoped command RequiresTimedInvok(): DefaultSuccess = 6;
+  fabric command RequiresTimedInvok(): DefaultSuccess = 6;
 
   // commands may have multiple attributes
-  fabric_scoped timed command RequiresTimedInvok(): DefaultSuccess = 7;
+  fabric timed command RequiresTimedInvok(): DefaultSuccess = 7;
 }
 
 // A client cluster represents something that is used by an app

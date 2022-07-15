@@ -199,8 +199,8 @@ class TestParser(unittest.TestCase):
                 command WithoutArg(): DefaultSuccess = 123;
                 command InOutStuff(InParam): OutParam = 222;
                 timed command TimedCommand(InParam): DefaultSuccess = 0xab;
-                fabric_scoped command FabricScopedCommand(InParam): DefaultSuccess = 0xac;
-                fabric_scoped Timed command FabricScopedTimedCommand(InParam): DefaultSuccess = 0xad;
+                fabric command FabricScopedCommand(InParam): DefaultSuccess = 0xac;
+                fabric Timed command FabricScopedTimedCommand(InParam): DefaultSuccess = 0xad;
             }
         """)
         expected = Idl(clusters=[

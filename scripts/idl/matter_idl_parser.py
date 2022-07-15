@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import enum
 import logging
 
 from lark import Lark
@@ -13,6 +14,9 @@ except:
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
     from matter_idl_types import *
+
+class SharedTag(enum.Enum):
+    FABRIC_SCOPED = enum.auto()
 
 
 class AddServerClusterToEndpointTransform:
@@ -128,6 +132,12 @@ class MatterIdlTransformer(Transformer):
         else:
             raise Error("Unexpected size for data type")
 
+    def shared_tag_fabric(self, _):
+        return SharedTag.FABRIC_SCOPED
+
+    def shared_tags(self, entries):
+        return entries
+
     @v_args(inline=True)
     def constant_entry(self, id, number):
         return ConstantEntry(name=id, code=number)
@@ -159,8 +169,8 @@ class MatterIdlTransformer(Transformer):
     def attr_nosubscribe(self, _):
         return AttributeTag.NOSUBSCRIBE
 
-    def attr_fabric_scoped(self, _):
-        return AttributeTag.FABRIC_SCOPED
+    def attribute_tags(self, tags):
+        return tags
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL
@@ -173,9 +183,6 @@ class MatterIdlTransformer(Transformer):
 
     def timed_command(self, _):
         return CommandAttribute.TIMED_INVOKE
-
-    def fabric_scoped_command(self, _):
-        return CommandAttribute.FABRIC_SCOPED
 
     def command_attributes(self, attrs):
         # List because attrs is a tuple
@@ -209,15 +216,25 @@ class MatterIdlTransformer(Transformer):
 
         return init_args
 
+
     def command(self, args):
-        # A command has 4 arguments if no input or
-        # 5 arguments if input parameter is available
-        param_in = None
-        if len(args) > 4:
-            param_in = args[2]
+        # The command takes 5 arguments if no input argument, 6 if input
+        # argument is provided
+        if len(args) != 6:
+            args.insert(3, None)
+
+        attr = args[1] # direct command attributes
+        for shared_attr in args[0]:
+            if shared_attr == SharedTag.FABRIC_SCOPED:
+                attr.add(CommandAttribute.FABRIC_SCOPED)
+            else:
+                raise Exception("Unknown shared tag: %r" % shared_attr)
 
         return Command(
-            attributes=args[0], input_param=param_in, output_param=args[-2], code=args[-1], **args[1])
+            attributes=attr,
+            input_param=args[3], output_param=args[4], code=args[5], 
+            **args[2]
+        )
 
     def event_access(self, privilege):
         return privilege[0]
@@ -297,9 +314,17 @@ class MatterIdlTransformer(Transformer):
         # handle escapes, skip the start and end quotes
         return s.value[1:-1].encode('utf-8').decode('unicode-escape')
 
-    def attribute(self, args):
-        tags = set(args[:-1])
-        (definition, acl) = args[-1]
+    @v_args(inline=True)
+    def attribute(self, shared_tags, tags, definition_tuple):
+
+        tags = set(tags)
+        (definition, acl) = definition_tuple
+
+        for shared_attr in shared_tags:
+            if shared_attr == SharedTag.FABRIC_SCOPED:
+                tags.add(AttributeTag.FABRIC_SCOPED)
+            else:
+                raise Exception("Unknown shared tag: %r" % shared_attr)
 
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
@@ -403,9 +428,8 @@ def CreateParser(skip_meta: bool = False):
     Generates a parser that will process a ".matter" file into a IDL
     """
 
-    # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars (e.g disabiguate
-    # between a keyword of 'fabric_scoped' appearing for both attribute and commands), earley
-    # is much slower:
+    # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars,
+    #       earley is much slower:
     #    - 0.39s LALR parsing of all-clusters-app.matter
     #    - 2.26s Earley parsing of the same thing.
     # For this reason, every attempt should be made to make the grammar context free
