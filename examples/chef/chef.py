@@ -321,6 +321,8 @@ def main(argv: Sequence[str]) -> None:
                       dest="use_zzz", action="store_true")
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
+    parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
+                      dest="dry_run", action="store_true")
     parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
     parser.add_option(
@@ -383,11 +385,14 @@ def main(argv: Sequence[str]) -> None:
         flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
-        os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
             for platform, label_args in cicd_config["cd_platforms"].items():
                 for label, args in label_args.items():
+                    archive_name = f"{label}-{device_name}"
+                    if options.dry_run:
+                        flush_print(archive_name)
+                        continue
                     command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
@@ -409,7 +414,7 @@ def main(argv: Sequence[str]) -> None:
                         if not options.keep_going:
                             exit(1)
                         continue
-                    archive_name = f"{label}-{device_name}"
+                    os.makedirs(archive_prefix, exist_ok=True)
                     archive_full_name = archive_prefix + archive_name + archive_suffix
                     flush_print(f"Adding build output to archive {archive_full_name}")
                     if os.path.exists(archive_full_name):
