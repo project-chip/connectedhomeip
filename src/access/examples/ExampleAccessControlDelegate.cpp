@@ -19,7 +19,6 @@
 #include "ExampleAccessControlDelegate.h"
 
 #include <lib/core/CHIPConfig.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -114,7 +113,7 @@ public:
                 mNode = node;
                 return CHIP_NO_ERROR;
             }
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -126,7 +125,7 @@ public:
             mNode = node;
             return CHIP_NO_ERROR;
         }
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
 private:
@@ -167,7 +166,7 @@ public:
                 Encode(target);
                 return CHIP_NO_ERROR;
             }
-            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
         return CHIP_ERROR_SENTINEL;
     }
@@ -179,7 +178,7 @@ public:
             Encode(target);
             return CHIP_NO_ERROR;
         }
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
 private:
@@ -950,17 +949,7 @@ CHIP_ERROR Copy(const Entry & entry, EntryStorage & storage)
         return CHIP_NO_ERROR;
     }
 #endif
-    CHIP_ERROR err = CopyViaInterface(entry, storage);
-
-    if (err == CHIP_ERROR_NOT_FOUND)
-    {
-        // Invalid data received. We convert this to constraint error for
-        // the purpose of IM error codes.
-        ChipLogError(DataManagement, "ACL copy failed: %" CHIP_ERROR_FORMAT, err.Format());
-        err = CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    return err;
+    return CopyViaInterface(entry, storage);
 }
 
 class AccessControlDelegate : public AccessControl::Delegate
