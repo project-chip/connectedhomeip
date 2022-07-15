@@ -74,7 +74,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
     chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
-    jbyteArray ipkEpochKey, uint16_t listenPort, CHIP_ERROR * errInfoOnFailure)
+    jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
+    bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -149,6 +150,11 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     initParams.fabricIndependentStorage        = wrapperStorage;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
+
+    CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
+    params.SetFailsafeTimerSeconds(failsafeTimerSeconds);
+    params.SetAttemptWiFiNetworkScan(attemptNetworkScanWiFi);
+    params.SetAttemptThreadNetworkScan(attemptNetworkScanThread);
 
     CHIP_ERROR err = wrapper->mGroupDataProvider.Init();
     if (err != CHIP_NO_ERROR)

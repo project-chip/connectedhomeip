@@ -176,8 +176,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             ChipLogProgress(Controller, "Not a BLE connection, skipping ScanNetworks");
         }
-        // fall through if no network scan is called for
-        FALLTHROUGH;
+        // skip scan step
+        return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
