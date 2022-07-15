@@ -1177,7 +1177,9 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     // TODO(#17208): Handle checking for byte-to-byte match with existing fabrics before allowing the add
 
-    // TODO(#17208): Validate cert signature prior to setting.
+    err = ValidateChipRCAC(rootCertificate);
+    VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::InvalidCommand);
+
     err = fabricTable.AddNewPendingTrustedRootCert(rootCertificate);
     VerifyOrExit(err != CHIP_ERROR_NO_MEMORY, finalStatus = Status::ResourceExhausted);
 
