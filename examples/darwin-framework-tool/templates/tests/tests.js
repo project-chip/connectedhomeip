@@ -70,7 +70,6 @@ function getTests() {
   //tests.disable('Test_TC_CC_9_3');
 
   // TODO: Test_TC_MC_3_7 does not work on Darwin for now.
-  tests.disable('Test_TC_APPLAUNCHER_1_3');
   tests.disable('Test_TC_APPLAUNCHER_3_7');
 
   // TODO: Test_TC_MC_3_8 does not work on Darwin for now.
