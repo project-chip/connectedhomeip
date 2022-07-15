@@ -402,7 +402,14 @@ def CreateParser(skip_meta: bool = False):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return ParserWithLines(Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='earley', propagate_positions=True), skip_meta)
+
+    # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars (e.g disabiguate
+    # between a keyword of 'fabric_scoped' appearing for both attribute and commands), earley
+    # is much slower:
+    #    - 0.39s LALR parsing of all-clusters-app.matter
+    #    - 2.26s Earley parsing of the same thing.
+    # For this reason, every attempt should be made to make the grammar context free
+    return ParserWithLines(Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True), skip_meta)
 
 
 if __name__ == '__main__':

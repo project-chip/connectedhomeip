@@ -96,7 +96,7 @@ class TestParser(unittest.TestCase):
                 attribute int32u rwAttr[] = 123;
                 readonly nosubscribe attribute int8s nosub[] = 0xaa;
                 readonly attribute nullable int8s isNullable = 0xab;
-                fabric_scoped readonly attribute int8s fabric_attr = 0x1234;
+                fabric readonly attribute int8s fabric_attr = 0x1234;
             }
         """)
 
