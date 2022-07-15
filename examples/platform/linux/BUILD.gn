@@ -43,7 +43,7 @@ source_set("app-main") {
     "ControllerShellCommands.h",
     "LinuxCommissionableDataProvider.cpp",
     "LinuxCommissionableDataProvider.h",
-    "NamedPipeCommands.cpp",    
+    "NamedPipeCommands.cpp",
     "Options.cpp",
     "Options.h",
     "testing/CustomCSRResponse.cpp",
