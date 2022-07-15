@@ -23,11 +23,11 @@ config:
 tests:
   - label: "DUT reads the SupportedModes attribute from the TH"
     verification: |
-        verify on Reference app receives the right response for the data sent in the above commands 
+        verify on Reference app receives the right response for the data sent in the above commands
 
         ./chip-tool modeselect read supported-modes 1 1
 
-        Verify in TH all-clusters-app 
+        Verify in TH all-clusters-app
 
         [1657112483.855657][5411:5417] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 736180028
         [1657112483.855821][5411:5417] CHIP:TOO:   SupportedModes: 3 entries
@@ -66,11 +66,11 @@ tests:
 
          ./chip-tool modeselect change-to-mode 4 1 1
 
-        Verify in TH all-clusters-app 
+        Verify in TH all-clusters-app
 
         [1657112505.553012][5418:5423] CHIP:DMG: InvokeResponseMessage =
         [1657112505.553052][5418:5423] CHIP:DMG: {
-        [1657112505.553091][5418:5423] CHIP:DMG:         suppressResponse = false, 
+        [1657112505.553091][5418:5423] CHIP:DMG:         suppressResponse = false,
         [1657112505.553133][5418:5423] CHIP:DMG:         InvokeResponseIBs =
         [1657112505.553183][5418:5423] CHIP:DMG:         [
         [1657112505.553223][5418:5423] CHIP:DMG:                 InvokeResponseIB =
@@ -83,18 +83,18 @@ tests:
         [1657112505.553588][5418:5423] CHIP:DMG:                                         ClusterId = 0x50,
         [1657112505.553645][5418:5423] CHIP:DMG:                                         CommandId = 0x0,
         [1657112505.553698][5418:5423] CHIP:DMG:                                 },
-        [1657112505.553762][5418:5423] CHIP:DMG:                                 
+        [1657112505.553762][5418:5423] CHIP:DMG:
         [1657112505.553810][5418:5423] CHIP:DMG:                                 StatusIB =
         [1657112505.553870][5418:5423] CHIP:DMG:                                 {
         [1657112505.553929][5418:5423] CHIP:DMG:                                         status = 0x00 (SUCCESS),
         [1657112505.553983][5418:5423] CHIP:DMG:                                 },
-        [1657112505.554037][5418:5423] CHIP:DMG:                                 
+        [1657112505.554037][5418:5423] CHIP:DMG:
         [1657112505.554085][5418:5423] CHIP:DMG:                         },
-        [1657112505.554136][5418:5423] CHIP:DMG:                         
+        [1657112505.554136][5418:5423] CHIP:DMG:
         [1657112505.554181][5418:5423] CHIP:DMG:                 },
-        [1657112505.554238][5418:5423] CHIP:DMG:                 
+        [1657112505.554238][5418:5423] CHIP:DMG:
         [1657112505.554277][5418:5423] CHIP:DMG:         ],
-        [1657112505.554325][5418:5423] CHIP:DMG:         
+        [1657112505.554325][5418:5423] CHIP:DMG:
         [1657112505.554364][5418:5423] CHIP:DMG:         InteractionModelRevision = 1
         [1657112505.554432][5418:5423] CHIP:DMG: },
         [1657112505.554523][5418:5423] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
