@@ -12,21 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Crypto implementation: mbedtls, openssl.
-  chip_crypto = ""
-  chip_with_se05x = 0
-  chip_with_se05x_da = 0
-}
+import("BUILD.generated.gni")
 
-if (chip_crypto == "") {
-  if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
-    chip_crypto = "mbedtls"
-  } else {
-    chip_crypto = "openssl"
-  }
-}
+config("boringssl_config") {
+  include_dirs= [ "src/include" ]
 
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl" || chip_crypto == "boringssl",
-       "Please select a valid crypto implementation: mbedtls, openssl, boringssl")
+  cflags= [
+    # TODO: What should we have here?
+  ]
+  # We want the basic crypto impl with no asm primitives until we hook-up platform-based
+  # support to the build later.
+  defines= [ "OPENSSL_NO_ASM=1" ]
+}
+all_sources= crypto_sources
+
+all_headers= crypto_headers
+
+static_library("boringssl") {
+  public= all_headers
+
+  sources= all_sources
+
+  public_configs= [ ":boringssl_config" ]
+
+}
