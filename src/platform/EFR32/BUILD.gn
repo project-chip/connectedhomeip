@@ -66,6 +66,10 @@ static_library("EFR32") {
   if (chip_crypto == "platform") {
     sources += [
       "CHIPCryptoPALPsaEfr32.cpp",
+      "Efr32OpaqueKeypair.h",
+      "Efr32PsaOpaqueKeypair.cpp",
+      "Efr32PsaOperationalKeystore.cpp",
+      "Efr32PsaOperationalKeystore.h",
     ]
   }
 
