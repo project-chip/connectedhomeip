@@ -113,5 +113,12 @@ public:
     app::DataModel::Nullable<bool> mipv6_offpremise;
 };
 
+/**
+ * Returns a reference to a DiagnosticDataProvider singleton object.
+ *
+ * Applications should use this to access the features of the DiagnosticDataProvider.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProvider();
+
 } // namespace DeviceLayer
 } // namespace chip

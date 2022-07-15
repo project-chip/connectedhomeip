@@ -56,5 +56,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
 void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics) {}
 
+DiagnosticDataProvider & GetDiagnosticDataProvider()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

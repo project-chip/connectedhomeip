@@ -353,5 +353,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+DiagnosticDataProvider & GetDiagnosticDataProvider()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

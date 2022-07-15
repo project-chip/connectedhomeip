@@ -69,5 +69,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     return CHIP_NO_ERROR;
 }
 
+DiagnosticDataProvider & GetDiagnosticDataProvider()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -112,7 +112,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     }
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 

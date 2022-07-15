@@ -184,19 +184,12 @@ private:
 };
 
 /**
- * Returns a reference to a DiagnosticDataProvider object.
+ * Returns the public interface of the DiagnosticDataProvider singleton object.
  *
- * Applications should use this to access the features of the DiagnosticDataProvider.
+ * chip applications should use this to access features of the DiagnosticDataProvider object
+ * that are common to all platforms.
  */
-DiagnosticDataProvider & GetDiagnosticDataProvider();
-
-/**
- * Sets a reference to a DiagnosticDataProvider object.
- *
- * This must be called before any calls to GetDiagnosticDataProvider. If a nullptr is passed in,
- * no changes will be made.
- */
-void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider);
+extern DiagnosticDataProvider & GetDiagnosticDataProvider();
 
 inline CHIP_ERROR DiagnosticDataProvider::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {

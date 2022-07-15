@@ -47,7 +47,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     err = Internal::AndroidConfig::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     // Call _InitChipStack() on the generic implementation base class

@@ -107,7 +107,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
 #if !CONFIG_NORDIC_SECURITY_BACKEND
     // Add entropy source based on Zephyr entropy driver

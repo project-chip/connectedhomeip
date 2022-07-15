@@ -359,7 +359,6 @@ if (chip_device_platform != "none") {
       "DeviceControlServer.cpp",
       "DeviceInfoProvider.cpp",
       "DeviceInstanceInfoProvider.cpp",
-      "DiagnosticDataProvider.cpp",
       "Entropy.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",

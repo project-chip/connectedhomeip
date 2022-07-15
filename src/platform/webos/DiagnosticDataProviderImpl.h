@@ -103,5 +103,12 @@ private:
 #endif
 };
 
+/**
+ * Returns a reference to a DiagnosticDataProvider singleton object.
+ *
+ * Applications should use this to access the features of the DiagnosticDataProvider.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProvider();
+
 } // namespace DeviceLayer
 } // namespace chip
