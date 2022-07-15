@@ -96,6 +96,7 @@ class TestParser(unittest.TestCase):
                 attribute int32u rwAttr[] = 123;
                 readonly nosubscribe attribute int8s nosub[] = 0xaa;
                 readonly attribute nullable int8s isNullable = 0xab;
+                fabric_scoped readonly attribute int8s fabric_attr = 0x1234;
             }
         """)
 
@@ -112,6 +113,8 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int8s"), code=0xAA, name="nosub", is_list=True)),
                         Attribute(tags=set([AttributeTag.READABLE]), definition=Field(
                             data_type=DataType(name="int8s"), code=0xAB, name="isNullable", attributes=set([FieldAttribute.NULLABLE]))),
+                        Attribute(tags=set([AttributeTag.READABLE, AttributeTag.FABRIC_SCOPED]), definition=Field(
+                            data_type=DataType(name="int8s"), code=0x1234, name="fabric_attr"))
                     ]
                     )])
         self.assertEqual(actual, expected)

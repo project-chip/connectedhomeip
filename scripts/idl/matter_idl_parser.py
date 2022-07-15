@@ -159,6 +159,9 @@ class MatterIdlTransformer(Transformer):
     def attr_nosubscribe(self, _):
         return AttributeTag.NOSUBSCRIBE
 
+    def attr_fabric_scoped(self, _):
+        return AttributeTag.FABRIC_SCOPED
+
     def critical_priority(self, _):
         return EventPriority.CRITICAL
 
@@ -399,7 +402,7 @@ def CreateParser(skip_meta: bool = False):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return ParserWithLines(Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True), skip_meta)
+    return ParserWithLines(Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='earley', propagate_positions=True), skip_meta)
 
 
 if __name__ == '__main__':

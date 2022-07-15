@@ -35,6 +35,7 @@ class AttributeTag(enum.Enum):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
+    FABRIC_SCOPED = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
