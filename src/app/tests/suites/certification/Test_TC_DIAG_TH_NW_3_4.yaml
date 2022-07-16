@@ -29,7 +29,8 @@ tests:
     - label: "DUT sends ResetCounts Command to TH"
       PICS: DGTHREAD.C.C00.Tx
       verification: |
-          ./chip-tool threadnetworkdiagnostics reset-counts 180 0
+          ./chip-tool threadnetworkdiagnostics reset-counts 65 0
+          Verify on the TH Log:
 
           [1649229224.437208][22196:22201] CHIP:DMG:                                 StatusIB =
           [1649229224.437366][22196:22201] CHIP:DMG:                                 {
@@ -53,11 +54,11 @@ tests:
       PICS: DGTHREAD.C.A0007
       verification: |
           ./chip-tool threadnetworkdiagnostics read overrun-count 180 0
+           Verify on the TH Log:
 
-
-          [1646735070.360374][5373:5378] CHIP:DMG: SuppressResponse = true,
-          [1646735070.360437][5373:5378] CHIP:DMG: InteractionModelRevision = 1
-          [1646735070.360495][5373:5378] CHIP:DMG: }
-          [1646735070.360800][5373:5378] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0006DataVersion: 3054043217
-          [1646735070.360905][5373:5378] CHIP:TOO: OverrunCount: 0
+          [1649827143.462761][3767:3772] CHIP:DMG:        SuppressResponse = true,
+          [1649827143.462823][3767:3772] CHIP:DMG:        InteractionModelRevision = 1
+          [1649827143.462880][3767:3772] CHIP:DMG: }
+          [1649827143.463177][3767:3772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0006 DataVersion: 2758196590
+          [1649827143.463312][3767:3772] CHIP:TOO:   OverrunCount: 0
       disabled: true

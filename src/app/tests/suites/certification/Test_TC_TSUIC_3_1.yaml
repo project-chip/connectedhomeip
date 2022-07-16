@@ -25,11 +25,10 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received read of the TemperatureDisplayMode attribute (id 0) looks like this:
-
           ./chip-tool thermostatuserinterfaceconfiguration read temperature-display-mode 12345 1
 
-          verify that you see something like this:
+
+          Verify in TH all-clusters-app Log:
 
           [1650966000.959191][11186:11191] CHIP:DMG: ReportDataMessage =
           [1650966000.959287][11186:11191] CHIP:DMG: {
@@ -65,7 +64,9 @@ tests:
 
           ./chip-tool thermostatuserinterfaceconfiguration read keypad-lockout 12345 1
 
-          verify that you see something like this:
+          Verify in TH all-clusters-app Log:
+
+
           [1650966035.736227][11195:11200] CHIP:DMG: ReportDataMessage =
           [1650966035.736277][11195:11200] CHIP:DMG: {
           [1650966035.736317][11195:11200] CHIP:DMG:         AttributeReportIBs =
@@ -102,6 +103,7 @@ tests:
       verification: |
           ./chip-tool thermostatuserinterfaceconfiguration read  schedule-programming-visibility  1 1
 
+          Verify in TH all-clusters-app Log:
           [1654689278.722504][8215:8215] CHIP:DMG: ReadRequestMessage =
           [1654689278.722531][8215:8215] CHIP:DMG: {
           [1654689278.722552][8215:8215] CHIP:DMG:         AttributePathIBs =
@@ -126,10 +128,9 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          On TestHarnes (all-cluster-app) a received write request looks like this (f.e TemperatureDisplayMode (id 0) value 1):
+          ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 1  1 1
 
-           ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 1  1 1
-
+          Verify in TH all-clusters-app Log:
           [1649674212.150303][2241:2241] CHIP:DMG: WriteRequestMessage =
           [1649674212.150341][2241:2241] CHIP:DMG: {
           [1649674212.150375][2241:2241] CHIP:DMG:         suppressResponse = false,
@@ -157,6 +158,9 @@ tests:
 
 
           ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1 1 1
+
+
+          Verify in TH all-clusters-app Log:
           [1649674352.430976][2241:2241] CHIP:DMG: WriteRequestMessage =
           [1649674352.431028][2241:2241] CHIP:DMG: {
           [1649674352.431064][2241:2241] CHIP:DMG:         suppressResponse = false,
@@ -189,6 +193,7 @@ tests:
           ./chip-tool thermostatuserinterfaceconfiguration write schedule-programming-visibility 1 1 1
 
 
+          Verify in TH all-clusters-app Log:
           [1649673609.998586][2338:2344] CHIP:DMG:                         AttributePathIB =
           [1649673609.998644][2338:2344] CHIP:DMG:                         {
           [1649673609.998690][2338:2344] CHIP:DMG:                                 Endpoint = 0x1,
@@ -209,6 +214,9 @@ tests:
           AttributeList. Commission DUT to TH again"
       verification: |
           ./chip-tool thermostatuserinterfaceconfiguration read attribute-list  1 1
+
+
+          Verify in TH all-clusters-minimal-app Log:
           [1654248197885] [91899:4015040] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_FFFB DataVersion: 2039959817
           [1654248197885] [91899:4015040] CHIP: [TOO]   AttributeList: 7 entries
           [1654248197885] [91899:4015040] CHIP: [TOO]     [1]: 0
@@ -220,13 +228,8 @@ tests:
           [1654248197885] [91899:4015040] CHIP: [TOO]     [7]: 65533
 
 
-
-
-
-          "On TestHarnes (all-cluster-app) a received write request looks like this (f.e TemperatureDisplayMode (id 0) value 1):
-
            ./chip-tool thermostatuserinterfaceconfiguration write temperature-display-mode 1  1 1
-
+          Verify in TH all-clusters-minimal-app Log:
           [1649674212.150303][2241:2241] CHIP:DMG: WriteRequestMessage =
           [1649674212.150341][2241:2241] CHIP:DMG: {
           [1649674212.150375][2241:2241] CHIP:DMG:         suppressResponse = false,
@@ -252,8 +255,8 @@ tests:
           [1649674212.151417][2241:2241] CHIP:DMG: },
 
 
-
           ./chip-tool thermostatuserinterfaceconfiguration write keypad-lockout 1 1 1
+          Verify in TH all-clusters-minimal-app Log:
           [1649674352.430976][2241:2241] CHIP:DMG: WriteRequestMessage =
           [1649674352.431028][2241:2241] CHIP:DMG: {
           [1649674352.431064][2241:2241] CHIP:DMG:         suppressResponse = false,

@@ -28,6 +28,8 @@ tests:
 
     - label: "DUT reads from the TH the(0xFFFD) ClusterRevision attribute"
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read  cluster-revision 1 0
           [1651186310867] [11123:114108] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFD DataVersion: 486381485
           [1651186310867] [11123:114108] CHIP: [TOO]   ClusterRevision: 1
@@ -35,6 +37,8 @@ tests:
 
     - label: "DUT reads from the TH the(0xFFFC) FeatureMap attribute"
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read  feature-map 1 0
           [1651186357789] [11140:114768] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFC DataVersion: 486381485
           [1651186357789] [11140:114768] CHIP: [TOO]   FeatureMap: 1
@@ -42,6 +46,8 @@ tests:
 
     - label: "DUT reads from the TH the(0xFFFB) AttributeList attribute"
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read attribute-list 1 0
           [1652335691.917681][3124:3129] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFB DataVersion: 3157629909
           [1652335691.917762][3124:3129] CHIP:TOO:   AttributeList: 6 entries
@@ -60,6 +66,8 @@ tests:
 
     - label: "DUT reads from the TH the(0xFFF9) AcceptedCommandList attribute"
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read accepted-command-list 1 0
 
           [1651186469211] [11184:116328] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF9 DataVersion: 486381485
@@ -68,6 +76,8 @@ tests:
 
     - label: "DUT reads from the TH the(0xFFF8) GeneratedCommandList attribute"
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read generated-command-list 1 0
           [1651191485645] [13481:177154] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFF8 DataVersion: 486381492
           [1651191485646] [13481:177154] CHIP: [TOO]   GeneratedCommandList: 0 entries

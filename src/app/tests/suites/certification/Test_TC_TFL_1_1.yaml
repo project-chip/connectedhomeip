@@ -23,6 +23,8 @@ config:
 tests:
     - label: "DUT reads from the TH the (0xFFFD) ClusterRevision attribute"
       verification: |
+          Verify in TH all-clusters-app
+
           ./chip-tool timeformatlocalization read  cluster-revision 1 0
 
           [1651185991606] [10988:109915] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFD DataVersion: 3316530441
@@ -31,6 +33,8 @@ tests:
 
     - label: "DUT reads from the TH the (0xFFFC) FeatureMap attribute"
       verification: |
+          Verify in TH all-clusters-app
+
           ./chip-tool timeformatlocalization read feature-map 1 0
           [1653379129.497852][7509:7514] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFC DataVersion: 724978222
           [1653379129.497936][7509:7514] CHIP:TOO:   FeatureMap: 0
@@ -38,6 +42,8 @@ tests:
 
     - label: "DUT reads from the TH the (0xFFFB) AttributeList attribute"
       verification: |
+          Verify in TH all-clusters-app
+
           ./chip-tool timeformatlocalization read attribute-list 1 0
           [1653999139.214139][7477:7482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFB DataVersion: 3201720795
           [1653999139.214208][7477:7482] CHIP:TOO:   AttributeList: 8 entries
@@ -59,6 +65,8 @@ tests:
 
     - label: "DUT reads from the TH the (0xFFF9) AcceptedCommandList attribute"
       verification: |
+          Verify in TH all-clusters-app
+
           ./chip-tool timeformatlocalization read accepted-command-list 1 0
           [1651186189564] [11076:112595] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF9 DataVersion: 3316530441
           [1651186189564] [11076:112595] CHIP: [TOO]   AcceptedCommandList: 0 entries
@@ -66,6 +74,8 @@ tests:
 
     - label: "DUT reads from the TH the (0xFFF8) GeneratedCommandList attribute"
       verification: |
+          Verify in TH all-clusters-app
+
           ./chip-tool timeformatlocalization read generated-command-list 1 0
           [1651191789962] [13591:180646] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF8 DataVersion: 3316530441
           [1651191789963] [13591:180646] CHIP: [TOO]   GeneratedCommandList: 0 entries

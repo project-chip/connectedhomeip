@@ -76,14 +76,12 @@ tests:
       verification: |
           ./chip-tool  threadnetworkdiagnostics  read-event connection-status 137 0
 
+          Verify on the TH Log:
 
-          D: 6728348 [EM]Handling via exchange: 2503r, Delegate: 0x2000753c
-          D: 6728354 [IM]Received Read request
-          D: 6728358 [DMG]IM RH moving to [GeneratingReports]
-          D: 6728363 [DMG]Building Reports for ReadHandler with LastReportGeneration = 0 0
-          D: 6728372 [DMG]Fetched 0 events
-          D: 6728375 [DMG]<RE> Sending report (payload has 7 bytes)...
-          I: 6728381 [IN]Prepared secure message 0x20004a74 to 0x000000000001B669 (1)  of.
-          I: 6728395 [IN]Sending encrypted msg 0x20004a74 with MessageCounter:6424591 to c
-          D: 6728409 [DMG]<RE> OnReportConfirm: NumReports = 0
+          [1651233430.972821][7560:7565] CHIP:DMG: ReportDataMessage =
+          [1651233430.972891][7560:7565] CHIP:DMG: {
+          [1651233430.972950][7560:7565] CHIP:DMG:         SuppressResponse = true,
+          [1651233430.973013][7560:7565] CHIP:DMG:         InteractionModelRevision = 1
+          [1651233430.973070][7560:7565] CHIP:DMG: }
+          [1651233430.973222][7560:7565] CHIP:EM: Sending Standalone Ack for MessageCounter:6424591 on exchange 2503i
       disabled: true

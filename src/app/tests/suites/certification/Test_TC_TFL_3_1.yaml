@@ -703,11 +703,69 @@ tests:
     - label: "TH writes 50 to ActiveCalendarType attribute"
       PICS: LTIME.S.A0001
       verification: |
-          Verify the write request shows 0x87 (Constraint Error)
+          Verify in TH log:
+
+          ./chip-tool timeformatlocalization write active-calendar-type 50  1 0
+
+          [1656934134.261135][6359:6364] CHIP:DMG: WriteResponseMessage =
+          [1656934134.261172][6359:6364] CHIP:DMG: {
+          [1656934134.261204][6359:6364] CHIP:DMG:         AttributeStatusIBs =
+          [1656934134.261248][6359:6364] CHIP:DMG:         [
+          [1656934134.261284][6359:6364] CHIP:DMG:                 AttributeStatusIB =
+          [1656934134.261334][6359:6364] CHIP:DMG:                 {
+          [1656934134.261375][6359:6364] CHIP:DMG:                         AttributePathIB =
+          [1656934134.261421][6359:6364] CHIP:DMG:                         {
+          [1656934134.261470][6359:6364] CHIP:DMG:                                 Endpoint = 0x0,
+          [1656934134.261517][6359:6364] CHIP:DMG:                                 Cluster = 0x2c,
+          [1656934134.261565][6359:6364] CHIP:DMG:                                 Attribute = 0x0000_0001,
+          [1656934134.261609][6359:6364] CHIP:DMG:                         }
+          [1656934134.261660][6359:6364] CHIP:DMG:
+          [1656934134.261703][6359:6364] CHIP:DMG:                         StatusIB =
+          [1656934134.261749][6359:6364] CHIP:DMG:                         {
+          [1656934134.261795][6359:6364] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
+          [1656934134.261840][6359:6364] CHIP:DMG:                         },
+          [1656934134.261884][6359:6364] CHIP:DMG:
+          [1656934134.261924][6359:6364] CHIP:DMG:                 },
+          [1656934134.261967][6359:6364] CHIP:DMG:
+          [1656934134.262001][6359:6364] CHIP:DMG:         ],
+          [1656934134.262043][6359:6364] CHIP:DMG:
+          [1656934134.262078][6359:6364] CHIP:DMG:         InteractionModelRevision = 1
+          [1656934134.262113][6359:6364] CHIP:DMG: }
+          [1656934134.262208][6359:6364] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
     - label: "TH writes 5 to HourFormat attribute"
-      PICS: LTIME.S.A0001
+      PICS: LTIME.S.A0000
       verification: |
-          Verify the write request shows 0x87 (Constraint Error)
+          Verify in TH log:
+
+           ./chip-tool timeformatlocalization write   hour-format  5 1 0
+
+          [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
+          [1656934321.911025][6387:6392] CHIP:DMG: {
+          [1656934321.911054][6387:6392] CHIP:DMG:         AttributeStatusIBs =
+          [1656934321.911096][6387:6392] CHIP:DMG:         [
+          [1656934321.911129][6387:6392] CHIP:DMG:                 AttributeStatusIB =
+          [1656934321.911165][6387:6392] CHIP:DMG:                 {
+          [1656934321.911200][6387:6392] CHIP:DMG:                         AttributePathIB =
+          [1656934321.911242][6387:6392] CHIP:DMG:                         {
+          [1656934321.911285][6387:6392] CHIP:DMG:                                 Endpoint = 0x0,
+          [1656934321.911330][6387:6392] CHIP:DMG:                                 Cluster = 0x2c,
+          [1656934321.911375][6387:6392] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1656934321.911417][6387:6392] CHIP:DMG:                         }
+          [1656934321.911463][6387:6392] CHIP:DMG:
+          [1656934321.911503][6387:6392] CHIP:DMG:                         StatusIB =
+          [1656934321.911574][6387:6392] CHIP:DMG:                         {
+          [1656934321.911618][6387:6392] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
+          [1656934321.911658][6387:6392] CHIP:DMG:                         },
+          [1656934321.911699][6387:6392] CHIP:DMG:
+          [1656934321.911733][6387:6392] CHIP:DMG:                 },
+          [1656934321.911772][6387:6392] CHIP:DMG:
+          [1656934321.911804][6387:6392] CHIP:DMG:         ],
+          [1656934321.911842][6387:6392] CHIP:DMG:
+          [1656934321.911875][6387:6392] CHIP:DMG:         InteractionModelRevision = 1
+          [1656934321.911906][6387:6392] CHIP:DMG: }
+          [1656934321.911992][6387:6392] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1656934321.912033][6387:6392] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1656934321.912104][6387:6392] CHIP:EM: Sending Standalone Ack for MessageCounter:9709501 on exchange 15031i
       disabled: true

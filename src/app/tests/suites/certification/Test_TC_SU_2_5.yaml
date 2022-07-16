@@ -95,6 +95,10 @@ tests:
           Once the update is finished, verify the software version from the Basic Information cluster on the DUT to match the version downloaded for the software update.
 
           ./chip-tool basic read software-version-string 0x1234567890 0
+
+
+          [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
+          [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersionString: 2.0
       disabled: true
 
     - label:
@@ -116,6 +120,9 @@ tests:
 
 
           ./chip-tool basic read software-version-string 0x1234567890 0
+
+          [1653636406.637617][11116:11121] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_000A DataVersion: 1527020963
+          [1653636406.637708][11116:11121] CHIP:TOO:   SoftwareVersionString: 1.0
       disabled: true
 
     - label: "Apply the OTA Update on DUT using vendor specific mechanism."

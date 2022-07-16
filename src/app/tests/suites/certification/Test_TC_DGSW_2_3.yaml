@@ -30,7 +30,7 @@ tests:
 
     - label: "Sends ResetWatermarks to DUT"
       command: "ResetWatermarks"
-      PICS: DGSW.S.C00
+      PICS: DGSW.S.C00.Rsp
 
     - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       command: "readAttribute"

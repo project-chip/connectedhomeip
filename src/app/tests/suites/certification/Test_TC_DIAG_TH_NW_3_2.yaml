@@ -19,6 +19,7 @@ config:
     nodeId: 0x12344321
     cluster: "Basic"
     endpoint: 0
+
 tests:
     - label: "Commission DUT to TH"
       verification: |
@@ -28,216 +29,225 @@ tests:
     - label: "DUT reads TxTotalCount attribute value from TH"
       PICS: DGTHREAD.C.A0017
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-total-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-total-count 65 0
 
+          Verify on the TH Log:
 
-          [1646736754.013797][5554:5559] CHIP:DMG: SuppressResponse = true,
-          [1646736754.013861][5554:5559] CHIP:DMG: InteractionModelRevision = 1
-          [1646736754.013919][5554:5559] CHIP:DMG: }
-          [1646736754.014214][5554:5559] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0016DataVersion: 3054043217
-          [1646736754.014333][5554:5559] CHIP:TOO: TxTotalCount: 296
+          [1649826011.966538][3502:3507] CHIP:DMG:        SuppressResponse = true,
+          [1649826011.966580][3502:3507] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826011.966618][3502:3507] CHIP:DMG: }
+          [1649826011.966832][3502:3507] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0016 DataVersion: 2758196590
+          [1649826011.966933][3502:3507] CHIP:TOO:   TxTotalCount: 432
       disabled: true
 
     - label: "DUT reads TxUnicastCount attribute value from TH"
       PICS: DGTHREAD.C.A0018
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-unicast-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-unicast-count 65 0
 
+          Verify on the TH Log:
 
-           [1646736830.623849][5564:5569] CHIP:DMG: SuppressResponse = true,
-           [1646736830.623913][5564:5569] CHIP:DMG: InteractionModelRevision = 1
-           [1646736830.623969][5564:5569] CHIP:DMG: }
-           [1646736830.624263][5564:5569] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0017DataVersion: 3054043217
-           [1646736830.624384][5564:5569] CHIP:TOO: TxUnicastCount: 302
+          [1649826032.959906][3511:3516] CHIP:DMG:        SuppressResponse = true,
+          [1649826032.959968][3511:3516] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826032.960025][3511:3516] CHIP:DMG: }
+          [1649826032.960325][3511:3516] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0017 DataVersion: 2758196590
+          [1649826032.960575][3511:3516] CHIP:TOO:   TxUnicastCount: 439
       disabled: true
 
     - label: "DUT reads TxBroadcastCount attribute value from TH"
       PICS: DGTHREAD.C.A0019
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-broadcast-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-broadcast-count 65 0
 
-           [1646736938.056552][5574:5579] CHIP:DMG: SuppressResponse = true,
-           [1646736938.056614][5574:5579] CHIP:DMG: InteractionModelRevision = 1
-           [1646736938.056671][5574:5579] CHIP:DMG: }
-           [1646736938.056964][5574:5579] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0018DataVersion: 3054043217
-           [1646736938.057084][5574:5579] CHIP:TOO: TxBroadcastCount: 5
+          Verify on the TH Log:
+
+          [1649826061.534516][3519:3524] CHIP:DMG:        SuppressResponse = true,
+          [1649826061.534579][3519:3524] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826061.534636][3519:3524] CHIP:DMG: }
+          [1649826061.534936][3519:3524] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0018 DataVersion: 2758196590
+          [1649826061.535078][3519:3524] CHIP:TOO:   TxBroadcastCount: 4
       disabled: true
 
     - label: "DUT reads TxAckRequestedCount attribute value from TH"
       PICS: DGTHREAD.C.A001a
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 65 0
 
+          Verify on the TH Log:
 
-          [1646736999.771267][5582:5587] CHIP:DMG: SuppressResponse = true,
-          [1646736999.771330][5582:5587] CHIP:DMG: InteractionModelRevision = 1
-          [1646736999.771412][5582:5587] CHIP:DMG: }
-          [1646736999.771749][5582:5587] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0019DataVersion: 3054043217
-          [1646736999.771871][5582:5587] CHIP:TOO: TxAckRequestedCount: 323
+          [1649826091.335485][3525:3530] CHIP:DMG:        SuppressResponse = true,
+          [1649826091.335549][3525:3530] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826091.335607][3525:3530] CHIP:DMG: }
+          [1649826091.335905][3525:3530] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0019 DataVersion: 2758196590
+          [1649826091.336042][3525:3530] CHIP:TOO:   TxAckRequestedCount: 461
       disabled: true
 
     - label: "DUT reads TxAckedCount attribute value from TH"
       PICS: DGTHREAD.C.A001b
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-acked-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-acked-count 65 0
 
+          Verify on the TH Log:
 
-          [1646737063.433032][5591:5596] CHIP:DMG: SuppressResponse = true,
-          [1646737063.433095][5591:5596] CHIP:DMG: InteractionModelRevision = 1
-          [1646737063.433170][5591:5596] CHIP:DMG: }
-          [1646737063.433507][5591:5596] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001ADataVersion: 3054043217
-          [1646737063.433629][5591:5596] CHIP:TOO: TxAckedCount: 333
+          [1649826121.430757][3534:3539] CHIP:DMG:        SuppressResponse = true,
+          [1649826121.430799][3534:3539] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826121.430837][3534:3539] CHIP:DMG: }
+          [1649826121.431047][3534:3539] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001A DataVersion: 2758196590
+          [1649826121.431144][3534:3539] CHIP:TOO:   TxAckedCount: 462
       disabled: true
 
     - label: "DUT reads TxNoAckRequestedCount attribute value from TH"
       PICS: DGTHREAD.C.A001c
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 65 0
+          Verify on the TH Log:
 
-
-          [1646737133.243140][5603:5608] CHIP:DMG: SuppressResponse = true,
-          [1646737133.243201][5603:5608] CHIP:DMG: InteractionModelRevision = 1
-          [1646737133.243259][5603:5608] CHIP:DMG: }
-          [1646737133.243552][5603:5608] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001BDataVersion: 3054043217
-          [1646737133.243673][5603:5608] CHIP:TOO: TxNoAckRequestedCount: 5
+          [1649826152.539898][3540:3545] CHIP:DMG:        SuppressResponse = true,
+          [1649826152.539960][3540:3545] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826152.540017][3540:3545] CHIP:DMG: }
+          [1649826152.540314][3540:3545] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001B DataVersion: 2758196590
+          [1649826152.540550][3540:3545] CHIP:TOO:   TxNoAckRequestedCount: 4
       disabled: true
 
     - label: "DUT reads TxDataCount attribute value from TH"
       PICS: DGTHREAD.C.A001d
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-data-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-data-count 65 0
+          Verify on the TH Log:
 
-
-          [1646737230.279803][5611:5616] CHIP:DMG: SuppressResponse = true,
-          [1646737230.279865][5611:5616] CHIP:DMG: InteractionModelRevision = 1
-          [1646737230.279922][5611:5616] CHIP:DMG: }
-          [1646737230.280221][5611:5616] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001CDataVersion: 3054043217
-          [1646737230.280338][5611:5616] CHIP:TOO: TxDataCount: 359
+          [1649826184.869528][3547:3552] CHIP:DMG:        SuppressResponse = true,
+          [1649826184.869589][3547:3552] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826184.869646][3547:3552] CHIP:DMG: }
+          [1649826184.869951][3547:3552] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001C DataVersion: 2758196590
+          [1649826184.870089][3547:3552] CHIP:TOO:   TxDataCount: 503
       disabled: true
 
     - label: "DUT reads TxDataPollCount attribute value from TH"
       PICS: DGTHREAD.C.A001e
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 65 0
+          Verify on the TH Log:
 
-
-          [1646737326.816048][5623:5628] CHIP:DMG: SuppressResponse = true,
-          [1646737326.816109][5623:5628] CHIP:DMG: InteractionModelRevision = 1
-          [1646737326.816165][5623:5628] CHIP:DMG: }
-          [1646737326.816458][5623:5628] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001DDataVersion: 3054043217
-          [1646737326.816574][5623:5628] CHIP:TOO: TxDataPollCount: 0
+          [1649826215.573121][3553:3558] CHIP:DMG:        SuppressResponse = true,
+          [1649826215.573185][3553:3558] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826215.573242][3553:3558] CHIP:DMG: }
+          [1649826215.573541][3553:3558] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001D DataVersion: 2758196590
+          [1649826215.573679][3553:3558] CHIP:TOO:   TxDataPollCount: 0
       disabled: true
 
     - label: "DUT reads TxBeaconCount attribute value from TH"
       PICS: DGTHREAD.C.A001f
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-beacon-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-beacon-count 65 0
+           Verify on the TH Log:
 
-
-          [1646737399.379912][5633:5638] CHIP:DMG: SuppressResponse = true,
-          [1646737399.379973][5633:5638] CHIP:DMG: InteractionModelRevision = 1
-          [1646737399.380030][5633:5638] CHIP:DMG: }
-          [1646737399.380317][5633:5638] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001EDataVersion: 3054043217
-          [1646737399.380439][5633:5638] CHIP:TOO: TxBeaconCount: 0
+          [1649826252.581671][3561:3566] CHIP:DMG:        SuppressResponse = true,
+          [1649826252.581733][3561:3566] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826252.581789][3561:3566] CHIP:DMG: }
+          [1649826252.582088][3561:3566] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001E DataVersion: 2758196590
+          [1649826252.582224][3561:3566] CHIP:TOO:   TxBeaconCount: 0
       disabled: true
 
     - label: "DUT reads TxBeaconRequestCount attribute value from TH"
       PICS: DGTHREAD.C.A0020
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 65 0
+          Verify on the TH Log:
 
-
-           [1646737480.599368][5642:5647] CHIP:DMG: SuppressResponse = true,
-           [1646737480.599429][5642:5647] CHIP:DMG: InteractionModelRevision = 1
-           [1646737480.599486][5642:5647] CHIP:DMG: }
-           [1646737480.599780][5642:5647] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001FDataVersion: 3054043217
-           [1646737480.599903][5642:5647] CHIP:TOO: TxBeaconRequestCount: 0
+          [1649826283.345936][3568:3573] CHIP:DMG:        SuppressResponse = true,
+          [1649826283.345998][3568:3573] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826283.346055][3568:3573] CHIP:DMG: }
+          [1649826283.346357][3568:3573] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_001F DataVersion: 2758196590
+          [1649826283.346499][3568:3573] CHIP:TOO:   TxBeaconRequestCount: 0
       disabled: true
 
     - label: "DUT reads TxOtherCount attribute value from TH"
       PICS: DGTHREAD.C.A0021
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-other-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-other-count 65 0
+          Verify on the TH Log:
 
-          [1646737573.463351][5653:5658] CHIP:DMG: SuppressResponse = true,
-          [1646737573.463413][5653:5658] CHIP:DMG: InteractionModelRevision = 1
-          [1646737573.463470][5653:5658] CHIP:DMG: }
-          [1646737573.463756][5653:5658] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0020DataVersion: 3054043217
-          [1646737573.463872][5653:5658] CHIP:TOO: TxOtherCount: 0
+          [1649826328.386892][3574:3579] CHIP:DMG:        SuppressResponse = true,
+          [1649826328.386953][3574:3579] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826328.387010][3574:3579] CHIP:DMG: }
+          [1649826328.387310][3574:3579] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0020 DataVersion: 2758196590
+          [1649826328.387453][3574:3579] CHIP:TOO:   TxOtherCount: 0
       disabled: true
 
     - label: "DUT reads TxRetryCount attribute value from TH"
       PICS: DGTHREAD.C.A0022
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-retry-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-retry-count 65 0
+          Verify on the TH Log:
 
-
-          [1646737638.131098][5662:5667] CHIP:DMG: SuppressResponse = true,
-          [1646737638.131161][5662:5667] CHIP:DMG: InteractionModelRevision = 1
-          [1646737638.131219][5662:5667] CHIP:DMG: }
-          [1646737638.131517][5662:5667] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0021DataVersion: 3054043217
-          [1646737638.131637][5662:5667] CHIP:TOO: TxRetryCount: 124
+          [1649826365.526774][3584:3589] CHIP:DMG:        SuppressResponse = true,
+          [1649826365.526838][3584:3589] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826365.526915][3584:3589] CHIP:DMG: }
+          [1649826365.527258][3584:3589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0021 DataVersion: 2758196590
+          [1649826365.527400][3584:3589] CHIP:TOO:   TxRetryCount: 986
       disabled: true
 
     - label: "DUT reads TxDirectMaxRetryExpiryCount attribute value from TH"
       PICS: DGTHREAD.C.A0023
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-direct-max-retry-expiry-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-direct-max-retry-expiry-count 65 0
+           Verify on the TH Log:
 
-
-          [1646737712.644496][5673:5678] CHIP:DMG: SuppressResponse = true,
-          [1646737712.644569][5673:5678] CHIP:DMG: InteractionModelRevision = 1
-          [1646737712.644617][5673:5678] CHIP:DMG: }
-          [1646737712.644934][5673:5678] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0022DataVersion: 3054043217
-          [1646737712.645037][5673:5678] CHIP:TOO: TxDirectMaxRetryExpiryCount: 0
+          [1649826396.738205][3590:3595] CHIP:DMG:        SuppressResponse = true,
+          [1649826396.738269][3590:3595] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826396.738353][3590:3595] CHIP:DMG: }
+          [1649826396.738698][3590:3595] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0022 DataVersion: 2758196590
+          [1649826396.738841][3590:3595] CHIP:TOO:   TxDirectMaxRetryExpiryCount: 15
       disabled: true
 
     - label: "DUT reads TxIndirectMaxRetryExpiryCount attribute value from TH"
       PICS: DGTHREAD.C.A0024
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-indirect-max-retry-expiry-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-indirect-max-retry-expiry-count 65 0
+          Verify on the TH Log:
 
-          [1646737804.538427][5684:5689] CHIP:DMG: SuppressResponse = true,
-          [1646737804.538481][5684:5689] CHIP:DMG: InteractionModelRevision = 1
-          [1646737804.538530][5684:5689] CHIP:DMG: }
-          [1646737804.538783][5684:5689] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0023DataVersion: 3054043217
-          [1646737804.538891][5684:5689] CHIP:TOO: TxIndirectMaxRetryExpiryCount: 0
+          [1649826428.732746][3598:3603] CHIP:DMG:        SuppressResponse = true,
+          [1649826428.732810][3598:3603] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826428.732868][3598:3603] CHIP:DMG: }
+          [1649826428.733168][3598:3603] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0023 DataVersion: 2758196590
+          [1649826428.733307][3598:3603] CHIP:TOO:   TxIndirectMaxRetryExpiryCount: 0
       disabled: true
 
     - label: "DUT reads TxErrCcaCount attribute value from TH"
       PICS: DGTHREAD.C.A0025
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-err-cca-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-err-cca-count 65 0
+          Verify on the TH Log:
 
-          [1646737871.927932][5692:5697] CHIP:DMG: SuppressResponse = true,
-          [1646737871.928016][5692:5697] CHIP:DMG: InteractionModelRevision = 1
-          [1646737871.928073][5692:5697] CHIP:DMG: }
-          [1646737871.928432][5692:5697] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0024DataVersion: 3054043217
-          [1646737871.928552][5692:5697] CHIP:TOO: TxErrCcaCount: 0
+          [1649826459.644117][3606:3611] CHIP:DMG:        SuppressResponse = true,
+          [1649826459.644179][3606:3611] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826459.644236][3606:3611] CHIP:DMG: }
+          [1649826459.644572][3606:3611] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0024 DataVersion: 2758196590
+          [1649826459.644713][3606:3611] CHIP:TOO:   TxErrCcaCount: 8
       disabled: true
 
     - label: "DUT reads TxErrAbortCount attribute value from TH"
       PICS: DGTHREAD.C.A0026
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-err-abort-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-err-abort-count 65 0
+           Verify on the TH Log:
 
-
-          [1646737944.909411][5703:5708] CHIP:DMG: SuppressResponse = true,
-          [1646737944.909473][5703:5708] CHIP:DMG: InteractionModelRevision = 1
-          [1646737944.909529][5703:5708] CHIP:DMG: }
-          [1646737944.909897][5703:5708] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0025DataVersion: 3054043217
-          [1646737944.910018][5703:5708] CHIP:TOO: TxErrAbortCount: 0
+          [1649826488.510290][3614:3619] CHIP:DMG:        SuppressResponse = true,
+          [1649826488.510353][3614:3619] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826488.510411][3614:3619] CHIP:DMG: }
+          [1649826488.510711][3614:3619] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0025 DataVersion: 2758196590
+          [1649826488.510848][3614:3619] CHIP:TOO:   TxErrAbortCount: 0
       disabled: true
 
     - label: "DUT reads TxErrBusyChannelCount attribute value from TH"
       PICS: DGTHREAD.C.A0027
       verification: |
-          ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 180 0
+          ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 65 0
+          Verify on the TH Log:
 
-
-           [1646738012.111932][5712:5717] CHIP:DMG: SuppressResponse = true,
-           [1646738012.111995][5712:5717] CHIP:DMG: InteractionModelRevision = 1
-           [1646738012.112052][5712:5717] CHIP:DMG: }
-           [1646738012.112343][5712:5717] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0026DataVersion: 3054043217
-           [1646738012.112462][5712:5717] CHIP:TOO: TxErrBusyChannelCount: 0
+          [1649826519.384125][3621:3626] CHIP:DMG:        SuppressResponse = true,
+          [1649826519.384189][3621:3626] CHIP:DMG:        InteractionModelRevision = 1
+          [1649826519.384269][3621:3626] CHIP:DMG: }
+          [1649826519.384665][3621:3626] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0026 DataVersion: 2758196590
+          [1649826519.384810][3621:3626] CHIP:TOO:   TxErrBusyChannelCount: 0
       disabled: true
