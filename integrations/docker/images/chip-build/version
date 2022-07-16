@@ -1,1 +1,1 @@
-0.5.85 Version bump reason: remove two Yocto SDKs to decrease the imx docker image size
+0.5.86 Version bump reason: [Ameba] Set matter_enable_persistentstorage_audit as disabled by default
