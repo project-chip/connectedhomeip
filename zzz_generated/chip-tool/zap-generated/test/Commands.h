@@ -398,8 +398,8 @@ public:
         printf("Test_TC_CADMIN_1_8\n");
         printf("Test_TC_CADMIN_1_11\n");
         printf("Test_TC_CADMIN_1_12\n");
-        printf("Test_TC_CADMIN_1_13\n");
         printf("Test_TC_CADMIN_1_14\n");
+        printf("Test_TC_CADMIN_1_15\n");
         printf("Test_TC_CADMIN_1_16\n");
         printf("Test_TC_CADMIN_1_17\n");
         printf("Test_TC_CADMIN_1_18\n");
@@ -413,7 +413,7 @@ public:
         printf("Test_TC_CADMIN_1_6\n");
         printf("Test_TC_CADMIN_1_9\n");
         printf("Test_TC_CADMIN_1_10\n");
-        printf("Test_TC_CADMIN_1_15\n");
+        printf("Test_TC_CADMIN_1_13\n");
         printf("Test_TC_CADMIN_1_25\n");
         printf("Test_TC_CADMIN_1_26\n");
         printf("Test_TC_MOD_1_2\n");
@@ -74876,11 +74876,11 @@ private:
     }
 };
 
-class Test_TC_CADMIN_1_13Suite : public TestCommand
+class Test_TC_CADMIN_1_14Suite : public TestCommand
 {
 public:
-    Test_TC_CADMIN_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_CADMIN_1_13", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_14", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -74888,7 +74888,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_CADMIN_1_13Suite() {}
+    ~Test_TC_CADMIN_1_14Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -74933,11 +74933,11 @@ private:
     }
 };
 
-class Test_TC_CADMIN_1_14Suite : public TestCommand
+class Test_TC_CADMIN_1_15Suite : public TestCommand
 {
 public:
-    Test_TC_CADMIN_1_14Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_CADMIN_1_14", 0, credsIssuerConfig)
+    Test_TC_CADMIN_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_15", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -74945,7 +74945,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_CADMIN_1_14Suite() {}
+    ~Test_TC_CADMIN_1_15Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -76811,11 +76811,11 @@ private:
     }
 };
 
-class Test_TC_CADMIN_1_15Suite : public TestCommand
+class Test_TC_CADMIN_1_13Suite : public TestCommand
 {
 public:
-    Test_TC_CADMIN_1_15Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_CADMIN_1_15", 17, credsIssuerConfig)
+    Test_TC_CADMIN_1_13Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CADMIN_1_13", 17, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
@@ -76827,7 +76827,7 @@ public:
         AddArgument("payload", &mPayload);
     }
 
-    ~Test_TC_CADMIN_1_15Suite() {}
+    ~Test_TC_CADMIN_1_13Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(500)); }
 
@@ -90289,8 +90289,8 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_CADMIN_1_8Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_11Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_12Suite>(credsIssuerConfig),
-        make_unique<Test_TC_CADMIN_1_13Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_14Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_15Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_16Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_17Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_18Suite>(credsIssuerConfig),
@@ -90304,7 +90304,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_CADMIN_1_6Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_9Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_10Suite>(credsIssuerConfig),
-        make_unique<Test_TC_CADMIN_1_15Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CADMIN_1_13Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_25Suite>(credsIssuerConfig),
         make_unique<Test_TC_CADMIN_1_26Suite>(credsIssuerConfig),
         make_unique<Test_TC_MOD_1_2Suite>(credsIssuerConfig),
