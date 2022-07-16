@@ -29,6 +29,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 162 0
 
+          Verify on the TH Log:
+
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
           [1645772651.445209][3856:3861] CHIP:DMG: }
@@ -44,6 +46,8 @@ tests:
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
+
+          Verify on the TH Log:
 
           [1650392597.976230][10152:10157] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -62,6 +66,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network 47524C50726976617465 62 0
 
+          Verify on the TH Log:
+
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
           [1650392982.606653][10188:10193] CHIP:TOO:   ConnectNetworkResponse: {
@@ -77,6 +83,8 @@ tests:
           notmatch thecommissionedr network, andBreadcrumb fieldset to 1"
       verification: |
           ./chip-tool networkcommissioning connect-network 47524C50726976617465 62 0
+
+          Verify on the TH Log:
 
           [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
