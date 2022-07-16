@@ -23,6 +23,7 @@ config:
 
 tests:
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 0"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -35,6 +36,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 1"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -47,6 +49,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 3"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -59,6 +62,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 4"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -71,6 +75,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 5"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -83,6 +88,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 6"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -95,6 +101,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 7"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -107,6 +114,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorLockAlarm Event by setting the AlarmCode to 8"
+      PICS: DRLK.C.E00
       verification: |
           ./chip-tool doorlock read-event door-lock-alarm 2 1
 
@@ -131,6 +139,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorStateChange event by setting the DoorState to 1"
+      PICS: DRLK.S.F05 && DRLK.C.E01
       verification: |
           "./chip-tool doorlock read-event door-state-change 2 1
 
@@ -143,6 +152,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorStateChange event by setting the DoorState to 2"
+      PICS: DRLK.S.F05 && DRLK.C.E01
       verification: |
           "./chip-tool doorlock read-event door-state-change 2 1
 
@@ -155,6 +165,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorStateChange event by setting the DoorState to 3"
+      PICS: DRLK.S.F05 && DRLK.C.E01
       verification: |
           "./chip-tool doorlock read-event door-state-change 2 1
 
@@ -167,6 +178,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorStateChange event by setting the DoorState to 4"
+      PICS: DRLK.S.F05 && DRLK.C.E01
       verification: |
           "./chip-tool doorlock read-event door-state-change 2 1
 
@@ -179,6 +191,7 @@ tests:
       disabled: true
 
     - label: "Simulate a DoorStateChange event by setting the DoorState to 5"
+      PICS: DRLK.S.F05 && DRLK.C.E01
       verification: |
           "./chip-tool doorlock read-event door-state-change 2 1
 
@@ -191,6 +204,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 0"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -282,6 +296,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 1"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -373,6 +388,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 2"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -464,6 +480,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 3"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -555,6 +572,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 4"
+      PICS: DRLK.C.E02
       verification: |
           "./chip-tool doorlock read-event lock-operation 2 1
 
@@ -646,6 +664,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 5"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -737,6 +756,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 6"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -828,6 +848,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 7"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -919,6 +940,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 8"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -1010,6 +1032,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockOperation event by setting OperationSource to 9"
+      PICS: DRLK.C.E02
       verification: |
           ./chip-tool doorlock read-event lock-operation 2 1
 
@@ -1102,6 +1125,7 @@ tests:
 
     - label:
           "Simulate a LockOperationError Event by setting OperationError as 0"
+      PICS: DRLK.C.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 2 1
 
@@ -1116,6 +1140,7 @@ tests:
 
     - label:
           "Simulate a LockOperationError Event by setting OperationError as 1"
+      PICS: DRLK.C.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 2 1
 
@@ -1130,6 +1155,7 @@ tests:
 
     - label:
           "Simulate a LockOperationError Event by setting OperationError as 2"
+      PICS: DRLK.C.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 2 1
 
@@ -1144,6 +1170,7 @@ tests:
 
     - label:
           "Simulate a LockOperationError Event by setting OperationError as 3"
+      PICS: DRLK.C.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 2 1
 
@@ -1158,6 +1185,7 @@ tests:
 
     - label:
           "Simulate a LockOperationError Event by setting OperationError as 4"
+      PICS: DRLK.C.E03
       verification: |
           ./chip-tool doorlock read-event lock-operation-error 2 1
 
@@ -1171,6 +1199,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockUserChange event by changing the Lock User"
+      PICS: DRLK.C.E04
       verification: |
           ./chip-tool doorlock read-event lock-user-change 2 1
 
@@ -1204,6 +1233,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockUserChange event by changing the Schedule"
+      PICS: DRLK.C.E04
       verification: |
           ./chip-tool doorlock read-event lock-user-change 2 1
 
@@ -1237,6 +1267,7 @@ tests:
       disabled: true
 
     - label: "Simulate a LockUserChange event by changing the Credential"
+      PICS: DRLK.C.E04
       verification: |
           ./chip-tool doorlock read-event lock-user-change 2 1
 

@@ -27,12 +27,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace PowerConfiguration {
-} // namespace PowerConfiguration
-
-namespace DeviceTemperatureConfiguration {
-} // namespace DeviceTemperatureConfiguration
-
 namespace Identify {
 
 // Need to convert consumers to using the new enum classes, so we
@@ -83,6 +77,12 @@ using IdentifyIdentifyType            = EmberAfIdentifyIdentifyType;
 } // namespace Identify
 
 namespace Groups {
+
+// Bitmap for GroupClusterFeature
+enum class GroupClusterFeature : uint32_t
+{
+    kGroupNames = 0x1,
+};
 } // namespace Groups
 
 namespace Scenes {
@@ -202,73 +202,8 @@ enum class LevelControlFeature : uint32_t
 };
 } // namespace LevelControl
 
-namespace Alarms {
-} // namespace Alarms
-
-namespace Time {
-} // namespace Time
-
 namespace BinaryInputBasic {
 } // namespace BinaryInputBasic
-
-namespace PowerProfile {
-} // namespace PowerProfile
-
-namespace ApplianceControl {
-
-// Enum for ApplianceStatus
-enum class ApplianceStatus : uint8_t
-{
-    kOff                      = 0x01,
-    kStandBy                  = 0x02,
-    kProgrammed               = 0x03,
-    kProgrammedWaitingToStart = 0x04,
-    kRunning                  = 0x05,
-    kPause                    = 0x06,
-    kEndProgrammed            = 0x07,
-    kFailure                  = 0x08,
-    kProgrammeInterrupted     = 0x09,
-    kIdle                     = 0x0A,
-    kRinseHold                = 0x0B,
-    kService                  = 0x0C,
-    kSuperfreezing            = 0x0D,
-    kSupercooling             = 0x0E,
-    kSuperheating             = 0x0F,
-};
-
-// Enum for CommandIdentification
-enum class CommandIdentification : uint8_t
-{
-    kStart                = 0x01,
-    kStop                 = 0x02,
-    kPause                = 0x03,
-    kStartSuperfreezing   = 0x04,
-    kStopSuperfreezing    = 0x05,
-    kStartSupercooling    = 0x06,
-    kStopSupercooling     = 0x07,
-    kDisableGas           = 0x08,
-    kEnableGas            = 0x09,
-    kEnableEnergyControl  = 0x0A,
-    kDisableEnergyControl = 0x0B,
-};
-
-// Enum for WarningEvent
-enum class WarningEvent : uint8_t
-{
-    kWarning1OverallPowerAboveAvailablePowerLevel                                      = 0x00,
-    kWarning2OverallPowerAbovePowerThresholdLevel                                      = 0x01,
-    kWarning3OverallPowerBackBelowTheAvailablePowerLevel                               = 0x02,
-    kWarning4OverallPowerBackBelowThePowerThresholdLevel                               = 0x03,
-    kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
-};
-
-// Bitmap for RemoteEnableFlagsAndDeviceStatus2
-enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
-{
-    kRemoteEnableFlags      = 0xF,
-    kDeviceStatus2Structure = 0xF0,
-};
-} // namespace ApplianceControl
 
 namespace PulseWidthModulation {
 } // namespace PulseWidthModulation
@@ -307,9 +242,6 @@ enum class Privilege : uint8_t
     kAdminister = 0x05,
 };
 } // namespace AccessControl
-
-namespace PollControl {
-} // namespace PollControl
 
 namespace BridgedActions {
 
@@ -486,8 +418,8 @@ namespace PowerSourceConfiguration {
 
 namespace PowerSource {
 
-// Enum for BatChargeFaultType
-enum class BatChargeFaultType : uint8_t
+// Enum for BatChargeFault
+enum class BatChargeFault : uint8_t
 {
     kUnspecfied          = 0x00,
     kAmbientTooHot       = 0x01,
@@ -519,8 +451,8 @@ enum class BatChargeState : uint8_t
     kIsNotCharging  = 0x03,
 };
 
-// Enum for BatFaultType
-enum class BatFaultType : uint8_t
+// Enum for BatFault
+enum class BatFault : uint8_t
 {
     kUnspecfied = 0x00,
     kOverTemp   = 0x01,
@@ -552,8 +484,8 @@ enum class WiredCurrentType : uint8_t
     kDc = 0x01,
 };
 
-// Enum for WiredFaultType
-enum class WiredFaultType : uint8_t
+// Enum for WiredFault
+enum class WiredFault : uint8_t
 {
     kUnspecfied   = 0x00,
     kOverVoltage  = 0x01,
@@ -976,9 +908,6 @@ enum class ModeSelectFeature : uint32_t
 };
 } // namespace ModeSelect
 
-namespace ShadeConfiguration {
-} // namespace ShadeConfiguration
-
 namespace DoorLock {
 
 // Enum for DlAlarmCode
@@ -1370,12 +1299,14 @@ enum class DoorLockFeature : uint32_t
     kRFIDCredentials    = 0x2,
     kFingerCredentials  = 0x4,
     kLogging            = 0x8,
-    kAccessSchedules    = 0x10,
+    kWeekDaySchedules   = 0x10,
     kDoorPositionSensor = 0x20,
     kFaceCredentials    = 0x40,
     kCredentialsOTA     = 0x80,
     kUsersManagement    = 0x100,
     kNotifications      = 0x200,
+    kYearDaySchedules   = 0x400,
+    kHolidaySchedules   = 0x800,
 };
 } // namespace DoorLock
 
@@ -1660,9 +1591,6 @@ enum class WindSupportMask : uint8_t
 };
 } // namespace FanControl
 
-namespace DehumidificationControl {
-} // namespace DehumidificationControl
-
 namespace ThermostatUserInterfaceConfiguration {
 } // namespace ThermostatUserInterfaceConfiguration
 
@@ -1841,96 +1769,6 @@ namespace RelativeHumidityMeasurement {
 
 namespace OccupancySensing {
 } // namespace OccupancySensing
-
-namespace CarbonMonoxideConcentrationMeasurement {
-} // namespace CarbonMonoxideConcentrationMeasurement
-
-namespace CarbonDioxideConcentrationMeasurement {
-} // namespace CarbonDioxideConcentrationMeasurement
-
-namespace EthyleneConcentrationMeasurement {
-} // namespace EthyleneConcentrationMeasurement
-
-namespace EthyleneOxideConcentrationMeasurement {
-} // namespace EthyleneOxideConcentrationMeasurement
-
-namespace HydrogenConcentrationMeasurement {
-} // namespace HydrogenConcentrationMeasurement
-
-namespace HydrogenSulphideConcentrationMeasurement {
-} // namespace HydrogenSulphideConcentrationMeasurement
-
-namespace NitricOxideConcentrationMeasurement {
-} // namespace NitricOxideConcentrationMeasurement
-
-namespace NitrogenDioxideConcentrationMeasurement {
-} // namespace NitrogenDioxideConcentrationMeasurement
-
-namespace OxygenConcentrationMeasurement {
-} // namespace OxygenConcentrationMeasurement
-
-namespace OzoneConcentrationMeasurement {
-} // namespace OzoneConcentrationMeasurement
-
-namespace SulfurDioxideConcentrationMeasurement {
-} // namespace SulfurDioxideConcentrationMeasurement
-
-namespace DissolvedOxygenConcentrationMeasurement {
-} // namespace DissolvedOxygenConcentrationMeasurement
-
-namespace BromateConcentrationMeasurement {
-} // namespace BromateConcentrationMeasurement
-
-namespace ChloraminesConcentrationMeasurement {
-} // namespace ChloraminesConcentrationMeasurement
-
-namespace ChlorineConcentrationMeasurement {
-} // namespace ChlorineConcentrationMeasurement
-
-namespace FecalColiformAndEColiConcentrationMeasurement {
-} // namespace FecalColiformAndEColiConcentrationMeasurement
-
-namespace FluorideConcentrationMeasurement {
-} // namespace FluorideConcentrationMeasurement
-
-namespace HaloaceticAcidsConcentrationMeasurement {
-} // namespace HaloaceticAcidsConcentrationMeasurement
-
-namespace TotalTrihalomethanesConcentrationMeasurement {
-} // namespace TotalTrihalomethanesConcentrationMeasurement
-
-namespace TotalColiformBacteriaConcentrationMeasurement {
-} // namespace TotalColiformBacteriaConcentrationMeasurement
-
-namespace TurbidityConcentrationMeasurement {
-} // namespace TurbidityConcentrationMeasurement
-
-namespace CopperConcentrationMeasurement {
-} // namespace CopperConcentrationMeasurement
-
-namespace LeadConcentrationMeasurement {
-} // namespace LeadConcentrationMeasurement
-
-namespace ManganeseConcentrationMeasurement {
-} // namespace ManganeseConcentrationMeasurement
-
-namespace SulfateConcentrationMeasurement {
-} // namespace SulfateConcentrationMeasurement
-
-namespace BromodichloromethaneConcentrationMeasurement {
-} // namespace BromodichloromethaneConcentrationMeasurement
-
-namespace BromoformConcentrationMeasurement {
-} // namespace BromoformConcentrationMeasurement
-
-namespace ChlorodibromomethaneConcentrationMeasurement {
-} // namespace ChlorodibromomethaneConcentrationMeasurement
-
-namespace ChloroformConcentrationMeasurement {
-} // namespace ChloroformConcentrationMeasurement
-
-namespace SodiumConcentrationMeasurement {
-} // namespace SodiumConcentrationMeasurement
 
 namespace WakeOnLan {
 } // namespace WakeOnLan
@@ -2233,186 +2071,6 @@ enum class ApplicationStatusEnum : uint8_t
 
 namespace AccountLogin {
 } // namespace AccountLogin
-
-namespace Messaging {
-
-// Enum for EventId
-enum class EventId : uint8_t
-{
-    kMeterCoverRemoved                  = 0x00,
-    kMeterCoverClosed                   = 0x01,
-    kStrongMagneticField                = 0x02,
-    kNoStrongMagneticField              = 0x03,
-    kBatteryFailure                     = 0x04,
-    kLowBattery                         = 0x05,
-    kProgramMemoryError                 = 0x06,
-    kRamError                           = 0x07,
-    kNvMemoryError                      = 0x08,
-    kMeasurementSystemError             = 0x09,
-    kWatchdogError                      = 0x0A,
-    kSupplyDisconnectFailure            = 0x0B,
-    kSupplyConnectFailure               = 0x0C,
-    kMeasurmentSoftwareChanged          = 0x0D,
-    kDstEnabled                         = 0x0E,
-    kDstDisabled                        = 0x0F,
-    kClockAdjBackward                   = 0x10,
-    kClockAdjForward                    = 0x11,
-    kClockInvalid                       = 0x12,
-    kCommsErrorHan                      = 0x13,
-    kCommsOkHan                         = 0x14,
-    kFraudAttempt                       = 0x15,
-    kPowerLoss                          = 0x16,
-    kIncorrectProtocol                  = 0x17,
-    kUnusualHanTraffic                  = 0x18,
-    kUnexpectedClockChange              = 0x19,
-    kCommsUsingUnauthenticatedComponent = 0x1A,
-    kErrorRegClear                      = 0x1B,
-    kAlarmRegClear                      = 0x1C,
-    kUnexpectedHwReset                  = 0x1D,
-    kUnexpectedProgramExecution         = 0x1E,
-    kEventLogCleared                    = 0x1F,
-    kManualDisconnect                   = 0x20,
-    kManualConnect                      = 0x21,
-    kRemoteDisconnection                = 0x22,
-    kLocalDisconnection                 = 0x23,
-    kLimitThresholdExceeded             = 0x24,
-    kLimitThresholdOk                   = 0x25,
-    kLimitThresholdChanged              = 0x26,
-    kMaximumDemandExceeded              = 0x27,
-    kProfileCleared                     = 0x28,
-    kFirmwareReadyForActivation         = 0x29,
-    kFirmwareActivated                  = 0x2A,
-    kPatchFailure                       = 0x2B,
-    kTouTariffActivation                = 0x2C,
-    k8x8Tariffactivated                 = 0x2D,
-    kSingleTariffRateActivated          = 0x2E,
-    kAsynchronousBillingOccurred        = 0x2F,
-    kSynchronousBillingOccurred         = 0x30,
-    kIncorrectPolarity                  = 0x80,
-    kCurrentNoVoltage                   = 0x81,
-    kUnderVoltage                       = 0x82,
-    kOverVoltage                        = 0x83,
-    kNormalVoltage                      = 0x84,
-    kPfBelowThreshold                   = 0x85,
-    kPfAboveThreshold                   = 0x86,
-    kTerminalCoverRemoved               = 0x87,
-    kTerminalCoverClosed                = 0x88,
-    kReverseFlow                        = 0xA0,
-    kTiltTamper                         = 0xA1,
-    kBatteryCoverRemoved                = 0xA2,
-    kBatteryCoverClosed                 = 0xA3,
-    kExcessFlow                         = 0xA4,
-    kCreditOk                           = 0xC0,
-    kLowCredit                          = 0xC1,
-    kEmergencyCreditInUse               = 0xC0,
-    kEmergencyCreditExhausted           = 0xC1,
-    kZeroCreditEcNotSelected            = 0xC2,
-    kSupplyOn                           = 0xC3,
-    kSupplyOffAarmed                    = 0xC4,
-    kSupplyOff                          = 0xC5,
-    kDiscountApplied                    = 0xC6,
-    kManufacturerSpecificA              = 0xE0,
-    kManufacturerSpecificB              = 0xE1,
-    kManufacturerSpecificC              = 0xE2,
-    kManufacturerSpecificD              = 0xE3,
-    kManufacturerSpecificE              = 0xE4,
-    kManufacturerSpecificF              = 0xE5,
-    kManufacturerSpecificG              = 0xE6,
-    kManufacturerSpecificH              = 0xE7,
-    kManufacturerSpecificI              = 0xE8,
-};
-
-// Enum for MessagingControlConfirmation
-enum class MessagingControlConfirmation : uint8_t
-{
-    kNotRequired = 0x00,
-    kRequired    = 0x80,
-};
-
-// Enum for MessagingControlEnhancedConfirmation
-enum class MessagingControlEnhancedConfirmation : uint8_t
-{
-    kNotRequired = 0x00,
-    kRequired    = 0x20,
-};
-
-// Enum for MessagingControlImportance
-enum class MessagingControlImportance : uint8_t
-{
-    kLow      = 0x00,
-    kMedium   = 0x04,
-    kHigh     = 0x08,
-    kCritical = 0x0C,
-};
-
-// Enum for MessagingControlTransmission
-enum class MessagingControlTransmission : uint8_t
-{
-    kNormal             = 0x00,
-    kNormalAndAnonymous = 0x01,
-    kAnonymous          = 0x02,
-    kReserved           = 0x03,
-};
-
-// Bitmap for MessagingConfirmationControl
-enum class MessagingConfirmationControl : uint8_t
-{
-    kNoReturned  = 0x1,
-    kYesReturned = 0x2,
-};
-
-// Bitmap for MessagingControlMask
-enum class MessagingControlMask : uint8_t
-{
-    kTransMechanism              = 0x3,
-    kMessageUrgency              = 0xC,
-    kEnhancedConfirmationRequest = 0x20,
-    kMessageConfirmation         = 0x80,
-};
-
-// Bitmap for MessagingExtendedControlMask
-enum class MessagingExtendedControlMask : uint8_t
-{
-    kMessageConfirmationStatus = 0x1,
-};
-} // namespace Messaging
-
-namespace ApplianceIdentification {
-} // namespace ApplianceIdentification
-
-namespace MeterIdentification {
-} // namespace MeterIdentification
-
-namespace ApplianceEventsAndAlert {
-
-// Enum for EventIdentification
-enum class EventIdentification : uint8_t
-{
-    kEndOfCycle         = 0x01,
-    kTemperatureReached = 0x04,
-    kEndOfCooking       = 0x05,
-    kSwitchingOff       = 0x06,
-    kWrongData          = 0x07,
-};
-
-// Bitmap for AlertCount
-enum class AlertCount : uint8_t
-{
-    kNumberOfAlerts = 0xF,
-    kTypeOfAlert    = 0xF0,
-};
-
-// Bitmap for AlertStructure
-enum class AlertStructure : uint32_t
-{
-    kAlertId          = 0xFF,
-    kCategory         = 0xF00,
-    kPresenceRecovery = 0x3000,
-};
-} // namespace ApplianceEventsAndAlert
-
-namespace ApplianceStatistics {
-} // namespace ApplianceStatistics
 
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement

@@ -172,10 +172,8 @@ ByteSpan MTROperationalCredentialsDelegate::IntermediateCertSpan() const
 bool MTROperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32_t & epoch)
 {
     NSDate * date = [NSDate dateWithTimeIntervalSinceNow:offset];
-    unsigned units = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute
-        | NSCalendarUnitSecond;
     NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSDateComponents * components = [calendar components:units fromDate:date];
+    NSDateComponents * components = [calendar componentsInTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0] fromDate:date];
 
     uint16_t year = static_cast<uint16_t>([components year]);
     uint8_t month = static_cast<uint8_t>([components month]);

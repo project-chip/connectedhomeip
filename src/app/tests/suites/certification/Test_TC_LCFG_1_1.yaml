@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 101.1.1. [TC-LCFG-1.1] Global Attributes [DUT-Server]
+name: 99.1.1. [TC-LCFG-1.1] Global Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -21,177 +21,77 @@ config:
     endpoint: 0
 
 tests:
-    - label: "TH reads SupportedLocales attribute from DUT"
+    - label: "Commission TH to DUT"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration read supported-locales 1 0
 
-          [1645772065.848431][3762:3767] CHIP:TOO:   SupportedLocales: 8 entries
-          [1645772065.850249][3762:3767] CHIP:TOO:     [1]: en-US
-          [1645772065.850298][3762:3767] CHIP:TOO:     [2]: de-DE
-          [1645772065.850333][3762:3767] CHIP:TOO:     [3]: fr-FR
-          [1645772065.850368][3762:3767] CHIP:TOO:     [4]: en-GB
-          [1645772065.850402][3762:3767] CHIP:TOO:     [5]: es-ES
-          [1645772065.850435][3762:3767] CHIP:TOO:     [6]: zh-CN
-          [1645772065.850469][3762:3767] CHIP:TOO:     [7]: it-IT
-          [1645772065.850502][3762:3767] CHIP:TOO:     [8]: ja-JP
-          [1645772065.851668][3762:3767] CHIP:EM: Sending Standalone Ack for MessageCounter:4927804 on exchange 64827i
       disabled: true
 
-    - label: "TH writes 'newsupportedlocales' to SupportedLocales attribute"
+    - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration write supported-locales newsupportedlocales 1 0
+          ./chip-tool localizationconfiguration read cluster-revision 1 0
 
-          or
 
-          '' ./chip-tool any write-by-id 0x002B 1 newsupportedlocales 3 0
+          [1649330698.587235][4440:4445] CHIP:DMG:
+          [1649330698.587269][4440:4445] CHIP:DMG:        SuppressResponse = true,
+          [1649330698.587315][4440:4445] CHIP:DMG:        InteractionModelRevision = 1
+          [1649330698.587347][4440:4445] CHIP:DMG: }
+          [1649330698.587556][4440:4445] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFD DataVersion: 419421945
+          [1649330698.587643][4440:4445] CHIP:TOO:   ClusterRevision: 1
       disabled: true
 
-    - label: "TH reads SupportedLocales attribute"
+    - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration read supported-locales 1 0
-          [1645772065.848431][3762:3767] CHIP:TOO:   SupportedLocales: 8 entries
-          [1645772065.850249][3762:3767] CHIP:TOO:     [1]: en-US
-          [1645772065.850298][3762:3767] CHIP:TOO:     [2]: de-DE
-          [1645772065.850333][3762:3767] CHIP:TOO:     [3]: fr-FR
-          [1645772065.850368][3762:3767] CHIP:TOO:     [4]: en-GB
-          [1645772065.850402][3762:3767] CHIP:TOO:     [5]: es-ES
-          [1645772065.850435][3762:3767] CHIP:TOO:     [6]: zh-CN
-          [1645772065.850469][3762:3767] CHIP:TOO:     [7]: it-IT
-          [1645772065.850502][3762:3767] CHIP:TOO:     [8]: ja-JP
-          [1645772065.851668][3762:3767] CHIP:EM: Sending Standalone Ack for MessageCounter:4927804 on exchange 64827i
+          ./chip-tool localizationconfiguration read feature-map 1 0
+
+
+          [1653462414.221894][29485:29490] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFC DataVersion: 2352052086
+          [1653462414.222033][29485:29490] CHIP:TOO:   FeatureMap: 0
+          [1653462414.222207][29485:29490] CHIP:EM: Sending Standalone Ack for MessageCounter:4940181 on exchange 7821i
       disabled: true
 
-    - label: "TH reads ActiveLocale Attribute from the DUT"
+    - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration read active-locale 1 0
+          ./chip-tool localizationconfiguration read  attribute-list 1 0
 
-          [1645772238.226467][3778:3783] CHIP:DMG: ReportDataMessage =
-          [1645772238.226511][3778:3783] CHIP:DMG: {
-          [1645772238.226545][3778:3783] CHIP:DMG:        AttributeReportIBs =
-          [1645772238.226596][3778:3783] CHIP:DMG:        [
-          [1645772238.226635][3778:3783] CHIP:DMG:                AttributeReportIB =
-          [1645772238.226691][3778:3783] CHIP:DMG:                {
-          [1645772238.226735][3778:3783] CHIP:DMG:                        AttributeDataIB =
-          [1645772238.226787][3778:3783] CHIP:DMG:                        {
-          [1645772238.226839][3778:3783] CHIP:DMG:                                DataVersion = 0xcf5f714e,
-          [1645772238.226895][3778:3783] CHIP:DMG:                                AttributePathIB =
-          [1645772238.226949][3778:3783] CHIP:DMG:                                {
-          [1645772238.227004][3778:3783] CHIP:DMG:                                   Endpoint = 0x0,
-          [1645772238.227065][3778:3783] CHIP:DMG:                                   Cluster = 0x2b,
-          [1645772238.227126][3778:3783] CHIP:DMG:                                   Attribute = 0x0000_0001,
-          [1645772238.227180][3778:3783] CHIP:DMG:                                }
-          [1645772238.227238][3778:3783] CHIP:DMG:
-          [1645772238.227300][3778:3783] CHIP:DMG:                                   Data = "ja-JP",
-          [1645772238.227357][3778:3783] CHIP:DMG:                        },
-          [1645772238.227413][3778:3783] CHIP:DMG:
-          [1645772238.227459][3778:3783] CHIP:DMG:                },
-          [1645772238.227513][3778:3783] CHIP:DMG:
-          [1645772238.227552][3778:3783] CHIP:DMG:        ],
-          [1645772238.227602][3778:3783] CHIP:DMG:
-          [1645772238.227642][3778:3783] CHIP:DMG:        SuppressResponse = true,
-          [1645772238.227683][3778:3783] CHIP:DMG:        InteractionModelRevision = 1
-          [1645772238.227721][3778:3783] CHIP:DMG: }
-          [1645772238.227930][3778:3783] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001DataVersion: 3479138638
-          [1645772238.228001][3778:3783] CHIP:TOO:   ActiveLocale: ja-JP
+          [1653462309.061114][29477:29482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFB DataVersion: 2352052086
+          [1653462309.061199][29477:29482] CHIP:TOO:   AttributeList: 7 entries
+          [1653462309.061233][29477:29482] CHIP:TOO:     [1]: 0
+          [1653462309.061258][29477:29482] CHIP:TOO:     [2]: 1
+          [1653462309.061284][29477:29482] CHIP:TOO:     [3]: 65528
+          [1653462309.061308][29477:29482] CHIP:TOO:     [4]: 65529
+          [1653462309.061332][29477:29482] CHIP:TOO:     [5]: 65531
+          [1653462309.061355][29477:29482] CHIP:TOO:     [6]: 65532
+          [1653462309.061379][29477:29482] CHIP:TOO:     [7]: 65533
+          [1653462309.061492][29477:29482] CHIP:EM: Sending Standalone Ack for MessageCounter:13553423 on exchange 61180i
       disabled: true
 
-    - label:
-          "TH writes new string not present in SupportedLocale attribute to
-          ActiveLocale Attribute."
+    - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration write active-locale fw-GB 1 0
-
-          [1645772751.418627][3827:3832] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1645772751.418700][3827:3832] CHIP:DMG: WriteResponseMessage =
-          [1645772751.418743][3827:3832] CHIP:DMG: {
-          [1645772751.418782][3827:3832] CHIP:DMG:        AttributeStatusIBs =
-          [1645772751.418839][3827:3832] CHIP:DMG:        [
-          [1645772751.418882][3827:3832] CHIP:DMG:                AttributeStatusIB =
-          [1645772751.418931][3827:3832] CHIP:DMG:                {
-          [1645772751.418977][3827:3832] CHIP:DMG:                        AttributePathIB =
-          [1645772751.419039][3827:3832] CHIP:DMG:                        {
-          [1645772751.419096][3827:3832] CHIP:DMG:                                Endpoint = 0x0,
-          [1645772751.419157][3827:3832] CHIP:DMG:                                Cluster = 0x2b,
-          [1645772751.419217][3827:3832] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1645772751.419271][3827:3832] CHIP:DMG:                        }
-          [1645772751.419332][3827:3832] CHIP:DMG:
-          [1645772751.419392][3827:3832] CHIP:DMG:                        StatusIB =
-          [1645772751.419447][3827:3832] CHIP:DMG:                        {
-          [1645772751.419497][3827:3832] CHIP:DMG:                                status = 0x87,
-          [1645772751.419553][3827:3832] CHIP:DMG:                        },
-          [1645772751.419608][3827:3832] CHIP:DMG:
-          [1645772751.419656][3827:3832] CHIP:DMG:                },
-          [1645772751.419714][3827:3832] CHIP:DMG:
-          [1645772751.419756][3827:3832] CHIP:DMG:        ],
-          [1645772751.419809][3827:3832] CHIP:DMG:
-          [1645772751.419852][3827:3832] CHIP:DMG:        InteractionModelRevision = 1
-          [1645772751.419893][3827:3832] CHIP:DMG: }
-          [1645772751.419997][3827:3832] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87
+          out 0f scope for V1.0
       disabled: true
 
-    - label:
-          "TH writes new string present in SupportedLocale attribute to
-          ActiveLocale Attribute."
+    - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration write active-locale fr-FR 1 0
+          ./chip-tool localizationconfiguration read accepted-command-list 1 0
 
-          [1645772570.568391][3806:3811] CHIP:DMG: WriteClient moving to [ResponseRe]
-          [1645772570.568456][3806:3811] CHIP:DMG: WriteResponseMessage =
-          [1645772570.568492][3806:3811] CHIP:DMG: {
-          [1645772570.568525][3806:3811] CHIP:DMG:        AttributeStatusIBs =
-          [1645772570.568569][3806:3811] CHIP:DMG:        [
-          [1645772570.568605][3806:3811] CHIP:DMG:                AttributeStatusIB =
-          [1645772570.568651][3806:3811] CHIP:DMG:                {
-          [1645772570.568694][3806:3811] CHIP:DMG:                        AttributePathIB =
-          [1645772570.568747][3806:3811] CHIP:DMG:                        {
-          [1645772570.568794][3806:3811] CHIP:DMG:                                Endpoint = 0x0,
-          [1645772570.568851][3806:3811] CHIP:DMG:                                Cluster = 0x2b,
-          [1645772570.568906][3806:3811] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1645772570.568958][3806:3811] CHIP:DMG:                        }
-          [1645772570.569014][3806:3811] CHIP:DMG:
-          [1645772570.569064][3806:3811] CHIP:DMG:                        StatusIB =
-          [1645772570.569104][3806:3811] CHIP:DMG:                        {
-          [1645772570.569147][3806:3811] CHIP:DMG:                                status = 0x0,
-          [1645772570.569267][3806:3811] CHIP:DMG:                        },
-          [1645772570.569311][3806:3811] CHIP:DMG:
-          [1645772570.569347][3806:3811] CHIP:DMG:                },
-          [1645772570.569387][3806:3811] CHIP:DMG:
-          [1645772570.569416][3806:3811] CHIP:DMG:        ],
-          [1645772570.569454][3806:3811] CHIP:DMG:
-          [1645772570.569484][3806:3811] CHIP:DMG:        InteractionModelRevision = 1
-          [1645772570.569513][3806:3811] CHIP:DMG: }
-          [1645772570.569589][3806:3811] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+          [1649331020.031045][4520:4525] CHIP:DMG:
+          [1649331020.031081][4520:4525] CHIP:DMG:        SuppressResponse = true,
+          [1649331020.031119][4520:4525] CHIP:DMG:        InteractionModelRevision = 1
+          [1649331020.031153][4520:4525] CHIP:DMG: }
+          [1649331020.031374][4520:4525] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFF9 DataVersion: 419421945
+          [1649331020.031470][4520:4525] CHIP:TOO:   AcceptedCommandList: 0 entries
       disabled: true
 
-    - label: "TH Reads ActiveLocale."
+    - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
       verification: |
-          ubuntu@ubuntu:~/apps$ '' ./chip-tool localizationconfiguration read active-locale 1 0
-          [1645772597.251785][3816:3821] CHIP:DMG: ReportDataMessage =
-          [1645772597.251837][3816:3821] CHIP:DMG: {
-          [1645772597.251866][3816:3821] CHIP:DMG:        AttributeReportIBs =
-          [1645772597.251907][3816:3821] CHIP:DMG:        [
-          [1645772597.251953][3816:3821] CHIP:DMG:                AttributeReportIB =
-          [1645772597.252010][3816:3821] CHIP:DMG:                {
-          [1645772597.252049][3816:3821] CHIP:DMG:                        AttributeDataIB =
-          [1645772597.252105][3816:3821] CHIP:DMG:                        {
-          [1645772597.252149][3816:3821] CHIP:DMG:                                DataVersion = 0xcf5f714f,
-          [1645772597.252237][3816:3821] CHIP:DMG:                                AttributePathIB =
-          [1645772597.252294][3816:3821] CHIP:DMG:                                {
-          [1645772597.252344][3816:3821] CHIP:DMG:                                   Endpoint = 0x0,
-          [1645772597.252405][3816:3821] CHIP:DMG:                                   Cluster = 0x2b,
-          [1645772597.252461][3816:3821] CHIP:DMG:                                   Attribute = 0x0000_0001,
-          [1645772597.252505][3816:3821] CHIP:DMG:                                }
-          [1645772597.252563][3816:3821] CHIP:DMG:
-          [1645772597.252623][3816:3821] CHIP:DMG:                                   Data = "fr-FR",
-          [1645772597.252671][3816:3821] CHIP:DMG:                        },
-          [1645772597.252728][3816:3821] CHIP:DMG:
-          [1645772597.252774][3816:3821] CHIP:DMG:                },
-          [1645772597.252819][3816:3821] CHIP:DMG:
-          [1645772597.252862][3816:3821] CHIP:DMG:        ],
-          [1645772597.252904][3816:3821] CHIP:DMG:
-          [1645772597.252948][3816:3821] CHIP:DMG:        SuppressResponse = true,
-          [1645772597.252981][3816:3821] CHIP:DMG:        InteractionModelRevision = 1
-          [1645772597.253024][3816:3821] CHIP:DMG: }
-          [1645772597.253230][3816:3821] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001DataVersion: 3479138639
-          [1645772597.253293][3816:3821] CHIP:TOO:   ActiveLocale: fr-FR
+          ./chip-tool localizationconfiguration read  generated-command-list 1 0
+
+
+          [1649330937.798986][4508:4513] CHIP:DMG:
+          [1649330937.799022][4508:4513] CHIP:DMG:        SuppressResponse = true,
+          [1649330937.799062][4508:4513] CHIP:DMG:        InteractionModelRevision = 1
+          [1649330937.799096][4508:4513] CHIP:DMG: }
+          [1649330937.799317][4508:4513] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFF8 DataVersion: 419421945
+          [1649330937.799413][4508:4513] CHIP:TOO:   GeneratedCommandList: 0 entries
       disabled: true

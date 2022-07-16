@@ -25,8 +25,11 @@ tests:
           "DUT increases the temperature by sending a SetpointRaiseLower command
           to the Test Harness, with a valid Mode argument (0, 1 or 2) and a
           reasonable positive value that is supported by the DUT."
+      PICS: TSTAT.C.C00.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received setpoint-raise-lower command with f.e. mode 0 and an amount of 10 looks like this:
+
+          ./chip-tool thermostat setpoint-raise-lower 0 10 1 1
 
 
           [1646064221.719107][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:4540287 on exchange 31012r
@@ -62,11 +65,14 @@ tests:
       disabled: true
 
     - label:
-          "DUT loweres the temperature by sending a SetpointRaiseLower command
-          to the Test Harness, with a valid Mode argument (0, 1 or 2) and a
+          "DUT lowers the temperature by sending a SetpointRaiseLower command to
+          the Test Harness, with a valid Mode argument (0, 1 or 2) and a
           reasonable negative value that is supported by the DUT."
+      PICS: TSTAT.C.C00.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received setpoint-raise-lower command with f.e. mode 0 and an amount of 10 looks like this:
+
+          ./chip-tool thermostat setpoint-raise-lower 0 -10 1 1
 
 
           [1646064525.675075][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:16717414 on exchange 9698r
@@ -102,34 +108,35 @@ tests:
       disabled: true
 
     - label: "DUT sends a GetRelayStatusLog command to the Test Harness."
+      PICS: TSTAT.C.C04.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received GetRelayStatusLog command looks like this:
-
+          ./chip-tool thermostat  get-relay-status-log  1 1
           [1646064788.912273][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:15642355 on exchange 58465r
           [1646064788.912319][33190:33190] CHIP:EM: Handling via exchange: 58465r, Delegate: 0xaaaace1730c8
           [1646064788.912604][33190:33190] CHIP:DMG: InvokeRequestMessage =
           [1646064788.912647][33190:33190] CHIP:DMG: {
-          [1646064788.912673][33190:33190] CHIP:DMG: 	suppressResponse = false,
-          [1646064788.912704][33190:33190] CHIP:DMG: 	timedRequest = false,
-          [1646064788.912732][33190:33190] CHIP:DMG: 	InvokeRequests =
-          [1646064788.912767][33190:33190] CHIP:DMG: 	[
-          [1646064788.912794][33190:33190] CHIP:DMG: 		CommandDataIB =
-          [1646064788.912833][33190:33190] CHIP:DMG: 		{
-          [1646064788.912861][33190:33190] CHIP:DMG: 			CommandPathIB =
-          [1646064788.912896][33190:33190] CHIP:DMG: 			{
-          [1646064788.912936][33190:33190] CHIP:DMG: 				EndpointId = 0x1,
-          [1646064788.912977][33190:33190] CHIP:DMG: 				ClusterId = 0x201,
-          [1646064788.913010][33190:33190] CHIP:DMG: 				CommandId = 0x4,
-          [1646064788.913048][33190:33190] CHIP:DMG: 			},
+          [1646064788.912673][33190:33190] CHIP:DMG:         suppressResponse = false,
+          [1646064788.912704][33190:33190] CHIP:DMG:         timedRequest = false,
+          [1646064788.912732][33190:33190] CHIP:DMG:         InvokeRequests =
+          [1646064788.912767][33190:33190] CHIP:DMG:         [
+          [1646064788.912794][33190:33190] CHIP:DMG:                 CommandDataIB =
+          [1646064788.912833][33190:33190] CHIP:DMG:                 {
+          [1646064788.912861][33190:33190] CHIP:DMG:                         CommandPathIB =
+          [1646064788.912896][33190:33190] CHIP:DMG:                         {
+          [1646064788.912936][33190:33190] CHIP:DMG:                                 EndpointId = 0x1,
+          [1646064788.912977][33190:33190] CHIP:DMG:                                 ClusterId = 0x201,
+          [1646064788.913010][33190:33190] CHIP:DMG:                                 CommandId = 0x4,
+          [1646064788.913048][33190:33190] CHIP:DMG:                         },
           [1646064788.913085][33190:33190] CHIP:DMG:
-          [1646064788.913116][33190:33190] CHIP:DMG: 			CommandData =
-          [1646064788.913151][33190:33190] CHIP:DMG: 			{
-          [1646064788.913186][33190:33190] CHIP:DMG: 			},
-          [1646064788.913218][33190:33190] CHIP:DMG: 		},
+          [1646064788.913116][33190:33190] CHIP:DMG:                         CommandData =
+          [1646064788.913151][33190:33190] CHIP:DMG:                         {
+          [1646064788.913186][33190:33190] CHIP:DMG:                         },
+          [1646064788.913218][33190:33190] CHIP:DMG:                 },
           [1646064788.913253][33190:33190] CHIP:DMG:
-          [1646064788.913280][33190:33190] CHIP:DMG: 	],
+          [1646064788.913280][33190:33190] CHIP:DMG:         ],
           [1646064788.913313][33190:33190] CHIP:DMG:
-          [1646064788.913340][33190:33190] CHIP:DMG: 	InteractionModelRevision = 1
+          [1646064788.913340][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
           [1646064788.913366][33190:33190] CHIP:DMG: },
           [1646064788.913428][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0201 e=1 p=o
           [1646064788.913476][33190:33190] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0201 Command=0x0000_0004

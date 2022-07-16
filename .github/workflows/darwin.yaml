@@ -88,21 +88,9 @@ jobs:
               # which is apparently being included after CHIPDeviceConfig.h.
               run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wno-macro-redefined'
               working-directory: src/darwin/Framework
-            - name: Copying Framework to Temporary Path
-              continue-on-error: true
-              run: |
-                  mkdir -p /tmp/macos_framework_output
-                  ls -la /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/
-                  mv /Users/runner/work/connectedhomeip/connectedhomeip/src/darwin/Framework/build/Release/Matter.framework /tmp/macos_framework_output
-                  ls -la /tmp/macos_framework_output
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
-            # Disabling for now
-            # - name: Build example darwin-framework-tool
-            #   timeout-minutes: 15
-            #   run: |
-            #       scripts/examples/gn_build_example.sh examples/darwin-framework-tool out/debug chip_config_network_layer_ble=false is_asan=true
             - name: Build example All Clusters Server
               timeout-minutes: 15
               run: |

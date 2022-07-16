@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,11 +27,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRDevice (InternalIntrospection)
+@interface MTRBaseDevice (InternalIntrospection)
 
-// TODO: remove me
-// Used to access the internal chip::DeviceProxy from TestCommandBridge
-- (chip::DeviceProxy *)internalDevice;
+/**
+ * Invalidate the CASE session, so an attempt to getConnectedDevice for this
+ * device id will have to create a new CASE session.  Ideally this API will go
+ * away.
+ */
+- (void)invalidateCASESession;
 
 @end
 

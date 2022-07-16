@@ -1,0 +1,128 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 129.1. [TC-ACL-1.1] Global attributes
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH1 commissions DUT using admin node ID N1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster ClusterRevision
+          attribute"
+      verification: |
+          ./chip-tool accesscontrol read cluster-revision 1 0
+
+          On TH, verify DUT responds the cluster revision value as 1
+
+          [1656335651.726036][4621:4626] CHIP:DMG:        SuppressResponse = true,
+          [1656335651.726074][4621:4626] CHIP:DMG:        InteractionModelRevision = 1
+          [1656335651.726109][4621:4626] CHIP:DMG: }
+          [1656335651.726296][4621:4626] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFD DataVersion: 2658161222
+          [1656335651.726376][4621:4626] CHIP:TOO:   ClusterRevision: 1
+          [1656335651.726479][4621:4626] CHIP:EM: Sending Standalone Ack for MessageCounter:42748782 on exchange 27808i
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster FeatureMap attribute"
+      verification: |
+          ./chip-tool accesscontrol read feature-map 1 0
+
+          On TH, verify DUT responds the  Featuremap  value as 0
+
+          [1656335839.955385][4637:4642] CHIP:DMG:
+          [1656335839.955419][4637:4642] CHIP:DMG:        SuppressResponse = true,
+          [1656335839.955453][4637:4642] CHIP:DMG:        InteractionModelRevision = 1
+          [1656335839.955485][4637:4642] CHIP:DMG: }
+          [1656335839.955653][4637:4642] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFC DataVersion: 2658161222
+          [1656335839.955723][4637:4642] CHIP:TOO:   FeatureMap: 0
+          [1656335839.955817][4637:4642] CHIP:EM: Sending Standalone Ack for MessageCounter:69406683 on exchange 34373i
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster AttributeList
+          attribute"
+      verification: |
+          ./chip-tool accesscontrol read attribute-list 1 0
+
+          On TH, verify DUT responds with a list  of  Attributes with 10 entries.
+
+          [1655960990.225266][2516:2521] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFB DataVersion: 477297741
+          [1655960990.225364][2516:2521] CHIP:TOO:   AttributeList: 10 entries
+          [1655960990.225406][2516:2521] CHIP:TOO:     [1]: 0
+          [1655960990.225441][2516:2521] CHIP:TOO:     [2]: 1
+          [1655960990.225474][2516:2521] CHIP:TOO:     [3]: 2
+          [1655960990.225507][2516:2521] CHIP:TOO:     [4]: 3
+          [1655960990.225540][2516:2521] CHIP:TOO:     [5]: 4
+          [1655960990.225575][2516:2521] CHIP:TOO:     [6]: 65528
+          [1655960990.225609][2516:2521] CHIP:TOO:     [7]: 65529
+          [1655960990.225643][2516:2521] CHIP:TOO:     [8]: 65531
+          [1655960990.225677][2516:2521] CHIP:TOO:     [9]: 65532
+          [1655960990.225710][2516:2521] CHIP:TOO:     [10]: 65533
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster EventList attribute"
+      verification: |
+          Out of scope for V1.0
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster AcceptedCommandList
+          attribute"
+      verification: |
+          ./chip-tool accesscontrol read accepted-command-list 1 0
+
+          on TH , verify DUT responds right to acceptedcommand list with 0 entries
+
+          [[1656478328.210742][2458:2463] CHIP:DMG:
+          [1656478328.210767][2458:2463] CHIP:DMG:        ],
+          [1656478328.210799][2458:2463] CHIP:DMG:
+          [1656478328.210826][2458:2463] CHIP:DMG:        SuppressResponse = true,
+          [1656478328.210853][2458:2463] CHIP:DMG:        InteractionModelRevision = 1
+          [1656478328.210877][2458:2463] CHIP:DMG: }
+          [1656478328.211032][2458:2463] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFF9 DataVersion: 3457122350
+          [1656478328.211099][2458:2463] CHIP:TOO:   AcceptedCommandList: 0 entries
+          [1656478328.211245][2458:2463] CHIP:EM: Sending Standalone Ack for MessageCounter:163659373 on exchange 15270i
+          [1656478328.211313][2458:2463] CHIP:IN: Prepared secure message 0xffff8a2e3958 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 15270i with MessageCounter:229380798.
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster GeneratedCommandList
+          attribute"
+      verification: |
+          ./chip-tool accesscontrol read generated-command-list 1 0
+
+          on TH , verify DUT responds right to GeneratedCommandList  with 0 entries
+
+          [[1656478396.324314][2467:2472] CHIP:DMG:
+          [1656478396.324346][2467:2472] CHIP:DMG:        ],
+          [1656478396.324386][2467:2472] CHIP:DMG:
+          [1656478396.324419][2467:2472] CHIP:DMG:        SuppressResponse = true,
+          [1656478396.324453][2467:2472] CHIP:DMG:        InteractionModelRevision = 1
+          [1656478396.324484][2467:2472] CHIP:DMG: }
+          [1656478396.324673][2467:2472] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFF8 DataVersion: 3457122350
+          [1656478396.324752][2467:2472] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1656478396.324843][2467:2472] CHIP:EM: Sending Standalone Ack for MessageCounter:73836177 on exchange 65471i
+          [1656478396.324920][2467:2472] CHIP:IN: Prepared secure message 0xffffab7ed958 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 65471i with MessageCounter:243106706.
+          [1656478396.324967][2467:2472] CHIP:IN: Sending encrypted msg 0xffffab7ed958 with MessageCounter:243106706 t
+      disabled: true

@@ -48,6 +48,7 @@ tests:
       disabled: true
 
     - label: "TH Sends BDX SendAccept message"
+      PICS: DLOG.S.C01.Tx
       verification: |
           Not Verifiable
       disabled: true

@@ -111,9 +111,17 @@ void SessionManager::Shutdown()
         mFabricTable->RemoveFabricDelegate(this);
         mFabricTable = nullptr;
     }
+
+    // Ensure that we don't create new sessions as we iterate our session table.
+    mState = State::kNotReady;
+
+    mSecureSessions.ForEachSession([&](auto session) {
+        session->MarkForEviction();
+        return Loop::Continue;
+    });
+
     mMessageCounterManager = nullptr;
 
-    mState        = State::kNotReady;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
     mCB           = nullptr;
@@ -121,7 +129,7 @@ void SessionManager::Shutdown()
 
 /**
  * @brief Notification that a fabric was removed.
- *        This function doesn't call ExpireAllPairingsForFabric
+ *        This function doesn't call ExpireAllSessionsForFabric
  *        since the CASE session might still be open to send a response
  *        on the removed fabric.
  */
@@ -342,7 +350,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
+void SessionManager::ExpireAllSessions(const ScopedNodeId & node)
 {
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetPeer() == node)
@@ -353,11 +361,11 @@ void SessionManager::ExpireAllPairings(const ScopedNodeId & node)
     });
 }
 
-void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
+void SessionManager::ExpireAllSessionsForFabric(FabricIndex fabricIndex)
 {
-    ChipLogDetail(Inet, "Expiring all connections for fabric %d!!", fabric);
+    ChipLogDetail(Inet, "Expiring all sessions for fabric 0x%x!!", static_cast<unsigned>(fabricIndex));
     mSecureSessions.ForEachSession([&](auto session) {
-        if (session->GetFabricIndex() == fabric)
+        if (session->GetFabricIndex() == fabricIndex)
         {
             session->MarkForEviction();
         }
@@ -365,9 +373,9 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
-void SessionManager::ExpireAllPASEPairings()
+void SessionManager::ExpireAllPASESessions()
 {
-    ChipLogDetail(Inet, "Expiring all PASE pairings");
+    ChipLogDetail(Inet, "Expiring all PASE sessions");
     mSecureSessions.ForEachSession([&](auto session) {
         if (session->GetSecureSessionType() == Transport::SecureSession::Type::kPASE)
         {
@@ -380,6 +388,7 @@ void SessionManager::ExpireAllPASEPairings()
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {
+    VerifyOrReturnValue(mState == State::kInitialized, NullOptional);
     return mSecureSessions.CreateNewSecureSession(secureSessionType, sessionEvictionHint);
 }
 
@@ -430,7 +439,12 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+    CHIP_ERROR err = packetHeader.DecodeAndConsume(msg);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to decode packet header: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
 
     if (packetHeader.IsEncrypted())
     {

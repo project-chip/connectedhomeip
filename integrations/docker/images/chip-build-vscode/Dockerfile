@@ -44,7 +44,6 @@ COPY --from=ameba /opt/ameba /opt/ameba
 COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
-COPY --from=imx /opt/fsl-imx-wayland /opt/fsl-imx-wayland
 
 COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
 

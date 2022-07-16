@@ -60,7 +60,11 @@ struct SetupParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    chip::VendorId controllerVendorId;
+    //
+    // This must be set to a valid, operational VendorId value associated with
+    // the controller/commissioner.
+    //
+    chip::VendorId controllerVendorId = VendorId::Unspecified;
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;

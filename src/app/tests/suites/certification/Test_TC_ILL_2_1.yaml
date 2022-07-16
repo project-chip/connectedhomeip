@@ -29,6 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads MeasuredValue attribute from DUT"
+      PICS: ILL.S.A0000
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:
@@ -38,6 +39,7 @@ tests:
               maxValue: 65534
 
     - label: "TH reads MinMeasuredValue attribute from DUT"
+      PICS: ILL.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
@@ -47,6 +49,7 @@ tests:
               maxValue: 65533
 
     - label: "TH reads MaxMeasuredValue attribute from DUT"
+      PICS: ILL.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
@@ -56,6 +59,7 @@ tests:
               maxValue: 65534
 
     - label: "TH reads Tolerance attribute from DUT"
+      PICS: ILL.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"
       response:
@@ -65,6 +69,7 @@ tests:
               maxValue: 2048
 
     - label: "TH reads LightSensorType attribute from DUT"
+      PICS: ILL.S.A0004
       command: "readAttribute"
       attribute: "LightSensorType"
       response:

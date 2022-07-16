@@ -49,5 +49,5 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform tizen
-            - name: Build example Tizen lighting app
+            - name: Build Tizen examples
               run: scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'tizen-*' build"

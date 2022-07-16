@@ -72,6 +72,10 @@ public:
     void SetBleLayer(Ble::BleLayer * bleLayer) { mBleLayer = bleLayer; };
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+    // Called to notify us that the DeviceCommissioner is shutting down and we
+    // should not try to do any more new work.
+    void CommissionerShuttingDown();
+
 private:
     // DevicePairingDelegate implementation.
     void OnStatusUpdate(DevicePairingDelegate::Status status) override;

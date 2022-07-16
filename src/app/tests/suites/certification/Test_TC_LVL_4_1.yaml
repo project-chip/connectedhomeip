@@ -37,9 +37,9 @@ tests:
           constraints:
               type: uint8
 
-    - label: "sends a Move to level command"
+    - label: "sends a MoveToLevelWithOnOff command"
       PICS: LVL.S.C00.Rsp
-      command: "MoveToLevel"
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
@@ -97,7 +97,7 @@ tests:
                 value: 9000
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.C01.Rsp && LVL.S.A0000
+      PICS: LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0003
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -195,7 +195,7 @@ tests:
                 value: "y"
 
     - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "MoveToLevel"
       arguments:
           values:

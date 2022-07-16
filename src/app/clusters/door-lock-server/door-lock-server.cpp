@@ -25,7 +25,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/af-event.h>
@@ -35,7 +34,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/EventLogging.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -230,7 +228,7 @@ bool DoorLockServer::GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpo
                         Attributes::NumberOfHolidaySchedulesSupported::Get, numberOfHolidaySchedules);
 }
 
-void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandObj,
+void DoorLockServer::setUserCommandHandler(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
 {
@@ -271,7 +269,8 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
 
     if (!userIndexValid(commandPath.mEndpointId, userIndex))
     {
-        emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [userIndex=%d]", userIndex);
+        emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
+                                      userIndex);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
@@ -282,6 +281,27 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
         emberAfDoorLockClusterPrintln(
             "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%u]", commandPath.mEndpointId,
             userIndex, static_cast<unsigned int>(userName.Value().size()));
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    if (!userStatus.IsNull() &&
+        (userStatus.Value() < DlUserStatus::kAvailable || userStatus.Value() > DlUserStatus::kOccupiedDisabled))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetUser] Unable to set the user: user status is out of range [endpointId=%d,userIndex=%d,userStatus=%u]",
+            commandPath.mEndpointId, userIndex, to_underlying(userStatus.Value()));
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    if (!userType.IsNull() && (userType.Value() < DlUserType::kUnrestrictedUser || userType.Value() > DlUserType::kRemoteOnlyUser))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetUser] Unable to set the user: user type is out of range [endpointId=%d,userIndex=%d,userType=%u]",
+            commandPath.mEndpointId, userIndex, to_underlying(userType.Value()));
 
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
@@ -299,20 +319,21 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
                             userType, credentialRule);
         break;
     case DlDataOperationType::kClear:
+    default:
         // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
+        // or anything else
         status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+        emberAfDoorLockClusterPrintln("[SetUser] Invalid operation type [endpointId=%d,operationType=%u]", commandPath.mEndpointId,
+                                      to_underlying(operationType));
         break;
     }
 
     emberAfSendImmediateDefaultResponse(status);
 }
 
-void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData)
+void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex)
 {
-    auto & userIndex = commandData.userIndex;
-
     emberAfDoorLockClusterPrintln("[GetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     if (!SupportsUSR(commandPath.mEndpointId))
@@ -362,7 +383,7 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
-            if (user.credentials.size() > 0)
+            if (!user.credentials.empty())
             {
                 TLV::TLVType credentialsContainer;
                 SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(to_underlying(ResponseFields::kCredentials)),
@@ -412,11 +433,9 @@ exit:
     }
 }
 
-void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
+void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * commandObj,
+                                             const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex)
 {
-    auto & userIndex = commandData.userIndex;
     emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     if (!SupportsUSR(commandPath.mEndpointId))
@@ -485,7 +504,7 @@ void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * command
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::SetCredentialCommandHandler(
+void DoorLockServer::setCredentialCommandHandler(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData)
 {
@@ -534,27 +553,15 @@ void DoorLockServer::SetCredentialCommandHandler(
         emberAfDoorLockClusterPrintln("[SetCredential] Credential index is out of range [endpointId=%d,credentialType=%u"
                                       ",credentialIndex=%d]",
                                       commandPath.mEndpointId, to_underlying(credentialType), credentialIndex);
-        sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
 
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
-    size_t minSize, maxSize;
-    if (!getCredentialRange(commandPath.mEndpointId, credentialType, minSize, maxSize))
+    auto status = credentialLengthWithinRange(commandPath.mEndpointId, credentialType, credentialData);
+    if (DlStatus::kSuccess != status)
     {
-        emberAfDoorLockClusterPrintln(
-            "[SetCredential] Unable to get min/max range for credential: internal error [endpointId=%d,credentialIndex=%d]",
-            commandPath.mEndpointId, credentialIndex);
-        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
-        return;
-    }
-    if (credentialData.size() < minSize || credentialData.size() > maxSize)
-    {
-        emberAfDoorLockClusterPrintln("[SetCredential] Credential data size is out of range "
-                                      "[endpointId=%d,credentialType=%u,minLength=%u,maxLength=%u,length=%u]",
-                                      commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int>(minSize),
-                                      static_cast<unsigned int>(maxSize), static_cast<unsigned int>(credentialData.size()));
-        sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -567,7 +574,7 @@ void DoorLockServer::SetCredentialCommandHandler(
             emberAfDoorLockClusterPrintln("[SetCredential] Unable to get the credential to exclude duplicated entry "
                                           "[endpointId=%d,credentialType=%u,credentialIndex=%d]",
                                           commandPath.mEndpointId, to_underlying(credentialType), i);
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
             return;
         }
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
@@ -578,7 +585,7 @@ void DoorLockServer::SetCredentialCommandHandler(
                 "[endpointId=%d,credentialType=%u,dataLength=%u,existingCredentialIndex=%d,credentialIndex=%d]",
                 commandPath.mEndpointId, to_underlying(credentialType), static_cast<unsigned int>(credentialData.size()), i,
                 credentialIndex);
-            sendSetCredentialResponse(commandObj, DlStatus::kDuplicate, 0, nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kDuplicate, 0, nextAvailableCredentialSlot);
             return;
         }
     }
@@ -590,7 +597,27 @@ void DoorLockServer::SetCredentialCommandHandler(
             "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
             commandPath.mEndpointId, credentialIndex);
 
-        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+        return;
+    }
+
+    // OPTIMIZE: We can unify the checks for enum validity here and in set user command handler
+    if (!userStatus.IsNull() &&
+        (userStatus.Value() < DlUserStatus::kAvailable || userStatus.Value() > DlUserStatus::kOccupiedDisabled))
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user status is out of range "
+                                      "[endpointId=%d,credentialIndex=%d,userStatus=%u]",
+                                      commandPath.mEndpointId, credentialIndex, to_underlying(userStatus.Value()));
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+        return;
+    }
+
+    if (!userType.IsNull() && (userType.Value() < DlUserType::kUnrestrictedUser || userType.Value() > DlUserType::kRemoteOnlyUser))
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is out of range "
+                                      "[endpointId=%d,credentialIndex=%d,userType=%u]",
+                                      commandPath.mEndpointId, credentialIndex, to_underlying(userType.Value()));
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -599,9 +626,9 @@ void DoorLockServer::SetCredentialCommandHandler(
     case DlDataOperationType::kAdd: {
         uint16_t createdUserIndex = 0;
 
-        DlStatus status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
-                                           existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
-        sendSetCredentialResponse(commandObj, status, createdUserIndex, nextAvailableCredentialSlot);
+        status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                  existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
+        sendSetCredentialResponse(commandObj, commandPath, status, createdUserIndex, nextAvailableCredentialSlot);
         return;
     }
     case DlDataOperationType::kModify: {
@@ -612,41 +639,36 @@ void DoorLockServer::SetCredentialCommandHandler(
                                           "[endpointId=%d,credentialIndex=%d]",
                                           commandPath.mEndpointId, credentialIndex);
 
-            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+            sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
             return;
         }
 
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
-            auto status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
-                                               existingCredential, credentialData);
-            sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
+            status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                          existingCredential, credentialData);
+            sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
             return;
         }
 
-        auto status = modifyCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
-                                       existingCredential, credentialData, userIndex.Value(), userStatus, userType);
-        sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
+        status = modifyCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                  existingCredential, credentialData, userIndex.Value(), userStatus, userType);
+        sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
         return;
     }
     case DlDataOperationType::kClear:
+    default:
         // appclusters, 5.2.4.40: set credential command supports only Add and Modify operational type.
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return;
+        sendSetCredentialResponse(commandObj, commandPath, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
     }
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::GetCredentialStatusCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData)
+void DoorLockServer::getCredentialStatusCommandHandler(chip::app::CommandHandler * commandObj,
+                                                       const chip::app::ConcreteCommandPath & commandPath,
+                                                       DlCredentialType credentialType, uint16_t credentialIndex)
 {
     emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
-
-    const auto & credentialType  = commandData.credential.credentialType;
-    const auto & credentialIndex = commandData.credential.credentialIndex;
 
     if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
     {
@@ -726,7 +748,7 @@ void DoorLockServer::GetCredentialStatusCommandHandler(
                                   nextCredentialIndex);
 }
 
-void DoorLockServer::ClearCredentialCommandHandler(
+void DoorLockServer::clearCredentialCommandHandler(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData)
 {
@@ -767,12 +789,13 @@ void DoorLockServer::ClearCredentialCommandHandler(
         clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, false));
 }
 
-void DoorLockServer::SetWeekDayScheduleCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
+void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                      const chip::app::ConcreteCommandPath & commandPath, uint8_t weekDayIndex,
+                                                      uint16_t userIndex, const chip::BitMask<DlDaysMaskMap> & daysMask,
+                                                      uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -797,20 +820,12 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         return;
     }
 
-    auto weekDayIndex     = commandData.weekDayIndex;
-    auto userIndex        = commandData.userIndex;
-    const auto & daysMask = commandData.daysMask;
-    auto startHour        = commandData.startHour;
-    auto startMinute      = commandData.startMinute;
-    auto endHour          = commandData.endHour;
-    auto endMinute        = commandData.endMinute;
-
     if (!weekDayIndexValid(endpointId, weekDayIndex) || !userIndexValid(endpointId, userIndex))
     {
         emberAfDoorLockClusterPrintln(
             "[SetWeekDaySchedule] Unable to add schedule - index out of range [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
             endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -819,7 +834,7 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - user does not exist "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                                       endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return;
     }
 
@@ -832,12 +847,13 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         rawDaysMask = static_cast<uint8_t>(rawDaysMask >> 1);
     }
 
+    // TODO: Check that bits are within range
     if (setBitsInDaysMask == 0 || setBitsInDaysMask > 1)
     {
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - daysMask is out of range "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d,daysMask=%x]",
                                       endpointId, weekDayIndex, userIndex, daysMask.Raw());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -847,7 +863,7 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - start time out of range "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                       endpointId, weekDayIndex, userIndex, startHour, startMinute, endHour, endMinute);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -856,7 +872,7 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Unable to add schedule - invalid time "
                                       "[endpointId=%d,weekDayIndex=%d,userIndex=%d,startTime=\"%d:%d\",endTime=\"%d:%d\"]",
                                       endpointId, weekDayIndex, userIndex, startHour, startMinute, endHour, endMinute);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -882,12 +898,12 @@ void DoorLockServer::SetWeekDayScheduleCommandHandler(
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::GetWeekDayScheduleCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
+void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                      const chip::app::ConcreteCommandPath & commandPath, uint8_t weekDayIndex,
+                                                      uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -895,9 +911,6 @@ void DoorLockServer::GetWeekDayScheduleCommandHandler(
     }
 
     emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Incoming command [endpointId=%d]", endpointId);
-
-    auto weekDayIndex = commandData.weekDayIndex;
-    auto userIndex    = commandData.userIndex;
 
     if (!weekDayIndexValid(endpointId, weekDayIndex) || !userIndexValid(endpointId, userIndex))
     {
@@ -912,7 +925,7 @@ void DoorLockServer::GetWeekDayScheduleCommandHandler(
     {
         emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                                       endpointId, weekDayIndex, userIndex);
-        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kNotFound);
+        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kFailure);
         return;
     }
 
@@ -928,12 +941,12 @@ void DoorLockServer::GetWeekDayScheduleCommandHandler(
                                    scheduleInfo.startHour, scheduleInfo.startMinute, scheduleInfo.endHour, scheduleInfo.endMinute);
 }
 
-void DoorLockServer::ClearWeekDayScheduleCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData)
+void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                        const chip::app::ConcreteCommandPath & commandPath, uint8_t weekDayIndex,
+                                                        uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -958,9 +971,6 @@ void DoorLockServer::ClearWeekDayScheduleCommandHandler(
         return;
     }
 
-    auto weekDayIndex = commandData.weekDayIndex;
-    auto userIndex    = commandData.userIndex;
-
     if (!userIndexValid(endpointId, userIndex) || (!weekDayIndexValid(endpointId, weekDayIndex) && 0xFE != weekDayIndex))
     {
         emberAfDoorLockClusterPrintln(
@@ -974,7 +984,7 @@ void DoorLockServer::ClearWeekDayScheduleCommandHandler(
     {
         emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]",
                                       endpointId, weekDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return;
     }
 
@@ -1008,12 +1018,12 @@ void DoorLockServer::ClearWeekDayScheduleCommandHandler(
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::SetYearDayScheduleCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData)
+void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                      const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                                      uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1038,17 +1048,12 @@ void DoorLockServer::SetYearDayScheduleCommandHandler(
         return;
     }
 
-    auto yearDayIndex  = commandData.yearDayIndex;
-    auto userIndex     = commandData.userIndex;
-    auto localStarTime = commandData.localStartTime;
-    auto localEndTime  = commandData.localEndTime;
-
     if (!yearDayIndexValid(endpointId, yearDayIndex) || !userIndexValid(endpointId, userIndex))
     {
         emberAfDoorLockClusterPrintln(
             "[SetYearDaySchedule] Unable to add schedule - index out of range [endpointId=%d,yearDayIndex=%d,userIndex=%d]",
             endpointId, yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -1057,21 +1062,21 @@ void DoorLockServer::SetYearDayScheduleCommandHandler(
         emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Unable to add schedule - user does not exist "
                                       "[endpointId=%d,yearDayIndex=%d,userIndex=%d]",
                                       endpointId, yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return;
     }
 
-    if (localEndTime <= localStarTime)
+    if (localEndTime <= localStartTime)
     {
         emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Unable to add schedule - schedule ends earlier than starts"
                                       "[endpointId=%d,yearDayIndex=%d,userIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
                                       "]",
-                                      endpointId, yearDayIndex, userIndex, localStarTime, localEndTime);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+                                      endpointId, yearDayIndex, userIndex, localStartTime, localEndTime);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
-    auto status = emberAfPluginDoorLockSetSchedule(endpointId, yearDayIndex, userIndex, DlScheduleStatus::kOccupied, localStarTime,
+    auto status = emberAfPluginDoorLockSetSchedule(endpointId, yearDayIndex, userIndex, DlScheduleStatus::kOccupied, localStartTime,
                                                    localEndTime);
     if (DlStatus::kSuccess != status)
     {
@@ -1085,7 +1090,7 @@ void DoorLockServer::SetYearDayScheduleCommandHandler(
 
     emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Successfully created new schedule "
                                   "[endpointId=%d,yearDayIndex=%d,userIndex=%d,localStartTime=%" PRIu32 ",endTime=%" PRIu32 "]",
-                                  endpointId, yearDayIndex, userIndex, localStarTime, localEndTime);
+                                  endpointId, yearDayIndex, userIndex, localStartTime, localEndTime);
 
     sendRemoteLockUserChange(endpointId, DlLockDataType::kYearDaySchedule, DlDataOperationType::kAdd, sourceNodeId, fabricIdx,
                              userIndex, static_cast<uint16_t>(yearDayIndex));
@@ -1093,21 +1098,18 @@ void DoorLockServer::SetYearDayScheduleCommandHandler(
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::GetYearDayScheduleCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData)
+void DoorLockServer::getYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                      const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                                      uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
     emberAfDoorLockClusterPrintln("[GetYearDaySchedule] incoming command [endpointId=%d]", endpointId);
-
-    auto yearDayIndex = commandData.yearDayIndex;
-    auto userIndex    = commandData.userIndex;
 
     if (!yearDayIndexValid(endpointId, yearDayIndex) || !userIndexValid(endpointId, userIndex))
     {
@@ -1122,7 +1124,7 @@ void DoorLockServer::GetYearDayScheduleCommandHandler(
     {
         emberAfDoorLockClusterPrintln("[GetYearDaySchedule] User does not exist [endpointId=%d,yearDayIndex=%d,userIndex=%d]",
                                       endpointId, yearDayIndex, userIndex);
-        sendGetYearDayScheduleResponse(commandObj, commandPath, yearDayIndex, userIndex, DlStatus::kNotFound);
+        sendGetYearDayScheduleResponse(commandObj, commandPath, yearDayIndex, userIndex, DlStatus::kFailure);
         return;
     }
 
@@ -1138,12 +1140,12 @@ void DoorLockServer::GetYearDayScheduleCommandHandler(
                                    scheduleInfo.localStartTime, scheduleInfo.localEndTime);
 }
 
-void DoorLockServer::ClearYearDayScheduleCommandHandler(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData)
+void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                        const chip::app::ConcreteCommandPath & commandPath, uint8_t yearDayIndex,
+                                                        uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1167,9 +1169,6 @@ void DoorLockServer::ClearYearDayScheduleCommandHandler(
         return;
     }
 
-    auto yearDayIndex = commandData.yearDayIndex;
-    auto userIndex    = commandData.userIndex;
-
     if (!userIndexValid(endpointId, userIndex) || (!yearDayIndexValid(endpointId, yearDayIndex) && 0xFE != yearDayIndex))
     {
         emberAfDoorLockClusterPrintln(
@@ -1183,7 +1182,7 @@ void DoorLockServer::ClearYearDayScheduleCommandHandler(
     {
         emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] User does not exist [endpointId=%d,yearDayIndex=%d,userIndex=%d]",
                                       endpointId, yearDayIndex, userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return;
     }
 
@@ -1217,12 +1216,15 @@ void DoorLockServer::ClearYearDayScheduleCommandHandler(
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
+chip::BitFlags<DoorLockFeature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
 {
-    uint32_t featureMap = 0;
-    bool success        = GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, featureMap);
-
-    return success && ((featureMap & to_underlying(feature)) != 0);
+    chip::BitFlags<DoorLockFeature> featureMap;
+    if (!GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, *featureMap.RawStorage()))
+    {
+        ChipLogError(Zcl, "Unable to get the door lock feature map: attribute read error");
+        featureMap.ClearAll();
+    }
+    return featureMap;
 }
 
 bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
@@ -1344,7 +1346,8 @@ bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DlCredent
     return true;
 }
 
-bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize)
+DlStatus DoorLockServer::credentialLengthWithinRange(chip::EndpointId endpointId, DlCredentialType type,
+                                                     const chip::ByteSpan & credentialData)
 {
     bool statusMin = true, statusMax = true;
     uint8_t minLen, maxLen;
@@ -1361,20 +1364,26 @@ bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DlCredentia
         statusMax = GetAttribute(endpointId, Attributes::MaxRFIDCodeLength::Id, Attributes::MaxRFIDCodeLength::Get, maxLen);
         break;
     default:
-        return false;
+        return DlStatus::kFailure;
     }
 
     if (!statusMin || !statusMax)
     {
         ChipLogError(Zcl, "Unable to read attributes to get min/max length for credentials [endpointId=%d,credentialType=%u]",
                      endpointId, to_underlying(type));
-        return false;
+        return DlStatus::kFailure;
     }
 
-    minSize = minLen;
-    maxSize = maxLen;
+    if (credentialData.size() < minLen || credentialData.size() > maxLen)
+    {
+        emberAfDoorLockClusterPrintln("Credential data size is out of range "
+                                      "[endpointId=%d,credentialType=%u,minLength=%u,maxLength=%u,length=%u]",
+                                      endpointId, to_underlying(type), minLen, maxLen,
+                                      static_cast<unsigned int>(credentialData.size()));
+        return DlStatus::kInvalidField;
+    }
 
-    return true;
+    return DlStatus::kSuccess;
 }
 
 bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType,
@@ -2257,32 +2266,21 @@ DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::Fab
     return status;
 }
 
-CHIP_ERROR DoorLockServer::sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
-                                                     uint16_t nextCredentialIndex)
+void DoorLockServer::sendSetCredentialResponse(chip::app::CommandHandler * commandObj,
+                                               const chip::app::ConcreteCommandPath & commandPath, DlStatus status,
+                                               uint16_t userIndex, uint16_t nextCredentialIndex)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    using ResponseFields = Commands::SetCredentialResponse::Fields;
-
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::SetCredentialResponse::Id };
-    TLV::TLVWriter * writer       = nullptr;
-    SuccessOrExit(err = commandObj->PrepareCommand(path));
-    VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kStatus)), status));
-
+    Commands::SetCredentialResponse::Type command{};
+    command.status = status;
     if (0 != userIndex)
     {
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndex));
+        command.userIndex.SetNonNull(userIndex);
     }
-
     if (0 != nextCredentialIndex)
     {
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextCredentialIndex)), nextCredentialIndex));
+        command.nextCredentialIndex.SetNonNull(nextCredentialIndex);
     }
-    SuccessOrExit(err = commandObj->FinishCommand());
-
-exit:
-    return err;
+    commandObj->AddResponse(commandPath, command);
 }
 
 bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type)
@@ -2951,14 +2949,14 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
     return DlLockDataType::kUnspecified;
 }
 
-void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                                        uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime,
-                                        DlOperatingMode operatingMode)
+void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                      const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex,
+                                                      uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
 {
     VerifyOrDie(nullptr != commandObj);
 
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -2972,7 +2970,7 @@ void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, 
         emberAfDoorLockClusterPrintln(
             "[SetHolidaySchedule] Unable to add schedule - index out of range [endpointId=%d,scheduleIndex=%d]", endpointId,
             holidayIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -2981,17 +2979,17 @@ void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, 
         emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - schedule ends earlier than starts"
                                       "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32 "]",
                                       endpointId, holidayIndex, localStartTime, localEndTime);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
-    if (operatingMode > DlOperatingMode::kPassage)
+    if (operatingMode > DlOperatingMode::kPassage || operatingMode < DlOperatingMode::kNormal)
     {
         emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Unable to add schedule - operating mode is out of range"
                                       "[endpointId=%d,scheduleIndex=%d,localStarTime=%" PRIu32 ",localEndTime=%" PRIu32
                                       ", operatingMode=%d]",
                                       endpointId, holidayIndex, localStartTime, localEndTime, to_underlying(operatingMode));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
         return;
     }
 
@@ -3013,11 +3011,11 @@ void DoorLockServer::setHolidaySchedule(chip::app::CommandHandler * commandObj, 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::getHolidaySchedule(chip::app::CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                        uint8_t holidayIndex)
+void DoorLockServer::getHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                      const ConcreteCommandPath & commandPath, uint8_t holidayIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetHolidaySchedule] Ignore command (not supported) [endpointId=%d,scheduleIndex=%d]",
                                       endpointId, holidayIndex);
@@ -3047,11 +3045,11 @@ void DoorLockServer::getHolidaySchedule(chip::app::CommandHandler * commandObj, 
                                 scheduleInfo.localEndTime, scheduleInfo.operatingMode);
 }
 
-void DoorLockServer::clearHolidaySchedule(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex)
+void DoorLockServer::clearHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
+                                                        const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -3141,7 +3139,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
         // [EM]: I don't think we should prevent door lock/unlocking if we couldn't find credential associated with user. I
         // think if the app thinks that PIN is correct the door should be unlocked.
         //
-        // [DV]: let's app decide on PIN correctness, we will fail only if 'opHandler' returns false.
+        // [DV]: let app decide on PIN correctness, we will fail only if 'opHandler' returns false.
         credentialsOk =
             true; // findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
     }
@@ -3354,7 +3352,7 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
 {
-    DoorLockServer::Instance().SetUserCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().setUserCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -3362,7 +3360,7 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData)
 {
-    DoorLockServer::Instance().GetUserCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().getUserCommandHandler(commandObj, commandPath, commandData.userIndex);
     return true;
 }
 
@@ -3370,7 +3368,7 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
                                              const chip::app::ConcreteCommandPath & commandPath,
                                              const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
 {
-    DoorLockServer::Instance().ClearUserCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().clearUserCommandHandler(commandObj, commandPath, commandData.userIndex);
     return true;
 }
 
@@ -3378,7 +3376,7 @@ bool emberAfDoorLockClusterSetCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData)
 {
-    DoorLockServer::Instance().SetCredentialCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().setCredentialCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -3386,7 +3384,8 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData)
 {
-    DoorLockServer::Instance().GetCredentialStatusCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().getCredentialStatusCommandHandler(commandObj, commandPath, commandData.credential.credentialType,
+                                                                 commandData.credential.credentialIndex);
     return true;
 }
 
@@ -3394,7 +3393,7 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData)
 {
-    DoorLockServer::Instance().ClearCredentialCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().clearCredentialCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -3402,7 +3401,9 @@ bool emberAfDoorLockClusterSetWeekDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().SetWeekDayScheduleCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().setWeekDayScheduleCommandHandler(
+        commandObj, commandPath, commandData.weekDayIndex, commandData.userIndex, commandData.daysMask, commandData.startHour,
+        commandData.startMinute, commandData.endHour, commandData.endMinute);
     return true;
 }
 
@@ -3410,7 +3411,8 @@ bool emberAfDoorLockClusterGetWeekDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().GetWeekDayScheduleCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().getWeekDayScheduleCommandHandler(commandObj, commandPath, commandData.weekDayIndex,
+                                                                commandData.userIndex);
     return true;
 }
 
@@ -3418,7 +3420,8 @@ bool emberAfDoorLockClusterClearWeekDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().ClearWeekDayScheduleCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().clearWeekDayScheduleCommandHandler(commandObj, commandPath, commandData.weekDayIndex,
+                                                                  commandData.userIndex);
     return true;
 }
 
@@ -3426,7 +3429,9 @@ bool emberAfDoorLockClusterSetYearDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().SetYearDayScheduleCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().setYearDayScheduleCommandHandler(commandObj, commandPath, commandData.yearDayIndex,
+                                                                commandData.userIndex, commandData.localStartTime,
+                                                                commandData.localEndTime);
     return true;
 }
 
@@ -3434,7 +3439,8 @@ bool emberAfDoorLockClusterGetYearDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().GetYearDayScheduleCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().getYearDayScheduleCommandHandler(commandObj, commandPath, commandData.yearDayIndex,
+                                                                commandData.userIndex);
     return true;
 }
 
@@ -3442,7 +3448,8 @@ bool emberAfDoorLockClusterClearYearDayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().ClearYearDayScheduleCommandHandler(commandObj, commandPath, commandData);
+    DoorLockServer::Instance().clearYearDayScheduleCommandHandler(commandObj, commandPath, commandData.yearDayIndex,
+                                                                  commandData.userIndex);
     return true;
 }
 
@@ -3450,8 +3457,9 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().setHolidaySchedule(commandObj, commandPath, commandData.holidayIndex, commandData.localStartTime,
-                                                  commandData.localEndTime, commandData.operatingMode);
+    DoorLockServer::Instance().setHolidayScheduleCommandHandler(commandObj, commandPath, commandData.holidayIndex,
+                                                                commandData.localStartTime, commandData.localEndTime,
+                                                                commandData.operatingMode);
     return true;
 }
 
@@ -3459,7 +3467,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().getHolidaySchedule(commandObj, commandPath, commandData.holidayIndex);
+    DoorLockServer::Instance().getHolidayScheduleCommandHandler(commandObj, commandPath, commandData.holidayIndex);
     return true;
 }
 
@@ -3467,7 +3475,7 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData)
 {
-    DoorLockServer::Instance().clearHolidaySchedule(commandObj, commandPath, commandData.holidayIndex);
+    DoorLockServer::Instance().clearHolidayScheduleCommandHandler(commandObj, commandPath, commandData.holidayIndex);
     return true;
 }
 
@@ -3583,9 +3591,9 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
     return res;
 }
 
-void emberAfPluginDoorLockServerLockoutEventHandler(void) {}
+void emberAfPluginDoorLockServerLockoutEventHandler() {}
 
-void emberAfPluginDoorLockServerRelockEventHandler(void) {}
+void emberAfPluginDoorLockServerRelockEventHandler() {}
 
 void MatterDoorLockPluginServerInitCallback()
 {
@@ -3594,155 +3602,6 @@ void MatterDoorLockPluginServerInitCallback()
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
-
-// =============================================================================
-// 'Default' callbacks for cluster commands
-// =============================================================================
-
-bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
-{
-    err = DlOperationError::kUnspecified;
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
-{
-    err = DlOperationError::kUnspecified;
-    return false;
-}
-
-// =============================================================================
-// 'Default' pre-change callbacks for cluster attributes
-// =============================================================================
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, chip::CharSpan newLanguage)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId, uint32_t newTime)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnSoundVolumeChange(chip::EndpointId EndpointId, uint8_t newVolume)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnOperatingModeChange(chip::EndpointId EndpointId, uint8_t newMode)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId, bool enable)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId, bool enable)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId, uint8_t newLimit)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId, uint8_t newTime)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, const chip::app::ConcreteAttributePath & attributePath,
-                                                EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-// =============================================================================
-// Users and credentials access callbacks
-// =============================================================================
-
-bool __attribute__((weak))
-emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                             const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
-                             DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
-                                   EmberAfPluginDoorLockCredentialInfo & credential)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                   chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
-                                   const chip::ByteSpan & credentialData)
-{
-    return false;
-}
-
-DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex,
-                                                                uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex,
-                                                                uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                 DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                 uint32_t localStartTime, uint32_t localEndTime)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                 uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
-{
-    return DlStatus::kFailure;
-}
 
 // =============================================================================
 // Timer callbacks

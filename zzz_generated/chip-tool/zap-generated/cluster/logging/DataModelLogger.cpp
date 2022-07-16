@@ -1633,46 +1633,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("PowerProfileId", indent + 1, value.powerProfileId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerProfileId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerProfileRemoteControl", indent + 1, value.powerProfileRemoteControl);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerProfileRemoteControl'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PowerProfileState", indent + 1, value.powerProfileState);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PowerProfileState'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value)
@@ -1788,30 +1748,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'LinkEstablished'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ScheduledTime", indent + 1, value.scheduledTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ScheduledTime'");
             return err;
         }
     }
@@ -2320,62 +2256,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StackSize'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::PowerProfile::Structs::TransferredPhase::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("EnergyPhaseId", indent + 1, value.energyPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EnergyPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MacroPhaseId", indent + 1, value.macroPhaseId);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MacroPhaseId'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ExpectedDuration", indent + 1, value.expectedDuration);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExpectedDuration'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PeakPower", indent + 1, value.peakPower);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PeakPower'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Energy", indent + 1, value.energy);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Energy'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("MaxActivationDelay", indent + 1, value.maxActivationDelay);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxActivationDelay'");
             return err;
         }
     }
@@ -5168,7 +5048,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case PowerSource::Attributes::Status::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::PowerSourceStatus value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Status", 1, value);
         }
@@ -5183,22 +5063,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("Description", 1, value);
         }
         case PowerSource::Attributes::WiredAssessedInputVoltage::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredAssessedInputVoltage", 1, value);
         }
         case PowerSource::Attributes::WiredAssessedInputFrequency::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredAssessedInputFrequency", 1, value);
         }
         case PowerSource::Attributes::WiredCurrentType::Id: {
-            uint8_t value;
+            chip::app::Clusters::PowerSource::WiredCurrentType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredCurrentType", 1, value);
         }
         case PowerSource::Attributes::WiredAssessedCurrent::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredAssessedCurrent", 1, value);
         }
@@ -5218,109 +5098,109 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WiredPresent", 1, value);
         }
         case PowerSource::Attributes::ActiveWiredFaults::Id: {
-            chip::app::DataModel::DecodableList<uint8_t> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveWiredFaults", 1, value);
         }
-        case PowerSource::Attributes::BatteryVoltage::Id: {
-            uint32_t value;
+        case PowerSource::Attributes::BatVoltage::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryVoltage", 1, value);
+            return DataModelLogger::LogValue("BatVoltage", 1, value);
         }
-        case PowerSource::Attributes::BatteryPercentRemaining::Id: {
-            uint8_t value;
+        case PowerSource::Attributes::BatPercentRemaining::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryPercentRemaining", 1, value);
+            return DataModelLogger::LogValue("BatPercentRemaining", 1, value);
         }
-        case PowerSource::Attributes::BatteryTimeRemaining::Id: {
-            uint32_t value;
+        case PowerSource::Attributes::BatTimeRemaining::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryTimeRemaining", 1, value);
+            return DataModelLogger::LogValue("BatTimeRemaining", 1, value);
         }
-        case PowerSource::Attributes::BatteryChargeLevel::Id: {
-            uint8_t value;
+        case PowerSource::Attributes::BatChargeLevel::Id: {
+            chip::app::Clusters::PowerSource::BatChargeLevel value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryChargeLevel", 1, value);
+            return DataModelLogger::LogValue("BatChargeLevel", 1, value);
         }
-        case PowerSource::Attributes::BatteryReplacementNeeded::Id: {
+        case PowerSource::Attributes::BatReplacementNeeded::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryReplacementNeeded", 1, value);
+            return DataModelLogger::LogValue("BatReplacementNeeded", 1, value);
         }
-        case PowerSource::Attributes::BatteryReplaceability::Id: {
-            uint8_t value;
+        case PowerSource::Attributes::BatReplaceability::Id: {
+            chip::app::Clusters::PowerSource::BatReplaceability value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryReplaceability", 1, value);
+            return DataModelLogger::LogValue("BatReplaceability", 1, value);
         }
-        case PowerSource::Attributes::BatteryPresent::Id: {
+        case PowerSource::Attributes::BatPresent::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryPresent", 1, value);
+            return DataModelLogger::LogValue("BatPresent", 1, value);
         }
-        case PowerSource::Attributes::ActiveBatteryFaults::Id: {
-            chip::app::DataModel::DecodableList<uint8_t> value;
+        case PowerSource::Attributes::ActiveBatFaults::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveBatteryFaults", 1, value);
+            return DataModelLogger::LogValue("ActiveBatFaults", 1, value);
         }
-        case PowerSource::Attributes::BatteryReplacementDescription::Id: {
+        case PowerSource::Attributes::BatReplacementDescription::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryReplacementDescription", 1, value);
+            return DataModelLogger::LogValue("BatReplacementDescription", 1, value);
         }
-        case PowerSource::Attributes::BatteryCommonDesignation::Id: {
+        case PowerSource::Attributes::BatCommonDesignation::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryCommonDesignation", 1, value);
+            return DataModelLogger::LogValue("BatCommonDesignation", 1, value);
         }
-        case PowerSource::Attributes::BatteryANSIDesignation::Id: {
+        case PowerSource::Attributes::BatANSIDesignation::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryANSIDesignation", 1, value);
+            return DataModelLogger::LogValue("BatANSIDesignation", 1, value);
         }
-        case PowerSource::Attributes::BatteryIECDesignation::Id: {
+        case PowerSource::Attributes::BatIECDesignation::Id: {
             chip::CharSpan value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryIECDesignation", 1, value);
+            return DataModelLogger::LogValue("BatIECDesignation", 1, value);
         }
-        case PowerSource::Attributes::BatteryApprovedChemistry::Id: {
+        case PowerSource::Attributes::BatApprovedChemistry::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryApprovedChemistry", 1, value);
+            return DataModelLogger::LogValue("BatApprovedChemistry", 1, value);
         }
-        case PowerSource::Attributes::BatteryCapacity::Id: {
+        case PowerSource::Attributes::BatCapacity::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryCapacity", 1, value);
+            return DataModelLogger::LogValue("BatCapacity", 1, value);
         }
-        case PowerSource::Attributes::BatteryQuantity::Id: {
+        case PowerSource::Attributes::BatQuantity::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryQuantity", 1, value);
+            return DataModelLogger::LogValue("BatQuantity", 1, value);
         }
-        case PowerSource::Attributes::BatteryChargeState::Id: {
-            uint8_t value;
+        case PowerSource::Attributes::BatChargeState::Id: {
+            chip::app::Clusters::PowerSource::BatChargeState value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryChargeState", 1, value);
+            return DataModelLogger::LogValue("BatChargeState", 1, value);
         }
-        case PowerSource::Attributes::BatteryTimeToFullCharge::Id: {
-            uint32_t value;
+        case PowerSource::Attributes::BatTimeToFullCharge::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryTimeToFullCharge", 1, value);
+            return DataModelLogger::LogValue("BatTimeToFullCharge", 1, value);
         }
-        case PowerSource::Attributes::BatteryFunctionalWhileCharging::Id: {
+        case PowerSource::Attributes::BatFunctionalWhileCharging::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryFunctionalWhileCharging", 1, value);
+            return DataModelLogger::LogValue("BatFunctionalWhileCharging", 1, value);
         }
-        case PowerSource::Attributes::BatteryChargingCurrent::Id: {
-            uint32_t value;
+        case PowerSource::Attributes::BatChargingCurrent::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("BatteryChargingCurrent", 1, value);
+            return DataModelLogger::LogValue("BatChargingCurrent", 1, value);
         }
-        case PowerSource::Attributes::ActiveBatteryChargeFaults::Id: {
-            chip::app::DataModel::DecodableList<uint8_t> value;
+        case PowerSource::Attributes::ActiveBatChargeFaults::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveBatteryChargeFaults", 1, value);
+            return DataModelLogger::LogValue("ActiveBatChargeFaults", 1, value);
         }
         case PowerSource::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7918,6 +7798,107 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case ColorControl::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case BallastConfiguration::Id: {
+        switch (path.mAttributeId)
+        {
+        case BallastConfiguration::Attributes::PhysicalMinLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PhysicalMinLevel", 1, value);
+        }
+        case BallastConfiguration::Attributes::PhysicalMaxLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PhysicalMaxLevel", 1, value);
+        }
+        case BallastConfiguration::Attributes::BallastStatus::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BallastStatus", 1, value);
+        }
+        case BallastConfiguration::Attributes::MinLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MinLevel", 1, value);
+        }
+        case BallastConfiguration::Attributes::MaxLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxLevel", 1, value);
+        }
+        case BallastConfiguration::Attributes::IntrinsicBalanceFactor::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("IntrinsicBalanceFactor", 1, value);
+        }
+        case BallastConfiguration::Attributes::BallastFactorAdjustment::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("BallastFactorAdjustment", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampQuantity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampQuantity", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampType::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampType", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampManufacturer::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampManufacturer", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampRatedHours::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampRatedHours", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampBurnHours::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampBurnHours", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampAlarmMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampAlarmMode", 1, value);
+        }
+        case BallastConfiguration::Attributes::LampBurnHoursTripPoint::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LampBurnHoursTripPoint", 1, value);
+        }
+        case BallastConfiguration::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case BallastConfiguration::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case BallastConfiguration::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case BallastConfiguration::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case BallastConfiguration::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);

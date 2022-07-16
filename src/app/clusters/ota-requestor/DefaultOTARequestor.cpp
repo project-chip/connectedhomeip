@@ -832,8 +832,18 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(OperationalDeviceProxy & devicePro
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
 
-    ReturnErrorOnFailure(mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec));
-    return mBdxDownloader->BeginPrepareDownload();
+    CHIP_ERROR err = mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mBdxDownloader->BeginPrepareDownload();
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        mBdxMessenger.Reset();
+    }
+
+    return err;
 }
 
 CHIP_ERROR DefaultOTARequestor::SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy)

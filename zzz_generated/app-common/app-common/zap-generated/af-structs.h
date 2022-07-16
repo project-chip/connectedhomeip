@@ -446,15 +446,6 @@ typedef struct _PlaybackPosition
     uint64_t position;
 } PlaybackPosition;
 
-// Struct for PowerProfileRecord
-typedef struct _PowerProfileRecord
-{
-    uint8_t powerProfileId;
-    uint8_t energyPhaseId;
-    bool powerProfileRemoteControl;
-    uint8_t powerProfileState;
-} PowerProfileRecord;
-
 // Struct for ProviderLocation
 typedef struct _ProviderLocation
 {
@@ -494,13 +485,6 @@ typedef struct _RouteTable
     bool Allocated;
     bool LinkEstablished;
 } RouteTable;
-
-// Struct for ScheduledPhase
-typedef struct _ScheduledPhase
-{
-    uint8_t energyPhaseId;
-    uint16_t scheduledTime;
-} ScheduledPhase;
 
 // Struct for SecurityPolicy
 typedef struct _SecurityPolicy
@@ -563,17 +547,6 @@ typedef struct _ThreadMetrics
     uint32_t StackFreeMinimum;
     uint32_t StackSize;
 } ThreadMetrics;
-
-// Struct for TransferredPhase
-typedef struct _TransferredPhase
-{
-    uint8_t energyPhaseId;
-    uint8_t macroPhaseId;
-    uint16_t expectedDuration;
-    uint16_t peakPower;
-    uint16_t energy;
-    uint16_t maxActivationDelay;
-} TransferredPhase;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
