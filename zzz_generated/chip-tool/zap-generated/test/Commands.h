@@ -11502,7 +11502,7 @@ private:
         }
         case 1: {
             LogStep(1, "Sends ResetCounts command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGETH.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGETH.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
@@ -15434,7 +15434,7 @@ private:
             LogStep(6, "Wait 9000ms");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 9000UL;
+            value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
@@ -28545,25 +28545,25 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read the mandatory attribute: MinMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "read the mandatory attribute: MaxMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "read the optional attribute: Tolerance");
-            VerifyOrDo(!ShouldSkip("TM.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::Tolerance::Id, true, chip::NullOptional);
         }
@@ -34273,7 +34273,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends ResetCounts command to DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
@@ -34283,37 +34283,37 @@ private:
         }
         case 2: {
             LogStep(2, "Reads BeaconLostCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads BeaconRxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads PacketMulticastRxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reads PacketMulticastTxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads PacketUnicastRxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id, true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Reads PacketUnicastTxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id, true, chip::NullOptional);
         }
@@ -55051,7 +55051,7 @@ private:
         }
         case 1: {
             LogStep(1, "Sends ResetWatermarks to DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
@@ -69164,7 +69164,7 @@ private:
 class Test_TC_BINFO_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_BINFO_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BINFO_2_2", 16, credsIssuerConfig)
+    Test_TC_BINFO_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BINFO_2_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -69185,8 +69185,6 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    uint32_t SoftwareVersionValue;
-
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
     //
@@ -69199,87 +69197,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                SoftwareVersionValue = value;
-            }
-            break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("softwareVersion", value, SoftwareVersionValue));
-            }
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 13:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 14:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -69295,121 +69212,6 @@ private:
         using namespace chip::app::Clusters;
         switch (testIndex)
         {
-        case 0: {
-            LogStep(0, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Query SoftwareVersion");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
-                                 chip::NullOptional);
-        }
-        case 2: {
-            LogStep(2, "Query Reachable Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
-                                 chip::NullOptional);
-        }
-        case 3: {
-            LogStep(3, "Reboot target device");
-            VerifyOrDo(!ShouldSkip("PICS_SDK_CI_ONLY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 4: {
-            LogStep(4, "Reboot target device(DUT)");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Please reboot the DUT and enter 'y' after DUT startsgarbage: not in length on purpose", 52);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 5: {
-            LogStep(5, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 6: {
-            LogStep(6, "Query SoftwareVersion");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
-                                 chip::NullOptional);
-        }
-        case 7: {
-            LogStep(7, "Reboot target device");
-            VerifyOrDo(!ShouldSkip("PICS_SDK_CI_ONLY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 8: {
-            LogStep(8, "Reboot target device(DUT)");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Please reboot the DUT and enter 'y' after DUT startsgarbage: not in length on purpose", 52);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 9: {
-            LogStep(9, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 10: {
-            LogStep(10, "Factory Reset the accessory");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
-            return FactoryReset(kIdentityAlpha, value);
-        }
-        case 11: {
-            LogStep(11, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 12: {
-            LogStep(12, "Reboot target device");
-            VerifyOrDo(!ShouldSkip("PICS_SDK_CI_ONLY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 13: {
-            LogStep(13, "Reboot target device(DUT)");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Please reboot the DUT and enter 'y' after DUT startsgarbage: not in length on purpose", 52);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 14: {
-            LogStep(14, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 15: {
-            LogStep(15, "Query Reachable Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
-                                 chip::NullOptional);
-        }
         }
         return CHIP_NO_ERROR;
     }
@@ -87007,25 +86809,25 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MinMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read the mandatory attribute: MaxMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads MeasuredValue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Operate on device to change the temperature significantly");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TM.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TMP.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -87035,7 +86837,7 @@ private:
         }
         case 5: {
             LogStep(5, "Read the mandatory attribute: MeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
