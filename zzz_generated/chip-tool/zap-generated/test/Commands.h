@@ -86081,10 +86081,11 @@ private:
         {
             ContinueOnChipMainThread(CHIP_NO_ERROR);
         }
-        }
-        return CHIP_NO_ERROR;
     }
-};
+    return CHIP_NO_ERROR;
+}
+}
+;
 
 class Test_TC_RH_3_1Suite : public TestCommand
 {
