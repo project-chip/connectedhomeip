@@ -263,7 +263,7 @@ tests:
           toPIXIT.CNET.WIFI_ 2ND_ACCESSPOINT_SSID andBreadcrumb fieldset to 3"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
-          ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 3 (second network)  
+          ./chip-tool networkcommissioning connect-network hex:536265655F4D6F746F 1 0 --Breadcrumb 3 (second network)
 
           Verify on the TH Log:
 

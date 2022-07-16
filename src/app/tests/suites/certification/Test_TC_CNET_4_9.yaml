@@ -142,7 +142,7 @@ tests:
           2"
       PICS: CNET.S.C04.Rsp
       verification: |
-          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 2 
+          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 2
 
           Verify on the TH Log:
 

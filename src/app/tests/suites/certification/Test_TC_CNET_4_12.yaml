@@ -34,7 +34,7 @@ tests:
           [1657808518.577181][5979:5984] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1657808518.577311][5979:5984] CHIP:TOO:   ArmFailSafeResponse: {
           [1657808518.577409][5979:5984] CHIP:TOO:     errorCode: 0
-          [1657808518.577466][5979:5984] CHIP:TOO:     debugText: 
+          [1657808518.577466][5979:5984] CHIP:TOO:     debugText:
           [1657808518.577518][5979:5984] CHIP:TOO:    }
           [1657808518.577604][5979:5984] CHIP:DMG: ICR moving to [AwaitingDe]
           [1657808518.577705][5979:5984] CHIP:EM: Sending Standalone Ack for MessageCounter:240383707 on exchange 56756i

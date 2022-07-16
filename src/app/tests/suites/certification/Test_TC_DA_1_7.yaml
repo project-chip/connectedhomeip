@@ -31,7 +31,7 @@ tests:
 
     - label: "Start the commissioning process of DUT1 by TH on a first Fabric"
       verification: |
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           TH side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
@@ -76,11 +76,11 @@ tests:
           2. Give the below command to extract the Authority key ID
           openssl x509 -in pai_6.pem -text
 
-          Verify that below extracted authority key is not same as the SDK's test PAA 
+          Verify that below extracted authority key is not same as the SDK's test PAA
           1. 78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5
           2. 6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
 
-          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA 
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA
 
           grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in pai_6.pem -text
           Certificate:
@@ -109,9 +109,9 @@ tests:
                           CA:TRUE, pathlen:0
                       X509v3 Key Usage: critical
                           Certificate Sign, CRL Sign
-                      X509v3 Subject Key Identifier: 
+                      X509v3 Subject Key Identifier:
                           AF:42:B7:09:4D:EB:D5:15:EC:6E:CF:33:B8:11:15:22:5F:32:52:88
-                      X509v3 Authority Key Identifier: 
+                      X509v3 Authority Key Identifier:
                           keyid:6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
 
               Signature Algorithm: ecdsa-with-SHA256
@@ -135,7 +135,7 @@ tests:
 
     - label: "Repeat Step 1 to 4 with DUT2"
       verification: |
-          To commission DUT2 to TH 
+          To commission DUT2 to TH
 
           "sudo ./chip-all-clusters-app --wifi --discriminator 3844
 
@@ -173,7 +173,7 @@ tests:
           2. Give the below command to extract the Authority key ID
           openssl x509 -in pai_6.pem -text
 
-          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA 
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA
 
           grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in pai_6.pem -text
           Certificate:
@@ -202,9 +202,9 @@ tests:
                           CA:TRUE, pathlen:0
                       X509v3 Key Usage: critical
                           Certificate Sign, CRL Sign
-                      X509v3 Subject Key Identifier: 
+                      X509v3 Subject Key Identifier:
                           AF:42:B7:09:4D:EB:D5:15:EC:6E:CF:33:B8:11:15:22:5F:32:52:88
-                      X509v3 Authority Key Identifier: 
+                      X509v3 Authority Key Identifier:
                           keyid:6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
 
               Signature Algorithm: ecdsa-with-SHA256
