@@ -1846,11 +1846,6 @@ PICS:
       id: MEDIAINPUT.S.NU
 
     - label:
-          "Does the DUT support the Media Input server cluster Name Updates
-          feature?"
-      id: MC_MEDIAINPUT.S.NU
-
-    - label:
           "Does the DUT support the Channel server cluster Channel List feature?"
       id: CHANNEL.S.CL
 
