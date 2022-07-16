@@ -29,25 +29,13 @@ tests:
     - label: "DUT reads Occupancy attribute from TH"
       PICS: OCC.C.A0000
       verification: |
-          ./chip-tool occupancysensing read occupancy  1 1
+          verify on Reference app receives the right response for the data sent in the below commands
+          ./chip-tool occupancysensing read occupancy 1 1
 
-          [1646207231.401268][2190:2190] CHIP:DMG: ReadRequestMessage =
-          [1646207231.401302][2190:2190] CHIP:DMG: {
-          [1646207231.401330][2190:2190] CHIP:DMG:        AttributePathIBs =
-          [1646207231.401370][2190:2190] CHIP:DMG:        [
-          [1646207231.401402][2190:2190] CHIP:DMG:                AttributePathIB =
-          [1646207231.401459][2190:2190] CHIP:DMG:                {
-          [1646207231.401514][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
-          [1646207231.401554][2190:2190] CHIP:DMG:                        Cluster = 0x406,
-          [1646207231.401597][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0000,
-          [1646207231.401635][2190:2190] CHIP:DMG:                }
-          [1646207231.401672][2190:2190] CHIP:DMG:
-          [1646207231.401705][2190:2190] CHIP:DMG:        ],
-          [1646207231.401739][2190:2190] CHIP:DMG:
-          [1646207231.401771][2190:2190] CHIP:DMG:        isFabricFiltered = false,
-          [1646207231.401803][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646207231.401832][2190:2190] CHIP:DMG: },
-          [1646207231.401908][2190:2190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          Verify in TH all-clusters-app log
+
+          [1648461864.548948][9281:9286] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 3082917122
+          [1648461864.549008][9281:9286] CHIP:TOO:   occupancy: 0
       disabled: true
 
     - label: "Operate on TH to change the occupancy status"
@@ -59,23 +47,11 @@ tests:
     - label: "after a few seconds, DUT reads Occupancy attribute from TH"
       PICS: OCC.C.A0000
       verification: |
-          ./chip-tool occupancysensing read occupancy  1 1
+          verify on Reference app receives the right response for the data sent in the below commands
+          ./chip-tool occupancysensing read occupancy 1 1
 
-          [1646207231.401268][2190:2190] CHIP:DMG: ReadRequestMessage =
-          [1646207231.401302][2190:2190] CHIP:DMG: {
-          [1646207231.401330][2190:2190] CHIP:DMG:        AttributePathIBs =
-          [1646207231.401370][2190:2190] CHIP:DMG:        [
-          [1646207231.401402][2190:2190] CHIP:DMG:                AttributePathIB =
-          [1646207231.401459][2190:2190] CHIP:DMG:                {
-          [1646207231.401514][2190:2190] CHIP:DMG:                        Endpoint = 0x1,
-          [1646207231.401554][2190:2190] CHIP:DMG:                        Cluster = 0x406,
-          [1646207231.401597][2190:2190] CHIP:DMG:                        Attribute = 0x0000_0000,
-          [1646207231.401635][2190:2190] CHIP:DMG:                }
-          [1646207231.401672][2190:2190] CHIP:DMG:
-          [1646207231.401705][2190:2190] CHIP:DMG:        ],
-          [1646207231.401739][2190:2190] CHIP:DMG:
-          [1646207231.401771][2190:2190] CHIP:DMG:        isFabricFiltered = false,
-          [1646207231.401803][2190:2190] CHIP:DMG:        InteractionModelRevision = 1
-          [1646207231.401832][2190:2190] CHIP:DMG: },
-          [1646207231.401908][2190:2190] CHIP:DMG: IM RH moving to [GeneratingReports]
+          Verify in TH all-clusters-app log
+
+          [1648461864.548948][9281:9286] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 3082917122
+          [1648461864.549008][9281:9286] CHIP:TOO:   occupancy: 1
       disabled: true

@@ -53,6 +53,22 @@ void TestEqualityOperator(nlTestSuite * inSuite, void * inContext)
             }
         }
     }
+
+    {
+        auto a                 = CATValues{ { 0x1111'0001, kUndefinedCAT, 0x2222'0002 } };
+        auto b                 = CATValues{ { 0x2222'0002, kUndefinedCAT, 0x1111'0001 } };
+        auto c                 = CATValues{ { 0x1111'0001, 0x2222'0002 } };
+        auto d                 = CATValues{ { 0x2222'0002, 0x1111'0001 } };
+        CATValues candidates[] = { a, b, c, d };
+
+        for (auto & outer : candidates)
+        {
+            for (auto & inner : candidates)
+            {
+                NL_TEST_ASSERT(inSuite, inner == outer);
+            }
+        }
+    }
 }
 
 void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
@@ -92,6 +108,33 @@ void TestInequalityOperator(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestValidity(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        auto a                      = CATValues{ { 0x1111'0001, 0x2222'0002, 0x3333'0003 } };
+        auto b                      = CATValues{ { 0x1111'0001, 0x3333'0003, 0x2222'0002 } };
+        auto c                      = CATValues{ { 0x2222'0002 } };
+        auto d                      = CATValues{ { 0x2222'0002, 0x3333'0003 } };
+        auto e                      = CATValues{ { 0x2222'0002, kUndefinedCAT, 0x3333'0003 } };
+        CATValues validCandidates[] = { a, b, c, d, e };
+        for (auto & candidate : validCandidates)
+        {
+            NL_TEST_ASSERT(inSuite, candidate.AreValid());
+        }
+    }
+
+    {
+        auto versionZero1             = CATValues{ { 0x1111'0000, 0x2222'0002, 0x3333'0003 } };
+        auto versionZero2             = CATValues{ { 0x2222'0000 } };
+        auto collidingId              = CATValues{ { 0x1111'0001, 0x3333'0003, 0x1111'0002 } };
+        CATValues invalidCandidates[] = { versionZero1, versionZero2, collidingId };
+        for (auto & candidate : invalidCandidates)
+        {
+            NL_TEST_ASSERT(inSuite, !candidate.AreValid());
+        }
+    }
+}
+
 void TestMembership(nlTestSuite * inSuite, void * inContext)
 {
     auto a = CATValues{ { 0x1111'0001 } };
@@ -104,12 +147,14 @@ void TestMembership(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !a.Contains(0x2222'0002));
     NL_TEST_ASSERT(inSuite, a.ContainsIdentifier(0x1111));
     NL_TEST_ASSERT(inSuite, !a.ContainsIdentifier(0x2222));
+    NL_TEST_ASSERT(inSuite, a.AreValid());
 
     NL_TEST_ASSERT(inSuite, b.Contains(0x1111'0001));
     NL_TEST_ASSERT(inSuite, b.Contains(0x2222'0002));
     NL_TEST_ASSERT(inSuite, b.GetNumTagsPresent() == 2);
     NL_TEST_ASSERT(inSuite, b.ContainsIdentifier(0x1111));
     NL_TEST_ASSERT(inSuite, b.ContainsIdentifier(0x2222));
+    NL_TEST_ASSERT(inSuite, b.AreValid());
 
     NL_TEST_ASSERT(inSuite, c.Contains(0x1111'0001));
     NL_TEST_ASSERT(inSuite, c.Contains(0x2222'0002));
@@ -118,6 +163,7 @@ void TestMembership(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x1111));
     NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x2222));
     NL_TEST_ASSERT(inSuite, c.ContainsIdentifier(0x3333));
+    NL_TEST_ASSERT(inSuite, c.AreValid());
 }
 
 void TestSubjectMatching(nlTestSuite * inSuite, void * inContext)
@@ -160,6 +206,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("Equality operator", TestEqualityOperator),
     NL_TEST_DEF("Inequality operator", TestInequalityOperator),
+    NL_TEST_DEF("Validity checks", TestValidity),
     NL_TEST_DEF("Set operations", TestMembership),
     NL_TEST_DEF("Subject matching for ACL", TestSubjectMatching),
     NL_TEST_SENTINEL()

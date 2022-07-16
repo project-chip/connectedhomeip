@@ -62,6 +62,10 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, strong) NSString * serialNumber;
 - (nullable NSArray<MTROptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
+/**
+ * Generate a random Matter-valid setup PIN.
+ */
++ (NSUInteger)generateRandomPIN;
 @end
 
 NS_ASSUME_NONNULL_END

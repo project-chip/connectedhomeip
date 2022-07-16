@@ -24,7 +24,7 @@ config:
 
 tests:
     - label: "DUT sends Play command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0000
+      PICS: MEDIAPLAYBACK.C.C0000
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -57,7 +57,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Pause command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0001
+      PICS: MEDIAPLAYBACK.C.C0001
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -90,7 +90,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Stop command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0002
+      PICS: MEDIAPLAYBACK.C.C0002
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 

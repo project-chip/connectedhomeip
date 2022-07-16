@@ -21,6 +21,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH to DUT"
+      verification: |
+
+      disabled: true
+
     - label:
           "DUT reads from the TH the (0x0000) CurrentHue attribute if
           CC.S.F00(HS) is true"

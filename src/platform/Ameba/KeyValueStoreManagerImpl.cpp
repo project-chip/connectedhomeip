@@ -50,17 +50,21 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
     ret = getPref_bin_new(key, key, (uint8_t *) value, value_size, read_bytes_size);
-
-    if (TRUE == ret)
+    switch (ret)
     {
-        err = CHIP_NO_ERROR;
-    }
-    else
-    {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
     }
 
-    return err;
+    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
@@ -85,14 +89,22 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    int32_t ret = deleteKey(key, key);
+    switch (ret)
+    {
+    case 0:
+        return CHIP_NO_ERROR;
+    case -6:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case -7:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case -8:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    default:
+        break;
+    }
 
-    if (TRUE == deleteKey(key, key))
-        err = CHIP_NO_ERROR;
-    else
-        err = CHIP_ERROR_INTERNAL;
-
-    return err;
+    return CHIP_ERROR_INTERNAL;
 }
 
 } // namespace PersistedStorage

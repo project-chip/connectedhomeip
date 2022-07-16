@@ -38,7 +38,7 @@ tests:
               type: uint16
 
     - label: "Read the optional global attribute: FeatureMap"
-      PICS: MC_CHANNEL.S.CL || MC_CHANNEL.S.LI
+      PICS: CHANNEL.S.CL || CHANNEL.S.LI
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -48,13 +48,40 @@ tests:
               maxValue: 3
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_CHANNEL.S.A0000 && MC_CHANNEL.S.A0001 && MC_CHANNEL.S.A0002
+      PICS: CHANNEL.S.A0000 && CHANNEL.S.A0001 && CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute(ChannelList): AttributeList"
+      PICS: CHANNEL.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Reading optional attribute(Lineup) in AttributeList"
+      PICS: CHANNEL.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Read the optional attribute(CurrentChannel): AttributeList"
+      PICS: CHANNEL.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

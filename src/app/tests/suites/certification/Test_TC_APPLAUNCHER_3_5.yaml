@@ -41,7 +41,7 @@ tests:
           [1651053952.328620][155084:155089] CHIP:TOO:     [2]: 456
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_APPLAUNCHER.S.A0000
+      PICS: PICS_USER_PROMPT && APPLAUNCHER.S.A0000
       arguments:
           values:
               - name: "message"

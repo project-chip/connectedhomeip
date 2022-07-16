@@ -138,10 +138,12 @@ const char * const gCmdOptionHelp =
     "       If not specified, the default base-64 encoded CHIP format is used.\n"
     "       Supported format parametes are:\n"
     "           x509-pem  - X.509 PEM format\n"
-    "           x509-der  - X.509 DER format\n"
+    "           x509-der  - X.509 DER raw format\n"
+    "           x509-hex  - X.509 DER hex encoded format\n"
     "           chip      - raw CHIP TLV format\n"
     "           chip-hex  - hex encoded CHIP TLV format\n"
     "           chip-b64  - base-64 encoded CHIP TLV format (default)\n"
+    "           chip-hex  - hex encoded CHIP TLV format\n"
     "\n"
     "   -V, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]\n"
     "\n"
@@ -250,8 +252,8 @@ const char * gCAKeyFileName          = nullptr;
 const char * gInKeyFileName          = nullptr;
 const char * gOutCertFileName        = nullptr;
 const char * gOutKeyFileName         = nullptr;
-CertFormat gOutCertFormat            = kCertFormat_Chip_Base64;
-KeyFormat gOutKeyFormat              = kKeyFormat_Chip_Base64;
+CertFormat gOutCertFormat            = kCertFormat_Default;
+KeyFormat gOutKeyFormat              = kKeyFormat_Default;
 uint32_t gValidDays                  = kCertValidDays_Undefined;
 FutureExtension gFutureExtensions[3] = { { 0, nullptr } };
 uint8_t gFutureExtensionsCount       = 0;
@@ -449,6 +451,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         {
             gOutCertFormat = kCertFormat_X509_DER;
             gOutKeyFormat  = kKeyFormat_X509_DER;
+        }
+        else if (strcmp(arg, "x509-hex") == 0)
+        {
+            gOutCertFormat = kCertFormat_X509_Hex;
+            gOutKeyFormat  = kKeyFormat_X509_Hex;
         }
         else if (strcmp(arg, "chip") == 0)
         {
@@ -844,12 +851,11 @@ bool Cmd_GenCert(int argc, char * argv[])
                    gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig);
     VerifyTrueOrExit(res);
 
-    if (gCertConfig.IsErrorTestCaseEnabled() &&
-        (gOutCertFormat == kCertFormat_Chip_Raw || gOutCertFormat == kCertFormat_Chip_Base64))
+    if (gCertConfig.IsErrorTestCaseEnabled() && IsChipCertFormat(gOutCertFormat))
     {
-        static constexpr uint32_t kExtraBufferLengthForOvesizedCert = 300;
-        uint8_t chipCertBuf[kMaxCHIPCertLength + kExtraBufferLengthForOvesizedCert];
-        chip::MutableByteSpan chipCert(chipCertBuf);
+        uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
+        std::unique_ptr<uint8_t[]> chipCertBuf = std::unique_ptr<uint8_t[]>(new uint8_t[chipCertBufLen]);
+        chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
         err = MakeCertChipTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
                               gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
         VerifyTrueOrExit(err == CHIP_NO_ERROR);
@@ -865,7 +871,7 @@ bool Cmd_GenCert(int argc, char * argv[])
 
     if (gOutKeyFileName != nullptr)
     {
-        res = WritePrivateKey(gOutKeyFileName, newKey.get(), gOutKeyFormat);
+        res = WriteKey(gOutKeyFileName, newKey.get(), gOutKeyFormat);
         VerifyTrueOrExit(res);
     }
 

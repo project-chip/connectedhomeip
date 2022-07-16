@@ -37,10 +37,20 @@ tests:
               type: uint16
 
     - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS: " !I.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
+          constraints:
+              type: map32
+
+    - label: "TH reads the FeatureMap attribute from the DUT"
+      PICS: I.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
           constraints:
               type: map32
 
@@ -61,6 +71,16 @@ tests:
               contains: [0, 64]
 
     - label: "Read the global attribute: GeneratedCommandList"
+      PICS: I.S.C00.Tx
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: [0]
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: GeneratedCommandList"
+      PICS: " !I.S.C00.Tx "
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

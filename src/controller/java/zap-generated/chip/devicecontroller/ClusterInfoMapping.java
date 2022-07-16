@@ -4997,6 +4997,78 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedBallastConfigurationClusterGeneratedCommandListAttributeCallback
+      implements ChipClusters.BallastConfigurationCluster.GeneratedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedBallastConfigurationClusterAcceptedCommandListAttributeCallback
+      implements ChipClusters.BallastConfigurationCluster.AcceptedCommandListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedBallastConfigurationClusterAttributeListAttributeCallback
+      implements ChipClusters.BallastConfigurationCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedIlluminanceMeasurementClusterGeneratedCommandListAttributeCallback
       implements ChipClusters.IlluminanceMeasurementCluster.GeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
@@ -7296,6 +7368,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("colorControl", colorControlClusterInfo);
+    ClusterInfo ballastConfigurationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.BallastConfigurationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("ballastConfiguration", ballastConfigurationClusterInfo);
     ClusterInfo illuminanceMeasurementClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.IlluminanceMeasurementCluster(ptr, endpointId),
@@ -7465,6 +7542,7 @@ public class ClusterInfoMapping {
         .get("thermostatUserInterfaceConfiguration")
         .combineCommands(source.get("thermostatUserInterfaceConfiguration"));
     destination.get("colorControl").combineCommands(source.get("colorControl"));
+    destination.get("ballastConfiguration").combineCommands(source.get("ballastConfiguration"));
     destination.get("illuminanceMeasurement").combineCommands(source.get("illuminanceMeasurement"));
     destination.get("temperatureMeasurement").combineCommands(source.get("temperatureMeasurement"));
     destination.get("pressureMeasurement").combineCommands(source.get("pressureMeasurement"));
@@ -11005,6 +11083,9 @@ public class ClusterInfoMapping {
     colorControlClusterInteractionInfoMap.put(
         "stepColorTemperature", colorControlstepColorTemperatureInteractionInfo);
     commandMap.put("colorControl", colorControlClusterInteractionInfoMap);
+    Map<String, InteractionInfo> ballastConfigurationClusterInteractionInfoMap =
+        new LinkedHashMap<>();
+    commandMap.put("ballastConfiguration", ballastConfigurationClusterInteractionInfoMap);
     Map<String, InteractionInfo> illuminanceMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("illuminanceMeasurement", illuminanceMeasurementClusterInteractionInfoMap);

@@ -19,6 +19,7 @@
 #include "AppMain.h"
 #include "AppOptions.h"
 #include "binding-handler.h"
+#include "main-common.h"
 
 int main(int argc, char * argv[])
 {
@@ -28,5 +29,7 @@ int main(int argc, char * argv[])
     LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
 
     ChipLinuxAppMainLoop();
+    ApplicationExit();
+
     return 0;
 }

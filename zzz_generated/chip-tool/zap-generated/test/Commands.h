@@ -199,6 +199,7 @@ public:
         printf("TestConfigVariables\n");
         printf("TestDescriptorCluster\n");
         printf("TestBasicInformation\n");
+        printf("TestFabricRemovalWhileSubscribed\n");
         printf("TestGeneralCommissioning\n");
         printf("TestIdentifyCluster\n");
         printf("TestOperationalCredentialsCluster\n");
@@ -384,6 +385,7 @@ public:
         printf("Test_TC_AUDIOOUTPUT_7_3\n");
         printf("Test_TC_AUDIOOUTPUT_7_4\n");
         printf("Test_TC_CONTENTLAUNCHER_10_3\n");
+        printf("Test_TC_CONTENTLAUNCHER_10_4\n");
         printf("Test_TC_CONTENTLAUNCHER_10_5\n");
         printf("Test_TC_CONTENTLAUNCHER_10_7\n");
         printf("Test_TC_MC_11_1\n");
@@ -555,6 +557,17 @@ public:
         printf("Test_TC_S_2_3\n");
         printf("Test_TC_S_3_1\n");
         printf("Test_TC_PCC_3_1\n");
+        printf("Test_TC_ACL_1_1\n");
+        printf("Test_TC_ACL_2_1\n");
+        printf("Test_TC_ACL_2_2\n");
+        printf("Test_TC_ACL_2_3\n");
+        printf("Test_TC_ACL_2_4\n");
+        printf("Test_TC_ACL_2_5\n");
+        printf("Test_TC_ACL_2_6\n");
+        printf("Test_TC_ACL_2_7\n");
+        printf("Test_TC_ACL_2_8\n");
+        printf("Test_TC_ACL_2_9\n");
+        printf("Test_TC_ACL_2_10\n");
 
         return CHIP_NO_ERROR;
     }
@@ -1988,7 +2001,7 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints : FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BooleanState::Id, BooleanState::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -2108,7 +2121,7 @@ private:
 class Test_TC_ACT_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_ACT_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_1_1", 6, credsIssuerConfig)
+    Test_TC_ACT_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACT_1_1", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -2157,6 +2170,26 @@ private:
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -2164,7 +2197,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
             }
             break;
-        case 3:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -2176,7 +2209,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 4:
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -2188,7 +2221,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 5:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -2220,22 +2253,34 @@ private:
                                  BridgedActions::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: AttributeList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BridgedActions::Id, BridgedActions::Attributes::AttributeList::Id,
+            LogStep(2, "Read the global attribute: FeatureMap");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BridgedActions::Id, BridgedActions::Attributes::FeatureMap::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AcceptedCommandList");
+            LogStep(3, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("ACT.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BridgedActions::Id, BridgedActions::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 4: {
+            LogStep(4, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip(" !ACT.S.A0002 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BridgedActions::Id, BridgedActions::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BridgedActions::Id,
                                  BridgedActions::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4, "Read the global attribute: GeneratedCommandList");
+        case 6: {
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), BridgedActions::Id,
                                  BridgedActions::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5,
+        case 7: {
+            LogStep(7,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -2253,7 +2298,7 @@ private:
 class Test_TC_CC_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_CC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_1_1", 7, credsIssuerConfig)
+    Test_TC_CC_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_CC_1_1", 15, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -2315,21 +2360,10 @@ private:
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
-                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 7UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 8UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 15UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16384UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 16385UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16386UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 16394UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16395UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16396UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16397UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16400UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65528UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65529UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65531UL));
@@ -2340,12 +2374,91 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 7UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16395UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16396UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16397UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16400UL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16384UL));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16386UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16387UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16388UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16389UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16390UL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 5:
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -2357,7 +2470,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -2389,7 +2502,7 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints : FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             VerifyOrDo(!ShouldSkip("(CC.S.F00 || CC.S.F01 || CC.S.F02 || CC.S.F03)"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::FeatureMap::Id, true,
@@ -2401,17 +2514,65 @@ private:
                                  true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the feature dependent attribute(CC.S.F00) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the feature dependent attribute(CC.S.F03) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the feature dependent attribute(CC.S.F04) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the feature dependent attribute(CC.S.F04) or ColorTemperatureMireds in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F04 && CC.S.A4010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the feature dependent attribute(CC.S.F01) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Read the feature dependent attribute(CC.S.F02) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Read the feature dependent attribute(CC.S.F00) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 11: {
+            LogStep(11, "Read the feature dependent attribute(CC.S.F00) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CC.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 12: {
+            LogStep(12, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 13: {
+            LogStep(13, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ColorControl::Id,
                                  ColorControl::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 14: {
+            LogStep(14,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -11341,7 +11502,7 @@ private:
         }
         case 1: {
             LogStep(1, "Sends ResetCounts command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGETH.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGETH.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), EthernetNetworkDiagnostics::Id,
@@ -11531,7 +11692,7 @@ private:
                                  FlowMeasurement::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints : FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), FlowMeasurement::Id, FlowMeasurement::Attributes::FeatureMap::Id,
                                  true, chip::NullOptional);
         }
@@ -12461,7 +12622,7 @@ private:
 class Test_TC_I_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_I_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_1_1", 7, credsIssuerConfig)
+    Test_TC_I_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_I_1_1", 9, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -12519,6 +12680,15 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 1UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -12531,7 +12701,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
             }
             break;
-        case 4:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -12541,7 +12711,21 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 64UL));
             }
             break;
-        case 5:
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 0UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -12553,7 +12737,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -12586,26 +12770,40 @@ private:
         }
         case 2: {
             LogStep(2, "TH reads the FeatureMap attribute from the DUT");
+            VerifyOrDo(!ShouldSkip(" !I.S.F00 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AttributeList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::AttributeList::Id, true,
+            LogStep(3, "TH reads the FeatureMap attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("I.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::AcceptedCommandList::Id, true,
+            LogStep(4, "Read the global attribute: AttributeList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::GeneratedCommandList::Id, true,
+            LogStep(5, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::AcceptedCommandList::Id, true,
                                  chip::NullOptional);
         }
         case 6: {
-            LogStep(6,
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrDo(!ShouldSkip("I.S.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::GeneratedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the global attribute: GeneratedCommandList");
+            VerifyOrDo(!ShouldSkip(" !I.S.C00.Tx "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Identify::Id, Identify::Attributes::GeneratedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -13313,7 +13511,7 @@ private:
 class Test_TC_ILL_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_ILL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_1_1", 7, credsIssuerConfig)
+    Test_TC_ILL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ILL_1_1", 9, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13387,6 +13585,24 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
@@ -13396,7 +13612,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 5:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -13408,7 +13624,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -13440,7 +13656,7 @@ private:
                                  IlluminanceMeasurement::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints : FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), IlluminanceMeasurement::Id,
                                  IlluminanceMeasurement::Attributes::FeatureMap::Id, true, chip::NullOptional);
         }
@@ -13450,17 +13666,29 @@ private:
                                  IlluminanceMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the optional attribute(Tolerance) in AttributeList");
+            VerifyOrDo(!ShouldSkip("ILL.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), IlluminanceMeasurement::Id,
+                                 IlluminanceMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the optional attribute(LightSensorType) in AttributeList");
+            VerifyOrDo(!ShouldSkip("ILL.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), IlluminanceMeasurement::Id,
+                                 IlluminanceMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), IlluminanceMeasurement::Id,
                                  IlluminanceMeasurement::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 7: {
+            LogStep(7, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), IlluminanceMeasurement::Id,
                                  IlluminanceMeasurement::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 8: {
+            LogStep(8,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -13625,7 +13853,7 @@ private:
 class Test_TC_LVL_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_LVL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_1_1", 7, credsIssuerConfig)
+    Test_TC_LVL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_LVL_1_1", 16, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -13676,8 +13904,9 @@ private:
             {
                 uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("featureMap", value, 3UL));
                 VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 7UL));
             }
             break;
         case 3:
@@ -13694,6 +13923,98 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16384UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 5UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 6UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16UL));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 18UL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 19UL));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 20UL));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 5UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 6UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 7UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 8UL));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -13707,7 +14028,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 7UL));
             }
             break;
-        case 5:
+        case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -13719,7 +14040,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -13752,6 +14073,7 @@ private:
         }
         case 2: {
             LogStep(2, "Read the global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("LVL.S.F00 || LVL.S.F01 || LVL.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -13761,18 +14083,72 @@ private:
                                  true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the optonal attribute(StartUpCurrentLevel and RemainingTime) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the optonal attribute(CurrentFrequency, MinFrequency and MinFrequency) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the optonal attribute(MinLevel) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the optonal attribute(MinLevel) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the optonal attribute(OnOffTransitionTime) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Read the optonal attribute(OnTransitionTime) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Read the optonal attribute(OffTransitionTime) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 11: {
+            LogStep(11, "Read the optonal attribute(DefaultMoveRate) in AttributeList");
+            VerifyOrDo(!ShouldSkip("LVL.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 12: {
+            LogStep(12, "Read the global attribute: AcceptedCommandList");
             VerifyOrDo(!ShouldSkip("LVL.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id,
                                  LevelControl::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 13: {
+            LogStep(13, "Read the global attribute: AcceptedCommandList");
+            VerifyOrDo(!ShouldSkip(" !LVL.S.F02 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id,
+                                 LevelControl::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
+        }
+        case 14: {
+            LogStep(14, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id,
                                  LevelControl::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 15: {
+            LogStep(15,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -14570,8 +14946,6 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    uint16_t OnOffTransitionTimeValue;
-
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
     //
@@ -14655,7 +15029,6 @@ private:
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint16"));
-                OnOffTransitionTimeValue = value;
             }
             break;
         case 13:
@@ -14715,16 +15088,14 @@ private:
                                  chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "sends a Move to level command");
+            LogStep(3, "sends a MoveToLevelWithOnOff command");
             VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
+            chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type value;
             value.level          = 64U;
             value.transitionTime = 0U;
-            value.optionMask     = 1U;
-            value.optionOverride = 1U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
-                               chip::NullOptional
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevelWithOnOff::Id,
+                               value, chip::NullOptional
 
             );
         }
@@ -14770,7 +15141,7 @@ private:
         }
         case 9: {
             LogStep(9, "sends a Move to level command");
-            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp && LVL.S.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp && LVL.S.M.VarRate"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 128U;
@@ -14825,13 +15196,13 @@ private:
         }
         case 15: {
             LogStep(15, "Reads CurrentLevel attribute from DUT");
-            VerifyOrDo(!ShouldSkip("LVL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id, true,
                                  chip::NullOptional);
         }
         case 16: {
             LogStep(16, "Reset level to 254");
-            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254U;
@@ -15016,16 +15387,14 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "sends a Move to level command");
+            LogStep(2, "sends a MoveToLevelWithOnOff command");
             VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
-            chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
+            chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type value;
             value.level          = 1U;
             value.transitionTime = 0U;
-            value.optionMask     = 1U;
-            value.optionOverride = 1U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevel::Id, value,
-                               chip::NullOptional
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevelWithOnOff::Id,
+                               value, chip::NullOptional
 
             );
         }
@@ -15065,12 +15434,12 @@ private:
             LogStep(6, "Wait 9000ms");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 9000UL;
+            value.ms = 10000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 7: {
             LogStep(7, "Reads CurrentLevel attribute from DUT");
-            VerifyOrDo(!ShouldSkip("LVL.S.C01.Rsp && LVL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C01.Rsp && LVL.S.A0000 && LVL.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id, true,
                                  chip::NullOptional);
         }
@@ -15152,7 +15521,7 @@ private:
         }
         case 16: {
             LogStep(16, "Reset level to 254");
-            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254U;
@@ -15236,6 +15605,7 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("currentLevel", value, MinlevelValue));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
                 CurrentlevelValue = value;
             }
@@ -15252,8 +15622,9 @@ private:
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("currentLevel", value, 65U));
                 VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 60U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 68U));
             }
             break;
         case 7:
@@ -15311,7 +15682,7 @@ private:
             VerifyOrDo(!ShouldSkip("LVL.S.C04.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type value;
-            value.level          = 1U;
+            value.level          = MinlevelValue;
             value.transitionTime = 0U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::MoveToLevelWithOnOff::Id,
                                value, chip::NullOptional
@@ -15326,7 +15697,7 @@ private:
         }
         case 4: {
             LogStep(4, "Sends step up command to DUT");
-            VerifyOrDo(!ShouldSkip("LVL.S.C02.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C02.Rsp && LVL.S.M.VarRate"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Step::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
@@ -15354,7 +15725,7 @@ private:
         }
         case 7: {
             LogStep(7, "Sends a StepWithOnOff command");
-            VerifyOrDo(!ShouldSkip("LVL.S.C06.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C06.Rsp && LVL.S.M.VarRate"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type value;
             value.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
@@ -15489,7 +15860,7 @@ private:
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 22U));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 32U));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 28U));
                 VerifyOrReturn(CheckConstraintNotValue("value", value, CurrentLevelValue));
             }
             break;
@@ -15596,8 +15967,8 @@ private:
             VerifyOrDo(!ShouldSkip("LVL.S.C03.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Stop::Type value;
-            value.optionMask     = 0U;
-            value.optionOverride = 0U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
@@ -15645,8 +16016,8 @@ private:
             LogStep(11, "Sends stop command to DUT");
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::Stop::Type value;
-            value.optionMask     = 0U;
-            value.optionOverride = 0U;
+            value.optionMask     = 1U;
+            value.optionOverride = 1U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LevelControl::Id, LevelControl::Commands::Stop::Id, value,
                                chip::NullOptional
 
@@ -15671,7 +16042,7 @@ private:
         }
         case 14: {
             LogStep(14, "Reset level to 254");
-            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type value;
             value.level          = 254U;
@@ -15834,7 +16205,7 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -15993,7 +16364,7 @@ private:
         }
         case 2: {
             LogStep(2, "Read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NV || MC_KEYPADINPUT.S.LK || MC_KEYPADINPUT.S.NK"),
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NV || KEYPADINPUT.S.LK || KEYPADINPUT.S.NK"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), KeypadInput::Id, KeypadInput::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
@@ -16033,7 +16404,7 @@ class Test_TC_APPLAUNCHER_1_3Suite : public TestCommand
 {
 public:
     Test_TC_APPLAUNCHER_1_3Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_APPLAUNCHER_1_3", 7, credsIssuerConfig)
+        TestCommand("Test_TC_APPLAUNCHER_1_3", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16091,6 +16462,15 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -16101,7 +16481,25 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
             }
             break;
-        case 4:
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+            }
+            break;
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -16112,7 +16510,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
             }
             break;
-        case 5:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -16121,7 +16519,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
             }
             break;
-        case 6:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -16154,29 +16552,46 @@ private:
         }
         case 2: {
             LogStep(2, "Read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.AP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.AP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::FeatureMap::Id, true, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.A0000 && MC_APPLAUNCHER.S.A0001"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(3, "Read the global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip(" !APPLAUNCHER.S.AP "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
+                                 ApplicationLauncher::Attributes::FeatureMap::Id, true, chip::NullOptional);
+        }
+        case 4: {
+            LogStep(4, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.A0000 && APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+        case 5: {
+            LogStep(5, "Read the optional attribute(CatalogList) in AttributeList");
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
+                                 ApplicationLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the optional attribute(CurrentApp) in AttributeList");
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
+                                 ApplicationLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 8: {
+            LogStep(8, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ApplicationLauncher::Id,
                                  ApplicationLauncher::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 9: {
+            LogStep(9,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -16195,7 +16610,7 @@ class Test_TC_MEDIAINPUT_1_4Suite : public TestCommand
 {
 public:
     Test_TC_MEDIAINPUT_1_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_MEDIAINPUT_1_4", 7, credsIssuerConfig)
+        TestCommand("Test_TC_MEDIAINPUT_1_4", 9, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16266,6 +16681,24 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -16275,7 +16708,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
             }
             break;
-        case 5:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -16287,7 +16720,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -16314,35 +16747,46 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "read the global attribute: ClusterRevision");
+            LogStep(1, "Read the global attribute: ClusterRevision");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::ClusterRevision::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0000 && MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the optonal attribute(InputList) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the optonal attribute(CurrentInput) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::AcceptedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 7: {
+            LogStep(7, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 8: {
+            LogStep(8,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -16485,7 +16929,7 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WakeOnLan::Id, WakeOnLan::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -16524,7 +16968,7 @@ class Test_TC_CHANNEL_1_6Suite : public TestCommand
 {
 public:
     Test_TC_CHANNEL_1_6Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_CHANNEL_1_6", 7, credsIssuerConfig)
+        TestCommand("Test_TC_CHANNEL_1_6", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16596,6 +17040,33 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -16604,7 +17075,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
             }
             break;
-        case 5:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -16612,7 +17083,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -16645,29 +17116,47 @@ private:
         }
         case 2: {
             LogStep(2, "Read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.CL || MC_CHANNEL.S.LI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.CL || CHANNEL.S.LI"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000 && MC_CHANNEL.S.A0001 && MC_CHANNEL.S.A0002"),
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000 && CHANNEL.S.A0001 && CHANNEL.S.A0002"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AcceptedCommandList::Id, true,
+            LogStep(4, "Read the optional attribute(ChannelList): AttributeList");
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::GeneratedCommandList::Id, true,
+            LogStep(5, "Reading optional attribute(Lineup) in AttributeList");
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 6: {
-            LogStep(6,
+            LogStep(6, "Read the optional attribute(CurrentChannel): AttributeList");
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the global attribute: AcceptedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::AcceptedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the global attribute: GeneratedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::GeneratedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -16686,7 +17175,7 @@ class Test_TC_MEDIAPLAYBACK_1_7Suite : public TestCommand
 {
 public:
     Test_TC_MEDIAPLAYBACK_1_7Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_MEDIAPLAYBACK_1_7", 7, credsIssuerConfig)
+        TestCommand("Test_TC_MEDIAPLAYBACK_1_7", 13, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16759,6 +17248,60 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 5UL));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 6UL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -16767,7 +17310,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
             }
             break;
-        case 5:
+        case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -16776,7 +17319,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 10UL));
             }
             break;
-        case 6:
+        case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -16809,8 +17352,7 @@ private:
         }
         case 2: {
             LogStep(2, "Read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.AS || MC_MEDIAPLAYBACK.S.VS"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.AS || MEDIAPLAYBACK.S.VS"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -16820,17 +17362,53 @@ private:
                                  true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the optional attribute(StartTime) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the optional attribute(Duration) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the optional attribute(SampledPosition) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the optional attribute(PlaybackSpeed) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the optional attribute(SeekRangeEnd) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Read the optional attribute(SeekRangeStart) in AttributeList");
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id,
                                  MediaPlayback::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 11: {
+            LogStep(11, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id,
                                  MediaPlayback::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 12: {
+            LogStep(12,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -16849,7 +17427,7 @@ class Test_TC_AUDIOOUTPUT_1_8Suite : public TestCommand
 {
 public:
     Test_TC_AUDIOOUTPUT_1_8Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_AUDIOOUTPUT_1_8", 7, credsIssuerConfig)
+        TestCommand("Test_TC_AUDIOOUTPUT_1_8", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -16900,8 +17478,9 @@ private:
             {
                 uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("featureMap", value, 1UL));
                 VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3UL));
             }
             break;
         case 3:
@@ -16935,12 +17514,26 @@ private:
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 {
                     auto iter_0 = value.begin();
-                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value)>("generatedCommandList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("generatedCommandList[0]", iter_0.GetValue(), 1UL));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 1));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
         case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
+                }
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -16972,7 +17565,7 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -16988,11 +17581,18 @@ private:
         }
         case 5: {
             LogStep(5, "Read the global attribute: GeneratedCommandList");
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.NU"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
-            LogStep(6,
+            LogStep(6, "Read the global attribute: GeneratedCommandList");
+            VerifyOrDo(!ShouldSkip(" !MEDIAINPUT.S.NU "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::GeneratedCommandList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -17144,19 +17744,19 @@ private:
                                  TargetNavigator::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Attributes::FeatureMap::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip(" !MC_TGTNAV.S.A0001 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip(" !TGTNAV.S.A0001 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
@@ -17324,7 +17924,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0000 && MC_APBSC.S.A0001 && MC_APBSC.S.A0003"),
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0000 && APBSC.S.A0001 && APBSC.S.A0003"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AttributeList::Id, true, chip::NullOptional);
@@ -17359,7 +17959,7 @@ class Test_TC_CONTENTLAUNCHER_1_11Suite : public TestCommand
 {
 public:
     Test_TC_CONTENTLAUNCHER_1_11Suite(CredentialIssuerCommands * credsIssuerConfig) :
-        TestCommand("Test_TC_CONTENTLAUNCHER_1_11", 7, credsIssuerConfig)
+        TestCommand("Test_TC_CONTENTLAUNCHER_1_11", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -17431,14 +18031,40 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
                 VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
                 VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
             }
             break;
-        case 5:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -17447,7 +18073,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
             }
             break;
-        case 6:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -17480,30 +18106,48 @@ private:
         }
         case 2: {
             LogStep(2, "Read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.CS || MC_CONTENTLAUNCHER.S.UP"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.CS || CONTENTLAUNCHER.S.UP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id, ContentLauncher::Attributes::FeatureMap::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0000 && MC_CONTENTLAUNCHER.S.A0001"),
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0000 && CONTENTLAUNCHER.S.A0001"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the optional attribute(AcceptHeader): AttributeList");
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
+                                 ContentLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the optional attribute(SupportedStreamingProtocols): AttributeList");
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
+                                 ContentLauncher::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the optional command(LaunchContent) in AcceptedCommandList attribute");
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.C.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 7: {
+            LogStep(7, "Read the optional command(LaunchURL) in AcceptedCommandList attribute");
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.C.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
+                                 ContentLauncher::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 9: {
+            LogStep(9,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -17642,7 +18286,7 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), AccountLogin::Id, AccountLogin::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -17745,7 +18389,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends Sleep command to DUT");
-            VerifyOrDo(!ShouldSkip("MC_LOWPOWER.S"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("LOWPOWER.S"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LowPower::Commands::Sleep::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), LowPower::Id, LowPower::Commands::Sleep::Id, value,
@@ -17837,7 +18481,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends CEC Settings Keys(0x0A) to DUT");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(10);
@@ -17848,7 +18492,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH sends CEC Home Keys(0x09) to DUT");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.LK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(9);
@@ -17990,7 +18634,7 @@ private:
         }
         case 1: {
             LogStep(1, "Send Numbers1");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(33);
@@ -18001,7 +18645,7 @@ private:
         }
         case 2: {
             LogStep(2, "Send Numbers2");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(34);
@@ -18012,7 +18656,7 @@ private:
         }
         case 3: {
             LogStep(3, "Send Numbers3");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(35);
@@ -18023,7 +18667,7 @@ private:
         }
         case 4: {
             LogStep(4, "Send Numbers4");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(36);
@@ -18034,7 +18678,7 @@ private:
         }
         case 5: {
             LogStep(5, "Send Numbers5");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(37);
@@ -18045,7 +18689,7 @@ private:
         }
         case 6: {
             LogStep(6, "Send Numbers6");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(38);
@@ -18056,7 +18700,7 @@ private:
         }
         case 7: {
             LogStep(7, "Send Numbers7");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(39);
@@ -18067,7 +18711,7 @@ private:
         }
         case 8: {
             LogStep(8, "Send Numbers8");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(40);
@@ -18078,7 +18722,7 @@ private:
         }
         case 9: {
             LogStep(9, "Send Numbers9");
-            VerifyOrDo(!ShouldSkip("MC_KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("KEYPADINPUT.S.NK"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::KeypadInput::Commands::SendKey::Type value;
             value.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(41);
@@ -18163,7 +18807,7 @@ private:
             LogStep(1,
                     "TH reads CatalogList attribute from the DUT and where each entry in the list is a CSA-issued Vendor Id of "
                     "type unsigned 16 bit integer ranging between 0-65536 for the catalog");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && APPLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18248,7 +18892,7 @@ private:
                     "TH reads CurrentApp attribute from the DUT and Verify the in-focus application attributes, which should "
                     "include the display Application ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no current "
                     "in-focus application");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && APPLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18346,7 +18990,7 @@ private:
         }
         case 1: {
             LogStep(1, "Launch an app with the provided a application ID");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
@@ -18363,7 +19007,7 @@ private:
         }
         case 2: {
             LogStep(2, "TH sends a LaunchApp command to DUT to launch an app which is not available");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type value;
 
@@ -18467,7 +19111,7 @@ private:
         }
         case 1: {
             LogStep(1, "Stop an app with the provided application ID");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type value;
 
@@ -18574,7 +19218,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends HideApp command to DUT");
-            VerifyOrDo(!ShouldSkip("MC_APPLAUNCHER.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APPLAUNCHER.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type value;
 
@@ -18666,7 +19310,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18759,7 +19403,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18769,7 +19413,7 @@ private:
         }
         case 2: {
             LogStep(2, "Select Input Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::SelectInput::Type value;
             value.index = 1U;
@@ -18780,7 +19424,7 @@ private:
         }
         case 3: {
             LogStep(3, "Read current input list");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::CurrentInput::Id, true,
                                  chip::NullOptional);
         }
@@ -18868,13 +19512,13 @@ private:
         }
         case 1: {
             LogStep(1, "Read attribute media input list");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Attributes::InputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Hide Input Status Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::HideInputStatus::Id, value,
@@ -18884,7 +19528,7 @@ private:
         }
         case 3: {
             LogStep(3, "Show Input Status Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaInput::Id, MediaInput::Commands::ShowInputStatus::Id, value,
@@ -18973,7 +19617,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -18983,7 +19627,7 @@ private:
         }
         case 2: {
             LogStep(2, "Rename Input Command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAINPUT.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAINPUT.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaInput::Commands::RenameInput::Type value;
             value.index = 1U;
@@ -18995,7 +19639,7 @@ private:
         }
         case 3: {
             LogStep(3, "TH reads the InputList attribute from the DUT to show list of Inputs available");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAINPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19079,7 +19723,7 @@ private:
             LogStep(1,
                     "TH reads the ChannelList attribute from the DUT and Verify that the response contains a list of the known TV "
                     "channels");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19184,13 +19828,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the ChannelList attribute");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::ChannelList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "TH sends a ChangeChannelByNumber command");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type value;
             value.majorNumber = mMajornumber.HasValue() ? mMajornumber.Value() : 9U;
@@ -19213,7 +19857,7 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the CurrentChannel attribute");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::CurrentChannel::Id, true,
                                  chip::NullOptional);
         }
@@ -19327,7 +19971,7 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the Lineup attribute from the DUT and Verify that the response contains a lineup info object");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -19337,19 +19981,19 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the ChannelList attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::ChannelList::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the CurrentChannel attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::CurrentChannel::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Sends a SkipChannel command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Channel::Commands::SkipChannel::Type value;
             value.count = 1U;
@@ -19371,7 +20015,7 @@ private:
         }
         case 6: {
             LogStep(6, "Reads the CurrentChannel attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CHANNEL.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Channel::Id, Channel::Attributes::CurrentChannel::Id, true,
                                  chip::NullOptional);
         }
@@ -19521,7 +20165,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -19531,13 +20175,13 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Sends a Play command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
@@ -19558,13 +20202,13 @@ private:
         }
         case 5: {
             LogStep(5, "Reads the playback state attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "sends a Pause command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -19590,7 +20234,7 @@ private:
         }
         case 9: {
             LogStep(9, "Sends a Stop command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StopPlayback::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StopPlayback::Id, value,
@@ -19611,7 +20255,7 @@ private:
         }
         case 11: {
             LogStep(11, "Reads the playback state attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
@@ -19797,7 +20441,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -19807,13 +20451,13 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Sends a Play command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
@@ -19834,13 +20478,13 @@ private:
         }
         case 5: {
             LogStep(5, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Sends a StartOver command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::StartOver::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::StartOver::Id, value,
@@ -19861,7 +20505,7 @@ private:
         }
         case 8: {
             LogStep(8, "Sends a Next command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Next::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Next::Id, value,
@@ -19882,7 +20526,7 @@ private:
         }
         case 10: {
             LogStep(10, "Sends a Previous command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Previous::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Previous::Id, value,
@@ -19903,7 +20547,7 @@ private:
         }
         case 12: {
             LogStep(12, "Sends a SkipForward command to the DUT ");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipForward::Type value;
             value.deltaPositionMilliseconds = 10000ULL;
@@ -19925,13 +20569,13 @@ private:
         }
         case 14: {
             LogStep(14, "Reads the SampledPosition attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id,
                                  true, chip::NullOptional);
         }
         case 15: {
             LogStep(15, "Sends a SkipBackward command to the DUT ");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::SkipBackward::Type value;
             value.deltaPositionMilliseconds = 10000ULL;
@@ -19953,7 +20597,7 @@ private:
         }
         case 17: {
             LogStep(17, "Reads the SampledPosition attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id,
                                  true, chip::NullOptional);
         }
@@ -20081,7 +20725,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20091,7 +20735,7 @@ private:
         }
         case 2: {
             LogStep(2, "Sends a Seek command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = 10000ULL;
@@ -20113,13 +20757,13 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the SampledPosition attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::SampledPosition::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "TH reads the StartTime attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20129,7 +20773,7 @@ private:
         }
         case 6: {
             LogStep(6, "TH reads the SeekRangeEnd attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20139,7 +20783,7 @@ private:
         }
         case 7: {
             LogStep(7, "TH reads the SeekRangeStart attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20149,7 +20793,7 @@ private:
         }
         case 8: {
             LogStep(8, "TH reads the Duration attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20159,7 +20803,7 @@ private:
         }
         case 9: {
             LogStep(9, "Sends a Seek command Position value beyond the furthest valid position");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C000B"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Seek::Type value;
             value.position = mSeekPosition.HasValue() ? mSeekPosition.Value() : 100000000ULL;
@@ -20358,7 +21002,7 @@ private:
         }
         case 1: {
             LogStep(1, "Precondition: Media content in a paused state at the beginning of the content");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Pause::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Pause::Id, value,
@@ -20368,19 +21012,19 @@ private:
         }
         case 2: {
             LogStep(2, "Reads the CurrentState attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Sends a FastForward command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
@@ -20390,19 +21034,19 @@ private:
         }
         case 5: {
             LogStep(5, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Sends a FastForward command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::FastForward::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::FastForward::Id, value,
@@ -20412,13 +21056,13 @@ private:
         }
         case 8: {
             LogStep(8, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 9: {
             LogStep(9, "Sends a Rewind command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
@@ -20428,13 +21072,13 @@ private:
         }
         case 10: {
             LogStep(10, "Reads the CurrentState attribute");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::CurrentState::Id,
                                  true, chip::NullOptional);
         }
         case 11: {
             LogStep(11, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
@@ -20445,7 +21089,7 @@ private:
         }
         case 12: {
             LogStep(12, "Sends a Rewind command to the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Rewind::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Rewind::Id, value,
@@ -20455,7 +21099,7 @@ private:
         }
         case 13: {
             LogStep(13, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message =
@@ -20466,7 +21110,7 @@ private:
         }
         case 14: {
             LogStep(14, "Sends a Play command");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::MediaPlayback::Commands::Play::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Commands::Play::Id, value,
@@ -20476,13 +21120,13 @@ private:
         }
         case 15: {
             LogStep(15, "Reads the PlaybackSpeed attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("MEDIAPLAYBACK.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), MediaPlayback::Id, MediaPlayback::Attributes::PlaybackSpeed::Id,
                                  true, chip::NullOptional);
         }
         case 16: {
             LogStep(16, "Sends consecutive FastForward commands");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20492,7 +21136,7 @@ private:
         }
         case 17: {
             LogStep(17, "Sends consecutive Rewind commands");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20589,13 +21233,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the OutputList attribute");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Sends a SelectAudioOutput command");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type value;
             value.index = 1U;
@@ -20606,7 +21250,7 @@ private:
         }
         case 3: {
             LogStep(3, "Reads the CurrentOutput attribute");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::CurrentOutput::Id, true,
                                  chip::NullOptional);
         }
@@ -20698,13 +21342,13 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the OutputList attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), AudioOutput::Id, AudioOutput::Attributes::OutputList::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Sends a RenameOutput command");
-            VerifyOrDo(!ShouldSkip("MC_AUDIOOUTPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("AUDIOOUTPUT.S.C0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type value;
             value.index = 1U;
@@ -20718,7 +21362,7 @@ private:
             LogStep(3,
                     "Reads the OutputList attribute from the DUT Verify that the output at the index provided in step 2 has the "
                     "name CertTest");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && MC_AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && AUDIOOUTPUT.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -20833,19 +21477,19 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the CurrentTarget attribute");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads the TargetList attribute");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id, TargetNavigator::Attributes::TargetList::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Sends a NavigateTarget command");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.C0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type value;
             value.target = mTargetvalue1.HasValue() ? mTargetvalue1.Value() : 1U;
@@ -20856,7 +21500,7 @@ private:
         }
         case 4: {
             LogStep(4, "Reads the CurrentTarget attribute");
-            VerifyOrDo(!ShouldSkip("MC_TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TGTNAV.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TargetNavigator::Id,
                                  TargetNavigator::Attributes::CurrentTarget::Id, true, chip::NullOptional);
         }
@@ -20997,49 +21641,49 @@ private:
         }
         case 1: {
             LogStep(1, "Reads the VendorName attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorName::Id,
                                  true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads the VendorID attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::VendorID::Id,
                                  true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads the ApplicationName attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ApplicationName::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads the ProductID attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::ProductID::Id,
                                  true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reads the Application attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::Application::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads the Status attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id, ApplicationBasic::Attributes::Status::Id,
                                  true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Reads the ApplicationVersion attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::ApplicationVersion::Id, true, chip::NullOptional);
         }
         case 8: {
             LogStep(8, "Reads the AllowedVendorList attribute");
-            VerifyOrDo(!ShouldSkip("MC_APBSC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("APBSC.S.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(3), ApplicationBasic::Id,
                                  ApplicationBasic::Attributes::AllowedVendorList::Id, true, chip::NullOptional);
         }
@@ -21129,13 +21773,13 @@ private:
         }
         case 1: {
             LogStep(1, "TH reads the AcceptHeader attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id, ContentLauncher::Attributes::AcceptHeader::Id,
                                  true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "TH reads the SupportedStreamingProtocols attribute from the DUT");
-            VerifyOrDo(!ShouldSkip("MC_CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("CONTENTLAUNCHER.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ContentLauncher::Id,
                                  ContentLauncher::Attributes::SupportedStreamingProtocols::Id, true, chip::NullOptional);
         }
@@ -21147,7 +21791,7 @@ private:
 class Test_TC_MOD_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_MOD_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MOD_1_1", 7, credsIssuerConfig)
+    Test_TC_MOD_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_MOD_1_1", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -21199,10 +21843,19 @@ private:
                 uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("featureMap", value, 1UL));
-                VerifyOrReturn(CheckConstraintType("value", "", "map8"));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
             }
             break;
         case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
@@ -21219,7 +21872,25 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
             }
             break;
-        case 4:
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 5UL));
+            }
+            break;
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -21228,7 +21899,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
             }
             break;
-        case 5:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -21240,7 +21911,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -21273,26 +21944,45 @@ private:
         }
         case 2: {
             LogStep(2, "TH reads the FeatureMap attribute from the DUT");
+            VerifyOrDo(!ShouldSkip("MOD.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "TH reads the AttributeList attribute from the DUT");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::AttributeList::Id, true,
+            LogStep(3, "TH reads the FeatureMap attribute from the DUT");
+            VerifyOrDo(!ShouldSkip(" !MOD.S.F00 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "TH reads the AttributeList attribute from the DUT");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "TH reads the optional attribute(StartUpMode) in AttributeList from the DUT");
+            VerifyOrDo(!ShouldSkip("MOD.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "TH reads the optional attribute(OnMode) in AttributeList from the DUT");
+            VerifyOrDo(!ShouldSkip("MOD.S.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::AcceptedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 8: {
+            LogStep(8, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), ModeSelect::Id, ModeSelect::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 9: {
+            LogStep(9,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -22099,6 +22789,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
                 VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65528UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65529UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65531UL));
@@ -22162,7 +22853,7 @@ private:
                                  OccupancySensing::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints : FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::FeatureMap::Id,
                                  true, chip::NullOptional);
         }
@@ -22460,7 +23151,7 @@ private:
 class Test_TC_OO_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_OO_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", 7, credsIssuerConfig)
+    Test_TC_OO_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_OO_1_1", 10, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -22518,6 +23209,15 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -22533,7 +23233,21 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
             }
             break;
-        case 4:
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65528UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65529UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65531UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65532UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
+            }
+            break;
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -22547,7 +23261,18 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 66UL));
             }
             break;
-        case 5:
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+            }
+            break;
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -22559,7 +23284,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -22586,34 +23311,53 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "read the global attribute: ClusterRevision");
+            LogStep(1, "Read the global attribute: ClusterRevision");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::ClusterRevision::Id, true,
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "read the optional global attribute: FeatureMap");
-            VerifyOrDo(!ShouldSkip("OO_LT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(2, "Read the global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("OO.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Read the global attribute: AttributeList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AttributeList::Id, true,
+            LogStep(3, "Read the global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip(" !OO.S.F00 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
-            VerifyOrDo(!ShouldSkip("OO_LT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AcceptedCommandList::Id, true,
+            LogStep(4, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip("OO.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GeneratedCommandList::Id, true,
+            LogStep(5, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip(" !OO.S.F00 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AttributeList::Id, true,
                                  chip::NullOptional);
         }
         case 6: {
-            LogStep(6,
+            LogStep(6, "Read the global attribute: AcceptedCommandList");
+            VerifyOrDo(!ShouldSkip("OO.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AcceptedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the global attribute: AcceptedCommandList");
+            VerifyOrDo(!ShouldSkip(" !OO.S.F00 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::AcceptedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the global attribute: GeneratedCommandList");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), OnOff::Id, OnOff::Attributes::GeneratedCommandList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -23552,7 +24296,7 @@ private:
 class Test_TC_PS_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_PS_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_1_1", 7, credsIssuerConfig)
+    Test_TC_PS_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PS_1_1", 11, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -23603,8 +24347,9 @@ private:
             {
                 uint32_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("featureMap", value, 2UL));
                 VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 7UL));
             }
             break;
         case 3:
@@ -23616,9 +24361,6 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 14UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 15UL));
-                VerifyOrReturn(CheckConstraintContains("value", value, 16UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65528UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65529UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65531UL));
@@ -23627,6 +24369,65 @@ private:
             }
             break;
         case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 5UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 7UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 8UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 9UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 10UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 11UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 12UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 13UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 14UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 15UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 17UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 18UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 26UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 27UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 28UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 29UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 30UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 19UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 20UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 21UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 22UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 23UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 24UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 25UL));
+            }
+            break;
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -23638,7 +24439,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 5:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -23650,7 +24451,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -23682,7 +24483,8 @@ private:
                                  true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip("PS.S.F00 || PS.S.F01 || PS.S.F02 || PS.S.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::FeatureMap::Id, true,
                                  chip::NullOptional);
         }
@@ -23692,17 +24494,41 @@ private:
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the Feature related(PS.S.F00-WIRED) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("PS.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the Feature related(PS.S.F01-BAT) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("PS.S.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the Feature related(PS.S.F02-RECHG) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("PS.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the Feature related(PS.S.F03-REPLC) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("PS.S.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::AcceptedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 9: {
+            LogStep(9, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PowerSource::Id, PowerSource::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 10: {
+            LogStep(10,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -24238,7 +25064,7 @@ private:
 class Test_TC_PRS_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_PRS_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_1_1", 7, credsIssuerConfig)
+    Test_TC_PRS_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_PRS_1_1", 14, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -24296,6 +25122,15 @@ private:
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -24309,7 +25144,61 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
             }
             break;
-        case 4:
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 16UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 17UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 18UL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 20UL));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 19UL));
+            }
+            break;
+        case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -24321,7 +25210,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 5:
+        case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -24333,7 +25222,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -24365,28 +25254,70 @@ private:
                                  PressureMeasurement::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute constraints: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             VerifyOrDo(!ShouldSkip("PRS.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::FeatureMap::Id, true, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Read the global mandatory attribute constraints: AttributeList");
+            LogStep(3, "Read the global attribute: FeatureMap");
+            VerifyOrDo(!ShouldSkip(" !PRS.S.F00 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::FeatureMap::Id, true, chip::NullOptional);
+        }
+        case 4: {
+            LogStep(4, "Read the global mandatory attribute: AttributeList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+        case 5: {
+            LogStep(5, "Read the optional attribute(ScaledValue) in AttributeList");
+            VerifyOrDo(!ShouldSkip("PRS.S.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the optional attribute(MinScaledValue) in AttributeList");
+            VerifyOrDo(!ShouldSkip("PRS.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the optional attribute(MaxScaledValue) in AttributeList");
+            VerifyOrDo(!ShouldSkip("PRS.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the optional attribute(Scale) in AttributeList");
+            VerifyOrDo(!ShouldSkip("PRS.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Read the optional attribute(Tolerance) in AttributeList");
+            VerifyOrDo(!ShouldSkip("PRS.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Read the optional attribute(ScaledTolerance) in AttributeList");
+            VerifyOrDo(!ShouldSkip("PRS.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
+                                 PressureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 11: {
+            LogStep(11, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 12: {
+            LogStep(12, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), PressureMeasurement::Id,
                                  PressureMeasurement::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 13: {
+            LogStep(13,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -26001,6 +26932,10 @@ private:
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                {
+                    auto iter_0 = value.begin();
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("acceptedCommandList", iter_0, 0));
+                }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
@@ -26135,6 +27070,15 @@ private:
         case 2:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                uint32_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
+                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::AttributeId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -26148,7 +27092,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
             }
             break;
-        case 3:
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -26160,7 +27104,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 4:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -26170,15 +27114,6 @@ private:
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("generatedCommandList", iter_0, 0));
                 }
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
-            }
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("featureMap", value, 0UL));
-                VerifyOrReturn(CheckConstraintType("value", "", "map32"));
             }
             break;
         case 6:
@@ -26213,24 +27148,24 @@ private:
                                  RelativeHumidityMeasurement::Attributes::ClusterRevision::Id, true, chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the global attribute: AttributeList");
+            LogStep(2, "Read FeatureMap attribute from the DUT");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
+                                 RelativeHumidityMeasurement::Attributes::FeatureMap::Id, true, chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "Read the global attribute: AttributeList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
-        case 3: {
-            LogStep(3, "Read the global attribute: AcceptedCommandList");
+        case 4: {
+            LogStep(4, "Read the global attribute: AcceptedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 4: {
-            LogStep(4, "Read the global attribute: GeneratedCommandList");
+        case 5: {
+            LogStep(5, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
                                  RelativeHumidityMeasurement::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
-        }
-        case 5: {
-            LogStep(5, "Read FeatureMap attribute from the DUT and Verify that the DUT");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), RelativeHumidityMeasurement::Id,
-                                 RelativeHumidityMeasurement::Attributes::FeatureMap::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6,
@@ -26381,7 +27316,7 @@ private:
 class Test_TC_SC_4_2Suite : public TestCommand
 {
 public:
-    Test_TC_SC_4_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_2", 48, credsIssuerConfig)
+    Test_TC_SC_4_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_SC_4_2", 46, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -26438,16 +27373,8 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
             break;
         case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26466,7 +27393,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 5:
+        case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26478,7 +27405,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 6:
+        case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26487,6 +27414,22 @@ private:
                 VerifyOrReturn(CheckConstraintIsHexString("value.hostName", value.hostName, true));
                 VerifyOrReturn(CheckConstraintMinLength("value.hostName", value.hostName.size(), 16));
                 VerifyOrReturn(CheckConstraintMaxLength("value.hostName", value.hostName.size(), 16));
+            }
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            shouldContinue = true;
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
             }
             shouldContinue = true;
             break;
@@ -26519,27 +27462,11 @@ private:
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
-            shouldContinue = true;
-            break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
-            shouldContinue = true;
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("vendorId", value.vendorId, mVendorId.HasValue() ? mVendorId.Value() : 65521U));
             }
             shouldContinue = true;
             break;
-        case 13:
+        case 11:
             if (IsUnsupported(status.mStatus))
             {
                 shouldContinue = true;
@@ -26553,7 +27480,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 14:
+        case 12:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26566,7 +27493,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 15:
+        case 13:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26579,7 +27506,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 16:
+        case 14:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26588,7 +27515,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 17:
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26598,7 +27525,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 18:
+        case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26607,7 +27534,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 19:
+        case 17:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26616,7 +27543,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 20:
+        case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26625,7 +27552,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 21:
+        case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26634,7 +27561,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 22:
+        case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26643,22 +27570,22 @@ private:
             }
             shouldContinue = true;
             break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
         case 24:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
             break;
         case 25:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 26:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 27:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26671,7 +27598,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 28:
+        case 26:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26683,7 +27610,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 29:
+        case 27:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26692,6 +27619,22 @@ private:
                 VerifyOrReturn(CheckConstraintIsHexString("value.hostName", value.hostName, true));
                 VerifyOrReturn(CheckConstraintMinLength("value.hostName", value.hostName.size(), 16));
                 VerifyOrReturn(CheckConstraintMaxLength("value.hostName", value.hostName.size(), 16));
+            }
+            shouldContinue = true;
+            break;
+        case 28:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            shouldContinue = true;
+            break;
+        case 29:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
             }
             shouldContinue = true;
             break;
@@ -26724,27 +27667,11 @@ private:
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
-            shouldContinue = true;
-            break;
-        case 34:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-            }
-            shouldContinue = true;
-            break;
-        case 35:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("vendorId", value.vendorId, mVendorId.HasValue() ? mVendorId.Value() : 65521U));
             }
             shouldContinue = true;
             break;
-        case 36:
+        case 34:
             if (IsUnsupported(status.mStatus))
             {
                 shouldContinue = true;
@@ -26758,7 +27685,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 37:
+        case 35:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26771,7 +27698,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 38:
+        case 36:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26784,7 +27711,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 39:
+        case 37:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26793,7 +27720,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 40:
+        case 38:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26803,7 +27730,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 41:
+        case 39:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26812,7 +27739,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 42:
+        case 40:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26821,7 +27748,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 43:
+        case 41:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26830,7 +27757,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 44:
+        case 42:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26839,7 +27766,7 @@ private:
             }
             shouldContinue = true;
             break;
-        case 45:
+        case 43:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::DiscoveryCommands::Commands::DiscoveryCommandResponse::DecodableType value;
@@ -26848,11 +27775,11 @@ private:
             }
             shouldContinue = true;
             break;
-        case 46:
+        case 44:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
-        case 47:
+        case 45:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -26872,28 +27799,14 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "Stop target device");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
-            return Stop(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Start target device with the provided discriminator for basic commissioning advertisement");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Start::Type value;
-            value.discriminator.Emplace();
-            value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
-            return Start(kIdentityAlpha, value);
-        }
-        case 2: {
-            LogStep(2, "Wait for the commissioned device to be retrieved");
+            LogStep(0, "Wait for the commissioned device to be retrieved");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
-        case 3: {
-            LogStep(3,
+        case 1: {
+            LogStep(1,
                     "TH is put in Commissioning Mode using Open Basic Commissioning Window command and starts advertising "
                     "Commissionable Node Discovery service using DNS-SD");
             ListFreer listFreer;
@@ -26905,161 +27818,161 @@ private:
 
             );
         }
-        case 4: {
-            LogStep(4, "Check Instance Name");
+        case 2: {
+            LogStep(2, "Check Instance Name");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 5: {
-            LogStep(5, "Check Hostname");
+        case 3: {
+            LogStep(3, "Check Hostname");
             VerifyOrDo(!ShouldSkip("(WIFI || ETH) && !THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 6: {
-            LogStep(6, "Check Hostname");
+        case 4: {
+            LogStep(4, "Check Hostname");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 7: {
-            LogStep(7, "Check Long Discriminator _L");
+        case 5: {
+            LogStep(5, "Check Long Discriminator _L");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByLongDiscriminator(kIdentityAlpha, value);
         }
-        case 8: {
-            LogStep(8, "Check Short Discriminator (_S)");
+        case 6: {
+            LogStep(6, "Check Short Discriminator (_S)");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByShortDiscriminator(kIdentityAlpha, value);
         }
-        case 9: {
-            LogStep(9, "Check Vendor ID (_V)");
+        case 7: {
+            LogStep(7, "Check Vendor ID (_V)");
             VerifyOrDo(!ShouldSkip("VENDOR_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type value;
             value.value = mVendorId.HasValue() ? mVendorId.Value() : 65521ULL;
             return FindCommissionableByVendorId(kIdentityAlpha, value);
         }
-        case 10: {
-            LogStep(10, "Check Device Type ID (_T)");
+        case 8: {
+            LogStep(8, "Check Device Type ID (_T)");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByDeviceType::Type value;
             value.value = mDeviceType.HasValue() ? mDeviceType.Value() : 5ULL;
             return FindCommissionableByDeviceType(kIdentityAlpha, value);
         }
-        case 11: {
-            LogStep(11, "Check Commissioning Mode (_CM)");
+        case 9: {
+            LogStep(9, "Check Commissioning Mode (_CM)");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type value;
             return FindCommissionableByCommissioningMode(kIdentityAlpha, value);
         }
+        case 10: {
+            LogStep(10, "TXT key for Vendor ID and Product ID (VP)");
+            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
+        }
+        case 11: {
+            LogStep(11, "TXT key for Vendor ID and Product ID (VP)");
+            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
+        }
         case 12: {
-            LogStep(12, "TXT key for Vendor ID and Product ID (VP)");
-            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
-            return FindCommissionable(kIdentityAlpha, value);
-        }
-        case 13: {
-            LogStep(13, "TXT key for Vendor ID and Product ID (VP)");
-            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
-            return FindCommissionable(kIdentityAlpha, value);
-        }
-        case 14: {
-            LogStep(14, "Optional TXT key for MRP Retry Interval Idle (CRI)");
+            LogStep(12, "Optional TXT key for MRP Retry Interval Idle (CRI)");
             VerifyOrDo(!ShouldSkip("CRI_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 15: {
-            LogStep(15, "Optional TXT key for MRP Retry Interval Active (CRA)");
+        case 13: {
+            LogStep(13, "Optional TXT key for MRP Retry Interval Active (CRA)");
             VerifyOrDo(!ShouldSkip("CRA_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 16: {
-            LogStep(16, "TXT key for commissioning mode (CM)");
+        case 14: {
+            LogStep(14, "TXT key for commissioning mode (CM)");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 17: {
-            LogStep(17, "Optional TXT key for device type (DT)");
+        case 15: {
+            LogStep(15, "Optional TXT key for device type (DT)");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DT_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 18: {
-            LogStep(18, "Optional TXT key for device name (DN)");
+        case 16: {
+            LogStep(16, "Optional TXT key for device name (DN)");
             VerifyOrDo(!ShouldSkip("DN_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 19: {
-            LogStep(19, "Optional TXT key for rotating device identifier (RI)");
+        case 17: {
+            LogStep(17, "Optional TXT key for rotating device identifier (RI)");
             VerifyOrDo(!ShouldSkip("RI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 20: {
-            LogStep(20, "Optional TXT key for pairing hint (PH)");
+        case 18: {
+            LogStep(18, "Optional TXT key for pairing hint (PH)");
             VerifyOrDo(!ShouldSkip("PH_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 21: {
-            LogStep(21, "Optional TXT key for pairing instructions (PI)");
+        case 19: {
+            LogStep(19, "Optional TXT key for pairing instructions (PI)");
             VerifyOrDo(!ShouldSkip("PI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 22: {
-            LogStep(22, "Check IPs");
+        case 20: {
+            LogStep(20, "Check IPs");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 23: {
-            LogStep(23, "Stop target device");
+        case 21: {
+            LogStep(21, "Stop target device");
             ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Stop::Type value;
             return Stop(kIdentityAlpha, value);
         }
-        case 24: {
-            LogStep(24, "Start target device with the provided discriminator for basic commissioning advertisement");
+        case 22: {
+            LogStep(22, "Start target device with the provided discriminator for basic commissioning advertisement");
             ListFreer listFreer;
             chip::app::Clusters::SystemCommands::Commands::Start::Type value;
             value.discriminator.Emplace();
             value.discriminator.Value() = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840U;
             return Start(kIdentityAlpha, value);
         }
-        case 25: {
-            LogStep(25, "Wait for the commissioned device to be retrieved");
+        case 23: {
+            LogStep(23, "Wait for the commissioned device to be retrieved");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
             value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
             return WaitForCommissionee(kIdentityAlpha, value);
         }
-        case 26: {
-            LogStep(26, "Open Commissioning Window");
+        case 24: {
+            LogStep(24, "Open Commissioning Window");
             ListFreer listFreer;
             chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
             value.commissioningTimeout = 180U;
@@ -27069,140 +27982,140 @@ private:
 
             );
         }
-        case 27: {
-            LogStep(27, "Check Instance Name");
+        case 25: {
+            LogStep(25, "Check Instance Name");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 28: {
-            LogStep(28, "Check Hostname");
+        case 26: {
+            LogStep(26, "Check Hostname");
             VerifyOrDo(!ShouldSkip("(WIFI || ETH) && !THREAD"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 29: {
-            LogStep(29, "Check Hostname");
+        case 27: {
+            LogStep(27, "Check Hostname");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && (!WIFI && !ETH) && THREAD"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 30: {
-            LogStep(30, "Check Long Discriminator _L");
+        case 28: {
+            LogStep(28, "Check Long Discriminator _L");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByLongDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByLongDiscriminator(kIdentityAlpha, value);
         }
-        case 31: {
-            LogStep(31, "Check Short Discriminator (_S)");
+        case 29: {
+            LogStep(29, "Check Short Discriminator (_S)");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByShortDiscriminator::Type value;
             value.value = mDiscriminator.HasValue() ? mDiscriminator.Value() : 3840ULL;
             return FindCommissionableByShortDiscriminator(kIdentityAlpha, value);
         }
-        case 32: {
-            LogStep(32, "Check Vendor ID (_V)");
+        case 30: {
+            LogStep(30, "Check Vendor ID (_V)");
             VerifyOrDo(!ShouldSkip("VENDOR_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByVendorId::Type value;
             value.value = mVendorId.HasValue() ? mVendorId.Value() : 65521ULL;
             return FindCommissionableByVendorId(kIdentityAlpha, value);
         }
-        case 33: {
-            LogStep(33, "Check Device Type ID (_T)");
+        case 31: {
+            LogStep(31, "Check Device Type ID (_T)");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DEVTYPE_SUBTYPE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByDeviceType::Type value;
             value.value = mDeviceType.HasValue() ? mDeviceType.Value() : 5ULL;
             return FindCommissionableByDeviceType(kIdentityAlpha, value);
         }
-        case 34: {
-            LogStep(34, "Check Commissioning Mode (_CM)");
+        case 32: {
+            LogStep(32, "Check Commissioning Mode (_CM)");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionableByCommissioningMode::Type value;
             return FindCommissionableByCommissioningMode(kIdentityAlpha, value);
         }
+        case 33: {
+            LogStep(33, "TXT key for Vendor ID and Product ID (VP)");
+            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
+        }
+        case 34: {
+            LogStep(34, "TXT key for Vendor ID and Product ID (VP)");
+            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
+            return FindCommissionable(kIdentityAlpha, value);
+        }
         case 35: {
-            LogStep(35, "TXT key for Vendor ID and Product ID (VP)");
-            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
-            return FindCommissionable(kIdentityAlpha, value);
-        }
-        case 36: {
-            LogStep(36, "TXT key for Vendor ID and Product ID (VP)");
-            VerifyOrDo(!ShouldSkip("VP_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
-            return FindCommissionable(kIdentityAlpha, value);
-        }
-        case 37: {
-            LogStep(37, "Optional TXT key for MRP Retry Interval Idle (CRI)");
+            LogStep(35, "Optional TXT key for MRP Retry Interval Idle (CRI)");
             VerifyOrDo(!ShouldSkip("CRI_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 38: {
-            LogStep(38, "Optional TXT key for MRP Retry Interval Active (CRA)");
+        case 36: {
+            LogStep(36, "Optional TXT key for MRP Retry Interval Active (CRA)");
             VerifyOrDo(!ShouldSkip("CRA_COMM_DISCOVERY_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 39: {
-            LogStep(39, "TXT key for commissioning mode (CM)");
+        case 37: {
+            LogStep(37, "TXT key for commissioning mode (CM)");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 40: {
-            LogStep(40, "Optional TXT key for device type (DT)");
+        case 38: {
+            LogStep(38, "Optional TXT key for device type (DT)");
             VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DT_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 41: {
-            LogStep(41, "Optional TXT key for device name (DN)");
+        case 39: {
+            LogStep(39, "Optional TXT key for device name (DN)");
             VerifyOrDo(!ShouldSkip("DN_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 42: {
-            LogStep(42, "Optional TXT key for rotating device identifier (RI)");
+        case 40: {
+            LogStep(40, "Optional TXT key for rotating device identifier (RI)");
             VerifyOrDo(!ShouldSkip("RI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 43: {
-            LogStep(43, "Optional TXT key for pairing hint (PH)");
+        case 41: {
+            LogStep(41, "Optional TXT key for pairing hint (PH)");
             VerifyOrDo(!ShouldSkip("PH_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 44: {
-            LogStep(44, "Optional TXT key for pairing instructions (PI)");
+        case 42: {
+            LogStep(42, "Optional TXT key for pairing instructions (PI)");
             VerifyOrDo(!ShouldSkip("PI_KEY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 45: {
-            LogStep(45, "Check IPs");
+        case 43: {
+            LogStep(43, "Check IPs");
             ListFreer listFreer;
             chip::app::Clusters::DiscoveryCommands::Commands::FindCommissionable::Type value;
             return FindCommissionable(kIdentityAlpha, value);
         }
-        case 46: {
-            LogStep(46, "TH adds an unknown key/value pair in the advertised data");
+        case 44: {
+            LogStep(44, "TH adds an unknown key/value pair in the advertised data");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
@@ -27213,8 +28126,8 @@ private:
             value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
             return UserPrompt(kIdentityAlpha, value);
         }
-        case 47: {
-            LogStep(47, "Scan for DNS-SD commissioner advertisements from TH");
+        case 45: {
+            LogStep(45, "Scan for DNS-SD commissioner advertisements from TH");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
@@ -27344,7 +28257,7 @@ private:
 class Test_TC_TMP_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_TMP_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TMP_1_1", 7, credsIssuerConfig)
+    Test_TC_TMP_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TMP_1_1", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -27408,6 +28321,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65528UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65529UL));
                 VerifyOrReturn(CheckConstraintContains("value", value, 65531UL));
@@ -27418,12 +28332,28 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65528UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65529UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65531UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65532UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 65533UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 5:
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -27435,7 +28365,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -27473,22 +28403,28 @@ private:
         }
         case 3: {
             LogStep(3, "Read the global attribute: AttributeList");
-            VerifyOrDo(!ShouldSkip("A_TEMPERATURE_TOLERANCE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read AcceptedCommandList attribute from the DUT");
+            LogStep(4, "Read the global attribute: AttributeList");
+            VerifyOrDo(!ShouldSkip(" !TMP.S.A0003 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
+                                 TemperatureMeasurement::Attributes::AttributeList::Id, true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read AcceptedCommandList attribute from the DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read GeneratedCommandList attribute from the DUT");
+        case 6: {
+            LogStep(6, "Read GeneratedCommandList attribute from the DUT");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6,
+        case 7: {
+            LogStep(7,
                     "Read EventList attribute from the DUT and Verify that the DUT response provides a list of supported events.");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
@@ -27609,25 +28545,25 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read the mandatory attribute: MinMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "read the mandatory attribute: MaxMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "read the optional attribute: Tolerance");
-            VerifyOrDo(!ShouldSkip("TM.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::Tolerance::Id, true, chip::NullOptional);
         }
@@ -27639,7 +28575,7 @@ private:
 class Test_TC_TSTAT_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_TSTAT_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSTAT_1_1", 7, credsIssuerConfig)
+    Test_TC_TSTAT_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSTAT_1_1", 17, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -27714,13 +28650,123 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 5UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 6UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 7UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 17UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 23UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 24UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+            }
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 4UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 8UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 18UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 21UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 22UL));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 19UL));
+            }
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 20UL));
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 25UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 30UL));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 32UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 33UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 34UL));
+            }
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 52UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 53UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 54UL));
+            }
+            break;
+        case 12:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 55UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 56UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 57UL));
+            }
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<chip::CommandId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 1UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
+                VerifyOrReturn(CheckConstraintContains("value", value, 3UL));
+            }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
                 VerifyOrReturn(CheckConstraintContains("value", value, 0UL));
             }
             break;
-        case 5:
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -27728,7 +28774,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -27760,7 +28806,7 @@ private:
                                  chip::NullOptional);
         }
         case 2: {
-            LogStep(2, "Read the optional global attribute constraints: FeatureMap");
+            LogStep(2, "Read the global attribute: FeatureMap");
             VerifyOrDo(!ShouldSkip("TSTAT.S.F00 || TSTAT.S.F01 || TSTAT.S.F02 || TSTAT.S.F03 || TSTAT.S.F04 || TSTAT.S.F05"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::FeatureMap::Id, true,
@@ -27772,17 +28818,78 @@ private:
                                  chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "Read the global attribute: AcceptedCommandList");
+            LogStep(4, "Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Read the Feature dependent(TSTAT.S.F01(COOL) & TSTAT.S.F02(OCC)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F01 && TSTAT.S.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 8: {
+            LogStep(8, "Read the Feature dependent(TSTAT.S.F00(HEAT) & TSTAT.S.F02(OCC)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F00 && TSTAT.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F05"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 10: {
+            LogStep(10, "Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 11: {
+            LogStep(11, "Read the Feature dependent(TSTAT.S.F04(SB)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 12: {
+            LogStep(12, "Read the Feature dependent(TSTAT.S.F04(SB) & TSTAT.S.F02(OCC)) attribute in AttributeList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F04 && TSTAT.S.F02"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AttributeList::Id, true,
+                                 chip::NullOptional);
+        }
+        case 13: {
+            LogStep(13, "Read the global attribute: AcceptedCommandList");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AcceptedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "Read the global attribute: GeneratedCommandList");
+        case 14: {
+            LogStep(14, "Read the global attribute: AcceptedCommandList");
+            VerifyOrDo(!ShouldSkip(" !TSTAT.S.F03 "), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::AcceptedCommandList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 15: {
+            LogStep(15, "Read the global attribute: GeneratedCommandList");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6, "Read the global attribute: EventList");
+        case 16: {
+            LogStep(16, "Read the global attribute: EventList");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
@@ -28627,7 +29734,7 @@ private:
 class Test_TC_TSTAT_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSTAT_2_2", 78, credsIssuerConfig)
+    Test_TC_TSTAT_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_TSTAT_2_2", 102, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -28665,37 +29772,24 @@ private:
             shouldContinue = true;
             break;
         case 1:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2600));
                 VerifyOrReturn(CheckConstraintType("value", "", "int16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 1600));
-                VerifyOrReturn(CheckConstraintMaxValue("value", value, 2600));
+                VerifyOrReturn(CheckConstraintMaxValue("value", value, 3200));
             }
             break;
         case 2:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 3:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2250));
+                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2500));
             }
             break;
         case 4:
@@ -28705,39 +29799,29 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 6:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
             break;
         case 7:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 2000));
                 VerifyOrReturn(CheckConstraintType("value", "", "int16"));
                 VerifyOrReturn(CheckConstraintMinValue("value", value, 700));
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 3000));
             }
             break;
-        case 8:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 9:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 11:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28745,24 +29829,31 @@ private:
                 VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 2100));
             }
             break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
         case 12:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 13:
-            if (IsUnsupported(status.mStatus))
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                return;
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 700));
             }
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 18:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28773,18 +29864,10 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 3200));
             }
             break;
-        case 14:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 19:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 15:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 20:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28792,31 +29875,19 @@ private:
                 VerifyOrReturn(CheckValue("unoccupiedCoolingSetpoint", value, 2500));
             }
             break;
-        case 16:
+        case 21:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 17:
+        case 22:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 18:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 19:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 24:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 20:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 25:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28827,18 +29898,10 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 3000));
             }
             break;
-        case 21:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 26:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 22:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 27:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28846,31 +29909,19 @@ private:
                 VerifyOrReturn(CheckValue("unoccupiedHeatingSetpoint", value, 2500));
             }
             break;
-        case 23:
+        case 28:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 24:
+        case 29:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 25:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 30:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 26:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 31:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 27:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 32:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28881,56 +29932,62 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 3000));
             }
             break;
-        case 28:
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 34:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 35:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 29:
+        case 36:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 30:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 37:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 31:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 38:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 39:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 40:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 32:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 41:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 42:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 43:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("maxHeatSetpointLimit", value, 2000));
+                VerifyOrReturn(CheckValue("maxHeatSetpointLimit", value, 2900));
             }
             break;
-        case 33:
+        case 44:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 34:
+        case 45:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 35:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 46:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 36:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 47:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 48:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28941,18 +29998,10 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 3200));
             }
             break;
-        case 37:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 49:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 38:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 50:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28960,31 +30009,22 @@ private:
                 VerifyOrReturn(CheckValue("minCoolSetpointLimit", value, 2000));
             }
             break;
-        case 39:
+        case 51:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 40:
+        case 52:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 41:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 53:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 42:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 54:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 43:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 55:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 56:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -28995,45 +30035,44 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 3200));
             }
             break;
-        case 44:
+        case 57:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 58:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 59:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 45:
+        case 60:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 46:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 61:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 62:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 47:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 63:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 48:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 64:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 65:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 49:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 66:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 50:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 67:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 68:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -29044,18 +30083,10 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 25));
             }
             break;
-        case 51:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 69:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 52:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 70:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -29063,27 +30094,19 @@ private:
                 VerifyOrReturn(CheckValue("minSetpointDeadBand", value, 5));
             }
             break;
-        case 53:
+        case 71:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 54:
+        case 72:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 55:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 73:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 56:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 74:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 57:
+        case 75:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Thermostat::ThermostatControlSequence value;
@@ -29094,10 +30117,10 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 5U));
             }
             break;
-        case 58:
+        case 76:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 59:
+        case 77:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Thermostat::ThermostatControlSequence value;
@@ -29105,146 +30128,120 @@ private:
                 VerifyOrReturn(CheckValue("controlSequenceOfOperation", value, 2U));
             }
             break;
-        case 60:
+        case 78:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 61:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                int16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, -30));
-            }
-            break;
-        case 62:
+        case 79:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 63:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 80:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 81:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 82:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 30));
+                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 1700));
             }
             break;
-        case 64:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 83:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 84:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 65:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 66:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                int16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, -30));
-            }
-            break;
-        case 67:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 68:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 69:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                int16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 30));
-            }
-            break;
-        case 70:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 71:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 72:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                int16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, -30));
-            }
-            break;
-        case 73:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                int16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, -30));
-            }
-            break;
-        case 74:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 75:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 76:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                int16_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 30));
-            }
-            break;
-        case 77:
-            if (IsUnsupported(status.mStatus))
-            {
-                return;
-            }
+        case 85:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 30));
+            }
+            break;
+        case 86:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 87:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 88:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2300));
+            }
+            break;
+        case 89:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 90:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 91:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2900));
+            }
+            break;
+        case 92:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 93:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 94:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 95:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2300));
+            }
+            break;
+        case 96:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 1700));
+            }
+            break;
+        case 97:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 98:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 99:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 100:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", value, 2900));
+            }
+            break;
+        case 101:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                int16_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", value, 2300));
             }
             break;
         default:
@@ -29271,29 +30268,29 @@ private:
         }
         case 1: {
             LogStep(1, "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Writes a value back that is different but valid for OccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
-            value = 2250;
+            value = 2500;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                   Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Writes OccupiedCoolingSetpoint to value below the MinCoolSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 30;
@@ -29303,7 +30300,7 @@ private:
         }
         case 5: {
             LogStep(5, "Writes OccupiedCoolingSetpoint to value above the MaxCoolSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4000;
@@ -29312,24 +30309,44 @@ private:
                                   chip::NullOptional);
         }
         case 6: {
-            LogStep(6, "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(6, "Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7, "Writes the CoolingSetpoint below the HeatingSetpoint when auto is enabled");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F05"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
-            value = 2600;
+            value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                   Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 7: {
-            LogStep(7, "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 8: {
+            LogStep(8, "Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 3200;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
+                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
+                                  chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 8: {
-            LogStep(8, "Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 10: {
+            LogStep(10, "Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2100;
@@ -29337,15 +30354,15 @@ private:
                                   Thermostat::Attributes::OccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 9: {
-            LogStep(9, "Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 11: {
+            LogStep(11, "Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 10: {
-            LogStep(10, "Writes OccupiedHeatingSetpoint to value below the MinHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 12: {
+            LogStep(12, "Writes OccupiedHeatingSetpoint to value below the MinHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 600;
@@ -29353,9 +30370,9 @@ private:
                                   Thermostat::Attributes::OccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 11: {
-            LogStep(11, "Writes OccupiedHeatingSetpoint to value above the MaxHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 13: {
+            LogStep(13, "Writes OccupiedHeatingSetpoint to value above the MaxHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4010;
@@ -29363,9 +30380,9 @@ private:
                                   Thermostat::Attributes::OccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 12: {
-            LogStep(12, "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 14: {
+            LogStep(14, "Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 700;
@@ -29373,15 +30390,41 @@ private:
                                   Thermostat::Attributes::OccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 13: {
-            LogStep(13, "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 15: {
+            LogStep(15, "Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
+                                 Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
+        }
+        case 16: {
+            LogStep(16, "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F00 && !TSTAT.S.F05"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 3000;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
+                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, value, chip::NullOptional,
+                                  chip::NullOptional);
+        }
+        case 17: {
+            LogStep(17, "Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 18: {
+            LogStep(18, "Reads UnoccupiedCoolingSetpoint attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
-        case 14: {
-            LogStep(14, "Writes a value back that is different but valid for UnoccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 19: {
+            LogStep(19, "Writes a value back that is different but valid for UnoccupiedCoolingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2500;
@@ -29389,15 +30432,15 @@ private:
                                   Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 15: {
-            LogStep(15, "Reads it back again to confirm the successful write of UnoccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 20: {
+            LogStep(20, "Reads it back again to confirm the successful write of UnoccupiedCoolingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
-        case 16: {
-            LogStep(16, "Writes UnoccupiedCoolingSetpoint to value below the MinHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 21: {
+            LogStep(21, "Writes UnoccupiedCoolingSetpoint to value below the MinHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1002;
@@ -29405,9 +30448,9 @@ private:
                                   Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 17: {
-            LogStep(17, "Writes UnoccupiedCoolingSetpoint to value above the MaxHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 22: {
+            LogStep(22, "Writes UnoccupiedCoolingSetpoint to value above the MaxHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4010;
@@ -29415,9 +30458,9 @@ private:
                                   Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 18: {
-            LogStep(18, "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 23: {
+            LogStep(23, "Writes the limit of MinCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1800;
@@ -29425,9 +30468,9 @@ private:
                                   Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 19: {
-            LogStep(19, "Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 24: {
+            LogStep(24, "Writes the limit of MaxCoolSetpointLimit to UnoccupiedCoolingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 3000;
@@ -29435,15 +30478,15 @@ private:
                                   Thermostat::Attributes::UnoccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 20: {
-            LogStep(20, "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 25: {
+            LogStep(25, "Reads UnoccupiedHeatingSetpoint attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 21: {
-            LogStep(21, "Writes a value back that is different but valid for UnoccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 26: {
+            LogStep(26, "Writes a value back that is different but valid for UnoccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2500;
@@ -29451,15 +30494,15 @@ private:
                                   Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 22: {
-            LogStep(22, "Reads it back again to confirm the successful write of UnoccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 27: {
+            LogStep(27, "Reads it back again to confirm the successful write of UnoccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 23: {
-            LogStep(23, "Writes UnoccupiedHeatingSetpoint to value below the MinHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 28: {
+            LogStep(28, "Writes UnoccupiedHeatingSetpoint to value below the MinHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 500;
@@ -29467,9 +30510,9 @@ private:
                                   Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 24: {
-            LogStep(24, "Writes UnoccupiedHeatingSetpoint to value above the MaxHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 29: {
+            LogStep(29, "Writes UnoccupiedHeatingSetpoint to value above the MaxHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4010;
@@ -29477,9 +30520,9 @@ private:
                                   Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 25: {
-            LogStep(25, "Writes the limit of MinHeatSetpointLimit to UnoccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 30: {
+            LogStep(30, "Writes the limit of MinHeatSetpointLimit to UnoccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1800;
@@ -29487,9 +30530,9 @@ private:
                                   Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 26: {
-            LogStep(26, "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint attribute");
-            VerifyOrDo(!ShouldSkip("A_UNOCCUPIEDHEATINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 31: {
+            LogStep(31, "Writes the limit of MaxHeatSetpointLimit to UnoccupiedHeatingSetpoint attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0014"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 3000;
@@ -29497,264 +30540,391 @@ private:
                                   Thermostat::Attributes::UnoccupiedHeatingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 27: {
-            LogStep(27, "Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 32: {
+            LogStep(32, "Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
                                  true, chip::NullOptional);
         }
-        case 28: {
-            LogStep(28, "Writes MinHeatSetpointLimit to value below the AbsMinHeatSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 33: {
+            LogStep(33, "Writes a value back that is different but valid for MinHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 34: {
+            LogStep(34, "Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 35: {
+            LogStep(35, "Writes MinHeatSetpointLimit to value below the AbsMinHeatSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 650;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 29: {
-            LogStep(29, "Writes MinHeatSetpointLimit to value above the AbsMaxHeatSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 36: {
+            LogStep(36, "Writes MinHeatSetpointLimit to value above the AbsMaxHeatSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4050;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 30: {
-            LogStep(30, "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 37: {
+            LogStep(37, "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 31: {
-            LogStep(31, "Writes a value back that is different but valid for MaxHeatSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 38: {
+            LogStep(38, "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 39: {
+            LogStep(39, "Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 40: {
+            LogStep(40, "Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
-            value = 2000;
+            value = 700;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
+                                  value, chip::NullOptional, chip::NullOptional);
+        }
+        case 41: {
+            LogStep(41, "Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("A_MINHEATSETPOINTLIMIT && TSTAT.S.F05"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 3000;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
+                                  value, chip::NullOptional, chip::NullOptional);
+        }
+        case 42: {
+            LogStep(42, "Writes a value back that is different but valid for MaxHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 2900;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 32: {
-            LogStep(32, "Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 43: {
+            LogStep(43, "Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
                                  true, chip::NullOptional);
         }
-        case 33: {
-            LogStep(33, "Writes MaxHeatSetpointLimit to value below the AbsMinHeatSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 44: {
+            LogStep(44, "Writes MaxHeatSetpointLimit to value below the AbsMinHeatSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 500;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 34: {
-            LogStep(34, "Writes MaxHeatSetpointLimit to value above the AbsMaxHeatSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 45: {
+            LogStep(45, "Writes MaxHeatSetpointLimit to value above the AbsMaxHeatSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 35: {
-            LogStep(35, "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MAXHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 46: {
+            LogStep(46, "Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 36: {
-            LogStep(36, "Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 47: {
+            LogStep(47, "Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 48: {
+            LogStep(48, "Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                  true, chip::NullOptional);
         }
-        case 37: {
-            LogStep(37, "Writes a value back that is different but valid for MinCoolSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 49: {
+            LogStep(49, "Writes a value back that is different but valid for MinCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 38: {
-            LogStep(38, "Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 50: {
+            LogStep(50, "Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                  true, chip::NullOptional);
         }
-        case 39: {
-            LogStep(39, "Writes MinCoolSetpointLimit to value below the AbsMinCoolSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 51: {
+            LogStep(51, "Writes MinCoolSetpointLimit to value below the AbsMinCoolSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 40: {
-            LogStep(40, "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 52: {
+            LogStep(52, "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 41: {
-            LogStep(41, "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 53: {
+            LogStep(53, "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 42: {
-            LogStep(42, "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 54: {
+            LogStep(54, "Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 43: {
-            LogStep(43, "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 55: {
+            LogStep(55, "Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 1600;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
+                                  value, chip::NullOptional, chip::NullOptional);
+        }
+        case 56: {
+            LogStep(56, "Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
                                  true, chip::NullOptional);
         }
-        case 44: {
-            LogStep(44, "Writes MaxCoolSetpointLimit to value below the AbsMinCoolSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 57: {
+            LogStep(57, "Writes a value back that is different but valid for MaxCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 58: {
+            LogStep(58, "Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 59: {
+            LogStep(59, "Writes MaxCoolSetpointLimit to value below the AbsMinCoolSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 45: {
-            LogStep(45, "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit ");
-            VerifyOrDo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 60: {
+            LogStep(60, "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 4000;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 46: {
-            LogStep(46, "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute");
-            VerifyOrDo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 61: {
+            LogStep(61, "Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 62: {
+            LogStep(62, "Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 47: {
-            LogStep(47, "Writes (sets back) default value of MinHeatSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_MINHEATSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 63: {
+            LogStep(63, "Writes (sets back) default value of MinHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0015"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 700;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinHeatSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 48: {
-            LogStep(48, "Writes (sets back) default value of MinCoolSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_MINCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 64: {
+            LogStep(64, "Writes (sets back)default value of MaxHeatSetpointLimit");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0016"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 65: {
+            LogStep(65, "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 2950;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
+                                  value, chip::NullOptional, chip::NullOptional);
+        }
+        case 66: {
+            LogStep(66, "Writes (sets back) default value of MinCoolSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 1600;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 49: {
-            LogStep(49, "Writes (sets back) default value of MaxCoolSetpointLimit");
-            VerifyOrDo(!ShouldSkip("A_MAXCOOLSETPOINTLIMIT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 67: {
+            LogStep(67, "Writes (sets back) default value of MaxCoolSetpointLimit");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0018"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 3200;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxCoolSetpointLimit::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 50: {
-            LogStep(50, "Reads MinSetpointDeadBand attribute from Server DUT and verifies that the value is within range");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 68: {
+            LogStep(68, "Reads MinSetpointDeadBand attribute from Server DUT and verifies that the value is within range");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                  true, chip::NullOptional);
         }
-        case 51: {
-            LogStep(51, "Writes a value back that is different but valid for MinSetpointDeadBand attribute");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 69: {
+            LogStep(69, "Writes a value back that is different but valid for MinSetpointDeadBand attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int8_t value;
             value = 5;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 52: {
-            LogStep(52, "Reads it back again to confirm the successful write of MinSetpointDeadBand attribute");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 70: {
+            LogStep(70, "Reads it back again to confirm the successful write of MinSetpointDeadBand attribute");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                  true, chip::NullOptional);
         }
-        case 53: {
-            LogStep(53, "Writes the value below MinSetpointDeadBand");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 71: {
+            LogStep(71, "Writes the value below MinSetpointDeadBand");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int8_t value;
             value = -1;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 54: {
-            LogStep(54, "Writes the value above MinSetpointDeadBand ");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 72: {
+            LogStep(72, "Writes the value above MinSetpointDeadBand ");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int8_t value;
             value = 30;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 55: {
-            LogStep(55, "Writes the min limit of MinSetpointDeadBand");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 73: {
+            LogStep(73, "Writes the min limit of MinSetpointDeadBand");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int8_t value;
             value = 0;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 56: {
-            LogStep(56, "Writes the max limit of MinSetpointDeadBand");
-            VerifyOrDo(!ShouldSkip("A_MINSETPOINTDEADBAND"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 74: {
+            LogStep(74, "Writes the max limit of MinSetpointDeadBand");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0019"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int8_t value;
             value = 25;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MinSetpointDeadBand::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 57: {
-            LogStep(57, "Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid");
-            VerifyOrDo(!ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 75: {
+            LogStep(75, "Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::ControlSequenceOfOperation::Id, true, chip::NullOptional);
         }
-        case 58: {
-            LogStep(58, "Write Attribute command for ControlSequenceOfOperation with a new valid value");
-            VerifyOrDo(!ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 76: {
+            LogStep(76, "Write Attribute command for ControlSequenceOfOperation with a new valid value");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::ThermostatControlSequence value;
             value = static_cast<chip::app::Clusters::Thermostat::ThermostatControlSequence>(2);
@@ -29762,15 +30932,45 @@ private:
                                   Thermostat::Attributes::ControlSequenceOfOperation::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 59: {
-            LogStep(59, "Read it back again to confirm the successful write");
-            VerifyOrDo(!ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 77: {
+            LogStep(77, "Read it back again to confirm the successful write");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A001b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::ControlSequenceOfOperation::Id, true, chip::NullOptional);
         }
-        case 60: {
-            LogStep(60, "Sends SetpointRaise Command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower"),
+        case 78: {
+            LogStep(78, "Writes MaxHeatSetpointLimit attribute to default value of 2950 to meet deadband constraint");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT && TSTAT.S.F05"),
+                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 2950;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id, Thermostat::Attributes::MaxHeatSetpointLimit::Id,
+                                  value, chip::NullOptional, chip::NullOptional);
+        }
+        case 79: {
+            LogStep(79, "Sets OccupiedCoolingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            int16_t value;
+            value = 2600;
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
+                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
+                                  chip::NullOptional);
+        }
+        case 80: {
+            LogStep(80, "Sets OccupiedHeatingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 81: {
+            LogStep(81, "Sends SetpointRaise Command");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type value;
@@ -29781,16 +30981,25 @@ private:
 
             );
         }
-        case 61: {
-            LogStep(61, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 82: {
+            LogStep(82, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 62: {
-            LogStep(62, "Sends SetpointRaise Command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower"),
+        case 83: {
+            LogStep(83, "Sets OccupiedHeatingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 84: {
+            LogStep(84, "Sends SetpointRaise Command");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type value;
@@ -29801,16 +31010,15 @@ private:
 
             );
         }
-        case 63: {
-            LogStep(63, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 85: {
+            LogStep(85, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 64: {
-            LogStep(64, "Sets OccupiedCoolingSetpoint to default value");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 86: {
+            LogStep(86, "Sets OccupiedCoolingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2600;
@@ -29818,9 +31026,9 @@ private:
                                   Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 65: {
-            LogStep(65, "Sends SetpointRaise Command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower"),
+        case 87: {
+            LogStep(87, "Sends SetpointRaise Command");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type value;
@@ -29831,16 +31039,15 @@ private:
 
             );
         }
-        case 66: {
-            LogStep(66, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 88: {
+            LogStep(88, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
-        case 67: {
-            LogStep(67, "Sets OccupiedCoolingSetpoint to default value");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 89: {
+            LogStep(89, "Sets OccupiedCoolingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2600;
@@ -29848,9 +31055,9 @@ private:
                                   Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 68: {
-            LogStep(68, "Sends SetpointRaise Command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower"),
+        case 90: {
+            LogStep(90, "Sends SetpointRaise Command");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type value;
@@ -29861,16 +31068,15 @@ private:
 
             );
         }
-        case 69: {
-            LogStep(69, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 91: {
+            LogStep(91, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
-        case 70: {
-            LogStep(70, "Sets OccupiedCoolingSetpoint to default value");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 92: {
+            LogStep(92, "Sets OccupiedCoolingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2600;
@@ -29878,9 +31084,19 @@ private:
                                   Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 71: {
-            LogStep(71, "Sends SetpointRaise Command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower"),
+        case 93: {
+            LogStep(93, "Sets OccupiedHeatingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 94: {
+            LogStep(94, "Sends SetpointRaise Command");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type value;
@@ -29891,22 +31107,21 @@ private:
 
             );
         }
-        case 72: {
-            LogStep(72, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 95: {
+            LogStep(95, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
-        case 73: {
-            LogStep(73, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 96: {
+            LogStep(96, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
-        case 74: {
-            LogStep(74, "Sets OccupiedCoolingSetpoint to default value");
-            VerifyOrDo(!ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 97: {
+            LogStep(97, "Sets OccupiedCoolingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             int16_t value;
             value = 2600;
@@ -29914,9 +31129,19 @@ private:
                                   Thermostat::Attributes::OccupiedCoolingSetpoint::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 75: {
-            LogStep(75, "Sends SetpointRaise Command");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && CR_SetpointRaiseLower"),
+        case 98: {
+            LogStep(98, "Sets OccupiedHeatingSetpoint to default value");
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 99: {
+            LogStep(99, "Sends SetpointRaise Command");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.C00.Rsp && TSTAT.S.F00"),
                        return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type value;
@@ -29927,17 +31152,15 @@ private:
 
             );
         }
-        case 76: {
-            LogStep(76, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDCOOLINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 100: {
+            LogStep(100, "Reads back OccupiedCoolingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedCoolingSetpoint::Id, true, chip::NullOptional);
         }
-        case 77: {
-            LogStep(77, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && A_OCCUPIEDHEATINGSETPOINT"),
-                       return ContinueOnChipMainThread(CHIP_NO_ERROR));
+        case 101: {
+            LogStep(101, "Reads back OccupiedHeatingSetpoint to confirm the success of the write");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && TSTAT.S.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), Thermostat::Id,
                                  Thermostat::Attributes::OccupiedHeatingSetpoint::Id, true, chip::NullOptional);
         }
@@ -33050,7 +34273,7 @@ private:
         }
         case 1: {
             LogStep(1, "TH sends ResetCounts command to DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
@@ -33060,37 +34283,37 @@ private:
         }
         case 2: {
             LogStep(2, "Reads BeaconLostCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads BeaconRxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads PacketMulticastRxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, true, chip::NullOptional);
         }
         case 5: {
             LogStep(5, "Reads PacketMulticastTxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, true, chip::NullOptional);
         }
         case 6: {
             LogStep(6, "Reads PacketUnicastRxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id, true, chip::NullOptional);
         }
         case 7: {
             LogStep(7, "Reads PacketUnicastTxCount attribute from DUT");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), WiFiNetworkDiagnostics::Id,
                                  WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id, true, chip::NullOptional);
         }
@@ -33102,7 +34325,7 @@ private:
 class Test_TC_WNCV_1_1Suite : public TestCommand
 {
 public:
-    Test_TC_WNCV_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_WNCV_1_1", 7, credsIssuerConfig)
+    Test_TC_WNCV_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_WNCV_1_1", 8, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -33181,6 +34404,15 @@ private:
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
+                chip::app::DataModel::DecodableList<chip::AttributeId> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+                VerifyOrReturn(CheckConstraintContains("value", value, 26UL));
+            }
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
@@ -33189,7 +34421,7 @@ private:
                 VerifyOrReturn(CheckConstraintContains("value", value, 2UL));
             }
             break;
-        case 5:
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -33201,7 +34433,7 @@ private:
                 VerifyOrReturn(CheckConstraintType("value", "", "list"));
             }
             break;
-        case 6:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -33246,19 +34478,25 @@ private:
                                  true, chip::NullOptional);
         }
         case 4: {
-            LogStep(4, "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute");
+            LogStep(4, "TH reads optional attribute(SafetyStatus) in AttributeList");
+            VerifyOrDo(!ShouldSkip("WNCV.S.Afffb && WNCV.S.A001a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id, WindowCovering::Attributes::AttributeList::Id,
+                                 true, chip::NullOptional);
+        }
+        case 5: {
+            LogStep(5, "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute");
             VerifyOrDo(!ShouldSkip("WNCV.S.Afff9"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
                                  WindowCovering::Attributes::AcceptedCommandList::Id, true, chip::NullOptional);
         }
-        case 5: {
-            LogStep(5, "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute");
+        case 6: {
+            LogStep(6, "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute");
             VerifyOrDo(!ShouldSkip("WNCV.S.Afff8"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), WindowCovering::Id,
                                  WindowCovering::Attributes::GeneratedCommandList::Id, true, chip::NullOptional);
         }
-        case 6: {
-            LogStep(6, "TH reads from the DUT the (0xFFFA) EventList attribute");
+        case 7: {
+            LogStep(7, "TH reads from the DUT the (0xFFFA) EventList attribute");
             VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && WNCV.S.Afffa"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
@@ -39010,7 +40248,7 @@ private:
 class TestClusterSuite : public TestCommand
 {
 public:
-    TestClusterSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestCluster", 489, credsIssuerConfig)
+    TestClusterSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestCluster", 490, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -39045,7 +40283,7 @@ private:
 
     chip::app::DataModel::Nullable<bool> booValueNull;
     chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> nullableValue254;
-    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> nullableEnumAttr254;
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> nullableEnumAttr3;
     uint8_t * nullableOctetStrTestValueBuffer = nullptr;
     chip::app::DataModel::Nullable<chip::ByteSpan> nullableOctetStrTestValue;
     char * nullableCharStringSaveBuffer = nullptr;
@@ -40088,15 +41326,16 @@ private:
                 chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("arg1", value.arg1, 20003U));
-                VerifyOrReturn(CheckValue("arg2", value.arg2, 101U));
+                VerifyOrReturn(CheckValue("arg2", value.arg2, 1U));
             }
             break;
         case 155:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
+                chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, true));
+                VerifyOrReturn(CheckValue("arg1", value.arg1, 20003U));
+                VerifyOrReturn(CheckValue("arg2", value.arg2, 4U));
             }
             break;
         case 156:
@@ -40104,7 +41343,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, false));
+                VerifyOrReturn(CheckValue("value", value.value, true));
             }
             break;
         case 157:
@@ -40112,7 +41351,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, true));
+                VerifyOrReturn(CheckValue("value", value.value, false));
             }
             break;
         case 158:
@@ -40120,7 +41359,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, false));
+                VerifyOrReturn(CheckValue("value", value.value, true));
             }
             break;
         case 159:
@@ -40128,7 +41367,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, true));
+                VerifyOrReturn(CheckValue("value", value.value, false));
             }
             break;
         case 160:
@@ -40136,10 +41375,18 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, false));
+                VerifyOrReturn(CheckValue("value", value.value, true));
             }
             break;
         case 161:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("value", value.value, false));
+            }
+            break;
+        case 162:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType value;
@@ -40155,7 +41402,7 @@ private:
                 VerifyOrReturn(CheckValue("arg1.h", value.arg1.h, 0.1));
             }
             break;
-        case 162:
+        case 163:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
@@ -40163,7 +41410,7 @@ private:
                 VerifyOrReturn(CheckValue("value", value.value, true));
             }
             break;
-        case 163:
+        case 164:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
@@ -40171,7 +41418,7 @@ private:
                 VerifyOrReturn(CheckValue("value", value.value, false));
             }
             break;
-        case 164:
+        case 165:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType value;
@@ -40200,7 +41447,7 @@ private:
                 }
             }
             break;
-        case 165:
+        case 166:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType value;
@@ -40211,20 +41458,12 @@ private:
                 }
             }
             break;
-        case 166:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, true));
-            }
-            break;
         case 167:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, false));
+                VerifyOrReturn(CheckValue("value", value.value, true));
             }
             break;
         case 168:
@@ -40232,7 +41471,7 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, true));
+                VerifyOrReturn(CheckValue("value", value.value, false));
             }
             break;
         case 169:
@@ -40240,13 +41479,21 @@ private:
             {
                 chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("value", value.value, false));
+                VerifyOrReturn(CheckValue("value", value.value, true));
             }
             break;
         case 170:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("value", value.value, false));
+            }
             break;
         case 171:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 172:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<uint8_t> value;
@@ -40265,10 +41512,10 @@ private:
                 }
             }
             break;
-        case 172:
+        case 173:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 173:
+        case 174:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::ByteSpan> value;
@@ -40291,10 +41538,10 @@ private:
                 }
             }
             break;
-        case 174:
+        case 175:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 175:
+        case 176:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType>
@@ -40322,7 +41569,7 @@ private:
                 }
             }
             break;
-        case 176:
+        case 177:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType value;
@@ -40337,7 +41584,7 @@ private:
                 VerifyOrReturn(CheckValue("originalValue.Value().Value()", value.originalValue.Value().Value(), 5U));
             }
             break;
-        case 177:
+        case 178:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType value;
@@ -40345,7 +41592,7 @@ private:
                 VerifyOrReturn(CheckValue("wasPresent", value.wasPresent, false));
             }
             break;
-        case 178:
+        case 179:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
@@ -40366,10 +41613,10 @@ private:
                 }
             }
             break;
-        case 179:
+        case 180:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 180:
+        case 181:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
@@ -40403,10 +41650,10 @@ private:
                 }
             }
             break;
-        case 181:
+        case 182:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 182:
+        case 183:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<bool> value;
@@ -40415,10 +41662,10 @@ private:
                 booValueNull = value;
             }
             break;
-        case 183:
+        case 184:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 184:
+        case 185:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<bool> value;
@@ -40427,7 +41674,7 @@ private:
                 VerifyOrReturn(CheckValue("nullableBoolean.Value()", value.Value(), true));
             }
             break;
-        case 185:
+        case 186:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<bool> value;
@@ -40435,10 +41682,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, booValueNull));
             }
             break;
-        case 186:
+        case 187:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 187:
+        case 188:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
@@ -40447,10 +41694,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableBitmap8.Value()", value.Value(), 254U));
             }
             break;
-        case 188:
+        case 189:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 189:
+        case 190:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
@@ -40460,10 +41707,10 @@ private:
                 nullableValue254 = value;
             }
             break;
-        case 190:
+        case 191:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 191:
+        case 192:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
@@ -40471,7 +41718,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableBitmap8", value));
             }
             break;
-        case 192:
+        case 193:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
@@ -40479,22 +41726,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, nullableValue254));
             }
             break;
-        case 193:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 194:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableBitmap16", value));
-                VerifyOrReturn(CheckValue("nullableBitmap16.Value()", value.Value(), 65534U));
-            }
             break;
         case 195:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 196:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
@@ -40502,11 +41737,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap16", value));
                 VerifyOrReturn(CheckValue("nullableBitmap16.Value()", value.Value(), 65534U));
             }
+            break;
+        case 196:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 197:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableBitmap16", value));
+                VerifyOrReturn(CheckValue("nullableBitmap16.Value()", value.Value(), 65534U));
+            }
             break;
         case 198:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 199:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
@@ -40514,22 +41761,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableBitmap16", value));
             }
             break;
-        case 199:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 200:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableBitmap32", value));
-                VerifyOrReturn(CheckValue("nullableBitmap32.Value()", value.Value(), 4294967294UL));
-            }
             break;
         case 201:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 202:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
@@ -40537,11 +41772,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap32", value));
                 VerifyOrReturn(CheckValue("nullableBitmap32.Value()", value.Value(), 4294967294UL));
             }
+            break;
+        case 202:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 203:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableBitmap32", value));
+                VerifyOrReturn(CheckValue("nullableBitmap32.Value()", value.Value(), 4294967294UL));
+            }
             break;
         case 204:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 205:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
@@ -40549,22 +41796,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableBitmap32", value));
             }
             break;
-        case 205:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 206:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableBitmap64", value));
-                VerifyOrReturn(CheckValue("nullableBitmap64.Value()", value.Value(), 18446744073709551614ULL));
-            }
             break;
         case 207:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 208:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
@@ -40572,11 +41807,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableBitmap64", value));
                 VerifyOrReturn(CheckValue("nullableBitmap64.Value()", value.Value(), 18446744073709551614ULL));
             }
+            break;
+        case 208:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 209:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableBitmap64", value));
+                VerifyOrReturn(CheckValue("nullableBitmap64.Value()", value.Value(), 18446744073709551614ULL));
+            }
             break;
         case 210:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 211:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
@@ -40584,10 +41831,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableBitmap64", value));
             }
             break;
-        case 211:
+        case 212:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 212:
+        case 213:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40596,22 +41843,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 0U));
             }
             break;
-        case 213:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 214:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt8u", value));
-                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254U));
-            }
             break;
         case 215:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 216:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40620,7 +41855,19 @@ private:
                 VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254U));
             }
             break;
+        case 216:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
         case 217:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt8u", value));
+                VerifyOrReturn(CheckValue("nullableInt8u.Value()", value.Value(), 254U));
+            }
+            break;
+        case 218:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40628,10 +41875,10 @@ private:
                 VerifyOrReturn(CheckValueNonNull("value", value));
             }
             break;
-        case 218:
+        case 219:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 219:
+        case 220:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40639,7 +41886,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt8u", value));
             }
             break;
-        case 220:
+        case 221:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40648,7 +41895,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
-        case 221:
+        case 222:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40656,10 +41903,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 254U));
             }
             break;
-        case 222:
+        case 223:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 223:
+        case 224:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40668,7 +41915,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 254U));
             }
             break;
-        case 224:
+        case 225:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -40676,10 +41923,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 129U));
             }
             break;
-        case 225:
+        case 226:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 226:
+        case 227:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40688,22 +41935,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableInt16u.Value()", value.Value(), 0U));
             }
             break;
-        case 227:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 228:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint16_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt16u", value));
-                VerifyOrReturn(CheckValue("nullableInt16u.Value()", value.Value(), 65534U));
-            }
             break;
         case 229:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 230:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40711,11 +41946,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt16u", value));
                 VerifyOrReturn(CheckValue("nullableInt16u.Value()", value.Value(), 65534U));
             }
+            break;
+        case 230:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 231:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt16u", value));
+                VerifyOrReturn(CheckValue("nullableInt16u.Value()", value.Value(), 65534U));
+            }
             break;
         case 232:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 233:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40723,7 +41970,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt16u", value));
             }
             break;
-        case 233:
+        case 234:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40732,7 +41979,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65534U));
             }
             break;
-        case 234:
+        case 235:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40740,10 +41987,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 65534U));
             }
             break;
-        case 235:
+        case 236:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 236:
+        case 237:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40752,7 +41999,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 65534U));
             }
             break;
-        case 237:
+        case 238:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -40760,10 +42007,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 32001U));
             }
             break;
-        case 238:
+        case 239:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 239:
+        case 240:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40772,22 +42019,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableInt32u.Value()", value.Value(), 0UL));
             }
             break;
-        case 240:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 241:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint32_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt32u", value));
-                VerifyOrReturn(CheckValue("nullableInt32u.Value()", value.Value(), 4294967294UL));
-            }
             break;
         case 242:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 243:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40795,11 +42030,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt32u", value));
                 VerifyOrReturn(CheckValue("nullableInt32u.Value()", value.Value(), 4294967294UL));
             }
+            break;
+        case 243:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 244:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint32_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt32u", value));
+                VerifyOrReturn(CheckValue("nullableInt32u.Value()", value.Value(), 4294967294UL));
+            }
             break;
         case 245:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 246:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40807,7 +42054,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt32u", value));
             }
             break;
-        case 246:
+        case 247:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40816,7 +42063,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 4294967294UL));
             }
             break;
-        case 247:
+        case 248:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40824,10 +42071,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 4294967294UL));
             }
             break;
-        case 248:
+        case 249:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 249:
+        case 250:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40836,7 +42083,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 4294967294UL));
             }
             break;
-        case 250:
+        case 251:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint32_t> value;
@@ -40844,10 +42091,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 2147483648UL));
             }
             break;
-        case 251:
+        case 252:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 252:
+        case 253:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40856,22 +42103,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableInt64u.Value()", value.Value(), 0ULL));
             }
             break;
-        case 253:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 254:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint64_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt64u", value));
-                VerifyOrReturn(CheckValue("nullableInt64u.Value()", value.Value(), 18446744073709551614ULL));
-            }
             break;
         case 255:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 256:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40879,11 +42114,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt64u", value));
                 VerifyOrReturn(CheckValue("nullableInt64u.Value()", value.Value(), 18446744073709551614ULL));
             }
+            break;
+        case 256:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 257:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint64_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt64u", value));
+                VerifyOrReturn(CheckValue("nullableInt64u.Value()", value.Value(), 18446744073709551614ULL));
+            }
             break;
         case 258:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 259:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40891,7 +42138,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt64u", value));
             }
             break;
-        case 259:
+        case 260:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40900,7 +42147,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 18446744073709551614ULL));
             }
             break;
-        case 260:
+        case 261:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40908,10 +42155,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 18446744073709551614ULL));
             }
             break;
-        case 261:
+        case 262:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 262:
+        case 263:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40920,7 +42167,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 18446744073709551614ULL));
             }
             break;
-        case 263:
+        case 264:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint64_t> value;
@@ -40928,22 +42175,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, 18000000000000000001ULL));
             }
             break;
-        case 264:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 265:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<int8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt8s", value));
-                VerifyOrReturn(CheckValue("nullableInt8s.Value()", value.Value(), -127));
-            }
             break;
         case 266:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 267:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -40951,11 +42186,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt8s", value));
                 VerifyOrReturn(CheckValue("nullableInt8s.Value()", value.Value(), -127));
             }
+            break;
+        case 267:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 268:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<int8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt8s", value));
+                VerifyOrReturn(CheckValue("nullableInt8s.Value()", value.Value(), -127));
+            }
             break;
         case 269:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 270:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -40963,7 +42210,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt8s", value));
             }
             break;
-        case 270:
+        case 271:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -40972,7 +42219,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
             }
             break;
-        case 271:
+        case 272:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -40980,10 +42227,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -127));
             }
             break;
-        case 272:
+        case 273:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 273:
+        case 274:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -40992,7 +42239,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 127));
             }
             break;
-        case 274:
+        case 275:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -41000,22 +42247,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -126));
             }
             break;
-        case 275:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 276:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<int16_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt16s", value));
-                VerifyOrReturn(CheckValue("nullableInt16s.Value()", value.Value(), -32767));
-            }
             break;
         case 277:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 278:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -41023,11 +42258,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt16s", value));
                 VerifyOrReturn(CheckValue("nullableInt16s.Value()", value.Value(), -32767));
             }
+            break;
+        case 278:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 279:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<int16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt16s", value));
+                VerifyOrReturn(CheckValue("nullableInt16s.Value()", value.Value(), -32767));
+            }
             break;
         case 280:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 281:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -41035,7 +42282,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt16s", value));
             }
             break;
-        case 281:
+        case 282:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -41044,7 +42291,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 32767));
             }
             break;
-        case 282:
+        case 283:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -41052,10 +42299,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -32767));
             }
             break;
-        case 283:
+        case 284:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 284:
+        case 285:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -41064,7 +42311,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 32767));
             }
             break;
-        case 285:
+        case 286:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -41072,22 +42319,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -32766));
             }
             break;
-        case 286:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 287:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<int32_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt32s", value));
-                VerifyOrReturn(CheckValue("nullableInt32s.Value()", value.Value(), -2147483647L));
-            }
             break;
         case 288:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 289:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int32_t> value;
@@ -41095,11 +42330,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt32s", value));
                 VerifyOrReturn(CheckValue("nullableInt32s.Value()", value.Value(), -2147483647L));
             }
+            break;
+        case 289:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 290:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<int32_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt32s", value));
+                VerifyOrReturn(CheckValue("nullableInt32s.Value()", value.Value(), -2147483647L));
+            }
             break;
         case 291:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 292:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int32_t> value;
@@ -41107,7 +42354,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt32s", value));
             }
             break;
-        case 292:
+        case 293:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int32_t> value;
@@ -41116,7 +42363,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 2147483647L));
             }
             break;
-        case 293:
+        case 294:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int32_t> value;
@@ -41124,10 +42371,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -2147483647L));
             }
             break;
-        case 294:
+        case 295:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 295:
+        case 296:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int32_t> value;
@@ -41136,7 +42383,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 2147483647L));
             }
             break;
-        case 296:
+        case 297:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int32_t> value;
@@ -41144,22 +42391,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -2147483646L));
             }
             break;
-        case 297:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 298:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<int64_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableInt64s", value));
-                VerifyOrReturn(CheckValue("nullableInt64s.Value()", value.Value(), -9223372036854775807LL));
-            }
             break;
         case 299:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 300:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int64_t> value;
@@ -41167,11 +42402,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableInt64s", value));
                 VerifyOrReturn(CheckValue("nullableInt64s.Value()", value.Value(), -9223372036854775807LL));
             }
+            break;
+        case 300:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 301:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<int64_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableInt64s", value));
+                VerifyOrReturn(CheckValue("nullableInt64s.Value()", value.Value(), -9223372036854775807LL));
+            }
             break;
         case 302:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 303:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int64_t> value;
@@ -41179,7 +42426,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableInt64s", value));
             }
             break;
-        case 303:
+        case 304:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int64_t> value;
@@ -41188,7 +42435,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 9223372036854775807LL));
             }
             break;
-        case 304:
+        case 305:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int64_t> value;
@@ -41196,10 +42443,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -9223372036854775807LL));
             }
             break;
-        case 305:
+        case 306:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 306:
+        case 307:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int64_t> value;
@@ -41208,7 +42455,7 @@ private:
                 VerifyOrReturn(CheckConstraintMaxValue("value", value, 9223372036854775807LL));
             }
             break;
-        case 307:
+        case 308:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int64_t> value;
@@ -41216,10 +42463,10 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, -9223372036854775806LL));
             }
             break;
-        case 308:
+        case 309:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 309:
+        case 310:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<float> value;
@@ -41228,10 +42475,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", value.Value(), 0.1f));
             }
             break;
-        case 310:
+        case 311:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 311:
+        case 312:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<float> value;
@@ -41240,10 +42487,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", value.Value(), INFINITY));
             }
             break;
-        case 312:
+        case 313:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 313:
+        case 314:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<float> value;
@@ -41252,10 +42499,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", value.Value(), -INFINITY));
             }
             break;
-        case 314:
+        case 315:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 315:
+        case 316:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<float> value;
@@ -41263,10 +42510,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableFloatSingle", value));
             }
             break;
-        case 316:
+        case 317:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 317:
+        case 318:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<float> value;
@@ -41275,10 +42522,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", value.Value(), 0.0f));
             }
             break;
-        case 318:
+        case 319:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 319:
+        case 320:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<double> value;
@@ -41287,10 +42534,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", value.Value(), 0.1234567890123));
             }
             break;
-        case 320:
+        case 321:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 321:
+        case 322:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<double> value;
@@ -41299,10 +42546,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", value.Value(), INFINITY));
             }
             break;
-        case 322:
+        case 323:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 323:
+        case 324:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<double> value;
@@ -41311,10 +42558,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", value.Value(), -INFINITY));
             }
             break;
-        case 324:
+        case 325:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 325:
+        case 326:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<double> value;
@@ -41322,10 +42569,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableFloatDouble", value));
             }
             break;
-        case 326:
+        case 327:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 327:
+        case 328:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<double> value;
@@ -41334,10 +42581,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", value.Value(), 0));
             }
             break;
-        case 328:
+        case 329:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 329:
+        case 330:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41346,22 +42593,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 0U));
             }
             break;
-        case 330:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 331:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint8_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableEnum8", value));
-                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254U));
-            }
             break;
         case 332:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 333:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41369,11 +42604,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableEnum8", value));
                 VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254U));
             }
+            break;
+        case 333:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 334:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint8_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableEnum8", value));
+                VerifyOrReturn(CheckValue("nullableEnum8.Value()", value.Value(), 254U));
+            }
             break;
         case 335:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 336:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41381,10 +42628,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableEnum8", value));
             }
             break;
-        case 336:
+        case 337:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 337:
+        case 338:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -41393,22 +42640,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableEnum16.Value()", value.Value(), 0U));
             }
             break;
-        case 338:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 339:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<uint16_t> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableEnum16", value));
-                VerifyOrReturn(CheckValue("nullableEnum16.Value()", value.Value(), 65534U));
-            }
             break;
         case 340:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 341:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -41416,11 +42651,23 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableEnum16", value));
                 VerifyOrReturn(CheckValue("nullableEnum16.Value()", value.Value(), 65534U));
             }
+            break;
+        case 341:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 342:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<uint16_t> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableEnum16", value));
+                VerifyOrReturn(CheckValue("nullableEnum16.Value()", value.Value(), 65534U));
+            }
             break;
         case 343:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 344:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -41428,10 +42675,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableEnum16", value));
             }
             break;
-        case 344:
+        case 345:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 345:
+        case 346:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
@@ -41440,35 +42687,35 @@ private:
                 VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 0U));
             }
             break;
-        case 346:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
         case 347:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValueNonNull("nullableEnumAttr", value));
-                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 254U));
-            }
             break;
         case 348:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-            break;
-        case 349:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValueNonNull("nullableEnumAttr", value));
-                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 254U));
-                nullableEnumAttr254 = value;
+                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 3U));
             }
+            break;
+        case 349:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 350:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNonNull("nullableEnumAttr", value));
+                VerifyOrReturn(CheckValue("nullableEnumAttr.Value()", value.Value(), 3U));
+                nullableEnumAttr3 = value;
+            }
             break;
         case 351:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 352:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
@@ -41476,15 +42723,15 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableEnumAttr", value));
             }
             break;
-        case 352:
+        case 353:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintNotValue("value", value, nullableEnumAttr254));
+                VerifyOrReturn(CheckConstraintNotValue("value", value, nullableEnumAttr3));
             }
             break;
-        case 353:
+        case 354:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::ByteSpan> value;
@@ -41494,10 +42741,10 @@ private:
                                                   chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
             }
             break;
-        case 354:
+        case 355:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 355:
+        case 356:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::ByteSpan> value;
@@ -41521,10 +42768,10 @@ private:
                 }
             }
             break;
-        case 356:
+        case 357:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 357:
+        case 358:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::ByteSpan> value;
@@ -41532,10 +42779,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableOctetString", value));
             }
             break;
-        case 358:
+        case 359:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 359:
+        case 360:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::ByteSpan> value;
@@ -41545,7 +42792,7 @@ private:
                                                   chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
             }
             break;
-        case 360:
+        case 361:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::ByteSpan> value;
@@ -41553,7 +42800,7 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, nullableOctetStrTestValue));
             }
             break;
-        case 361:
+        case 362:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
@@ -41562,10 +42809,10 @@ private:
                 VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", value.Value(), chip::CharSpan("", 0)));
             }
             break;
-        case 362:
+        case 363:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 363:
+        case 364:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
@@ -41588,7 +42835,7 @@ private:
                 }
             }
             break;
-        case 364:
+        case 365:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
@@ -41604,10 +42851,10 @@ private:
                 }
             }
             break;
-        case 365:
+        case 366:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 366:
+        case 367:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
@@ -41615,10 +42862,10 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableCharString", value));
             }
             break;
-        case 367:
+        case 368:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 368:
+        case 369:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
@@ -41627,7 +42874,7 @@ private:
                 VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", value.Value(), chip::CharSpan("", 0)));
             }
             break;
-        case 369:
+        case 370:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<chip::CharSpan> value;
@@ -41635,19 +42882,19 @@ private:
                 VerifyOrReturn(CheckConstraintNotValue("value", value, nullableCharStringSave));
             }
             break;
-        case 370:
+        case 371:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT));
             break;
-        case 371:
+        case 372:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER));
             break;
-        case 372:
+        case 373:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_VALUE));
             break;
-        case 373:
+        case 374:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 374:
+        case 375:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<uint8_t> value;
@@ -41666,10 +42913,10 @@ private:
                 }
             }
             break;
-        case 375:
+        case 376:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 376:
+        case 377:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<uint8_t> value;
@@ -41689,16 +42936,13 @@ private:
             }
             shouldContinue = true;
             break;
-        case 377:
+        case 378:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 70U));
             }
-            break;
-        case 378:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 379:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -41710,6 +42954,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 382:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 383:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
@@ -41717,10 +42964,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 70U));
             }
             break;
-        case 383:
+        case 384:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 384:
+        case 385:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
@@ -41728,10 +42975,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 20U));
             }
             break;
-        case 385:
+        case 386:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 386:
+        case 387:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
@@ -41739,10 +42986,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 100U));
             }
             break;
-        case 387:
+        case 388:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 388:
+        case 389:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint8_t value;
@@ -41750,16 +42997,13 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8u", value, 50U));
             }
             break;
-        case 389:
+        case 390:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16u", value, 200U));
             }
-            break;
-        case 390:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 391:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -41771,6 +43015,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 394:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 395:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -41778,10 +43025,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16u", value, 200U));
             }
             break;
-        case 395:
+        case 396:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 396:
+        case 397:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -41789,10 +43036,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16u", value, 100U));
             }
             break;
-        case 397:
+        case 398:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 398:
+        case 399:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -41800,10 +43047,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16u", value, 1000U));
             }
             break;
-        case 399:
+        case 400:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 400:
+        case 401:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 uint16_t value;
@@ -41811,16 +43058,13 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16u", value, 500U));
             }
             break;
-        case 401:
+        case 402:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8s", value, -20));
             }
-            break;
-        case 402:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 403:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -41832,6 +43076,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 406:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 407:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -41839,10 +43086,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8s", value, -20));
             }
             break;
-        case 407:
+        case 408:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 408:
+        case 409:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -41850,10 +43097,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8s", value, -40));
             }
             break;
-        case 409:
+        case 410:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 410:
+        case 411:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -41861,10 +43108,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8s", value, 50));
             }
             break;
-        case 411:
+        case 412:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 412:
+        case 413:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int8_t value;
@@ -41872,16 +43119,13 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt8s", value, 6));
             }
             break;
-        case 413:
+        case 414:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16s", value, -100));
             }
-            break;
-        case 414:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 415:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -41893,6 +43137,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 418:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 419:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -41900,10 +43147,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16s", value, -100));
             }
             break;
-        case 419:
+        case 420:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 420:
+        case 421:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -41911,10 +43158,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16s", value, -150));
             }
             break;
-        case 421:
+        case 422:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 422:
+        case 423:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -41922,10 +43169,10 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16s", value, 200));
             }
             break;
-        case 423:
+        case 424:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 424:
+        case 425:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 int16_t value;
@@ -41933,7 +43180,7 @@ private:
                 VerifyOrReturn(CheckValue("rangeRestrictedInt16s", value, 7));
             }
             break;
-        case 425:
+        case 426:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41941,9 +43188,6 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8u", value));
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 70U));
             }
-            break;
-        case 426:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 427:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -41955,6 +43199,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 430:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 431:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41963,10 +43210,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 70U));
             }
             break;
-        case 431:
+        case 432:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 432:
+        case 433:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41975,10 +43222,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 20U));
             }
             break;
-        case 433:
+        case 434:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 434:
+        case 435:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41987,10 +43234,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 100U));
             }
             break;
-        case 435:
+        case 436:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 436:
+        case 437:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -41999,10 +43246,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8u.Value()", value.Value(), 50U));
             }
             break;
-        case 437:
+        case 438:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 438:
+        case 439:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint8_t> value;
@@ -42010,7 +43257,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableRangeRestrictedInt8u", value));
             }
             break;
-        case 439:
+        case 440:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -42018,9 +43265,6 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt16u", value));
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16u.Value()", value.Value(), 200U));
             }
-            break;
-        case 440:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 441:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -42032,6 +43276,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 444:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 445:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -42040,10 +43287,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16u.Value()", value.Value(), 200U));
             }
             break;
-        case 445:
+        case 446:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 446:
+        case 447:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -42052,10 +43299,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16u.Value()", value.Value(), 100U));
             }
             break;
-        case 447:
+        case 448:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 448:
+        case 449:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -42064,10 +43311,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16u.Value()", value.Value(), 1000U));
             }
             break;
-        case 449:
+        case 450:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 450:
+        case 451:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -42076,10 +43323,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16u.Value()", value.Value(), 500U));
             }
             break;
-        case 451:
+        case 452:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 452:
+        case 453:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<uint16_t> value;
@@ -42087,7 +43334,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableRangeRestrictedInt16u", value));
             }
             break;
-        case 453:
+        case 454:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -42095,9 +43342,6 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8s", value));
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", value.Value(), -20));
             }
-            break;
-        case 454:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 455:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -42109,6 +43353,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 458:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 459:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -42117,10 +43364,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", value.Value(), -20));
             }
             break;
-        case 459:
+        case 460:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 460:
+        case 461:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -42129,10 +43376,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", value.Value(), -40));
             }
             break;
-        case 461:
+        case 462:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 462:
+        case 463:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -42141,10 +43388,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", value.Value(), 50));
             }
             break;
-        case 463:
+        case 464:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 464:
+        case 465:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -42153,10 +43400,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", value.Value(), 6));
             }
             break;
-        case 465:
+        case 466:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 466:
+        case 467:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int8_t> value;
@@ -42164,7 +43411,7 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableRangeRestrictedInt8s", value));
             }
             break;
-        case 467:
+        case 468:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -42172,9 +43419,6 @@ private:
                 VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt16s", value));
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", value.Value(), -100));
             }
-            break;
-        case 468:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 469:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
@@ -42186,6 +43430,9 @@ private:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
         case 472:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+            break;
+        case 473:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -42194,10 +43441,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", value.Value(), -100));
             }
             break;
-        case 473:
+        case 474:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 474:
+        case 475:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -42206,10 +43453,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", value.Value(), -150));
             }
             break;
-        case 475:
+        case 476:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 476:
+        case 477:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -42218,10 +43465,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", value.Value(), 200));
             }
             break;
-        case 477:
+        case 478:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 478:
+        case 479:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -42230,10 +43477,10 @@ private:
                 VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", value.Value(), 7));
             }
             break;
-        case 479:
+        case 480:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 480:
+        case 481:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::Nullable<int16_t> value;
@@ -42241,19 +43488,19 @@ private:
                 VerifyOrReturn(CheckValueNull("nullableRangeRestrictedInt16s", value));
             }
             break;
-        case 481:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_DATA_TYPE));
-            break;
         case 482:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_DATA_TYPE));
             break;
         case 483:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_DATA_TYPE));
-            break;
-        case 484:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
             break;
+        case 484:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_INVALID_DATA_TYPE));
+            break;
         case 485:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_FAILURE));
+            break;
+        case 486:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -42300,7 +43547,7 @@ private:
                 }
             }
             break;
-        case 486:
+        case 487:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -42329,10 +43576,10 @@ private:
                 }
             }
             break;
-        case 487:
+        case 488:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 488:
+        case 489:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType value;
@@ -43419,14 +44666,25 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type value;
             value.arg1 = static_cast<chip::VendorId>(20003);
-            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(1);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEnumsRequest::Id, value,
                                chip::NullOptional
 
             );
         }
         case 155: {
-            LogStep(155, "Send Test Command With Struct Argument and arg1.b is true");
+            LogStep(155, "Send a command with a vendor_id and invalid enum");
+            ListFreer listFreer;
+            chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type value;
+            value.arg1 = static_cast<chip::VendorId>(20003);
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEnumsRequest::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 156: {
+            LogStep(156, "Send Test Command With Struct Argument and arg1.b is true");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type value;
 
@@ -43444,8 +44702,8 @@ private:
 
             );
         }
-        case 156: {
-            LogStep(156, "Send Test Command With Struct Argument and arg1.b is false");
+        case 157: {
+            LogStep(157, "Send Test Command With Struct Argument and arg1.b is false");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type value;
 
@@ -43463,8 +44721,8 @@ private:
 
             );
         }
-        case 157: {
-            LogStep(157, "Send Test Command With Nested Struct Argument and arg1.c.b is true");
+        case 158: {
+            LogStep(158, "Send Test Command With Nested Struct Argument and arg1.c.b is true");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type value;
 
@@ -43485,8 +44743,8 @@ private:
 
             );
         }
-        case 158: {
-            LogStep(158, "Send Test Command With Nested Struct Argument arg1.c.b is false");
+        case 159: {
+            LogStep(159, "Send Test Command With Nested Struct Argument arg1.c.b is false");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type value;
 
@@ -43507,8 +44765,8 @@ private:
 
             );
         }
-        case 159: {
-            LogStep(159, "Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true");
+        case 160: {
+            LogStep(160, "Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type value;
 
@@ -43586,8 +44844,8 @@ private:
 
             );
         }
-        case 160: {
-            LogStep(160, "Send Test Command With Nested Struct List Argument and some fields b of arg1.d are false");
+        case 161: {
+            LogStep(161, "Send Test Command With Nested Struct List Argument and some fields b of arg1.d are false");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type value;
 
@@ -43665,8 +44923,8 @@ private:
 
             );
         }
-        case 161: {
-            LogStep(161, "Send Test Command With Struct Argument and see what we get back");
+        case 162: {
+            LogStep(162, "Send Test Command With Struct Argument and see what we get back");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type value;
 
@@ -43684,8 +44942,8 @@ private:
 
             );
         }
-        case 162: {
-            LogStep(162, "Send Test Command With List of INT8U and none of them is set to 0");
+        case 163: {
+            LogStep(163, "Send Test Command With List of INT8U and none of them is set to 0");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type value;
 
@@ -43708,8 +44966,8 @@ private:
 
             );
         }
-        case 163: {
-            LogStep(163, "Send Test Command With List of INT8U and one of them is set to 0");
+        case 164: {
+            LogStep(164, "Send Test Command With List of INT8U and one of them is set to 0");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type value;
 
@@ -43733,8 +44991,8 @@ private:
 
             );
         }
-        case 164: {
-            LogStep(164, "Send Test Command With List of INT8U and get it reversed");
+        case 165: {
+            LogStep(165, "Send Test Command With List of INT8U and get it reversed");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type value;
 
@@ -43757,8 +45015,8 @@ private:
 
             );
         }
-        case 165: {
-            LogStep(165, "Send Test Command With empty List of INT8U and get an empty list back");
+        case 166: {
+            LogStep(166, "Send Test Command With empty List of INT8U and get an empty list back");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type value;
 
@@ -43768,8 +45026,8 @@ private:
 
             );
         }
-        case 166: {
-            LogStep(166, "Send Test Command With List of Struct Argument and arg1.b of first item is true");
+        case 167: {
+            LogStep(167, "Send Test Command With List of Struct Argument and arg1.b of first item is true");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type value;
 
@@ -43805,8 +45063,8 @@ private:
 
             );
         }
-        case 167: {
-            LogStep(167, "Send Test Command With List of Struct Argument and arg1.b of first item is false");
+        case 168: {
+            LogStep(168, "Send Test Command With List of Struct Argument and arg1.b of first item is false");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type value;
 
@@ -43842,8 +45100,8 @@ private:
 
             );
         }
-        case 168: {
-            LogStep(168,
+        case 169: {
+            LogStep(169,
                     "Send Test Command With List of Nested Struct List Argument and all fields b of elements of arg1.d are true");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type value;
@@ -43931,8 +45189,8 @@ private:
 
             );
         }
-        case 169: {
-            LogStep(169, "Send Test Command With Nested Struct List Argument and some fields b of elements of arg1.d are false");
+        case 170: {
+            LogStep(170, "Send Test Command With Nested Struct List Argument and some fields b of elements of arg1.d are false");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type value;
 
@@ -44019,8 +45277,8 @@ private:
 
             );
         }
-        case 170: {
-            LogStep(170, "Write attribute LIST With List of INT8U and none of them is set to 0");
+        case 171: {
+            LogStep(171, "Write attribute LIST With List of INT8U and none of them is set to 0");
             ListFreer listFreer;
             chip::app::DataModel::List<const uint8_t> value;
 
@@ -44036,13 +45294,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 171: {
-            LogStep(171, "Read attribute LIST With List of INT8U");
+        case 172: {
+            LogStep(172, "Read attribute LIST With List of INT8U");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, true,
                                  chip::NullOptional);
         }
-        case 172: {
-            LogStep(172, "Write attribute LIST With List of OCTET_STRING");
+        case 173: {
+            LogStep(173, "Write attribute LIST With List of OCTET_STRING");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::ByteSpan> value;
 
@@ -44058,13 +45316,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListOctetString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 173: {
-            LogStep(173, "Read attribute LIST With List of OCTET_STRING");
+        case 174: {
+            LogStep(174, "Read attribute LIST With List of OCTET_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListOctetString::Id,
                                  true, chip::NullOptional);
         }
-        case 174: {
-            LogStep(174, "Write attribute LIST With List of LIST_STRUCT_OCTET_STRING");
+        case 175: {
+            LogStep(175, "Write attribute LIST With List of LIST_STRUCT_OCTET_STRING");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type> value;
 
@@ -44095,13 +45353,13 @@ private:
                                   TestCluster::Attributes::ListStructOctetString::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 175: {
-            LogStep(175, "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING");
+        case 176: {
+            LogStep(176, "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::ListStructOctetString::Id, true, chip::NullOptional);
         }
-        case 176: {
-            LogStep(176, "Send Test Command with optional arg set.");
+        case 177: {
+            LogStep(177, "Send Test Command with optional arg set.");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type value;
             value.arg1.Emplace();
@@ -44112,8 +45370,8 @@ private:
 
             );
         }
-        case 177: {
-            LogStep(177, "Send Test Command without its optional arg.");
+        case 178: {
+            LogStep(178, "Send Test Command without its optional arg.");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -44121,13 +45379,13 @@ private:
 
             );
         }
-        case 178: {
-            LogStep(178, "Read list of structs containing nullables and optionals");
+        case 179: {
+            LogStep(179, "Read list of structs containing nullables and optionals");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::ListNullablesAndOptionalsStruct::Id, true, chip::NullOptional);
         }
-        case 179: {
-            LogStep(179, "Write list of structs containing nullables and optionals");
+        case 180: {
+            LogStep(180, "Write list of structs containing nullables and optionals");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type> value;
 
@@ -44157,26 +45415,26 @@ private:
                                   TestCluster::Attributes::ListNullablesAndOptionalsStruct::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 180: {
-            LogStep(180, "Read list of structs containing nullables and optionals after writing");
+        case 181: {
+            LogStep(181, "Read list of structs containing nullables and optionals after writing");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::ListNullablesAndOptionalsStruct::Id, true, chip::NullOptional);
         }
-        case 181: {
-            LogStep(181, "Write attribute NULLABLE_BOOLEAN null");
+        case 182: {
+            LogStep(182, "Write attribute NULLABLE_BOOLEAN null");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<bool> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 182: {
-            LogStep(182, "Read attribute NULLABLE_BOOLEAN null");
+        case 183: {
+            LogStep(183, "Read attribute NULLABLE_BOOLEAN null");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
                                  true, chip::NullOptional);
         }
-        case 183: {
-            LogStep(183, "Write attribute NULLABLE_BOOLEAN True");
+        case 184: {
+            LogStep(184, "Write attribute NULLABLE_BOOLEAN True");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<bool> value;
             value.SetNonNull();
@@ -44184,18 +45442,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 184: {
-            LogStep(184, "Read attribute NULLABLE_BOOLEAN True");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
-                                 true, chip::NullOptional);
-        }
         case 185: {
-            LogStep(185, "Read attribute NULLABLE_BOOLEAN not null");
+            LogStep(185, "Read attribute NULLABLE_BOOLEAN True");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
                                  true, chip::NullOptional);
         }
         case 186: {
-            LogStep(186, "Write attribute NULLABLE_BITMAP8 Max Value");
+            LogStep(186, "Read attribute NULLABLE_BOOLEAN not null");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBoolean::Id,
+                                 true, chip::NullOptional);
+        }
+        case 187: {
+            LogStep(187, "Write attribute NULLABLE_BITMAP8 Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
@@ -44203,13 +45461,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 187: {
-            LogStep(187, "Read attribute NULLABLE_BITMAP8 Max Value");
+        case 188: {
+            LogStep(188, "Read attribute NULLABLE_BITMAP8 Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                  true, chip::NullOptional);
         }
-        case 188: {
-            LogStep(188, "Write attribute NULLABLE_BITMAP8 Invalid Value");
+        case 189: {
+            LogStep(189, "Write attribute NULLABLE_BITMAP8 Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNonNull();
@@ -44217,31 +45475,31 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 189: {
-            LogStep(189, "Read attribute NULLABLE_BITMAP8 unchanged Value");
+        case 190: {
+            LogStep(190, "Read attribute NULLABLE_BITMAP8 unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                  true, chip::NullOptional);
         }
-        case 190: {
-            LogStep(190, "Write attribute NULLABLE_BITMAP8 null Value");
+        case 191: {
+            LogStep(191, "Write attribute NULLABLE_BITMAP8 null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 191: {
-            LogStep(191, "Read attribute NULLABLE_BITMAP8 null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
-                                 true, chip::NullOptional);
-        }
         case 192: {
-            LogStep(192, "Read attribute NULLABLE_BITMAP8 not 254 Value");
+            LogStep(192, "Read attribute NULLABLE_BITMAP8 null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
                                  true, chip::NullOptional);
         }
         case 193: {
-            LogStep(193, "Write attribute NULLABLE_BITMAP16 Max Value");
+            LogStep(193, "Read attribute NULLABLE_BITMAP8 not 254 Value");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap8::Id,
+                                 true, chip::NullOptional);
+        }
+        case 194: {
+            LogStep(194, "Write attribute NULLABLE_BITMAP16 Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNonNull();
@@ -44249,13 +45507,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 194: {
-            LogStep(194, "Read attribute NULLABLE_BITMAP16 Max Value");
+        case 195: {
+            LogStep(195, "Read attribute NULLABLE_BITMAP16 Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                  true, chip::NullOptional);
         }
-        case 195: {
-            LogStep(195, "Write attribute NULLABLE_BITMAP16 Invalid Value");
+        case 196: {
+            LogStep(196, "Write attribute NULLABLE_BITMAP16 Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNonNull();
@@ -44263,26 +45521,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 196: {
-            LogStep(196, "Read attribute NULLABLE_BITMAP16 unchanged Value");
+        case 197: {
+            LogStep(197, "Read attribute NULLABLE_BITMAP16 unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                  true, chip::NullOptional);
         }
-        case 197: {
-            LogStep(197, "Write attribute NULLABLE_BITMAP16 null Value");
+        case 198: {
+            LogStep(198, "Write attribute NULLABLE_BITMAP16 null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 198: {
-            LogStep(198, "Read attribute NULLABLE_BITMAP16 null Value");
+        case 199: {
+            LogStep(199, "Read attribute NULLABLE_BITMAP16 null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap16::Id,
                                  true, chip::NullOptional);
         }
-        case 199: {
-            LogStep(199, "Write attribute NULLABLE_BITMAP32 Max Value");
+        case 200: {
+            LogStep(200, "Write attribute NULLABLE_BITMAP32 Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNonNull();
@@ -44290,13 +45548,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 200: {
-            LogStep(200, "Read attribute NULLABLE_BITMAP32 Max Value");
+        case 201: {
+            LogStep(201, "Read attribute NULLABLE_BITMAP32 Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                  true, chip::NullOptional);
         }
-        case 201: {
-            LogStep(201, "Write attribute NULLABLE_BITMAP32 Invalid Value");
+        case 202: {
+            LogStep(202, "Write attribute NULLABLE_BITMAP32 Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNonNull();
@@ -44304,26 +45562,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 202: {
-            LogStep(202, "Read attribute NULLABLE_BITMAP32 unchanged Value");
+        case 203: {
+            LogStep(203, "Read attribute NULLABLE_BITMAP32 unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                  true, chip::NullOptional);
         }
-        case 203: {
-            LogStep(203, "Write attribute NULLABLE_BITMAP32 null Value");
+        case 204: {
+            LogStep(204, "Write attribute NULLABLE_BITMAP32 null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 204: {
-            LogStep(204, "Read attribute NULLABLE_BITMAP32 null Value");
+        case 205: {
+            LogStep(205, "Read attribute NULLABLE_BITMAP32 null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap32::Id,
                                  true, chip::NullOptional);
         }
-        case 205: {
-            LogStep(205, "Write attribute NULLABLE_BITMAP64 Max Value");
+        case 206: {
+            LogStep(206, "Write attribute NULLABLE_BITMAP64 Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNonNull();
@@ -44331,13 +45589,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 206: {
-            LogStep(206, "Read attribute NULLABLE_BITMAP64 Max Value");
+        case 207: {
+            LogStep(207, "Read attribute NULLABLE_BITMAP64 Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                  true, chip::NullOptional);
         }
-        case 207: {
-            LogStep(207, "Write attribute NULLABLE_BITMAP64 Invalid Value");
+        case 208: {
+            LogStep(208, "Write attribute NULLABLE_BITMAP64 Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNonNull();
@@ -44345,26 +45603,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 208: {
-            LogStep(208, "Read attribute NULLABLE_BITMAP64 unchanged Value");
+        case 209: {
+            LogStep(209, "Read attribute NULLABLE_BITMAP64 unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                  true, chip::NullOptional);
         }
-        case 209: {
-            LogStep(209, "Write attribute NULLABLE_BITMAP64 null Value");
+        case 210: {
+            LogStep(210, "Write attribute NULLABLE_BITMAP64 null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 210: {
-            LogStep(210, "Read attribute NULLABLE_BITMAP64 null Value");
+        case 211: {
+            LogStep(211, "Read attribute NULLABLE_BITMAP64 null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableBitmap64::Id,
                                  true, chip::NullOptional);
         }
-        case 211: {
-            LogStep(211, "Write attribute NULLABLE_INT8U Min Value");
+        case 212: {
+            LogStep(212, "Write attribute NULLABLE_INT8U Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -44372,13 +45630,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 212: {
-            LogStep(212, "Read attribute NULLABLE_INT8U Min Value");
+        case 213: {
+            LogStep(213, "Read attribute NULLABLE_INT8U Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
                                  chip::NullOptional);
         }
-        case 213: {
-            LogStep(213, "Write attribute NULLABLE_INT8U Max Value");
+        case 214: {
+            LogStep(214, "Write attribute NULLABLE_INT8U Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -44386,13 +45644,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 214: {
-            LogStep(214, "Read attribute NULLABLE_INT8U Max Value");
+        case 215: {
+            LogStep(215, "Read attribute NULLABLE_INT8U Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
                                  chip::NullOptional);
         }
-        case 215: {
-            LogStep(215, "Write attribute NULLABLE_INT8U Invalid Value");
+        case 216: {
+            LogStep(216, "Write attribute NULLABLE_INT8U Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -44400,41 +45658,41 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 216: {
-            LogStep(216, "Read attribute NULLABLE_INT8U unchanged Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
-                                 chip::NullOptional);
-        }
         case 217: {
-            LogStep(217, "Read attribute NULLABLE_INT8U unchanged Value with constraint");
+            LogStep(217, "Read attribute NULLABLE_INT8U unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
                                  chip::NullOptional);
         }
         case 218: {
-            LogStep(218, "Write attribute NULLABLE_INT8U null Value");
+            LogStep(218, "Read attribute NULLABLE_INT8U unchanged Value with constraint");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 219: {
+            LogStep(219, "Write attribute NULLABLE_INT8U null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 219: {
-            LogStep(219, "Read attribute NULLABLE_INT8U null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
-                                 chip::NullOptional);
-        }
         case 220: {
-            LogStep(220, "Read attribute NULLABLE_INT8U null Value & range");
+            LogStep(220, "Read attribute NULLABLE_INT8U null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
                                  chip::NullOptional);
         }
         case 221: {
-            LogStep(221, "Read attribute NULLABLE_INT8U null Value & not");
+            LogStep(221, "Read attribute NULLABLE_INT8U null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
                                  chip::NullOptional);
         }
         case 222: {
-            LogStep(222, "Write attribute NULLABLE_INT8U Value");
+            LogStep(222, "Read attribute NULLABLE_INT8U null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 223: {
+            LogStep(223, "Write attribute NULLABLE_INT8U Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -44442,18 +45700,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 223: {
-            LogStep(223, "Read attribute NULLABLE_INT8U Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
-                                 chip::NullOptional);
-        }
         case 224: {
-            LogStep(224, "Read attribute NULLABLE_INT8U notValue OK");
+            LogStep(224, "Read attribute NULLABLE_INT8U Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
                                  chip::NullOptional);
         }
         case 225: {
-            LogStep(225, "Write attribute NULLABLE_INT16U Min Value");
+            LogStep(225, "Read attribute NULLABLE_INT8U notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 226: {
+            LogStep(226, "Write attribute NULLABLE_INT16U Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -44461,13 +45719,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 226: {
-            LogStep(226, "Read attribute NULLABLE_INT16U Min Value");
+        case 227: {
+            LogStep(227, "Read attribute NULLABLE_INT16U Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
                                  chip::NullOptional);
         }
-        case 227: {
-            LogStep(227, "Write attribute NULLABLE_INT16U Max Value");
+        case 228: {
+            LogStep(228, "Write attribute NULLABLE_INT16U Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -44475,13 +45733,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 228: {
-            LogStep(228, "Read attribute NULLABLE_INT16U Max Value");
+        case 229: {
+            LogStep(229, "Read attribute NULLABLE_INT16U Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
                                  chip::NullOptional);
         }
-        case 229: {
-            LogStep(229, "Write attribute NULLABLE_INT16U Invalid Value");
+        case 230: {
+            LogStep(230, "Write attribute NULLABLE_INT16U Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -44489,36 +45747,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 230: {
-            LogStep(230, "Read attribute NULLABLE_INT16U unchanged Value");
+        case 231: {
+            LogStep(231, "Read attribute NULLABLE_INT16U unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
                                  chip::NullOptional);
         }
-        case 231: {
-            LogStep(231, "Write attribute NULLABLE_INT16U null Value");
+        case 232: {
+            LogStep(232, "Write attribute NULLABLE_INT16U null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 232: {
-            LogStep(232, "Read attribute NULLABLE_INT16U null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
-                                 chip::NullOptional);
-        }
         case 233: {
-            LogStep(233, "Read attribute NULLABLE_INT16U null Value & range");
+            LogStep(233, "Read attribute NULLABLE_INT16U null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
                                  chip::NullOptional);
         }
         case 234: {
-            LogStep(234, "Read attribute NULLABLE_INT16U null Value & not");
+            LogStep(234, "Read attribute NULLABLE_INT16U null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
                                  chip::NullOptional);
         }
         case 235: {
-            LogStep(235, "Write attribute NULLABLE_INT16U Value");
+            LogStep(235, "Read attribute NULLABLE_INT16U null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 236: {
+            LogStep(236, "Write attribute NULLABLE_INT16U Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -44526,18 +45784,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 236: {
-            LogStep(236, "Read attribute NULLABLE_INT16U Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
-                                 chip::NullOptional);
-        }
         case 237: {
-            LogStep(237, "Read attribute NULLABLE_INT16U notValue OK");
+            LogStep(237, "Read attribute NULLABLE_INT16U Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
                                  chip::NullOptional);
         }
         case 238: {
-            LogStep(238, "Write attribute NULLABLE_INT32U Min Value");
+            LogStep(238, "Read attribute NULLABLE_INT16U notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 239: {
+            LogStep(239, "Write attribute NULLABLE_INT32U Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
@@ -44545,13 +45803,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 239: {
-            LogStep(239, "Read attribute NULLABLE_INT32U Min Value");
+        case 240: {
+            LogStep(240, "Read attribute NULLABLE_INT32U Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
                                  chip::NullOptional);
         }
-        case 240: {
-            LogStep(240, "Write attribute NULLABLE_INT32U Max Value");
+        case 241: {
+            LogStep(241, "Write attribute NULLABLE_INT32U Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
@@ -44559,13 +45817,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 241: {
-            LogStep(241, "Read attribute NULLABLE_INT32U Max Value");
+        case 242: {
+            LogStep(242, "Read attribute NULLABLE_INT32U Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
                                  chip::NullOptional);
         }
-        case 242: {
-            LogStep(242, "Write attribute NULLABLE_INT32U Invalid Value");
+        case 243: {
+            LogStep(243, "Write attribute NULLABLE_INT32U Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
@@ -44573,36 +45831,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 243: {
-            LogStep(243, "Read attribute NULLABLE_INT32U unchanged Value");
+        case 244: {
+            LogStep(244, "Read attribute NULLABLE_INT32U unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
                                  chip::NullOptional);
         }
-        case 244: {
-            LogStep(244, "Write attribute NULLABLE_INT32U null Value");
+        case 245: {
+            LogStep(245, "Write attribute NULLABLE_INT32U null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 245: {
-            LogStep(245, "Read attribute NULLABLE_INT32U null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
-                                 chip::NullOptional);
-        }
         case 246: {
-            LogStep(246, "Read attribute NULLABLE_INT32U null Value & range");
+            LogStep(246, "Read attribute NULLABLE_INT32U null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
                                  chip::NullOptional);
         }
         case 247: {
-            LogStep(247, "Read attribute NULLABLE_INT32U null Value & not");
+            LogStep(247, "Read attribute NULLABLE_INT32U null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
                                  chip::NullOptional);
         }
         case 248: {
-            LogStep(248, "Write attribute NULLABLE_INT32U Value");
+            LogStep(248, "Read attribute NULLABLE_INT32U null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 249: {
+            LogStep(249, "Write attribute NULLABLE_INT32U Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint32_t> value;
             value.SetNonNull();
@@ -44610,18 +45868,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 249: {
-            LogStep(249, "Read attribute NULLABLE_INT32U Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
-                                 chip::NullOptional);
-        }
         case 250: {
-            LogStep(250, "Read attribute NULLABLE_INT32U notValue OK");
+            LogStep(250, "Read attribute NULLABLE_INT32U Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
                                  chip::NullOptional);
         }
         case 251: {
-            LogStep(251, "Write attribute NULLABLE_INT64U Min Value");
+            LogStep(251, "Read attribute NULLABLE_INT32U notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 252: {
+            LogStep(252, "Write attribute NULLABLE_INT64U Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
@@ -44629,13 +45887,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 252: {
-            LogStep(252, "Read attribute NULLABLE_INT64U Min Value");
+        case 253: {
+            LogStep(253, "Read attribute NULLABLE_INT64U Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
                                  chip::NullOptional);
         }
-        case 253: {
-            LogStep(253, "Write attribute NULLABLE_INT64U Max Value");
+        case 254: {
+            LogStep(254, "Write attribute NULLABLE_INT64U Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
@@ -44643,13 +45901,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 254: {
-            LogStep(254, "Read attribute NULLABLE_INT64U Max Value");
+        case 255: {
+            LogStep(255, "Read attribute NULLABLE_INT64U Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
                                  chip::NullOptional);
         }
-        case 255: {
-            LogStep(255, "Write attribute NULLABLE_INT64U Invalid Value");
+        case 256: {
+            LogStep(256, "Write attribute NULLABLE_INT64U Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
@@ -44657,36 +45915,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 256: {
-            LogStep(256, "Read attribute NULLABLE_INT64U unchanged Value");
+        case 257: {
+            LogStep(257, "Read attribute NULLABLE_INT64U unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
                                  chip::NullOptional);
         }
-        case 257: {
-            LogStep(257, "Write attribute NULLABLE_INT64U null Value");
+        case 258: {
+            LogStep(258, "Write attribute NULLABLE_INT64U null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 258: {
-            LogStep(258, "Read attribute NULLABLE_INT64U null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
-                                 chip::NullOptional);
-        }
         case 259: {
-            LogStep(259, "Read attribute NULLABLE_INT64U null Value & range");
+            LogStep(259, "Read attribute NULLABLE_INT64U null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
                                  chip::NullOptional);
         }
         case 260: {
-            LogStep(260, "Read attribute NULLABLE_INT64U null Value & not");
+            LogStep(260, "Read attribute NULLABLE_INT64U null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
                                  chip::NullOptional);
         }
         case 261: {
-            LogStep(261, "Write attribute NULLABLE_INT64U Value");
+            LogStep(261, "Read attribute NULLABLE_INT64U null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 262: {
+            LogStep(262, "Write attribute NULLABLE_INT64U Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint64_t> value;
             value.SetNonNull();
@@ -44694,18 +45952,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 262: {
-            LogStep(262, "Read attribute NULLABLE_INT64U Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
-                                 chip::NullOptional);
-        }
         case 263: {
-            LogStep(263, "Read attribute NULLABLE_INT64U notValue OK");
+            LogStep(263, "Read attribute NULLABLE_INT64U Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
                                  chip::NullOptional);
         }
         case 264: {
-            LogStep(264, "Write attribute NULLABLE_INT8S Min Value");
+            LogStep(264, "Read attribute NULLABLE_INT64U notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64u::Id, true,
+                                 chip::NullOptional);
+        }
+        case 265: {
+            LogStep(265, "Write attribute NULLABLE_INT8S Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -44713,13 +45971,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 265: {
-            LogStep(265, "Read attribute NULLABLE_INT8S Min Value");
+        case 266: {
+            LogStep(266, "Read attribute NULLABLE_INT8S Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
                                  chip::NullOptional);
         }
-        case 266: {
-            LogStep(266, "Write attribute NULLABLE_INT8S Invalid Value");
+        case 267: {
+            LogStep(267, "Write attribute NULLABLE_INT8S Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -44727,36 +45985,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 267: {
-            LogStep(267, "Read attribute NULLABLE_INT8S unchanged Value");
+        case 268: {
+            LogStep(268, "Read attribute NULLABLE_INT8S unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
                                  chip::NullOptional);
         }
-        case 268: {
-            LogStep(268, "Write attribute NULLABLE_INT8S null Value");
+        case 269: {
+            LogStep(269, "Write attribute NULLABLE_INT8S null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 269: {
-            LogStep(269, "Read attribute NULLABLE_INT8S null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
-                                 chip::NullOptional);
-        }
         case 270: {
-            LogStep(270, "Read attribute NULLABLE_INT8S null Value & range");
+            LogStep(270, "Read attribute NULLABLE_INT8S null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
                                  chip::NullOptional);
         }
         case 271: {
-            LogStep(271, "Read attribute NULLABLE_INT8S null Value & not");
+            LogStep(271, "Read attribute NULLABLE_INT8S null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
                                  chip::NullOptional);
         }
         case 272: {
-            LogStep(272, "Write attribute NULLABLE_INT8S Value");
+            LogStep(272, "Read attribute NULLABLE_INT8S null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 273: {
+            LogStep(273, "Write attribute NULLABLE_INT8S Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -44764,18 +46022,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 273: {
-            LogStep(273, "Read attribute NULLABLE_INT8S Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
-                                 chip::NullOptional);
-        }
         case 274: {
-            LogStep(274, "Read attribute NULLABLE_INT8S notValue OK");
+            LogStep(274, "Read attribute NULLABLE_INT8S Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
                                  chip::NullOptional);
         }
         case 275: {
-            LogStep(275, "Write attribute NULLABLE_INT16S Min Value");
+            LogStep(275, "Read attribute NULLABLE_INT8S notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt8s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 276: {
+            LogStep(276, "Write attribute NULLABLE_INT16S Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -44783,13 +46041,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 276: {
-            LogStep(276, "Read attribute NULLABLE_INT16S Min Value");
+        case 277: {
+            LogStep(277, "Read attribute NULLABLE_INT16S Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
                                  chip::NullOptional);
         }
-        case 277: {
-            LogStep(277, "Write attribute NULLABLE_INT16S Invalid Value");
+        case 278: {
+            LogStep(278, "Write attribute NULLABLE_INT16S Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -44797,36 +46055,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 278: {
-            LogStep(278, "Read attribute NULLABLE_INT16S unchanged Value");
+        case 279: {
+            LogStep(279, "Read attribute NULLABLE_INT16S unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
                                  chip::NullOptional);
         }
-        case 279: {
-            LogStep(279, "Write attribute NULLABLE_INT16S null Value");
+        case 280: {
+            LogStep(280, "Write attribute NULLABLE_INT16S null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 280: {
-            LogStep(280, "Read attribute NULLABLE_INT16S null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
-                                 chip::NullOptional);
-        }
         case 281: {
-            LogStep(281, "Read attribute NULLABLE_INT16S null Value & range");
+            LogStep(281, "Read attribute NULLABLE_INT16S null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
                                  chip::NullOptional);
         }
         case 282: {
-            LogStep(282, "Read attribute NULLABLE_INT16S null Value & not");
+            LogStep(282, "Read attribute NULLABLE_INT16S null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
                                  chip::NullOptional);
         }
         case 283: {
-            LogStep(283, "Write attribute NULLABLE_INT16S Value");
+            LogStep(283, "Read attribute NULLABLE_INT16S null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 284: {
+            LogStep(284, "Write attribute NULLABLE_INT16S Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -44834,18 +46092,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 284: {
-            LogStep(284, "Read attribute NULLABLE_INT16S Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
-                                 chip::NullOptional);
-        }
         case 285: {
-            LogStep(285, "Read attribute NULLABLE_INT16S notValue OK");
+            LogStep(285, "Read attribute NULLABLE_INT16S Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
                                  chip::NullOptional);
         }
         case 286: {
-            LogStep(286, "Write attribute NULLABLE_INT32S Min Value");
+            LogStep(286, "Read attribute NULLABLE_INT16S notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt16s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 287: {
+            LogStep(287, "Write attribute NULLABLE_INT32S Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNonNull();
@@ -44853,13 +46111,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 287: {
-            LogStep(287, "Read attribute NULLABLE_INT32S Min Value");
+        case 288: {
+            LogStep(288, "Read attribute NULLABLE_INT32S Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
                                  chip::NullOptional);
         }
-        case 288: {
-            LogStep(288, "Write attribute NULLABLE_INT32S Invalid Value");
+        case 289: {
+            LogStep(289, "Write attribute NULLABLE_INT32S Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNonNull();
@@ -44867,36 +46125,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 289: {
-            LogStep(289, "Read attribute NULLABLE_INT32S unchanged Value");
+        case 290: {
+            LogStep(290, "Read attribute NULLABLE_INT32S unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
                                  chip::NullOptional);
         }
-        case 290: {
-            LogStep(290, "Write attribute NULLABLE_INT32S null Value");
+        case 291: {
+            LogStep(291, "Write attribute NULLABLE_INT32S null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 291: {
-            LogStep(291, "Read attribute NULLABLE_INT32S null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
-                                 chip::NullOptional);
-        }
         case 292: {
-            LogStep(292, "Read attribute NULLABLE_INT32S null Value & range");
+            LogStep(292, "Read attribute NULLABLE_INT32S null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
                                  chip::NullOptional);
         }
         case 293: {
-            LogStep(293, "Read attribute NULLABLE_INT32S null Value & not");
+            LogStep(293, "Read attribute NULLABLE_INT32S null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
                                  chip::NullOptional);
         }
         case 294: {
-            LogStep(294, "Write attribute NULLABLE_INT32S Value");
+            LogStep(294, "Read attribute NULLABLE_INT32S null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 295: {
+            LogStep(295, "Write attribute NULLABLE_INT32S Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int32_t> value;
             value.SetNonNull();
@@ -44904,18 +46162,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 295: {
-            LogStep(295, "Read attribute NULLABLE_INT32S Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
-                                 chip::NullOptional);
-        }
         case 296: {
-            LogStep(296, "Read attribute NULLABLE_INT32S notValue OK");
+            LogStep(296, "Read attribute NULLABLE_INT32S Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
                                  chip::NullOptional);
         }
         case 297: {
-            LogStep(297, "Write attribute NULLABLE_INT64S Min Value");
+            LogStep(297, "Read attribute NULLABLE_INT32S notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt32s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 298: {
+            LogStep(298, "Write attribute NULLABLE_INT64S Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
@@ -44923,13 +46181,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 298: {
-            LogStep(298, "Read attribute NULLABLE_INT64S Min Value");
+        case 299: {
+            LogStep(299, "Read attribute NULLABLE_INT64S Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
                                  chip::NullOptional);
         }
-        case 299: {
-            LogStep(299, "Write attribute NULLABLE_INT64S Invalid Value");
+        case 300: {
+            LogStep(300, "Write attribute NULLABLE_INT64S Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
@@ -44937,36 +46195,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 300: {
-            LogStep(300, "Read attribute NULLABLE_INT64S unchanged Value");
+        case 301: {
+            LogStep(301, "Read attribute NULLABLE_INT64S unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
                                  chip::NullOptional);
         }
-        case 301: {
-            LogStep(301, "Write attribute NULLABLE_INT64S null Value");
+        case 302: {
+            LogStep(302, "Write attribute NULLABLE_INT64S null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 302: {
-            LogStep(302, "Read attribute NULLABLE_INT64S null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
-                                 chip::NullOptional);
-        }
         case 303: {
-            LogStep(303, "Read attribute NULLABLE_INT64S null Value & range");
+            LogStep(303, "Read attribute NULLABLE_INT64S null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
                                  chip::NullOptional);
         }
         case 304: {
-            LogStep(304, "Read attribute NULLABLE_INT64S null Value & not");
+            LogStep(304, "Read attribute NULLABLE_INT64S null Value & range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
                                  chip::NullOptional);
         }
         case 305: {
-            LogStep(305, "Write attribute NULLABLE_INT64S Value");
+            LogStep(305, "Read attribute NULLABLE_INT64S null Value & not");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 306: {
+            LogStep(306, "Write attribute NULLABLE_INT64S Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int64_t> value;
             value.SetNonNull();
@@ -44974,18 +46232,18 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 306: {
-            LogStep(306, "Read attribute NULLABLE_INT64S Value in range");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
-                                 chip::NullOptional);
-        }
         case 307: {
-            LogStep(307, "Read attribute NULLABLE_INT64S notValue OK");
+            LogStep(307, "Read attribute NULLABLE_INT64S Value in range");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
                                  chip::NullOptional);
         }
         case 308: {
-            LogStep(308, "Write attribute NULLABLE_SINGLE medium Value");
+            LogStep(308, "Read attribute NULLABLE_INT64S notValue OK");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableInt64s::Id, true,
+                                 chip::NullOptional);
+        }
+        case 309: {
+            LogStep(309, "Write attribute NULLABLE_SINGLE medium Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
@@ -44993,13 +46251,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 309: {
-            LogStep(309, "Read attribute NULLABLE_SINGLE medium Value");
+        case 310: {
+            LogStep(310, "Read attribute NULLABLE_SINGLE medium Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                  true, chip::NullOptional);
         }
-        case 310: {
-            LogStep(310, "Write attribute NULLABLE_SINGLE largest Value");
+        case 311: {
+            LogStep(311, "Write attribute NULLABLE_SINGLE largest Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
@@ -45007,13 +46265,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 311: {
-            LogStep(311, "Read attribute NULLABLE_SINGLE largest Value");
+        case 312: {
+            LogStep(312, "Read attribute NULLABLE_SINGLE largest Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                  true, chip::NullOptional);
         }
-        case 312: {
-            LogStep(312, "Write attribute NULLABLE_SINGLE smallest Value");
+        case 313: {
+            LogStep(313, "Write attribute NULLABLE_SINGLE smallest Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
@@ -45021,26 +46279,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 313: {
-            LogStep(313, "Read attribute NULLABLE_SINGLE smallest Value");
+        case 314: {
+            LogStep(314, "Read attribute NULLABLE_SINGLE smallest Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                  true, chip::NullOptional);
         }
-        case 314: {
-            LogStep(314, "Write attribute NULLABLE_SINGLE null Value");
+        case 315: {
+            LogStep(315, "Write attribute NULLABLE_SINGLE null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 315: {
-            LogStep(315, "Read attribute NULLABLE_SINGLE null Value");
+        case 316: {
+            LogStep(316, "Read attribute NULLABLE_SINGLE null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                  true, chip::NullOptional);
         }
-        case 316: {
-            LogStep(316, "Write attribute NULLABLE_SINGLE 0 Value");
+        case 317: {
+            LogStep(317, "Write attribute NULLABLE_SINGLE 0 Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<float> value;
             value.SetNonNull();
@@ -45048,13 +46306,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 317: {
-            LogStep(317, "Read attribute NULLABLE_SINGLE 0 Value");
+        case 318: {
+            LogStep(318, "Read attribute NULLABLE_SINGLE 0 Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatSingle::Id,
                                  true, chip::NullOptional);
         }
-        case 318: {
-            LogStep(318, "Write attribute NULLABLE_DOUBLE medium Value");
+        case 319: {
+            LogStep(319, "Write attribute NULLABLE_DOUBLE medium Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
@@ -45062,13 +46320,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 319: {
-            LogStep(319, "Read attribute NULLABLE_DOUBLE medium Value");
+        case 320: {
+            LogStep(320, "Read attribute NULLABLE_DOUBLE medium Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                  true, chip::NullOptional);
         }
-        case 320: {
-            LogStep(320, "Write attribute NULLABLE_DOUBLE largest Value");
+        case 321: {
+            LogStep(321, "Write attribute NULLABLE_DOUBLE largest Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
@@ -45076,13 +46334,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 321: {
-            LogStep(321, "Read attribute NULLABLE_DOUBLE largest Value");
+        case 322: {
+            LogStep(322, "Read attribute NULLABLE_DOUBLE largest Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                  true, chip::NullOptional);
         }
-        case 322: {
-            LogStep(322, "Write attribute NULLABLE_DOUBLE smallest Value");
+        case 323: {
+            LogStep(323, "Write attribute NULLABLE_DOUBLE smallest Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
@@ -45090,26 +46348,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 323: {
-            LogStep(323, "Read attribute NULLABLE_DOUBLE smallest Value");
+        case 324: {
+            LogStep(324, "Read attribute NULLABLE_DOUBLE smallest Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                  true, chip::NullOptional);
         }
-        case 324: {
-            LogStep(324, "Write attribute NULLABLE_DOUBLE null Value");
+        case 325: {
+            LogStep(325, "Write attribute NULLABLE_DOUBLE null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 325: {
-            LogStep(325, "Read attribute NULLABLE_DOUBLE null Value");
+        case 326: {
+            LogStep(326, "Read attribute NULLABLE_DOUBLE null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                  true, chip::NullOptional);
         }
-        case 326: {
-            LogStep(326, "Write attribute NULLABLE_DOUBLE 0 Value");
+        case 327: {
+            LogStep(327, "Write attribute NULLABLE_DOUBLE 0 Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<double> value;
             value.SetNonNull();
@@ -45117,13 +46375,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 327: {
-            LogStep(327, "Read attribute NULLABLE_DOUBLE 0 Value");
+        case 328: {
+            LogStep(328, "Read attribute NULLABLE_DOUBLE 0 Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableFloatDouble::Id,
                                  true, chip::NullOptional);
         }
-        case 328: {
-            LogStep(328, "Write attribute NULLABLE_ENUM8 Min Value");
+        case 329: {
+            LogStep(329, "Write attribute NULLABLE_ENUM8 Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45131,13 +46389,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 329: {
-            LogStep(329, "Read attribute NULLABLE_ENUM8 Min Value");
+        case 330: {
+            LogStep(330, "Read attribute NULLABLE_ENUM8 Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id, true,
                                  chip::NullOptional);
         }
-        case 330: {
-            LogStep(330, "Write attribute NULLABLE_ENUM8 Max Value");
+        case 331: {
+            LogStep(331, "Write attribute NULLABLE_ENUM8 Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45145,13 +46403,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 331: {
-            LogStep(331, "Read attribute NULLABLE_ENUM8 Max Value");
+        case 332: {
+            LogStep(332, "Read attribute NULLABLE_ENUM8 Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id, true,
                                  chip::NullOptional);
         }
-        case 332: {
-            LogStep(332, "Write attribute NULLABLE_ENUM8 Invalid Value");
+        case 333: {
+            LogStep(333, "Write attribute NULLABLE_ENUM8 Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45159,26 +46417,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 333: {
-            LogStep(333, "Read attribute NULLABLE_ENUM8 unchanged Value");
+        case 334: {
+            LogStep(334, "Read attribute NULLABLE_ENUM8 unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id, true,
                                  chip::NullOptional);
         }
-        case 334: {
-            LogStep(334, "Write attribute NULLABLE_ENUM8 null Value");
+        case 335: {
+            LogStep(335, "Write attribute NULLABLE_ENUM8 null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 335: {
-            LogStep(335, "Read attribute NULLABLE_ENUM8 null Value");
+        case 336: {
+            LogStep(336, "Read attribute NULLABLE_ENUM8 null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum8::Id, true,
                                  chip::NullOptional);
         }
-        case 336: {
-            LogStep(336, "Write attribute NULLABLE_ENUM16 Min Value");
+        case 337: {
+            LogStep(337, "Write attribute NULLABLE_ENUM16 Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45186,13 +46444,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 337: {
-            LogStep(337, "Read attribute NULLABLE_ENUM16 Min Value");
+        case 338: {
+            LogStep(338, "Read attribute NULLABLE_ENUM16 Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id, true,
                                  chip::NullOptional);
         }
-        case 338: {
-            LogStep(338, "Write attribute NULLABLE_ENUM16 Max Value");
+        case 339: {
+            LogStep(339, "Write attribute NULLABLE_ENUM16 Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45200,13 +46458,13 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 339: {
-            LogStep(339, "Read attribute NULLABLE_ENUM16 Max Value");
+        case 340: {
+            LogStep(340, "Read attribute NULLABLE_ENUM16 Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id, true,
                                  chip::NullOptional);
         }
-        case 340: {
-            LogStep(340, "Write attribute NULLABLE_ENUM16 Invalid Value");
+        case 341: {
+            LogStep(341, "Write attribute NULLABLE_ENUM16 Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45214,26 +46472,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 341: {
-            LogStep(341, "Read attribute NULLABLE_ENUM16 unchanged Value");
+        case 342: {
+            LogStep(342, "Read attribute NULLABLE_ENUM16 unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id, true,
                                  chip::NullOptional);
         }
-        case 342: {
-            LogStep(342, "Write attribute NULLABLE_ENUM16 null Value");
+        case 343: {
+            LogStep(343, "Write attribute NULLABLE_ENUM16 null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 343: {
-            LogStep(343, "Read attribute NULLABLE_ENUM16 null Value");
+        case 344: {
+            LogStep(344, "Read attribute NULLABLE_ENUM16 null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnum16::Id, true,
                                  chip::NullOptional);
         }
-        case 344: {
-            LogStep(344, "Write attribute NULLABLE_SIMPLE_ENUM Min Value");
+        case 345: {
+            LogStep(345, "Write attribute NULLABLE_SIMPLE_ENUM Min Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNonNull();
@@ -45241,27 +46499,27 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 345: {
-            LogStep(345, "Read attribute NULLABLE_SIMPLE_ENUM Min Value");
+        case 346: {
+            LogStep(346, "Read attribute NULLABLE_SIMPLE_ENUM Min Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                  true, chip::NullOptional);
         }
-        case 346: {
-            LogStep(346, "Write attribute NULLABLE_SIMPLE_ENUM Max Value");
+        case 347: {
+            LogStep(347, "Write attribute NULLABLE_SIMPLE_ENUM Max Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNonNull();
-            value.Value() = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(254);
+            value.Value() = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 347: {
-            LogStep(347, "Read attribute NULLABLE_SIMPLE_ENUM Max Value");
+        case 348: {
+            LogStep(348, "Read attribute NULLABLE_SIMPLE_ENUM Max Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                  true, chip::NullOptional);
         }
-        case 348: {
-            LogStep(348, "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value");
+        case 349: {
+            LogStep(349, "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNonNull();
@@ -45269,36 +46527,36 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 349: {
-            LogStep(349, "Read attribute NULLABLE_SIMPLE_ENUM unchanged Value");
+        case 350: {
+            LogStep(350, "Read attribute NULLABLE_SIMPLE_ENUM unchanged Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                  true, chip::NullOptional);
         }
-        case 350: {
-            LogStep(350, "Write attribute NULLABLE_SIMPLE_ENUM null Value");
+        case 351: {
+            LogStep(351, "Write attribute NULLABLE_SIMPLE_ENUM null Value");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 351: {
-            LogStep(351, "Read attribute NULLABLE_SIMPLE_ENUM null Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
-                                 true, chip::NullOptional);
-        }
         case 352: {
-            LogStep(352, "Read attribute NULLABLE_SIMPLE_ENUM not 254 Value");
+            LogStep(352, "Read attribute NULLABLE_SIMPLE_ENUM null Value");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                  true, chip::NullOptional);
         }
         case 353: {
-            LogStep(353, "Read attribute NULLABLE_OCTET_STRING Default Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
+            LogStep(353, "Read attribute NULLABLE_SIMPLE_ENUM not 3 Value");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableEnumAttr::Id,
                                  true, chip::NullOptional);
         }
         case 354: {
-            LogStep(354, "Write attribute NULLABLE_OCTET_STRING");
+            LogStep(354, "Read attribute NULLABLE_OCTET_STRING Default Value");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
+                                 true, chip::NullOptional);
+        }
+        case 355: {
+            LogStep(355, "Write attribute NULLABLE_OCTET_STRING");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             value.SetNonNull();
@@ -45306,26 +46564,26 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 355: {
-            LogStep(355, "Read attribute NULLABLE_OCTET_STRING");
+        case 356: {
+            LogStep(356, "Read attribute NULLABLE_OCTET_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                  true, chip::NullOptional);
         }
-        case 356: {
-            LogStep(356, "Write attribute NULLABLE_OCTET_STRING");
+        case 357: {
+            LogStep(357, "Write attribute NULLABLE_OCTET_STRING");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 357: {
-            LogStep(357, "Read attribute NULLABLE_OCTET_STRING");
+        case 358: {
+            LogStep(358, "Read attribute NULLABLE_OCTET_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                  true, chip::NullOptional);
         }
-        case 358: {
-            LogStep(358, "Write attribute NULLABLE_OCTET_STRING");
+        case 359: {
+            LogStep(359, "Write attribute NULLABLE_OCTET_STRING");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::ByteSpan> value;
             value.SetNonNull();
@@ -45333,23 +46591,23 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 359: {
-            LogStep(359, "Read attribute NULLABLE_OCTET_STRING");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
-                                 true, chip::NullOptional);
-        }
         case 360: {
-            LogStep(360, "Read attribute NULLABLE_OCTET_STRING not TestValue");
+            LogStep(360, "Read attribute NULLABLE_OCTET_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                  true, chip::NullOptional);
         }
         case 361: {
-            LogStep(361, "Read attribute NULLABLE_CHAR_STRING Default Value");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
+            LogStep(361, "Read attribute NULLABLE_OCTET_STRING not TestValue");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableOctetString::Id,
                                  true, chip::NullOptional);
         }
         case 362: {
-            LogStep(362, "Write attribute NULLABLE_CHAR_STRING");
+            LogStep(362, "Read attribute NULLABLE_CHAR_STRING Default Value");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
+                                 true, chip::NullOptional);
+        }
+        case 363: {
+            LogStep(363, "Write attribute NULLABLE_CHAR_STRING");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             value.SetNonNull();
@@ -45357,31 +46615,31 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 363: {
-            LogStep(363, "Read attribute NULLABLE_CHAR_STRING");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
-                                 true, chip::NullOptional);
-        }
         case 364: {
             LogStep(364, "Read attribute NULLABLE_CHAR_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
                                  true, chip::NullOptional);
         }
         case 365: {
-            LogStep(365, "Write attribute NULLABLE_CHAR_STRING - Value too long");
+            LogStep(365, "Read attribute NULLABLE_CHAR_STRING");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
+                                 true, chip::NullOptional);
+        }
+        case 366: {
+            LogStep(366, "Write attribute NULLABLE_CHAR_STRING - Value too long");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             value.SetNull();
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 366: {
-            LogStep(366, "Read attribute NULLABLE_CHAR_STRING");
+        case 367: {
+            LogStep(367, "Read attribute NULLABLE_CHAR_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
                                  true, chip::NullOptional);
         }
-        case 367: {
-            LogStep(367, "Write attribute NULLABLE_CHAR_STRING - Empty");
+        case 368: {
+            LogStep(368, "Write attribute NULLABLE_CHAR_STRING - Empty");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<chip::CharSpan> value;
             value.SetNonNull();
@@ -45389,28 +46647,28 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 368: {
-            LogStep(368, "Read attribute NULLABLE_CHAR_STRING");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
-                                 true, chip::NullOptional);
-        }
         case 369: {
-            LogStep(369, "Read attribute NULLABLE_CHAR_STRING not ☉T☉");
+            LogStep(369, "Read attribute NULLABLE_CHAR_STRING");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
                                  true, chip::NullOptional);
         }
         case 370: {
-            LogStep(370, "Read attribute from nonexistent endpoint.");
+            LogStep(370, "Read attribute NULLABLE_CHAR_STRING not ☉T☉");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::NullableCharString::Id,
+                                 true, chip::NullOptional);
+        }
+        case 371: {
+            LogStep(371, "Read attribute from nonexistent endpoint.");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(200), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, true,
                                  chip::NullOptional);
         }
-        case 371: {
-            LogStep(371, "Read attribute from nonexistent cluster.");
+        case 372: {
+            LogStep(372, "Read attribute from nonexistent cluster.");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, true,
                                  chip::NullOptional);
         }
-        case 372: {
-            LogStep(372, "Send a command that takes an optional parameter but do not set it.");
+        case 373: {
+            LogStep(373, "Send a command that takes an optional parameter but do not set it.");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
@@ -45418,8 +46676,8 @@ private:
 
             );
         }
-        case 373: {
-            LogStep(373, "Send a command that takes an optional parameter but do not set it.");
+        case 374: {
+            LogStep(374, "Send a command that takes an optional parameter but do not set it.");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type value;
             value.arg1.Emplace();
@@ -45429,13 +46687,13 @@ private:
 
             );
         }
-        case 374: {
-            LogStep(374, "Subscribe to list attribute");
+        case 375: {
+            LogStep(375, "Subscribe to list attribute");
             return SubscribeAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, 2, 5,
                                       true, chip::NullOptional, chip::NullOptional);
         }
-        case 375: {
-            LogStep(375, "Write subscribed-to list attribute");
+        case 376: {
+            LogStep(376, "Write subscribed-to list attribute");
             ListFreer listFreer;
             chip::app::DataModel::List<const uint8_t> value;
 
@@ -45451,98 +46709,98 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ListInt8u::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 376: {
-            LogStep(376, "Check for list attribute report");
+        case 377: {
+            LogStep(377, "Check for list attribute report");
             return WaitForReport();
         }
-        case 377: {
-            LogStep(377, "Read range-restricted unsigned 8-bit integer");
+        case 378: {
+            LogStep(378, "Read range-restricted unsigned 8-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8u::Id,
                                  true, chip::NullOptional);
         }
-        case 378: {
-            LogStep(378, "Write min value to a range-restricted unsigned 8-bit integer");
+        case 379: {
+            LogStep(379, "Write min value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 0U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 379: {
-            LogStep(379, "Write just-below-range value to a range-restricted unsigned 8-bit integer");
+        case 380: {
+            LogStep(380, "Write just-below-range value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 19U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 380: {
-            LogStep(380, "Write just-above-range value to a range-restricted unsigned 8-bit integer");
+        case 381: {
+            LogStep(381, "Write just-above-range value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 101U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 381: {
-            LogStep(381, "Write max value to a range-restricted unsigned 8-bit integer");
+        case 382: {
+            LogStep(382, "Write max value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 255U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 382: {
-            LogStep(382, "Verify range-restricted unsigned 8-bit integer value has not changed");
+        case 383: {
+            LogStep(383, "Verify range-restricted unsigned 8-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8u::Id,
                                  true, chip::NullOptional);
         }
-        case 383: {
-            LogStep(383, "Write min valid value to a range-restricted unsigned 8-bit integer");
+        case 384: {
+            LogStep(384, "Write min valid value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 20U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 384: {
-            LogStep(384, "Verify range-restricted unsigned 8-bit integer value is at min valid");
+        case 385: {
+            LogStep(385, "Verify range-restricted unsigned 8-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8u::Id,
                                  true, chip::NullOptional);
         }
-        case 385: {
-            LogStep(385, "Write max valid value to a range-restricted unsigned 8-bit integer");
+        case 386: {
+            LogStep(386, "Write max valid value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 100U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 386: {
-            LogStep(386, "Verify range-restricted unsigned 8-bit integer value is at max valid");
+        case 387: {
+            LogStep(387, "Verify range-restricted unsigned 8-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8u::Id,
                                  true, chip::NullOptional);
         }
-        case 387: {
-            LogStep(387, "Write middle valid value to a range-restricted unsigned 8-bit integer");
+        case 388: {
+            LogStep(388, "Write middle valid value to a range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             uint8_t value;
             value = 50U;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8u::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 388: {
-            LogStep(388, "Verify range-restricted unsigned 8-bit integer value is at mid valid");
+        case 389: {
+            LogStep(389, "Verify range-restricted unsigned 8-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8u::Id,
                                  true, chip::NullOptional);
         }
-        case 389: {
-            LogStep(389, "Read range-restricted unsigned 16-bit integer");
+        case 390: {
+            LogStep(390, "Read range-restricted unsigned 16-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 390: {
-            LogStep(390, "Write min value to a range-restricted unsigned 16-bit integer");
+        case 391: {
+            LogStep(391, "Write min value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 0U;
@@ -45550,8 +46808,8 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 391: {
-            LogStep(391, "Write just-below-range value to a range-restricted unsigned 16-bit integer");
+        case 392: {
+            LogStep(392, "Write just-below-range value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 99U;
@@ -45559,8 +46817,8 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 392: {
-            LogStep(392, "Write just-above-range value to a range-restricted unsigned 16-bit integer");
+        case 393: {
+            LogStep(393, "Write just-above-range value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 1001U;
@@ -45568,8 +46826,8 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 393: {
-            LogStep(393, "Write max value to a range-restricted unsigned 16-bit integer");
+        case 394: {
+            LogStep(394, "Write max value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 65535U;
@@ -45577,13 +46835,13 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 394: {
-            LogStep(394, "Verify range-restricted unsigned 16-bit integer value has not changed");
+        case 395: {
+            LogStep(395, "Verify range-restricted unsigned 16-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 395: {
-            LogStep(395, "Write min valid value to a range-restricted unsigned 16-bit integer");
+        case 396: {
+            LogStep(396, "Write min valid value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 100U;
@@ -45591,13 +46849,13 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 396: {
-            LogStep(396, "Verify range-restricted unsigned 16-bit integer value is at min valid");
+        case 397: {
+            LogStep(397, "Verify range-restricted unsigned 16-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 397: {
-            LogStep(397, "Write max valid value to a range-restricted unsigned 16-bit integer");
+        case 398: {
+            LogStep(398, "Write max valid value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 1000U;
@@ -45605,13 +46863,13 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 398: {
-            LogStep(398, "Verify range-restricted unsigned 16-bit integer value is at max valid");
+        case 399: {
+            LogStep(399, "Verify range-restricted unsigned 16-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 399: {
-            LogStep(399, "Write middle valid value to a range-restricted unsigned 16-bit integer");
+        case 400: {
+            LogStep(400, "Write middle valid value to a range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             uint16_t value;
             value = 500U;
@@ -45619,99 +46877,99 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 400: {
-            LogStep(400, "Verify range-restricted unsigned 16-bit integer value is at mid valid");
+        case 401: {
+            LogStep(401, "Verify range-restricted unsigned 16-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 401: {
-            LogStep(401, "Read range-restricted signed 8-bit integer");
+        case 402: {
+            LogStep(402, "Read range-restricted signed 8-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8s::Id,
                                  true, chip::NullOptional);
         }
-        case 402: {
-            LogStep(402, "Write min value to a range-restricted signed 8-bit integer");
+        case 403: {
+            LogStep(403, "Write min value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = -128;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 403: {
-            LogStep(403, "Write just-below-range value to a range-restricted signed 8-bit integer");
+        case 404: {
+            LogStep(404, "Write just-below-range value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = -41;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 404: {
-            LogStep(404, "Write just-above-range value to a range-restricted signed 8-bit integer");
+        case 405: {
+            LogStep(405, "Write just-above-range value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = 51;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 405: {
-            LogStep(405, "Write max value to a range-restricted signed 8-bit integer");
+        case 406: {
+            LogStep(406, "Write max value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = 127;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 406: {
-            LogStep(406, "Verify range-restricted signed 8-bit integer value has not changed");
+        case 407: {
+            LogStep(407, "Verify range-restricted signed 8-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8s::Id,
                                  true, chip::NullOptional);
         }
-        case 407: {
-            LogStep(407, "Write min valid value to a range-restricted signed 8-bit integer");
+        case 408: {
+            LogStep(408, "Write min valid value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = -40;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 408: {
-            LogStep(408, "Verify range-restricted signed 8-bit integer value is at min valid");
+        case 409: {
+            LogStep(409, "Verify range-restricted signed 8-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8s::Id,
                                  true, chip::NullOptional);
         }
-        case 409: {
-            LogStep(409, "Write max valid value to a range-restricted signed 8-bit integer");
+        case 410: {
+            LogStep(410, "Write max valid value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = 50;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 410: {
-            LogStep(410, "Verify range-restricted signed 8-bit integer value is at max valid");
+        case 411: {
+            LogStep(411, "Verify range-restricted signed 8-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8s::Id,
                                  true, chip::NullOptional);
         }
-        case 411: {
-            LogStep(411, "Write middle valid value to a range-restricted signed 8-bit integer");
+        case 412: {
+            LogStep(412, "Write middle valid value to a range-restricted signed 8-bit integer");
             ListFreer listFreer;
             int8_t value;
             value = 6;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                   TestCluster::Attributes::RangeRestrictedInt8s::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 412: {
-            LogStep(412, "Verify range-restricted signed 8-bit integer value is at mid valid");
+        case 413: {
+            LogStep(413, "Verify range-restricted signed 8-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::RangeRestrictedInt8s::Id,
                                  true, chip::NullOptional);
         }
-        case 413: {
-            LogStep(413, "Read range-restricted signed 16-bit integer");
+        case 414: {
+            LogStep(414, "Read range-restricted signed 16-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 414: {
-            LogStep(414, "Write min value to a range-restricted signed 16-bit integer");
+        case 415: {
+            LogStep(415, "Write min value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = -32768;
@@ -45719,8 +46977,8 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 415: {
-            LogStep(415, "Write just-below-range value to a range-restricted signed 16-bit integer");
+        case 416: {
+            LogStep(416, "Write just-below-range value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = -151;
@@ -45728,8 +46986,8 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 416: {
-            LogStep(416, "Write just-above-range value to a range-restricted signed 16-bit integer");
+        case 417: {
+            LogStep(417, "Write just-above-range value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = 201;
@@ -45737,8 +46995,8 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 417: {
-            LogStep(417, "Write max value to a range-restricted signed 16-bit integer");
+        case 418: {
+            LogStep(418, "Write max value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = 32767;
@@ -45746,13 +47004,13 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 418: {
-            LogStep(418, "Verify range-restricted signed 16-bit integer value has not changed");
+        case 419: {
+            LogStep(419, "Verify range-restricted signed 16-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 419: {
-            LogStep(419, "Write min valid value to a range-restricted signed 16-bit integer");
+        case 420: {
+            LogStep(420, "Write min valid value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = -150;
@@ -45760,13 +47018,13 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 420: {
-            LogStep(420, "Verify range-restricted signed 16-bit integer value is at min valid");
+        case 421: {
+            LogStep(421, "Verify range-restricted signed 16-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 421: {
-            LogStep(421, "Write max valid value to a range-restricted signed 16-bit integer");
+        case 422: {
+            LogStep(422, "Write max valid value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = 200;
@@ -45774,13 +47032,13 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 422: {
-            LogStep(422, "Verify range-restricted signed 16-bit integer value is at max valid");
+        case 423: {
+            LogStep(423, "Verify range-restricted signed 16-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 423: {
-            LogStep(423, "Write middle valid value to a range-restricted signed 16-bit integer");
+        case 424: {
+            LogStep(424, "Write middle valid value to a range-restricted signed 16-bit integer");
             ListFreer listFreer;
             int16_t value;
             value = 7;
@@ -45788,18 +47046,18 @@ private:
                                   TestCluster::Attributes::RangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 424: {
-            LogStep(424, "Verify range-restricted signed 16-bit integer value is at mid valid");
+        case 425: {
+            LogStep(425, "Verify range-restricted signed 16-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::RangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 425: {
-            LogStep(425, "Read nullable range-restricted unsigned 8-bit integer");
+        case 426: {
+            LogStep(426, "Read nullable range-restricted unsigned 8-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, true, chip::NullOptional);
         }
-        case 426: {
-            LogStep(426, "Write min value to a nullable range-restricted unsigned 8-bit integer");
+        case 427: {
+            LogStep(427, "Write min value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45808,8 +47066,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 427: {
-            LogStep(427, "Write just-below-range value to a nullable range-restricted unsigned 8-bit integer");
+        case 428: {
+            LogStep(428, "Write just-below-range value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45818,8 +47076,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 428: {
-            LogStep(428, "Write just-above-range value to a nullable range-restricted unsigned 8-bit integer");
+        case 429: {
+            LogStep(429, "Write just-above-range value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45828,8 +47086,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 429: {
-            LogStep(429, "Write max value to a nullable range-restricted unsigned 8-bit integer");
+        case 430: {
+            LogStep(430, "Write max value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45838,13 +47096,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 430: {
-            LogStep(430, "Verify nullable range-restricted unsigned 8-bit integer value has not changed");
+        case 431: {
+            LogStep(431, "Verify nullable range-restricted unsigned 8-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, true, chip::NullOptional);
         }
-        case 431: {
-            LogStep(431, "Write min valid value to a nullable range-restricted unsigned 8-bit integer");
+        case 432: {
+            LogStep(432, "Write min valid value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45853,13 +47111,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 432: {
-            LogStep(432, "Verify nullable range-restricted unsigned 8-bit integer value is at min valid");
+        case 433: {
+            LogStep(433, "Verify nullable range-restricted unsigned 8-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, true, chip::NullOptional);
         }
-        case 433: {
-            LogStep(433, "Write max valid value to a nullable range-restricted unsigned 8-bit integer");
+        case 434: {
+            LogStep(434, "Write max valid value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45868,13 +47126,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 434: {
-            LogStep(434, "Verify nullable range-restricted unsigned 8-bit integer value is at max valid");
+        case 435: {
+            LogStep(435, "Verify nullable range-restricted unsigned 8-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, true, chip::NullOptional);
         }
-        case 435: {
-            LogStep(435, "Write middle valid value to a nullable range-restricted unsigned 8-bit integer");
+        case 436: {
+            LogStep(436, "Write middle valid value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNonNull();
@@ -45883,13 +47141,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 436: {
-            LogStep(436, "Verify nullable range-restricted unsigned 8-bit integer value is at mid valid");
+        case 437: {
+            LogStep(437, "Verify nullable range-restricted unsigned 8-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, true, chip::NullOptional);
         }
-        case 437: {
-            LogStep(437, "Write null value to a nullable range-restricted unsigned 8-bit integer");
+        case 438: {
+            LogStep(438, "Write null value to a nullable range-restricted unsigned 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint8_t> value;
             value.SetNull();
@@ -45897,18 +47155,18 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 438: {
-            LogStep(438, "Verify nullable range-restricted unsigned 8-bit integer value is null");
+        case 439: {
+            LogStep(439, "Verify nullable range-restricted unsigned 8-bit integer value is null");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, true, chip::NullOptional);
         }
-        case 439: {
-            LogStep(439, "Read nullable range-restricted unsigned 16-bit integer");
+        case 440: {
+            LogStep(440, "Read nullable range-restricted unsigned 16-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 440: {
-            LogStep(440, "Write min value to a nullable range-restricted unsigned 16-bit integer");
+        case 441: {
+            LogStep(441, "Write min value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45917,8 +47175,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 441: {
-            LogStep(441, "Write just-below-range value to a nullable range-restricted unsigned 16-bit integer");
+        case 442: {
+            LogStep(442, "Write just-below-range value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45927,8 +47185,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 442: {
-            LogStep(442, "Write just-above-range value to a nullable range-restricted unsigned 16-bit integer");
+        case 443: {
+            LogStep(443, "Write just-above-range value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45937,8 +47195,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 443: {
-            LogStep(443, "Write max value to a nullable range-restricted unsigned 16-bit integer");
+        case 444: {
+            LogStep(444, "Write max value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45947,13 +47205,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 444: {
-            LogStep(444, "Verify nullable range-restricted unsigned 16-bit integer value has not changed");
+        case 445: {
+            LogStep(445, "Verify nullable range-restricted unsigned 16-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 445: {
-            LogStep(445, "Write min valid value to a nullable range-restricted unsigned 16-bit integer");
+        case 446: {
+            LogStep(446, "Write min valid value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45962,13 +47220,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 446: {
-            LogStep(446, "Verify nullable range-restricted unsigned 16-bit integer value is at min valid");
+        case 447: {
+            LogStep(447, "Verify nullable range-restricted unsigned 16-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 447: {
-            LogStep(447, "Write max valid value to a nullable range-restricted unsigned 16-bit integer");
+        case 448: {
+            LogStep(448, "Write max valid value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45977,13 +47235,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 448: {
-            LogStep(448, "Verify nullable range-restricted unsigned 16-bit integer value is at max valid");
+        case 449: {
+            LogStep(449, "Verify nullable range-restricted unsigned 16-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 449: {
-            LogStep(449, "Write middle valid value to a nullable range-restricted unsigned 16-bit integer");
+        case 450: {
+            LogStep(450, "Write middle valid value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNonNull();
@@ -45992,13 +47250,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 450: {
-            LogStep(450, "Verify nullable range-restricted unsigned 16-bit integer value is at mid valid");
+        case 451: {
+            LogStep(451, "Verify nullable range-restricted unsigned 16-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 451: {
-            LogStep(451, "Write null value to a nullable range-restricted unsigned 16-bit integer");
+        case 452: {
+            LogStep(452, "Write null value to a nullable range-restricted unsigned 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<uint16_t> value;
             value.SetNull();
@@ -46006,18 +47264,18 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 452: {
-            LogStep(452, "Verify nullable range-restricted unsigned 16-bit integer value is null");
+        case 453: {
+            LogStep(453, "Verify nullable range-restricted unsigned 16-bit integer value is null");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, true, chip::NullOptional);
         }
-        case 453: {
-            LogStep(453, "Read nullable range-restricted signed 8-bit integer");
+        case 454: {
+            LogStep(454, "Read nullable range-restricted signed 8-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, true, chip::NullOptional);
         }
-        case 454: {
-            LogStep(454, "Write min value to a nullable range-restricted signed 8-bit integer");
+        case 455: {
+            LogStep(455, "Write min value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46026,8 +47284,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 455: {
-            LogStep(455, "Write just-below-range value to a nullable range-restricted signed 8-bit integer");
+        case 456: {
+            LogStep(456, "Write just-below-range value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46036,8 +47294,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 456: {
-            LogStep(456, "Write just-above-range value to a nullable range-restricted signed 8-bit integer");
+        case 457: {
+            LogStep(457, "Write just-above-range value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46046,8 +47304,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 457: {
-            LogStep(457, "Write max value to a nullable range-restricted signed 8-bit integer");
+        case 458: {
+            LogStep(458, "Write max value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46056,13 +47314,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 458: {
-            LogStep(458, "Verify nullable range-restricted signed 8-bit integer value has not changed");
+        case 459: {
+            LogStep(459, "Verify nullable range-restricted signed 8-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, true, chip::NullOptional);
         }
-        case 459: {
-            LogStep(459, "Write min valid value to a nullable range-restricted signed 8-bit integer");
+        case 460: {
+            LogStep(460, "Write min valid value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46071,13 +47329,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 460: {
-            LogStep(460, "Verify nullable range-restricted signed 8-bit integer value is at min valid");
+        case 461: {
+            LogStep(461, "Verify nullable range-restricted signed 8-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, true, chip::NullOptional);
         }
-        case 461: {
-            LogStep(461, "Write max valid value to a nullable range-restricted signed 8-bit integer");
+        case 462: {
+            LogStep(462, "Write max valid value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46086,13 +47344,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 462: {
-            LogStep(462, "Verify nullable range-restricted signed 8-bit integer value is at max valid");
+        case 463: {
+            LogStep(463, "Verify nullable range-restricted signed 8-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, true, chip::NullOptional);
         }
-        case 463: {
-            LogStep(463, "Write middle valid value to a nullable range-restricted signed 8-bit integer");
+        case 464: {
+            LogStep(464, "Write middle valid value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNonNull();
@@ -46101,13 +47359,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 464: {
-            LogStep(464, "Verify nullable range-restricted signed 8-bit integer value is at mid valid");
+        case 465: {
+            LogStep(465, "Verify nullable range-restricted signed 8-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, true, chip::NullOptional);
         }
-        case 465: {
-            LogStep(465, "Write null value to a nullable range-restricted signed 8-bit integer");
+        case 466: {
+            LogStep(466, "Write null value to a nullable range-restricted signed 8-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int8_t> value;
             value.SetNull();
@@ -46115,18 +47373,18 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 466: {
-            LogStep(466, "Verify nullable range-restricted signed 8-bit integer value is at null");
+        case 467: {
+            LogStep(467, "Verify nullable range-restricted signed 8-bit integer value is at null");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, true, chip::NullOptional);
         }
-        case 467: {
-            LogStep(467, "Read nullable range-restricted signed 16-bit integer");
+        case 468: {
+            LogStep(468, "Read nullable range-restricted signed 16-bit integer");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 468: {
-            LogStep(468, "Write min value to a nullable range-restricted signed 16-bit integer");
+        case 469: {
+            LogStep(469, "Write min value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46135,8 +47393,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 469: {
-            LogStep(469, "Write just-below-range value to a nullable range-restricted signed 16-bit integer");
+        case 470: {
+            LogStep(470, "Write just-below-range value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46145,8 +47403,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 470: {
-            LogStep(470, "Write just-above-range value to a nullable range-restricted signed 16-bit integer");
+        case 471: {
+            LogStep(471, "Write just-above-range value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46155,8 +47413,8 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 471: {
-            LogStep(471, "Write max value to a nullable range-restricted signed 16-bit integer");
+        case 472: {
+            LogStep(472, "Write max value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46165,13 +47423,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 472: {
-            LogStep(472, "Verify nullable range-restricted signed 16-bit integer value has not changed");
+        case 473: {
+            LogStep(473, "Verify nullable range-restricted signed 16-bit integer value has not changed");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 473: {
-            LogStep(473, "Write min valid value to a nullable range-restricted signed 16-bit integer");
+        case 474: {
+            LogStep(474, "Write min valid value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46180,13 +47438,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 474: {
-            LogStep(474, "Verify nullable range-restricted signed 16-bit integer value is at min valid");
+        case 475: {
+            LogStep(475, "Verify nullable range-restricted signed 16-bit integer value is at min valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 475: {
-            LogStep(475, "Write max valid value to a nullable range-restricted signed 16-bit integer");
+        case 476: {
+            LogStep(476, "Write max valid value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46195,13 +47453,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 476: {
-            LogStep(476, "Verify nullable range-restricted signed 16-bit integer value is at max valid");
+        case 477: {
+            LogStep(477, "Verify nullable range-restricted signed 16-bit integer value is at max valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 477: {
-            LogStep(477, "Write middle valid value to a nullable range-restricted signed 16-bit integer");
+        case 478: {
+            LogStep(478, "Write middle valid value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNonNull();
@@ -46210,13 +47468,13 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 478: {
-            LogStep(478, "Verify nullable range-restricted signed 16-bit integer value is at mid valid");
+        case 479: {
+            LogStep(479, "Verify nullable range-restricted signed 16-bit integer value is at mid valid");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 479: {
-            LogStep(479, "Write null value to a nullable range-restricted signed 16-bit integer");
+        case 480: {
+            LogStep(480, "Write null value to a nullable range-restricted signed 16-bit integer");
             ListFreer listFreer;
             chip::app::DataModel::Nullable<int16_t> value;
             value.SetNull();
@@ -46224,49 +47482,49 @@ private:
                                   TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, value, chip::NullOptional,
                                   chip::NullOptional);
         }
-        case 480: {
-            LogStep(480, "Verify nullable range-restricted signed 16-bit integer value is null");
+        case 481: {
+            LogStep(481, "Verify nullable range-restricted signed 16-bit integer value is null");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id,
                                  TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, true, chip::NullOptional);
         }
-        case 481: {
-            LogStep(481, "Write attribute that returns general status on write");
+        case 482: {
+            LogStep(482, "Write attribute that returns general status on write");
             ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::GeneralErrorBoolean::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 482: {
-            LogStep(482, "Write attribute that returns cluster-specific status on write");
+        case 483: {
+            LogStep(483, "Write attribute that returns cluster-specific status on write");
             ListFreer listFreer;
             bool value;
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ClusterErrorBoolean::Id,
                                   value, chip::NullOptional, chip::NullOptional);
         }
-        case 483: {
-            LogStep(483, "Read attribute that returns general status on read");
+        case 484: {
+            LogStep(484, "Read attribute that returns general status on read");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::GeneralErrorBoolean::Id,
                                  true, chip::NullOptional);
         }
-        case 484: {
-            LogStep(484, "read attribute that returns cluster-specific status on read");
+        case 485: {
+            LogStep(485, "read attribute that returns cluster-specific status on read");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::ClusterErrorBoolean::Id,
                                  true, chip::NullOptional);
         }
-        case 485: {
-            LogStep(485, "read AcceptedCommandList attribute");
+        case 486: {
+            LogStep(486, "read AcceptedCommandList attribute");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::AcceptedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 486: {
-            LogStep(486, "read GeneratedCommandList attribute");
+        case 487: {
+            LogStep(487, "read GeneratedCommandList attribute");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::GeneratedCommandList::Id,
                                  true, chip::NullOptional);
         }
-        case 487: {
-            LogStep(487, "Write struct-typed attribute");
+        case 488: {
+            LogStep(488, "Write struct-typed attribute");
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type value;
 
@@ -46282,8 +47540,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::StructAttr::Id, value,
                                   chip::NullOptional, chip::NullOptional);
         }
-        case 488: {
-            LogStep(488, "Read struct-typed attribute");
+        case 489: {
+            LogStep(489, "Read struct-typed attribute");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Attributes::StructAttr::Id, true,
                                  chip::NullOptional);
         }
@@ -47368,7 +48626,7 @@ private:
                     chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value;
                     VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                     VerifyOrReturn(CheckValue("testEvent.arg1", value.arg1, 4U));
-                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 5U));
+                    VerifyOrReturn(CheckValue("testEvent.arg2", value.arg2, 3U));
                     VerifyOrReturn(CheckValue("testEvent.arg3", value.arg3, true));
                 }
                 shouldContinue = true;
@@ -47472,7 +48730,7 @@ private:
             ListFreer listFreer;
             chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type value;
             value.arg1 = 4U;
-            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(5);
+            value.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(3);
             value.arg3 = true;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), TestCluster::Id, TestCluster::Commands::TestEmitTestEventRequest::Id,
                                value, chip::NullOptional
@@ -50213,6 +51471,179 @@ private:
             value = false;
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::LocalConfigDisabled::Id, value,
                                   chip::NullOptional, chip::NullOptional);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class TestFabricRemovalWhileSubscribedSuite : public TestCommand
+{
+public:
+    TestFabricRemovalWhileSubscribedSuite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("TestFabricRemovalWhileSubscribed", 8, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
+        AddArgument("payload", &mPayload);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~TestFabricRemovalWhileSubscribedSuite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mDiscriminator;
+    chip::Optional<chip::CharSpan> mPayload;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::FabricIndex ourFabricIndex;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 0:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 1:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                uint8_t value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("commissionedFabrics", value, 1U));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+            }
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::FabricIndex value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
+                VerifyOrReturn(CheckConstraintMinValue("value", value, 1U));
+                ourFabricIndex = value;
+            }
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::DataModel::DecodableList<
+                    chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>
+                    value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckConstraintType("value", "", "list"));
+            }
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+            }
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Wait for the commissioned device to be retrieved");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
+            return WaitForCommissionee(kIdentityAlpha, value);
+        }
+        case 1: {
+            LogStep(1, "Read number of commissioned fabrics");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                                 OperationalCredentials::Attributes::CommissionedFabrics::Id, true, chip::NullOptional);
+        }
+        case 2: {
+            LogStep(2, "Read current fabric index");
+            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                                 OperationalCredentials::Attributes::CurrentFabricIndex::Id, true, chip::NullOptional);
+        }
+        case 3: {
+            LogStep(3, "Open commissioning window from alpha");
+            ListFreer listFreer;
+            chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type value;
+            value.commissioningTimeout = 180U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), AdministratorCommissioning::Id,
+                               AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Id, value,
+                               chip::Optional<uint16_t>(10000), chip::NullOptional
+
+            );
+        }
+        case 4: {
+            LogStep(4, "Commission from beta");
+            ListFreer listFreer;
+            chip::app::Clusters::CommissionerCommands::Commands::PairWithCode::Type value;
+            value.nodeId  = 74565ULL;
+            value.payload = mPayload.HasValue() ? mPayload.Value() : chip::Span<const char>("MT:-24J0AFN00KA0648G00", 22);
+            return PairWithCode(kIdentityBeta, value);
+        }
+        case 5: {
+            LogStep(5, "Wait for the commissioned device to be retrieved for beta");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
+            value.nodeId = 74565ULL;
+            return WaitForCommissionee(kIdentityBeta, value);
+        }
+        case 6: {
+            LogStep(6, "Subscribe Fabrics Attribute from beta");
+            return SubscribeAttribute(kIdentityBeta, GetEndpoint(0), OperationalCredentials::Id,
+                                      OperationalCredentials::Attributes::Fabrics::Id, 2, 5, true, chip::NullOptional,
+                                      chip::NullOptional);
+        }
+        case 7: {
+            LogStep(7, "Remove single own fabric");
+            ListFreer listFreer;
+            chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type value;
+            value.fabricIndex = ourFabricIndex;
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), OperationalCredentials::Id,
+                               OperationalCredentials::Commands::RemoveFabric::Id, value, chip::NullOptional
+
+            );
         }
         }
         return CHIP_NO_ERROR;
@@ -53449,25 +54880,25 @@ private:
         }
         case 1: {
             LogStep(1, "Reads a list of ThreadMetrics struct non-global attribute from DUT.");
-            VerifyOrDo(!ShouldSkip("DGSW.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::ThreadMetrics::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "Reads CurrentHeapFree non-global attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapFree::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads CurrentHeapUsed non-global attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads CurrentHeapHighWaterMark non-global attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, true, chip::NullOptional);
         }
@@ -53640,7 +55071,7 @@ private:
         }
         case 1: {
             LogStep(1, "Sends ResetWatermarks to DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.C00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.C00.Rsp"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
@@ -53656,13 +55087,13 @@ private:
         }
         case 3: {
             LogStep(3, "Reads CurrentHeapUsed attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Reads CurrentHeapHighWaterMark attribute value from DUT");
-            VerifyOrDo(!ShouldSkip("DGSW.S.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGSW.S.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), SoftwareDiagnostics::Id,
                                  SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, true, chip::NullOptional);
         }
@@ -61928,6 +63359,15 @@ private:
             break;
         case 1:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
@@ -61935,7 +63375,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
             break;
-        case 2:
+        case 5:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
@@ -61943,15 +63383,6 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -62036,6 +63467,15 @@ private:
             break;
         case 23:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 25:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 26:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
@@ -62043,7 +63483,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
             break;
-        case 24:
+        case 27:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
@@ -62051,15 +63491,6 @@ private:
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
-            break;
-        case 25:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 26:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 27:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
         case 28:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
@@ -62151,27 +63582,7 @@ private:
             return WaitForCommissionee(kIdentityAlpha, value);
         }
         case 1: {
-            LogStep(1, "Add Group 1 (endpoint 1)");
-            ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 257U;
-            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
-
-            );
-        }
-        case 2: {
-            LogStep(2, "Add Group 2 (endpoint 0)");
-            ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 258U;
-            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
-            return SendCommand(kIdentityAlpha, GetEndpoint(0), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
-
-            );
-        }
-        case 3: {
-            LogStep(3, "KeySet Write 1");
+            LogStep(1, "KeySet Write 1");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
@@ -62205,8 +63616,8 @@ private:
 
             );
         }
-        case 4: {
-            LogStep(4, "KeySet Write 2");
+        case 2: {
+            LogStep(2, "KeySet Write 2");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
@@ -62240,8 +63651,8 @@ private:
 
             );
         }
-        case 5: {
-            LogStep(5, "Write Group Keys");
+        case 3: {
+            LogStep(3, "Write Group Keys");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> value;
 
@@ -62262,6 +63673,26 @@ private:
             }
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
+        }
+        case 4: {
+            LogStep(4, "Add Group 1 (endpoint 1)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 257U;
+            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
+        }
+        case 5: {
+            LogStep(5, "Add Group 2 (endpoint 0)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 258U;
+            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
         }
         case 6: {
             LogStep(6, "Install ACLs");
@@ -62306,7 +63737,7 @@ private:
             LogStep(9, "Wait for write 1");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = 100UL;
+            value.ms = 1000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
         case 10: {
@@ -62410,27 +63841,7 @@ private:
             return WaitForCommissionee(kIdentityGamma, value);
         }
         case 23: {
-            LogStep(23, "Add Group 1 (endpoint 1) for gamma");
-            ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 257U;
-            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
-            return SendCommand(kIdentityGamma, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
-
-            );
-        }
-        case 24: {
-            LogStep(24, "Add Group 2 (endpoint 0) for gamma");
-            ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 258U;
-            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
-            return SendCommand(kIdentityGamma, GetEndpoint(0), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
-
-            );
-        }
-        case 25: {
-            LogStep(25, "KeySet Write 1 for gamma");
+            LogStep(23, "KeySet Write 1 for gamma");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
@@ -62464,8 +63875,8 @@ private:
 
             );
         }
-        case 26: {
-            LogStep(26, "KeySet Write 2 for gamma");
+        case 24: {
+            LogStep(24, "KeySet Write 2 for gamma");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
@@ -62499,8 +63910,8 @@ private:
 
             );
         }
-        case 27: {
-            LogStep(27, "Write Group Keys for gamma");
+        case 25: {
+            LogStep(25, "Write Group Keys for gamma");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> value;
 
@@ -62521,6 +63932,26 @@ private:
             }
             return WriteAttribute(kIdentityGamma, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
+        }
+        case 26: {
+            LogStep(26, "Add Group 1 (endpoint 1) for gamma");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 257U;
+            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityGamma, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
+        }
+        case 27: {
+            LogStep(27, "Add Group 2 (endpoint 0) for gamma");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 258U;
+            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityGamma, GetEndpoint(0), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
         }
         case 28: {
             LogStep(28, "Install ACLs for gamma");
@@ -62642,7 +64073,7 @@ private:
 class TestGroupsClusterSuite : public TestCommand
 {
 public:
-    TestGroupsClusterSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestGroupsCluster", 19, credsIssuerConfig)
+    TestGroupsClusterSuite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("TestGroupsCluster", 27, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -62694,7 +64125,7 @@ private:
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
             break;
         case 3:
@@ -62702,30 +64133,45 @@ private:
             {
                 chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
+                VerifyOrReturn(CheckValue("status", value.status, 126U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
             }
             break;
         case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
+            }
+            break;
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
                 VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
             }
             break;
-        case 5:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
             break;
-        case 6:
+        case 9:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
@@ -62734,46 +64180,18 @@ private:
                 {
                     auto iter_0 = value.groupList.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.groupList)>("groupList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("groupList[0]", iter_0.GetValue(), 1U));
+                    VerifyOrReturn(CheckValue("groupList[0]", iter_0.GetValue(), 257U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.groupList)>("groupList", iter_0, 1));
                 }
-            }
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
-            }
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
-                VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
-            }
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 135U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 0U));
             }
             break;
         case 10:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
+                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 4U));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
             break;
         case 11:
@@ -62782,8 +64200,8 @@ private:
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
-                VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
+                VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #2", 8)));
             }
             break;
         case 12:
@@ -62792,10 +64210,30 @@ private:
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
                 VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
             }
             break;
         case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
+                VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
+            }
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
+                VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #2", 8)));
+            }
+            break;
+        case 15:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
@@ -62804,33 +64242,93 @@ private:
                 {
                     auto iter_0 = value.groupList.begin();
                     VerifyOrReturn(CheckNextListItemDecodes<decltype(value.groupList)>("groupList", iter_0, 0));
-                    VerifyOrReturn(CheckValue("groupList[0]", iter_0.GetValue(), 1U));
+                    VerifyOrReturn(CheckValue("groupList[0]", iter_0.GetValue(), 258U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value.groupList)>("groupList", iter_0, 1));
                 }
-            }
-            break;
-        case 14:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 1U));
             }
             break;
         case 16:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
-                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
                 VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 139U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 4369U));
+                VerifyOrReturn(CheckValue("status", value.status, 135U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 0U));
             }
             break;
         case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 260U));
+            }
+            break;
+        case 18:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
+            }
+            break;
+        case 19:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
+                VerifyOrReturn(CheckValueAsString("groupName", value.groupName, chip::CharSpan("Group #1", 8)));
+            }
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
+            }
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValueNull("capacity", value.capacity));
+                {
+                    auto iter_0 = value.groupList.begin();
+                    VerifyOrReturn(CheckNextListItemDecodes<decltype(value.groupList)>("groupList", iter_0, 0));
+                    VerifyOrReturn(CheckValue("groupList[0]", iter_0.GetValue(), 257U));
+                    VerifyOrReturn(CheckNoMoreListItems<decltype(value.groupList)>("groupList", iter_0, 1));
+                }
+            }
+            break;
+        case 22:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            break;
+        case 23:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
+            }
+            break;
+        case 24:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 139U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
+            }
+            break;
+        case 25:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType value;
@@ -62839,7 +64337,7 @@ private:
                 VerifyOrReturn(CheckValue("groupId", value.groupId, 32767U));
             }
             break;
-        case 18:
+        case 26:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType value;
@@ -62887,44 +64385,112 @@ private:
             LogStep(2, "View First Group (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 1U;
+            value.groupId = 257U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
         case 3: {
-            LogStep(3, "Add First Group (new)");
+            LogStep(3, "Add First Group (no keys)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 1U;
+            value.groupId   = 257U;
             value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
 
             );
         }
         case 4: {
-            LogStep(4, "View First Group (new)");
+            LogStep(4, "Add KeySet");
             ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 1U;
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
-                               chip::NullOptional
+            chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
+
+            value.groupKeySet.groupKeySetID = 417U;
+            value.groupKeySet.groupKeySecurityPolicy =
+                static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+            value.groupKeySet.epochKey0.SetNonNull();
+            value.groupKeySet.epochKey0.Value() = chip::ByteSpan(
+                chip::Uint8::from_const_char(
+                    "\240\241\242\243\244\245\246\247\250\251\252\253\254\255\256\257garbage: not in length on purpose"),
+                16);
+            value.groupKeySet.epochStartTime0.SetNonNull();
+            value.groupKeySet.epochStartTime0.Value() = 1110000ULL;
+            value.groupKeySet.epochKey1.SetNonNull();
+            value.groupKeySet.epochKey1.Value() = chip::ByteSpan(
+                chip::Uint8::from_const_char(
+                    "\260\261\262\263\264\265\266\267\270\271\272\273\274\275\276\277garbage: not in length on purpose"),
+                16);
+            value.groupKeySet.epochStartTime1.SetNonNull();
+            value.groupKeySet.epochStartTime1.Value() = 1110001ULL;
+            value.groupKeySet.epochKey2.SetNonNull();
+            value.groupKeySet.epochKey2.Value() = chip::ByteSpan(
+                chip::Uint8::from_const_char(
+                    "\300\301\302\303\304\305\306\307\310\311\312\313\314\315\316\317garbage: not in length on purpose"),
+                16);
+            value.groupKeySet.epochStartTime2.SetNonNull();
+            value.groupKeySet.epochStartTime2.Value() = 1110002ULL;
+
+            return SendCommand(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
+                               GroupKeyManagement::Commands::KeySetWrite::Id, value, chip::NullOptional
 
             );
         }
         case 5: {
-            LogStep(5, "View Second Group (not found)");
+            LogStep(5, "Write Group Keys");
+            ListFreer listFreer;
+            chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> value;
+
+            {
+                auto * listHolder_0 = new ListHolder<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(2);
+                listFreer.add(listHolder_0);
+
+                listHolder_0->mList[0].groupId       = 257U;
+                listHolder_0->mList[0].groupKeySetID = 417U;
+                listHolder_0->mList[0].fabricIndex   = 1U;
+
+                listHolder_0->mList[1].groupId       = 258U;
+                listHolder_0->mList[1].groupKeySetID = 417U;
+                listHolder_0->mList[1].fabricIndex   = 1U;
+
+                value = chip::app::DataModel::List<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(
+                    listHolder_0->mList, 2);
+            }
+            return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
+                                  GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
+        }
+        case 6: {
+            LogStep(6, "Add First Group (new)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 257U;
+            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
+        }
+        case 7: {
+            LogStep(7, "View First Group (new)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 4369U;
+            value.groupId = 257U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 6: {
-            LogStep(6, "Get Group Membership 1 (all)");
+        case 8: {
+            LogStep(8, "View Second Group (not found)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
+            value.groupId = 258U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 9: {
+            LogStep(9, "Get Group Membership 1 (all)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
 
@@ -62934,8 +64500,28 @@ private:
 
             );
         }
-        case 7: {
-            LogStep(7, "View Group 3 (not found)");
+        case 10: {
+            LogStep(10, "Add Second Group (new)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 258U;
+            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
+        }
+        case 11: {
+            LogStep(11, "View Second Group (new)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
+            value.groupId = 258U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 12: {
+            LogStep(12, "View Group 3 (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 32767U;
@@ -62944,18 +64530,46 @@ private:
 
             );
         }
-        case 8: {
-            LogStep(8, "View First Group (existing)");
+        case 13: {
+            LogStep(13, "View First Group (existing)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 1U;
+            value.groupId = 257U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 9: {
-            LogStep(9, "Remove Group 0 (invalid)");
+        case 14: {
+            LogStep(14, "View Second Group (existing)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
+            value.groupId = 258U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 15: {
+            LogStep(15, "Get Group Membership 2");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
+
+            {
+                auto * listHolder_0 = new ListHolder<chip::GroupId>(3);
+                listFreer.add(listHolder_0);
+                listHolder_0->mList[0] = 258U;
+                listHolder_0->mList[1] = 259U;
+                listHolder_0->mList[2] = 32767U;
+                value.groupList        = chip::app::DataModel::List<chip::GroupId>(listHolder_0->mList, 3);
+            }
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::GetGroupMembership::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 16: {
+            LogStep(16, "Remove Group 0 (invalid)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
             value.groupId = 0U;
@@ -62964,38 +64578,48 @@ private:
 
             );
         }
-        case 10: {
-            LogStep(10, "Remove Group 4 (not found)");
+        case 17: {
+            LogStep(17, "Remove Group 4 (not found)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
-            value.groupId = 4U;
+            value.groupId = 260U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 11: {
-            LogStep(11, "View First Group (not removed)");
+        case 18: {
+            LogStep(18, "Remove Second Group (existing)");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::RemoveGroup::Type value;
+            value.groupId = 258U;
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveGroup::Id, value,
+                               chip::NullOptional
+
+            );
+        }
+        case 19: {
+            LogStep(19, "View First Group (not removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 1U;
+            value.groupId = 257U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 12: {
-            LogStep(12, "View Second Group (removed)");
+        case 20: {
+            LogStep(20, "View Second Group (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 4369U;
+            value.groupId = 258U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 13: {
-            LogStep(13, "Get Group Membership 3");
+        case 21: {
+            LogStep(21, "Get Group Membership 3");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
 
@@ -63003,8 +64627,8 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::GroupId>(4);
                 listFreer.add(listHolder_0);
                 listHolder_0->mList[0] = 1U;
-                listHolder_0->mList[1] = 2U;
-                listHolder_0->mList[2] = 4369U;
+                listHolder_0->mList[1] = 257U;
+                listHolder_0->mList[2] = 258U;
                 listHolder_0->mList[3] = 3U;
                 value.groupList        = chip::app::DataModel::List<chip::GroupId>(listHolder_0->mList, 4);
             }
@@ -63013,8 +64637,8 @@ private:
 
             );
         }
-        case 14: {
-            LogStep(14, "Remove All");
+        case 22: {
+            LogStep(22, "Remove All");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type value;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::RemoveAllGroups::Id, value,
@@ -63022,28 +64646,28 @@ private:
 
             );
         }
-        case 15: {
-            LogStep(15, "View First Group (removed)");
+        case 23: {
+            LogStep(23, "View First Group (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 1U;
+            value.groupId = 257U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 16: {
-            LogStep(16, "View Second Group (still removed)");
+        case 24: {
+            LogStep(24, "View Second Group (still removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
-            value.groupId = 4369U;
+            value.groupId = 258U;
             return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::ViewGroup::Id, value,
                                chip::NullOptional
 
             );
         }
-        case 17: {
-            LogStep(17, "View Group 3 (removed)");
+        case 25: {
+            LogStep(25, "View Group 3 (removed)");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::ViewGroup::Type value;
             value.groupId = 32767U;
@@ -63052,8 +64676,8 @@ private:
 
             );
         }
-        case 18: {
-            LogStep(18, "Get Group Membership 4");
+        case 26: {
+            LogStep(26, "Get Group Membership 4");
             ListFreer listFreer;
             chip::app::Clusters::Groups::Commands::GetGroupMembership::Type value;
 
@@ -63061,8 +64685,8 @@ private:
                 auto * listHolder_0 = new ListHolder<chip::GroupId>(5);
                 listFreer.add(listHolder_0);
                 listHolder_0->mList[0] = 1U;
-                listHolder_0->mList[1] = 2U;
-                listHolder_0->mList[2] = 4369U;
+                listHolder_0->mList[1] = 257U;
+                listHolder_0->mList[2] = 258U;
                 listHolder_0->mList[3] = 3U;
                 listHolder_0->mList[4] = 32767U;
                 value.groupList        = chip::app::DataModel::List<chip::GroupId>(listHolder_0->mList, 5);
@@ -63136,29 +64760,11 @@ private:
             break;
         case 3:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
-            }
             break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("status", value.status, 0U));
-                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
-            }
             break;
         case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            break;
-        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType value;
@@ -63179,13 +64785,13 @@ private:
                     CheckValue("groupKeySet.epochStartTime2.Value()", value.groupKeySet.epochStartTime2.Value(), 1110002ULL));
             }
             break;
-        case 8:
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
             break;
-        case 9:
+        case 7:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             break;
-        case 10:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             {
                 chip::app::DataModel::DecodableList<
@@ -63204,6 +64810,24 @@ private:
                     VerifyOrReturn(CheckValue("groupKeyMap[1].fabricIndex", iter_0.GetValue().fabricIndex, 1U));
                     VerifyOrReturn(CheckNoMoreListItems<decltype(value)>("groupKeyMap", iter_0, 2));
                 }
+            }
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 257U));
+            }
+            break;
+        case 10:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            {
+                chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType value;
+                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
+                VerifyOrReturn(CheckValue("status", value.status, 0U));
+                VerifyOrReturn(CheckValue("groupId", value.groupId, 258U));
             }
             break;
         case 11:
@@ -63341,27 +64965,7 @@ private:
                                  GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id, true, chip::NullOptional);
         }
         case 3: {
-            LogStep(3, "Add Group 1");
-            ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 257U;
-            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
-
-            );
-        }
-        case 4: {
-            LogStep(4, "Add Group 2");
-            ListFreer listFreer;
-            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
-            value.groupId   = 258U;
-            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
-            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
-
-            );
-        }
-        case 5: {
-            LogStep(5, "KeySet Write 1");
+            LogStep(3, "KeySet Write 1");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
@@ -63395,8 +64999,8 @@ private:
 
             );
         }
-        case 6: {
-            LogStep(6, "KeySet Write 2");
+        case 4: {
+            LogStep(4, "KeySet Write 2");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type value;
 
@@ -63430,8 +65034,8 @@ private:
 
             );
         }
-        case 7: {
-            LogStep(7, "KeySet Read");
+        case 5: {
+            LogStep(5, "KeySet Read");
             ListFreer listFreer;
             chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type value;
             value.groupKeySetID = 417U;
@@ -63440,8 +65044,8 @@ private:
 
             );
         }
-        case 8: {
-            LogStep(8, "Write Group Keys (invalid)");
+        case 6: {
+            LogStep(6, "Write Group Keys (invalid)");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> value;
 
@@ -63459,8 +65063,8 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 9: {
-            LogStep(9, "Write Group Keys");
+        case 7: {
+            LogStep(7, "Write Group Keys");
             ListFreer listFreer;
             chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type> value;
 
@@ -63482,10 +65086,30 @@ private:
             return WriteAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                   GroupKeyManagement::Attributes::GroupKeyMap::Id, value, chip::NullOptional, chip::NullOptional);
         }
-        case 10: {
-            LogStep(10, "Read Group Keys");
+        case 8: {
+            LogStep(8, "Read Group Keys");
             return ReadAttribute(kIdentityAlpha, GetEndpoint(0), GroupKeyManagement::Id,
                                  GroupKeyManagement::Attributes::GroupKeyMap::Id, true, chip::NullOptional);
+        }
+        case 9: {
+            LogStep(9, "Add Group 1");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 257U;
+            value.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
+        }
+        case 10: {
+            LogStep(10, "Add Group 2");
+            ListFreer listFreer;
+            chip::app::Clusters::Groups::Commands::AddGroup::Type value;
+            value.groupId   = 258U;
+            value.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+            return SendCommand(kIdentityAlpha, GetEndpoint(1), Groups::Id, Groups::Commands::AddGroup::Id, value, chip::NullOptional
+
+            );
         }
         case 11: {
             LogStep(11, "Read GroupTable");
@@ -67560,7 +69184,7 @@ private:
 class Test_TC_BINFO_2_2Suite : public TestCommand
 {
 public:
-    Test_TC_BINFO_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BINFO_2_2", 16, credsIssuerConfig)
+    Test_TC_BINFO_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_BINFO_2_2", 0, credsIssuerConfig)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -67581,8 +69205,6 @@ private:
     chip::Optional<chip::EndpointId> mEndpoint;
     chip::Optional<uint16_t> mTimeout;
 
-    uint32_t SoftwareVersionValue;
-
     chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
 
     //
@@ -67595,87 +69217,6 @@ private:
 
         switch (mTestIndex - 1)
         {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 1:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "uint8"));
-                SoftwareVersionValue = value;
-            }
-            break;
-        case 2:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
-            break;
-        case 3:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                uint32_t value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckValue("softwareVersion", value, SoftwareVersionValue));
-            }
-            break;
-        case 7:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 8:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 9:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 10:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 11:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 12:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 13:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 14:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 15:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            {
-                bool value;
-                VerifyOrReturn(CheckDecodeValue(chip::app::DataModel::Decode(*data, value)));
-                VerifyOrReturn(CheckConstraintType("value", "", "bool"));
-            }
-            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -67691,121 +69232,6 @@ private:
         using namespace chip::app::Clusters;
         switch (testIndex)
         {
-        case 0: {
-            LogStep(0, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "Query SoftwareVersion");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
-                                 chip::NullOptional);
-        }
-        case 2: {
-            LogStep(2, "Query Reachable Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
-                                 chip::NullOptional);
-        }
-        case 3: {
-            LogStep(3, "Reboot target device");
-            VerifyOrDo(!ShouldSkip("PICS_SDK_CI_ONLY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 4: {
-            LogStep(4, "Reboot target device(DUT)");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Please reboot the DUT and enter 'y' after DUT startsgarbage: not in length on purpose", 52);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 5: {
-            LogStep(5, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 6: {
-            LogStep(6, "Query SoftwareVersion");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::SoftwareVersion::Id, true,
-                                 chip::NullOptional);
-        }
-        case 7: {
-            LogStep(7, "Reboot target device");
-            VerifyOrDo(!ShouldSkip("PICS_SDK_CI_ONLY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 8: {
-            LogStep(8, "Reboot target device(DUT)");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Please reboot the DUT and enter 'y' after DUT startsgarbage: not in length on purpose", 52);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 9: {
-            LogStep(9, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 10: {
-            LogStep(10, "Factory Reset the accessory");
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::FactoryReset::Type value;
-            return FactoryReset(kIdentityAlpha, value);
-        }
-        case 11: {
-            LogStep(11, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 12: {
-            LogStep(12, "Reboot target device");
-            VerifyOrDo(!ShouldSkip("PICS_SDK_CI_ONLY"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::SystemCommands::Commands::Reboot::Type value;
-            return Reboot(kIdentityAlpha, value);
-        }
-        case 13: {
-            LogStep(13, "Reboot target device(DUT)");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message =
-                chip::Span<const char>("Please reboot the DUT and enter 'y' after DUT startsgarbage: not in length on purpose", 52);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 14: {
-            LogStep(14, "Wait for the commissioned device to be retrieved");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type value;
-            value.nodeId = mNodeId.HasValue() ? mNodeId.Value() : 305414945ULL;
-            return WaitForCommissionee(kIdentityAlpha, value);
-        }
-        case 15: {
-            LogStep(15, "Query Reachable Fabrics");
-            return ReadAttribute(kIdentityAlpha, GetEndpoint(0), Basic::Id, Basic::Attributes::Reachable::Id, true,
-                                 chip::NullOptional);
-        }
         }
         return CHIP_NO_ERROR;
     }
@@ -72268,6 +73694,63 @@ public:
     }
 
     ~Test_TC_CONTENTLAUNCHER_10_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CONTENTLAUNCHER_10_4Suite : public TestCommand
+{
+public:
+    Test_TC_CONTENTLAUNCHER_10_4Suite(CredentialIssuerCommands * credsIssuerConfig) :
+        TestCommand("Test_TC_CONTENTLAUNCHER_10_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_CONTENTLAUNCHER_10_4Suite() {}
 
     chip::System::Clock::Timeout GetWaitDuration() const override
     {
@@ -85346,25 +86829,25 @@ private:
         }
         case 1: {
             LogStep(1, "read the mandatory attribute: MinMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MinMeasuredValue::Id, true, chip::NullOptional);
         }
         case 2: {
             LogStep(2, "read the mandatory attribute: MaxMeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, true, chip::NullOptional);
         }
         case 3: {
             LogStep(3, "Reads MeasuredValue attribute from DUT");
-            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
         case 4: {
             LogStep(4, "Operate on device to change the temperature significantly");
-            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TM.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_USER_PROMPT && TMP.M.ManuallyControlled"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Please enter 'y' for successgarbage: not in length on purpose", 28);
@@ -85374,7 +86857,7 @@ private:
         }
         case 5: {
             LogStep(5, "Read the mandatory attribute: MeasuredValue");
-            VerifyOrDo(!ShouldSkip("TM.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("TMP.S.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return ReadAttribute(kIdentityAlpha, GetEndpoint(1), TemperatureMeasurement::Id,
                                  TemperatureMeasurement::Attributes::MeasuredValue::Id, true, chip::NullOptional);
         }
@@ -87406,6 +88889,622 @@ private:
     }
 };
 
+class Test_TC_ACL_1_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_1_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_1_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_1_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_1Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_1Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_1", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_1Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_2Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_2Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_2", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_2Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_3Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_3Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_3", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_3Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_4Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_4Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_4", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_4Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_5Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_5Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_5", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_5Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_6Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_6Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_6", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_6Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_7Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_7Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_7", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_7Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_8Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_8Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_8", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_8Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_9Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_9Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_9", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_9Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_ACL_2_10Suite : public TestCommand
+{
+public:
+    Test_TC_ACL_2_10Suite(CredentialIssuerCommands * credsIssuerConfig) : TestCommand("Test_TC_ACL_2_10", 0, credsIssuerConfig)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_ACL_2_10Suite() {}
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.ValueOr(kTimeoutInSeconds));
+    }
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
 #endif // CONFIG_ENABLE_YAML_TESTS
 
 void registerCommandsTests(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
@@ -87581,6 +89680,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<TestConfigVariablesSuite>(credsIssuerConfig),
         make_unique<TestDescriptorClusterSuite>(credsIssuerConfig),
         make_unique<TestBasicInformationSuite>(credsIssuerConfig),
+        make_unique<TestFabricRemovalWhileSubscribedSuite>(credsIssuerConfig),
         make_unique<TestGeneralCommissioningSuite>(credsIssuerConfig),
         make_unique<TestIdentifyClusterSuite>(credsIssuerConfig),
         make_unique<TestOperationalCredentialsClusterSuite>(credsIssuerConfig),
@@ -87755,6 +89855,7 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_AUDIOOUTPUT_7_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_AUDIOOUTPUT_7_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_CONTENTLAUNCHER_10_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_CONTENTLAUNCHER_10_4Suite>(credsIssuerConfig),
         make_unique<Test_TC_CONTENTLAUNCHER_10_5Suite>(credsIssuerConfig),
         make_unique<Test_TC_CONTENTLAUNCHER_10_7Suite>(credsIssuerConfig),
         make_unique<Test_TC_MC_11_1Suite>(credsIssuerConfig),
@@ -87926,6 +90027,17 @@ void registerCommandsTests(Commands & commands, CredentialIssuerCommands * creds
         make_unique<Test_TC_S_2_3Suite>(credsIssuerConfig),
         make_unique<Test_TC_S_3_1Suite>(credsIssuerConfig),
         make_unique<Test_TC_PCC_3_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_1_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_1Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_2Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_3Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_4Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_5Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_6Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_7Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_8Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_9Suite>(credsIssuerConfig),
+        make_unique<Test_TC_ACL_2_10Suite>(credsIssuerConfig),
 #endif // CONFIG_ENABLE_YAML_TESTS
     };
 

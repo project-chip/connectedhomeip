@@ -37,7 +37,7 @@ tests:
     - label:
           "Reads the Lineup attribute from the DUT and Verify that the response
           contains a lineup info object"
-      PICS: MC_CHANNEL.S.A0001 && PICS_USER_PROMPT
+      PICS: CHANNEL.S.A0001 && PICS_USER_PROMPT
       verification: |
           ./chip-tool channel read lineup 1 1
           [1653999659095] [94964:7676726] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0504 Attribute 0x0000_0001 DataVersion: 3623945891
@@ -57,7 +57,7 @@ tests:
                 value: "y"
 
     - label: "Reads the ChannelList attribute from the DUT"
-      PICS: MC_CHANNEL.S.A0000
+      PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
       response:
@@ -65,14 +65,14 @@ tests:
               type: list
 
     - label: "Reads the CurrentChannel attribute from the DUT"
-      PICS: MC_CHANNEL.S.A0002
+      PICS: CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:
           value: [majorNumber: majornumber, minorNumber: minornumber]
 
     - label: "Sends a SkipChannel command to the DUT"
-      PICS: MC_CHANNEL.S.C0003
+      PICS: CHANNEL.S.C0003
       command: "SkipChannel"
       arguments:
           values:
@@ -91,7 +91,7 @@ tests:
                 value: "y"
 
     - label: "Reads the CurrentChannel attribute from the DUT"
-      PICS: MC_CHANNEL.S.A0002
+      PICS: CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:

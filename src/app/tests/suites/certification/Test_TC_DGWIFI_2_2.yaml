@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 51.2.2. [TC-DGWIFI-2.2] Event functionality with server as DUT
+name: 3.2.2. [TC-DGWIFI-2.2] Event Functionality [DUT as Server]
 
 config:
     nodeId: 0x12344321
@@ -21,25 +21,54 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
-      verification: |
-
-      disabled: true
-
-    - label: "TH sends chip-tool command to DUT"
+    - label:
+          "Disconnect node WiFi as a result of de-authentication or
+          dis-association."
       PICS: DGWIFI.S.E00
       verification: |
-          chip-tool wifinetworkdiagnostics read-event disconnection 1 0
+          This is an Optional event so its not compulsory to get the expected outcome
+
+          ./chip-tool wifinetworkdiagnostics read-event disconnection 1 0
+          Verify on the TH Log:
+
+          [1655734228.476828][18708:18713] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0000
+          [1655734228.476890][18708:18713] CHIP:TOO:          Event number: 2
+          [1655734228.476945][18708:18713] CHIP:TOO:          Priority: Info
+          [1655734228.476998][18708:18713] CHIP:TOO:          Timestamp: 30160685
+          [1655734228.477141][18708:18713] CHIP:TOO:   Disconnection: {
+          [1655734228.477215][18708:18713] CHIP:TOO:     ReasonCode: 65533
+          [1655734228.477271][18708:18713] CHIP:TOO:    }
       disabled: true
 
-    - label: "TH sends chip-tool command to DUT"
+    - label:
+          "Disconnect node WiFi as a result of de-authentication or
+          dis-association. DUT exhausts all internal retries."
       PICS: DGWIFI.S.E01
       verification: |
-          chip-tool wifinetworkdiagnostics read-event association-failure 1 0
+          This is an Optional event so its not compulsory to get the expected outcome
+
+          ./chip-tool wifinetworkdiagnostics read-event association-failure 1 0
+
+           CHIP:DMG: ReportDataMessage =
+          [1651574380.297222][8941:8946] CHIP:DMG: {
+          [1651574380.297245][8941:8946] CHIP:DMG:         SuppressResponse = true,
+          [1651574380.297270][8941:8946] CHIP:DMG:         InteractionModelRevision = 1
+          [1651574380.297293][8941:8946] CHIP:DMG: }
+          [1651574380.297374][8941:8946] CHIP:EM: Sending Standalone Ack for MessageCounter:12534430 on exchange 15170i
       disabled: true
 
-    - label: "TH sends chip-tool command to DUT"
+    - label: "Disconnect and reconnect node WiFi."
       PICS: DGWIFI.S.E02
       verification: |
-          chip-tool wifinetworkdiagnostics read-event connection-status 1 0
+          This is an Optional event so its not compulsory to get the expected outcome
+
+          ./chip-tool wifinetworkdiagnostics read-event connection-status 1 0
+
+          [1655734276.513474][18731:18736] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Event 0x0000_0002
+          [1655734276.513504][18731:18736] CHIP:TOO:          Event number: 3
+          [1655734276.513526][18731:18736] CHIP:TOO:          Priority: Info
+          [1655734276.513548][18731:18736] CHIP:TOO:          Timestamp: 30160685
+          [1655734276.513621][18731:18736] CHIP:TOO:   ConnectionStatus: {
+          [1655734276.513659][18731:18736] CHIP:TOO:     ConnectionStatus: 0
+          [1655734276.513733][18731:18736] CHIP:TOO:    }
       disabled: true

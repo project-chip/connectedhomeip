@@ -28,6 +28,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
       verification: |
+          Verify in TH Log
+
           ./chip-tool localizationconfiguration read cluster-revision 1 0
 
 
@@ -41,6 +43,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
       verification: |
+          Verify in TH Log
+
           ./chip-tool localizationconfiguration read feature-map 1 0
 
 
@@ -51,6 +55,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
       verification: |
+          Verify in TH Log
+
           ./chip-tool localizationconfiguration read  attribute-list 1 0
 
           [1653462309.061114][29477:29482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFB DataVersion: 2352052086
@@ -72,6 +78,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
       verification: |
+          Verify in TH Log
+
           ./chip-tool localizationconfiguration read accepted-command-list 1 0
 
 
@@ -85,6 +93,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
       verification: |
+          Verify in TH Log
+
           ./chip-tool localizationconfiguration read  generated-command-list 1 0
 
 

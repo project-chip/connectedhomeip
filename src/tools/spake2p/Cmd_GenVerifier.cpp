@@ -37,6 +37,7 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <setup_payload/SetupPayload.h>
 
 namespace {
 
