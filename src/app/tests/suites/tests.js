@@ -234,8 +234,8 @@ function getManualTests() {
         "Test_TC_CADMIN_1_8",
         "Test_TC_CADMIN_1_11",
         "Test_TC_CADMIN_1_12",
-        "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_14",
+        "Test_TC_CADMIN_1_15",
         "Test_TC_CADMIN_1_16",
         "Test_TC_CADMIN_1_17",
         "Test_TC_CADMIN_1_18",
@@ -250,7 +250,7 @@ function getManualTests() {
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
-        "Test_TC_CADMIN_1_15",
+        "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_25",
         "Test_TC_CADMIN_1_26",
     ];
