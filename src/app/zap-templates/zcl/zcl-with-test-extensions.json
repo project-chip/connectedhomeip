@@ -1,5 +1,7 @@
 {
-    "version": "ZCL Test Data",
+    "description": "Matter SDK ZCL data with some extensions",
+    "category": "matter",
+    "version": 1,
     "xmlRoot": [
         ".",
         "./data-model/chip/",
