@@ -22826,12 +22826,14 @@ typedef NS_OPTIONS(uint32_t, MTRDoorLockFeature) {
     MTRDoorLockFeatureRFIDCredentials = 0x2,
     MTRDoorLockFeatureFingerCredentials = 0x4,
     MTRDoorLockFeatureLogging = 0x8,
-    MTRDoorLockFeatureAccessSchedules = 0x10,
+    MTRDoorLockFeatureWeekDaySchedules = 0x10,
     MTRDoorLockFeatureDoorPositionSensor = 0x20,
     MTRDoorLockFeatureFaceCredentials = 0x40,
     MTRDoorLockFeatureCredentialsOTA = 0x80,
     MTRDoorLockFeatureUsersManagement = 0x100,
     MTRDoorLockFeatureNotifications = 0x200,
+    MTRDoorLockFeatureYearDaySchedules = 0x400,
+    MTRDoorLockFeatureHolidaySchedules = 0x800,
 };
 
 typedef NS_ENUM(uint8_t, MTRWindowCoveringEndProductType) {
