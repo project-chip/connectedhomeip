@@ -98,6 +98,7 @@ public:
     {
         // We don't shut down InteractionModelReports here; we leave it for
         // Cleanup to handle.
+        mError = CHIP_NO_ERROR;
         ModelCommand::Shutdown();
     }
 
