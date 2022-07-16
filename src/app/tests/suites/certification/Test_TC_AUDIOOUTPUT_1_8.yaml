@@ -64,7 +64,7 @@ tests:
               contains: [0]
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: MC_MEDIAINPUT.S.NU
+      PICS: MEDIAINPUT.S.NU
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -73,7 +73,7 @@ tests:
               type: list
 
     - label: "Read the global attribute: GeneratedCommandList"
-      PICS: " !MC_MEDIAINPUT.S.NU "
+      PICS: " !MEDIAINPUT.S.NU "
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

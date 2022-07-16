@@ -377,7 +377,7 @@ limitations under the License.
     <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">MinLevel</attribute>
     <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">MaxLevel</attribute>
     <attribute side="server" code="0x0014" define="INTRINSIC_BALLAST_FACTOR" type="INT8U" writable="true" isNullable="true" optional="true">IntrinsicBalanceFactor</attribute>
-    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFE" isNullable="true" optional="true">BallastFactorAdjustment</attribute>
+    <attribute side="server" code="0x0015" define="BALLAST_FACTOR_ADJUSTMENT" type="INT8U" min="0x64" writable="true" default="0xFF" isNullable="true" optional="true">BallastFactorAdjustment</attribute>
     <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="INT8U" writable="false" optional="false">LampQuantity</attribute>
     <attribute side="server" code="0x0030" define="LAMP_TYPE" type="CHAR_STRING" length="16" writable="true" optional="true">LampType</attribute>
     <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">LampManufacturer</attribute>

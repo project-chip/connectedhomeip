@@ -1299,12 +1299,14 @@ enum class DoorLockFeature : uint32_t
     kRFIDCredentials    = 0x2,
     kFingerCredentials  = 0x4,
     kLogging            = 0x8,
-    kAccessSchedules    = 0x10,
+    kWeekDaySchedules   = 0x10,
     kDoorPositionSensor = 0x20,
     kFaceCredentials    = 0x40,
     kCredentialsOTA     = 0x80,
     kUsersManagement    = 0x100,
     kNotifications      = 0x200,
+    kYearDaySchedules   = 0x400,
+    kHolidaySchedules   = 0x800,
 };
 } // namespace DoorLock
 

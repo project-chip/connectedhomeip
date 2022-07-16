@@ -38,8 +38,8 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the global attribute: FeatureMap"
-      PICS: MC_MEDIAINPUT.S.NU
+    - label: "Read the optional global attribute: FeatureMap"
+      PICS: MEDIAINPUT.S.NU
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -48,6 +48,7 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
+      PICS: MEDIAINPUT.S.A0000 && MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -56,7 +57,7 @@ tests:
               contains: [65528, 65529, 65531, 65532, 65533]
 
     - label: "Read the optonal attribute(InputList) in AttributeList"
-      PICS: MC_MEDIAINPUT.S.A0000
+      PICS: MEDIAINPUT.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -65,7 +66,7 @@ tests:
               contains: [0]
 
     - label: "Read the optonal attribute(CurrentInput) in AttributeList"
-      PICS: MC_MEDIAINPUT.S.A0001
+      PICS: MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:

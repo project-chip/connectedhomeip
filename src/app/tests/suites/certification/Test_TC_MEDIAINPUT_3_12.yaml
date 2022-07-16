@@ -30,7 +30,7 @@ tests:
                 value: nodeId
 
     - label: "Read attribute media input list"
-      PICS: MC_MEDIAINPUT.S.A0000
+      PICS: MEDIAINPUT.S.A0000
       command: "readAttribute"
       attribute: "InputList"
       response:
@@ -38,13 +38,13 @@ tests:
               type: list
 
     - label: "Hide Input Status Command"
-      PICS: MC_MEDIAINPUT.S.C0002
+      PICS: MEDIAINPUT.S.C0002
       command: "HideInputStatus"
       response:
           error: 0
 
     - label: "Show Input Status Command"
-      PICS: MC_MEDIAINPUT.S.C0001
+      PICS: MEDIAINPUT.S.C0001
       command: "ShowInputStatus"
       response:
           error: 0
