@@ -162,7 +162,7 @@ tests:
           Networks attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1 
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1
 
           Verify on the TH Log:
 

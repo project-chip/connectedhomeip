@@ -26,7 +26,7 @@ tests:
     - label: "TH sends ArmFailSafe command to the DUT"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
-            
+
           Verify on the TH Log:
 
           [1653477320.523480][30238:30243] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
