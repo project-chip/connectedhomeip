@@ -3911,30 +3911,24 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace MaxLevel
 
-namespace PowerOnLevel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+namespace IntrinsicBalanceFactor {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace PowerOnLevel
-
-namespace PowerOnFadeTime {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace PowerOnFadeTime
-
-namespace IntrinsicBallastFactor {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace IntrinsicBallastFactor
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
+} // namespace IntrinsicBalanceFactor
 
 namespace BallastFactorAdjustment {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
 } // namespace BallastFactorAdjustment
 
-namespace LampQuality {
+namespace LampQuantity {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace LampQuality
+} // namespace LampQuantity
 
 namespace LampType {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
@@ -3947,13 +3941,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LampManufacturer
 
 namespace LampRatedHours {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int24u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace LampRatedHours
 
 namespace LampBurnHours {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int24u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace LampBurnHours
 
 namespace LampAlarmMode {
@@ -3962,8 +3960,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace LampAlarmMode
 
 namespace LampBurnHoursTripPoint {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int24u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace LampBurnHoursTripPoint
 
 namespace FeatureMap {

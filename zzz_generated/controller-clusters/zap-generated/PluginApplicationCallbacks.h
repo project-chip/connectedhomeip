@@ -66,6 +66,7 @@
     MatterFanControlPluginClientInitCallback();                                                                                    \
     MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
     MatterColorControlPluginClientInitCallback();                                                                                  \
+    MatterBallastConfigurationPluginClientInitCallback();                                                                          \
     MatterIlluminanceMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \

@@ -3336,6 +3336,28 @@ client cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
+client cluster BallastConfiguration = 769 {
+  readonly attribute int8u physicalMinLevel = 0;
+  readonly attribute int8u physicalMaxLevel = 1;
+  readonly attribute bitmap8 ballastStatus = 2;
+  attribute int8u minLevel = 16;
+  attribute int8u maxLevel = 17;
+  attribute nullable int8u intrinsicBalanceFactor = 20;
+  attribute nullable int8u ballastFactorAdjustment = 21;
+  readonly attribute int8u lampQuantity = 32;
+  attribute char_string<16> lampType = 48;
+  attribute char_string<16> lampManufacturer = 49;
+  attribute nullable int24u lampRatedHours = 50;
+  attribute nullable int24u lampBurnHours = 51;
+  attribute bitmap8 lampAlarmMode = 52;
+  attribute nullable int24u lampBurnHoursTripPoint = 53;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 client cluster IlluminanceMeasurement = 1024 {
   enum LightSensorType : ENUM8 {
     kPhotodiode = 0;
@@ -4393,6 +4415,7 @@ endpoint 1 {
   binding cluster FanControl;
   binding cluster ThermostatUserInterfaceConfiguration;
   binding cluster ColorControl;
+  binding cluster BallastConfiguration;
   binding cluster IlluminanceMeasurement;
   binding cluster TemperatureMeasurement;
   binding cluster PressureMeasurement;
