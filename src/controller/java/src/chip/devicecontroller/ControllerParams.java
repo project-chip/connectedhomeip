@@ -93,7 +93,7 @@ public final class ControllerParams {
     private int failsafeTimerSeconds = 30;
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = true;
-  
+
     private Builder() {}
 
     public Builder setUdpListenPort(int udpListenPort) {
