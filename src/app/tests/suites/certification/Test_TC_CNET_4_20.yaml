@@ -188,6 +188,21 @@ tests:
     - label: "DUT sends the RemoveNetwork command to the TH"
       PICS: CNET.C.C06.Tx
       verification: |
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+
+          [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1650373300.704957][42697:42702] CHIP:TOO:   NetworkConfigResponse: {
+          [1650373300.705012][42697:42702] CHIP:TOO:     networkingStatus: 0
+          [1650373300.705044][42697:42702] CHIP:TOO:     networkIndex: 0
+          [1650373300.705073][42697:42702] CHIP:TOO:    }
+          [1650373300.705120][42697:42702] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1650373300.705181][42697:42702] CHIP:EM: Sending Standalone Ack for MessageCounter:9924068 on exchange 3557i
+      disabled: true
+
+    - label: "DUT sends the ConnectNetwork command to the TH"
+      PICS: CNET.C.C08.Tx
+      verification: |
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
           [1650376217.124606][42876:42881] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
@@ -200,8 +215,8 @@ tests:
           [1650376217.125282][42876:42881] CHIP:EM: Sending Standalone Ack for MessageCounter:7901929 on exchange 1050i
       disabled: true
 
-    - label: "DUT sends the ConnectNetwork command to the TH"
-      PICS: CNET.C.C08.Tx
+    - label: "DUT sends the ReorderNetwork command to the TH"
+      PICS: CNET.C.C04.Tx
       verification: |
           ./chip-tool networkcommissioning reorder-network hex:47524C50726976617465 3 1 0
 
@@ -213,19 +228,4 @@ tests:
           [1650381494.821016][44087:44092] CHIP:TOO:    }
           [1650381494.821087][44087:44092] CHIP:DMG: ICR moving to [AwaitingDe]
           [1650381494.821174][44087:44092] CHIP:EM: Sending Standalone Ack for MessageCounter:5656346 on exchange 4849i
-      disabled: true
-
-    - label: "DUT sends the ReorderNetwork command to the TH"
-      PICS: CNET.C.C04.Tx
-      verification: |
-          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
-
-          [1650373300.704806][42697:42702] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650373300.704864][42697:42702] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650373300.704957][42697:42702] CHIP:TOO:   NetworkConfigResponse: {
-          [1650373300.705012][42697:42702] CHIP:TOO:     networkingStatus: 0
-          [1650373300.705044][42697:42702] CHIP:TOO:     networkIndex: 0
-          [1650373300.705073][42697:42702] CHIP:TOO:    }
-          [1650373300.705120][42697:42702] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650373300.705181][42697:42702] CHIP:EM: Sending Standalone Ack for MessageCounter:9924068 on exchange 3557i
       disabled: true

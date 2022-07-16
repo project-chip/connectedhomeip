@@ -30,7 +30,7 @@ tests:
           "TH1 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       verification: |
-          ./chip-tool operationalcredentials read  1 0
+          ./chip-tool operationalcredentials read current-fabric-index 1 0
 
           On TH, Verify DUT Responds  to CurrentFabricIndex attribute of operationalCredential cluster  as 1
 
@@ -121,6 +121,9 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
+
+          On TH , Verify DUT  Responds  Successfully .
+
           [1657278638.722246][9030:9035] CHIP:DMG:                AttributeReportIB =
           [1657278638.722296][9030:9035] CHIP:DMG:                {
           [1657278638.722333][9030:9035] CHIP:DMG:                        AttributeDataIB =
@@ -166,6 +169,8 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
+
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
 
           [1656416899.781899][3814:3819] CHIP:DMG: WriteResponseMessage =
 
@@ -218,6 +223,8 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
+
+          On TH , Verify DUT  Responds  Successfully  .
 
           [1657278788.400832][9048:9053] CHIP:DMG: ReportDataMessage =
           [1657278788.400863][9048:9053] CHIP:DMG: {
@@ -284,9 +291,11 @@ tests:
           "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
           value is list of AccessControlExtensionStruct containing 1 element
           struct Data field: D_OK_FULL"
-      PICS: ACL.S.A0001(
+      PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003148656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E0018"}]' 1 0
+
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
           [1656417544.279572][3888:3893] CHIP:DMG: WriteResponseMessage =
           [1656417544.279598][3888:3893] CHIP:DMG: {
           [1656417544.279620][3888:3893] CHIP:DMG:        AttributeStatusIBs =
@@ -329,6 +338,8 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
+
+          On TH , Verify DUT  Responds  Successfully .
 
           1657278905.391846][9065:9070] CHIP:DMG: ReportDataMessage =
           [1657278905.391878][9065:9070] CHIP:DMG: {
@@ -398,7 +409,7 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"}]' 1 0
-
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
           1657279033.590101][9081:9086] CHIP:DMG: WriteResponseMessage =
           [1657279033.590134][9081:9086] CHIP:DMG: {
           [1657279033.590167][9081:9086] CHIP:DMG:        AttributeStatusIBs =
@@ -456,6 +467,8 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"1518"}]' 1 0
 
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+
           [1657609094.514337][8195:8200] CHIP:DMG: WriteResponseMessage =
           [1657609094.514410][8195:8200] CHIP:DMG: {
           [1657609094.514447][8195:8200] CHIP:DMG:        AttributeStatusIBs =
@@ -508,6 +521,8 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"3701D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
+
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
 
           [1657609434.913859][8206:8211] CHIP:DMG: WriteResponseMessage =
           [1657609434.913892][8206:8211] CHIP:DMG: {
@@ -562,6 +577,8 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"17103D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
 
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+
           [1657609579.493445][8215:8220] CHIP:DMG: WriteResponseMessage =
           [1657609579.493480][8215:8220] CHIP:DMG: {
           [1657609579.493509][8215:8220] CHIP:DMG:        AttributeStatusIBs =
@@ -615,6 +632,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018FF"}]' 1 0
 
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
           [1657609625.258101][8223:8228] CHIP:DMG: WriteResponseMessage =
           [1657609625.258129][8223:8228] CHIP:DMG: {
           [1657609625.258152][8223:8228] CHIP:DMG:        AttributeStatusIBs =
@@ -668,6 +686,9 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700"}]' 1 0
 
+
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+
           [1657609654.298297][8229:8234] CHIP:DMG: WriteResponseMessage =
           [1657609654.298338][8229:8234] CHIP:DMG: {
           [1657609654.298400][8229:8234] CHIP:DMG:        AttributeStatusIBs =
@@ -719,7 +740,9 @@ tests:
           struct Data field: D_BAD_NOnE"
       PICS: ACL.S.A0001
       verification: |
-          /chip-tool accesscontrol write extension '[{"data":""}]' 1 0
+          ./chip-tool accesscontrol write extension '[{"data":""}]' 1 0
+
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
 
           [1657609694.044950][8236:8241] CHIP:DMG: WriteResponseMessage =
           [1657609694.044980][8236:8241] CHIP:DMG: {
@@ -776,6 +799,7 @@ tests:
       verification: |
           ./chip-tool accesscontrol write extension '[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
 
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
           1657279798.807750][9208:9213] CHIP:DMG: WriteResponseMessage =
           [1657279798.807783][9208:9213] CHIP:DMG: {
           [1657279798.807812][9208:9213] CHIP:DMG:        AttributeStatusIBs =
@@ -845,6 +869,8 @@ tests:
       verification: |
           ./chip-tool accesscontrol read extension 1 0
 
+          On TH , Verify DUT  Responds  Successfully .
+
           1657279968.695899][9221:9226] CHIP:DMG: ReportDataMessage =
           [1657279968.695931][9221:9226] CHIP:DMG: {
           [1657279968.695956][9221:9226] CHIP:DMG:        AttributeReportIBs =
@@ -911,51 +937,34 @@ tests:
           value is an empty list"
       PICS: ACL.S.A0001
       verification: |
-          ./chip-tool accesscontrol write extension '[{"data":""}]' 1 0
+          ./chip-tool accesscontrol write extension '[]' 1 0
 
-          1657280110.934160][9249:9254] CHIP:DMG: WriteResponseMessage =
-          [1657280110.934187][9249:9254] CHIP:DMG: {
-          [1657280110.934211][9249:9254] CHIP:DMG:        AttributeStatusIBs =
-          [1657280110.934242][9249:9254] CHIP:DMG:        [
-          [1657280110.934266][9249:9254] CHIP:DMG:                AttributeStatusIB =
-          [1657280110.934298][9249:9254] CHIP:DMG:                {
-          [1657280110.934324][9249:9254] CHIP:DMG:                        AttributePathIB =
-          [1657280110.934350][9249:9254] CHIP:DMG:                        {
-          [1657280110.934376][9249:9254] CHIP:DMG:                                Endpoint = 0x0,
-          [1657280110.934425][9249:9254] CHIP:DMG:                                Cluster = 0x1f,
-          [1657280110.934457][9249:9254] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657280110.934489][9249:9254] CHIP:DMG:                        }
-          [1657280110.934526][9249:9254] CHIP:DMG:
-          [1657280110.934570][9249:9254] CHIP:DMG:                        StatusIB =
-          [1657280110.934611][9249:9254] CHIP:DMG:                        {
-          [1657280110.934671][9249:9254] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657280110.934721][9249:9254] CHIP:DMG:                        },
-          [1657280110.934765][9249:9254] CHIP:DMG:
-          [1657280110.934801][9249:9254] CHIP:DMG:                },
-          [1657280110.934851][9249:9254] CHIP:DMG:
-          [1657280110.934883][9249:9254] CHIP:DMG:                AttributeStatusIB =
-          [1657280110.934921][9249:9254] CHIP:DMG:                {
-          [1657280110.934958][9249:9254] CHIP:DMG:                        AttributePathIB =
-          [1657280110.934999][9249:9254] CHIP:DMG:                        {
-          [1657280110.935041][9249:9254] CHIP:DMG:                                Endpoint = 0x0,
-          [1657280110.935090][9249:9254] CHIP:DMG:                                Cluster = 0x1f,
-          [1657280110.935140][9249:9254] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657280110.935184][9249:9254] CHIP:DMG:                                ListIndex = Null,
-          [1657280110.935225][9249:9254] CHIP:DMG:                        }
-          [1657280110.935271][9249:9254] CHIP:DMG:
-          [1657280110.935311][9249:9254] CHIP:DMG:                        StatusIB =
-          [1657280110.935352][9249:9254] CHIP:DMG:                        {
-          [1657280110.935394][9249:9254] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657280110.935439][9249:9254] CHIP:DMG:                        },
-          [1657280110.935480][9249:9254] CHIP:DMG:
-          [1657280110.935516][9249:9254] CHIP:DMG:                },
-          [1657280110.935559][9249:9254] CHIP:DMG:
-          [1657280110.935593][9249:9254] CHIP:DMG:        ],
-          [1657280110.935637][9249:9254] CHIP:DMG:
-          [1657280110.935669][9249:9254] CHIP:DMG:        InteractionModelRevision = 1
-          [1657280110.935702][9249:9254] CHIP:DMG: }
-          [1657280110.935832][9249:9254] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1657280110.935905][9249:9254] CHIP:EM: Sending Standalone Ack for MessageCounter:177934863 on exchange 1329i
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element .
+
+          7625][1521:1526] CHIP:DMG:                AttributeStatusIB =
+          [1657692723.227673][1521:1526] CHIP:DMG:                {
+          [1657692723.227725][1521:1526] CHIP:DMG:                        AttributePathIB =
+          [1657692723.227780][1521:1526] CHIP:DMG:                        {
+          [1657692723.227834][1521:1526] CHIP:DMG:                                Endpoint = 0x0,
+          [1657692723.227897][1521:1526] CHIP:DMG:                                Cluster = 0x1f,
+          [1657692723.227956][1521:1526] CHIP:DMG:                                Attribute = 0x0000_0001,
+          [1657692723.228012][1521:1526] CHIP:DMG:                        }
+          [1657692723.228073][1521:1526] CHIP:DMG:
+          [1657692723.228125][1521:1526] CHIP:DMG:                        StatusIB =
+          [1657692723.228182][1521:1526] CHIP:DMG:                        {
+          [1657692723.228238][1521:1526] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1657692723.228294][1521:1526] CHIP:DMG:                        },
+          [1657692723.228349][1521:1526] CHIP:DMG:
+          [1657692723.228397][1521:1526] CHIP:DMG:                },
+          [1657692723.228449][1521:1526] CHIP:DMG:
+          [1657692723.228492][1521:1526] CHIP:DMG:        ],
+          [1657692723.228551][1521:1526] CHIP:DMG:
+          [1657692723.228582][1521:1526] CHIP:DMG:        InteractionModelRevision = 1
+          [1657692723.228608][1521:1526] CHIP:DMG: }
+          [1657692723.228738][1521:1526] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657692723.228802][1521:1526] CHIP:EM: Sending Standalone Ack for MessageCounter:57305662 on exchange 27543i
+          [1657692723.228869][1521:1526] CHIP:IN: Prepared secure message 0xffff9fffd9d8 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 27543i with MessageCounter:9219504.
+          [1657692723.228909][1521:1526]
       disabled: true
 
     - label:
@@ -963,6 +972,8 @@ tests:
       PICS: ACL.S.A0001
       verification: |
           ./chip-tool accesscontrol read extension 1 0
+
+          On TH , Verify DUT  Responds  Successfully .
 
           1657280113.650757][9255:9260] CHIP:DMG: ReportDataMessage =
           [1657280113.650786][9255:9260] CHIP:DMG: {
