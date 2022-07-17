@@ -536,6 +536,10 @@ SWTCH.S.F01=1
 SWTCH.S.F02=1
 SWTCH.S.F03=1
 SWTCH.S.F04=1
+SWTCH.C.F00=1
+SWTCH.C.F01=1
+SWTCH.C.M.RA=1
+SWTCH.C.M.EV=1
 
 #General Commissioning Cluster
 CGEN.S.A0000=1
@@ -593,8 +597,12 @@ OTAC.C.M.NotifyUpdateApplied=1
 
 #User Label
 ULABEL.S.A0000=1
+ULABEL.C.A0000=1
+
 #Fixed Label
 FLABEL.S.A0000=1
+FLABEL.C.A0000=1
+
 #Thermostat User Configuration Cluster
 TSUIC.S.A0000=1
 TSUIC.S.A0001=1
