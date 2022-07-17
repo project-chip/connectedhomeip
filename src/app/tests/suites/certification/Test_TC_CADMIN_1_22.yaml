@@ -15,7 +15,7 @@
 
 name:
     24.1.22. [TC-CADMIN-1.22] max number of Commissioned Fabrics and
-    SupportedFabrics rollover using BCM [DUT - Commissionee]
+    SupportedFabrics rollover using BCM [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -24,13 +24,11 @@ config:
 
 tests:
     - label: "Reset DUT_CE to factory defaults"
-      PICS: PICS_MF
       verification: |
 
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      PICS: PICS_MF
       verification: |
           "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
@@ -38,8 +36,8 @@ tests:
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.S.C0001
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -81,7 +79,6 @@ tests:
       disabled: true
 
     - label: "THn starts a commissioning process with DUT_CE"
-      PICS: PICS_MF
       verification: |
           On nth controller using chip tool connect to the accessory
 
@@ -95,7 +92,7 @@ tests:
     - label:
           "Repeat Step 3 and Step 4 an additional (SupportedFabrics - 2) times
           to reach an index value of SupportedFabrics on DUT_CE"
-      PICS: PICS_MF
+      PICS: CADMIN.S.C0001
       verification: |
           Repeat step 3 until  CommissionedFabrics=SupportedFabrics
       disabled: true
@@ -103,7 +100,7 @@ tests:
     - label:
           "THn starts a commissioning process and opens a commissioning window
           with DUT_CE"
-      PICS: PICS_MF
+      PICS: CADMIN.S.C0001
       verification: |
           On nth controller using chip tool connect to the accessory
 
@@ -117,7 +114,7 @@ tests:
       disabled: true
 
     - label: "TH_CR1 removes FabricIndex1"
-      PICS: PICS_MF
+      PICS: OPCREDS.S.C0a.Rsp
       verification: |
           on 1st controller using chip tool, remove fabric with FabricIndex=1
 

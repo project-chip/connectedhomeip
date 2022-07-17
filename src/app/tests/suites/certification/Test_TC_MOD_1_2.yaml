@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 79.1.2. [TC-MOD-1.2] Cluster attributes with server as DUT
+name: 80.1.2. [TC-MOD-1.2] Cluster attributes with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -24,6 +24,8 @@ tests:
     - label: "TH reads the SupportedModes attribute from DUT"
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
+
+          Verify on the TH Log:
 
           [1654595167.600241][14362:14367] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 366231602
           [1654595167.600345][14362:14367] CHIP:TOO:   SupportedModes: 3 entries
@@ -60,7 +62,10 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
+          Verify on the TH Log:
+
           [1645776767.611140][4667:4672] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469718
+
           [1645776767.611214][4667:4672] CHIP:TOO:   CurrentMode: 0
       disabled: true
 
@@ -68,7 +73,11 @@ tests:
       verification: |
           ./chip-tool modeselect read on-mode 1 1
 
+          Verify on the TH Log:
+
+
           [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4277065072
+
           [1649676072.466094][10754:10759] CHIP:TOO:   OnMode: null
       disabled: true
 
@@ -76,7 +85,11 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
+          Verify on the TH Log:
+
+
           [1649677014.496348][10778:10784] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 4277065072
+
           [1649677014.496469][10778:10784] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
@@ -84,7 +97,10 @@ tests:
       verification: |
           ./chip-tool modeselect read description 1 1
 
+          Verify on the TH Log:
+
           [1649677114.614974][10787:10792] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 4277065072
+
           [1649677114.615110][10787:10792] CHIP:TOO:   Description: Coffee
       disabled: true
 
@@ -92,6 +108,9 @@ tests:
       verification: |
           ./chip-tool modeselect read standard-namespace 1 1
 
+          Verify on the TH Log:
+
           [1649677167.900539][10795:10801] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0001 DataVersion: 4277065072
+
           [1649677167.900660][10795:10801] CHIP:TOO:   StandardNamespace: 0
       disabled: true

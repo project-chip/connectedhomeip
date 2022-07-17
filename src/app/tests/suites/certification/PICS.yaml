@@ -1759,6 +1759,55 @@ PICS:
     - label: "Does the DUT support Basic Commissioning Method (BCM)?"
       id: PICS_MF_BCM
 
+    - label: "Does the Device support User Interface Display"
+      id: CADMIN.UserInterfaceDisplay
+
+    - label: "Does the Device support Audio Interface"
+      id: CADMIN.AudioInterface
+    #server
+    - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
+      id: CADMIN.S.C0000
+
+    - label: "Does the Device support Basic Commissioning Method (BCM)?"
+      id: CADMIN.S.C0001
+
+    - label: "Does the Device support revoking commissioning window?"
+      id: CADMIN.S.C0002
+
+    - label: "Does the Device implement receiving the RemoveFabric command?"
+      id: OPCREDS.S.C0a.Rsp
+    #attributes
+    - label: "Does the Device support Fabrics attribute?"
+      id: OPCREDS.S.A0001
+
+    - label: "Does the Device support NodeLabel attribute?"
+      id: BINFO.S.A0005
+
+    - label: "Does the Device support WindowStatus attribute?"
+      id: CADMIN.S.A0000
+
+    #client
+    - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
+      id: CADMIN.C.C0000
+
+    - label: "Does the Device support Basic Commissioning Method (BCM)?"
+      id: CADMIN.C.C0001
+
+    - label: "Does the Device support revoking commissioning window?"
+      id: CADMIN.C.C0002
+
+    - label: "Does the Device implement receiving the RemoveFabric command?"
+      id: OPCREDS.C.C0a.Tx
+    #attributes
+    - label: "Does the Device support Fabrics attribute?"
+      id: OPCREDS.C.A0001
+
+    - label: "Does the Device support NodeLabel attribute?"
+      id: BINFO.C.A0005
+
+    - label: "Does the Device support WindowStatus attribute?"
+      id: CADMIN.C.A0000
+
     #User Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
       id: ULABEL.S.A0000
@@ -4452,6 +4501,7 @@ PICS:
     - label: "Does the DUT support the AccessControlExtensionChanged Event?"
       id: ACL.S.E01
 
+    #Mode select
     #Mode select
     - label: "Does the DUT support the StartUpMode attribute?"
       id: MOD.S.A0004

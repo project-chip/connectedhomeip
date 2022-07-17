@@ -59,20 +59,20 @@ tests:
               - name: "StepSize"
                 value: 5
               - name: "TransitionTime"
-                value: 25
+                value: 5
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
     #delay step is necessary to let the attribute value change over time
-    - label: "Wait 25ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 25
+                value: 1000
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
       PICS: CC.S.A0000
@@ -81,7 +81,7 @@ tests:
       response:
           constraints:
               type: uint8
-              minValue: 0
+              minValue: 5
               maxValue: 254
 
     - label: "Step hue down command"
@@ -94,19 +94,19 @@ tests:
               - name: "StepSize"
                 value: 5
               - name: "TransitionTime"
-                value: 25
+                value: 5
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 25ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 25
+                value: 1000
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
       PICS: CC.S.A0000
@@ -116,7 +116,7 @@ tests:
           constraints:
               type: uint8
               minValue: 0
-              maxValue: 254
+              maxValue: 249
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
