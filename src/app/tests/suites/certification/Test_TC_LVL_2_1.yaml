@@ -29,7 +29,8 @@ tests:
                 value: nodeId
 
     # Temporary - see #13551
-    - label: "Reset level to 254"
+    - label: "Precondition: Reset level to 254"
+      PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevel"
       arguments:
           values:
@@ -43,12 +44,20 @@ tests:
                 value: 1
 
     - label: "Wait 100ms"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
                 value: 100
+
+    - label: "Precondition: Reads the CurrentLevel attribute"
+      PICS: LVL.S.A0000
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 254
 
     - label: "Reads the CurrentLevel attribute"
       PICS: LVL.S.A0000

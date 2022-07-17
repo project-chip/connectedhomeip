@@ -137,6 +137,7 @@ function getManualTests() {
         "Test_TC_CNET_4_19",
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21",
+        "Test_TC_CNET_4_22",
     ];
 
     const DiagnosticsLogs = [
@@ -499,6 +500,11 @@ function getManualTests() {
         "Test_TC_ACL_2_10",
     ];
 
+    const UserLabel = [
+        "Test_TC_ULABEL_3_1",
+    ];
+
+
     const tests = [
         DeviceDiscovery,
         Groups,
@@ -547,6 +553,7 @@ function getManualTests() {
         Scenes,
         PumpConfigurationControl,
         AccessControl,
+        UserLabel,
     ].flat(1);
 
     tests.disable = disable.bind(tests);
@@ -650,7 +657,6 @@ function getTests() {
         "Test_TC_ULABEL_2_2",
         "Test_TC_ULABEL_2_3",
         "Test_TC_ULABEL_2_4",
-        "Test_TC_ULABEL_3_1",
     ];
 
     const MediaControl = [
