@@ -1,5 +1,5 @@
 /**
- * \file mbedtls_user_config.h
+ * \file config.h
  *
  * \brief Configuration options (set of defines)
  *
@@ -468,7 +468,7 @@
  *
  * This module is required for X.509 CRL parsing.
  */
-#undef MBEDTLS_X509_CRL_PARSE_C
+//#undef MBEDTLS_X509_CRL_PARSE_C
 
 /**
  * \def MBEDTLS_X509_CSR_PARSE_C
@@ -521,7 +521,7 @@
  *
  * This module is required for X.509 certificate creation.
  */
-#undef MBEDTLS_X509_CRT_WRITE_C
+//#undef MBEDTLS_X509_CRT_WRITE_C
 
 /**
  * \def MBEDTLS_CERTS_C
@@ -705,21 +705,78 @@
 #undef MBEDTLS_KEY_EXCHANGE_RSA_PSK_ENABLED
 
 /**
- * Allow SHA-1 in the default TLS configuration for certificate signing if
- * enabled in the application Makefile.
+ * \def MBEDTLS_PSA_CRYPTO_C
  *
- * Without this build-time option, SHA-1 support must be activated explicitly
- * through mbedtls_ssl_conf_cert_profile. Turning on this option is not
- * recommended because of it is possible to generate SHA-1 collisions, however
- * this may be safe for legacy infrastructure where additional controls apply.
+ * Enable the Platform Security Architecture cryptography API.
  *
- * \warning   SHA-1 is considered a weak message digest and its use constitutes
- *            a security risk. If possible, we recommend avoiding dependencies
- *            on it, and considering stronger message digests instead.
+ * \warning The PSA Crypto API is still beta status. While you're welcome to
+ * experiment using it, incompatible API changes are still possible, and some
+ * parts may not have reached the same quality as the rest of Mbed TLS yet.
+ *
+ * Module:  library/psa_crypto.c
+ *
+ * Requires: MBEDTLS_CTR_DRBG_C, MBEDTLS_ENTROPY_C
  *
  */
-#ifdef CY_MQTT_ENABLE_SECURE_TEST_MOSQUITTO_SUPPORT
-#define MBEDTLS_TLS_DEFAULT_ALLOW_SHA1_IN_CERTIFICATES
-#endif
+#undef MBEDTLS_PSA_CRYPTO_C
+
+/**
+ * \def MBEDTLS_PSA_CRYPTO_STORAGE_C
+ *
+ * Enable the Platform Security Architecture persistent key storage.
+ *
+ * Module:  library/psa_crypto_storage.c
+ *
+ * Requires: MBEDTLS_PSA_CRYPTO_C,
+ *           either MBEDTLS_PSA_ITS_FILE_C or a native implementation of
+ *           the PSA ITS interface
+ */
+#undef MBEDTLS_PSA_CRYPTO_STORAGE_C
+
+/**
+ * \def MBEDTLS_PSA_ITS_FILE_C
+ *
+ * Enable the emulation of the Platform Security Architecture
+ * Internal Trusted Storage (PSA ITS) over files.
+ *
+ * Module:  library/psa_its_file.c
+ *
+ * Requires: MBEDTLS_FS_IO
+ */
+#undef MBEDTLS_PSA_ITS_FILE_C
+
+/**
+ * \def MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
+ *
+ * This option controls the availability of the API mbedtls_ssl_get_peer_cert()
+ * giving access to the peer's certificate after completion of the handshake.
+ *
+ * Unless you need mbedtls_ssl_peer_cert() in your application, it is
+ * recommended to disable this option for reduced RAM usage.
+ *
+ * \note If this option is disabled, mbedtls_ssl_get_peer_cert() is still
+ *       defined, but always returns \c NULL.
+ *
+ * \note This option has no influence on the protection against the
+ *       triple handshake attack. Even if it is disabled, Mbed TLS will
+ *       still ensure that certificates do not change during renegotiation,
+ *       for exaple by keeping a hash of the peer's certificate.
+ *
+ * Comment this macro to disable storing the peer's certificate
+ * after the handshake.
+ */
+#undef MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
+
+/**
+ * \def MBEDTLS_DEPRECATED_REMOVED
+ *
+ * Remove deprecated functions and features so that they generate an error if
+ * used. Functionality deprecated in one version will usually be removed in the
+ * next version. You can enable this to help you prepare the transition to a
+ * new major version by making sure your code is not using this functionality.
+ *
+ * Uncomment to get errors on using deprecated functions and features.
+ */
+#define MBEDTLS_DEPRECATED_REMOVED
 
 #endif /* MBEDTLS_USER_CONFIG_HEADER */
