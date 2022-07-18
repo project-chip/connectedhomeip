@@ -22,9 +22,11 @@ config:
 
 tests:
     - label: "DUT reads LabelList from the TH"
-      PICS: FLABEL.S.A0000
+      PICS: FLABEL.C.A0000
       verification: |
           ./chip-tool fixedlabel read label-list 1 0
+
+          Verify in DUT as client side:
 
           [1651124649.820293][2819:2824] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_0000 DataVersion: 3688229931
           [1651124649.820478][2819:2824] CHIP:TOO:   label list: 4 entries

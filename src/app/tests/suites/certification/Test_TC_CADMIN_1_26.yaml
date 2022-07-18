@@ -11,100 +11,98 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.26. [TC-CADMIN-1.26] Open commissioning window - durations max and
-    max+1 [ECM] [DUT - Commissionee]
+    24.1.26. [TC-CADMIN-1.26] Open commissioning window - durations min and
+    min-1 [ECM] [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    timeout: 330
     endpoint: 0
 
 tests:
-    - label: "Reset DUT_CE to factory defaults"
-      PICS: PICS_MF
+    - label: "Factory Reset the DUT_CE"
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Factory Reset the DUT_CE"
       verification: |
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
-      disabled: true
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE using ECM"
-      PICS: PICS_MF
-      verification: |
-          "1. Provision the device using 1st controller chip tool(use above instructions) ,
-          "
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
+              - name: "discriminator"
+                value: 3840
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
 
-    - label:
-          "TH_CR1 opens a commissioning window on DUT_CE with a value of 900
-          seconds"
-      PICS: PICS_MF
-      verification: |
-          On 1st controller chip tool, open commissioning window
-
-          Below is the example when using chip tool as controller
-
-
-          For ECM,
-          ./chip-tool pairing open-commissioning-window 1 1 900 1000 3840
-
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [35484132896]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
-      disabled: true
-
-    - label: "Wait for commissioning Window to 901 seconds"
-      PICS: PICS_MF
-      verification: |
-          Wait for commissioning Window to Timeout
-      disabled: true
-
-    - label:
-          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
-      PICS: PICS_MF
-      verification: |
-          ./chip-tool administratorcommissioning read window-status 1 0
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
-          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
-          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i
-      disabled: true
-
-    - label:
-          "TH_CR1 opens a commissioning window on DUT_CE with a value of 901
-          seconds"
-      PICS: PICS_MF
-      verification: |
-          On 1st controller chip tool, open commissioning window
-
-          Below is the example when using chip tool as controller
-
-
-          For ECM,
-          ./chip-tool pairing open-commissioning-window 1 1 901 1000 3840
-
-          CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x85
-          [1652860801.225084][9512:9517] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-          [1652860801.225173][9512:9517] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1652860801.225294][9512:9517] CHIP:EM: Sending Standalone Ack for MessageCounter:4191961 on exchange 37827i
-      disabled: true
+    - label: "Wait for commissioning Window to 301 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 181000
 
     - label:
           "TH_CR1 reads the window status to verify the DUT_CE window is closed"
-      PICS: PICS_MF
-      verification: |
-          ./chip-tool administratorcommissioning read window-status 1 0
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
 
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_0000 DataVersion: 2849200592
-          [1651137648.760469][14047:14052] CHIP:TOO:   WindowStatus: 0
-          [1651137648.760534][14047:14052] CHIP:EM: Sending Standalone Ack for MessageCounter:5527412 on exchange 14590i
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 179
+              - name: "PAKEVerifier"
+                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
+              - name: "discriminator"
+                value: 3840
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0

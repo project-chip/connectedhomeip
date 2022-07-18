@@ -50,6 +50,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -67,6 +68,7 @@ tests:
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "nodeId"
@@ -80,6 +82,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -88,6 +91,7 @@ tests:
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
+      PICS: CADMIN.S.C0002
       timedInteractionTimeoutMs: 10000
 
     - label: "Commission from beta"
@@ -107,6 +111,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0002
       response:
           error: FAILURE
 
@@ -115,6 +120,7 @@ tests:
       cluster: "Basic"
       command: "writeAttribute"
       attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
       arguments:
           value: "chiptest"
 
@@ -123,6 +129,7 @@ tests:
       cluster: "Basic"
       command: "readAttribute"
       attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
       response:
           value: "chiptest"
 
@@ -131,10 +138,24 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      identity: "alpha"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0001
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+      response:
+          error: 1
 
     - label: "Commission from beta"
       identity: "beta"
@@ -155,6 +176,16 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
+
+    - label:
+          "TH_CR1 tries to revoke the commissioning window on DUT_CE using
+          RevokeCommissioning command"
+      cluster: "AdministratorCommissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C0002
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"

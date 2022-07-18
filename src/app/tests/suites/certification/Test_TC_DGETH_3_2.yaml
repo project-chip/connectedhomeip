@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.2. [TC-DGETH-3.2] Command generated functionality with client as DUT
+name: 3.3.2. [TC-DGETH-3.2] Command Generated {DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -26,9 +26,12 @@ tests:
 
       disabled: true
 
-    - label: "DUT sends ResetCounts to TH"
-      PICS: DGETH.S.C00
+    - label: "DUT sends ResetCounts to TH."
+      PICS: DGETH.S.C00.Rsp
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           Verify Command data recieved from running the below command is a success
 
           ./chip-tool ethernetnetworkdiagnostics reset-counts 1 1

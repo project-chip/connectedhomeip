@@ -52,6 +52,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C0000
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -366,7 +367,7 @@ tests:
           error: FAILURE
 
     - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          "TH_CR2 starts a commissioning process with DUT_CE using valid setup
           code"
       identity: "beta"
       cluster: "CommissionerCommands"
@@ -376,7 +377,7 @@ tests:
               - name: "nodeId"
                 value: nodeId2
               - name: "payload"
-                value: payload2
+                value: payload
       response:
           error: FAILURE
 

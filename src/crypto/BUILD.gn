@@ -24,14 +24,7 @@ buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
   header_dir = "crypto"
 
-  chip_crypto_mbedtls = chip_crypto == "mbedtls"
-  chip_crypto_openssl = chip_crypto == "openssl"
-
-  defines = [
-    "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
-    "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
-    "CHIP_WITH_OPENSSL=${chip_crypto_openssl}",
-  ]
+  defines = []
 
   if (chip_with_se05x == 1) {
     defines += [ "CHIP_CRYPTO_HSM=1" ]
@@ -46,13 +39,27 @@ buildconfig_header("crypto_buildconfig") {
   }
 }
 
+config("crypto_config") {
+  chip_crypto_mbedtls = chip_crypto == "mbedtls"
+  chip_crypto_openssl = chip_crypto == "openssl"
+  chip_crypto_boringssl = chip_crypto == "boringssl"
+
+  defines = [
+    "CHIP_CRYPTO_MBEDTLS=${chip_crypto_mbedtls}",
+    "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
+    "CHIP_CRYPTO_BORINGSSL=${chip_crypto_boringssl}",
+  ]
+}
+
 if (chip_crypto == "openssl") {
   import("${build_root}/config/linux/pkg_config.gni")
 
   pkg_config("openssl_config") {
     packages = [ "openssl" ]
   }
-} else {
+} else if (chip_crypto == "boringssl") {
+  import("//build_overrides/boringssl.gni")
+} else if (chip_crypto == "mbedtls") {
   import("//build_overrides/mbedtls.gni")
 }
 
@@ -79,7 +86,7 @@ static_library("crypto") {
     "${nlassert_root}:nlassert",
   ]
 
-  public_configs = []
+  public_configs = [ ":crypto_config" ]
 
   if (chip_crypto == "mbedtls") {
     sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
@@ -92,6 +99,10 @@ static_library("crypto") {
   } else if (chip_crypto == "openssl") {
     sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
     public_configs += [ ":openssl_config" ]
+  } else if (chip_crypto == "boringssl") {
+    # BoringSSL is close enough to OpenSSL that isd uses same PAL, with minor #ifdef differences
+    sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
+    public_deps += [ "${boringssl_root}:boringssl" ]
   } else {
     assert(false, "Invalid CHIP crypto")
   }

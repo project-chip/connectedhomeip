@@ -66,7 +66,7 @@ tests:
               contains: [0]
 
     - label: "Reading optional attribute(Lineup) in AttributeList"
-      PICS: CHANNEL.S.A0000
+      PICS: CHANNEL.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -75,7 +75,7 @@ tests:
               contains: [1]
 
     - label: "Read the optional attribute(CurrentChannel): AttributeList"
-      PICS: CHANNEL.S.A0000
+      PICS: CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:

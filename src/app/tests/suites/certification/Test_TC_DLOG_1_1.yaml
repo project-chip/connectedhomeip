@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 55.1.1. [TC-DLOG-1.1] Global Attributes [DUT-Server]
+name: 56.1.1. [TC-DLOG-1.1] Global Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -30,6 +30,7 @@ tests:
       verification: |
           sudo ./chip-tool diagnosticlogs read cluster-revision 1 0
 
+          Verify on the TH Log:
 
           [1653983972.206171][5186:5191] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFD DataVersion: 2389393200
           [1653983972.206236][5186:5191] CHIP:TOO:   ClusterRevision: 1
@@ -39,6 +40,7 @@ tests:
       verification: |
           sudo ./chip-tool diagnosticlogs read feature-map 1 0
 
+          Verify on the TH Log:
 
           [1653983676.882544][5166:5171] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFC DataVersion: 2389393200
           [1653983676.882637][5166:5171] CHIP:TOO:   FeatureMap: 0
@@ -48,6 +50,7 @@ tests:
       verification: |
           sudo ./chip-tool diagnosticlogs read attribute-list 1 0
 
+          Verify on the TH Log:
 
           [1649670392.536999][3576:3581] CHIP:DMG:
           [1649670392.537040][3576:3581] CHIP:DMG:        SuppressResponse = true,
@@ -64,6 +67,7 @@ tests:
       verification: |
           sudo ./chip-tool diagnosticlogs read accepted-command-list 1 0
 
+          Verify on the TH Log:
 
           [1649670700.139000][3624:3629] CHIP:DMG:
           [1649670700.139033][3624:3629] CHIP:DMG:        SuppressResponse = true,
@@ -78,6 +82,7 @@ tests:
       verification: |
           sudo ./chip-tool diagnosticlogs read generated-command-list 1 0
 
+          Verify on the TH Log:
 
           [1649670576.965898][3602:3607] CHIP:DMG:
           [1649670576.965927][3602:3607] CHIP:DMG:        SuppressResponse = true,

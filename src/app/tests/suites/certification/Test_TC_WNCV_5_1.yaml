@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.4.6. [TC-WNCV-5.1] Mandatory Attributes Verification with client as DUT
+name: 3.4.6. [TC-WNCV-5.1] Mandatory Attributes Verification [DUT as Client]
 
 config:
     nodeId: 0x12344321
@@ -26,32 +26,17 @@ tests:
 
       disabled: true
 
-    - label: "DUT reads the FeatureMap attribute from TH"
+    - label: "DUT reads the (65532) _FeatureMap_ attribute from T"
       PICS: WNCV.C.Afffc
       verification: |
           On TestHarnes (all-cluster-app) a received read of feature-map looks like this:
 
-          [1646298926.644020][362295:362295] CHIP:IM: Received Read request
-          [1646298926.644091][362295:362295] CHIP:DMG: ReadRequestMessage =
-          [1646298926.644120][362295:362295] CHIP:DMG: {
-          [1646298926.644194][362295:362295] CHIP:DMG:         AttributePathIBs =
-          [1646298926.644223][362295:362295] CHIP:DMG:         [
-          [1646298926.644273][362295:362295] CHIP:DMG:                 AttributePathIB =
-          [1646298926.644301][362295:362295] CHIP:DMG:                 {
-          [1646298926.644450][362295:362295] CHIP:DMG:                         Endpoint = 0x1,
-          [1646298926.644493][362295:362295] CHIP:DMG:                         Cluster = 0x102,
-          [1646298926.644540][362295:362295] CHIP:DMG:                         Attribute = 0x0000_FFFC,
-          [1646298926.644620][362295:362295] CHIP:DMG:                 }
-          [1646298926.644819][362295:362295] CHIP:DMG:
-          [1646298926.644861][362295:362295] CHIP:DMG:         ],
-          [1646298926.644936][362295:362295] CHIP:DMG:
-          [1646298926.644986][362295:362295] CHIP:DMG:         isFabricFiltered = true,
-          [1646298926.645061][362295:362295] CHIP:DMG:         InteractionModelRevision = 1
-          [1646298926.645086][362295:362295] CHIP:DMG: },
-          [1646298926.645122][362295:362295] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1646298926.645190][362295:362295] CHIP:DMG: <RE:Run> Cluster 102, Attribute fffc is dirty
-          [1646298926.645252][362295:362295] CHIP:DMG: Reading attribute: Cluster=0x0000_0102 Endpoint=1 AttributeId=0x0000_FFFC (expanded=0)
-          [1646298926.645282][362295:362295] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=v
+          ./chip-tool windowcovering read feature-map 1 1
+
+          Verify in TH all-clusters-app log
+
+          [1657103226.784391][4633:4638] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_FFFC DataVersion: 383647307
+          [1657103226.784460][4633:4638] CHIP:TOO:   FeatureMap: 23
       disabled: true
 
     - label: "Check Attribute defining the product"
@@ -64,27 +49,12 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received read of type looks like this:
 
-          [1646299341.831213][362295:362295] CHIP:IM: Received Read request
-          [1646299341.831257][362295:362295] CHIP:DMG: ReadRequestMessage =
-          [1646299341.831301][362295:362295] CHIP:DMG: {
-          [1646299341.831327][362295:362295] CHIP:DMG:         AttributePathIBs =
-          [1646299341.831369][362295:362295] CHIP:DMG:         [
-          [1646299341.831395][362295:362295] CHIP:DMG:                 AttributePathIB =
-          [1646299341.831428][362295:362295] CHIP:DMG:                 {
-          [1646299341.831456][362295:362295] CHIP:DMG:                         Endpoint = 0x1,
-          [1646299341.831483][362295:362295] CHIP:DMG:                         Cluster = 0x102,
-          [1646299341.831527][362295:362295] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1646299341.831553][362295:362295] CHIP:DMG:                 }
-          [1646299341.831587][362295:362295] CHIP:DMG:
-          [1646299341.831613][362295:362295] CHIP:DMG:         ],
-          [1646299341.831641][362295:362295] CHIP:DMG:
-          [1646299341.831674][362295:362295] CHIP:DMG:         isFabricFiltered = true,
-          [1646299341.831718][362295:362295] CHIP:DMG:         InteractionModelRevision = 1
-          [1646299341.831744][362295:362295] CHIP:DMG: },
-          [1646299341.831808][362295:362295] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1646299341.831877][362295:362295] CHIP:DMG: <RE:Run> Cluster 102, Attribute 0 is dirty
-          [1646299341.831923][362295:362295] CHIP:DMG: Reading attribute: Cluster=0x0000_0102 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
-          [1646299341.831954][362295:362295] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=v
+          ./chip-tool windowcovering read type 1 1
+
+          Verify in TH all-clusters-app log
+
+          [1657103199.191382][4627:4632] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0000 DataVersion: 383647307
+          [1657103199.191447][4627:4632] CHIP:TOO:   Type: 8
       disabled: true
 
     - label: "DUT reads the EndProductType attribute from TH"
@@ -92,27 +62,12 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received read of end-product-type looks like this:
 
-          1646299403.213429][362295:362295] CHIP:IM: Received Read request
-          [1646299403.213463][362295:362295] CHIP:DMG: ReadRequestMessage =
-          [1646299403.213491][362295:362295] CHIP:DMG: {
-          [1646299403.213546][362295:362295] CHIP:DMG:         AttributePathIBs =
-          [1646299403.213576][362295:362295] CHIP:DMG:         [
-          [1646299403.213617][362295:362295] CHIP:DMG:                 AttributePathIB =
-          [1646299403.213644][362295:362295] CHIP:DMG:                 {
-          [1646299403.213689][362295:362295] CHIP:DMG:                         Endpoint = 0x1,
-          [1646299403.213716][362295:362295] CHIP:DMG:                         Cluster = 0x102,
-          [1646299403.213744][362295:362295] CHIP:DMG:                         Attribute = 0x0000_000D,
-          [1646299403.213797][362295:362295] CHIP:DMG:                 }
-          [1646299403.213828][362295:362295] CHIP:DMG:
-          [1646299403.213861][362295:362295] CHIP:DMG:         ],
-          [1646299403.213889][362295:362295] CHIP:DMG:
-          [1646299403.213922][362295:362295] CHIP:DMG:         isFabricFiltered = true,
-          [1646299403.213978][362295:362295] CHIP:DMG:         InteractionModelRevision = 1
-          [1646299403.214006][362295:362295] CHIP:DMG: },
-          [1646299403.214082][362295:362295] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1646299403.214193][362295:362295] CHIP:DMG: <RE:Run> Cluster 102, Attribute d is dirty
-          [1646299403.214240][362295:362295] CHIP:DMG: Reading attribute: Cluster=0x0000_0102 Endpoint=1 AttributeId=0x0000_000D (expanded=0)
-          [1646299403.214286][362295:362295] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=v
+          ./chip-tool windowcovering read end-product-type 1 1
+
+          Verify in TH all-clusters-app log
+
+          [1657103251.203086][4641:4646] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_000D DataVersion: 383647307
+          [1657103251.203153][4641:4646] CHIP:TOO:   EndProductType: 0
       disabled: true
 
     - label: "Check Attribute defining the working status"
@@ -125,27 +80,12 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received read of mode looks like this:
 
-          [1646298391.021408][362295:362295] CHIP:IM: Received Read request
-          [1646298391.021612][362295:362295] CHIP:DMG: ReadRequestMessage =
-          [1646298391.021678][362295:362295] CHIP:DMG: {
-          [1646298391.021770][362295:362295] CHIP:DMG:         AttributePathIBs =
-          [1646298391.021799][362295:362295] CHIP:DMG:         [
-          [1646298391.021870][362295:362295] CHIP:DMG:                 AttributePathIB =
-          [1646298391.021899][362295:362295] CHIP:DMG:                 {
-          [1646298391.022134][362295:362295] CHIP:DMG:                         Endpoint = 0x1,
-          [1646298391.022444][362295:362295] CHIP:DMG:                         Cluster = 0x102,
-          [1646298391.022769][362295:362295] CHIP:DMG:                         Attribute = 0x0000_0017,
-          [1646298391.023006][362295:362295] CHIP:DMG:                 }
-          [1646298391.023359][362295:362295] CHIP:DMG:
-          [1646298391.023414][362295:362295] CHIP:DMG:         ],
-          [1646298391.023491][362295:362295] CHIP:DMG:
-          [1646298391.023577][362295:362295] CHIP:DMG:         isFabricFiltered = true,
-          [1646298391.023605][362295:362295] CHIP:DMG:         InteractionModelRevision = 1
-          [1646298391.023658][362295:362295] CHIP:DMG: },
-          [1646298391.023698][362295:362295] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1646298391.023913][362295:362295] CHIP:DMG: <RE:Run> Cluster 102, Attribute 17 is dirty
-          [1646298391.024036][362295:362295] CHIP:DMG: Reading attribute: Cluster=0x0000_0102 Endpoint=1 AttributeId=0x0000_0017 (expanded=0)
-          [1646298391.024247][362295:362295] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=v
+          ./chip-tool windowcovering read mode 1 1
+
+          Verify in TH all-clusters-app log
+
+          [1657103273.905725][4647:4652] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0017 DataVersion: 383647307
+          [1657103273.905816][4647:4652] CHIP:TOO:   Mode: 0
       disabled: true
 
     - label: "DUT reads the ConfigStatus attribute from TH"
@@ -153,25 +93,10 @@ tests:
       verification: |
           On TestHarnes (all-cluster-app) a received read of config-status looks like this:
 
-          [1646298854.266428][362295:362295] CHIP:IM: Received Read request
-          [1646298854.266463][362295:362295] CHIP:DMG: ReadRequestMessage =
-          [1646298854.266490][362295:362295] CHIP:DMG: {
-          [1646298854.266537][362295:362295] CHIP:DMG:         AttributePathIBs =
-          [1646298854.266582][362295:362295] CHIP:DMG:         [
-          [1646298854.266631][362295:362295] CHIP:DMG:                 AttributePathIB =
-          [1646298854.266676][362295:362295] CHIP:DMG:                 {
-          [1646298854.266726][362295:362295] CHIP:DMG:                         Endpoint = 0x1,
-          [1646298854.266769][362295:362295] CHIP:DMG:                         Cluster = 0x102,
-          [1646298854.266840][362295:362295] CHIP:DMG:                         Attribute = 0x0000_0007,
-          [1646298854.266880][362295:362295] CHIP:DMG:                 }
-          [1646298854.266922][362295:362295] CHIP:DMG:
-          [1646298854.266963][362295:362295] CHIP:DMG:         ],
-          [1646298854.266990][362295:362295] CHIP:DMG:
-          [1646298854.267021][362295:362295] CHIP:DMG:         isFabricFiltered = true,
-          [1646298854.267047][362295:362295] CHIP:DMG:         InteractionModelRevision = 1
-          [1646298854.267091][362295:362295] CHIP:DMG: },
-          [1646298854.267129][362295:362295] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1646298854.267197][362295:362295] CHIP:DMG: <RE:Run> Cluster 102, Attribute 7 is dirty
-          [1646298854.267240][362295:362295] CHIP:DMG: Reading attribute: Cluster=0x0000_0102 Endpoint=1 AttributeId=0x0000_0007 (expanded=0)
-          [1646298854.267295][362295:362295] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0102 e=1 p=v
+          ./chip-tool windowcovering read config-status 1 1
+
+          Verify in TH all-clusters-app log
+
+          [1657103295.608407][4654:4659] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0007 DataVersion: 383647307
+          [1657103295.608521][4654:4659] CHIP:TOO:   ConfigStatus: 27
       disabled: true

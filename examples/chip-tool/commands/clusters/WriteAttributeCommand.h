@@ -149,6 +149,12 @@ public:
                                                            dataVersion);
     }
 
+    void Shutdown() override
+    {
+        mError = CHIP_NO_ERROR;
+        ModelCommand::Shutdown();
+    }
+
 protected:
     WriteAttribute(const char * attributeName, CredentialIssuerCommands * credsIssuerConfig) :
         InteractionModelWriter(this), ModelCommand("write", credsIssuerConfig)

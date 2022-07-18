@@ -27,26 +27,18 @@ tests:
       PICS: LCFG.C.A0001
       verification: |
           ./chip-tool localizationconfiguration read supported-locales 1 0
+          verify on Reference app receives the right response for the data sent in the above commands
 
-          [1651227647.876273][2825:2825] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:15793025 on exchange 646r
-          [1651227647.876333][2825:2825] CHIP:EM: Handling via exchange: 646r, Delegate: 0xaaaae659a088
-          [1651227647.876468][2825:2825] CHIP:IM: Received Read request
-          [1651227647.876540][2825:2825] CHIP:DMG: ReadRequestMessage =
-          [1651227647.876583][2825:2825] CHIP:DMG: {
-          [1651227647.876617][2825:2825] CHIP:DMG:        AttributePathIBs =
-          [1651227647.876660][2825:2825] CHIP:DMG:        [
-          [1651227647.876699][2825:2825] CHIP:DMG:                AttributePathIB =
-          [1651227647.876754][2825:2825] CHIP:DMG:                {
-          [1651227647.876801][2825:2825] CHIP:DMG:                        Endpoint = 0x0,
-          [1651227647.876854][2825:2825] CHIP:DMG:                        Cluster = 0x2b,
-          [1651227647.876906][2825:2825] CHIP:DMG:                        Attribute = 0x0000_0002,
-          [1651227647.876954][2825:2825] CHIP:DMG:                }
-          [1651227647.877002][2825:2825] CHIP:DMG:
-          [1651227647.877046][2825:2825] CHIP:DMG:        ],
-          [1651227647.877091][2825:2825] CHIP:DMG:
-          [1651227647.877134][2825:2825] CHIP:DMG:        isFabricFiltered = true,
-          [1651227647.877175][2825:2825] CHIP:DMG:        InteractionModelRevision = 1
-          [1651227647.877214][2825:2825] CHIP:DMG: },
+          [1657111931.771994][5357:5363] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 3168433155
+          [1657111931.772105][5357:5363] CHIP:TOO:   SupportedLocales: 8 entries
+          [1657111931.772175][5357:5363] CHIP:TOO:     [1]: en-US
+          [1657111931.772220][5357:5363] CHIP:TOO:     [2]: de-DE
+          [1657111931.772262][5357:5363] CHIP:TOO:     [3]: fr-FR
+          [1657111931.772303][5357:5363] CHIP:TOO:     [4]: en-GB
+          [1657111931.772344][5357:5363] CHIP:TOO:     [5]: es-ES
+          [1657111931.772385][5357:5363] CHIP:TOO:     [6]: zh-CN
+          [1657111931.772426][5357:5363] CHIP:TOO:     [7]: it-IT
+          [1657111931.772466][5357:5363] CHIP:TOO:     [8]: ja-JP
       disabled: true
 
     - label: "DUT reads ActiveLocale attribute from the TH"
@@ -54,32 +46,8 @@ tests:
       verification: |
           ./chip-tool localizationconfiguration read active-locale 1 0
 
-          [1651564394.279517][8392:8397] CHIP:DMG: ReportDataMessage =
-          [1651564394.279566][8392:8397] CHIP:DMG: {
-          [1651564394.279606][8392:8397] CHIP:DMG:         AttributeReportIBs =
-          [1651564394.279662][8392:8397] CHIP:DMG:         [
-          [1651564394.279706][8392:8397] CHIP:DMG:                 AttributeReportIB =
-          [1651564394.279771][8392:8397] CHIP:DMG:                 {
-          [1651564394.279821][8392:8397] CHIP:DMG:                         AttributeDataIB =
-          [1651564394.279884][8392:8397] CHIP:DMG:                         {
-          [1651564394.279944][8392:8397] CHIP:DMG:                                 DataVersion = 0x66e5e842,
-          [1651564394.280008][8392:8397] CHIP:DMG:                                 AttributePathIB =
-          [1651564394.280069][8392:8397] CHIP:DMG:                                 {
-          [1651564394.280176][8392:8397] CHIP:DMG:                                         Endpoint = 0x0,
-          [1651564394.280245][8392:8397] CHIP:DMG:                                         Cluster = 0x2b,
-          [1651564394.280314][8392:8397] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1651564394.280376][8392:8397] CHIP:DMG:                                 }
-          [1651564394.280440][8392:8397] CHIP:DMG:
-          [1651564394.280509][8392:8397] CHIP:DMG:                                         Data = "en-US",
-          [1651564394.280574][8392:8397] CHIP:DMG:                         },
-          [1651564394.280641][8392:8397] CHIP:DMG:
-          [1651564394.280691][8392:8397] CHIP:DMG:                 },
-          [1651564394.280750][8392:8397] CHIP:DMG:
-          [1651564394.280797][8392:8397] CHIP:DMG:         ],
-          [1651564394.280853][8392:8397] CHIP:DMG:
-          [1651564394.280898][8392:8397] CHIP:DMG:         SuppressResponse = true,
-          [1651564394.280944][8392:8397] CHIP:DMG:         InteractionModelRevision = 1
-          [1651564394.280986][8392:8397] CHIP:DMG: }
+          verify on Reference app receives the right response for the data sent in the above commands
+
           [1651564394.281211][8392:8397] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_0001 DataVersion: 1726343234
           [1651564394.281289][8392:8397] CHIP:TOO:   ActiveLocale: en-US
       disabled: true

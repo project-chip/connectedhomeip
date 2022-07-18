@@ -107,7 +107,7 @@ tests:
           "UpdateAvailable".'
       PICS: OTAS.S.M.DelayedActionTime
       verification: |
-          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy
+          ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy -t 180
 
           ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
 

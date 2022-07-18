@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.12. [TC-CADMIN-1.12] Device exits commissioning mode after 20 failed
-    commission attempts [BCM] [DUT - Commissioner]
+    24.1.12. [TC-CADMIN-1.12] Open commissioning window on DUT twice using ECM
+    then BCM [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -24,15 +24,14 @@ config:
 
 tests:
     - label: "TH_CR2 starts a commissioning process with TH_CE"
-      PICS: PICS_MF
       verification: |
           "1. Provision the device using 2nd controller chip tool on the raspi (use above instructions)
       disabled: true
 
     - label:
-          "TH_CR2 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          "TH_CR2 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On the 2nd controller using chip tool, open commissioning window using BCM
 
@@ -73,9 +72,10 @@ tests:
       disabled: true
 
     - label:
-          "Set up a DUT_CR1 to start attempting to do PASE to TH_CE and failing
-          20 times. This can be done using an invalid passcode"
-      PICS: PICS_MF
+          "Before the expiration of PIXIT.CADMIN.CwDuration set in step 2, set
+          up a DUT_CR1 to start attempting to do PASE to TH_CE and failing 20
+          times. This can be done using a valid onboarding payload with an
+          incorrect setupcode"
       verification: |
           On 2nd controller, using chip-tool connect using wrong passcode. Repeat the step for 20 times.
 
@@ -88,9 +88,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 starts a 21st commissioning process using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          "Before the expiration of PIXIT.CADMIN.CwDuration set in step 2,
+          DUT_CR1 attempts to do PASE to DUT_CE using the correct onboarding
+          payload"
       verification: |
           On 2nd controller, using chip tool connect using correct passcode.
 
@@ -105,7 +105,7 @@ tests:
     - label:
           "TH_CR3 starts a commissioning process with TH_CE using the correct
           PAKEVerifier"
-      PICS: PICS_MF
+      PICS: CADMIN.C.C0001
       verification: |
           1. On 3rd controller using chip-tool connect using correct passcode
 
