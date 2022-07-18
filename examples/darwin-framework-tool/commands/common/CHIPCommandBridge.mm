@@ -30,12 +30,17 @@ const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
+dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
+OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
 
 CHIP_ERROR CHIPCommandBridge::Run()
 {
     ChipLogProgress(chipTool, "Running Command");
     ReturnErrorOnFailure(MaybeSetUpStack());
     SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
+    ChipLogDetail(chipTool, "Setting OTA Provider Delegate:");
+    mOTADelegate.nodeID = [CurrentCommissioner() controllerNodeId];
+    [CurrentCommissioner() setOTAProviderDelegate:mOTADelegate queue:mOTAProviderCallbackQueue];
     ReturnLogErrorOnFailure(RunCommand());
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
 
@@ -61,6 +66,9 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     NSData * ipk;
     CHIPToolKeypair * nocSigner = [[CHIPToolKeypair alloc] init];
     storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+
+    mOTAProviderCallbackQueue = dispatch_queue_create("com.darwin-framework-tool.command", DISPATCH_QUEUE_SERIAL);
+    mOTADelegate = [[OTAProviderDelegate alloc] init];
 
     auto factory = [MTRControllerFactory sharedInstance];
     if (factory == nil) {
