@@ -681,6 +681,12 @@ PCC.S.A0016=1
 PCC.S.A0017=1
 PCC.S.A0020=1
 PCC.S.A0021=1
+PCC.M.ControlModeConstSpeed=1
+PCC.M.ControlModeConstPressure=1
+PCC.M.ControlModeCompPressure=1
+PCC.M.ControlModeConstFlow=1
+PCC.M.ControlModeConstTemp=1
+PCC.M.ControlModeAuto=1
 
 #Power Source Cluster
 PS.S.A0000=1
