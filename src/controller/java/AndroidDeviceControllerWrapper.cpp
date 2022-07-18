@@ -422,8 +422,8 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningStatusUpdateMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate", "(JI)V",
-                                                             &onCommissioningStatusUpdateMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
+                                                             "(JLJAVA/LANG/STRING;I)V", &onCommissioningStatusUpdateMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     UtfString jStageCompleted(env, StageToString(stageCompleted));
@@ -437,7 +437,7 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(chip::Controller::R
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onReadCommissioningInfoMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onReadCommissioningInfo", "(JI)V",
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onReadCommissioningInfo", "(IIII)V",
                                                              &onReadCommissioningInfoMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
