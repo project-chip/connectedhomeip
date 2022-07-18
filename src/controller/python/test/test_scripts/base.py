@@ -1012,3 +1012,18 @@ class BaseTestHelper:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False
         return True
+
+    def TestFabricScopedCommandDuringPase(self, nodeid: int):
+        '''Validates that fabric-scoped commands fail during PASE with UNSUPPORTED_ACCESS
+
+        The nodeid is the PASE pseudo-node-ID used during PASE establishment
+        '''
+        status = None
+        try:
+            response = asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto")))
+        except IM.InteractionModelError as ex:
+            status = ex.status
+
+        # TODO: Should be IM.Status.UnsupportedAccess
+        return status == IM.Status.InvalidCommand
