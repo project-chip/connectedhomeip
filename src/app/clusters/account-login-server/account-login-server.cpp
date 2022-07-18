@@ -152,7 +152,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLoginCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
     emberAfSendImmediateDefaultResponse(status);
     return true;
@@ -177,7 +177,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
 
     emberAfSendImmediateDefaultResponse(status);
