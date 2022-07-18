@@ -21,14 +21,19 @@
 #include <platform/CHIPDeviceError.h>
 
 namespace chip {
-namespace Crypto {
+namespace DeviceLayer {
+namespace Internal {
 
 typedef uint16_t EFR32OpaqueKeyId;
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdUnknown       = 0xFFFFU; // Do not modify, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdVolatile      = 0xFFFEU; // Do not modify, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMin = 0x0U;    // Do not modify, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMax = 0x1FFU;  // Do not decrease, will impact existing deployments
 
 enum class EFR32OpaqueKeyUsages : uint8_t
 {
     ECDSA_P256_SHA256 = 0,
-    ECDH_P256 = 1,
+    ECDH_P256         = 1,
 };
 
 /**
@@ -74,16 +79,23 @@ public:
     /**
      * @brief Get the public key for this keypair
      *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR GetPublicKey(uint8_t* output, size_t output_size, size_t * output_length) const;
-
-    /**
-     * @brief Get the public key for this keypair
+     * @param output        Output buffer to put public key (in 0x04 || X || Y format)
+     * @param output_size   Size of \p output
+     * @param output_length Amount of bytes put in \p output on success
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetKeyId(EFR32OpaqueKeyId* key_id) const;
+    CHIP_ERROR GetPublicKey(uint8_t * output, size_t output_size, size_t * output_length) const;
+
+    /**
+     * @brief Get the key ID for this keypair
+     *
+     * @return Returns kEFR32OpaqueKeyIdUnknown for an uninitialised/invalid
+     *         key, kEFR32OpaqueKeyIdVolatile for a volatile key, and a key
+     *         ID in the range [kEFR32OpaqueKeyIdPersistentMin, kEFR32OpaqueKeyIdPersistentMax]
+     *         for valid persistent keys.
+     **/
+    EFR32OpaqueKeyId GetKeyId() const;
 
     /**
      * @brief Use this keypair to sign a message using the ECDSA-SHA256 algorithm
@@ -98,8 +110,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Sign(const uint8_t* msg, size_t msg_len,
-                    uint8_t* output, size_t output_size, size_t * output_length) const;
+    CHIP_ERROR Sign(const uint8_t * msg, size_t msg_len, uint8_t * output, size_t output_size, size_t * output_length) const;
 
     /**
      * @brief Use this keypair to derive a key using the raw ECDH algorithm
@@ -113,8 +124,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Derive(const uint8_t* their_key, size_t their_key_len,
-                      uint8_t* output, size_t output_size, size_t * output_length) const;
+    CHIP_ERROR Derive(const uint8_t * their_key, size_t their_key_len, uint8_t * output, size_t output_size,
+                      size_t * output_length) const;
 
     /**
      * @brief Delete the keypair from storage
@@ -124,10 +135,11 @@ public:
     CHIP_ERROR Delete();
 
 protected:
-    void * mContext = nullptr;
-    bool mHasKey = false;
+    void * mContext      = nullptr;
+    bool mHasKey         = false;
+    bool mIsPersistent   = false;
     uint8_t * mPubkeyRef = nullptr;
-    size_t mPubkeySize = 0;
+    size_t mPubkeySize   = 0;
     size_t mPubkeyLength = 0;
 };
 
@@ -139,7 +151,7 @@ protected:
  * interface / partly implementation. Future optimisation should look at
  * converting P256Keypair to a fully abstract interface.
  **/
-class EFR32OpaqueP256Keypair : public P256Keypair, public EFR32OpaqueKeypair
+class EFR32OpaqueP256Keypair : public chip::Crypto::P256Keypair, public EFR32OpaqueKeypair
 {
 public:
     EFR32OpaqueP256Keypair();
@@ -155,13 +167,13 @@ public:
      * @brief Serialize the keypair (unsupported on opaque keys)
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
+    CHIP_ERROR Serialize(chip::Crypto::P256SerializedKeypair & output) const override;
 
     /**
      * @brief Deserialize the keypair (unsupported on opaque keys)
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
+    CHIP_ERROR Deserialize(chip::Crypto::P256SerializedKeypair & input) override;
 
     /**
      * @brief Generate a new Certificate Signing Request (CSR).
@@ -180,7 +192,8 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length,
+                              chip::Crypto::P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief A function to derive a shared secret using ECDH
@@ -195,15 +208,17 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+    CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key,
+                                  chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/
-    const P256PublicKey & Pubkey() const override;
+    const chip::Crypto::P256PublicKey & Pubkey() const override;
 
 private:
-    P256PublicKey mPubKey;
+    chip::Crypto::P256PublicKey mPubKey;
 };
 
-} // namespace Crypto
+} // namespace Internal
+} // namespace DeviceLayer
 } // namespace chip

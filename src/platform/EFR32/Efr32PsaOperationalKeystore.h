@@ -21,15 +21,17 @@
 
 #include <psa/crypto.h>
 
+#include "Efr32OpaqueKeypair.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/EFR32/EFR32Config.h>
-#include "Efr32OpaqueKeypair.h"
 
 #ifndef SL_MATTER_MAX_STORED_OP_KEYS
 #define SL_MATTER_MAX_STORED_OP_KEYS (kMaxValidFabricIndex - kMinValidFabricIndex + 1)
 #endif
 
 namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
 /**
  * @brief OperationalKeystore implementation making use of the EFR32 SDK-provided
@@ -39,10 +41,10 @@ namespace chip {
  *          DOES NOT have the raw key material (in usable form) passed up/down to
  *          direct storage APIs that may make copies on heap/stack without sanitization.
  */
-class Efr32PsaOperationalKeystore : public Crypto::OperationalKeystore
+class Efr32PsaOperationalKeystore : public chip::Crypto::OperationalKeystore
 {
 public:
-    Efr32PsaOperationalKeystore() {};
+    Efr32PsaOperationalKeystore(){};
     virtual ~Efr32PsaOperationalKeystore() override;
 
     // Non-copyable
@@ -58,14 +60,14 @@ public:
 
     bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override;
     CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
-    CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override;
+    CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const chip::Crypto::P256PublicKey & nocPublicKey) override;
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
     void RevertPendingKeypair() override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
-                                 Crypto::P256ECDSASignature & outSignature) const override;
+                                 chip::Crypto::P256ECDSASignature & outSignature) const override;
     Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override;
-    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override;
+    void ReleaseEphemeralKeypair(chip::Crypto::P256Keypair * keypair) override;
 
 protected:
     // The keymap maps PSA Crypto persistent key ID offsets against fabric IDs.
@@ -75,14 +77,14 @@ protected:
 
     // The key cache is to avoid having to reconstruct keys from the storage
     // backend all the time (since it is rather slow).
-    Crypto::EFR32OpaqueP256Keypair * mCachedKey = nullptr;
+    EFR32OpaqueP256Keypair * mCachedKey = nullptr;
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a
     // pending keypair override for a given fabric.
-    FabricIndex mPendingFabricIndex                     = kUndefinedFabricIndex;
-    Crypto::EFR32OpaqueP256Keypair * mPendingKeypair    = nullptr;
-    bool mIsPendingKeypairActive                        = false;
-    bool mIsInitialized                                 = false;
+    FabricIndex mPendingFabricIndex          = kUndefinedFabricIndex;
+    EFR32OpaqueP256Keypair * mPendingKeypair = nullptr;
+    bool mIsPendingKeypairActive             = false;
+    bool mIsInitialized                      = false;
 
 private:
     void ResetPendingKey()
@@ -92,10 +94,12 @@ private:
             mPendingKeypair->Delete();
             Platform::Delete(mPendingKeypair);
         }
-        mPendingKeypair           = nullptr;
-        mIsPendingKeypairActive   = false;
-        mPendingFabricIndex       = kUndefinedFabricIndex;
+        mPendingKeypair         = nullptr;
+        mIsPendingKeypairActive = false;
+        mPendingFabricIndex     = kUndefinedFabricIndex;
     }
 };
 
+} // namespace Internal
+} // namespace DeviceLayer
 } // namespace chip

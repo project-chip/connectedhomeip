@@ -45,6 +45,9 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
+#include <platform/EFR32/Efr32PsaOperationalKeystore.h>
+static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread/cli.h>
@@ -114,9 +117,6 @@ void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
     }
 }
 
-#include <platform/EFR32/Efr32PsaOperationalKeystore.h>
-static chip::Efr32PsaOperationalKeystore gEfr32OperationalKeystore;
-
 CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 {
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
@@ -149,9 +149,10 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 
     // Init Matter Server and Start Event Loop
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+    gOperationalKeystore.Init();
+
     static chip::CommonCaseDeviceServerInitParams initParams;
-    gEfr32OperationalKeystore.Init();
-    initParams.operationalKeystore = &gEfr32OperationalKeystore;
+    initParams.operationalKeystore = &gOperationalKeystore;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 #if CHIP_ENABLE_OPENTHREAD
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
