@@ -29,6 +29,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
+          Verify on the TH Log:
+
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
           [1645772651.445209][3856:3861] CHIP:DMG: }
@@ -46,6 +48,8 @@ tests:
           field set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
+
+          Verify on the TH Log:
 
           [1650383264.543046][44233:44238] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650383264.543109][44233:44238] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -65,6 +69,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
+          Verify on the TH Log:
+
           [1650383270.888700][44239:44244] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1650383270.888774][44239:44244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1650383270.888876][44239:44244] CHIP:TOO:   NetworkConfigResponse: {
@@ -81,6 +87,8 @@ tests:
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+
+          Verify on the TH Log:
 
           [1650383278.349428][44245:44250] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
           [1650383278.349490][44245:44250] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007

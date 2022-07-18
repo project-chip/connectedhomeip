@@ -16,6 +16,7 @@ name: 24.1.3. [TC-CADMIN-1.3] Node Behavior using ECM [DUT - Commissionee]
 
 config:
     nodeId: 0x12344321
+    timeout: 300
     nodeId2:
         type: NODE_ID
         defaultValue: 0xCAFE
@@ -39,6 +40,7 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -57,6 +59,7 @@ tests:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "writeAttribute"
+      PICS: BINFO.S.A0005
       cluster: "Basic"
       attribute: "NodeLabel"
       arguments:
@@ -66,6 +69,7 @@ tests:
           "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
           attribute of DUT_CE"
       command: "readAttribute"
+      PICS: BINFO.S.A0005
       cluster: "Basic"
       attribute: "NodeLabel"
       response:
@@ -98,6 +102,7 @@ tests:
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
+      PICS: OPCREDS.S.A0001
       response:
           value: [{ Label: "", nodeId: nodeId }]
           constraints:
@@ -108,6 +113,7 @@ tests:
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
+      PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
           value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
@@ -119,6 +125,7 @@ tests:
           attribute of DUT_CE"
       command: "writeAttribute"
       cluster: "Basic"
+      PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       arguments:
           value: "chiptest1"
@@ -128,6 +135,7 @@ tests:
           attribute of DUT_CE"
       command: "readAttribute"
       cluster: "Basic"
+      PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       response:
           value: "chiptest1"
@@ -141,6 +149,7 @@ tests:
       identity: "beta"
       command: "writeAttribute"
       cluster: "Basic"
+      PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       arguments:
           value: "chiptest2"
@@ -151,9 +160,79 @@ tests:
       identity: "beta"
       command: "readAttribute"
       cluster: "Basic"
+      PICS: OPCREDS.S.A0001
       attribute: "NodeLabel"
       response:
           value: "chiptest2"
           constraints:
               type: string
               maxLength: 32
+
+    - label: "TH_CR2 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
+      identity: "beta"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Wait for the commissioning window in step 13 to timeout"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 180000
+
+    - label:
+          "TH_CR2 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      PICS: CADMIN.S.A0000
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      response:
+          value: 0
+
+    - label: "TH_CR2 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
+      identity: "beta"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
+              - name: "discriminator"
+                value: discriminator
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+
+    - label:
+          "TH_CR1 starts a commissioning process with DUT_CE before the timeout
+          from step 12"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: payload
+      response:
+          error: FAILURE

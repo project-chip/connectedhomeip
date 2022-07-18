@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 21.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH. [{DUT_Client}]
+name: 3.3.2. [TC-IDM-3.2] Write Response Action from DUT to TH. [{DUT_Server}]
 
 config:
     nodeId: 0x12344321
@@ -28,9 +28,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
 
           ./chip-tool levelcontrol write on-level 2 1 1
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
           [1653026683.396666][6229:6234] CHIP:DMG: WriteResponseMessage =
           [1653026683.396685][6229:6234] CHIP:DMG: {
@@ -78,9 +80,10 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          sudo ./chip-tool basic write local-config-disabled 1 1 0
+
           Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
-          sudo ./chip-tool basic write local-config-disabled 1 1 0
           [1655201045.952849][3550:3555] CHIP:DMG: WriteResponseMessage =
           [1655201045.952886][3550:3555] CHIP:DMG: {
           [1655201045.952916][3550:3555] CHIP:DMG:         AttributeStatusIBs =
@@ -121,9 +124,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
           ./chip-tool basic write node-label new 1 0
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           [1655806131.663097][7241:7246] CHIP:DMG: WriteClient moving to [ResponseRe]
           [1655806131.663177][7241:7246] CHIP:DMG: WriteResponseMessage =
           [1655806131.663215][7241:7246] CHIP:DMG: {
@@ -163,9 +168,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          sudo Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           [1649152567.635323][16212:16217] CHIP:DMG: WriteResponseMessage =
           [1649152567.635361][16212:16217] CHIP:DMG: {
           [1649152567.635394][16212:16217] CHIP:DMG:         AttributeStatusIBs =
@@ -240,9 +247,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          sudo ./chip-tool any write-by-id 0x0204 0  1  1 1
+
+
           Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
-          sudo ./chip-tool any write-by-id 0x0204 0  1  1 1
           [1649152707.514290][16226:16231] CHIP:DMG: WriteResponseMessage =
           [1649152707.514324][16226:16231] CHIP:DMG: {
           [1649152707.514354][16226:16231] CHIP:DMG:         AttributeStatusIBs =
@@ -282,9 +291,9 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
-
           sudo ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
+
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
           [1649152768.817940][16237:16242] CHIP:DMG: WriteResponseMessage =
           [1649152768.817971][16237:16242] CHIP:DMG: {
@@ -529,9 +538,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          sudo  ./chip-tool levelcontrol write on-level 2 1 1
+
+
           Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
 
-          sudo  ./chip-tool levelcontrol write on-level 2 1 1
 
           [1653028376.099679][6518:6523] CHIP:DMG: WriteResponseMessage =
           [1653028376.099696][6518:6523] CHIP:DMG: {
@@ -633,11 +644,10 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
-
 
           ./chip-tool levelcontrol read on-level 1 1
 
+          Verify On TH,  Verify DUT is responsds with attribute value
           [1653028897.525838][6605:6611] CHIP:DMG: ReportDataMessage =
           [1653028897.525863][6605:6611] CHIP:DMG: {
           [1653028897.525885][6605:6611] CHIP:DMG:         AttributeReportIBs =
@@ -669,6 +679,8 @@ tests:
 
 
           ./chip-tool levelcontrol write on-level  3 1 1 --data-version 0xc4c9d7ae
+
+          Veify On TH,  DUT sends a Write Response message with a success
           [1653028938.426783][6617:6622] CHIP:DMG: WriteResponseMessage =
           [1653028938.426797][6617:6622] CHIP:DMG: {
           [1653028938.426806][6617:6622] CHIP:DMG:         AttributeStatusIBs =
@@ -696,6 +708,8 @@ tests:
 
            ./chip-tool levelcontrol read on-level 1 1
 
+          Verify on TH receives WriteResponseMessage with the status set to Success for the data sent in the above command and veriy  by sending a ReadRequestMessage to read the value that was modified.
+
           [1655201977.366318][3837:3842] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 3958539604
           [1655201977.366411][3837:3842] CHIP:TOO:   on level: 3
           [1655201977.366511][3837:3842] CHIP:EM: Sending Standalone Ack for MessageCounter:237652616 on exchange 15939i
@@ -712,15 +726,19 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          Verify DUT is responsds with DATA_VERSION_MISMATCH for the second Write request.
+
 
           ./chip-tool levelcontrol read on-level 1 1
+
+          Verify On TH,  Verify DUT is responsds with attribute value
 
           [1653029048.535610][6634:6639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 3301562287
           [1653029048.535653][6634:6639] CHIP:TOO:   on level: 3
 
 
           ./chip-tool levelcontrol write on-level 4 1 1
+
+          Veify On TH,  DUT sends a Write Response message with a success
 
           [1653029055.885156][6643:6648] CHIP:DMG:                         }
           [1653029055.885169][6643:6648] CHIP:DMG:
@@ -732,6 +750,9 @@ tests:
 
 
            ./chip-tool levelcontrol write on-level 4 1 1  --data-version  0xc4c9d7af
+
+          Verify on TH,  DUT is responsds with DATA_VERSION_MISMATCH for the second Write request.
+
           [1653029088.401601][6655:6660] CHIP:DMG: WriteResponseMessage =
           [1653029088.401614][6655:6660] CHIP:DMG: {
           [1653029088.401623][6655:6660] CHIP:DMG:         AttributeStatusIBs =

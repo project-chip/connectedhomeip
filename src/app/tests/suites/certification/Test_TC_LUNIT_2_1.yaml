@@ -26,177 +26,143 @@ tests:
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read temperature-unit 1 0
-          [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
-          [1651195354.966398][4306:4306] CHIP:DMG: {
-          [1651195354.966420][4306:4306] CHIP:DMG:         AttributePathIBs =
-          [1651195354.966446][4306:4306] CHIP:DMG:         [
-          [1651195354.966508][4306:4306] CHIP:DMG:                 AttributePathIB =
-          [1651195354.966544][4306:4306] CHIP:DMG:                 {
-          [1651195354.966574][4306:4306] CHIP:DMG:                         Endpoint = 0x0,
-          [1651195354.966626][4306:4306] CHIP:DMG:                         Cluster = 0x2d,
-          [1651195354.966657][4306:4306] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1651195354.966685][4306:4306] CHIP:DMG:                 }
-          [1651195354.966714][4306:4306] CHIP:DMG:
-          [1651195354.966766][4306:4306] CHIP:DMG:         ],
-          [1651195354.966799][4306:4306] CHIP:DMG:
-          [1651195354.966845][4306:4306] CHIP:DMG:         isFabricFiltered = true,
-          [1651195354.966872][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651195354.966896][4306:4306] CHIP:DMG: },
+
+          [1657108071.586424][5119:5124] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 4164031415
+          [1657108071.586491][5119:5124] CHIP:TOO:   TemperatureUnit: 0
       disabled: true
 
     - label: "DUT writes 0 to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Fahrenheit
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization write temperature-unit 0 1 0
 
-          [1651186603.330367][4306:4306] CHIP:DMG: WriteRequestMessage =
-          [1651186603.330394][4306:4306] CHIP:DMG: {
-          [1651186603.330482][4306:4306] CHIP:DMG:         suppressResponse = false,
-          [1651186603.330515][4306:4306] CHIP:DMG:         timedRequest = false,
-          [1651186603.330542][4306:4306] CHIP:DMG:         AttributeDataIBs =
-          [1651186603.330574][4306:4306] CHIP:DMG:         [
-          [1651186603.330601][4306:4306] CHIP:DMG:                 AttributeDataIB =
-          [1651186603.330631][4306:4306] CHIP:DMG:                 {
-          [1651186603.330662][4306:4306] CHIP:DMG:                         AttributePathIB =
-          [1651186603.330691][4306:4306] CHIP:DMG:                         {
-          [1651186603.330725][4306:4306] CHIP:DMG:                                 Endpoint = 0x0,
-          [1651186603.330762][4306:4306] CHIP:DMG:                                 Cluster = 0x2d,
-          [1651186603.330797][4306:4306] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1651186603.330829][4306:4306] CHIP:DMG:                         }
-          [1651186603.330863][4306:4306] CHIP:DMG:
-          [1651186603.330899][4306:4306] CHIP:DMG:                                 Data = 0,
-          [1651186603.330932][4306:4306] CHIP:DMG:                 },
-          [1651186603.330963][4306:4306] CHIP:DMG:
-          [1651186603.330989][4306:4306] CHIP:DMG:         ],
-          [1651186603.331020][4306:4306] CHIP:DMG:
-          [1651186603.331047][4306:4306] CHIP:DMG:         moreChunkedMessages = false,
-          [1651186603.331074][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651186603.331099][4306:4306] CHIP:DMG: },
+          [1657108113.524411][5127:5132] CHIP:DMG: WriteResponseMessage =
+          [1657108113.524437][5127:5132] CHIP:DMG: {
+          [1657108113.524460][5127:5132] CHIP:DMG:         AttributeStatusIBs =
+          [1657108113.524497][5127:5132] CHIP:DMG:         [
+          [1657108113.524521][5127:5132] CHIP:DMG:                 AttributeStatusIB =
+          [1657108113.524551][5127:5132] CHIP:DMG:                 {
+          [1657108113.524579][5127:5132] CHIP:DMG:                         AttributePathIB =
+          [1657108113.524610][5127:5132] CHIP:DMG:                         {
+          [1657108113.524645][5127:5132] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657108113.524678][5127:5132] CHIP:DMG:                                 Cluster = 0x2d,
+          [1657108113.524708][5127:5132] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657108113.524739][5127:5132] CHIP:DMG:                         }
+          [1657108113.524771][5127:5132] CHIP:DMG:
+          [1657108113.524800][5127:5132] CHIP:DMG:                         StatusIB =
+          [1657108113.524831][5127:5132] CHIP:DMG:                         {
+          [1657108113.524862][5127:5132] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657108113.524895][5127:5132] CHIP:DMG:                         },
+          [1657108113.524924][5127:5132] CHIP:DMG:
+          [1657108113.524951][5127:5132] CHIP:DMG:                 },
+          [1657108113.524981][5127:5132] CHIP:DMG:
+          [1657108113.525005][5127:5132] CHIP:DMG:         ],
+          [1657108113.525034][5127:5132] CHIP:DMG:
+          [1657108113.525058][5127:5132] CHIP:DMG:         InteractionModelRevision = 1
+          [1657108113.525081][5127:5132] CHIP:DMG: }
+          [1657108113.525148][5127:5132] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read temperature-unit 1 0
-          [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
-          [1651195354.966398][4306:4306] CHIP:DMG: {
-          [1651195354.966420][4306:4306] CHIP:DMG:         AttributePathIBs =
-          [1651195354.966446][4306:4306] CHIP:DMG:         [
-          [1651195354.966508][4306:4306] CHIP:DMG:                 AttributePathIB =
-          [1651195354.966544][4306:4306] CHIP:DMG:                 {
-          [1651195354.966574][4306:4306] CHIP:DMG:                         Endpoint = 0x0,
-          [1651195354.966626][4306:4306] CHIP:DMG:                         Cluster = 0x2d,
-          [1651195354.966657][4306:4306] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1651195354.966685][4306:4306] CHIP:DMG:                 }
-          [1651195354.966714][4306:4306] CHIP:DMG:
-          [1651195354.966766][4306:4306] CHIP:DMG:         ],
-          [1651195354.966799][4306:4306] CHIP:DMG:
-          [1651195354.966845][4306:4306] CHIP:DMG:         isFabricFiltered = true,
-          [1651195354.966872][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651195354.966896][4306:4306] CHIP:DMG: },
+
+          [1657108071.586424][5119:5124] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 4164031415
+          [1657108071.586491][5119:5124] CHIP:TOO:   TemperatureUnit: 0
       disabled: true
 
     - label: "DUT writes 1 to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Celsius
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization write temperature-unit 1 1 0
-          [1651190221.098512][4306:4306] CHIP:DMG: WriteRequestMessage =
-          [1651190221.098539][4306:4306] CHIP:DMG: {
-          [1651190221.098563][4306:4306] CHIP:DMG:         suppressResponse = false,
-          [1651190221.098590][4306:4306] CHIP:DMG:         timedRequest = false,
-          [1651190221.098615][4306:4306] CHIP:DMG:         AttributeDataIBs =
-          [1651190221.098645][4306:4306] CHIP:DMG:         [
-          [1651190221.098671][4306:4306] CHIP:DMG:                 AttributeDataIB =
-          [1651190221.098743][4306:4306] CHIP:DMG:                 {
-          [1651190221.098806][4306:4306] CHIP:DMG:                         AttributePathIB =
-          [1651190221.098838][4306:4306] CHIP:DMG:                         {
-          [1651190221.098872][4306:4306] CHIP:DMG:                                 Endpoint = 0x0,
-          [1651190221.098903][4306:4306] CHIP:DMG:                                 Cluster = 0x2d,
-          [1651190221.098940][4306:4306] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1651190221.099043][4306:4306] CHIP:DMG:                         }
-          [1651190221.099080][4306:4306] CHIP:DMG:
-          [1651190221.099117][4306:4306] CHIP:DMG:                                 Data = 1,
-          [1651190221.099202][4306:4306] CHIP:DMG:                 },
-          [1651190221.099271][4306:4306] CHIP:DMG:
-          [1651190221.099296][4306:4306] CHIP:DMG:         ],
-          [1651190221.099326][4306:4306] CHIP:DMG:
-          [1651190221.099352][4306:4306] CHIP:DMG:         moreChunkedMessages = false,
-          [1651190221.099378][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651190221.099448][4306:4306] CHIP:DMG: },
-          [1651190221.099532][4306:4306] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_002D e=0 p=o
-          [1651190221.099596][4306:4306] CHIP:DMG: AccessControl: allowed
+
+          [1657108163.429166][5149:5154] CHIP:DMG: WriteResponseMessage =
+          [1657108163.429205][5149:5154] CHIP:DMG: {
+          [1657108163.429228][5149:5154] CHIP:DMG:         AttributeStatusIBs =
+          [1657108163.429259][5149:5154] CHIP:DMG:         [
+          [1657108163.429283][5149:5154] CHIP:DMG:                 AttributeStatusIB =
+          [1657108163.429310][5149:5154] CHIP:DMG:                 {
+          [1657108163.429335][5149:5154] CHIP:DMG:                         AttributePathIB =
+          [1657108163.429374][5149:5154] CHIP:DMG:                         {
+          [1657108163.429405][5149:5154] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657108163.429441][5149:5154] CHIP:DMG:                                 Cluster = 0x2d,
+          [1657108163.429474][5149:5154] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657108163.429505][5149:5154] CHIP:DMG:                         }
+          [1657108163.429539][5149:5154] CHIP:DMG:
+          [1657108163.429572][5149:5154] CHIP:DMG:                         StatusIB =
+          [1657108163.429606][5149:5154] CHIP:DMG:                         {
+          [1657108163.429637][5149:5154] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657108163.429671][5149:5154] CHIP:DMG:                         },
+          [1657108163.429702][5149:5154] CHIP:DMG:
+          [1657108163.429728][5149:5154] CHIP:DMG:                 },
+          [1657108163.429759][5149:5154] CHIP:DMG:
+          [1657108163.429782][5149:5154] CHIP:DMG:         ],
+          [1657108163.429811][5149:5154] CHIP:DMG:
+          [1657108163.429834][5149:5154] CHIP:DMG:         InteractionModelRevision = 1
+          [1657108163.429857][5149:5154] CHIP:DMG: }
+          [1657108163.429923][5149:5154] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read temperature-unit 1 0
-          [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
-          [1651195354.966398][4306:4306] CHIP:DMG: {
-          [1651195354.966420][4306:4306] CHIP:DMG:         AttributePathIBs =
-          [1651195354.966446][4306:4306] CHIP:DMG:         [
-          [1651195354.966508][4306:4306] CHIP:DMG:                 AttributePathIB =
-          [1651195354.966544][4306:4306] CHIP:DMG:                 {
-          [1651195354.966574][4306:4306] CHIP:DMG:                         Endpoint = 0x0,
-          [1651195354.966626][4306:4306] CHIP:DMG:                         Cluster = 0x2d,
-          [1651195354.966657][4306:4306] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1651195354.966685][4306:4306] CHIP:DMG:                 }
-          [1651195354.966714][4306:4306] CHIP:DMG:
-          [1651195354.966766][4306:4306] CHIP:DMG:         ],
-          [1651195354.966799][4306:4306] CHIP:DMG:
-          [1651195354.966845][4306:4306] CHIP:DMG:         isFabricFiltered = true,
-          [1651195354.966872][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651195354.966896][4306:4306] CHIP:DMG: },
+          [1657108230.188723][5156:5161] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 4164031418
+          [1657108230.188792][5156:5161] CHIP:TOO:   TemperatureUnit: 1
       disabled: true
 
     - label: "DUT writes 2 to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Kelvin
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool unitlocalization write temperature-unit 2 1 0
-          [1651190829.683764][4306:4306] CHIP:DMG: WriteRequestMessage =
-          [1651190829.683792][4306:4306] CHIP:DMG: {
-          [1651190829.683827][4306:4306] CHIP:DMG:         suppressResponse = false,
-          [1651190829.683884][4306:4306] CHIP:DMG:         timedRequest = false,
-          [1651190829.683921][4306:4306] CHIP:DMG:         AttributeDataIBs =
-          [1651190829.683956][4306:4306] CHIP:DMG:         [
-          [1651190829.683991][4306:4306] CHIP:DMG:                 AttributeDataIB =
-          [1651190829.684017][4306:4306] CHIP:DMG:                 {
-          [1651190829.684045][4306:4306] CHIP:DMG:                         AttributePathIB =
-          [1651190829.684083][4306:4306] CHIP:DMG:                         {
-          [1651190829.684124][4306:4306] CHIP:DMG:                                 Endpoint = 0x0,
-          [1651190829.684163][4306:4306] CHIP:DMG:                                 Cluster = 0x2d,
-          [1651190829.684209][4306:4306] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1651190829.684238][4306:4306] CHIP:DMG:                         }
-          [1651190829.684289][4306:4306] CHIP:DMG:
-          [1651190829.684335][4306:4306] CHIP:DMG:                                 Data = 2,
-          [1651190829.684371][4306:4306] CHIP:DMG:                 },
-          [1651190829.684410][4306:4306] CHIP:DMG:
-          [1651190829.684435][4306:4306] CHIP:DMG:         ],
-          [1651190829.684474][4306:4306] CHIP:DMG:
-          [1651190829.684501][4306:4306] CHIP:DMG:         moreChunkedMessages = false,
-          [1651190829.684535][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651190829.684556][4306:4306] CHIP:DMG: },
+
+          [1657108163.429166][5149:5154] CHIP:DMG: WriteResponseMessage =
+          [1657108163.429205][5149:5154] CHIP:DMG: {
+          [1657108163.429228][5149:5154] CHIP:DMG:         AttributeStatusIBs =
+          [1657108163.429259][5149:5154] CHIP:DMG:         [
+          [1657108163.429283][5149:5154] CHIP:DMG:                 AttributeStatusIB =
+          [1657108163.429310][5149:5154] CHIP:DMG:                 {
+          [1657108163.429335][5149:5154] CHIP:DMG:                         AttributePathIB =
+          [1657108163.429374][5149:5154] CHIP:DMG:                         {
+          [1657108163.429405][5149:5154] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657108163.429441][5149:5154] CHIP:DMG:                                 Cluster = 0x2d,
+          [1657108163.429474][5149:5154] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657108163.429505][5149:5154] CHIP:DMG:                         }
+          [1657108163.429539][5149:5154] CHIP:DMG:
+          [1657108163.429572][5149:5154] CHIP:DMG:                         StatusIB =
+          [1657108163.429606][5149:5154] CHIP:DMG:                         {
+          [1657108163.429637][5149:5154] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657108163.429671][5149:5154] CHIP:DMG:                         },
+          [1657108163.429702][5149:5154] CHIP:DMG:
+          [1657108163.429728][5149:5154] CHIP:DMG:                 },
+          [1657108163.429759][5149:5154] CHIP:DMG:
+          [1657108163.429782][5149:5154] CHIP:DMG:         ],
+          [1657108163.429811][5149:5154] CHIP:DMG:
+          [1657108163.429834][5149:5154] CHIP:DMG:         InteractionModelRevision = 1
+          [1657108163.429857][5149:5154] CHIP:DMG: }
+          [1657108163.429923][5149:5154] CHIP:DMG: WriteClient moving to [AwaitingDe]
       disabled: true
 
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool unitlocalization read temperature-unit 1 0
-          [1651195354.966370][4306:4306] CHIP:DMG: ReadRequestMessage =
-          [1651195354.966398][4306:4306] CHIP:DMG: {
-          [1651195354.966420][4306:4306] CHIP:DMG:         AttributePathIBs =
-          [1651195354.966446][4306:4306] CHIP:DMG:         [
-          [1651195354.966508][4306:4306] CHIP:DMG:                 AttributePathIB =
-          [1651195354.966544][4306:4306] CHIP:DMG:                 {
-          [1651195354.966574][4306:4306] CHIP:DMG:                         Endpoint = 0x0,
-          [1651195354.966626][4306:4306] CHIP:DMG:                         Cluster = 0x2d,
-          [1651195354.966657][4306:4306] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1651195354.966685][4306:4306] CHIP:DMG:                 }
-          [1651195354.966714][4306:4306] CHIP:DMG:
-          [1651195354.966766][4306:4306] CHIP:DMG:         ],
-          [1651195354.966799][4306:4306] CHIP:DMG:
-          [1651195354.966845][4306:4306] CHIP:DMG:         isFabricFiltered = true,
-          [1651195354.966872][4306:4306] CHIP:DMG:         InteractionModelRevision = 1
-          [1651195354.966896][4306:4306] CHIP:DMG: },
+
+          [1657108230.188723][5156:5161] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_0000 DataVersion: 4164031418
+          [1657108230.188792][5156:5161] CHIP:TOO:   TemperatureUnit: 2
       disabled: true

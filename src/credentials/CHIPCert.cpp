@@ -655,6 +655,8 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
 
 CHIP_ERROR ChipDN::AddCATs(const chip::CATValues & cats)
 {
+    VerifyOrReturnError(cats.AreValid(), CHIP_ERROR_INVALID_ARGUMENT);
+
     for (auto & cat : cats.values)
     {
         if (cat != kUndefinedCAT)
@@ -1374,6 +1376,9 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
     {
         cats.values[i] = kUndefinedCAT;
     }
+
+    // Make sure the set contained valid data, otherwise it's an invalid cert
+    VerifyOrReturnError(cats.AreValid(), CHIP_ERROR_WRONG_CERT_DN);
 
     return CHIP_NO_ERROR;
 }

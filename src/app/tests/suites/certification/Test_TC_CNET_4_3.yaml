@@ -40,6 +40,9 @@ tests:
           ubuntu@ubuntu:~/apps$ ./chip-tool descriptor read server-list 1 0
 
 
+          Verify on the TH Log:
+
+
           [1646226258.250313][2446:2451] CHIP:DMG:        SuppressResponse = true,
           [1646226258.250337][2446:2451] CHIP:DMG:        InteractionModelRevision = 1
           [1646226258.250359][2446:2451] CHIP:DMG: }
@@ -77,6 +80,8 @@ tests:
       verification: |
           ubuntu@ubuntu:~/sethu-apr1/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read feature-map 1 0
 
+          Verify on the TH Log:
+
 
           [1649309323.273092][2611:2617] CHIP:DMG: }
           [1649309323.273466][2611:2617] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 3138976789
@@ -88,6 +93,8 @@ tests:
       PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read max-networks 1 0
+
+          Verify on the TH Log:
 
           [1646226441.815782][2475:2480] CHIP:DMG:        SuppressResponse = true,
           [1646226441.815849][2475:2480] CHIP:DMG:        InteractionModelRevision = 1
@@ -109,6 +116,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
 
+          Verify on the TH Log:
+
           [1654076774.294361][33659:33664] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 609053543
           [1654076774.294505][33659:33664] CHIP:TOO:   Networks: 1 entries
           [1654076774.294625][33659:33664] CHIP:TOO:     [1]: {
@@ -121,6 +130,8 @@ tests:
       PICS: CNET.S.A0004
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 1 0
+
+          Verify on the TH Log:
 
           [1646226615.428003][2502:2507] CHIP:DMG:
           [1646226615.428035][2502:2507] CHIP:DMG:        SuppressResponse = true,
@@ -136,6 +147,8 @@ tests:
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-networking-status 1 0
 
+          Verify on the TH Log:
+
           [1646227167.614060][2533:2538] CHIP:DMG:        SuppressResponse = true,
           [1646227167.614095][2533:2538] CHIP:DMG:        InteractionModelRevision = 1
           [1646227167.614126][2533:2538] CHIP:DMG: }
@@ -149,7 +162,9 @@ tests:
           Networks attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
-          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1 0
+          ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-network-id 1
+
+          Verify on the TH Log:
 
           [1654076802.288579][33669:33674] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 609053543
           [1654076802.288708][33669:33674] CHIP:TOO:   LastNetworkID: 6368697035
@@ -159,6 +174,8 @@ tests:
       PICS: CNET.S.A0007
       verification: |
           ubuntu@ubuntu:~/apps$ ./chip-tool networkcommissioning read last-connect-error-value 1 0
+
+          Verify on the TH Log:
 
           [1653483224.839873][28189:28194] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 3189790698
           [1653483224.839927][28189:28194] CHIP:TOO:   LastConnectErrorValue: null

@@ -137,6 +137,7 @@ function getManualTests() {
         "Test_TC_CNET_4_19",
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21",
+        "Test_TC_CNET_4_22",
     ];
 
     const DiagnosticsLogs = [
@@ -218,6 +219,7 @@ function getManualTests() {
         "Test_TC_AUDIOOUTPUT_7_3",
         "Test_TC_AUDIOOUTPUT_7_4",
         "Test_TC_CONTENTLAUNCHER_10_3",
+        "Test_TC_CONTENTLAUNCHER_10_4",
         "Test_TC_CONTENTLAUNCHER_10_5",
         "Test_TC_CONTENTLAUNCHER_10_7",
         "Test_TC_MC_11_1",
@@ -233,8 +235,8 @@ function getManualTests() {
         "Test_TC_CADMIN_1_8",
         "Test_TC_CADMIN_1_11",
         "Test_TC_CADMIN_1_12",
-        "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_14",
+        "Test_TC_CADMIN_1_15",
         "Test_TC_CADMIN_1_16",
         "Test_TC_CADMIN_1_17",
         "Test_TC_CADMIN_1_18",
@@ -244,16 +246,14 @@ function getManualTests() {
         "Test_TC_CADMIN_1_22",
         "Test_TC_CADMIN_1_23",
         "Test_TC_CADMIN_1_24",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26",
-        "Test_TC_CADMIN_1_27",
-        "Test_TC_CADMIN_1_28",
         // Slow tests that should not run in CI because they take many minutes each
         "Test_TC_CADMIN_1_5",
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
-        "Test_TC_CADMIN_1_15",
+        "Test_TC_CADMIN_1_13",
+        "Test_TC_CADMIN_1_25",
+        "Test_TC_CADMIN_1_26",
     ];
 
     const ModeSelect = [
@@ -486,6 +486,25 @@ function getManualTests() {
         "Test_TC_PCC_3_1",
     ];
 
+    const AccessControl = [
+        "Test_TC_ACL_1_1",
+        "Test_TC_ACL_2_1",
+        "Test_TC_ACL_2_2",
+        "Test_TC_ACL_2_3",
+        "Test_TC_ACL_2_4",
+        "Test_TC_ACL_2_5",
+        "Test_TC_ACL_2_6",
+        "Test_TC_ACL_2_7",
+        "Test_TC_ACL_2_8",
+        "Test_TC_ACL_2_9",
+        "Test_TC_ACL_2_10",
+    ];
+
+    const UserLabel = [
+        "Test_TC_ULABEL_3_1",
+    ];
+
+
     const tests = [
         DeviceDiscovery,
         Groups,
@@ -533,6 +552,8 @@ function getManualTests() {
         Binding,
         Scenes,
         PumpConfigurationControl,
+        AccessControl,
+        UserLabel,
     ].flat(1);
 
     tests.disable = disable.bind(tests);
@@ -636,7 +657,6 @@ function getTests() {
         "Test_TC_ULABEL_2_2",
         "Test_TC_ULABEL_2_3",
         "Test_TC_ULABEL_2_4",
-        "Test_TC_ULABEL_3_1",
     ];
 
     const MediaControl = [

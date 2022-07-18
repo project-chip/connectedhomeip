@@ -25,6 +25,8 @@ tests:
           "TH prompts the operator to make the DUT send one or more supported
           commands from the Level Control cluster"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool levelcontrol  move-to-level-with-on-off  1 0 1 1
 
           [1653376388.152776][6857:6862] CHIP:DMG:                                 StatusIB =

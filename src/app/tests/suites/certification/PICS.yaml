@@ -554,21 +554,21 @@ PICS:
 
       # Temperature Measurement cluster
     - label: "Does the device implement the MeasuredValue attribute?"
-      id: TM.S.A0000
+      id: TMP.S.A0000
 
     - label: "Does the device implement the MinMeasuredValue attribute?"
-      id: TM.S.A0001
+      id: TMP.S.A0001
 
     - label: "Does the device implement the MaxMeasuredValue attribute?"
-      id: TM.S.A0002
+      id: TMP.S.A0002
 
     - label: "Does the device implement the Tolerance attribute?"
-      id: TM.S.A0003
+      id: TMP.S.A0003
 
     - label:
           "Can the MeasuredValue attribute changed by physical control at the
           device?"
-      id: TM.M.ManuallyControlled
+      id: TMP.M.ManuallyControlled
 
     - label: "Does the device implement the Tolerance attribute?"
       id: A_TEMPERATURE_TOLERANCE
@@ -605,7 +605,7 @@ PICS:
       id: DGSW.S.A0003
 
     - label: "Does the device implement the ResetWaterMarks command?"
-      id: DGSW.S.C00
+      id: DGSW.S.C00.Rsp
 
       # Thermostat cluster
     - label: "Does the device implement the Heating feature"
@@ -634,6 +634,12 @@ PICS:
 
     - label: "Does the device implement the Tolerance attribute?"
       id: A_TEMPERATURE_TOLERANCE
+
+    - label: "Does the device implement the OccupiedCoolingSetpoint attribute?"
+      id: A_OCCUPIEDCOOLINGSETPOINT
+
+    - label: "Does the device implement the OccupiedHeatingSetpoint attribute?"
+      id: A_OCCUPIEDHEATINGSETPOINT
 
     - label: "Does the device implement the LocalTemperature attribute?"
       id: TSTAT.S.A0000
@@ -1570,6 +1576,9 @@ PICS:
     - label: "Does the device represent a Latching Switch?"
       id: SWTCH.S.F00
 
+    - label: "Does the device represent a Latching Switch?"
+      id: SWTCH.C.F00
+
     - label: "Does the device implement the CurrentScene attribute?"
       id: SWTCH.S.F01
 
@@ -1581,6 +1590,16 @@ PICS:
 
     - label: "Does the MS device support Momentary Switch MultiPress?"
       id: SWTCH.S.F04
+
+    - label:
+          "Does the DUT support reading attribute to get switch state (polling)?"
+      id: SWTCH.C.M.RA
+
+    - label: "Does the DUT support eventing to get switch state changes?"
+      id: SWTCH.C.M.EV
+
+    - label: "Does the device implement the CurrentScene attribute?"
+      id: SWTCH.C.F01
 
     #General Commissioning Cluster
     - label: "Does the device(Server) support Breadcrumb attribute?"
@@ -1740,536 +1759,603 @@ PICS:
     - label: "Does the DUT support Basic Commissioning Method (BCM)?"
       id: PICS_MF_BCM
 
+    - label: "Does the Device support User Interface Display"
+      id: CADMIN.UserInterfaceDisplay
+
+    - label: "Does the Device support Audio Interface"
+      id: CADMIN.AudioInterface
+    #server
+    - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
+      id: CADMIN.S.C0000
+
+    - label: "Does the Device support Basic Commissioning Method (BCM)?"
+      id: CADMIN.S.C0001
+
+    - label: "Does the Device support revoking commissioning window?"
+      id: CADMIN.S.C0002
+
+    - label: "Does the Device implement receiving the RemoveFabric command?"
+      id: OPCREDS.S.C0a.Rsp
+    #attributes
+    - label: "Does the Device support Fabrics attribute?"
+      id: OPCREDS.S.A0001
+
+    - label: "Does the Device support NodeLabel attribute?"
+      id: BINFO.S.A0005
+
+    - label: "Does the Device support WindowStatus attribute?"
+      id: CADMIN.S.A0000
+
+    #client
+    - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
+      id: CADMIN.C.C0000
+
+    - label: "Does the Device support Basic Commissioning Method (BCM)?"
+      id: CADMIN.C.C0001
+
+    - label: "Does the Device support revoking commissioning window?"
+      id: CADMIN.C.C0002
+
+    - label: "Does the Device implement receiving the RemoveFabric command?"
+      id: OPCREDS.C.C0a.Tx
+    #attributes
+    - label: "Does the Device support Fabrics attribute?"
+      id: OPCREDS.C.A0001
+
+    - label: "Does the Device support NodeLabel attribute?"
+      id: BINFO.C.A0005
+
+    - label: "Does the Device support WindowStatus attribute?"
+      id: CADMIN.C.A0000
+
     #User Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
       id: ULABEL.S.A0000
+
+    - label:
+          "DUT sends a write request to the TH, to write to an entry in the
+          LabelList"
+      id: ULABEL.C.A0000
 
     #Fixed Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
       id: FLABEL.S.A0000
 
+    - label: "Does the DUT Server support LabelList attribute?"
+      id: FLABEL.C.A0000
+
     #Media clusters
     - label:
           "Does the DUT support the Keypad Input server cluster Navigation Keys?"
-      id: MC_KEYPADINPUT.S.NV
+      id: KEYPADINPUT.S.NV
 
     - label:
           "Does the DUT support the Keypad Input server cluster Location Keys?"
-      id: MC_KEYPADINPUT.S.LK
+      id: KEYPADINPUT.S.LK
 
     - label: "Does the DUT support the Keypad Input server cluster Number Keys?"
-      id: MC_KEYPADINPUT.S.NK
+      id: KEYPADINPUT.S.NK
 
     - label:
           "Does the DUT support the Application Launcher server cluster
           Application Platform feature?"
-      id: MC_APPLAUNCHER.S.AP
+      id: APPLAUNCHER.S.AP
 
     - label:
           "Does the DUT support the Application Launcher server cluster
           CatalogList attribute?"
-      id: MC_APPLAUNCHER.S.A0000
+      id: APPLAUNCHER.S.A0000
 
     - label:
           "Does the DUT support the Application Launcher server cluster
           CurrentApp attribute?"
-      id: MC_APPLAUNCHER.S.A0001
+      id: APPLAUNCHER.S.A0001
 
     - label:
           "Does the DUT support the Media Input server cluster InputList
           attribute?"
-      id: MC_MEDIAINPUT.S.A0000
+      id: MEDIAINPUT.S.A0000
 
     - label:
           "Does the DUT support the Media Input server cluster CurrentInput
           attribute?"
-      id: MC_MEDIAINPUT.S.A0001
+      id: MEDIAINPUT.S.A0001
+
+    - label:
+          "Does the DUT support the Media Input server cluster Name Updates
+          feature?"
+      id: MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Channel server cluster Channel List feature?"
-      id: MC_CHANNEL.S.CL
+      id: CHANNEL.S.CL
 
     - label:
           "Does the DUT support the Channel server cluster Lineup Info feature?"
-      id: MC_CHANNEL.S.LI
+      id: CHANNEL.S.LI
 
     - label:
           "Does the DUT support the Channel server cluster ChannelList
           attribute?"
-      id: MC_CHANNEL.S.A0000
+      id: CHANNEL.S.A0000
 
     - label: "Does the DUT support the Channel server cluster Lineup attribute?"
-      id: MC_CHANNEL.S.A0001
+      id: CHANNEL.S.A0001
 
     - label:
           "Does the DUT support the Channel server cluster CurrentChannel
           attribute?"
-      id: MC_CHANNEL.S.A0002
+      id: CHANNEL.S.A0002
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannel
           command?"
-      id: MC_CHANNEL.S.C0000
+      id: CHANNEL.S.C0000
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannelByNumber
           command?"
-      id: MC_CHANNEL.S.C0002
+      id: CHANNEL.S.C0002
 
     - label:
           "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: MC_CHANNEL.S.C0003
+      id: CHANNEL.S.C0003
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
           feature?"
-      id: MC_MEDIAPLAYBACK.S.AS
+      id: MEDIAPLAYBACK.S.AS
 
     - label:
           "Does the DUT support the Media Playback server cluster Variable Speed
           feature?"
-      id: MC_MEDIAPLAYBACK.S.VS
+      id: MEDIAPLAYBACK.S.VS
 
     - label:
           "Does the DUT support the Media Input server cluster, Name Updates
           feature?"
-      id: MC_MEDIAINPUT.S.NU
+      id: MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
-      id: MC_TGTNAV.S.A0001
+      id: TGTNAV.S.A0001
 
     - label:
           "Does the DUT support the Application Basic server cluster VendorName
           attribute?"
-      id: MC_APBSC.S.A0000
+      id: APBSC.S.A0000
 
     - label:
           "Does the DUT support the Application Basic server cluster VendorID
           attribute?"
-      id: MC_APBSC.S.A0001
+      id: APBSC.S.A0001
 
     - label:
           "Does the DUT support the Application Basic server cluster ProductID
           attribute?"
-      id: MC_APBSC.S.A0003
+      id: APBSC.S.A0003
 
     - label:
           "Does the DUT support the Content Launcher server cluster Content
           Search feature?"
-      id: MC_CONTENTLAUNCHER.S.CS
+      id: CONTENTLAUNCHER.S.CS
 
     - label:
           "Does the DUT support the Content Launcher server cluster Content
           Search feature?"
-      id: MC_CONTENTLAUNCHER.S.UP
+      id: CONTENTLAUNCHER.S.UP
 
     - label:
           "Does the DUT support the Content Launcher server cluster AcceptHeader
           attribute?"
-      id: MC_CONTENTLAUNCHER.S.A0000
+      id: CONTENTLAUNCHER.S.A0000
 
     - label:
           "Does the DUT support the Content Launcher server cluster
           SupportedStreamingProtocols attribute?"
-      id: MC_CONTENTLAUNCHER.S.A0001
+      id: CONTENTLAUNCHER.S.A0001
 
     - label: "Does the device implement the Low Power cluster as a server?"
-      id: MC_LOWPOWER.S
+      id: LOWPOWER.S
 
     - label: "Does the device implement the Low Power cluster as a client?"
-      id: MC_LOWPOWER.C
+      id: LOWPOWER.C
 
     - label:
           "Does the DUT support the Media Input server cluster SelectInput
           command?"
-      id: MC_MEDIAINPUT.S.C0000
+      id: MEDIAINPUT.S.C0000
 
     - label:
           "Does the DUT support the Media Input server cluster ShowStatus
           command?"
-      id: MC_MEDIAINPUT.S.C0001
+      id: MEDIAINPUT.S.C0001
 
     - label:
           "Does the DUT support the Media Input server cluster HideStatus
           command"
-      id: MC_MEDIAINPUT.S.C0002
+      id: MEDIAINPUT.S.C0002
 
     - label:
           "Does the DUT support the Media Input server cluster Rename command?"
-      id: MC_MEDIAINPUT.S.C0003
+      id: MEDIAINPUT.S.C0003
+
+    - label:
+          "Does the DUT support the Media Input server cluster Name Updates
+          feature?"
+      id: MEDIAINPUT.S.NU
 
     - label:
           "Does the DUT support the Media Input client cluster SelectInput
           command?"
-      id: MC_MEDIAINPUT.C.C0000
+      id: MEDIAINPUT.C.C0000
 
     - label:
           "Does the DUT support the Media Input client cluster ShowStatus
           command?"
-      id: MC_MEDIAINPUT.C.C0001
+      id: MEDIAINPUT.C.C0001
 
     - label:
           "Does the DUT support the Media Input client cluster HideStatus
           command?"
-      id: MC_MEDIAINPUT.C.C0002
+      id: MEDIAINPUT.C.C0002
 
     - label:
           "Does the DUT support the Media Input server cluster Rename command?"
-      id: MC_MEDIAINPUT.C.C0003
+      id: MEDIAINPUT.C.C0003
 
     - label:
           "Does the DUT support the Application Launcher client cluster
           LaunchApp command?"
-      id: MC_APPLAUNCHER.C.C0000
+      id: APPLAUNCHER.C.C0000
 
     - label:
           "Does the DUT support the Application Launcher client cluster StopApp
           command?"
-      id: MC_APPLAUNCHER.C.C0001
+      id: APPLAUNCHER.C.C0001
 
     - label:
           "Does the DUT support the Application Launcher client cluster HideApp
           command?"
-      id: MC_APPLAUNCHER.C.C0002
+      id: APPLAUNCHER.C.C0002
 
     - label:
           "Does the DUT support the Application Launcher server cluster StopApp
           command?"
-      id: MC_APPLAUNCHER.S.C0001
+      id: APPLAUNCHER.S.C0001
 
     - label:
           "Does the DUT support the Application Launcher server cluster HideApp
           command?"
-      id: MC_APPLAUNCHER.S.C0002
+      id: APPLAUNCHER.S.C0002
 
     - label:
           "Does the DUT support the Wake On LAN server cluster MACAddress
           attribute?"
-      id: MC_WAKEONLAN.S.A0000
+      id: WAKEONLAN.S.A0000
 
     - label: "Does the device implement the Wake On LAN cluster as a server?"
-      id: MC_WAKEONLAN.S
+      id: WAKEONLAN.S
 
     - label:
           "Does the DUT support the Channel server cluster Channel List feature?"
-      id: MC_CHANNEL.S.CL
+      id: CHANNEL.S.CL
 
     - label:
           "Does the DUT support the Channel server cluster ChannelList
           attribute?"
-      id: MC_CHANNEL.S.A0000
+      id: CHANNEL.S.A0000
 
     - label: "Does the DUT support the Channel server cluster Lineup attribute?"
-      id: MC_CHANNEL.S.A0001
+      id: CHANNEL.S.A0001
 
     - label:
           "Does the DUT support the Channel server cluster CurrentChannel
           attribute?"
-      id: MC_CHANNEL.S.A0002
+      id: CHANNEL.S.A0002
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannel
           command?"
-      id: MC_CHANNEL.S.C0000
+      id: CHANNEL.S.C0000
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannelByNumber
           command?"
-      id: MC_CHANNEL.S.C0002
+      id: CHANNEL.S.C0002
 
     - label:
           "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: MC_CHANNEL.S.C0003
+      id: CHANNEL.S.C0003
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
           feature?"
-      id: MC_MEDIAPLAYBACK.S.AS
+      id: MEDIAPLAYBACK.S.AS
 
     - label:
           "Does the DUT support the Media Playback server cluster Variable Speed
           feature?"
-      id: MC_MEDIAPLAYBACK.S.VS
+      id: MEDIAPLAYBACK.S.VS
 
     - label:
           "Does the DUT support the Media Playback server cluster CurrentState
           attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0000
+      id: MEDIAPLAYBACK.S.A0000
 
     - label:
           "Does the DUT support the Media Playback server cluster StartTime
           attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0001
+      id: MEDIAPLAYBACK.S.A0001
 
     - label:
           "Does the DUT support the Media Playback server cluster Duration
           attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0002
+      id: MEDIAPLAYBACK.S.A0002
 
     - label:
           "Does the DUT support the Media Playback server cluster
           SampledPosition attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0003
+      id: MEDIAPLAYBACK.S.A0003
 
     - label:
           "Does the DUT support the Media Playback server cluster PlaybackSpeed
           attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0004
+      id: MEDIAPLAYBACK.S.A0004
 
     - label:
           "Does the DUT support the Media Playback server cluster SeekRangeEnd
           attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0005
+      id: MEDIAPLAYBACK.S.A0005
 
     - label:
           "Does the DUT support the Media Playback server cluster SeekRangeStart
           attribute?"
-      id: MC_MEDIAPLAYBACK.S.A0006
+      id: MEDIAPLAYBACK.S.A0006
 
     - label:
           "Does the DUT support the Media Playback server cluster Play command?"
-      id: MC_MEDIAPLAYBACK.S.C0000
+      id: MEDIAPLAYBACK.S.C0000
 
     - label:
           "Does the DUT support the Media Playback server cluster Pause command?"
-      id: MC_MEDIAPLAYBACK.S.C0001
+      id: MEDIAPLAYBACK.S.C0001
 
     - label:
           "Does the DUT support the Media Playback server cluster Stop command?"
-      id: MC_MEDIAPLAYBACK.S.C0002
+      id: MEDIAPLAYBACK.S.C0002
 
     - label:
           "Does the DUT support the Media Playback server cluster StartOver
           command?"
-      id: MC_MEDIAPLAYBACK.S.C0003
+      id: MEDIAPLAYBACK.S.C0003
 
     - label:
           "Does the DUT support the Media Playback server cluster Previous
           command?"
-      id: MC_MEDIAPLAYBACK.S.C0004
+      id: MEDIAPLAYBACK.S.C0004
 
     - label:
           "Does the DUT support the Media Playback server cluster Next command?"
-      id: MC_MEDIAPLAYBACK.S.C0005
+      id: MEDIAPLAYBACK.S.C0005
 
     - label:
           "Does the DUT support the Media Playback server cluster Rewind
           command?"
-      id: MC_MEDIAPLAYBACK.S.C0006
+      id: MEDIAPLAYBACK.S.C0006
 
     - label:
           "Does the DUT support the Media Playback server cluster FastForward
           command?"
-      id: MC_MEDIAPLAYBACK.S.C0007
+      id: MEDIAPLAYBACK.S.C0007
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipForward
           command?"
-      id: MC_MEDIAPLAYBACK.S.C0008
+      id: MEDIAPLAYBACK.S.C0008
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipBackward
           command?"
-      id: MC_MEDIAPLAYBACK.S.C0009
+      id: MEDIAPLAYBACK.S.C0009
 
     - label:
           "Does the DUT support the Media Playback server cluster Seek command?"
-      id: MC_MEDIAPLAYBACK.S.C000B
+      id: MEDIAPLAYBACK.S.C000B
 
     - label:
           "Does the DUT support the Media Playback client cluster Play command?"
-      id: MC_MEDIAPLAYBACK.C.C0000
+      id: MEDIAPLAYBACK.C.C0000
 
     - label:
           "Does the DUT support the Media Playback client cluster Pause command?"
-      id: MC_MEDIAPLAYBACK.C.C0001
+      id: MEDIAPLAYBACK.C.C0001
 
     - label:
           "Does the DUT support the Media Playback client cluster Stop command?"
-      id: MC_MEDIAPLAYBACK.C.C0002
+      id: MEDIAPLAYBACK.C.C0002
 
     - label:
           "Does the DUT support the Media Playback client cluster StartOver
           command?"
-      id: MC_MEDIAPLAYBACK.C.C0003
+      id: MEDIAPLAYBACK.C.C0003
 
     - label:
           "Does the DUT support the Media Playback client cluster Previous
           command?"
-      id: MC_MEDIAPLAYBACK.C.C0004
+      id: MEDIAPLAYBACK.C.C0004
 
     - label:
           "Does the DUT support the Media Playback client cluster Next command?"
-      id: MC_MEDIAPLAYBACK.C.C0005
+      id: MEDIAPLAYBACK.C.C0005
 
     - label:
           "Does the DUT support the Media Playback client cluster Rewind
           command?"
-      id: MC_MEDIAPLAYBACK.C.C0006
+      id: MEDIAPLAYBACK.C.C0006
 
     - label:
           "Does the DUT support the Media Playback client cluster FastForward
           command?"
-      id: MC_MEDIAPLAYBACK.C.C0007
+      id: MEDIAPLAYBACK.C.C0007
 
     - label:
           "Does the DUT support the Media Playback client cluster SkipForward
           command?"
-      id: MC_MEDIAPLAYBACK.C.C0008
+      id: MEDIAPLAYBACK.C.C0008
 
     - label:
           "Does the DUT support the Media Playback client cluster SkipBackward
           command?"
-      id: MC_MEDIAPLAYBACK.C.C0009
+      id: MEDIAPLAYBACK.C.C0009
 
     - label:
           "Does the DUT support the Media Playback client cluster Seek command?"
-      id: MC_MEDIAPLAYBACK.C.C000B
+      id: MEDIAPLAYBACK.C.C000B
 
     - label:
           "Does the DUT support the Audio Output server cluster OutputList
           attribute?"
-      id: MC_AUDIOOUTPUT.S.A0000
+      id: AUDIOOUTPUT.S.A0000
 
     - label:
           "Does the DUT support the Audio Output server cluster CurrentOutput
           attribute?"
-      id: MC_AUDIOOUTPUT.S.A0001
+      id: AUDIOOUTPUT.S.A0001
 
     - label:
           "Does the DUT support the Audio Output server cluster SelectOutput
           command?"
-      id: MC_AUDIOOUTPUT.S.C0000
+      id: AUDIOOUTPUT.S.C0000
 
     - label:
           "Does the DUT support the Audio Output server cluster RenameOutput
           command?"
-      id: MC_AUDIOOUTPUT.S.C0001
+      id: AUDIOOUTPUT.S.C0001
 
     - label:
           "Does the DUT support the Audio Ouput server cluster Name Updates
           feature?"
-      id: MC_AUDIOOUTPUT.S.NU
+      id: AUDIOOUTPUT.S.NU
 
     - label:
           "Does the DUT support the Target Navigator server cluster TargetList
           attribute?"
-      id: MC_TGTNAV.S.A0000
+      id: TGTNAV.S.A0000
 
     - label:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
-      id: MC_TGTNAV.S.A0001
+      id: TGTNAV.S.A0001
 
     - label:
           "Does the DUT support the Target Navigator server cluster
           NavigateTarget command?"
-      id: MC_TGTNAV.S.C0000
+      id: TGTNAV.S.C0000
 
     - label:
           "Does the DUT support the Application Basic server cluster VendorName
           attribute?"
-      id: MC_APBSC.S.A0000
+      id: APBSC.S.A0000
 
     - label:
           "Does the DUT support the Application Basic server cluster VendorID
           attribute?"
-      id: MC_APBSC.S.A0001
+      id: APBSC.S.A0001
 
     - label:
           "Does the DUT support the Application Basic server cluster
           ApplicationName attribute?"
-      id: MC_APBSC.S.A0002
+      id: APBSC.S.A0002
 
     - label:
           "Does the DUT support the Application Basic server cluster ProductID
           attribute?"
-      id: MC_APBSC.S.A0003
+      id: APBSC.S.A0003
 
     - label:
           "Does the DUT support the Application Basic server cluster Application
           attribute?"
-      id: MC_APBSC.S.A0004
+      id: APBSC.S.A0004
 
     - label:
           "Does the DUT support the Application Basic server cluster Status
           attribute?"
-      id: MC_APBSC.S.A0005
+      id: APBSC.S.A0005
 
     - label:
           "Does the DUT support the Application Basic server cluster
           ApplicationVersion attribute?"
-      id: MC_APBSC.S.A0006
+      id: APBSC.S.A0006
 
     - label:
           "Does the DUT support the Application Basic server cluster
           AllowedVendorList attribute?"
-      id: MC_APBSC.S.A0007
+      id: APBSC.S.A0007
 
     - label:
           "Does the DUT support the Content Launcher server cluster Content
           Search feature?"
-      id: MC_CONTENTLAUNCHER.S.CS
+      id: CONTENTLAUNCHER.S.CS
 
     - label:
           "Does the DUT support the Content Launcher server cluster URL Playback
           feature?"
-      id: MC_CONTENTLAUNCHER.S.UP
+      id: CONTENTLAUNCHER.S.UP
 
     - label:
           "Does the DUT support the Content Launcher server cluster AcceptHeader
           attribute?"
-      id: MC_CONTENTLAUNCHER.S.A0000
+      id: CONTENTLAUNCHER.S.A0000
 
     - label:
           "Does the DUT support the Content Launcher server cluster
           SupportedStreamingProtocols attribute?"
-      id: MC_CONTENTLAUNCHER.S.A0001
+      id: CONTENTLAUNCHER.S.A0001
 
     - label:
           "Does the DUT support the Content Launcher server cluster
           LaunchContent command?"
-      id: MC_CONTENTLAUNCHER.C.C0000
+      id: CONTENTLAUNCHER.C.C0000
 
     - label:
           "Does the DUT support the Content Launcher server cluster LaunchURL
           command?"
-      id: MC_CONTENTLAUNCHER.C.C0001
+      id: CONTENTLAUNCHER.C.C0001
 
     - label:
           "Does the DUT support the Content Launcher server cluster and is
           Commissionable?"
-      id: MC_ALOGIN.S.COMMISSIONABLE
+      id: ALOGIN.S.COMMISSIONABLE
 
     - label:
           "Does the DUT support the Account Login server cluster GetSetupPIN
           command?"
-      id: MC_ALOGIN.S.C0000
+      id: ALOGIN.S.C0000
 
     - label:
           "Does the DUT support the Account Login client cluster GetSetupPIN
           command?"
-      id: MC_ALOGIN.C.C0000
+      id: ALOGIN.C.C0000
 
     - label: "Does the device implement the Keypad Input cluster as a client?"
-      id: MC_KEYPADINPUT.C
+      id: KEYPADINPUT.C
 
     - label:
           "Does the DUT support the Target Navigator server cluster TargetList
           attribute?"
-      id: MC_TGTNAV.S.A0000
+      id: TGTNAV.S.A0000
 
     - label:
           "Does the DUT support the Target Navigator server cluster
           CurrentTarget attribute?"
-      id: MC_TGTNAV.S.A0001
+      id: TGTNAV.S.A0001
 
     - label:
           "Does the DUT support the Target Navigator server cluster
           NavigateTarget command?"
-      id: MC_TGTNAV.S.C0000
+      id: TGTNAV.S.C0000
 
     - label:
           "Does the DUT support the commissioning procedure initiated by a
@@ -2287,31 +2373,31 @@ PICS:
     - label:
           "Does the DUT support the Channel client cluster, ChangeChannel
           command?"
-      id: MC_CHANNEL.C.C0000
+      id: CHANNEL.C.C0000
 
     - label:
           "Does the DUT support the Channel client cluster,
           ChangeChannelByNumber command?"
-      id: MC_CHANNEL.C.C0002
+      id: CHANNEL.C.C0002
 
     - label:
           "Does the DUT support the Channel client cluster, SkipChannel command?"
-      id: MC_CHANNEL.C.C0003
+      id: CHANNEL.C.C0003
 
     - label:
           "Does the DUT support the Application Launcher server cluster,
           LaunchApp command?"
-      id: MC_APPLAUNCHER.S.C0000
+      id: APPLAUNCHER.S.C0000
 
     - label:
           "Does the DUT support the Application Launcher server cluster, StopApp
           command?"
-      id: MC_APPLAUNCHER.S.C0001
+      id: APPLAUNCHER.S.C0001
 
     - label:
           "Does the DUT support the Application Launcher server cluster, HideApp
           command?"
-      id: MC_APPLAUNCHER.S.C0002
+      id: APPLAUNCHER.S.C0002
     #Bridge
     - label: "Does the DUT implement a Bridge"
       id: MCORE.BRIDGE
@@ -2380,7 +2466,7 @@ PICS:
       id: DGGEN.S.A0008
 
     - label: "Indicates that node is configured for test event triggers."
-      id: DGGEN.S.C00
+      id: DGGEN.S.C00.Rsp
 
     - label:
           "Indicates a change in the set of hardware faults currently detected
@@ -2755,7 +2841,7 @@ PICS:
 
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
-      id: DGETH.S.C00
+      id: DGETH.S.C00.Rsp
 
     - label: "Does the device implement the PHYRate attribute?"
       id: DGETH.S.A0000
@@ -2881,7 +2967,7 @@ PICS:
           "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
-      id: DGWIFI.S.C00
+      id: DGWIFI.S.C00.Rsp
     #Actions Cluster
     - label: "Does the device implement the ActionList attribute?"
       id: ACT.S.A0000
@@ -4393,6 +4479,29 @@ PICS:
           AddTrustedRootCertificate command?"
       id: OPCREDS.C.C0b.Tx
 
+    #Access Control cluster
+    - label: "Does the DUT support the ACL attribute?"
+      id: ACL.S.A0000
+
+    - label: "Does the DUT support extension attribute?"
+      id: ACL.S.A0001
+
+    - label: "Does the DUT support SubjectsPerAccessControlEntry attribute?"
+      id: ACL.S.A0002
+
+    - label: "Does the DUT support TargetsPerAccessControlEntry event?"
+      id: ACL.S.A0003
+
+    - label: "Does the DUT support AccessControlEntriesPerFabric attribute?"
+      id: ACL.S.A0004
+
+    - label: "Does the DUT support the AccessControlEntryChanged Event?"
+      id: ACL.S.E00
+
+    - label: "Does the DUT support the AccessControlExtensionChanged Event?"
+      id: ACL.S.E01
+
+    #Mode select
     #Mode select
     - label: "Does the DUT support the StartUpMode attribute?"
       id: MOD.S.A0004

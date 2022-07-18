@@ -50,4 +50,11 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform tizen
             - name: Build Tizen examples
-              run: scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target-glob 'tizen-*' build"
+              run: |
+                ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target-glob 'tizen-*' \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                    "

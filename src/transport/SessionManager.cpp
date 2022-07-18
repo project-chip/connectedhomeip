@@ -439,7 +439,12 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+    CHIP_ERROR err = packetHeader.DecodeAndConsume(msg);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to decode packet header: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
 
     if (packetHeader.IsEncrypted())
     {

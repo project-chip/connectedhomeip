@@ -329,7 +329,7 @@ def main(argv: Sequence[str]) -> None:
         "", "--ipv6only", help="Compile build which only supports ipv6. Linux only.",
         action="store_true")
     parser.add_option(
-        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "x64"])
+        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
 
     options, _ = parser.parse_args(argv)
 
@@ -621,24 +621,36 @@ def main(argv: Sequence[str]) -> None:
                 'chip_config_network_layer_ble = false',
                 f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
             ])
-            if options.cpu_type == "arm64":
-                uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
-                if "aarch" not in uname_resp and "arm" not in uname_resp:
-                    if (
-                            "aarch" not in uname_resp and
-                            "arm" not in uname_resp and
-                            "SYSROOT_AARCH64" not in shell.env):
+
+            uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+            if "aarch" not in uname_resp and "arm" not in uname_resp:
+                if options.cpu_type == "arm64":
+                    if "SYSROOT_AARCH64" not in shell.env:
                         flush_print(
                             "SYSROOT_AARCH64 env variable not set. "
                             "AARCH64 toolchain needed for cross-compiling for arm64.")
                         exit(1)
                     shell.env["PKG_CONFIG_PATH"] = (
                         f'{shell.env["SYSROOT_AARCH64"]}/lib/aarch64-linux-gnu/pkgconfig')
-                linux_args.append('target_cpu="arm64"')
-                linux_args.append('is_clang=true')
-                linux_args.append('chip_crypto="mbedtls"')
-                linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
-            elif options.cpu_type == "x64":
+                    linux_args.append('target_cpu="arm64"')
+                    linux_args.append('is_clang=true')
+                    linux_args.append('chip_crypto="mbedtls"')
+                    linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
+
+                elif options.cpu_type == "arm":
+                    if "SYSROOT_ARMHF" not in shell.env:
+                        flush_print(
+                            "SYSROOT_ARMHF env variable not set. "
+                            "ARMHF toolchain needed for cross-compiling for arm.")
+                        exit(1)
+                    shell.env["PKG_CONFIG_PATH"] = (
+                        f'{shell.env["SYSROOT_ARMHF"]}/lib/arm-linux-gnueabihf/pkgconfig')
+                    linux_args.append('target_cpu="arm"')
+                    linux_args.append('is_clang=true')
+                    linux_args.append('chip_crypto="mbedtls"')
+                    linux_args.append(f'sysroot="{shell.env["SYSROOT_ARMHF"]}"')
+
+            if options.cpu_type == "x64":
                 uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
                 if "x64" not in uname_resp and "x86_64" not in uname_resp:
                     flush_print(f"Unable to cross compile for x64 on {uname_resp}")

@@ -103,12 +103,12 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
     int32_t success = 0;
 
     success = getPref_bool_new(key.Namespace, key.Name, &intVal);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_bool_new: %s/%s failed\n", key.Namespace, key.Name);
 
     val = (intVal != 0);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -119,10 +119,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
     int32_t success = 0;
 
     success = getPref_u32_new(key.Namespace, key.Name, &val);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -133,10 +133,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
     int32_t success = 0;
 
     success = getPref_u64_new(key.Namespace, key.Name, &val);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -147,10 +147,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     int32_t success = 0;
 
     success = getPref_str_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_str_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
     {
         return CHIP_NO_ERROR;
     }
@@ -166,10 +166,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     int32_t success = 0;
 
     success = getPref_bin_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_bin_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
     {
         return CHIP_NO_ERROR;
     }

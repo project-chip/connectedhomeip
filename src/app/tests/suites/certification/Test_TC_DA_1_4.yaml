@@ -25,10 +25,9 @@ config:
 tests:
     - label: "Start the commissioning process of TH1 on DUT"
       verification: |
-          DUT side:
           sudo ./chip-all-clusters-app --wifi
 
-          TH side:
+          DUT as commissioner side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
@@ -36,7 +35,7 @@ tests:
 
     - label: "DUT generates 32-byte AttestationNonce"
       verification: |
-          Verifu in TH log
+          DUT as commissioner side:
           [1655374218.117635][35023:35028] CHIP:CTL: Sent Attestation request, waiting for the Attestation Information
           [1655374218.117686][35023:35028] CHIP:DMG: ICR moving to [AwaitingDe]
           [1655374218.204040][35023:35028] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
@@ -182,7 +181,7 @@ tests:
           "DUT sends AttestationRequest Command with AttestationNonce as field
           to the TH1."
       verification: |
-          Verifu in TH log
+          DUT as commissioner side:
           [1655374218.117635][35023:35028] CHIP:CTL: Sent Attestation request, waiting for the Attestation Information
           [1655374218.117686][35023:35028] CHIP:DMG: ICR moving to [AwaitingDe]
           [1655374218.204040][35023:35028] CHIP:DL: HandlePlatformSpecificBLEEvent 16387
@@ -329,16 +328,20 @@ tests:
           by setting the following error condition: 1. Commissionee is not yet
           certified"
       verification: |
+          sudo rm -rf /tmp/chip_*
+          sudo ./chip-all-clusters-app --dac_provide /Dec_message_2.json
 
+
+          DUT as commissioner side:
+          ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840
       disabled: true
 
     - label: "Factory Reset TH1 so that it is commissionable again"
       verification: |
-          "DUT side:
           sudo rm -rf /tmp/chip_*
           sudo ./chip-all-clusters-app --wifi
 
-          TH side:
+          DUT as commissioner side:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
@@ -352,7 +355,25 @@ tests:
           algorithm 3. Commissionee provides DAC with validity period that is
           not in range of PAA/PAI"
       verification: |
+          sudo rm -rf /tmp/chip_*
+          sudo ./chip-all-clusters-app --dac_provider Dec_1_message.json
 
+          [1656932880.436914][14314:14314] CHIP:TS: Reverted Last Known Good Time to previous value
+          [1656932880.436955][14314:14314] CHIP:FP: Error deleting part of fabric 1: ../../third_party/connectedhomeip/src/platform/Linux/KeyValueStoreManagerImpl.cpp:101: CHIP Error 0x000000A0: Value not found in the persisted storage
+          [1656932880.437015][14314:14314] CHIP:ZCL: OpCreds: failed to delete fabric at index 1: ../../third_party/connectedhomeip/src/credentials/FabricTable.cpp:913: CHIP Error 0x000000D8: The item referenced in the function call was not found
+          [1656932880.437051][14314:14314] CHIP:DMG: Endpoint 0, Cluster 0x0000_0030 update version to 6e573ab0
+          [1656932880.437078][14314:14314] CHIP:DL: Long dispatch time: 151 ms, for event type 32784
+          [1656932880.437107][14314:14314] CHIP:FS: Fail-safe cleanly disarmed
+
+
+
+          DUT as commissioner side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3840
+
+          [1656930733.433435][6274:6280] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1656930733.433497][6274:6280] CHIP:CTL: Failsafe disarmed
+          [1656930733.433550][6274:6280] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1656930733.433611][6274:6280] CHIP:TOO: Device commissioning Failure: ../../third_party/connectedhomeip/src/controller/AutoCommissioner.cpp:204: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
     - label:
@@ -365,5 +386,20 @@ tests:
           4. The Product ID (PID) the DAC is not present in the product_id_array
           field in the Certification Declaration"
       verification: |
+          sudo rm -rf /tmp/chip_*
+          sudo ./chip-all-clusters-app --dac_provider dac_message.json
 
+          [1656930733.541889][14161:14161] CHIP:FP: Error deleting part of fabric 1: ../../third_party/connectedhomeip/src/platform/Linux/KeyValueStoreManagerImpl.cpp:101: CHIP Error 0x000000A0: Value not found in the persisted storage
+          [1656930733.541947][14161:14161] CHIP:ZCL: OpCreds: failed to delete fabric at index 1: ../../third_party/connectedhomeip/src/credentials/FabricTable.cpp:913: CHIP Error 0x000000D8: The item referenced in the function call was not found
+          [1656930733.541979][14161:14161] CHIP:DMG: Endpoint 0, Cluster 0x0000_0030 update version to 1f053233
+          [1656930733.542004][14161:14161] CHIP:DL: Long dispatch time: 147 ms, for event type 32784
+          [1656930733.542032][14161:14161] CHIP:FS: Fail-safe cleanly disarmed
+
+
+          DUT as commissioner side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3840
+          [1656930733.433435][6274:6280] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1656930733.433497][6274:6280] CHIP:CTL: Failsafe disarmed
+          [1656930733.433550][6274:6280] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1656930733.433611][6274:6280] CHIP:TOO: Device commissioning Failure: ../../third_party/connectedhomeip/src/controller/AutoCommissioner.cpp:204: CHIP Error 0x0000002F: Invalid argument
       disabled: true

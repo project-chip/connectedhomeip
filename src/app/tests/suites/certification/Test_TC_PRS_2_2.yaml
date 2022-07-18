@@ -29,6 +29,8 @@ tests:
     - label: "TH reads from the DUT the MeasuredValue attribute"
       PICS: PRS.S.A0000
       verification: |
+          Verify on the TH Log:
+
           ./chip-tool pressuremeasurement read measured-value 1 1
 
           CHIP:TOO:   MeasuredValue: 0
