@@ -159,9 +159,11 @@ public:
         // Invalidate our existing CASE session; otherwise getConnectedDevice
         // will just hand it right back to us without establishing a new CASE
         // session when a reboot is done on the server.
-        if (GetDevice(identity) != nil) {
-            [GetDevice(identity) invalidateCASESession];
-            mConnectedDevices[identity] = nil;
+        if (value.expireExistingSession.ValueOr(true)) {
+            if (GetDevice(identity) != nil) {
+                [GetDevice(identity) invalidateCASESession];
+                mConnectedDevices[identity] = nil;
+            }
         }
 
         [controller getBaseDevice:value.nodeId
