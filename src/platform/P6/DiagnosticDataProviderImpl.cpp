@@ -255,7 +255,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
         SuccessOrExit(CHIP_ERROR_INTERNAL);
     }
     /* VHT Capable bit variable is not defined in whd and has to use the reserved bit */
-    if (bss_info.reserved[0])
+    if (bss_info.vht_cap)
     {
         wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC;
     }
