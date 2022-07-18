@@ -39,7 +39,7 @@ tests:
               type: uint16
 
     - label: "Read the optional global attribute: FeatureMap"
-      PICS: MC_APPLAUNCHER.S.AP
+      PICS: APPLAUNCHER.S.AP
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -47,14 +47,41 @@ tests:
           constraints:
               type: map32
 
+    - label: "Read the global attribute: FeatureMap"
+      PICS: " !APPLAUNCHER.S.AP "
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_APPLAUNCHER.S.A0000 && MC_APPLAUNCHER.S.A0001
+      PICS: APPLAUNCHER.S.A0000 && APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute(CatalogList) in AttributeList"
+      PICS: APPLAUNCHER.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the optional attribute(CurrentApp) in AttributeList"
+      PICS: APPLAUNCHER.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

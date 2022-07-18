@@ -50,7 +50,7 @@ tests:
           [1651055193.215585][155444:155449] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_MEDIAINPUT.S.A0000
+      PICS: PICS_USER_PROMPT && MEDIAINPUT.S.A0000
       arguments:
           values:
               - name: "message"
@@ -59,7 +59,7 @@ tests:
                 value: "y"
 
     - label: "Select Input Command"
-      PICS: MC_MEDIAINPUT.S.C0000
+      PICS: MEDIAINPUT.S.C0000
       command: "SelectInput"
       arguments:
           values:
@@ -67,7 +67,7 @@ tests:
                 value: 1
 
     - label: "Read current input list"
-      PICS: MC_MEDIAINPUT.S.A0001
+      PICS: MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "CurrentInput"
       response:

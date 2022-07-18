@@ -539,6 +539,7 @@ exit:
 void Engine::Run(System::Layer * aSystemLayer, void * apAppState)
 {
     Engine * const pEngine = reinterpret_cast<Engine *>(apAppState);
+    pEngine->mRunScheduled = false;
     pEngine->Run();
 }
 
@@ -574,8 +575,6 @@ void Engine::Run()
     uint32_t numReadHandled = 0;
 
     InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
-
-    mRunScheduled = false;
 
     // We may be deallocating read handlers as we go.  Track how many we had
     // initially, so we make sure to go through all of them.

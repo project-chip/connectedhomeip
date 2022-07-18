@@ -23,24 +23,17 @@
 #pragma mark - Clusters IDs
 
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
-    MTRClusterPowerConfigurationID = 0x00000001,
-    MTRClusterDeviceTemperatureConfigurationID = 0x00000002,
     MTRClusterIdentifyID = 0x00000003,
     MTRClusterGroupsID = 0x00000004,
     MTRClusterScenesID = 0x00000005,
     MTRClusterOnOffID = 0x00000006,
     MTRClusterOnOffSwitchConfigurationID = 0x00000007,
     MTRClusterLevelControlID = 0x00000008,
-    MTRClusterAlarmsID = 0x00000009,
-    MTRClusterTimeID = 0x0000000A,
     MTRClusterBinaryInputBasicID = 0x0000000F,
-    MTRClusterPowerProfileID = 0x0000001A,
-    MTRClusterApplianceControlID = 0x0000001B,
     MTRClusterPulseWidthModulationID = 0x0000001C,
     MTRClusterDescriptorID = 0x0000001D,
     MTRClusterBindingID = 0x0000001E,
     MTRClusterAccessControlID = 0x0000001F,
-    MTRClusterPollControlID = 0x00000020,
     MTRClusterBridgedActionsID = 0x00000025,
     MTRClusterBasicID = 0x00000028,
     MTRClusterOtaSoftwareUpdateProviderID = 0x00000029,
@@ -71,14 +64,12 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterProxyValidID = 0x00000044,
     MTRClusterBooleanStateID = 0x00000045,
     MTRClusterModeSelectID = 0x00000050,
-    MTRClusterShadeConfigurationID = 0x00000100,
     MTRClusterDoorLockID = 0x00000101,
     MTRClusterWindowCoveringID = 0x00000102,
     MTRClusterBarrierControlID = 0x00000103,
     MTRClusterPumpConfigurationAndControlID = 0x00000200,
     MTRClusterThermostatID = 0x00000201,
     MTRClusterFanControlID = 0x00000202,
-    MTRClusterDehumidificationControlID = 0x00000203,
     MTRClusterThermostatUserInterfaceConfigurationID = 0x00000204,
     MTRClusterColorControlID = 0x00000300,
     MTRClusterBallastConfigurationID = 0x00000301,
@@ -88,36 +79,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterFlowMeasurementID = 0x00000404,
     MTRClusterRelativeHumidityMeasurementID = 0x00000405,
     MTRClusterOccupancySensingID = 0x00000406,
-    MTRClusterCarbonMonoxideConcentrationMeasurementID = 0x0000040C,
-    MTRClusterCarbonDioxideConcentrationMeasurementID = 0x0000040D,
-    MTRClusterEthyleneConcentrationMeasurementID = 0x0000040E,
-    MTRClusterEthyleneOxideConcentrationMeasurementID = 0x0000040F,
-    MTRClusterHydrogenConcentrationMeasurementID = 0x00000410,
-    MTRClusterHydrogenSulphideConcentrationMeasurementID = 0x00000411,
-    MTRClusterNitricOxideConcentrationMeasurementID = 0x00000412,
-    MTRClusterNitrogenDioxideConcentrationMeasurementID = 0x00000413,
-    MTRClusterOxygenConcentrationMeasurementID = 0x00000414,
-    MTRClusterOzoneConcentrationMeasurementID = 0x00000415,
-    MTRClusterSulfurDioxideConcentrationMeasurementID = 0x00000416,
-    MTRClusterDissolvedOxygenConcentrationMeasurementID = 0x00000417,
-    MTRClusterBromateConcentrationMeasurementID = 0x00000418,
-    MTRClusterChloraminesConcentrationMeasurementID = 0x00000419,
-    MTRClusterChlorineConcentrationMeasurementID = 0x0000041A,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementID = 0x0000041B,
-    MTRClusterFluorideConcentrationMeasurementID = 0x0000041C,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementID = 0x0000041D,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementID = 0x0000041E,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementID = 0x0000041F,
-    MTRClusterTurbidityConcentrationMeasurementID = 0x00000420,
-    MTRClusterCopperConcentrationMeasurementID = 0x00000421,
-    MTRClusterLeadConcentrationMeasurementID = 0x00000422,
-    MTRClusterManganeseConcentrationMeasurementID = 0x00000423,
-    MTRClusterSulfateConcentrationMeasurementID = 0x00000424,
-    MTRClusterBromodichloromethaneConcentrationMeasurementID = 0x00000425,
-    MTRClusterBromoformConcentrationMeasurementID = 0x00000426,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementID = 0x00000427,
-    MTRClusterChloroformConcentrationMeasurementID = 0x00000428,
-    MTRClusterSodiumConcentrationMeasurementID = 0x00000429,
     MTRClusterWakeOnLanID = 0x00000503,
     MTRClusterChannelID = 0x00000504,
     MTRClusterTargetNavigatorID = 0x00000505,
@@ -130,10 +91,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterApplicationLauncherID = 0x0000050C,
     MTRClusterApplicationBasicID = 0x0000050D,
     MTRClusterAccountLoginID = 0x0000050E,
-    MTRClusterApplianceIdentificationID = 0x00000B00,
-    MTRClusterMeterIdentificationID = 0x00000B01,
-    MTRClusterApplianceEventsAndAlertID = 0x00000B02,
-    MTRClusterApplianceStatisticsID = 0x00000B03,
     MTRClusterElectricalMeasurementID = 0x00000B04,
     MTRClusterTestClusterID = 0xFFF1FC05,
 };
@@ -147,86 +104,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterGlobalAttributeAttributeListID = 0x0000FFFB,
     MTRClusterGlobalAttributeFeatureMapID = 0x0000FFFC,
     MTRClusterGlobalAttributeClusterRevisionID = 0x0000FFFD,
-
-    // Cluster PowerConfiguration attributes
-    MTRClusterPowerConfigurationAttributeMainsVoltageID = 0x00000000,
-    MTRClusterPowerConfigurationAttributeMainsFrequencyID = 0x00000001,
-    MTRClusterPowerConfigurationAttributeMainsAlarmMaskID = 0x00000010,
-    MTRClusterPowerConfigurationAttributeMainsVoltageMinThresholdID = 0x00000011,
-    MTRClusterPowerConfigurationAttributeMainsVoltageMaxThresholdID = 0x00000012,
-    MTRClusterPowerConfigurationAttributeMainsVoltageDwellTripID = 0x00000013,
-    MTRClusterPowerConfigurationAttributeBatteryVoltageID = 0x00000020,
-    MTRClusterPowerConfigurationAttributeBatteryPercentageRemainingID = 0x00000021,
-    MTRClusterPowerConfigurationAttributeBatteryManufacturerID = 0x00000030,
-    MTRClusterPowerConfigurationAttributeBatterySizeID = 0x00000031,
-    MTRClusterPowerConfigurationAttributeBatteryAhrRatingID = 0x00000032,
-    MTRClusterPowerConfigurationAttributeBatteryQuantityID = 0x00000033,
-    MTRClusterPowerConfigurationAttributeBatteryRatedVoltageID = 0x00000034,
-    MTRClusterPowerConfigurationAttributeBatteryAlarmMaskID = 0x00000035,
-    MTRClusterPowerConfigurationAttributeBatteryVoltageMinThresholdID = 0x00000036,
-    MTRClusterPowerConfigurationAttributeBatteryVoltageThreshold1ID = 0x00000037,
-    MTRClusterPowerConfigurationAttributeBatteryVoltageThreshold2ID = 0x00000038,
-    MTRClusterPowerConfigurationAttributeBatteryVoltageThreshold3ID = 0x00000039,
-    MTRClusterPowerConfigurationAttributeBatteryPercentageMinThresholdID = 0x0000003A,
-    MTRClusterPowerConfigurationAttributeBatteryPercentageThreshold1ID = 0x0000003B,
-    MTRClusterPowerConfigurationAttributeBatteryPercentageThreshold2ID = 0x0000003C,
-    MTRClusterPowerConfigurationAttributeBatteryPercentageThreshold3ID = 0x0000003D,
-    MTRClusterPowerConfigurationAttributeBatteryAlarmStateID = 0x0000003E,
-    MTRClusterPowerConfigurationAttributeBattery2VoltageID = 0x00000040,
-    MTRClusterPowerConfigurationAttributeBattery2PercentageRemainingID = 0x00000041,
-    MTRClusterPowerConfigurationAttributeBattery2ManufacturerID = 0x00000050,
-    MTRClusterPowerConfigurationAttributeBattery2SizeID = 0x00000051,
-    MTRClusterPowerConfigurationAttributeBattery2AhrRatingID = 0x00000052,
-    MTRClusterPowerConfigurationAttributeBattery2QuantityID = 0x00000053,
-    MTRClusterPowerConfigurationAttributeBattery2RatedVoltageID = 0x00000054,
-    MTRClusterPowerConfigurationAttributeBattery2AlarmMaskID = 0x00000055,
-    MTRClusterPowerConfigurationAttributeBattery2VoltageMinThresholdID = 0x00000056,
-    MTRClusterPowerConfigurationAttributeBattery2VoltageThreshold1ID = 0x00000057,
-    MTRClusterPowerConfigurationAttributeBattery2VoltageThreshold2ID = 0x00000058,
-    MTRClusterPowerConfigurationAttributeBattery2VoltageThreshold3ID = 0x00000059,
-    MTRClusterPowerConfigurationAttributeBattery2PercentageMinThresholdID = 0x0000005A,
-    MTRClusterPowerConfigurationAttributeBattery2PercentageThreshold1ID = 0x0000005B,
-    MTRClusterPowerConfigurationAttributeBattery2PercentageThreshold2ID = 0x0000005C,
-    MTRClusterPowerConfigurationAttributeBattery2PercentageThreshold3ID = 0x0000005D,
-    MTRClusterPowerConfigurationAttributeBattery2AlarmStateID = 0x0000005E,
-    MTRClusterPowerConfigurationAttributeBattery3VoltageID = 0x00000060,
-    MTRClusterPowerConfigurationAttributeBattery3PercentageRemainingID = 0x00000061,
-    MTRClusterPowerConfigurationAttributeBattery3ManufacturerID = 0x00000070,
-    MTRClusterPowerConfigurationAttributeBattery3SizeID = 0x00000071,
-    MTRClusterPowerConfigurationAttributeBattery3AhrRatingID = 0x00000072,
-    MTRClusterPowerConfigurationAttributeBattery3QuantityID = 0x00000073,
-    MTRClusterPowerConfigurationAttributeBattery3RatedVoltageID = 0x00000074,
-    MTRClusterPowerConfigurationAttributeBattery3AlarmMaskID = 0x00000075,
-    MTRClusterPowerConfigurationAttributeBattery3VoltageMinThresholdID = 0x00000076,
-    MTRClusterPowerConfigurationAttributeBattery3VoltageThreshold1ID = 0x00000077,
-    MTRClusterPowerConfigurationAttributeBattery3VoltageThreshold2ID = 0x00000078,
-    MTRClusterPowerConfigurationAttributeBattery3VoltageThreshold3ID = 0x00000079,
-    MTRClusterPowerConfigurationAttributeBattery3PercentageMinThresholdID = 0x0000007A,
-    MTRClusterPowerConfigurationAttributeBattery3PercentageThreshold1ID = 0x0000007B,
-    MTRClusterPowerConfigurationAttributeBattery3PercentageThreshold2ID = 0x0000007C,
-    MTRClusterPowerConfigurationAttributeBattery3PercentageThreshold3ID = 0x0000007D,
-    MTRClusterPowerConfigurationAttributeBattery3AlarmStateID = 0x0000007E,
-    MTRClusterPowerConfigurationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPowerConfigurationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPowerConfigurationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPowerConfigurationAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPowerConfigurationAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster DeviceTemperatureConfiguration attributes
-    MTRClusterDeviceTemperatureConfigurationAttributeCurrentTemperatureID = 0x00000000,
-    MTRClusterDeviceTemperatureConfigurationAttributeMinTempExperiencedID = 0x00000001,
-    MTRClusterDeviceTemperatureConfigurationAttributeMaxTempExperiencedID = 0x00000002,
-    MTRClusterDeviceTemperatureConfigurationAttributeOverTempTotalDwellID = 0x00000003,
-    MTRClusterDeviceTemperatureConfigurationAttributeDeviceTempAlarmMaskID = 0x00000010,
-    MTRClusterDeviceTemperatureConfigurationAttributeLowTempThresholdID = 0x00000011,
-    MTRClusterDeviceTemperatureConfigurationAttributeHighTempThresholdID = 0x00000012,
-    MTRClusterDeviceTemperatureConfigurationAttributeLowTempDwellTripPointID = 0x00000013,
-    MTRClusterDeviceTemperatureConfigurationAttributeHighTempDwellTripPointID = 0x00000014,
-    MTRClusterDeviceTemperatureConfigurationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterDeviceTemperatureConfigurationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterDeviceTemperatureConfigurationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterDeviceTemperatureConfigurationAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterDeviceTemperatureConfigurationAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster Identify attributes
     MTRClusterIdentifyAttributeIdentifyTimeID = 0x00000000,
@@ -300,31 +177,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterLevelControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterLevelControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster Alarms attributes
-    MTRClusterAlarmsAttributeAlarmCountID = 0x00000000,
-    MTRClusterAlarmsAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterAlarmsAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterAlarmsAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterAlarmsAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterAlarmsAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster Time attributes
-    MTRClusterTimeAttributeTimeID = 0x00000000,
-    MTRClusterTimeAttributeTimeStatusID = 0x00000001,
-    MTRClusterTimeAttributeTimeZoneID = 0x00000002,
-    MTRClusterTimeAttributeDstStartID = 0x00000003,
-    MTRClusterTimeAttributeDstEndID = 0x00000004,
-    MTRClusterTimeAttributeDstShiftID = 0x00000005,
-    MTRClusterTimeAttributeStandardTimeID = 0x00000006,
-    MTRClusterTimeAttributeLocalTimeID = 0x00000007,
-    MTRClusterTimeAttributeLastSetTimeID = 0x00000008,
-    MTRClusterTimeAttributeValidUntilTimeID = 0x00000009,
-    MTRClusterTimeAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTimeAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTimeAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTimeAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTimeAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
     // Cluster BinaryInputBasic attributes
     MTRClusterBinaryInputBasicAttributeActiveTextID = 0x00000004,
     MTRClusterBinaryInputBasicAttributeDescriptionID = 0x0000001C,
@@ -340,28 +192,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterBinaryInputBasicAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterBinaryInputBasicAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterBinaryInputBasicAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster PowerProfile attributes
-    MTRClusterPowerProfileAttributeTotalProfileNumID = 0x00000000,
-    MTRClusterPowerProfileAttributeMultipleSchedulingID = 0x00000001,
-    MTRClusterPowerProfileAttributeEnergyFormattingID = 0x00000002,
-    MTRClusterPowerProfileAttributeEnergyRemoteID = 0x00000003,
-    MTRClusterPowerProfileAttributeScheduleModeID = 0x00000004,
-    MTRClusterPowerProfileAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPowerProfileAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPowerProfileAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPowerProfileAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPowerProfileAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ApplianceControl attributes
-    MTRClusterApplianceControlAttributeStartTimeID = 0x00000000,
-    MTRClusterApplianceControlAttributeFinishTimeID = 0x00000001,
-    MTRClusterApplianceControlAttributeRemainingTimeID = 0x00000002,
-    MTRClusterApplianceControlAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterApplianceControlAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterApplianceControlAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterApplianceControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterApplianceControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster PulseWidthModulation attributes
     MTRClusterPulseWidthModulationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
@@ -400,20 +230,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterAccessControlAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterAccessControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterAccessControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster PollControl attributes
-    MTRClusterPollControlAttributeCheckInIntervalID = 0x00000000,
-    MTRClusterPollControlAttributeLongPollIntervalID = 0x00000001,
-    MTRClusterPollControlAttributeShortPollIntervalID = 0x00000002,
-    MTRClusterPollControlAttributeFastPollTimeoutID = 0x00000003,
-    MTRClusterPollControlAttributeCheckInIntervalMinID = 0x00000004,
-    MTRClusterPollControlAttributeLongPollIntervalMinID = 0x00000005,
-    MTRClusterPollControlAttributeFastPollTimeoutMaxID = 0x00000006,
-    MTRClusterPollControlAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterPollControlAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterPollControlAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterPollControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterPollControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster BridgedActions attributes
     MTRClusterBridgedActionsAttributeActionListID = 0x00000000,
@@ -841,18 +657,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterModeSelectAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterModeSelectAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster ShadeConfiguration attributes
-    MTRClusterShadeConfigurationAttributePhysicalClosedLimitID = 0x00000000,
-    MTRClusterShadeConfigurationAttributeMotorStepSizeID = 0x00000001,
-    MTRClusterShadeConfigurationAttributeStatusID = 0x00000002,
-    MTRClusterShadeConfigurationAttributeClosedLimitID = 0x00000010,
-    MTRClusterShadeConfigurationAttributeModeID = 0x00000011,
-    MTRClusterShadeConfigurationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterShadeConfigurationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterShadeConfigurationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterShadeConfigurationAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterShadeConfigurationAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
     // Cluster DoorLock attributes
     MTRClusterDoorLockAttributeLockStateID = 0x00000000,
     MTRClusterDoorLockAttributeLockTypeID = 0x00000001,
@@ -1046,21 +850,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterFanControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterFanControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster DehumidificationControl attributes
-    MTRClusterDehumidificationControlAttributeRelativeHumidityID = 0x00000000,
-    MTRClusterDehumidificationControlAttributeDehumidificationCoolingID = 0x00000001,
-    MTRClusterDehumidificationControlAttributeRhDehumidificationSetpointID = 0x00000010,
-    MTRClusterDehumidificationControlAttributeRelativeHumidityModeID = 0x00000011,
-    MTRClusterDehumidificationControlAttributeDehumidificationLockoutID = 0x00000012,
-    MTRClusterDehumidificationControlAttributeDehumidificationHysteresisID = 0x00000013,
-    MTRClusterDehumidificationControlAttributeDehumidificationMaxCoolID = 0x00000014,
-    MTRClusterDehumidificationControlAttributeRelativeHumidityDisplayID = 0x00000015,
-    MTRClusterDehumidificationControlAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterDehumidificationControlAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterDehumidificationControlAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterDehumidificationControlAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterDehumidificationControlAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
     // Cluster ThermostatUserInterfaceConfiguration attributes
     MTRClusterThermostatUserInterfaceConfigurationAttributeTemperatureDisplayModeID = 0x00000000,
     MTRClusterThermostatUserInterfaceConfigurationAttributeKeypadLockoutID = 0x00000001,
@@ -1231,358 +1020,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterOccupancySensingAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterOccupancySensingAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
-    // Cluster CarbonMonoxideConcentrationMeasurement attributes
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterCarbonMonoxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster CarbonDioxideConcentrationMeasurement attributes
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterCarbonDioxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster EthyleneConcentrationMeasurement attributes
-    MTRClusterEthyleneConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterEthyleneConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterEthyleneConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterEthyleneConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterEthyleneConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterEthyleneConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterEthyleneConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterEthyleneConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterEthyleneConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster EthyleneOxideConcentrationMeasurement attributes
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterEthyleneOxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster HydrogenConcentrationMeasurement attributes
-    MTRClusterHydrogenConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterHydrogenConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterHydrogenConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterHydrogenConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterHydrogenConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterHydrogenConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterHydrogenConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterHydrogenConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterHydrogenConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster HydrogenSulphideConcentrationMeasurement attributes
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterHydrogenSulphideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster NitricOxideConcentrationMeasurement attributes
-    MTRClusterNitricOxideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterNitricOxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster NitrogenDioxideConcentrationMeasurement attributes
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterNitrogenDioxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster OxygenConcentrationMeasurement attributes
-    MTRClusterOxygenConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterOxygenConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterOxygenConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterOxygenConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterOxygenConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOxygenConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOxygenConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOxygenConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOxygenConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster OzoneConcentrationMeasurement attributes
-    MTRClusterOzoneConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterOzoneConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterOzoneConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterOzoneConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterOzoneConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterOzoneConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterOzoneConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterOzoneConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterOzoneConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster SulfurDioxideConcentrationMeasurement attributes
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterSulfurDioxideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster DissolvedOxygenConcentrationMeasurement attributes
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterDissolvedOxygenConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster BromateConcentrationMeasurement attributes
-    MTRClusterBromateConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterBromateConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterBromateConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterBromateConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterBromateConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBromateConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBromateConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBromateConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBromateConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ChloraminesConcentrationMeasurement attributes
-    MTRClusterChloraminesConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterChloraminesConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterChloraminesConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterChloraminesConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterChloraminesConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterChloraminesConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterChloraminesConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterChloraminesConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterChloraminesConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ChlorineConcentrationMeasurement attributes
-    MTRClusterChlorineConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterChlorineConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterChlorineConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterChlorineConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterChlorineConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterChlorineConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterChlorineConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterChlorineConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterChlorineConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster FecalColiformAndEColiConcentrationMeasurement attributes
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFecalColiformAndEColiConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster FluorideConcentrationMeasurement attributes
-    MTRClusterFluorideConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterFluorideConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterFluorideConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterFluorideConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterFluorideConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterFluorideConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterFluorideConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterFluorideConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterFluorideConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster HaloaceticAcidsConcentrationMeasurement attributes
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterHaloaceticAcidsConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster TotalTrihalomethanesConcentrationMeasurement attributes
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTotalTrihalomethanesConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster TotalColiformBacteriaConcentrationMeasurement attributes
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTotalColiformBacteriaConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster TurbidityConcentrationMeasurement attributes
-    MTRClusterTurbidityConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterTurbidityConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterTurbidityConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterTurbidityConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterTurbidityConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterTurbidityConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterTurbidityConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterTurbidityConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterTurbidityConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster CopperConcentrationMeasurement attributes
-    MTRClusterCopperConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterCopperConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterCopperConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterCopperConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterCopperConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterCopperConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterCopperConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterCopperConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterCopperConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster LeadConcentrationMeasurement attributes
-    MTRClusterLeadConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterLeadConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterLeadConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterLeadConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterLeadConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterLeadConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterLeadConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterLeadConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterLeadConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ManganeseConcentrationMeasurement attributes
-    MTRClusterManganeseConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterManganeseConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterManganeseConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterManganeseConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterManganeseConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterManganeseConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterManganeseConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterManganeseConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterManganeseConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster SulfateConcentrationMeasurement attributes
-    MTRClusterSulfateConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterSulfateConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterSulfateConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterSulfateConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterSulfateConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterSulfateConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterSulfateConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterSulfateConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterSulfateConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster BromodichloromethaneConcentrationMeasurement attributes
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBromodichloromethaneConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster BromoformConcentrationMeasurement attributes
-    MTRClusterBromoformConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterBromoformConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterBromoformConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterBromoformConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterBromoformConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterBromoformConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterBromoformConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterBromoformConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterBromoformConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ChlorodibromomethaneConcentrationMeasurement attributes
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeGeneratedCommandListID
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeAcceptedCommandListID
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterChlorodibromomethaneConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ChloroformConcentrationMeasurement attributes
-    MTRClusterChloroformConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterChloroformConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterChloroformConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterChloroformConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterChloroformConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterChloroformConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterChloroformConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterChloroformConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterChloroformConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster SodiumConcentrationMeasurement attributes
-    MTRClusterSodiumConcentrationMeasurementAttributeMeasuredValueID = 0x00000000,
-    MTRClusterSodiumConcentrationMeasurementAttributeMinMeasuredValueID = 0x00000001,
-    MTRClusterSodiumConcentrationMeasurementAttributeMaxMeasuredValueID = 0x00000002,
-    MTRClusterSodiumConcentrationMeasurementAttributeToleranceID = 0x00000003,
-    MTRClusterSodiumConcentrationMeasurementAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterSodiumConcentrationMeasurementAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterSodiumConcentrationMeasurementAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterSodiumConcentrationMeasurementAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterSodiumConcentrationMeasurementAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
     // Cluster WakeOnLan attributes
     MTRClusterWakeOnLanAttributeMACAddressID = 0x00000000,
     MTRClusterWakeOnLanAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
@@ -1695,60 +1132,6 @@ typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
     MTRClusterAccountLoginAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
     MTRClusterAccountLoginAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
     MTRClusterAccountLoginAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ApplianceIdentification attributes
-    MTRClusterApplianceIdentificationAttributeBasicIdentificationID = 0x00000000,
-    MTRClusterApplianceIdentificationAttributeCompanyNameID = 0x00000010,
-    MTRClusterApplianceIdentificationAttributeCompanyIdID = 0x00000011,
-    MTRClusterApplianceIdentificationAttributeBrandNameID = 0x00000012,
-    MTRClusterApplianceIdentificationAttributeBrandIdID = 0x00000013,
-    MTRClusterApplianceIdentificationAttributeModelID = 0x00000014,
-    MTRClusterApplianceIdentificationAttributePartNumberID = 0x00000015,
-    MTRClusterApplianceIdentificationAttributeProductRevisionID = 0x00000016,
-    MTRClusterApplianceIdentificationAttributeSoftwareRevisionID = 0x00000017,
-    MTRClusterApplianceIdentificationAttributeProductTypeNameID = 0x00000018,
-    MTRClusterApplianceIdentificationAttributeProductTypeIdID = 0x00000019,
-    MTRClusterApplianceIdentificationAttributeCecedSpecificationVersionID = 0x0000001A,
-    MTRClusterApplianceIdentificationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterApplianceIdentificationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterApplianceIdentificationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterApplianceIdentificationAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterApplianceIdentificationAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster MeterIdentification attributes
-    MTRClusterMeterIdentificationAttributeCompanyNameID = 0x00000000,
-    MTRClusterMeterIdentificationAttributeMeterTypeIdID = 0x00000001,
-    MTRClusterMeterIdentificationAttributeDataQualityIdID = 0x00000004,
-    MTRClusterMeterIdentificationAttributeCustomerNameID = 0x00000005,
-    MTRClusterMeterIdentificationAttributeModelID = 0x00000006,
-    MTRClusterMeterIdentificationAttributePartNumberID = 0x00000007,
-    MTRClusterMeterIdentificationAttributeProductRevisionID = 0x00000008,
-    MTRClusterMeterIdentificationAttributeSoftwareRevisionID = 0x0000000A,
-    MTRClusterMeterIdentificationAttributeUtilityNameID = 0x0000000B,
-    MTRClusterMeterIdentificationAttributePodID = 0x0000000C,
-    MTRClusterMeterIdentificationAttributeAvailablePowerID = 0x0000000D,
-    MTRClusterMeterIdentificationAttributePowerThresholdID = 0x0000000E,
-    MTRClusterMeterIdentificationAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterMeterIdentificationAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterMeterIdentificationAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterMeterIdentificationAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterMeterIdentificationAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ApplianceEventsAndAlert attributes
-    MTRClusterApplianceEventsAndAlertAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterApplianceEventsAndAlertAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterApplianceEventsAndAlertAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterApplianceEventsAndAlertAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterApplianceEventsAndAlertAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster ApplianceStatistics attributes
-    MTRClusterApplianceStatisticsAttributeLogMaxSizeID = 0x00000000,
-    MTRClusterApplianceStatisticsAttributeLogQueueMaxSizeID = 0x00000001,
-    MTRClusterApplianceStatisticsAttributeGeneratedCommandListID = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterApplianceStatisticsAttributeAcceptedCommandListID = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterApplianceStatisticsAttributeAttributeListID = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterApplianceStatisticsAttributeFeatureMapID = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterApplianceStatisticsAttributeClusterRevisionID = MTRClusterGlobalAttributeClusterRevisionID,
 
     // Cluster ElectricalMeasurement attributes
     MTRClusterElectricalMeasurementAttributeMeasurementTypeID = 0x00000000,
@@ -2034,54 +1417,6 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterLevelControlCommandStopWithOnOffID = 0x00000007,
     MTRClusterLevelControlCommandMoveToClosestFrequencyID = 0x00000008,
 
-    // Cluster Alarms commands
-    MTRClusterAlarmsCommandResetAlarmID = 0x00000000,
-    MTRClusterAlarmsCommandAlarmID = 0x00000000,
-    MTRClusterAlarmsCommandResetAllAlarmsID = 0x00000001,
-    MTRClusterAlarmsCommandGetAlarmResponseID = 0x00000001,
-    MTRClusterAlarmsCommandGetAlarmID = 0x00000002,
-    MTRClusterAlarmsCommandResetAlarmLogID = 0x00000003,
-
-    // Cluster PowerProfile commands
-    MTRClusterPowerProfileCommandPowerProfileRequestID = 0x00000000,
-    MTRClusterPowerProfileCommandPowerProfileNotificationID = 0x00000000,
-    MTRClusterPowerProfileCommandPowerProfileStateRequestID = 0x00000001,
-    MTRClusterPowerProfileCommandPowerProfileResponseID = 0x00000001,
-    MTRClusterPowerProfileCommandGetPowerProfilePriceResponseID = 0x00000002,
-    MTRClusterPowerProfileCommandPowerProfileStateResponseID = 0x00000002,
-    MTRClusterPowerProfileCommandGetOverallSchedulePriceResponseID = 0x00000003,
-    MTRClusterPowerProfileCommandGetPowerProfilePriceID = 0x00000003,
-    MTRClusterPowerProfileCommandEnergyPhasesScheduleNotificationID = 0x00000004,
-    MTRClusterPowerProfileCommandPowerProfilesStateNotificationID = 0x00000004,
-    MTRClusterPowerProfileCommandEnergyPhasesScheduleResponseID = 0x00000005,
-    MTRClusterPowerProfileCommandGetOverallSchedulePriceID = 0x00000005,
-    MTRClusterPowerProfileCommandPowerProfileScheduleConstraintsRequestID = 0x00000006,
-    MTRClusterPowerProfileCommandEnergyPhasesScheduleRequestID = 0x00000006,
-    MTRClusterPowerProfileCommandEnergyPhasesScheduleStateRequestID = 0x00000007,
-    MTRClusterPowerProfileCommandEnergyPhasesScheduleStateResponseID = 0x00000007,
-    MTRClusterPowerProfileCommandGetPowerProfilePriceExtendedResponseID = 0x00000008,
-    MTRClusterPowerProfileCommandEnergyPhasesScheduleStateNotificationID = 0x00000008,
-    MTRClusterPowerProfileCommandPowerProfileScheduleConstraintsNotificationID = 0x00000009,
-    MTRClusterPowerProfileCommandPowerProfileScheduleConstraintsResponseID = 0x0000000A,
-    MTRClusterPowerProfileCommandGetPowerProfilePriceExtendedID = 0x0000000B,
-
-    // Cluster ApplianceControl commands
-    MTRClusterApplianceControlCommandExecutionOfACommandID = 0x00000000,
-    MTRClusterApplianceControlCommandSignalStateResponseID = 0x00000000,
-    MTRClusterApplianceControlCommandSignalStateID = 0x00000001,
-    MTRClusterApplianceControlCommandSignalStateNotificationID = 0x00000001,
-    MTRClusterApplianceControlCommandWriteFunctionsID = 0x00000002,
-    MTRClusterApplianceControlCommandOverloadPauseResumeID = 0x00000003,
-    MTRClusterApplianceControlCommandOverloadPauseID = 0x00000004,
-    MTRClusterApplianceControlCommandOverloadWarningID = 0x00000005,
-
-    // Cluster PollControl commands
-    MTRClusterPollControlCommandCheckInID = 0x00000000,
-    MTRClusterPollControlCommandCheckInResponseID = 0x00000000,
-    MTRClusterPollControlCommandFastPollStopID = 0x00000001,
-    MTRClusterPollControlCommandSetLongPollIntervalID = 0x00000002,
-    MTRClusterPollControlCommandSetShortPollIntervalID = 0x00000003,
-
     // Cluster BridgedActions commands
     MTRClusterBridgedActionsCommandInstantActionID = 0x00000000,
     MTRClusterBridgedActionsCommandInstantActionWithTransitionID = 0x00000001,
@@ -2301,20 +1636,6 @@ typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
     MTRClusterAccountLoginCommandGetSetupPINResponseID = 0x00000001,
     MTRClusterAccountLoginCommandLoginID = 0x00000002,
     MTRClusterAccountLoginCommandLogoutID = 0x00000003,
-
-    // Cluster ApplianceEventsAndAlert commands
-    MTRClusterApplianceEventsAndAlertCommandGetAlertsID = 0x00000000,
-    MTRClusterApplianceEventsAndAlertCommandGetAlertsResponseID = 0x00000000,
-    MTRClusterApplianceEventsAndAlertCommandAlertsNotificationID = 0x00000001,
-    MTRClusterApplianceEventsAndAlertCommandEventsNotificationID = 0x00000002,
-
-    // Cluster ApplianceStatistics commands
-    MTRClusterApplianceStatisticsCommandLogNotificationID = 0x00000000,
-    MTRClusterApplianceStatisticsCommandLogRequestID = 0x00000000,
-    MTRClusterApplianceStatisticsCommandLogResponseID = 0x00000001,
-    MTRClusterApplianceStatisticsCommandLogQueueRequestID = 0x00000001,
-    MTRClusterApplianceStatisticsCommandLogQueueResponseID = 0x00000002,
-    MTRClusterApplianceStatisticsCommandStatisticsAvailableID = 0x00000003,
 
     // Cluster ElectricalMeasurement commands
     MTRClusterElectricalMeasurementCommandGetProfileInfoResponseCommandID = 0x00000000,

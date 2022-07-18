@@ -56,6 +56,7 @@ tests:
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
+          value: []
           constraints:
               type: list
 

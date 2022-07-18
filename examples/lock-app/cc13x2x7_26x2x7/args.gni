@@ -29,7 +29,7 @@ lwip_debug = false
 chip_enable_ota_requestor = true
 
 # Disable CHIP Logging
-chip_progress_logging = false
+#chip_progress_logging = false
 chip_detail_logging = false
 chip_automation_logging = false
 
@@ -40,7 +40,7 @@ chip_config_network_layer_ble = true
 # INCLUDE_xSemaphoreGetMutexHolder
 chip_stack_lock_tracking = "none"
 
-chip_openthread_ftd = true
+chip_openthread_ftd = false
 
 matter_device_vid = "0xFFF1"
 matter_device_pid = "0x8006"

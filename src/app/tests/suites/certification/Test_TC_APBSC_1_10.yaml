@@ -47,7 +47,7 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_APBSC.S.A0000 && MC_APBSC.S.A0001 && MC_APBSC.S.A0003
+      PICS: APBSC.S.A0000 && APBSC.S.A0001 && APBSC.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
       response:
