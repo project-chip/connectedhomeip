@@ -181,14 +181,21 @@ bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command
 
     if (!HasFeature(endpoint, AudioOutputFeature::kNameUpdates))
     {
-        ChipLogError(Zcl, "AudioOutput no name updates feature") err = CHIP_ERROR_INCORRECT_STATE;
+        ChipLogError(Zcl, "AudioOutput no name updates feature");
+        err = CHIP_ERROR_INCORRECT_STATE;
         ExitNow();
     }
 
-    bool success = delegate->HandleRenameOutput(index, name);
-    Protocols::InteractionModel::Status status =
-        success ? Protocols::InteractionModel::Status::Success : Protocols::InteractionModel::Status::Failure;
+    Protocols::InteractionModel::Status status;
 
+    if (delegate->HandleRenameOutput(index, name))
+    {
+        status = Protocols::InteractionModel::Status::Success;
+    }
+    else
+    {
+        status = Protocols::InteractionModel::Status::Failure;
+    }
     command->AddStatus(commandPath, status);
 
 exit:
