@@ -77,7 +77,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     return CHIP_NO_ERROR;
 }
 
-DiagnosticDataProvider & GetDiagnosticDataProvider()
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();
 }

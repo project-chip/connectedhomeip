@@ -62,6 +62,8 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
+class DiagnosticDataProviderImpl;
+
 /**
  * Defines the WiFi Diagnostics Delegate class to notify WiFi network events.
  */
@@ -184,12 +186,28 @@ private:
 };
 
 /**
- * Returns the public interface of the DiagnosticDataProvider singleton object.
+ * Returns a reference to the public interface of the DiagnosticDataProvider singleton object.
  *
- * Matter applications should use this to access features of the DiagnosticDataProvider object
+ * Applications should use this to access features of the DiagnosticDataProvider object
  * that are common to all platforms.
  */
-extern DiagnosticDataProvider & GetDiagnosticDataProvider();
+DiagnosticDataProvider & GetDiagnosticDataProvider();
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+extern DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
+
+/**
+ * Sets a reference to a DiagnosticDataProvider object.
+ *
+ * This must be called before any calls to GetDiagnosticDataProvider. If a nullptr is passed in,
+ * no changes will be made.
+ */
+void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider);
 
 inline CHIP_ERROR DiagnosticDataProvider::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {

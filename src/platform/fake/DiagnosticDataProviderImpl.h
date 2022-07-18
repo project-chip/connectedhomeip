@@ -56,11 +56,12 @@ public:
 };
 
 /**
- * Returns a reference to a DiagnosticDataProvider singleton object.
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
  *
- * Applications should use this to access the features of the DiagnosticDataProvider.
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
  */
-DiagnosticDataProvider & GetDiagnosticDataProvider();
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

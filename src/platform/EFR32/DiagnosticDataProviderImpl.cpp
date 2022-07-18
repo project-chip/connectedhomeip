@@ -481,7 +481,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 }
 #endif // SL_WIFI
 
-DiagnosticDataProvider & GetDiagnosticDataProvider()
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();
 }

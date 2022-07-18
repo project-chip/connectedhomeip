@@ -117,7 +117,7 @@ void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetr
     }
 }
 
-DiagnosticDataProvider & GetDiagnosticDataProvider()
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();
 }

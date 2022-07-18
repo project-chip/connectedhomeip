@@ -17,32 +17,42 @@
 
 /**
  *    @file
- *          Provides an implementation of the DiagnosticDataProvider object.
+ *          Implements a getter and setter for a singleton DiagnosticDataProvider object.
  */
 
-#pragma once
-
+#include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace DeviceLayer {
 
-/**
- * Concrete implementation of the PlatformManager singleton object for Linux platforms.
- */
-class DiagnosticDataProviderImpl : public DiagnosticDataProvider
-{
-public:
-    static DiagnosticDataProviderImpl & GetDefaultInstance();
-};
+class DiagnosticDataProvider;
 
-/**
- * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
- *
- * Applications can use this to gain access to features of the DiagnosticDataProvider
- * that are specific to the selected platform.
+namespace {
+
+/** Singleton pointer to the DiagnosticDataProvider implementation.
  */
-DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
+DiagnosticDataProvider * gInstance = nullptr;
+
+} // namespace
+
+DiagnosticDataProvider & GetDiagnosticDataProvider()
+{
+    if (gInstance != nullptr)
+    {
+        return *gInstance;
+    }
+
+    return GetDiagnosticDataProviderImpl();
+}
+
+void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider)
+{
+    if (diagnosticDataProvider != nullptr)
+    {
+        gInstance = diagnosticDataProvider;
+    }
+}
 
 } // namespace DeviceLayer
 } // namespace chip

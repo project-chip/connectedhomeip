@@ -826,7 +826,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-DiagnosticDataProvider & GetDiagnosticDataProvider()
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
