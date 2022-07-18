@@ -883,12 +883,15 @@ public:
     CHIP_ERROR AddNewFabricForTest(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                    const ByteSpan & opKeySpan, FabricIndex * outFabricIndex);
 
+    // TODO: Add docs :D
+    void AllowCollisionsOnNextFabricAdd() { mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored); }
+
     // Same as AddNewFabricForTest, but ignore if we are colliding with same <Root Public Key, Fabric Id>, so
     // that a single fabric table can have N nodes for same fabric. This usually works, but is bad form.
     CHIP_ERROR AddNewFabricForTestIgnoringCollisions(const ByteSpan & rootCert, const ByteSpan & icacCert, const ByteSpan & nocCert,
                                                      const ByteSpan & opKeySpan, FabricIndex * outFabricIndex)
     {
-        mStateFlags.Set(StateFlags::kAreCollidingFabricsIgnored);
+        AllowCollisionsOnNextFabricAdd();
         CHIP_ERROR err = AddNewFabricForTest(rootCert, icacCert, nocCert, opKeySpan, outFabricIndex);
         mStateFlags.Clear(StateFlags::kAreCollidingFabricsIgnored);
         return err;

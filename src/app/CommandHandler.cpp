@@ -315,6 +315,18 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
+    if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
+    {
+        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
+        // This is mostly just during a PASE session before AddNOC.
+        if (GetAccessingFabricIndex() == kUndefinedFabricIndex)
+        {
+            // TODO: when wildcard invokes are supported, discard a
+            // wildcard-expanded path instead of returning a status.
+            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
+    }
+
     err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
@@ -680,4 +692,5 @@ CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::ap
     return CHIP_NO_ERROR;
 }
 void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
-                                                             const chip::Access::SubjectDescriptor & subjectDescriptor) {}
+                                                             const chip::Access::SubjectDescriptor & subjectDescriptor)
+{}
