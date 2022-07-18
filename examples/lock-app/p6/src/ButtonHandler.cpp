@@ -60,18 +60,24 @@ void ButtonHandler::GpioInit(void)
         printf(" cyhal_gpio_init failed for APP_FUNCTION_BUTTON\r\n");
     }
     /* Configure GPIO interrupt. */
-    cyhal_gpio_register_callback(APP_LOCK_BUTTON, lockbuttonIsr, NULL);
-    cyhal_gpio_register_callback(APP_FUNCTION_BUTTON, functionbuttonIsr, NULL);
+    static cyhal_gpio_callback_data_t lock_button_cbdata;
+    static cyhal_gpio_callback_data_t func_button_cbdata;
+    lock_button_cbdata.callback     = lock_button_callback;
+    lock_button_cbdata.callback_arg = NULL;
+    cyhal_gpio_register_callback(APP_LOCK_BUTTON, &lock_button_cbdata);
+    func_button_cbdata.callback     = func_button_callback;
+    func_button_cbdata.callback_arg = NULL;
+    cyhal_gpio_register_callback(APP_FUNCTION_BUTTON, &func_button_cbdata);
     cyhal_gpio_enable_event(APP_LOCK_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
     cyhal_gpio_enable_event(APP_FUNCTION_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
 }
-void ButtonHandler::lockbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
+void ButtonHandler::lock_button_callback(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
     xTimerStartFromISR(buttonTimers[APP_LOCK_BUTTON_IDX], &taskWoken);
 }
 
-void ButtonHandler::functionbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
+void ButtonHandler::func_button_callback(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
     xTimerStartFromISR(buttonTimers[APP_FUNCTION_BUTTON_IDX], &taskWoken);
