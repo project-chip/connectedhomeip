@@ -449,27 +449,88 @@ void InteractionModelReports::CleanupReadClient(ReadClient * aReadClient)
         mReadClients.end());
 }
 
-CHIP_ERROR InteractionModelReports::ReadAll(DeviceProxy * device, std::vector<EndpointId> endpointIds,
-                                            const Optional<bool> & fabricFiltered)
+CHIP_ERROR InteractionModelReports::ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                                            std::vector<chip::EventId> eventIds, const chip::Optional<bool> & fabricFiltered,
+                                            const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
+                                            const chip::Optional<chip::EventNumber> & eventNumber)
 {
+    const size_t endpointCount  = endpointIds.size();
+    const size_t clusterCount   = clusterIds.size();
+    const size_t attributeCount = attributeIds.size();
+    const size_t eventCount     = eventIds.size();
+
+    // TODO Add data version supports
+
+    VerifyOrReturnError(endpointCount > 0 && endpointCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(attributeCount > 0 && attributeCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(eventCount > 0 && eventCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const bool hasSameIdsCount = (clusterCount == (attributeCount + eventCount)) && (clusterCount == endpointCount);
+    VerifyOrReturnError(hasSameIdsCount, CHIP_ERROR_INVALID_ARGUMENT);
+
     AttributePathParams attributePathParams[kMaxAllowedPaths];
     EventPathParams eventPathParams[kMaxAllowedPaths];
 
-    auto pathsCount = endpointIds.size();
-    VerifyOrReturnError(pathsCount > 0 && pathsCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
-
+    size_t attributeIndex = 0;
+    size_t eventIndex     = 0;
+    size_t pathsCount     = clusterCount;
     for (size_t i = 0; i < pathsCount; i++)
     {
-        auto endpointId                    = endpointIds.at(i);
-        attributePathParams[i].mEndpointId = endpointId;
-        eventPathParams[i].mEndpointId     = endpointId;
+        auto clusterId  = clusterIds.at(i);
+        auto endpointId = endpointIds.at(i);
+
+        if (attributeIndex < attributeIds.size())
+        {
+            auto attributeId = attributeIds.at(attributeIndex);
+
+            if (endpointId != kInvalidEndpointId)
+            {
+                attributePathParams[attributeIndex].mEndpointId = endpointId;
+            }
+
+            if (clusterId != kInvalidClusterId)
+            {
+                attributePathParams[attributeIndex].mClusterId = clusterId;
+            }
+
+            if (attributeId != kInvalidAttributeId)
+            {
+                attributePathParams[attributeIndex].mAttributeId = attributeId;
+            }
+
+            attributeIndex++;
+        }
+        else if (eventIndex < eventIds.size())
+        {
+            auto eventId = eventIds.at(eventIndex);
+
+            if (endpointId != kInvalidEndpointId)
+            {
+                eventPathParams[eventIndex].mEndpointId = endpointId;
+            }
+
+            if (clusterId != kInvalidClusterId)
+            {
+                eventPathParams[eventIndex].mClusterId = clusterId;
+            }
+
+            if (eventId != kInvalidEventId)
+            {
+                eventPathParams[eventIndex].mEventId = eventId;
+            }
+
+            eventIndex++;
+        }
     }
 
     ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpEventPathParamsList        = eventPathParams;
-    params.mEventPathParamsListSize     = pathsCount;
+    params.mEventPathParamsListSize     = eventCount;
+    params.mEventNumber                 = eventNumber;
     params.mpAttributePathParamsList    = attributePathParams;
-    params.mAttributePathParamsListSize = pathsCount;
+    params.mAttributePathParamsListSize = attributeCount;
 
     if (fabricFiltered.HasValue())
     {

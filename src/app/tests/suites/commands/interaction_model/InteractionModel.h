@@ -108,7 +108,11 @@ protected:
                            const chip::Optional<std::vector<bool>> & isUrgents   = chip::NullOptional);
 
     CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
-                       const chip::Optional<bool> & fabricFiltered = chip::Optional<bool>(true));
+                       std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                       std::vector<chip::EventId> eventIds,
+                       const chip::Optional<bool> & fabricFiltered                         = chip::Optional<bool>(true),
+                       const chip::Optional<std::vector<chip::DataVersion>> & dataVersions = chip::NullOptional,
+                       const chip::Optional<chip::EventNumber> & eventNumber               = chip::NullOptional);
 
     void Shutdown() { mReadClients.clear(); }
 

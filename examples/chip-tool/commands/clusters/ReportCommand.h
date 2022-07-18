@@ -418,7 +418,20 @@ class ReadAll : public ReadCommand
 public:
     ReadAll(CredentialIssuerCommands * credsIssuerConfig) : ReadCommand("read-all", credsIssuerConfig)
     {
-        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
+        AddArgument("cluster-ids", 0, UINT32_MAX, &mClusterIds,
+                    "Comma-separated list of cluster ids to read from (e.g. \"6\" or \"8,0x201\").\n  Allowed to be 0xFFFFFFFF to "
+                    "indicate a wildcard cluster.");
+        AddArgument("attribute-ids", 0, UINT32_MAX, &mAttributeIds,
+                    "Comma-separated list of attribute ids to read (e.g. \"0\" or \"1,0xFFFC,0xFFFD\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard attribute.");
+        AddArgument("event-ids", 0, UINT32_MAX, &mEventIds,
+                    "Comma-separated list of event ids to read (e.g. \"0\" or \"1,2,3\").\n  Allowed to be "
+                    "0xFFFFFFFF to indicate a wildcard event.");
+        AddArgument("fabric-filtered", 0, 1, &mFabricFiltered,
+                    "Boolean indicating whether to do a fabric-filtered read. Defaults to true.");
+        AddArgument("data-versions", 0, UINT32_MAX, &mDataVersions,
+                    "Comma-separated list of data versions for the clusters being read.");
+        AddArgument("event-min", 0, UINT64_MAX, &mEventNumber);
         ReadCommand::AddArguments();
     }
 
@@ -432,9 +445,16 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        return ReadCommand::ReadAll(device, endpointIds, mFabricFiltered);
+        return ReadCommand::ReadAll(device, endpointIds, mClusterIds, mAttributeIds, mEventIds, mFabricFiltered, mDataVersions,
+                                    mEventNumber);
     }
 
 private:
+    std::vector<chip::ClusterId> mClusterIds;
+    std::vector<chip::AttributeId> mAttributeIds;
+    std::vector<chip::EventId> mEventIds;
+
     chip::Optional<bool> mFabricFiltered;
+    chip::Optional<std::vector<chip::DataVersion>> mDataVersions;
+    chip::Optional<chip::EventNumber> mEventNumber;
 };
