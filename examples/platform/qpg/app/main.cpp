@@ -55,11 +55,10 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
-
 namespace {
 constexpr uint32_t kInitOTARequestorDelaySec = 3;
-constexpr int extDiscTimeoutSecs = 20;
-}
+constexpr int extDiscTimeoutSecs             = 20;
+} // namespace
 
 /*****************************************************************************
  *                    Macro Definitions
