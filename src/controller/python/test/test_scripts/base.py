@@ -1025,5 +1025,4 @@ class BaseTestHelper:
         except IM.InteractionModelError as ex:
             status = ex.status
 
-        # TODO: Should be IM.Status.UnsupportedAccess
-        return status == IM.Status.InvalidCommand
+        return status == IM.Status.UnsupportedAccess
