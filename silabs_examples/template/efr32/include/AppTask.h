@@ -23,9 +23,9 @@
 #include <stdint.h>
 
 #include "AppEvent.h"
+#include "FreeRTOS.h"
 #include "sl_simple_button_instances.h"
 
-#include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
