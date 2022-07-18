@@ -151,7 +151,7 @@ class ChipDeviceController():
                 self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
                     err)
             else:
-                print("Established secure ession with Device")
+                print("Established secure session with Device")
             if self.state != DCState.COMMISSIONING:
                 # During Commissioning, HandleKeyExchangeComplete will also be called,
                 # in this case the async operation should be marked as finished by
