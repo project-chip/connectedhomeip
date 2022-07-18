@@ -33,6 +33,7 @@ public class ChipDeviceController {
   private long deviceControllerPtr;
   private int connectionId;
   private CompletionListener completionListener;
+  private ScanNetworksListener scanNetworksListener;
 
   /**
    * To load class and jni, we need to new AndroidChipPlatform after jni load but before new
@@ -54,6 +55,10 @@ public class ChipDeviceController {
 
   public void setCompletionListener(CompletionListener listener) {
     completionListener = listener;
+  }
+
+  public void setScanNetworksListener(ScanNetworksListener listener) {
+    scanNetworksListener = listener;
   }
 
   public void pairDevice(
@@ -259,8 +264,8 @@ public class ChipDeviceController {
   }
 
   public void onScanNetworksFailure(int errorCode) {
-    if (completionListener != null) {
-      completionListener.onScanNetworksFailure(errorCode);
+    if (scanNetworksListener != null) {
+      scanNetworksListener.onScanNetworksFailure(errorCode);
     }
   }
 
@@ -271,8 +276,8 @@ public class ChipDeviceController {
           wiFiScanResults,
       Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
           threadScanResults) {
-    if (completionListener != null) {
-      completionListener.onScanNetworksSuccess(
+    if (scanNetworksListener != null) {
+      scanNetworksListener.onScanNetworksSuccess(
           networkingStatus, debugText, wiFiScanResults, threadScanResults);
     }
   }
@@ -650,6 +655,20 @@ public class ChipDeviceController {
   }
 
   /** Interface to listen for callbacks from CHIPDeviceController. */
+  public interface ScanNetworksListener {
+    /** Notifies when scan networks call fails. */
+    void onScanNetworksFailure(int errorCode);
+
+    void onScanNetworksSuccess(
+        Integer networkingStatus,
+        Optional<String> debugText,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
+            wiFiScanResults,
+        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
+            threadScanResults);
+  }
+
+  /** Interface to listen for callbacks from CHIPDeviceController. */
   public interface CompletionListener {
 
     /** Notifies the completion of "ConnectDevice" command. */
@@ -673,17 +692,6 @@ public class ChipDeviceController {
 
     /** Notifies the completion of each stage of commissioning. */
     void onCommissioningStatusUpdate(long nodeId, String stage, int errorCode);
-
-    /** Notifies when scan networks call fails. */
-    void onScanNetworksFailure(int errorCode);
-
-    void onScanNetworksSuccess(
-        Integer networkingStatus,
-        Optional<String> debugText,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>
-            wiFiScanResults,
-        Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>
-            threadScanResults);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

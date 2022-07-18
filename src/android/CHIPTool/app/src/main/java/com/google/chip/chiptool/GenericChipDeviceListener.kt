@@ -31,18 +31,6 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onScanNetworksFailure(errorCode: Int) {
-    // No op
-  }
-
-  override fun onScanNetworksSuccess(
-          networkingStatus: Int,
-          debugText: Optional<String>,
-          wiFiScanResults: Optional<ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResult>>,
-          threadScanResults: Optional<ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResult>>) {
-    // No op
-  }
-
   override fun onNotifyChipConnectionClosed() {
     // No op
   }
