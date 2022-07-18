@@ -151,7 +151,7 @@ class ChipDeviceController():
                 self._ChipStack.callbackRes = self._ChipStack.ErrorToException(
                     err)
             else:
-                print("Established CASE with Device")
+                print("Established secure session with Device")
             if self.state != DCState.COMMISSIONING:
                 # During Commissioning, HandleKeyExchangeComplete will also be called,
                 # in this case the async operation should be marked as finished by
@@ -939,7 +939,7 @@ class ChipDeviceController():
             print(f"CommandResponse {res}")
             return (0, res)
         except InteractionModelError as ex:
-            return (int(ex.state), None)
+            return (int(ex.status), None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         self.CheckIsActive()

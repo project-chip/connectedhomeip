@@ -20695,5 +20695,68 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
     return false;
 }
 
+// TODO(#20811): Actually generate the following based on ZAP metadata
+// See https://github.com/project-chip/zap/issues/609
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
+{
+    // Maybe it would be smaller code to codegen a table and walk over it?
+    // Not sure.
+    switch (aCluster)
+    {
+    case Clusters::Groups::Id: {
+        switch (aCommand)
+        {
+        case Clusters::Groups::Commands::AddGroup::Id:
+        case Clusters::Groups::Commands::ViewGroup::Id:
+        case Clusters::Groups::Commands::GetGroupMembership::Id:
+        case Clusters::Groups::Commands::RemoveGroup::Id:
+        case Clusters::Groups::Commands::RemoveAllGroups::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::GroupKeyManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::GroupKeyManagement::Commands::KeySetWrite::Id:
+        case Clusters::GroupKeyManagement::Commands::KeySetRead::Id:
+        case Clusters::GroupKeyManagement::Commands::KeySetRemove::Id:
+        case Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::GeneralCommissioning::Id: {
+        switch (aCommand)
+        {
+        case Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::Scenes::Id: {
+        // Entire cluster is fabric-scoped.
+        return true;
+    }
+    case Clusters::OperationalCredentials::Id: {
+        switch (aCommand)
+        {
+        case Clusters::OperationalCredentials::Commands::UpdateNOC::Id:
+        case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    default:
+        break;
+    }
+
+    return false;
+}
+
 } // namespace app
 } // namespace chip
