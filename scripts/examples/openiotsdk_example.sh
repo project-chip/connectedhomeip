@@ -30,14 +30,23 @@ Options:
     -s,--scratch                    Remove build directory at all before building
     -C,--command    <command>       Action to execute <build-run | run | build - default>
     -d,--debug      <debug_enable>  Build in debug mode <true | false - default>
-    -p,--path       <build_path>    Build path <build_path - default is example_dir/build>      
+    -p,--path       <build_path>    Build path <build_path - default is example_dir/build>
 
 Examples:
     shell
     unit-tests
+
+You can run individual test suites of unit tests by using their names with the run command:
+
 EOF
+    cat /workspaces/connectedhomeip/src/test_driver/openiotsdk/unit-tests/testnames.txt
+    echo ""
 }
 
+readarray -t TEST_NAMES </workspaces/connectedhomeip/src/test_driver/openiotsdk/unit-tests/testnames.txt
+
+export FAST_MODEL_PLUGINS_PATH=/workspaces/connectedhomeip
+IS_TEST=0
 NAME="$(basename "$0")"
 HERE="$(dirname "$0")"
 CHIP_ROOT="$(realpath $HERE/../..)"
@@ -54,6 +63,7 @@ FVP_BIN=FVP_Corstone_SSE-300_Ethos-U55
 GDB_PLUGIN="${FAST_MODEL_PLUGINS_PATH}/GDBRemoteConnection.so"
 FVP_CONFIG_FILE="${CHIP_ROOT}/examples/platform/openiotsdk/fvp/cs300.conf"
 TELNET_TERMINAL_PORT=5000
+FAILED_TESTS=0
 
 function build_with_cmake {
     CMAKE="$(which cmake)"
@@ -101,10 +111,10 @@ function run_fvp {
         exit 1
     fi
 
-    if [[ "$EXAMPLE" != "unit-tests" ]]; then
+    if [[ $IS_TEST -eq 0 ]]; then
         EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE-example.elf"
     else
-        EXAMPLE_EXE_PATH="$BUILD_PATH/chip-openiotsdk-$EXAMPLE.elf"
+        EXAMPLE_EXE_PATH="$BUILD_PATH/$EXAMPLE.elf"
     fi
 
     # Check if executable file exists
@@ -121,8 +131,19 @@ function run_fvp {
 
     $FVP_BIN $OPTIONS -f $FVP_CONFIG_FILE --application $EXAMPLE_EXE_PATH >/dev/null 2>&1 &
     sleep 1
-    telnet localhost ${TELNET_TERMINAL_PORT}
+
     trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+    expect <<EOF
+    set timeout 1200
+    spawn telnet localhost ${TELNET_TERMINAL_PORT}
+    expect -re {Test status: (\d+)}
+    set retcode \$expect_out(1,string)
+    expect "Open IoT SDK unit-tests completed"
+    sleep 1
+    puts "$EXAMPLE status: \$retcode"
+    exit \$retcode
+EOF
+    FAILED_TESTS=$(expr $FAILED_TESTS + $?)
 }
 
 SHORT=C:,p:,d:,c,s,h
@@ -174,16 +195,29 @@ if [[ $# -lt 1 ]]; then
     exit 1
 fi
 
-case "$1" in
-shell | unit-tests)
-    EXAMPLE=$1
-    ;;
-*)
-    echo "Wrong example name"
-    show_usage
-    exit 2
-    ;;
-esac
+EXAMPLE=$1
+
+if [[ "$EXAMPLE" == "unit-tests" ]]; then
+    IS_TEST=1
+fi
+
+if [[ " ${TEST_NAMES[*]} " =~ " $EXAMPLE " ]]; then
+    echo "treating example as unit test name"
+    if [[ "$COMMAND" == *"build"* ]]; then
+        echo "Test suites can only accept --command run"
+        show_usage
+        exit 2
+    fi
+    IS_TEST=1
+fi
+
+if [[ $IS_TEST -eq 0 ]]; then
+    if [[ ! "$EXAMPLE" == "shell" ]]; then
+        echo "Wrong example name"
+        show_usage
+        exit 2
+    fi
+fi
 
 case "$COMMAND" in
 build | run | build-run) ;;
@@ -196,10 +230,10 @@ esac
 
 TOOLCHAIN_PATH="toolchains/toolchain-$TOOLCHAIN.cmake"
 
-if [[ "$EXAMPLE" != "unit-tests" ]]; then
+if [[ $IS_TEST -eq 0 ]]; then
     EXAMPLE_PATH="$CHIP_ROOT/examples/$EXAMPLE/openiotsdk"
 else
-    EXAMPLE_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/$EXAMPLE"
+    EXAMPLE_PATH="$CHIP_ROOT/src/test_driver/openiotsdk/unit-tests"
 fi
 
 if [ -z "${BUILD_PATH}" ]; then
@@ -211,5 +245,18 @@ if [[ "$COMMAND" == *"build"* ]]; then
 fi
 
 if [[ "$COMMAND" == *"run"* ]]; then
-    run_fvp
+    # if user wants to run unit-tests we need to loop through all test names
+    if [[ "$EXAMPLE" == "unit-tests" ]]; then
+
+        for NAME in "${TEST_NAMES[@]}"; do
+            EXAMPLE=$NAME
+            run_fvp
+        done
+    else
+        run_fvp
+    fi
+
+    echo "Failed tests total: $FAILED_TESTS"
 fi
+
+exit $FAILED_TESTS

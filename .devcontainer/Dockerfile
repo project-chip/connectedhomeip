@@ -36,7 +36,8 @@ RUN apt-get -fy install git vim emacs sudo \
     docker.io \
     iputils-ping net-tools \
     libncurses5 \
-    libpython2.7
+    libpython2.7 \
+    expect
 
 RUN groupadd -g $USER_GID $USERNAME
 RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
