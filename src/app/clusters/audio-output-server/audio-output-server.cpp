@@ -179,9 +179,9 @@ bool emberAfAudioOutputClusterRenameOutputCallback(app::CommandHandler * command
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (!HasFeature(endpoint, AudioOutputFeature::kNameUpdates)) {
-        ChipLogError(Zcl, "AudioOutput no name updates feature")
-        err = CHIP_ERROR_INCORRECT_STATE;
+    if (!HasFeature(endpoint, AudioOutputFeature::kNameUpdates))
+    {
+        ChipLogError(Zcl, "AudioOutput no name updates feature") err = CHIP_ERROR_INCORRECT_STATE;
         ExitNow();
     }
 
