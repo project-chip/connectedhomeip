@@ -52,7 +52,7 @@ tests:
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
-          Verify on the OTA Provider logs that the QueryImage command is sent only once in that 1 minute interval.
+          Verify on the OTA Provider logs that the QueryImage command is sent only once in that 2 minute interval.
       disabled: true
 
     - label:

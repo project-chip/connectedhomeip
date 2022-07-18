@@ -32,6 +32,8 @@ tests:
       verification: |
           ./chip-tool  operationalcredentials read current-fabric-index 1 0
 
+          On TH, Verify DUT Responds  to CurrentFabricIndex attribute of operationalCredential cluster  as 1
+
           [1657283596.149202][2284:2289] CHIP:DMG:                                {
           [1657283596.149247][2284:2289] CHIP:DMG:                                        Endpoint = 0x0,
           [1657283596.149293][2284:2289] CHIP:DMG:                                        Cluster = 0x3e,
@@ -62,6 +64,8 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
 
+
+          Verify in TH log:
           848.856174][2311:2316] CHIP:EM: Removed CHIP MessageCounter:265690133 from RetransTable on exchange 23190i
           [1657283848.856239][2311:2316] CHIP:DMG: ReportDataMessage =
           [1657283848.856278][2311:2316] CHIP:DMG: {
@@ -80,6 +84,8 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension '[{"data":"1718"}]' 1 0
+          Verify in TH log:
+
           217.510779][2371:2376] CHIP:DMG:                        AttributePathIB =
           [1657284217.510818][2371:2376] CHIP:DMG:                        {
           [1657284217.510857][2371:2376] CHIP:DMG:                                Endpoint = 0x0,
@@ -126,6 +132,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
+          Verify in TH log:
 
           [1657618132.685459][8992:8998] CHIP:DMG:
           [1657618132.685495][8992:8998] CHIP:DMG:        SuppressResponse = true,
@@ -154,7 +161,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension '[{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
-
+          On TH , Verify DUT  Responds  Successfully to extension attribute list containg one element
           7284747.131523][2411:2416] CHIP:DMG:                        StatusIB =
           [1657284747.131568][2411:2416] CHIP:DMG:                        {
           [1657284747.131618][2411:2416] CHIP:DMG:                                status = 0x00 (SUCCESS),
@@ -301,6 +308,8 @@ tests:
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
 
+          On TH , Verify DUT  Responds  Successfully
+
           [1657618374.299423][9024:9029] CHIP:DMG: }
           [1657618374.299739][9024:9029] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
           [1657618374.299773][9024:9029] CHIP:TOO:         Event number: 86
@@ -368,6 +377,8 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  write extension '[{"data":"1718"},{"data":"17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"}]' 1 0
+
+
 
           1657289068.797364][9823:9828] CHIP:DMG: WriteResponseMessage =
           [1657289068.797394][9823:9828] CHIP:DMG: {
@@ -438,6 +449,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
+          On TH , Verify DUT  Responds  Successfully
 
           [1657618501.560311][9050:9055] CHIP:DMG: }
           [1657618501.560653][9050:9055] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
@@ -546,33 +558,33 @@ tests:
           value is an empty list"
       PICS: ACL.S.E01
       verification: |
-          ./chip-tool accesscontrol write extension '[{"data":""}]' 1 0
+          ./chip-tool accesscontrol write extension '[]' 1 0
+          On TH , Verify DUT  Responds  Successfully
 
-          [1657286533.545278][2576:2581] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657286533.545354][2576:2581] CHIP:DMG:                        },
-          [1657286533.545428][2576:2581] CHIP:DMG:
-          [1657286533.545495][2576:2581] CHIP:DMG:                },
-          [1657286533.545580][2576:2581] CHIP:DMG:
-          [1657286533.545639][2576:2581] CHIP:DMG:                AttributeStatusIB =
-          [1657286533.545702][2576:2581] CHIP:DMG:                {
-          [1657286533.545763][2576:2581] CHIP:DMG:                        AttributePathIB =
-          [1657286533.545829][2576:2581] CHIP:DMG:                        {
-          [1657286533.545904][2576:2581] CHIP:DMG:                                Endpoint = 0x0,
-          [1657286533.545986][2576:2581] CHIP:DMG:                                Cluster = 0x1f,
-          [1657286533.546075][2576:2581] CHIP:DMG:                                Attribute = 0x0000_0001,
-          [1657286533.546148][2576:2581] CHIP:DMG:                                ListIndex = Null,
-          [1657286533.546220][2576:2581] CHIP:DMG:                        }
-          [1657286533.546303][2576:2581] CHIP:DMG:
-          [1657286533.546373][2576:2581] CHIP:DMG:                        StatusIB =
-          [1657286533.546447][2576:2581] CHIP:DMG:                        {
-          [1657286533.546520][2576:2581] CHIP:DMG:                                status = 0x00 (SUCCESS),
-          [1657286533.546595][2576:2581] CHIP:DMG:                        },
-          [1657286533.546669][2576:2581] CHIP:DMG:
-          [1657286533.546735][2576:2581] CHIP:DMG:                },
-          [1657286533.546811][2576:2581] CHIP:DMG:
-          [1657286533.546869][2576:2581] CHIP:DMG:        ],
-          [1657286533.546950][2576:2581] CHIP:DMG:
-          [1657286533.547008][2576:2581] CHIP:DMG:        In
+          7625][1521:1526] CHIP:DMG:                AttributeStatusIB =
+          [1657692723.227673][1521:1526] CHIP:DMG:                {
+          [1657692723.227725][1521:1526] CHIP:DMG:                        AttributePathIB =
+          [1657692723.227780][1521:1526] CHIP:DMG:                        {
+          [1657692723.227834][1521:1526] CHIP:DMG:                                Endpoint = 0x0,
+          [1657692723.227897][1521:1526] CHIP:DMG:                                Cluster = 0x1f,
+          [1657692723.227956][1521:1526] CHIP:DMG:                                Attribute = 0x0000_0001,
+          [1657692723.228012][1521:1526] CHIP:DMG:                        }
+          [1657692723.228073][1521:1526] CHIP:DMG:
+          [1657692723.228125][1521:1526] CHIP:DMG:                        StatusIB =
+          [1657692723.228182][1521:1526] CHIP:DMG:                        {
+          [1657692723.228238][1521:1526] CHIP:DMG:                                status = 0x00 (SUCCESS),
+          [1657692723.228294][1521:1526] CHIP:DMG:                        },
+          [1657692723.228349][1521:1526] CHIP:DMG:
+          [1657692723.228397][1521:1526] CHIP:DMG:                },
+          [1657692723.228449][1521:1526] CHIP:DMG:
+          [1657692723.228492][1521:1526] CHIP:DMG:        ],
+          [1657692723.228551][1521:1526] CHIP:DMG:
+          [1657692723.228582][1521:1526] CHIP:DMG:        InteractionModelRevision = 1
+          [1657692723.228608][1521:1526] CHIP:DMG: }
+          [1657692723.228738][1521:1526] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657692723.228802][1521:1526] CHIP:EM: Sending Standalone Ack for MessageCounter:57305662 on exchange 27543i
+          [1657692723.228869][1521:1526] CHIP:IN: Prepared secure message 0xffff9fffd9d8 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 27543i with MessageCounter:9219504.
+          [1657692723.228909][1521:1526]
       disabled: true
 
     - label:
@@ -581,6 +593,7 @@ tests:
       PICS: ACL.S.E01
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
+          On TH , Verify DUT  Responds  Successfully
 
           [1657618604.091599][9063:9068] CHIP:DMG: }
           [1657618604.091929][9063:9068] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001

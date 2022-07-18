@@ -21,9 +21,16 @@ config:
     endpoint: 0
 
 tests:
+    - label:
+          "Pre-Conditions 1. DUT1 and DUT2 Supports Factory Reset Method 2. DUT1
+          and DUT2 must have a different subject public key 3. TH1 only has
+          official PAAs from DCL"
+      verification: |
+
+      disabled: true
+
     - label: "Start the commissioning process of DUT1 by TH on a first Fabric"
       verification: |
-          DUT side:
           sudo ./chip-all-clusters-app --wifi
 
           TH side:
@@ -35,33 +42,186 @@ tests:
     - label:
           "TH sends CertificateChainRequest Command to DUT1 for both PAI and DAC"
       verification: |
+          To get DAC value, send below command.
+          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
+
           "Verify in TH log:
 
-          [1655374217.766326][35023:35028] CHIP:DMG: DAC/PAI (463) =
-          [1655374217.766373][35023:35028] CHIP:DMG: {
-          -----BEGIN CERTIFICATE-----
-          MIIByzCCAXGgAwIBAgIIVq2CIq2UW2QwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP
-          TWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMjAyMDUw
-          MDAwMDBaGA85OTk5MTIzMTIzNTk1OVowPTElMCMGA1UEAwwcTWF0dGVyIERldiBQ
-          QUkgMHhGRkYxIG5vIFBJRDEUMBIGCisGAQQBgqJ8AgEMBEZGRjEwWTATBgcqhkjO
-          PQIBBggqhkjOPQMBBwNCAARBmpMVwhc+DIyHbQPM/JRIUmR/f+xeUIL0BZko7KiU
-          xZQVEwmsYx5MsDOSr2hLC6+35ls7gWLC9Sv5MbjneqqCo2YwZDASBgNVHRMBAf8E
-          CDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUY1QOR/ZLHDjROISk
-          YtFsGV2P+zwwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGhcX4wCgYIKoZI
-          zj0EAwIDSAAwRQIhALLvJ/Sa6bUPuR7qyUxNC9u415KcbLiPrOUpNo0SBUwMAiBl
-          Xckrhr2QmIKmxiF3uCXX0F7b58Ivn+pxIg5+pwP4kQ==
-          -----END CERTIFICATE-----
-          "
+          [1657774717.721972][7956:7961] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
+          [1657774717.722019][7956:7961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
+          [1657774717.722135][7956:7961] CHIP:TOO:   CertificateChainResponse: {
+          [1657774717.722181][7956:7961] CHIP:TOO:     certificate: 308201E73082018EA003020102020869CDF10DE9E54ED1300A06082A8648CE3D040302303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A30533125302306035504030C1C4D61747465722044657620444143203078464646312F30783830303131143012060A2B0601040182A27C02010C044646463131143012060A2B0601040182A27C02020C04383030313059301306072A8648CE3D020106082A8648CE3D03010703420004463AC69342910A0E5588FC6FF56BB63E62ECCECB148F7D4EB03EE552601415767D16A5C663F793E49123260B8297A7CD7E7CFC7B316B39D98E90D29377738E82A360305E300C0603551D130101FF04023000300E0603551D0F0101FF040403020780301D0603551D0E0416041488DDE7B300382932CFF734C04624810F44168A6F301F0603551D2304183016801463540E47F64B1C38D13884A462D16C195D8FFB3C300A06082A8648CE3D040302
+          [1657774717.722269][7956:7961] CHIP:TOO:     ...........: 034700304402200127A27B4B44610EE2FCDC4D2B7885563660BC0F76F17219ED6A08DFB2B3C1CD02206B59E0AF45F3EB2A85B919D35731528C6028C415239545E108E4E54E70971353
+          [1657774717.722297][7956:7961] CHIP:TOO:    }
+
+
+          To get PAI value, send below command.
+          ./chip-tool operationalcredentials certificate-chain-request 2 1 0
+
+          [1657774756.281112][7964:7969] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
+          [1657774756.281164][7964:7969] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
+          [1657774756.281236][7964:7969] CHIP:TOO:   CertificateChainResponse: {
+          [1657774756.281289][7964:7969] CHIP:TOO:     certificate: 308201CB30820171A003020102020856AD8222AD945B64300A06082A8648CE3D04030230303118301606035504030C0F4D617474657220546573742050414131143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313059301306072A8648CE3D020106082A8648CE3D03010703420004419A9315C2173E0C8C876D03CCFC944852647F7FEC5E5082F4059928ECA894C594151309AC631E4CB03392AF684B0BAFB7E65B3B8162C2F52BF931B8E77AAA82A366306430120603551D130101FF040830060101FF020100300E0603551D0F0101FF040403020106301D0603551D0E0416041463540E47F64B1C38D13884A462D16C195D8FFB3C301F0603551D230418301680146AFD22771F511FECBF1641976710DCDC31A1717E300A06082A8648CE3D0403020348003045022100B2EF27F49AE9B50FB91EEAC94C4D0BDBB8D7929C6C
+          [1657774756.281357][7964:7969] CHIP:TOO:     ...........: B88FACE529368D12054C0C0220655DC92B86BD909882A6C62177B825D7D05EDBE7C22F9FEA71220E7EA703F891
+          [1657774756.281388][7964:7969] CHIP:TOO:    }
       disabled: true
 
     - label:
           "TH saves PAI certificates. Extract the Authority Key Identifier from
           the PAI certificate"
       verification: |
+          1. Save the PAI value from commissioning log of TH in the file as below
+          vi pai_6.pem
 
+          2. Give the below command to extract the Authority key ID
+          openssl x509 -in pai_6.pem -text
+
+          Verify that below extracted authority key is not same as the SDK's test PAA
+          1. 78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5
+          2. 6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
+
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA
+
+          grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in pai_6.pem -text
+          Certificate:
+              Data:
+                  Version: 3 (0x2)
+                  Serial Number: 4498223361705918669 (0x3e6ce6509ad840cd)
+                  Signature Algorithm: ecdsa-with-SHA256
+                  Issuer: CN = Matter Test PAA, 1.3.6.1.4.1.37244.2.1 = FFF1
+                  Validity
+                      Not Before: Jun 28 14:23:43 2021 GMT
+                      Not After : Dec 31 23:59:59 9999 GMT
+                  Subject: CN = Matter Test PAI, 1.3.6.1.4.1.37244.2.1 = FFF1, 1.3.6.1.4.1.37244.2.2 = 8000
+                  Subject Public Key Info:
+                      Public Key Algorithm: id-ecPublicKey
+                          Public-Key: (256 bit)
+                          pub:
+                              04:80:dd:f1:1b:22:8f:3e:31:f6:3b:cf:57:98:da:
+                              14:62:3a:eb:bd:e8:2e:f3:78:ee:ad:bf:b1:8f:e1:
+                              ab:ce:31:d0:8e:d4:b2:06:04:b6:cc:c6:d9:b5:fa:
+                              b6:4e:7d:e1:0c:b7:4b:e0:17:c9:ec:15:16:05:6d:
+                              70:f2:cd:0b:22
+                          ASN1 OID: prime256v1
+                          NIST CURVE: P-256
+                  X509v3 extensions:
+                      X509v3 Basic Constraints: critical
+                          CA:TRUE, pathlen:0
+                      X509v3 Key Usage: critical
+                          Certificate Sign, CRL Sign
+                      X509v3 Subject Key Identifier:
+                          AF:42:B7:09:4D:EB:D5:15:EC:6E:CF:33:B8:11:15:22:5F:32:52:88
+                      X509v3 Authority Key Identifier:
+                          keyid:6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
+
+              Signature Algorithm: ecdsa-with-SHA256
+                   30:45:02:21:00:96:c9:c8:cf:2e:01:88:60:05:d8:f5:bc:72:
+                   c0:7b:75:fd:9a:57:69:5a:c4:91:11:31:13:8b:ea:03:3c:e5:
+                   03:02:20:25:54:94:3b:e5:7d:53:d6:c4:75:f7:d2:3e:bf:cf:
+                   c2:03:6c:d2:9b:a6:39:3e:c7:ef:ad:87:14:ab:71:82:19
+          -----BEGIN CERTIFICATE-----
+          MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP
+          TWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx
+          NDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg
+          UEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAw
+          WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7z
+          eO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDAS
+          BgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3
+          CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGh
+          cX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETET
+          i+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==
+          -----END CERTIFICATE-----
       disabled: true
 
     - label: "Repeat Step 1 to 4 with DUT2"
       verification: |
+          To commission DUT2 to TH
 
+          "sudo ./chip-all-clusters-app --wifi --discriminator 3844
+
+          TH side:
+          ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3844 --trace_decode 1
+
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success"
+
+
+          Verify in TH log:
+
+          ./chip-tool operationalcredentials certificate-chain-request 1 1 0
+          [1657774717.721972][7956:7961] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
+          [1657774717.722019][7956:7961] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
+          [1657774717.722135][7956:7961] CHIP:TOO:   CertificateChainResponse: {
+          [1657774717.722181][7956:7961] CHIP:TOO:     certificate: 308201E73082018EA003020102020869CDF10DE9E54ED1300A06082A8648CE3D040302303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A30533125302306035504030C1C4D61747465722044657620444143203078464646312F30783830303131143012060A2B0601040182A27C02010C044646463131143012060A2B0601040182A27C02020C04383030313059301306072A8648CE3D020106082A8648CE3D03010703420004463AC69342910A0E5588FC6FF56BB63E62ECCECB148F7D4EB03EE552601415767D16A5C663F793E49123260B8297A7CD7E7CFC7B316B39D98E90D29377738E82A360305E300C0603551D130101FF04023000300E0603551D0F0101FF040403020780301D0603551D0E0416041488DDE7B300382932CFF734C04624810F44168A6F301F0603551D2304183016801463540E47F64B1C38D13884A462D16C195D8FFB3C300A06082A8648CE3D040302
+          [1657774717.722269][7956:7961] CHIP:TOO:     ...........: 034700304402200127A27B4B44610EE2FCDC4D2B7885563660BC0F76F17219ED6A08DFB2B3C1CD02206B59E0AF45F3EB2A85B919D35731528C6028C415239545E108E4E54E70971353
+          [1657774717.722297][7956:7961] CHIP:TOO:    }
+
+
+
+          ./chip-tool operationalcredentials certificate-chain-request 2 1 0
+
+          [1657774756.281112][7964:7969] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0003
+          [1657774756.281164][7964:7969] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0003
+          [1657774756.281236][7964:7969] CHIP:TOO:   CertificateChainResponse: {
+          [1657774756.281289][7964:7969] CHIP:TOO:     certificate: 308201CB30820171A003020102020856AD8222AD945B64300A06082A8648CE3D04030230303118301606035504030C0F4D617474657220546573742050414131143012060A2B0601040182A27C02010C04464646313020170D3232303230353030303030305A180F39393939313233313233353935395A303D3125302306035504030C1C4D6174746572204465762050414920307846464631206E6F2050494431143012060A2B0601040182A27C02010C04464646313059301306072A8648CE3D020106082A8648CE3D03010703420004419A9315C2173E0C8C876D03CCFC944852647F7FEC5E5082F4059928ECA894C594151309AC631E4CB03392AF684B0BAFB7E65B3B8162C2F52BF931B8E77AAA82A366306430120603551D130101FF040830060101FF020100300E0603551D0F0101FF040403020106301D0603551D0E0416041463540E47F64B1C38D13884A462D16C195D8FFB3C301F0603551D230418301680146AFD22771F511FECBF1641976710DCDC31A1717E300A06082A8648CE3D0403020348003045022100B2EF27F49AE9B50FB91EEAC94C4D0BDBB8D7929C6C
+          [1657774756.281357][7964:7969] CHIP:TOO:     ...........: B88FACE529368D12054C0C0220655DC92B86BD909882A6C62177B825D7D05EDBE7C22F9FEA71220E7EA703F891
+          [1657774756.281388][7964:7969] CHIP:TOO:    }
+
+
+          "1. Save the PAI value from commissioning log of TH in the file as below
+          vi pai_6.pem
+
+          2. Give the below command to extract the Authority key ID
+          openssl x509 -in pai_6.pem -text
+
+          Below certificate has been extracted using the sample DUT, hence the Authority key ID is same as SDK's test PAA
+
+          grl@grl-ThinkPad-L480:~/jul14_2ndcntrl/connectedhomeip$ openssl x509 -in pai_6.pem -text
+          Certificate:
+              Data:
+                  Version: 3 (0x2)
+                  Serial Number: 4498223361705918669 (0x3e6ce6509ad840cd)
+                  Signature Algorithm: ecdsa-with-SHA256
+                  Issuer: CN = Matter Test PAA, 1.3.6.1.4.1.37244.2.1 = FFF1
+                  Validity
+                      Not Before: Jun 28 14:23:43 2021 GMT
+                      Not After : Dec 31 23:59:59 9999 GMT
+                  Subject: CN = Matter Test PAI, 1.3.6.1.4.1.37244.2.1 = FFF1, 1.3.6.1.4.1.37244.2.2 = 8000
+                  Subject Public Key Info:
+                      Public Key Algorithm: id-ecPublicKey
+                          Public-Key: (256 bit)
+                          pub:
+                              04:80:dd:f1:1b:22:8f:3e:31:f6:3b:cf:57:98:da:
+                              14:62:3a:eb:bd:e8:2e:f3:78:ee:ad:bf:b1:8f:e1:
+                              ab:ce:31:d0:8e:d4:b2:06:04:b6:cc:c6:d9:b5:fa:
+                              b6:4e:7d:e1:0c:b7:4b:e0:17:c9:ec:15:16:05:6d:
+                              70:f2:cd:0b:22
+                          ASN1 OID: prime256v1
+                          NIST CURVE: P-256
+                  X509v3 extensions:
+                      X509v3 Basic Constraints: critical
+                          CA:TRUE, pathlen:0
+                      X509v3 Key Usage: critical
+                          Certificate Sign, CRL Sign
+                      X509v3 Subject Key Identifier:
+                          AF:42:B7:09:4D:EB:D5:15:EC:6E:CF:33:B8:11:15:22:5F:32:52:88
+                      X509v3 Authority Key Identifier:
+                          keyid:6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E
+
+              Signature Algorithm: ecdsa-with-SHA256
+                   30:45:02:21:00:96:c9:c8:cf:2e:01:88:60:05:d8:f5:bc:72:
+                   c0:7b:75:fd:9a:57:69:5a:c4:91:11:31:13:8b:ea:03:3c:e5:
+                   03:02:20:25:54:94:3b:e5:7d:53:d6:c4:75:f7:d2:3e:bf:cf:
+                   c2:03:6c:d2:9b:a6:39:3e:c7:ef:ad:87:14:ab:71:82:19
+          -----BEGIN CERTIFICATE-----
+          MIIB1DCCAXqgAwIBAgIIPmzmUJrYQM0wCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP
+          TWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTAgFw0yMTA2Mjgx
+          NDIzNDNaGA85OTk5MTIzMTIzNTk1OVowRjEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg
+          UEFJMRQwEgYKKwYBBAGConwCAQwERkZGMTEUMBIGCisGAQQBgqJ8AgIMBDgwMDAw
+          WTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAASA3fEbIo8+MfY7z1eY2hRiOuu96C7z
+          eO6tv7GP4avOMdCO1LIGBLbMxtm1+rZOfeEMt0vgF8nsFRYFbXDyzQsio2YwZDAS
+          BgNVHRMBAf8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUr0K3
+          CU3r1RXsbs8zuBEVIl8yUogwHwYDVR0jBBgwFoAUav0idx9RH+y/FkGXZxDc3DGh
+          cX4wCgYIKoZIzj0EAwIDSAAwRQIhAJbJyM8uAYhgBdj1vHLAe3X9mldpWsSRETET
+          i+oDPOUDAiAlVJQ75X1T1sR199I+v8/CA2zSm6Y5PsfvrYcUq3GCGQ==
+          -----END CERTIFICATE-----
       disabled: true

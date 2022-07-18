@@ -554,21 +554,21 @@ PICS:
 
       # Temperature Measurement cluster
     - label: "Does the device implement the MeasuredValue attribute?"
-      id: TM.S.A0000
+      id: TMP.S.A0000
 
     - label: "Does the device implement the MinMeasuredValue attribute?"
-      id: TM.S.A0001
+      id: TMP.S.A0001
 
     - label: "Does the device implement the MaxMeasuredValue attribute?"
-      id: TM.S.A0002
+      id: TMP.S.A0002
 
     - label: "Does the device implement the Tolerance attribute?"
-      id: TM.S.A0003
+      id: TMP.S.A0003
 
     - label:
           "Can the MeasuredValue attribute changed by physical control at the
           device?"
-      id: TM.M.ManuallyControlled
+      id: TMP.M.ManuallyControlled
 
     - label: "Does the device implement the Tolerance attribute?"
       id: A_TEMPERATURE_TOLERANCE
@@ -605,7 +605,7 @@ PICS:
       id: DGSW.S.A0003
 
     - label: "Does the device implement the ResetWaterMarks command?"
-      id: DGSW.S.C00
+      id: DGSW.S.C00.Rsp
 
       # Thermostat cluster
     - label: "Does the device implement the Heating feature"
@@ -634,6 +634,12 @@ PICS:
 
     - label: "Does the device implement the Tolerance attribute?"
       id: A_TEMPERATURE_TOLERANCE
+
+    - label: "Does the device implement the OccupiedCoolingSetpoint attribute?"
+      id: A_OCCUPIEDCOOLINGSETPOINT
+
+    - label: "Does the device implement the OccupiedHeatingSetpoint attribute?"
+      id: A_OCCUPIEDHEATINGSETPOINT
 
     - label: "Does the device implement the LocalTemperature attribute?"
       id: TSTAT.S.A0000
@@ -1570,6 +1576,9 @@ PICS:
     - label: "Does the device represent a Latching Switch?"
       id: SWTCH.S.F00
 
+    - label: "Does the device represent a Latching Switch?"
+      id: SWTCH.C.F00
+
     - label: "Does the device implement the CurrentScene attribute?"
       id: SWTCH.S.F01
 
@@ -1581,6 +1590,16 @@ PICS:
 
     - label: "Does the MS device support Momentary Switch MultiPress?"
       id: SWTCH.S.F04
+
+    - label:
+          "Does the DUT support reading attribute to get switch state (polling)?"
+      id: SWTCH.C.M.RA
+
+    - label: "Does the DUT support eventing to get switch state changes?"
+      id: SWTCH.C.M.EV
+
+    - label: "Does the device implement the CurrentScene attribute?"
+      id: SWTCH.C.F01
 
     #General Commissioning Cluster
     - label: "Does the device(Server) support Breadcrumb attribute?"
@@ -1740,13 +1759,70 @@ PICS:
     - label: "Does the DUT support Basic Commissioning Method (BCM)?"
       id: PICS_MF_BCM
 
+    - label: "Does the Device support User Interface Display"
+      id: CADMIN.UserInterfaceDisplay
+
+    - label: "Does the Device support Audio Interface"
+      id: CADMIN.AudioInterface
+    #server
+    - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
+      id: CADMIN.S.C0000
+
+    - label: "Does the Device support Basic Commissioning Method (BCM)?"
+      id: CADMIN.S.C0001
+
+    - label: "Does the Device support revoking commissioning window?"
+      id: CADMIN.S.C0002
+
+    - label: "Does the Device implement receiving the RemoveFabric command?"
+      id: OPCREDS.S.C0a.Rsp
+    #attributes
+    - label: "Does the Device support Fabrics attribute?"
+      id: OPCREDS.S.A0001
+
+    - label: "Does the Device support NodeLabel attribute?"
+      id: BINFO.S.A0005
+
+    - label: "Does the Device support WindowStatus attribute?"
+      id: CADMIN.S.A0000
+
+    #client
+    - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
+      id: CADMIN.C.C0000
+
+    - label: "Does the Device support Basic Commissioning Method (BCM)?"
+      id: CADMIN.C.C0001
+
+    - label: "Does the Device support revoking commissioning window?"
+      id: CADMIN.C.C0002
+
+    - label: "Does the Device implement receiving the RemoveFabric command?"
+      id: OPCREDS.C.C0a.Tx
+    #attributes
+    - label: "Does the Device support Fabrics attribute?"
+      id: OPCREDS.C.A0001
+
+    - label: "Does the Device support NodeLabel attribute?"
+      id: BINFO.C.A0005
+
+    - label: "Does the Device support WindowStatus attribute?"
+      id: CADMIN.C.A0000
+
     #User Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
       id: ULABEL.S.A0000
 
+    - label:
+          "DUT sends a write request to the TH, to write to an entry in the
+          LabelList"
+      id: ULABEL.C.A0000
+
     #Fixed Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
       id: FLABEL.S.A0000
+
+    - label: "Does the DUT Server support LabelList attribute?"
+      id: FLABEL.C.A0000
 
     #Media clusters
     - label:
@@ -2390,7 +2466,7 @@ PICS:
       id: DGGEN.S.A0008
 
     - label: "Indicates that node is configured for test event triggers."
-      id: DGGEN.S.C00
+      id: DGGEN.S.C00.Rsp
 
     - label:
           "Indicates a change in the set of hardware faults currently detected
@@ -2765,7 +2841,7 @@ PICS:
 
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
-      id: DGETH.S.C00
+      id: DGETH.S.C00.Rsp
 
     - label: "Does the device implement the PHYRate attribute?"
       id: DGETH.S.A0000
@@ -2891,7 +2967,7 @@ PICS:
           "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
-      id: DGWIFI.S.C00
+      id: DGWIFI.S.C00.Rsp
     #Actions Cluster
     - label: "Does the device implement the ActionList attribute?"
       id: ACT.S.A0000
@@ -4425,6 +4501,7 @@ PICS:
     - label: "Does the DUT support the AccessControlExtensionChanged Event?"
       id: ACL.S.E01
 
+    #Mode select
     #Mode select
     - label: "Does the DUT support the StartUpMode attribute?"
       id: MOD.S.A0004

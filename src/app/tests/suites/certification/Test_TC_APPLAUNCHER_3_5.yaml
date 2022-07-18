@@ -29,22 +29,11 @@ tests:
                 value: nodeId
 
     # Issue 13029
+    #this step implicitly validating the attribute(CatalogList)constraints, as long as the payload is being parsed successfully
     - label:
           "TH reads CatalogList attribute from the DUT and where each entry in
           the list is a CSA-issued Vendor Id of type unsigned 16 bit integer
           ranging between 0-65536 for the catalog"
-      verification: |
-          ./chip-tool applicationlauncher read catalog-list 1 1
-          [1651053952.328482][155084:155089] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050C Attribute 0x0000_0000 DataVersion: 3275104958
-          [1651053952.328551][155084:155089] CHIP:TOO:   CatalogList: 2 entries
-          [1651053952.328589][155084:155089] CHIP:TOO:     [1]: 123
-          [1651053952.328620][155084:155089] CHIP:TOO:     [2]: 456
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && APPLAUNCHER.S.A0000
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: APPLAUNCHER.S.A0000
+      command: "readAttribute"
+      attribute: "CatalogList"

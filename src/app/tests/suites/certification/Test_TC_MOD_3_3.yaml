@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 79.3.3. [TC-MOD-3.3] OTA Mode Verification (DUT as Server)
+name: 80.3.3. [TC-MOD-3.3] OTA Mode Verification (DUT as Server)
 
 config:
     nodeId: 0x12344321
@@ -25,6 +25,8 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
+          Verify on the TH Log:
+
           [1645778279.693082][4898:4903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469722
           [1645778279.693151][4898:4903] CHIP:TOO:   StartUpMode: 0
       disabled: true
@@ -33,13 +35,15 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
+          Verify on the TH Log:
+
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 7
       disabled: true
 
     - label:
           "If the StartUpMode and CurrentMode attributes have the same value,
-          proceed to step 2c, Otherwise proceed to step 3a."
+          proceed to step 2c, Otherwise proceed to step 3a"
       verification: |
           If the StartUpMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
       disabled: true
@@ -47,6 +51,9 @@ tests:
     - label: "TH reads the SupportedModes attribute from the DUT"
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
+
+          Verify on the TH Log:
+
           [1645776742.667057][4661:4666] CHIP:TOO:   SupportedModes: 3 entries
           [1645776742.669546][4661:4666] CHIP:TOO:     [1]: {
           [1645776742.669588][4661:4666] CHIP:TOO:       Label: Black
@@ -68,16 +75,18 @@ tests:
     - label:
           "Select a value from the list in step 2c with a different value than
           the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the DUT with the selected value."
+          to the DUT with the selected value"
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
+
+          Verify on the TH Log:
 
           [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
 
     - label:
           "Perform an OTA update on the device that requires a reboot. Allow for
-          the DUT to update and fully reboot."
+          the DUT to update and fully reboot"
       verification: |
           Perform an OTA update on the device that requires a reboot. Allow for the DUT to update and fully reboot.
       disabled: true
@@ -85,6 +94,8 @@ tests:
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
           ./chip-tool modeselect read current-mode 1 1
+
+          Verify on the TH Log:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4

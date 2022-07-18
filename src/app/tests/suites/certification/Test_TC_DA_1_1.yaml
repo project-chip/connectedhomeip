@@ -25,10 +25,9 @@ config:
 tests:
     - label: "Commission DUT to TH1s Fabric"
       verification: |
-          DUT side:
           sudo ./chip-all-clusters-app --wifi
 
-          TH side:
+          Verify in TH log:
           ./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1
 
           [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
@@ -40,6 +39,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0
 
+          Verify in TH log:
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
           [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
@@ -56,16 +56,34 @@ tests:
           "Factory reset DUT Perform the device discovery flow checks as covered
           in TC-DD-2.2"
       verification: |
-          1. TH starts matter announcement procedure using BLE transport : verify this by sending "./chip-tool discover commissionables" after launching all-clusters-app on DUT
+          1. TH starts matter announcement procedure using BLE transport : verify this by sending
+          "./chip-tool discover commissionables" after launching all-clusters-app on DUT
+
           2. DUT must find TH and provide onboarding data to for validation.
-          Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH by passing "./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1"
+          Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH
+          1. TH starts matter announcement procedure using BLE transport : verify this by sending "./chip-tool discover commissionables" after launching all-clusters-app on DUT
+          2. DUT must find TH and provide onboarding data to for validation. Pass Criteria: DUT is able to report the Onboarding payload as set on TH : Verify this by commissioning DUT with TH by passing "./chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1"
       disabled: true
 
     - label: "Commission DUT to TH2s Fabric"
       verification: |
           To commission DUT to TH2 follow below procedure
           1../chip-tool  pairing open-commissioning-window 1 1 400 2000 3840  on TH
+          Verify in TH Log:
+          CHIP:IN: Sending encrypted msg 0xaaaad3464d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 5805157 msec
+          [1635691999.946536][3822:3827] CHIP:DMG: ICR moving to [CommandSen]
+          [1635691999.946586][3822:3827] CHIP:CTL: Manual pairing code: [35407541839]
+          [1635691999.946650][3822:3827] CHIP:CTL: SetupQRCode: [MT:00000CQM00G6V851H10]
+          [1635691999.946802][3822:3827] CHIP:EM: Sending Standalone Ack for MessageCounter:3234931243 on exchange 35324i
+          [1635691999.946850][3822:3827] CHIP:IN: Prepared plaintext message 0xffffaa58a960 to 0x0000000000000000 of type 0x10 and protocolId (0, 0) on exchange 35324i with MessageCounter:1726016118.
+          [1635691999.946895][3822:3827] CHIP:IN: Sending plaintext msg 0xffffaa58a960 with MessageCounter:1726016118 to 0x0000000000000000 at monotonic time: 5805158 msec
+          [1635691999.946983][3822:3827] CHIP:EM: Flushed pending ack for MessageCounter:3234931243 on exchange 35324i
+
+
           2. manualcode will be provided by TH when we pass above command pass manualcode in TH2 to commission by using "./chip-tool pairing code 2 36199720672" considering 36199720672 as manualcode generated in TH
+
+          Verify whether you got below message in the log of TH
+          Device commissioning completed with success
       disabled: true
 
     - label:
@@ -74,6 +92,7 @@ tests:
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0
 
+          Verify in TH Log:
           [1655471672.386120][13377:13382] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2667297992
           [1655471672.386213][13377:13382] CHIP:TOO:   Fabrics: 1 entries
           [1655471672.386291][13377:13382] CHIP:TOO:     [1]: {
@@ -88,9 +107,10 @@ tests:
 
     - label:
           "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT"
-      PICS: ""
       verification: |
-          "./chip-tool operationalcredentials read nocs 2 0
+          ./chip-tool operationalcredentials read nocs 2 0
+
+          Verify in TH Log:
 
           [1655471146.098327][13302:13307] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2667297991
           [1655471146.098416][13302:13307] CHIP:TOO:   NOCs: 1 entries
@@ -98,5 +118,5 @@ tests:
           [1655471146.098537][13302:13307] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415012411011824070124080130094104D5FA104FF03F9118BDC2A072D50DB3BED32C47F138439FBF05753D02D01AEC10F350CB77EA22844A83FF0FEF6CFA764F5B1FD48E487F3EC82A201D376F56DCC8370A350128011824020136030402040118300414BD61F9405A7A15EFA38F8B6833AB9027876482E1300514B5AED0B2C2CDBB9D4D0124755B56278B081FD4AD18300B40441AA0EE6ACE43EEA2A52321821D8B260AAFFEBD394C2FD11E83008C5AD2DF5EA58FAFA14A3EF7BAFDE190591298311D7DE6A257819D98D0E9FE239A635684B418
           [1655471146.098591][13302:13307] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104B267483D9981A2C15E7DE8C63298FEB6DC19EAA9AEA41D9D659CD3BBBD25B943B3186716C82B297091D64B1620E8FB2C6FD095F509684E074C5B479E583CE295370A3501290118240260300414B5AED0B2C2CDBB9D4D0124755B56278B081FD4AD3005146EDE812590A5E6E4463798EB06AC3BD5284DFAAE18300B404A48E0B45704A98739C0C656B0F1A4252AEED8E1EBA5FD1032C79A4B26BF8A314EFDD7C835947DEB4B3E9F6D0BF2A561CEE54B45F311773301D4B5CFFF2F76D918
           [1655471146.098630][13302:13307] CHIP:TOO:       FabricIndex: 2
-          [1655471146.098660][13302:13307] CHIP:TOO:      }"
+          [1655471146.098660][13302:13307] CHIP:TOO:      }
       disabled: true

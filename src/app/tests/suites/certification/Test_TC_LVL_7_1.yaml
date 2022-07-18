@@ -26,7 +26,9 @@ tests:
     - label: "TH reads the MinLevel attribute from the DUT"
       PICS: LVL.S.A0002
       verification: |
-          ./chip-tool levelcontrol read min-level 1 1
+          Verify in TH Log
+
+           ./chip-tool levelcontrol read min-level 1 1
 
           [1654065563.003862][10039:10044] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0002 DataVersion: 540248549
           [1654065563.003916][10039:10044] CHIP:TOO:   min level: 0
@@ -36,6 +38,8 @@ tests:
     - label: "TH reads the MaxLevel attribute from the DUT"
       PICS: LVL.S.A0003
       verification: |
+          Verify in TH Log
+
           ./chip-tool levelcontrol read max-level 1 1
 
 
@@ -51,6 +55,8 @@ tests:
           0x0000 (move immediately)."
       PICS: LVL.S.C04.Rsp
       verification: |
+          Verify in TH Log
+
           ./chip-tool levelcontrol move-to-level-with-on-off  253 0 1 1
 
           [1654065833.084144][10181:10186] CHIP:DMG: InvokeResponseMessage =
@@ -88,6 +94,8 @@ tests:
     - label: "TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C04.Rsp && LVL.S.A0000
       verification: |
+          Verify in TH Log
+
           ./chip-tool levelcontrol read current-level 1 1
 
           [1654065859.401140][10188:10193] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0000 DataVersion: 540248551
@@ -98,6 +106,9 @@ tests:
     - label: "TH reads the CurrentFrequency attribute."
       PICS: LVL.S.A0004
       verification: |
+          Verify in TH Log
+
+
           ./chip-tool levelcontrol read current-frequency 1 1
 
           [1654065889.927185][10196:10201] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0004 DataVersion: 540248551
@@ -108,7 +119,9 @@ tests:
     - label: "TH reads the MinFrequency attribute."
       PICS: LVL.S.A0005
       verification: |
-          ./chip-tool levelcontrol read min-frequency 1 1
+          Verify in TH Log
+
+           ./chip-tool levelcontrol read min-frequency 1 1
 
           [1654066011.412756][10228:10233] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0005 DataVersion: 540248551
           [1654066011.412814][10228:10233] CHIP:TOO:   min frequency: 0
@@ -118,7 +131,9 @@ tests:
     - label: "TH reads the MaxFrequency attribute."
       PICS: LVL.S.A0006
       verification: |
-          ./chip-tool levelcontrol read max-frequency 1 1
+          Verify in TH Log
+
+           ./chip-tool levelcontrol read max-frequency 1 1
 
           [1654066035.586373][10241:10246] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0006 DataVersion: 540248551
           [1654066035.586435][10241:10246] CHIP:TOO:   max frequency: 0
@@ -131,6 +146,8 @@ tests:
           fmax"
       PICS: LVL.S.C08.Rsp
       verification: |
+          Optional command based on Feature support
+
           Frequency feature for level control cluster is not supporting in chip-tool
       disabled: true
 
@@ -145,6 +162,8 @@ tests:
           field set to fmax + 1"
       PICS: LVL.S.C08.Rsp
       verification: |
+          Optional command based on Feature support
+
           Frequency feature for level control cluster is not supporting in chip-tool
       disabled: true
 
@@ -159,6 +178,8 @@ tests:
           field set to fmin - 1"
       PICS: LVL.S.C08.Rsp
       verification: |
+          Optional command based on Feature support
+
           Frequency feature for level control cluster is not supporting in chip-tool
       disabled: true
 

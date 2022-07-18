@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 119.1.1. [TC-G-1.1] Global Attributes [DUT-Server]
+name: 121.1.1. [TC-G-1.1] Global Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -28,7 +28,9 @@ tests:
 
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
-          ./chip-tool groups read cluster-revision 1 0
+          ./chip-tool groups read cluster-revision 1 1
+
+          Verify on the TH Log:
 
           [1651216621.203474][2391:2396] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 745654550
           [1651216621.204919][2391:2396] CHIP:TOO:   ClusterRevision: 4
@@ -36,26 +38,28 @@ tests:
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
-          ./chip-tool groups read feature-map 1 0
+          ./chip-tool groups read feature-map 1 1
 
-          [1651216952.185475][2414:2419] CHIP:DMG:
-          [1651216952.185500][2414:2419] CHIP:DMG:        SuppressResponse = true,
-          [1651216952.185525][2414:2419] CHIP:DMG:        InteractionModelRevision = 1
-          [1651216952.185548][2414:2419] CHIP:DMG: }
-          [1651216952.185658][2414:2419] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          Verify on the TH Log:
+
+          [1653556224.547920][18764:18769] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFC DataVersion: 3409054639
+          [1653556224.548038][18764:18769] CHIP:TOO:   FeatureMap: 1
       disabled: true
 
-    - label: "TH reads AttribubteList from DUT"
+    - label: "TH reads AttributeList from DUT"
       verification: |
-          ./chip-tool groups read attribute-list 1 0
+          ./chip-tool groups read attribute-list 1 1
 
-          [1651217016.772370][2424:2429] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFB DataVersion: 745654550
-          [1651217016.772471][2424:2429] CHIP:TOO:   AttributeList: 5 entries
-          [1651217016.772519][2424:2429] CHIP:TOO:     [1]: 0
-          [1651217016.772558][2424:2429] CHIP:TOO:     [2]: 65528
-          [1651217016.772595][2424:2429] CHIP:TOO:     [3]: 65529
-          [1651217016.772632][2424:2429] CHIP:TOO:     [4]: 65531
-          [1651217016.772667][2424:2429] CHIP:TOO:     [5]: 65533
+          Verify on the TH Log:
+
+          [1653556295.417734][18773:18779] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFB DataVersion: 3409054639
+          [1653556295.417900][18773:18779] CHIP:TOO:   AttributeList: 6 entries
+          [1653556295.417971][18773:18779] CHIP:TOO:     [1]: 0
+          [1653556295.418015][18773:18779] CHIP:TOO:     [2]: 65528
+          [1653556295.418057][18773:18779] CHIP:TOO:     [3]: 65529
+          [1653556295.418098][18773:18779] CHIP:TOO:     [4]: 65531
+          [1653556295.418138][18773:18779] CHIP:TOO:     [5]: 65532
+          [1653556295.418179][18773:18779] CHIP:TOO:     [6]: 65533
       disabled: true
 
     - label: "TH reads EventList from DUT"
@@ -65,7 +69,9 @@ tests:
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
-          ./chip-tool groups read accepted-command-list 1 0
+          ./chip-tool groups read accepted-command-list 1 1
+
+          Verify on the TH Log:
 
           [1651217107.034926][2435:2440] CHIP:TOO:   AcceptedCommandList: 6 entries
           [1651217107.034984][2435:2440] CHIP:TOO:     [1]: 0
@@ -78,7 +84,9 @@ tests:
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
-          ./chip-tool groups read generated-command-list 1 0
+          ./chip-tool groups read generated-command-list 1 1
+
+          Verify on the TH Log:
 
           [1651217152.020233][2444:2449] CHIP:TOO:   GeneratedCommandList: 4 entries
           [1651217152.020276][2444:2449] CHIP:TOO:     [1]: 0

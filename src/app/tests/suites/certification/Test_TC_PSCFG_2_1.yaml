@@ -29,6 +29,8 @@ tests:
     - label: "TH reads the Sources attribute from the DUT"
       PICS: PSCFG.S.A0000
       verification: |
+          Verify on the TH Log:
+
           ./chip-tool powersourceconfiguration read sources 1 0
 
           The response should look like this:

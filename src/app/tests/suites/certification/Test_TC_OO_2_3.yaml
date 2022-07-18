@@ -281,6 +281,13 @@ tests:
               - name: "OffWaitTime"
                 value: 300
 
+    - label: "9b:Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: OO.S.A0000
+      response:
+          value: 1
+
     - label: "9b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
@@ -509,7 +516,7 @@ tests:
       response:
           constarints:
               minValue: 0
-              maxValue: 10
+              maxValue: 15
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -595,7 +602,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 10
+              maxValue: 15
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -638,7 +645,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 10
+              maxValue: 15
 
     - label: "17a:Send On Command"
       PICS: OO.S.C01.Rsp
@@ -714,7 +721,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 10
+              maxValue: 15
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -730,7 +737,7 @@ tests:
       arguments:
           values:
               - name: "OnOffControl"
-                value: 1
+                value: 0
               - name: "OnTime"
                 value: 300
               - name: "OffWaitTime"
@@ -740,7 +747,7 @@ tests:
     - label: "18b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000
+      PICS: OO.S.A0000 && PICS_SKIP_SAMPLE_APP
       response:
           value: 1
 
@@ -748,7 +755,7 @@ tests:
     - label: "18b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A4001
+      PICS: OO.S.A4001 && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               minValue: 270
@@ -758,7 +765,7 @@ tests:
     - label: "18b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A4002
+      PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP
       response:
           value: 300
 
@@ -788,7 +795,7 @@ tests:
       arguments:
           values:
               - name: "OnOffControl"
-                value: 1
+                value: 0
               - name: "OnTime"
                 value: 300
               - name: "OffWaitTime"
@@ -881,7 +888,7 @@ tests:
     - label: "21b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A4002
+      PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
               minValue: 180

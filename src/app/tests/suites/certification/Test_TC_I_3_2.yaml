@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 58.3.2. [TC-I-3.2] Functionality with Client as DUT
+name: 59.3.2. [TC-I-3.2] Functionality with Client as DUT
 
 config:
     nodeId: 0x12344321
@@ -28,6 +28,8 @@ tests:
       PICS: I.C.C00.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received Identify command with f.e. 60 as IdentifyTime looks like this:
+          Verify in TH all-clusters-app log
+
           ./chip-tool identify identify 60 1 1
           [1646010972.583498][33190:33190] CHIP:EM: Handling via exchange: 60250r, Delegate: 0xaaaace1730c8
           [1646010972.583578][33190:33190] CHIP:DMG: InvokeRequestMessage =
@@ -62,7 +64,7 @@ tests:
 
     - label:
           "DUT issues an IdentifyQuery command to the Test Harness. Note:
-          IdentifyQuery is not supported by Matter"
+          IdentifyQuery is not supported by Matter."
       PICS: I.C.C01.Tx
       verification: |
           IdentifyQuery is not supported by Matter
@@ -74,6 +76,9 @@ tests:
       PICS: I.C.C00.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received Identify command with an IdentifyTime of 0 looks like this:
+
+          Verify in TH all-clusters-app log
+
           ./chip-tool identify identify 0 1 1
           [1646011311.206353][33190:33190] CHIP:EM: Handling via exchange: 12024r, Delegate: 0xaaaace1730c8
           [1646011311.206436][33190:33190] CHIP:DMG: InvokeRequestMessage =
@@ -109,10 +114,13 @@ tests:
 
     - label:
           "DUT sends a TriggerEffect command to the Test Harness, with any
-          supported EffectIdentifier argument and EffectVariant set to 0 ."
+          supported EffectIdentifier argument and EffectVariant set to 0."
       PICS: I.C.C40.Tx
       verification: |
           On TestHarnes (all-cluster-app) a received Identify command with f.e. 1 as EffectIdentifier looks like this:
+
+          Verify in TH all-clusters-app log
+
           ./chip-tool identify trigger-effect 0 0 1 1
           [1646011549.034604][33190:33190] CHIP:EM: Received message of type 0x8 with protocolId (0, 1) and MessageCounter:3605482 on exchange 36067r
           [1646011549.034646][33190:33190] CHIP:EM: Handling via exchange: 36067r, Delegate: 0xaaaace1730c8

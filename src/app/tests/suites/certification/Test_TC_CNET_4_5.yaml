@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    11.4.5. [TC-CNET-4.5] [Wi-Fi] UNSUPPORTED_ACCESS message Validation
+    11.4.5. [TC-CNET-4.5] [Wi-Fi] FAILSAFE_REQUIRED message Validation
     [DUT-Server]
 
 config:
@@ -30,12 +30,13 @@ tests:
           1"
       PICS: CNET.S.C02.Rsp
       verification: |
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 matter123 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
 
-          [1653476386.237761][30120:30125] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0002 Status=0x7e
-          [1653476386.237809][30120:30125] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1653476386.237862][30120:30125] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1653476386.237936][30120:30125] CHIP:EM: Sending Standalone Ack for MessageCounter:80621 on exchange 31019i
+          Verify on the TH Log:
+
+          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
+          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
@@ -45,11 +46,11 @@ tests:
       verification: |
           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
 
+          Verify on the TH Log:
 
-          [1653476465.080140][30133:30138] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0004 Status=0x7e
-          [1653476465.080178][30133:30138] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1653476465.080218][30133:30138] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1653476465.080283][30133:30138] CHIP:EM: Sending Standalone Ack for MessageCounter:8000679 on exchange 31408i
+          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
+          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label:
@@ -59,8 +60,9 @@ tests:
       verification: |
           ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
 
-          [1653476531.525782][30142:30147] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0006 Status=0x7e
-          [1653476531.525840][30142:30147] CHIP:TOO: Error: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
-          [1653476531.525948][30142:30147] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1653476531.526067][30142:30147] CHIP:EM: Sending Standalone Ack for MessageCounter:9576225 on exchange 7511i
+          Verify on the TH Log:
+
+          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
+          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
+          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true

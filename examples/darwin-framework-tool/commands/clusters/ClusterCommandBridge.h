@@ -101,6 +101,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void Shutdown() override
+    {
+        mError = nil;
+        ModelCommand::Shutdown();
+    }
+
 protected:
     ClusterCommand(const char * _Nonnull commandName)
         : ModelCommand(commandName)

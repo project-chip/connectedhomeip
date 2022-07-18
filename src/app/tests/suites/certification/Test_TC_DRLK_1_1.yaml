@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 111.1.1. [TC-DRLK-1.1] Global Attributes [DUT-Server]
+name: 113.1.1. [TC-DRLK-1.1] Global Attributes [DUT-Server]
 
 config:
     nodeId: 0x12344321
@@ -29,87 +29,123 @@ tests:
     - label: "TH reads the ClusterRevision from DUT"
       verification: |
           ./chip-tool doorlock read cluster-revision 1 1
+          Verify on the TH Log:
 
-          [1653373723.118856][2592:2597] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFD DataVersion: 4018252607
-          [1653373723.121404][2592:2597] CHIP:TOO:   ClusterRevision: 6
+          [1654670381.498137][2934:2939] CHIP:DMG:
+          [1654670381.498163][2934:2939] CHIP:DMG:        SuppressResponse = true,
+          [1654670381.498189][2934:2939] CHIP:DMG:        InteractionModelRevision = 1
+          [1654670381.498214][2934:2939] CHIP:DMG: }
+          [1654670381.498373][2934:2939] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFD DataVersion: 1454093977
+          [1654670381.498486][2934:2939] CHIP:TOO:   ClusterRevision: 6
       disabled: true
 
     - label: "TH reads the FeatureMap from DUT"
       verification: |
           ./chip-tool doorlock read feature-map 1 1
+          Verify on the TH Log:
 
-          [1653373812.820370][2602:2607] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFC DataVersion: 4018252607
-          [1653373812.820429][2602:2607] CHIP:TOO:   FeatureMap: 275
+          [1656418178.505801][10046:10051] CHIP:DMG:      ],
+          [1656418178.505844][10046:10051] CHIP:DMG:
+          [1656418178.505880][10046:10051] CHIP:DMG:      SuppressResponse = true,
+          [1656418178.505917][10046:10051] CHIP:DMG:      InteractionModelRevision = 1
+          [1656418178.505951][10046:10051] CHIP:DMG: }
+          [1656418178.506139][10046:10051] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFC DataVersion: 1077483880
+          [1656418178.506228][10046:10051] CHIP:TOO:   FeatureMap: 435
       disabled: true
 
     - label: "TH reads AttributeList from DUT"
       verification: |
           ./chip-tool doorlock read attribute-list 1 1
+          Verify on the TH Log:
 
-          [1653373860.712540][2696:2701] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFB DataVersion: 4018252607
-          [1653373860.712642][2696:2701] CHIP:TOO:   AttributeList: 29 entries
-          [1653373860.712676][2696:2701] CHIP:TOO:     [1]: 0
-          [1653373860.712702][2696:2701] CHIP:TOO:     [2]: 1
-          [1653373860.712727][2696:2701] CHIP:TOO:     [3]: 2
-          [1653373860.712751][2696:2701] CHIP:TOO:     [4]: 3
-          [1653373860.712775][2696:2701] CHIP:TOO:     [5]: 17
-          [1653373860.712800][2696:2701] CHIP:TOO:     [6]: 18
-          [1653373860.712824][2696:2701] CHIP:TOO:     [7]: 19
-          [1653373860.712848][2696:2701] CHIP:TOO:     [8]: 20
-          [1653373860.712872][2696:2701] CHIP:TOO:     [9]: 21
-          [1653373860.712895][2696:2701] CHIP:TOO:     [10]: 23
-          [1653373860.712919][2696:2701] CHIP:TOO:     [11]: 24
-          [1653373860.712943][2696:2701] CHIP:TOO:     [12]: 25
-          [1653373860.712967][2696:2701] CHIP:TOO:     [13]: 26
-          [1653373860.712991][2696:2701] CHIP:TOO:     [14]: 27
-          [1653373860.713014][2696:2701] CHIP:TOO:     [15]: 33
-          [1653373860.713038][2696:2701] CHIP:TOO:     [16]: 35
-          [1653373860.713060][2696:2701] CHIP:TOO:     [17]: 36
-          [1653373860.713083][2696:2701] CHIP:TOO:     [18]: 37
-          [1653373860.713107][2696:2701] CHIP:TOO:     [19]: 38
-          [1653373860.713131][2696:2701] CHIP:TOO:     [20]: 41
-          [1653373860.713155][2696:2701] CHIP:TOO:     [21]: 43
-          [1653373860.713178][2696:2701] CHIP:TOO:     [22]: 48
-          [1653373860.713202][2696:2701] CHIP:TOO:     [23]: 49
-          [1653373860.713226][2696:2701] CHIP:TOO:     [24]: 51
-          [1653373860.713248][2696:2701] CHIP:TOO:     [25]: 65528
-          [1653373860.713272][2696:2701] CHIP:TOO:     [26]: 65529
-          [1653373860.713296][2696:2701] CHIP:TOO:     [27]: 65531
-          [1653373860.713320][2696:2701] CHIP:TOO:     [28]: 65532
-          [1653373860.713344][2696:2701] CHIP:TOO:     [29]: 65533
+          [1656418220.810680][10056:10061] CHIP:DMG:      ],
+          [1656418220.810827][10056:10061] CHIP:DMG:
+          [1656418220.810851][10056:10061] CHIP:DMG:      SuppressResponse = true,
+          [1656418220.810876][10056:10061] CHIP:DMG:      InteractionModelRevision = 1
+          [1656418220.810898][10056:10061] CHIP:DMG: }
+          [1656418220.812834][10056:10061] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFFB DataVersion: 1077483880
+          [1656418220.812948][10056:10061] CHIP:TOO:   AttributeList: 31 entries
+          [1656418220.812982][10056:10061] CHIP:TOO:     [1]: 0
+          [1656418220.813007][10056:10061] CHIP:TOO:     [2]: 1
+          [1656418220.813031][10056:10061] CHIP:TOO:     [3]: 2
+          [1656418220.813055][10056:10061] CHIP:TOO:     [4]: 3
+          [1656418220.813079][10056:10061] CHIP:TOO:     [5]: 17
+          [1656418220.813103][10056:10061] CHIP:TOO:     [6]: 18
+          [1656418220.813126][10056:10061] CHIP:TOO:     [7]: 19
+          [1656418220.813150][10056:10061] CHIP:TOO:     [8]: 20
+          [1656418220.813174][10056:10061] CHIP:TOO:     [9]: 21
+          [1656418220.813198][10056:10061] CHIP:TOO:     [10]: 22
+          [1656418220.813222][10056:10061] CHIP:TOO:     [11]: 23
+          [1656418220.813246][10056:10061] CHIP:TOO:     [12]: 24
+          [1656418220.813270][10056:10061] CHIP:TOO:     [13]: 25
+          [1656418220.813294][10056:10061] CHIP:TOO:     [14]: 26
+          [1656418220.813317][10056:10061] CHIP:TOO:     [15]: 27
+          [1656418220.813341][10056:10061] CHIP:TOO:     [16]: 28
+          [1656418220.813365][10056:10061] CHIP:TOO:     [17]: 33
+          [1656418220.813389][10056:10061] CHIP:TOO:     [18]: 35
+          [1656418220.813413][10056:10061] CHIP:TOO:     [19]: 36
+          [1656418220.813437][10056:10061] CHIP:TOO:     [20]: 37
+          [1656418220.813460][10056:10061] CHIP:TOO:     [21]: 38
+          [1656418220.813484][10056:10061] CHIP:TOO:     [22]: 41
+          [1656418220.813508][10056:10061] CHIP:TOO:     [23]: 43
+          [1656418220.813531][10056:10061] CHIP:TOO:     [24]: 48
+          [1656418220.813555][10056:10061] CHIP:TOO:     [25]: 49
+          [1656418220.813579][10056:10061] CHIP:TOO:     [26]: 51
+          [1656418220.813603][10056:10061] CHIP:TOO:     [27]: 65528
+          [1656418220.813627][10056:10061] CHIP:TOO:     [28]: 65529
+          [1656418220.813652][10056:10061] CHIP:TOO:     [29]: 65531
+          [1656418220.813676][10056:10061] CHIP:TOO:     [30]: 65532
+          [1656418220.813699][10056:10061] CHIP:TOO:     [31]: 65533
       disabled: true
 
     - label: "TH reads EventList from DUT"
       verification: |
-          out of scope for V1.0
+
       disabled: true
 
     - label: "TH reads AcceptedCommandList from DUT"
       verification: |
           ./chip-tool doorlock read accepted-command-list 1 1
+          Verify on the TH Log:
 
-          [1653373949.890221][2715:2720] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF9 DataVersion: 4018252607
-          [1653373949.890312][2715:2720] CHIP:TOO:   AcceptedCommandList: 14 entries
-          [1653373949.890347][2715:2720] CHIP:TOO:     [1]: 0
-          [1653373949.890373][2715:2720] CHIP:TOO:     [2]: 1
-          [1653373949.890398][2715:2720] CHIP:TOO:     [3]: 11
-          [1653373949.890423][2715:2720] CHIP:TOO:     [4]: 12
-          [1653373949.890448][2715:2720] CHIP:TOO:     [5]: 13
-          [1653373949.890472][2715:2720] CHIP:TOO:     [6]: 14
-          [1653373949.890496][2715:2720] CHIP:TOO:     [7]: 15
-          [1653373949.890521][2715:2720] CHIP:TOO:     [8]: 16
-          [1653373949.890545][2715:2720] CHIP:TOO:     [9]: 26
-          [1653373949.890569][2715:2720] CHIP:TOO:     [10]: 27
-          [1653373949.890593][2715:2720] CHIP:TOO:     [11]: 29
-          [1653373949.890617][2715:2720] CHIP:TOO:     [12]: 34
-          [1653373949.890642][2715:2720] CHIP:TOO:     [13]: 36
-          [1653373949.890666][2715:2720] CHIP:TOO:     [14]: 38
+          [1656418338.200497][10068:10073] CHIP:DMG:      ],
+          [1656418338.200598][10068:10073] CHIP:DMG:
+          [1656418338.200622][10068:10073] CHIP:DMG:      SuppressResponse = true,
+          [1656418338.200646][10068:10073] CHIP:DMG:      InteractionModelRevision = 1
+          [1656418338.200669][10068:10073] CHIP:DMG: }
+          [1656418338.201816][10068:10073] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF9 DataVersion: 1077483880
+          [1656418338.201910][10068:10073] CHIP:TOO:   AcceptedCommandList: 18 entries
+          [1656418338.201943][10068:10073] CHIP:TOO:     [1]: 0
+          [1656418338.201968][10068:10073] CHIP:TOO:     [2]: 1
+          [1656418338.201992][10068:10073] CHIP:TOO:     [3]: 3
+          [1656418338.202016][10068:10073] CHIP:TOO:     [4]: 11
+          [1656418338.202040][10068:10073] CHIP:TOO:     [5]: 12
+          [1656418338.202064][10068:10073] CHIP:TOO:     [6]: 13
+          [1656418338.202088][10068:10073] CHIP:TOO:     [7]: 14
+          [1656418338.202112][10068:10073] CHIP:TOO:     [8]: 15
+          [1656418338.202135][10068:10073] CHIP:TOO:     [9]: 16
+          [1656418338.202159][10068:10073] CHIP:TOO:     [10]: 17
+          [1656418338.202183][10068:10073] CHIP:TOO:     [11]: 18
+          [1656418338.202207][10068:10073] CHIP:TOO:     [12]: 19
+          [1656418338.202231][10068:10073] CHIP:TOO:     [13]: 26
+          [1656418338.202255][10068:10073] CHIP:TOO:     [14]: 27
+          [1656418338.202278][10068:10073] CHIP:TOO:     [15]: 29
+          [1656418338.202302][10068:10073] CHIP:TOO:     [16]: 34
+          [1656418338.202326][10068:10073] CHIP:TOO:     [17]: 36
+          [1656418338.202350][10068:10073] CHIP:TOO:     [18]: 38
       disabled: true
 
     - label: "TH reads GeneratedCommandList from DUT"
       verification: |
           ./chip-tool doorlock read generated-command-list 1 1
+          Verify on the TH Log:
 
-          [1653374054.494879][2725:2730] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF8 DataVersion: 4018252607
-          [1653374054.494967][2725:2730] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1654673615.346710][3233:3239] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_FFF8 DataVersion: 3738767914
+          [1654673615.346798][3233:3239] CHIP:TOO:   GeneratedCommandList: 6 entries
+          [1654673615.346834][3233:3239] CHIP:TOO:     [1]: 12
+          [1654673615.346864][3233:3239] CHIP:TOO:     [2]: 15
+          [1654673615.346891][3233:3239] CHIP:TOO:     [3]: 18
+          [1654673615.346927][3233:3239] CHIP:TOO:     [4]: 28
+          [1654673615.346965][3233:3239] CHIP:TOO:     [5]: 35
+          [1654673615.347012][3233:3239] CHIP:TOO:     [6]: 37
       disabled: true

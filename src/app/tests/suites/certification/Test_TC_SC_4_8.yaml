@@ -25,12 +25,14 @@ config:
 tests:
     - label: "Commission TH1 to DUTs Fabric"
       verification: |
-          1. Provision the device using 1st controller chip-tool  on the raspi (use above instructions)
+          1. Provision the device using 1st controller chip-tool (as example commissioner) on the raspi (use above instructions)
 
 
-          " On first controller, using administratorcommissioningg chip tool open commissioning window.
+          ./chip-tool pairing onnetwork 2 20202021
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+          Assigned compressed fabric ID: 0xF3C001637A30CEEC
+          Assigned compressed fabric ID: 0xBE320A8460153487
+          Assigned compressed fabric ID: 0x8A124463B858624F
       disabled: true
 
     - label: "Commission TH2 to DUTs Fabric"
@@ -38,7 +40,12 @@ tests:
           Using your DUT Controller connect to the accessory.
 
           Below is the example when using chip tool as controller
-          ./chip-tool pairing onnetwork 1 20202021
+
+          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
+
+          Assigned compressed fabric ID: 0xF3C001637A30CEEC
+          Assigned compressed fabric ID: 0xBE320A8460153487
+          Assigned compressed fabric ID: 0x8A124463B858624F
 
           Verify you got below message
           Device commissioning completed with success
@@ -48,22 +55,40 @@ tests:
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
+          Verify the below log on the DUT as client device
+
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
           [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
           [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
           [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 1
           [1651571274.155215][10562:10567] CHIP:TOO:    }
+
+
+          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
+
+          Assigned compressed fabric ID: 0xF3C001637A30CEEC
+          Assigned compressed fabric ID: 0xBE320A8460153487
+          Assigned compressed fabric ID: 0x8A124463B858624F
       disabled: true
 
     - label: "Send RemoveFabric from DUT to TH2 and comission DUT to TH2 again"
       verification: |
-          ./chip-tool operationalcredentials remove-fabrics 2 2 0
+          ./chip-tool operationalcredentials remove-fabric 1 2 0
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          [1651571274.155030][10562:10567] CHIP:TOO:   NOCResponse: {
-          [1651571274.155102][10562:10567] CHIP:TOO:     statusCode: 0
-          [1651571274.155159][10562:10567] CHIP:TOO:     fabricIndex: 2
-          [1651571274.155215][10562:10567] CHIP:TOO:    }
+          [1657628679275] [78509:912135] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1657628679275] [78509:912135] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1657628679275] [78509:912135] CHIP: [TOO]   NOCResponse: {
+          [1657628679275] [78509:912135] CHIP: [TOO]     statusCode: 0
+          [1657628679275] [78509:912135] CHIP: [TOO]     fabricIndex: 1
+          [1657628679275] [78509:912135] CHIP: [TOO]    }
+          [1657628679275] [78509:912135] CHIP: [DMG] ICR mov
+
+          ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
+
+          ./chip-tool pairing onnetwork 2 20202021
+
+          Assigned compressed fabric ID: 0xF3C001637A30CEEC
+          Assigned compressed fabric ID: 0xBE320A8460153487
+          Assigned compressed fabric ID: 0x8A124463B858624F
       disabled: true
