@@ -2189,7 +2189,7 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    ram      attribute featureMap default = 2;
+    ram      attribute featureMap default = 4;
     ram      attribute clusterRevision default = 1;
   }
 
