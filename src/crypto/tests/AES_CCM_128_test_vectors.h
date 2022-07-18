@@ -25,6 +25,10 @@
 
 #include <lib/core/CHIPError.h>
 
+#if CHIP_HAVE_CONFIG_H
+#include <crypto/CryptoBuildConfig.h>
+#endif // CHIP_HAVE_CONFIG_H
+
 struct ccm_128_test_vector
 {
     const uint8_t * pt;
