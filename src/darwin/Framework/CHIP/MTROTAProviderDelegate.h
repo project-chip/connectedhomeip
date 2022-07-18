@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * All delegate methods will be called on the supplied Delegate Queue.
  */
 @protocol MTROTAProviderDelegate <NSObject>
-@optional
+@required
 /**
  * Notify the delegate when query image command is received
  *
