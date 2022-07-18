@@ -50,8 +50,8 @@ void OperationalDeviceProxy::MoveToState(State aTargetState)
 {
     if (mState != aTargetState)
     {
-        ChipLogDetail(Controller, "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64 "]: State change %d --> %d",
-                      ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
+        ChipLogDetail(Controller, "OperationalDeviceProxy[%u:" ChipLogFormatX64 "]: State change %d --> %d",
+                      mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
         mState = aTargetState;
 
@@ -66,14 +66,14 @@ bool OperationalDeviceProxy::AttachToExistingSecureSession()
 {
     VerifyOrReturnError(mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress, false);
 
-    ScopedNodeId peerNodeId(mPeerId.GetNodeId(), mFabricIndex);
     auto sessionHandle =
-        mInitParams.sessionManager->FindSecureSessionForNode(peerNodeId, MakeOptional(Transport::SecureSession::Type::kCASE));
+        mInitParams.sessionManager->FindSecureSessionForNode(mPeerId, MakeOptional(Transport::SecureSession::Type::kCASE));
     if (!sessionHandle.HasValue())
         return false;
 
-    ChipLogProgress(Controller, "Found an existing secure session to [" ChipLogFormatX64 "-" ChipLogFormatX64 "]!",
-                    ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+    ChipLogProgress(Controller, "Found an existing secure session to [%u:" ChipLogFormatX64 "]!", mPeerId.GetFabricIndex(),
+                    ChipLogValueX64(mPeerId.GetNodeId()));
+
     mDeviceAddress = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     if (!mSecureSession.Grab(sessionHandle.Value()))
         return false;
@@ -212,7 +212,7 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
         mInitParams.sessionManager, mInitParams.sessionResumptionStorage, mInitParams.certificateValidityPolicy,
-        mInitParams.exchangeMgr, mFabricTable, mFabricIndex, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
+        mInitParams.exchangeMgr, mFabricTable, mInitParams.groupDataProvider, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
 
     CHIP_ERROR err = mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mRemoteMRPConfig, this);
@@ -359,7 +359,7 @@ void OperationalDeviceProxy::OnSessionHang()
 
 void OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricIndex, GetDeviceId());
+    app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mPeerId.GetFabricIndex(), GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy()
@@ -395,7 +395,12 @@ CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
         return CHIP_NO_ERROR;
     }
 
-    NodeLookupRequest request(mPeerId);
+    auto const * fabricInfo = mFabricTable->FindFabricWithIndex(mPeerId.GetFabricIndex());
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    PeerId peerId(fabricInfo->GetCompressedFabricId(), mPeerId.GetNodeId());
+
+    NodeLookupRequest request(peerId);
 
     return Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 }

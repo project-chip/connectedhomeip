@@ -518,10 +518,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     char addrStr[50];
 
     CHIP_ERROR err =
-        wrapper->Controller()->GetPeerAddressAndPort(PeerId()
-                                                         .SetCompressedFabricId(wrapper->Controller()->GetCompressedFabricId())
-                                                         .SetNodeId(static_cast<chip::NodeId>(deviceId)),
-                                                     addr, port);
+        wrapper->Controller()->GetPeerAddressAndPort(ScopedNodeId(deviceId, wrapper->Controller()->GetFabricIndex()), addr, port);
 
     if (err != CHIP_NO_ERROR)
     {

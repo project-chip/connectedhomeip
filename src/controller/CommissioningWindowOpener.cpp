@@ -308,7 +308,7 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Operat
     }
 }
 
-void CommissioningWindowOpener::OnDeviceConnectionFailureCallback(void * context, PeerId peerId, CHIP_ERROR error)
+void CommissioningWindowOpener::OnDeviceConnectionFailureCallback(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     OnOpenCommissioningWindowFailure(context, error);
 }

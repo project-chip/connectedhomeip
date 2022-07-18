@@ -156,8 +156,9 @@ private:
             ChipLogError(SecureChannel, "Can't get the CASESessionManager");
             return;
         }
-        caseSessionManager->FindOrEstablishSession(caseCommand->GetFabricInfo()->GetPeerIdForNode(caseCommand->GetNodeId()),
-                                                   &sOnConnectedCallback, &sOnConnectionFailureCallback);
+        caseSessionManager->FindOrEstablishSession(
+            ScopedNodeId(caseCommand->GetNodeId(), caseCommand->GetFabricInfo()->GetFabricIndex()), &sOnConnectedCallback,
+            &sOnConnectionFailureCallback);
     }
 
     static CHIP_ERROR ConnectToNodeHandler(int argc, char ** argv)

@@ -55,7 +55,7 @@ public:
 
     virtual chip::Optional<SessionHandle> GetSecureSession() const = 0;
 
-    virtual CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR SetNodeId(const ScopedNodeId & nodeId) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
 

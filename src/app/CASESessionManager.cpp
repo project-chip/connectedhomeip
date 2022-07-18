@@ -28,11 +28,11 @@ CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CAS
     return AddressResolve::Resolver::Instance().Init(systemLayer);
 }
 
-void CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
-                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
+    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
+                  ChipLogValueX64(peerId.GetNodeId()));
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
@@ -64,7 +64,7 @@ void CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callbac
     }
 }
 
-void CASESessionManager::ReleaseSession(PeerId peerId)
+void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 {
     ReleaseSession(FindExistingSession(peerId));
 }
@@ -79,7 +79,7 @@ void CASESessionManager::ReleaseAllSessions()
     mConfig.devicePool->ReleaseAllDevices();
 }
 
-CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
+CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr)
 {
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
@@ -87,7 +87,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const
+OperationalDeviceProxy * CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
 {
     return mConfig.devicePool->FindDevice(peerId);
 }
