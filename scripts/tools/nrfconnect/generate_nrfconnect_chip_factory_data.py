@@ -171,13 +171,13 @@ def gen_test_certs(chip_cert_exe: str,
 
 
 def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> dict:
-    """ Generate spake2 params using external spake2p script
+    """ Generate Spake2+ params using external spake2p tool
 
     Args:
-        spake2p_path (str): path to spake2 executable
-        passcode (int): Pairing passcode using in SPAKE 2
-        it (int): Iteration counter for SPAKE2 Verifier generation
-        salt (str): Salt used to generate SPAKE2 password
+        spake2p_path (str): path to spake2p executable
+        passcode (int): Pairing passcode using in Spake2+
+        it (int): Iteration counter for Spake2+ verifier generation
+        salt (str): Salt used to generate Spake2+ verifier
 
     Returns:
         dict: dictionary containing passcode, it, salt, and generated Verifier
@@ -197,7 +197,7 @@ def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> 
 
 class FactoryDataGenerator:
     """
-    Class to generate factory data from given arguments and generate a Json file
+    Class to generate factory data from given arguments and generate a JSON file
 
     """
 
@@ -221,11 +221,11 @@ class FactoryDataGenerator:
             try:
                 self._user_data = json.loads(self._args.user)
             except json.decoder.JSONDecodeError as e:
-                raise AssertionError("Provided wrong user data, this is not a Json format! {}".format(e))
+                raise AssertionError("Provided wrong user data, this is not a JSON format! {}".format(e))
         assert (self._args.spake2_verifier or (self._args.passcode and self._args.spake2p_path)), \
-            "Can not find spake2 verifier, to generate a new one please provide passcode (--passcode) and path to spake2p script (--spake2p_path)"
+            "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode) and path to spake2p tool (--spake2p_path)"
         assert (self._args.chip_cert_path or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
-            "Can not find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path)"
+            "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path)"
         assert self._args.output.endswith(".json"), \
             "Output path doesn't contain .json file path. ({})".format(self._args.output)
         assert not (self._args.passcode in INVALID_PASSCODES), \
@@ -233,14 +233,14 @@ class FactoryDataGenerator:
 
     def generate_json(self):
         """
-        This function generates JSON data, .json file and validate it
+        This function generates JSON data, .json file and validates it.
 
-        To validate generated JSON data a scheme must be provided within script's arguments
+        To validate generated JSON data a scheme must be provided within script's arguments.
 
         - In the first part, if the rotating device id unique id has been not provided
-            as an argument, it will be created.
-        - If user provided passcode and spake2 verifier have been not provided
-            as an argument, it will be created using an external script
+          as an argument, it will be created.
+        - If user-provided passcode and Spake2+ verifier have been not provided
+          as an argument, it will be created using an external script
         - Passcode is not stored in JSON by default. To store it for debugging purposes, add --include_passcode argument.
         - Validating output JSON is not mandatory, but highly recommended.
 
@@ -283,13 +283,13 @@ class FactoryDataGenerator:
         # try to read DAC public and private keys
         dac_priv_key = get_raw_private_key_der(dac_key, self._args.dac_key_password)
         if dac_priv_key is None:
-            log.error("Can not read DAC keys from : {}".format(dac_key))
+            log.error("Cannot read DAC keys from : {}".format(dac_key))
             sys.exit(-1)
 
         try:
             json_file = open(self._args.output, "w+")
         except FileNotFoundError:
-            print("Can not create JSON file in this location: {}".format(self._args.output))
+            print("Cannot create JSON file in this location: {}".format(self._args.output))
             sys.exit(-1)
         with json_file:
             # serialize data
@@ -326,12 +326,12 @@ class FactoryDataGenerator:
             if self._args.schema:
                 is_json_valid = self._validate_output_json(json_object)
             else:
-                log.warning("Json Schema file has not been provided, the output file can be wrong. Be aware of that.")
+                log.warning("JSON Schema file has not been provided, the output file can be wrong. Be aware of that.")
             try:
                 if is_json_valid:
                     json_file.write(json_object)
             except IOError as e:
-                log.error("Can not save output file into directory: {}".format(self._args.output))
+                log.error("Cannot save output file into directory: {}".format(self._args.output))
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
@@ -349,7 +349,7 @@ class FactoryDataGenerator:
 
     def _generate_rotating_device_uid(self):
         """ If rotating device unique ID has not been provided it should be generated """
-        log.warning("Can not find rotating device UID in provided arguments list. A new one will be generated.")
+        log.warning("Cannot find rotating device UID in provided arguments list. A new one will be generated.")
         rdu = secrets.token_bytes(16)
         log.info("\n\nThe new rotate device UID: {}\n".format(rdu.hex()))
         return rdu
@@ -362,12 +362,12 @@ class FactoryDataGenerator:
         """
         try:
             with open(self._args.schema) as schema_file:
-                log.info("Validating Json with schema...")
+                log.info("Validating JSON with schema...")
                 schema = json.loads(schema_file.read())
                 validator = jsonschema.Draft202012Validator(schema=schema)
                 validator.validate(instance=json.loads(output_json))
         except IOError as e:
-            log.error("provided Json schema file is wrong: {}".format(self._args.schema))
+            log.error("Provided JSON schema file is wrong: {}".format(self._args.schema))
             return False
         else:
             log.info("Validate OK")
@@ -390,17 +390,17 @@ def main():
     def allow_any_int(i): return int(i, 0)
     def base64_str(s): return base64.b64decode(s)
 
-    mandatory_arguments = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate Json file")
+    mandatory_arguments = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate JSON file")
     optional_arguments = parser.add_argument_group(
         "Optional keys", "These arguments are optional and they depend on the user-purpose")
     parser.add_argument("-s", "--schema", type=str,
-                        help="Json schema file to validate Json output data")
+                        help="JSON schema file to validate JSON output data")
     parser.add_argument("-o", "--output", type=str, required=True,
                         help="Output path to store .json file, e.g. my_dir/output.json")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Run this script with DEBUG logging level")
     parser.add_argument("--include_passcode", action="store_true",
-                        help="passcode is used only for generating Spake2 Verifier to include it in factory data add this argument")
+                        help="Include passcode in factory data. By default, it is used only for generating Spake2+ verifier.")
     parser.add_argument("--overwrite", action="store_true",
                         help="If output JSON file exist this argument allows to generate new factory data and overwrite it.")
     # Json known-keys values
@@ -452,7 +452,7 @@ def main():
     optional_arguments.add_argument("--rd_uid", type=str,
                                     help="[hex string] [128-bit hex-encoded] Provide the rotating device unique ID. If this argument is not provided a new rotating device id unique id will be generated.")
     optional_arguments.add_argument("--passcode", type=allow_any_int,
-                                    help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2 Verifier).")
+                                    help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2+ verifier).")
     optional_arguments.add_argument("--spake2p_path", type=str,
                                     help="[string] Provide a path to spake2p. By default You can find spake2p in connectedhomeip/src/tools/spake2p directory and build it there.")
     optional_arguments.add_argument("--spake2_verifier", type=base64_str,
@@ -461,7 +461,7 @@ def main():
                                     help="[hex string] [128-bit hex-encoded] The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command."
                                     "This value is used during Certification Tests, and should not be present on production devices.")
     optional_arguments.add_argument("--user", type=str,
-                                    help="[string] Provide additional user-specific keys in Json format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
+                                    help="[string] Provide additional user-specific keys in JSON format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
     optional_arguments.add_argument("--gen_cd", action="store_true", default=False,
                                     help="Generate a new Certificate Declaration in .der format according to used Vendor ID and Product ID. This certificate will not be included to the factory data.")
     optional_arguments.add_argument("--paa_cert", type=str,
