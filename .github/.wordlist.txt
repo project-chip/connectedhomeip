@@ -946,6 +946,7 @@ OTARequestorDriver
 OTARequestorInterface
 OTARequestorSerialPort
 OTARequestorStorage
+otasoftwareupdateapp
 OtaSoftwareUpdateProvider
 otasoftwareupdaterequestor
 otatesting

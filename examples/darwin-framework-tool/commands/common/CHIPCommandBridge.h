@@ -23,6 +23,8 @@
 #include <map>
 #include <string>
 
+#include "../provider/OTAProviderDelegate.h"
+
 #pragma once
 
 constexpr const char kIdentityAlpha[] = "alpha";
@@ -47,6 +49,8 @@ public:
         mCommandExitStatus = status;
         StopWaiting();
     }
+
+    static OTAProviderDelegate * mOTADelegate;
 
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
@@ -115,4 +119,5 @@ private:
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
     bool mWaitingForResponse{ true };
+    static dispatch_queue_t mOTAProviderCallbackQueue;
 };
