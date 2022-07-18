@@ -25,27 +25,103 @@
 
 #include "Efr32PsaOperationalKeystore.h"
 #include "Efr32OpaqueKeypair.h"
+#include "EFR32Config.h"
 
 namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
 static_assert((sizeof(FabricIndex) == 1), "Implementation is not prepared for large fabric indices");
+static_assert(SL_MATTER_MAX_STORED_OP_KEYS <= (kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin));
 
 using namespace chip::Crypto;
+
+using chip::Platform::MemoryCalloc;
+using chip::Platform::MemoryFree;
 
 Efr32PsaOperationalKeystore::~Efr32PsaOperationalKeystore()
 {
     if (mIsInitialized)
     {
         ResetPendingKey();
-        Platform::Delete<Crypto::EFR32OpaqueP256Keypair>(mCachedKey);
+        Platform::Delete<EFR32OpaqueP256Keypair>(mCachedKey);
     }
 }
 
 CHIP_ERROR Efr32PsaOperationalKeystore::Init()
 {
-    // Todo: load key map from storage
+    // Load keymap from storage
+    size_t outLen;
+    CHIP_ERROR error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping), outLen);
 
-    mCachedKey = Platform::New<Crypto::EFR32OpaqueP256Keypair>();
+    if (error == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        // This can happen with a blank device. Write out the uninitialized map.
+        for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+        {
+            mKeyMapping[i] = kUndefinedFabricIndex;
+        }
+
+        outLen = SL_MATTER_MAX_STORED_OP_KEYS;
+    }
+    else if (error == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        // This can happen when reducing SL_MATTER_MAX_STORED_OP_KEYS on existing devices
+        // We can do a partial recovery.
+        size_t existingLen = 0;
+        if (!EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_OpKeyMap, existingLen))
+        {
+            return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        }
+
+        uint8_t* temp_buf = (uint8_t*) MemoryCalloc(1, existingLen);
+        if (!temp_buf)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        error = EFR32Config::ReadConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, temp_buf, existingLen, outLen);
+        if (error != CHIP_NO_ERROR)
+        {
+            MemoryFree(temp_buf);
+            return error;
+        }
+
+        memcpy(mKeyMapping, temp_buf, existingLen);
+        MemoryFree(temp_buf);
+
+        for (size_t i = existingLen; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+        {
+            mKeyMapping[i] = kUndefinedFabricIndex;
+        }
+
+        outLen = SL_MATTER_MAX_STORED_OP_KEYS;
+    }
+    else if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+
+    if (outLen < SL_MATTER_MAX_STORED_OP_KEYS)
+    {
+        // This can happen when increasing SL_MATTER_MAX_STORED_OP_KEYS on existing devices
+        for (size_t i = outLen; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
+        {
+            mKeyMapping[i] = kUndefinedFabricIndex;
+        }
+
+        outLen = SL_MATTER_MAX_STORED_OP_KEYS;
+    }
+
+    // Update cache
+    error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+
+    // Initialize cache key
+    mCachedKey = Platform::New<EFR32OpaqueP256Keypair>();
     if (!mCachedKey)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -94,52 +170,57 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
     VerifyOrReturnError(outCertificateSigningRequest.size() >= Crypto::kMAX_CSR_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Generate new key
-    EFR32OpaqueKeyId id = 0;
+    EFR32OpaqueKeyId id = kEFR32OpaqueKeyIdUnknown;
 
     if (mPendingFabricIndex != kUndefinedFabricIndex)
     {
         // If we already have a pending key, delete it and put a new one in its place
-        error = mPendingKeypair->GetKeyId(&id);
-        if (error != CHIP_NO_ERROR)
+        id = mPendingKeypair->GetKeyId();
+        if (id == kEFR32OpaqueKeyIdUnknown)
         {
             ResetPendingKey();
-            return error;
         }
-
-        mPendingKeypair->Delete();
+        else
+        {
+            mPendingKeypair->Delete();
+            if (id == kEFR32OpaqueKeyIdVolatile)
+            {
+                id = kEFR32OpaqueKeyIdUnknown;
+            }
+        }
     }
 
-    if (id == 0)
+    if (id == kEFR32OpaqueKeyIdUnknown)
     {
         // Find empty slot in keymap
         for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
         {
             if (mKeyMapping[i] == kUndefinedFabricIndex)
             {
-                id = i + 1;
+                id = i + kEFR32OpaqueKeyIdPersistentMin;
                 break;
-            }
-
-            if (i >= SL_MATTER_MAX_STORED_OP_KEYS - 1)
-            {
-                ResetPendingKey();
-                return CHIP_ERROR_NO_MEMORY;
             }
         }
 
         if (!mPendingKeypair)
         {
-            mPendingKeypair = Platform::New<Crypto::EFR32OpaqueP256Keypair>();
+            mPendingKeypair = Platform::New<EFR32OpaqueP256Keypair>();
         }
     }
 
+    if (id < kEFR32OpaqueKeyIdPersistentMin || id > kEFR32OpaqueKeyIdPersistentMax)
+    {
+        // Could not find a free spot in the map
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     // Create new key on the old or found key ID
-    error = mPendingKeypair->Create(id, Crypto::EFR32OpaqueKeyUsages::ECDSA_P256_SHA256);
+    error = mPendingKeypair->Create(id, EFR32OpaqueKeyUsages::ECDSA_P256_SHA256);
     if (error != CHIP_NO_ERROR)
     {
         // Try deleting and recreating this key since keys don't get wiped on factory erase yet
         mPendingKeypair->Delete();
-        error = mPendingKeypair->Create(id, Crypto::EFR32OpaqueKeyUsages::ECDSA_P256_SHA256);
+        error = mPendingKeypair->Create(id, EFR32OpaqueKeyUsages::ECDSA_P256_SHA256);
     }
 
     if (error != CHIP_NO_ERROR)
@@ -186,24 +267,28 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     VerifyOrReturnError(mIsPendingKeypairActive == true, CHIP_ERROR_INCORRECT_STATE);
 
     // Add key association to key map
-    EFR32OpaqueKeyId id = 0;
-    mPendingKeypair->GetKeyId(&id);
+    EFR32OpaqueKeyId id = mPendingKeypair->GetKeyId();
 
-    if (id == 0)
+    if (id == kEFR32OpaqueKeyIdUnknown || id == kEFR32OpaqueKeyIdVolatile)
     {
         ResetPendingKey();
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (mKeyMapping[id - 1] != kUndefinedFabricIndex)
+    if (mKeyMapping[id - kEFR32OpaqueKeyIdPersistentMin] != kUndefinedFabricIndex)
     {
         ResetPendingKey();
         return CHIP_ERROR_INTERNAL;
     }
 
-    mKeyMapping[id - 1] = fabricIndex;
+    mKeyMapping[id - kEFR32OpaqueKeyIdPersistentMin] = fabricIndex;
 
-    // Todo: persist key map
+    // Persist key map
+    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
 
     // There's a good chance we'll need the key again soon
     mCachedKey->Load(id);
@@ -220,32 +305,41 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
+    // Remove pending keypair if we have it and the fabric ID matches
+    if ((mPendingKeypair != nullptr) && (fabricIndex == mPendingFabricIndex))
+    {
+        RevertPendingKeypair();
+    }
+
     // Figure out which key ID we're looking for
     EFR32OpaqueKeyId id = 0;
     for (size_t i = 0; i < SL_MATTER_MAX_STORED_OP_KEYS; i++)
     {
         if (mKeyMapping[i] == fabricIndex)
         {
-            id = i + 1;
+            id = i + kEFR32OpaqueKeyIdPersistentMin;
 
             // Reset the key mapping since we'll be deleting this key
             mKeyMapping[i] = kUndefinedFabricIndex;
             break;
         }
-
-        if (i >= SL_MATTER_MAX_STORED_OP_KEYS - 1)
-        {
-            return CHIP_ERROR_INTERNAL;
-        }
     }
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    if (id < kEFR32OpaqueKeyIdPersistentMin || id > kEFR32OpaqueKeyIdPersistentMax)
+    {
+        // Fabric is not in the map, so assume it's gone already
+        return CHIP_NO_ERROR;
+    }
 
-    // TODO: Persist key map here
+    // Persist key map
+    CHIP_ERROR error = EFR32Config::WriteConfigValueBin(EFR32Config::kConfigKey_OpKeyMap, mKeyMapping, sizeof(mKeyMapping));
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
 
     // Check if key is cached
-    EFR32OpaqueKeyId cachedId = 0;
-    mCachedKey->GetKeyId(&cachedId);
+    EFR32OpaqueKeyId cachedId = mCachedKey->GetKeyId();
 
     if (id == cachedId)
     {
@@ -294,19 +388,19 @@ CHIP_ERROR Efr32PsaOperationalKeystore::SignWithOpKeypair(FabricIndex fabricInde
     {
         if (mKeyMapping[i] == fabricIndex)
         {
-            id = i + 1;
+            id = i + kEFR32OpaqueKeyIdPersistentMin;
             break;
-        }
-
-        if (i >= SL_MATTER_MAX_STORED_OP_KEYS - 1)
-        {
-            return CHIP_ERROR_INTERNAL;
         }
     }
 
+    if (id < kEFR32OpaqueKeyIdPersistentMin || id > kEFR32OpaqueKeyIdPersistentMax)
+    {
+        // Fabric is not in the map, but the caller thinks it's there?
+        return CHIP_ERROR_INTERNAL;
+    }
+
     // Check whether we have the key in cache
-    EFR32OpaqueKeyId cachedId = 0;
-    mCachedKey->GetKeyId(&cachedId);
+    EFR32OpaqueKeyId cachedId = mCachedKey->GetKeyId();
 
     if (id == cachedId)
     {
@@ -314,7 +408,6 @@ CHIP_ERROR Efr32PsaOperationalKeystore::SignWithOpKeypair(FabricIndex fabricInde
     }
 
     // If not, we need to recreate from the backend
-    // Todo: figure out a way to construct the cache such that we can actually update it here
     CHIP_ERROR error = mCachedKey->Load(id);
     if (error != CHIP_NO_ERROR)
     {
@@ -333,11 +426,11 @@ CHIP_ERROR Efr32PsaOperationalKeystore::SignWithOpKeypair(FabricIndex fabricInde
 
 Crypto::P256Keypair * Efr32PsaOperationalKeystore::AllocateEphemeralKeypairForCASE()
 {
-    Crypto::EFR32OpaqueP256Keypair * new_key = Platform::New<Crypto::EFR32OpaqueP256Keypair>();
+    EFR32OpaqueP256Keypair * new_key = Platform::New<EFR32OpaqueP256Keypair>();
 
     if (new_key != nullptr)
     {
-        new_key->Create(0, Crypto::EFR32OpaqueKeyUsages::ECDH_P256);
+        new_key->Create(kEFR32OpaqueKeyIdVolatile, EFR32OpaqueKeyUsages::ECDH_P256);
     }
 
     return new_key;
@@ -345,7 +438,9 @@ Crypto::P256Keypair * Efr32PsaOperationalKeystore::AllocateEphemeralKeypairForCA
 
 void Efr32PsaOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
-    Platform::Delete<EFR32OpaqueP256Keypair>((Crypto::EFR32OpaqueP256Keypair *)keypair);
+    Platform::Delete<EFR32OpaqueP256Keypair>((EFR32OpaqueP256Keypair *)keypair);
 }
 
+} // namespace Internal
+} // namespace DeviceLayer
 } // namespace chip

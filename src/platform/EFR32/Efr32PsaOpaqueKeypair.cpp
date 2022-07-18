@@ -34,13 +34,26 @@
 using chip::Platform::MemoryCalloc;
 using chip::Platform::MemoryFree;
 
+using chip::Crypto::P256PublicKey;
+using chip::Crypto::P256Keypair;
+using chip::Crypto::P256ECDSASignature;
+using chip::Crypto::P256ECDHDerivedSecret;
+using chip::Crypto::P256SerializedKeypair;
+
 namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-namespace Crypto {
-
-#define PSA_KEY_ID_FOR_MATTER_MIN   (0x2000)
-#define PSA_KEY_ID_FOR_MATTER_MAX   (0x2FFF)
+/*******************************************************************************
+ *
+ * PSA key ID range for storing Matter Opaque keys
+ *
+ ******************************************************************************/
+#define PSA_KEY_ID_FOR_MATTER_MIN   (0x00004400)
+#define PSA_KEY_ID_FOR_MATTER_MAX   (0x000045FF)
 #define PSA_KEY_ID_FOR_MATTER_SIZE  (PSA_KEY_ID_FOR_MATTER_MAX - PSA_KEY_ID_FOR_MATTER_MIN + 1)
+
+static_assert((kEFR32OpaqueKeyIdPersistentMax - kEFR32OpaqueKeyIdPersistentMin) < PSA_KEY_ID_FOR_MATTER_SIZE, "Not enough PSA range to store all allowed opaque key IDs");
 
 #if defined(SEMAILBOX_PRESENT) && (_SILICON_LABS_SECURITY_FEATURE == _SILICON_LABS_SECURITY_FEATURE_VAULT)
 #define PSA_CRYPTO_LOCATION_FOR_DEVICE PSA_KEY_LOCATION_SL_SE_OPAQUE
@@ -82,11 +95,11 @@ static void _log_PSA_error(psa_status_t status)
 
 static bool is_opaque_key_valid(EFR32OpaqueKeyId id)
 {
-    if (id == 0)
+    if (id == kEFR32OpaqueKeyIdVolatile)
     {
         return true;
     }
-    else if (id <= PSA_KEY_ID_FOR_MATTER_SIZE)
+    else if (id >= kEFR32OpaqueKeyIdPersistentMin && id <= (kEFR32OpaqueKeyIdPersistentMin + PSA_KEY_ID_FOR_MATTER_SIZE))
     {
         return true;
     }
@@ -96,27 +109,27 @@ static bool is_opaque_key_valid(EFR32OpaqueKeyId id)
 
 static mbedtls_svc_key_id_t psa_key_id_from_opaque(EFR32OpaqueKeyId id)
 {
-    if (id == 0 || !is_opaque_key_valid(id))
+    if (id == kEFR32OpaqueKeyIdVolatile || !is_opaque_key_valid(id))
     {
         return 0;
     }
 
-    return PSA_KEY_ID_FOR_MATTER_MIN + id;
+    return PSA_KEY_ID_FOR_MATTER_MIN + (id - kEFR32OpaqueKeyIdPersistentMin);
 }
 
 static EFR32OpaqueKeyId opaque_key_id_from_psa(mbedtls_svc_key_id_t id)
 {
     if (id == 0)
     {
-        return 0;
+        return kEFR32OpaqueKeyIdVolatile;
     }
     else if (id >= PSA_KEY_ID_FOR_MATTER_MIN && id <= PSA_KEY_ID_FOR_MATTER_MAX)
     {
-        return id - PSA_KEY_ID_FOR_MATTER_MIN;
+        return (id + kEFR32OpaqueKeyIdPersistentMin) - PSA_KEY_ID_FOR_MATTER_MIN;
     }
     else
     {
-        return 0;
+        return kEFR32OpaqueKeyIdUnknown;
     }
 }
 
@@ -141,11 +154,17 @@ CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId key_id)
     CHIP_ERROR error = CHIP_NO_ERROR;
     psa_status_t status = PSA_ERROR_BAD_STATE;
 
-    VerifyOrExit(key_id != 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(key_id != kEFR32OpaqueKeyIdVolatile, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(is_opaque_key_valid(key_id), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mContext, error = CHIP_ERROR_INCORRECT_STATE);
 
     psa_crypto_init();
+
+    // If the object contains a volatile key, clean it up before reusing the object storage
+    if (mHasKey && !mIsPersistent)
+    {
+        Delete();
+    }
 
     status = psa_export_public_key(psa_key_id_from_opaque(key_id),
                                    mPubkeyRef, mPubkeySize, &mPubkeyLength);
@@ -161,6 +180,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId key_id)
     // Store the key ID and mark the key as valid
     *(mbedtls_svc_key_id_t*) mContext = psa_key_id_from_opaque(key_id);
     mHasKey = true;
+    mIsPersistent = true;
 
 exit:
     if (error != CHIP_NO_ERROR)
@@ -182,7 +202,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId key_id, EFR32OpaqueKeyUsa
 
     psa_crypto_init();
 
-    if (key_id == 0)
+    if (key_id == kEFR32OpaqueKeyIdVolatile)
     {
         psa_set_key_lifetime(&attr, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
                                         PSA_KEY_LIFETIME_VOLATILE,
@@ -233,6 +253,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId key_id, EFR32OpaqueKeyUsa
 
     // Store the key ID and mark the key as valid
     mHasKey = true;
+    mIsPersistent = key_id != kEFR32OpaqueKeyIdVolatile;
 
 exit:
     psa_reset_key_attributes(&attr);
@@ -262,14 +283,19 @@ exit:
     return error;
 }
 
-CHIP_ERROR EFR32OpaqueKeypair::GetKeyId(EFR32OpaqueKeyId* key_id) const
+EFR32OpaqueKeyId EFR32OpaqueKeypair::GetKeyId() const
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    VerifyOrExit(mHasKey, error = CHIP_ERROR_INCORRECT_STATE);
+    if (!mHasKey)
+    {
+        return kEFR32OpaqueKeyIdUnknown;
+    }
 
-    *key_id = opaque_key_id_from_psa(*(mbedtls_svc_key_id_t*) mContext);
-exit:
-    return error;
+    if (!mIsPersistent)
+    {
+        return kEFR32OpaqueKeyIdVolatile;
+    }
+
+    return opaque_key_id_from_psa(*(mbedtls_svc_key_id_t*) mContext);
 }
 
 CHIP_ERROR EFR32OpaqueKeypair::Sign(const uint8_t* msg, size_t msg_len,
@@ -324,6 +350,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Delete()
 
 exit:
     mHasKey = false;
+    mIsPersistent = false;
     memset(mPubkeyRef, 0, mPubkeySize);
     if (mContext)
     {
@@ -440,8 +467,6 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t ms
     CHIP_ERROR error = CHIP_NO_ERROR;
     size_t output_length = 0;
 
-    VerifyOrExit(mHasKey, error = CHIP_ERROR_INCORRECT_STATE);
-
     error = Sign(msg, msg_length, out_signature.Bytes(), out_signature.Capacity(), &output_length);
 
     SuccessOrExit(error);
@@ -454,8 +479,6 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDH_derive_secret(const P256PublicKey & remo
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     size_t output_length = 0;
-
-    VerifyOrExit(mHasKey, error = CHIP_ERROR_INCORRECT_STATE);
 
     error = Derive(Uint8::to_const_uchar(remote_public_key), remote_public_key.Length(),
                    Uint8::to_uchar(out_secret),
@@ -473,6 +496,6 @@ const P256PublicKey & EFR32OpaqueP256Keypair::Pubkey() const
     return mPubKey;
 }
 
-} // namespace Crypto
-
+} // namespace Internal
+} // namespace DeviceLayer
 } // namespace chip

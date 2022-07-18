@@ -129,6 +129,7 @@ public:
     static constexpr Key kConfigKey_GroupKeyMax =
         EFR32ConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
     static constexpr Key kConfigKey_UniqueId = EFR32ConfigKey(kMatterFactory_KeyBase, 0x1F);
+    static constexpr Key kConfigKey_OpKeyMap = EFR32ConfigKey(kMatterConfig_KeyBase, 0x20);
 
     // Matter Counter Keys
     static constexpr Key kConfigKey_BootCount             = EFR32ConfigKey(kMatterCounter_KeyBase, 0x00);
@@ -144,7 +145,7 @@ public:
     static constexpr Key kMinConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x00);
     static constexpr Key kMaxConfigKey_MatterFactory = EFR32ConfigKey(kMatterFactory_KeyBase, 0x0A);
     static constexpr Key kMinConfigKey_MatterConfig  = EFR32ConfigKey(kMatterConfig_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterConfig  = EFR32ConfigKey(kMatterConfig_KeyBase, 0x1B);
+    static constexpr Key kMaxConfigKey_MatterConfig  = EFR32ConfigKey(kMatterConfig_KeyBase, 0x20);
 
     // Allows 32 Counters to be created.
     static constexpr Key kMinConfigKey_MatterCounter = EFR32ConfigKey(kMatterCounter_KeyBase, 0x00);
@@ -173,6 +174,7 @@ public:
     static CHIP_ERROR WriteConfigValueCounter(uint8_t counterIdx, uint32_t val);
     static CHIP_ERROR ClearConfigValue(Key key);
     static bool ConfigValueExists(Key key);
+    static bool ConfigValueExists(Key key, size_t & dataLen);
     static CHIP_ERROR FactoryResetConfig(void);
     static bool ValidConfigKey(Key key);
 

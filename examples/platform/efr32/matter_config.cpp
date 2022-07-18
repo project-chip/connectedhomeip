@@ -115,7 +115,7 @@ void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
 }
 
 #include <platform/EFR32/Efr32PsaOperationalKeystore.h>
-static chip::Efr32PsaOperationalKeystore gEfr32OperationalKeystore;
+static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gEfr32OperationalKeystore;
 
 CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 {
