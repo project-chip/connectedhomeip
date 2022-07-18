@@ -182,7 +182,7 @@ tests:
           "read OverrunCount attribute from DUT and verify response value, If
           the Overruncount is greater than zero or not"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 65 0 
+          ./chip-tool threadnetworkdiagnostics read overrun-count 65 0
 
            Verify on the TH Log:
 
