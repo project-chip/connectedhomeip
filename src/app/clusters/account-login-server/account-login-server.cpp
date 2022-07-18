@@ -143,7 +143,7 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (!delegate->HandleLogin(tempAccountIdentifier, setupPin)) 
+    if (!delegate->HandleLogin(tempAccountIdentifier, setupPin))
     {
         status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     }
