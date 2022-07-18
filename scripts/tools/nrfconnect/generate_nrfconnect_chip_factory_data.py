@@ -186,7 +186,7 @@ def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> 
     cmd = [
         spake2p_path, 'gen-verifier',
         '--iteration-count', str(it),
-        '--salt', str(salt),
+        '--salt', salt,
         '--pin-code', str(passcode),
         '--out', '-',
     ]
@@ -256,12 +256,12 @@ class FactoryDataGenerator:
             rd_uid = HEX_PREFIX + self._args.rd_uid
 
         if not self._args.spake2_verifier:
-            spake_2_verifier = base64.b64decode(self._generate_spake2_verifier())
+            spake_2_verifier = self._generate_spake2_verifier()
         else:
-            spake_2_verifier = base64.b64decode(self._args.spake2_verifier)
+            spake_2_verifier = self._args.spake2_verifier
 
-        # convert salt to bytestring to be coherent with spake2 verifier type
-        spake_2_salt = bytes(self._args.spake2_salt, 'utf-8')
+        # convert salt to bytestring to be coherent with Spake2+ verifier type
+        spake_2_salt = self._args.spake2_salt
 
         if self._args.chip_cert_path:
             certs = gen_test_certs(self._args.chip_cert_path,
@@ -313,9 +313,10 @@ class FactoryDataGenerator:
             self._add_entry("discriminator", self._args.discriminator)
             if rd_uid:
                 self._add_entry("rd_uid", rd_uid)
-            self._add_entry("enable_key", HEX_PREFIX + self._args.enable_key)
-            # add user-specific data
-            self._add_entry("user", self._args.user)
+            if self._args.enable_key:
+                self._add_entry("enable_key", HEX_PREFIX + self._args.enable_key)
+            if self._args.user:
+                self._add_entry("user", self._args.user)
 
             factory_data_dict = dict(self._factory_data)
 
@@ -343,8 +344,8 @@ class FactoryDataGenerator:
     def _generate_spake2_verifier(self):
         """ If verifier has not been provided in arguments list it should be generated via external script """
         spake2_params = gen_spake2p_params(self._args.spake2p_path, self._args.passcode,
-                                           self._args.spake2_it, self._args.spake2_salt)
-        return spake2_params["Verifier"]
+                                           self._args.spake2_it, self._args.spake2_salt.decode('ascii'))
+        return base64.b64decode(spake2_params["Verifier"])
 
     def _generate_rotating_device_uid(self):
         """ If rotating device unique ID has not been provided it should be generated """
@@ -387,6 +388,7 @@ def main():
     parser = argparse.ArgumentParser(description="NrfConnect Factory Data NVS generator tool")
 
     def allow_any_int(i): return int(i, 0)
+    def base64_str(s): return base64.b64decode(s)
 
     mandatory_arguments = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate Json file")
     optional_arguments = parser.add_argument_group(
@@ -425,9 +427,9 @@ def main():
     mandatory_arguments.add_argument("--hw_ver_str", type=str, required=True,
                                      help="[ascii string] Provide hardware version in string format.")
     mandatory_arguments.add_argument("--spake2_it", type=allow_any_int, required=True,
-                                     help="[int | hex int] Provide Spake2 Iteration Counter.")
-    mandatory_arguments.add_argument("--spake2_salt", type=str, required=True,
-                                     help="[ascii string] Provide Spake2 Salt.")
+                                     help="[int | hex int] Provide Spake2+ iteration count.")
+    mandatory_arguments.add_argument("--spake2_salt", type=base64_str, required=True,
+                                     help="[base64 string] Provide Spake2+ salt.")
     mandatory_arguments.add_argument("--discriminator", type=allow_any_int, required=True,
                                      help="[int] Provide BLE pairing discriminator. \
                                      A 12-bit value matching the field of the same name in \
@@ -453,8 +455,8 @@ def main():
                                     help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2 Verifier).")
     optional_arguments.add_argument("--spake2p_path", type=str,
                                     help="[string] Provide a path to spake2p. By default You can find spake2p in connectedhomeip/src/tools/spake2p directory and build it there.")
-    optional_arguments.add_argument("--spake2_verifier", type=str,
-                                    help="[ascii string] Provide Spake2 Verifier without generating it.")
+    optional_arguments.add_argument("--spake2_verifier", type=base64_str,
+                                    help="[base64 string] Provide Spake2+ verifier without generating it.")
     optional_arguments.add_argument("--enable_key", type=str,
                                     help="[hex string] [128-bit hex-encoded] The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command."
                                     "This value is used during Certification Tests, and should not be present on production devices.")
