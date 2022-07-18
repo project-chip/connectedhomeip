@@ -24,6 +24,7 @@
 
 #include "AppEvent.h"
 #include "FreeRTOS.h"
+#include "LightingManager.h"
 #include "sl_simple_button_instances.h"
 
 #include "timers.h" // provides FreeRTOS timer support
@@ -45,6 +46,7 @@ public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
 
+    void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
     void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
@@ -54,12 +56,17 @@ private:
 
     CHIP_ERROR Init();
 
+    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(LightingManager::Action_t aAction);
+    static void ActionChangeLight(LightingManager::Action_t aAction, uint16_t endpoint, uint8_t value);
+
     void CancelTimer(void);
 
     void DispatchEvent(AppEvent * event);
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
+    static void LightActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void UpdateClusterState(intptr_t context);

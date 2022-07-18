@@ -21,6 +21,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#ifdef RGB_LED_ENABLED
+#include "led_widget_rgb.h"
+#endif //RGB_LED_ENABLED
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #include "qrcodegen.h"
@@ -81,7 +84,12 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 LEDWidget sStatusLED;
+#ifdef RGB_LED_ENABLED
+#define LIGHT_LED_RGB &sl_led_rgb_pwm
+LEDWidgetRGB sLightLED;
+#else 
 LEDWidget sLightLED;
+#endif
 
 #ifdef SL_WIFI
 bool sIsWiFiProvisioned = false;
@@ -168,7 +176,7 @@ void OnTriggerOffWithEffect(OnOffEffect * effect)
     chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
     uint8_t effectVariant                                      = effect->mEffectVariant;
 
-    // Uses print outs until we can support the effects
+    // Uses printouts until we can support the effects
     if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
     {
         if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS)
@@ -266,10 +274,26 @@ CHIP_ERROR AppTask::Init()
 
     EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
+    err = LightMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        EFR32_LOG("LightMgr().Init() failed");
+        appError(err);
+    }
+
+    LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    LightMgr().SetLightCallbacks(ActionChangeLight);
+
     // Initialize LEDs
     LEDWidget::InitGpio();
-    sStatusLED.Init(SYSTEM_STATE_LED);
+    sStatusLED.Init(SYSTEM_STATE_LED);   
+#if defined(RGB_LED_ENABLED)
+    LEDWidgetRGB::InitGpioRGB();
+    sLightLED.Init(LIGHT_LED_RGB);
+#else
     sLightLED.Init(LIGHT_LED);
+#endif //RGB_LED_ENABLED
+    sLightLED.Set(LightMgr().IsLightOn());
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -386,6 +410,46 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
+void AppTask::LightActionEventHandler(AppEvent * aEvent)
+{
+    bool initiated = false;
+    LightingManager::Action_t action;
+    int32_t actor;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aEvent->Type == AppEvent::kEventType_Light)
+    {
+        action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
+        actor  = aEvent->LightEvent.Actor;
+    }
+    else if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        if (LightMgr().IsLightOn())
+        {
+            action = LightingManager::OFF_ACTION;
+        }
+        else
+        {
+            action = LightingManager::ON_ACTION;
+        }
+        actor = AppEvent::kEventType_Button;
+    }
+    else
+    {
+        err = APP_ERROR_UNHANDLED_EVENT;
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        initiated = LightMgr().InitiateAction(actor, action);
+
+        if (!initiated)
+        {
+            EFR32_LOG("Action is already in progress or active.");
+        }
+    }
+}
+
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
     if (buttonHandle == NULL)
@@ -397,7 +461,12 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     button_event.Type               = AppEvent::kEventType_Button;
     button_event.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_FUNCTION_BUTTON)
+    if (buttonHandle == APP_LIGHT_SWITCH && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    {
+        button_event.Handler = LightActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (buttonHandle == APP_FUNCTION_BUTTON)
     {
         button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
@@ -487,6 +556,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
+            // Set Light status LED back to show state of light.
+            sLightLED.Set(LightMgr().IsLightOn());
 
             sAppTask.CancelTimer();
 
@@ -530,6 +601,78 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+{
+    // Action initiated, update the light led
+    if (aAction == LightingManager::ON_ACTION)
+    {
+        EFR32_LOG("Turning light ON")
+        sLightLED.Set(true);
+    }
+    else if (aAction == LightingManager::OFF_ACTION)
+    {
+        EFR32_LOG("Turning light OFF")
+        sLightLED.Set(false);
+    }
+
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.mSyncClusterToButtonAction = true;
+    }
+}
+
+void AppTask::ActionCompleted(LightingManager::Action_t aAction)
+{
+    // action has been completed on the light
+    if (aAction == LightingManager::ON_ACTION)
+    {
+        EFR32_LOG("Light ON")
+    }
+    else if (aAction == LightingManager::OFF_ACTION)
+    {
+        EFR32_LOG("Light OFF")
+    }
+
+    if (sAppTask.mSyncClusterToButtonAction)
+    {
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
+        sAppTask.mSyncClusterToButtonAction = false;
+    }
+}
+
+void AppTask::ActionChangeLight(LightingManager::Action_t aAction, uint16_t endpoint, uint8_t value)
+{
+#ifdef RGB_LED_ENABLED
+    if (aAction == LightingManager::MOVE_TO_LEVEL)
+    {
+        sLightLED.SetLevel(value, endpoint);
+        EFR32_LOG("Light LED Level set to: %d.", value);
+    }
+    else if (aAction == LightingManager::MOVE_TO_HUE)
+    {
+        sLightLED.SetHue(value, endpoint);
+        EFR32_LOG("Light LED hue set.");
+    }
+    else if (aAction == LightingManager::MOVE_TO_SAT)
+    {
+        sLightLED.SetSaturation(value, endpoint);
+        EFR32_LOG("Light LED saturation set.");
+    }
+#else 
+    EFR32_LOG(" Level Control and Color control are unavailable on your board.");
+#endif //RGB_LED_ENABLED
+}
+
+void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
+{
+    AppEvent event;
+    event.Type              = AppEvent::kEventType_Light;
+    event.LightEvent.Actor  = aActor;
+    event.LightEvent.Action = aAction;
+    event.Handler           = LightActionEventHandler;
+    PostEvent(&event);
+}
+
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
     if (sAppEventQueue != NULL)
@@ -571,5 +714,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         EFR32_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(intptr_t context)
+{
+    uint8_t newValue = LightMgr().IsLightOn();
+
+    // write the new on/off value
+    EmberAfStatus status = OnOffServer::Instance().setOnOffValue(1, newValue, false);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        EFR32_LOG("ERR: updating on/off %x", status);
     }
 }

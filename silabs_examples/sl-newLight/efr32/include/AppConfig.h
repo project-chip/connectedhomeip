@@ -21,9 +21,9 @@
 
 #include "efr32_utils.h"
 
-// ---- Template Example App Config ----
+// ---- newLight Example App Config ----
 
-#define APP_TASK_NAME "TEMPLATE"
+#define APP_TASK_NAME "NEWLIGHT"
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

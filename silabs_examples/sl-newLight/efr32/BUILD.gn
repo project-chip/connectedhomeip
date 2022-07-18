@@ -60,6 +60,9 @@ declare_args() {
 
   # Enables LCD Qr Code on supported devices
   show_qr_code = true
+
+  # Enables RGB LEDs on supported devices
+  rgb_led = false
 }
 
 # Sanity check
@@ -75,8 +78,15 @@ if (efr32_board == "BRD4166A" || efr32_board == "BRD4180A") {
   show_qr_code = false
 }
 
+if (efr32_board == "BRD4166A" || efr32_board == "BRD4160A" || efr32_board == "BRD2207A") {
+  rgb_led = true
+}
+
 # Enables LCD on supported devices
 lcd_on = show_qr_code
+
+# Enables RGB LEDs on supported devices
+rgb_on = rgb_led
 
 # WiFi settings
 if (chip_enable_wifi) {
@@ -109,6 +119,7 @@ efr32_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
+    "${efr32_project_dir}/light_modules",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
   ]
@@ -168,6 +179,7 @@ efr32_executable("newLight_app") {
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
+    "light_modules/LightingManager.cpp",
   ]
 
   if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
@@ -243,6 +255,11 @@ efr32_executable("newLight_app") {
 
       deps += [ "${chip_root}/examples/common/QRCode" ]
     }
+  }
+
+  if (rgb_on) {
+    sources += [ "light_modules/led_widget_rgb.cpp" ]
+    defines += [ "RGB_LED_ENABLED" ]
   }
 
   if (chip_enable_pw_rpc) {

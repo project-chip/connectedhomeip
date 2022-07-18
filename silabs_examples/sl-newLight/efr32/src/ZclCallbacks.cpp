@@ -21,6 +21,7 @@
  */
 
 #include "AppConfig.h"
+#include "LightingManager.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -30,21 +31,59 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
+
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
     ClusterId clusterId     = attributePath.mClusterId;
-    // AttributeId attributeId = attributePath.mAttributeId;
+    AttributeId attributeId = attributePath.mAttributeId;
+    EndpointId endpoint     = attributePath.mEndpointId;
+    LightingManager::Action_t action_type = LightingManager::IGNORE_ACTION;
+
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
 
+    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    {
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+    }
+    else if (clusterId == LevelControl::Id)
+    {
+       ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
 
-    // Template TODO, fill with cluster configuration
-    // switch (clusterId)
-    // {
-    //     case :
-    //     default :
+       if (attributeId == LevelControl::Attributes::CurrentLevel::Id)
+       {
+          action_type = LightingManager::MOVE_TO_LEVEL; 
+       } 
 
-    // }
+       LightMgr().InitiateActionLight(AppEvent::kEventType_Light, action_type, endpoint, *value);
+    }
+    else if (clusterId == ColorControl::Id)
+    {
+        ChipLogProgress(Zcl, "Color Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+
+        if (attributeId == ColorControl::Attributes::CurrentHue::Id)
+        {
+            action_type = LightingManager::MOVE_TO_HUE;
+        } 
+        else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id) 
+        {
+            action_type = LightingManager::MOVE_TO_SAT;
+        }
+
+        LightMgr().InitiateActionLight(AppEvent::kEventType_Light, action_type, endpoint, *value);
+    }
+    else if (clusterId == OnOffSwitchConfiguration::Id)
+    {
+        ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+    }
+    else if (clusterId == Identify::Id)
+    {
+        ChipLogProgress(Zcl, "Identify attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
+                        ChipLogValueMEI(attributeId), type, *value, size);
+    }
 }
 
 /** @brief OnOff Cluster Init
