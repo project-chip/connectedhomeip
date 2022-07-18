@@ -453,7 +453,7 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     // evicted.
     if (mSession)
     {
-        if (mSession->IsSecureSession())
+        if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
         {
             mSession->AsSecureSession()->MarkAsDefunct();
         }
