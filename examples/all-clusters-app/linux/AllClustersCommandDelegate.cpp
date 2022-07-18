@@ -29,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
 void AllClustersCommandDelegate::OnEventCommandReceived(const char * command)
@@ -228,14 +229,20 @@ void AllClustersCommandDelegate::OnSwitchEventHandler(uint32_t eventId)
 
     if (eventId == Clusters::Switch::Events::SwitchLatched::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
     }
     else if (eventId == Clusters::Switch::Events::InitialPress::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
     }
     else if (eventId == Clusters::Switch::Events::LongPress::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
     }
     else if (eventId == Clusters::Switch::Events::ShortRelease::Id)
@@ -248,10 +255,14 @@ void AllClustersCommandDelegate::OnSwitchEventHandler(uint32_t eventId)
     }
     else if (eventId == Clusters::Switch::Events::MultiPressOngoing::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
     }
     else if (eventId == Clusters::Switch::Events::MultiPressComplete::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, newPosition, count);
     }
     else
