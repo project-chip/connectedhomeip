@@ -105,7 +105,7 @@ jobs:
                      --target-skip-glob '{TestGroupMessaging}' \
                      run \
                      --iterations 1 \
-                     --test-timeout-seconds 200 \
+                     --test-timeout-seconds 120 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
                      --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
