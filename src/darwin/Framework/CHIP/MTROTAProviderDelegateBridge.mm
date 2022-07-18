@@ -44,39 +44,36 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(chip::app::CommandHandler * 
     const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData)
 {
-    // Make sure to hold on to the command handler and command path to be used in the completion block
-    __block chip::app::CommandHandler::Handle handle(commandObj);
-    __block chip::app::ConcreteCommandPath cachedCommandPath(
-        commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
-
     id<MTROTAProviderDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(handleQueryImage:completionHandler:)]) {
-        if (strongDelegate && mQueue) {
-            auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
-            CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
-            if (err != CHIP_NO_ERROR) {
-                commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::InvalidCommand);
-                handle.Release();
-                return;
-            }
-
-            dispatch_async(mQueue, ^{
-                [strongDelegate handleQueryImage:commandParams
-                               completionHandler:^(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
-                                   NSError * _Nullable error) {
-                                   dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                       chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type response;
-                                       ConvertFromQueryImageResponseParms(data, response);
-
-                                       chip::app::CommandHandler * handler = handle.Get();
-                                       if (handler) {
-                                           handler->AddResponse(cachedCommandPath, response);
-                                           handle.Release();
-                                       }
-                                   });
-                               }];
-            });
+    if (strongDelegate && mQueue) {
+        auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterQueryImageParams alloc] init];
+        CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
+        if (err != CHIP_NO_ERROR) {
+            commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::InvalidCommand);
+            return;
         }
+
+        // Make sure to hold on to the command handler and command path to be used in the completion block
+        __block chip::app::CommandHandler::Handle handle(commandObj);
+        __block chip::app::ConcreteCommandPath cachedCommandPath(
+            commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
+
+        dispatch_async(mQueue, ^{
+            [strongDelegate handleQueryImage:commandParams
+                           completionHandler:^(MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
+                               NSError * _Nullable error) {
+                               dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+                                   chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type response;
+                                   ConvertFromQueryImageResponseParms(data, response);
+
+                                   chip::app::CommandHandler * handler = handle.Get();
+                                   if (handler) {
+                                       handler->AddResponse(cachedCommandPath, response);
+                                       handle.Release();
+                                   }
+                               });
+                           }];
+        });
     }
 }
 
@@ -90,29 +87,27 @@ void MTROTAProviderDelegateBridge::HandleApplyUpdateRequest(chip::app::CommandHa
         commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     id<MTROTAProviderDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(handleApplyUpdateRequest:completionHandler:)]) {
-        if (strongDelegate && mQueue) {
-            auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
-            ConvertToApplyUpdateRequestParams(commandData, commandParams);
+    if (strongDelegate && mQueue) {
+        auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams alloc] init];
+        ConvertToApplyUpdateRequestParams(commandData, commandParams);
 
-            dispatch_async(mQueue, ^{
-                [strongDelegate
-                    handleApplyUpdateRequest:commandParams
-                           completionHandler:^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
-                               NSError * _Nullable error) {
-                               dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                   chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type response;
-                                   ConvertFromApplyUpdateRequestResponseParms(data, response);
+        dispatch_async(mQueue, ^{
+            [strongDelegate
+                handleApplyUpdateRequest:commandParams
+                       completionHandler:^(MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
+                           NSError * _Nullable error) {
+                           dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+                               chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type response;
+                               ConvertFromApplyUpdateRequestResponseParms(data, response);
 
-                                   chip::app::CommandHandler * handler = handle.Get();
-                                   if (handler) {
-                                       handler->AddResponse(cachedCommandPath, response);
-                                       handle.Release();
-                                   }
-                               });
-                           }];
-            });
-        }
+                               chip::app::CommandHandler * handler = handle.Get();
+                               if (handler) {
+                                   handler->AddResponse(cachedCommandPath, response);
+                                   handle.Release();
+                               }
+                           });
+                       }];
+        });
     }
 }
 
@@ -126,25 +121,23 @@ void MTROTAProviderDelegateBridge::HandleNotifyUpdateApplied(chip::app::CommandH
         commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId);
 
     id<MTROTAProviderDelegate> strongDelegate = mDelegate;
-    if ([strongDelegate respondsToSelector:@selector(handleNotifyUpdateApplied:completionHandler:)]) {
-        if (strongDelegate && mQueue) {
-            auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
-            ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
+    if (strongDelegate && mQueue) {
+        auto * commandParams = [[MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams alloc] init];
+        ConvertToNotifyUpdateAppliedParams(commandData, commandParams);
 
-            dispatch_async(mQueue, ^{
-                [strongDelegate
-                    handleNotifyUpdateApplied:commandParams
-                            completionHandler:^(NSError * _Nullable error) {
-                                dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
-                                    chip::app::CommandHandler * handler = handle.Get();
-                                    if (handler) {
-                                        handler->AddStatus(cachedCommandPath, chip::Protocols::InteractionModel::Status::Success);
-                                        handle.Release();
-                                    }
-                                });
-                            }];
-            });
-        }
+        dispatch_async(mQueue, ^{
+            [strongDelegate
+                handleNotifyUpdateApplied:commandParams
+                        completionHandler:^(NSError * _Nullable error) {
+                            dispatch_async(chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue(), ^{
+                                chip::app::CommandHandler * handler = handle.Get();
+                                if (handler) {
+                                    handler->AddStatus(cachedCommandPath, chip::Protocols::InteractionModel::Status::Success);
+                                    handle.Release();
+                                }
+                            });
+                        }];
+        });
     }
 }
 
