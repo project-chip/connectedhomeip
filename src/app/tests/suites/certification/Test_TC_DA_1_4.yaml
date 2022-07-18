@@ -327,6 +327,7 @@ tests:
           "TH1 responds to the DUT with an invalid AttestationResponse Command
           by setting the following error condition: 1. Commissionee is not yet
           certified"
+      PICS: MCORE.DA.ATTEST_WARNING
       verification: |
           sudo rm -rf /tmp/chip_*
           sudo ./chip-all-clusters-app --dac_provide /Dec_message_2.json
