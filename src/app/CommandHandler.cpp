@@ -407,6 +407,10 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         ExitNow();
     }
 
+    // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
+    // always have an accessing fabric, by definition.
+
+    // Find which endpoints can process the command, and dispatch to them.
     iterator = groupDataProvider->IterateEndpoints(fabric);
     VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
