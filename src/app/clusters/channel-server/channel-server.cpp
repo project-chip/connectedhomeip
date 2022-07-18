@@ -255,14 +255,19 @@ exit:
 bool emberAfChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
-
-    auto & majorNumber = commandData.majorNumber;
-    auto & minorNumber = commandData.minorNumber;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EndpointId endpoint  = commandPath.mEndpointId;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & majorNumber   = commandData.majorNumber;
+    auto & minorNumber   = commandData.minorNumber;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (!delegate->HandleChangeChannelByNumber(majorNumber, minorNumber))
+    {
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -271,8 +276,6 @@ exit:
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    bool success         = delegate->HandleChangeChannelByNumber(majorNumber, minorNumber);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -280,12 +283,18 @@ exit:
 bool emberAfChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                               const Commands::SkipChannel::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
-    auto & count        = commandData.count;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EndpointId endpoint  = commandPath.mEndpointId;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    auto & count         = commandData.count;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (!delegate->HandleSkipChannel(count))
+    {
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -294,8 +303,6 @@ exit:
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    bool success         = delegate->HandleSkipChannel(count);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
