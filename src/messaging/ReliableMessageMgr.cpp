@@ -141,6 +141,10 @@ void ReliableMessageMgr::ExecuteActions()
             // response.  Otherwise, we need to do it.
             if (!entry->ec->IsResponseExpected())
             {
+                if (session->IsSecureSession())
+                {
+                    session->AsSecureSession()->MarkAsDefunct();
+                }
                 session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
             }
 
