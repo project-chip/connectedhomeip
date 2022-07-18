@@ -35,4 +35,11 @@
 #define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours
 #define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
 
+// Maximum number of users supported by lock
+#define CONFIG_LOCK_NUM_USERS (5)
+// Maximum number of credentials supported by lock
+#define CONFIG_LOCK_NUM_CREDENTIALS (10)
+// Maximum number of credentials per user supported by lock
+#define CONFIG_LOCK_NUM_CREDENTIALS_PER_USER (2)
+
 #endif // APP_CONFIG_H
