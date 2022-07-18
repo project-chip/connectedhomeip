@@ -1607,7 +1607,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     mbedtls_x509_crt certChain;
     mbedtls_x509_crt rootCert;
     int mbedResult;
-    uint32_t flags;
+    uint32_t flags = 0;
 
     result = CertificateChainValidationResult::kInternalFrameworkError;
 
