@@ -247,6 +247,8 @@ function getManualTests() {
         "Test_TC_CADMIN_1_23",
         "Test_TC_CADMIN_1_24",
         // Slow tests that should not run in CI because they take many minutes each
+        "Test_TC_CADMIN_1_3",
+        "Test_TC_CADMIN_1_4",
         "Test_TC_CADMIN_1_5",
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_9",
@@ -703,8 +705,6 @@ function getTests() {
     ];
 
     const MultipleFabrics = [
-        "Test_TC_CADMIN_1_3",
-        "Test_TC_CADMIN_1_4",
     ];
 
     const OTASoftwareUpdate = [
