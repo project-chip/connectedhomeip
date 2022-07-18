@@ -278,8 +278,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -614,6 +614,7 @@ IasWd
 iaszone
 ibb
 ICA
+iCloud
 ICMP
 IDF
 IDL
@@ -659,6 +660,7 @@ InvokeCommandRequests
 InvokeCommandResponse
 IoT
 ipaddr
+iPadOS
 ipadr
 ipp
 iptables
@@ -1090,8 +1092,8 @@ REPL
 repo
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1137,8 +1139,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1324,6 +1326,7 @@ ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
 TvCasting
+tvOS
 TXD
 txt
 uargument
@@ -1370,8 +1373,8 @@ util
 utils
 UUID
 ux
-VCP
 validator
+VCP
 Vectorcall
 VendorID
 VendorName

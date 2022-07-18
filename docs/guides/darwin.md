@@ -6,15 +6,15 @@ Learn more about Matter on the [here](https://buildwithmatter.com/)
 
 ## Setup Requirements
 
-#### Matter functionality is currently a Developer Preview, current enablement requirements include:
+#### Matter functionality is currently a Developer Preview, current requirements include:
 
 -   An iPhone or iPad running iOS/iPadOS at least 15.6. You will need to install
     a profile on it (instructions below).
 -   An Apple TV running at least tvOS 15.6. You will need to install a profile
     on it (instructions below). If you have multiple Apple TVs, you will need to
     install the profile on all of them.
--   The iPhone or iPad with the Matter enablement profile must belong to the
-    same iCloud account as the Apple TV with the Matter enablement profile.
+-   The iPhone or iPad with the Matter profile must belong to the same iCloud
+    account as the Apple TV with the Matter profile.
 -   A test iCloud account is highly recommended for Matter development to avoid
     interference with existing homes.
 
@@ -119,7 +119,7 @@ For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
 
 2. Edit PRODUCT_ID value in the file
    `connectedhomeip/examples/lighting-app/nrfconnect/main/include/CHIPProjectConfig.h`
-   to ensure you are using asupported Product ID from the “Ensuring Your Matter
+   to ensure you are using a supported Product ID from the “Ensuring Your Matter
    Accessory Works with iOS iPadOS/tvOS” section above.
     - Follow
       [these instructions](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/nrfconnect#readme)
