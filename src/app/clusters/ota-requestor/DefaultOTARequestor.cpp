@@ -289,6 +289,9 @@ void DefaultOTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdat
         requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
+    case OTAApplyUpdateAction::kUnknownEnumValue:
+        OnApplyUpdateFailure(context, CHIP_ERROR_INVALID_ARGUMENT);
+        break;
     }
 }
 
