@@ -2574,6 +2574,24 @@ PICS:
     - label: "Does the device implement the LifetimeEnergyConsumed attribute?"
       id: PCC.S.A0021
 
+    - label: "Does the device implement the ConstantSpeed control mode?"
+      id: PCC.M.ControlModeConstSpeed
+
+    - label: "Does the device implement the ConstantPressure control mode?"
+      id: PCC.M.ControlModeConstPressure
+
+    - label: "Does the device implement the ProportionalPressure control mode?"
+      id: PCC.M.ControlModeCompPressure
+
+    - label: "Does the device implement the ConstantFlow control mode?"
+      id: PCC.M.ControlModeConstFlow
+
+    - label: "Does the device implement the ConstantTemperature control mode?"
+      id: PCC.M.ControlModeConstTemp
+
+    - label: "Does the device implement the Automatic control mode?"
+      id: PCC.M.ControlModeAuto
+
     #Power Source Cluster
     - label: "Does the device implement the Status attribute?"
       id: PS.S.A0000
@@ -3076,204 +3094,204 @@ PICS:
     #Thread Network Diagnostics Cluster
     #server attributes
     - label: "Does the DUT-server support the channel attribute?"
-      id: DGTHREAD.S.A0001
+      id: DGTHREAD.S.A0000
 
     - label: "Does the DUT-server support the RoutingRole attribute?"
-      id: DGTHREAD.S.A0002
+      id: DGTHREAD.S.A0001
 
     - label: "Does the DUT-server support the NetworkName attribute?"
-      id: DGTHREAD.S.A0003
+      id: DGTHREAD.S.A0002
 
     - label: "Does the DUT-server support the PanId attribute?"
-      id: DGTHREAD.S.A0004
+      id: DGTHREAD.S.A0003
 
     - label: "Does the DUT-server support the ExtendedPanId attribute?"
-      id: DGTHREAD.S.A0005
+      id: DGTHREAD.S.A0004
 
     - label: "Does the DUT-server support the MeshLocalPrefix attribute?"
-      id: DGTHREAD.S.A0006
+      id: DGTHREAD.S.A0005
 
     - label: "Does the DUT-server support the OverrunCount attribute?"
-      id: DGTHREAD.S.A0007
+      id: DGTHREAD.S.A0006
 
     - label: "Does the DUT-server support the NeighborTable attribute?"
-      id: DGTHREAD.S.A0008
+      id: DGTHREAD.S.A0007
 
     - label: "Does the DUT-server support the RouteTable attribute?"
-      id: DGTHREAD.S.A0009
+      id: DGTHREAD.S.A0008
 
     - label: "Does the DUT-server support the PartitionId attribute?"
-      id: DGTHREAD.S.A000a
+      id: DGTHREAD.S.A0009
 
     - label: "Does the DUT-server support the Weighting attribute?"
-      id: DGTHREAD.S.A000b
+      id: DGTHREAD.S.A000a
 
     - label: "Does the DUT-server support the DataVersion attribute?"
-      id: DGTHREAD.S.A000c
+      id: DGTHREAD.S.A000b
 
     - label: "Does the DUT-server support the StableDataVersion attribute?"
-      id: DGTHREAD.S.A000d
+      id: DGTHREAD.S.A000c
 
     - label: "Does the DUT-server support the LeaderRouterId attribute?"
-      id: DGTHREAD.S.A000e
+      id: DGTHREAD.S.A000d
 
     - label: "Does the DUT-server support the DetachedRoleCount attribute?"
-      id: DGTHREAD.S.A000f
+      id: DGTHREAD.S.A000e
 
     - label: "Does the DUT-server support the ChildRoleCount attribute?"
-      id: DGTHREAD.S.A0010
+      id: DGTHREAD.S.A000f
 
     - label: "Does the DUT-server support the RouterRoleCount attribute?"
-      id: DGTHREAD.S.A0011
+      id: DGTHREAD.S.A0010
 
     - label: "Does the DUT-server support the LeaderRoleCount attribute?"
-      id: DGTHREAD.S.A0012
+      id: DGTHREAD.S.A0011
 
     - label: "Does the DUT-server support the AttachAttemptCount attribute?"
-      id: DGTHREAD.S.A0013
+      id: DGTHREAD.S.A0012
 
     - label: "Does the DUT-server support the PartitionIdChangeCount attribute?"
-      id: DGTHREAD.S.A0014
+      id: DGTHREAD.S.A0013
 
     - label:
           "Does the DUT-server support the BetterPartitionAttachAttemptCount
           attribute?"
-      id: DGTHREAD.S.A0015
+      id: DGTHREAD.S.A0014
 
     - label: "Does the DUT-server support the ParentChangeCount attribute?"
-      id: DGTHREAD.S.A0016
+      id: DGTHREAD.S.A0015
 
     - label: "Does the DUT-server support the TxTotalCount attribute?"
-      id: DGTHREAD.S.A0017
+      id: DGTHREAD.S.A0016
 
     - label: "Does the DUT-server support the TxUnicastCount attribute?"
-      id: DGTHREAD.S.A0018
+      id: DGTHREAD.S.A0017
 
     - label: "Does the DUT-server support the TxBroadcastCount attribute?"
-      id: DGTHREAD.S.A0019
+      id: DGTHREAD.S.A0018
 
     - label: "Does the DUT-server support the TxAckRequestedCount attribute?"
-      id: DGTHREAD.S.A001a
+      id: DGTHREAD.S.A0019
 
     - label: "Does the DUT-server support the TxAckedCount attribute?"
-      id: DGTHREAD.S.A001b
+      id: DGTHREAD.S.A001a
 
     - label: "Does the DUT-server support the TxNoAckRequestedCount attribute?"
-      id: DGTHREAD.S.A001c
+      id: DGTHREAD.S.A001b
 
     - label: "Does the DUT-server support the TxDataCount attribute?"
-      id: DGTHREAD.S.A001d
+      id: DGTHREAD.S.A001c
 
     - label: "Does the DUT-server support the TxDataPollCount attribute?"
-      id: DGTHREAD.S.A001e
+      id: DGTHREAD.S.A001d
 
     - label: "Does the DUT-server support the TxBeaconCount attribute?"
-      id: DGTHREAD.S.A001f
+      id: DGTHREAD.S.A001e
 
     - label: "Does the DUT-server support the TxBeaconRequestCount attribute?"
-      id: DGTHREAD.S.A0020
+      id: DGTHREAD.S.A001f
 
     - label: "Does the DUT-server support the TxOtherCount attribute?"
-      id: DGTHREAD.S.A0021
+      id: DGTHREAD.S.A0020
 
     - label: "Does the DUT-server support the TxRetryCount attribute?"
-      id: DGTHREAD.S.A0022
+      id: DGTHREAD.S.A0021
 
     - label:
           "Does the DUT-server support the TxDirectMaxRetryExpiryCount
           attribute?"
-      id: DGTHREAD.S.A0023
+      id: DGTHREAD.S.A0022
 
     - label:
           "Does the DUT-server support the TxIndirectMaxRetryExpiryCount
           attribute?"
-      id: DGTHREAD.S.A0024
+      id: DGTHREAD.S.A0023
 
     - label: "Does the DUT-server support the TxErrCcaCount attribute?"
-      id: DGTHREAD.S.A0025
+      id: DGTHREAD.S.A0024
 
     - label: "Does the DUT-server support the TxErrAbortCount attribute?"
-      id: DGTHREAD.S.A0026
+      id: DGTHREAD.S.A0025
 
     - label: "Does the DUT-server support the TxErrBusyChannelCount attribute?"
-      id: DGTHREAD.S.A0027
+      id: DGTHREAD.S.A0026
 
     - label: "Does the DUT-server support the RxTotalCount attribute?"
-      id: DGTHREAD.S.A0028
+      id: DGTHREAD.S.A0027
 
     - label: "Does the DUT-server support the RxUnicastCount attribute?"
-      id: DGTHREAD.S.A0029
+      id: DGTHREAD.S.A0028
 
     - label: "Does the DUT-server support the RxBroadcastCount attribute?"
-      id: DGTHREAD.S.A002a
+      id: DGTHREAD.S.A0029
 
     - label: "Does the DUT-server support the RxDataCount attribute?"
-      id: DGTHREAD.S.A002b
+      id: DGTHREAD.S.A002a
 
     - label: "Does the DUT-server support the RxDataPollCount attribute?"
-      id: DGTHREAD.S.A002c
+      id: DGTHREAD.S.A002b
 
     - label: "Does the DUT-server support the RxBeaconCount attribute?"
-      id: DGTHREAD.S.A002d
+      id: DGTHREAD.S.A002c
 
     - label: "Does the DUT-server support the RxBeaconRequestCount attribute?"
-      id: DGTHREAD.S.A002e
+      id: DGTHREAD.S.A002d
 
     - label: "Does the DUT-server support the RxOtherCount attribute?"
-      id: DGTHREAD.S.A002f
+      id: DGTHREAD.S.A002e
 
     - label: "Does the DUT-server support the RxAddressFilteredCount attribute?"
-      id: DGTHREAD.S.A0030
+      id: DGTHREAD.S.A002f
 
     - label:
           "Does the DUT-server support the RxDestAddrFilteredCount attribute?"
-      id: DGTHREAD.S.A0031
+      id: DGTHREAD.S.A0030
 
     - label: "Does the DUT-server support the RxDuplicatedCount attribute?"
-      id: DGTHREAD.S.A0032
+      id: DGTHREAD.S.A0031
 
     - label: "Does the DUT-server support the RxErrNoFrameCount attribute?"
-      id: DGTHREAD.S.A0033
+      id: DGTHREAD.S.A0032
 
     - label:
           "Does the DUT-server support the RxErrUnknownNeighborCount attribute?"
-      id: DGTHREAD.S.A0034
+      id: DGTHREAD.S.A0033
 
     - label:
           "Does the DUT-server support the RxErrInvalidScrAddrCount attribute?"
-      id: DGTHREAD.S.A0035
+      id: DGTHREAD.S.A0034
 
     - label: "Does the DUT-server support the RxErrSecCount attribute?"
-      id: DGTHREAD.S.A0036
+      id: DGTHREAD.S.A0035
 
     - label: "Does the DUT-server support the RxErrFcsCount attribute?"
-      id: DGTHREAD.S.A0037
+      id: DGTHREAD.S.A0036
 
     - label: "Does the DUT-server support the RxErrOtherCount attribute?"
-      id: DGTHREAD.S.A0038
+      id: DGTHREAD.S.A0037
 
     - label: "Does the DUT-server support the ActiveTimestamp attribute?"
-      id: DGTHREAD.S.A0039
+      id: DGTHREAD.S.A0038
 
     - label: "Does the DUT-server support the PendingTimestamp attribute?"
-      id: DGTHREAD.S.A003a
+      id: DGTHREAD.S.A0039
 
     - label: "Does the DUT-server support the Delay attribute?"
-      id: DGTHREAD.S.A003b
+      id: DGTHREAD.S.A003a
 
     - label: "Does the DUT-server support the SecurityPolicy attribute?"
-      id: DGTHREAD.S.A003c
+      id: DGTHREAD.S.A003b
 
     - label: "Does the DUT-server support the ChannelPage0Mask attribute?"
-      id: DGTHREAD.S.A003d
+      id: DGTHREAD.S.A003c
 
     - label:
           "Does the DUT-server support the OperationalDatasetComponents
           attribute?"
-      id: DGTHREAD.S.A003e
+      id: DGTHREAD.S.A003d
 
     - label: "Does the DUT-server support the ActiveNetworkFaults attribute?"
-      id: DGTHREAD.S.A003f
+      id: DGTHREAD.S.A003e
 
     #server commands
     - label:
@@ -3300,204 +3318,204 @@ PICS:
 
     #client attributes
     - label: "Does the DUT-client support the channel attribute?"
-      id: DGTHREAD.C.A0001
+      id: DGTHREAD.C.A0000
 
     - label: "Does the DUT-client support the RoutingRole attribute?"
-      id: DGTHREAD.C.A0002
+      id: DGTHREAD.C.A0001
 
     - label: "Does the DUT-client support the NetworkName attribute?"
-      id: DGTHREAD.C.A0003
+      id: DGTHREAD.C.A0002
 
     - label: "Does the DUT-client support the PanId attribute?"
-      id: DGTHREAD.C.A0004
+      id: DGTHREAD.C.A0003
 
     - label: "Does the DUT-client support the ExtendedPanId attribute?"
-      id: DGTHREAD.C.A0005
+      id: DGTHREAD.C.A0004
 
     - label: "Does the DUT-client support the MeshLocalPrefix attribute?"
-      id: DGTHREAD.C.A0006
+      id: DGTHREAD.C.A0005
 
     - label: "Does the DUT-client support the OverrunCount attribute?"
-      id: DGTHREAD.C.A0007
+      id: DGTHREAD.C.A0006
 
     - label: "Does the DUT-client support the NeighborTable attribute?"
-      id: DGTHREAD.C.A0008
+      id: DGTHREAD.C.A0007
 
     - label: "Does the DUT-client support the RouteTable attribute?"
-      id: DGTHREAD.C.A0009
+      id: DGTHREAD.C.A0008
 
     - label: "Does the DUT-client support the PartitionId attribute?"
-      id: DGTHREAD.C.A000a
+      id: DGTHREAD.C.A0009
 
     - label: "Does the DUT-client support the Weighting attribute?"
-      id: DGTHREAD.C.A000b
+      id: DGTHREAD.C.A000a
 
     - label: "Does the DUT-client support the DataVersion attribute?"
-      id: DGTHREAD.C.A000c
+      id: DGTHREAD.C.A000b
 
     - label: "Does the DUT-client support the StableDataVersion attribute?"
-      id: DGTHREAD.C.A000d
+      id: DGTHREAD.C.A000c
 
     - label: "Does the DUT-client support the LeaderRouterId attribute?"
-      id: DGTHREAD.C.A000e
+      id: DGTHREAD.C.A000d
 
     - label: "Does the DUT-client support the DetachedRoleCount attribute?"
-      id: DGTHREAD.C.A000f
+      id: DGTHREAD.C.A000e
 
     - label: "Does the DUT-client support the ChildRoleCount attribute?"
-      id: DGTHREAD.C.A0010
+      id: DGTHREAD.C.A000f
 
     - label: "Does the DUT-client support the RouterRoleCount attribute?"
-      id: DGTHREAD.C.A0011
+      id: DGTHREAD.C.A0010
 
     - label: "Does the DUT-client support the LeaderRoleCount attribute?"
-      id: DGTHREAD.C.A0012
+      id: DGTHREAD.C.A0011
 
     - label: "Does the DUT-client support the AttachAttemptCount attribute?"
-      id: DGTHREAD.C.A0013
+      id: DGTHREAD.C.A0012
 
     - label: "Does the DUT-client support the PartitionIdChangeCount attribute?"
-      id: DGTHREAD.C.A0014
+      id: DGTHREAD.C.A0013
 
     - label:
           "Does the DUT-client support the BetterPartitionAttachAttemptCount
           attribute?"
-      id: DGTHREAD.C.A0015
+      id: DGTHREAD.C.A0014
 
     - label: "Does the DUT-client support the ParentChangeCount attribute?"
-      id: DGTHREAD.C.A0016
+      id: DGTHREAD.C.A0015
 
     - label: "Does the DUT-client support the TxTotalCount attribute?"
-      id: DGTHREAD.C.A0017
+      id: DGTHREAD.C.A0016
 
     - label: "Does the DUT-client support the TxUnicastCount attribute?"
-      id: DGTHREAD.C.A0018
+      id: DGTHREAD.C.A0017
 
     - label: "Does the DUT-client support the TxBroadcastCount attribute?"
-      id: DGTHREAD.C.A0019
+      id: DGTHREAD.C.A0018
 
     - label: "Does the DUT-client support the TxAckRequestedCount attribute?"
-      id: DGTHREAD.C.A001a
+      id: DGTHREAD.C.A0019
 
     - label: "Does the DUT-client support the TxAckedCount attribute?"
-      id: DGTHREAD.C.A001b
+      id: DGTHREAD.C.A001a
 
     - label: "Does the DUT-client support the TxNoAckRequestedCount attribute?"
-      id: DGTHREAD.C.A001c
+      id: DGTHREAD.C.A001b
 
     - label: "Does the DUT-client support the TxDataCount attribute?"
-      id: DGTHREAD.C.A001d
+      id: DGTHREAD.C.A001c
 
     - label: "Does the DUT-client support the TxDataPollCount attribute?"
-      id: DGTHREAD.C.A001e
+      id: DGTHREAD.C.A001d
 
     - label: "Does the DUT-client support the TxBeaconCount attribute?"
-      id: DGTHREAD.C.A001f
+      id: DGTHREAD.C.A001e
 
     - label: "Does the DUT-client support the TxBeaconRequestCount attribute?"
-      id: DGTHREAD.C.A0020
+      id: DGTHREAD.C.A001f
 
     - label: "Does the DUT-client support the TxOtherCount attribute?"
-      id: DGTHREAD.C.A0021
+      id: DGTHREAD.C.A0020
 
     - label: "Does the DUT-client support the TxRetryCount attribute?"
-      id: DGTHREAD.C.A0022
+      id: DGTHREAD.C.A0021
 
     - label:
           "Does the DUT-client support the TxDirectMaxRetryExpiryCount
           attribute?"
-      id: DGTHREAD.C.A0023
+      id: DGTHREAD.C.A0022
 
     - label:
           "Does the DUT-client support the TxIndirectMaxRetryExpiryCount
           attribute?"
-      id: DGTHREAD.C.A0024
+      id: DGTHREAD.C.A0023
 
     - label: "Does the DUT-client support the TxErrCcaCount attribute?"
-      id: DGTHREAD.C.A0025
+      id: DGTHREAD.C.A0024
 
     - label: "Does the DUT-client support the TxErrAbortCount attribute?"
-      id: DGTHREAD.C.A0026
+      id: DGTHREAD.C.A0025
 
     - label: "Does the DUT-client support the TxErrBusyChannelCount attribute?"
-      id: DGTHREAD.C.A0027
+      id: DGTHREAD.C.A0026
 
     - label: "Does the DUT-client support the RxTotalCount attribute?"
-      id: DGTHREAD.C.A0028
+      id: DGTHREAD.C.A0027
 
     - label: "Does the DUT-client support the RxUnicastCount attribute?"
-      id: DGTHREAD.C.A0029
+      id: DGTHREAD.C.A0028
 
     - label: "Does the DUT-client support the RxBroadcastCount attribute?"
-      id: DGTHREAD.C.A002a
+      id: DGTHREAD.C.A0029
 
     - label: "Does the DUT-client support the RxDataCount attribute?"
-      id: DGTHREAD.C.A002b
+      id: DGTHREAD.C.A002a
 
     - label: "Does the DUT-client support the RxDataPollCount attribute?"
-      id: DGTHREAD.C.A002c
+      id: DGTHREAD.C.A002b
 
     - label: "Does the DUT-client support the RxBeaconCount attribute?"
-      id: DGTHREAD.C.A002d
+      id: DGTHREAD.C.A002c
 
     - label: "Does the DUT-client support the RxBeaconRequestCount attribute?"
-      id: DGTHREAD.C.A002e
+      id: DGTHREAD.C.A002d
 
     - label: "Does the DUT-client support the RxOtherCount attribute?"
-      id: DGTHREAD.C.A002f
+      id: DGTHREAD.C.A002e
 
     - label: "Does the DUT-client support the RxAddressFilteredCount attribute?"
-      id: DGTHREAD.C.A0030
+      id: DGTHREAD.C.A002f
 
     - label:
           "Does the DUT-client support the RxDestAddrFilteredCount attribute?"
-      id: DGTHREAD.C.A0031
+      id: DGTHREAD.C.A0030
 
     - label: "Does the DUT-client support the RxDuplicatedCount attribute?"
-      id: DGTHREAD.C.A0032
+      id: DGTHREAD.C.A0031
 
     - label: "Does the DUT-client support the RxErrNoFrameCount attribute?"
-      id: DGTHREAD.C.A0033
+      id: DGTHREAD.C.A0032
 
     - label:
           "Does the DUT-client support the RxErrUnknownNeighborCount attribute?"
-      id: DGTHREAD.C.A0034
+      id: DGTHREAD.C.A0033
 
     - label:
           "Does the DUT-client support the RxErrInvalidScrAddrCount attribute?"
-      id: DGTHREAD.C.A0035
+      id: DGTHREAD.C.A0034
 
     - label: "Does the DUT-client support the RxErrSecCount attribute?"
-      id: DGTHREAD.C.A0036
+      id: DGTHREAD.C.A0035
 
     - label: "Does the DUT-client support the RxErrFcsCount attribute?"
-      id: DGTHREAD.C.A0037
+      id: DGTHREAD.C.A0036
 
     - label: "Does the DUT-client support the RxErrOtherCount attribute?"
-      id: DGTHREAD.C.A0038
+      id: DGTHREAD.C.A0037
 
     - label: "Does the DUT-client support the ActiveTimestamp attribute?"
-      id: DGTHREAD.C.A0039
+      id: DGTHREAD.C.A0038
 
     - label: "Does the DUT-client support the PendingTimestamp attribute?"
-      id: DGTHREAD.C.A003a
+      id: DGTHREAD.C.A0039
 
     - label: "Does the DUT-client support the Delay attribute?"
-      id: DGTHREAD.C.A003b
+      id: DGTHREAD.C.A003a
 
     - label: "Does the DUT-client support the SecurityPolicy attribute?"
-      id: DGTHREAD.C.A003c
+      id: DGTHREAD.C.A003b
 
     - label: "Does the DUT-client support the ChannelPage0Mask attribute?"
-      id: DGTHREAD.C.A003d
+      id: DGTHREAD.C.A003c
 
     - label:
           "Does the DUT-client support the OperationalDatasetComponents
           attribute?"
-      id: DGTHREAD.C.A003e
+      id: DGTHREAD.C.A003d
 
     - label: "Does the DUT-client support the ActiveNetworkFaults attribute?"
-      id: DGTHREAD.C.A003f
+      id: DGTHREAD.C.A003e
 
     #Illuminance Measurement Cluster
     #server
@@ -3715,19 +3733,19 @@ PICS:
       id: DRLK.S.C03.Rsp
 
     - label: "Does the DUT-server support the SetWeekDaySchedule command?"
-      id: DRLK.S.C0B.Rsp
+      id: DRLK.S.C0b.Rsp
 
     - label: "Does the DUT-server support the GetWeekDaySchedule command?"
-      id: DRLK.S.C0C.Rsp
+      id: DRLK.S.C0c.Rsp
 
     - label: "Does the DUT-server support the ClearWeekDaySchedule command?"
-      id: DRLK.S.C0D.Rsp
+      id: DRLK.S.C0d.Rsp
 
     - label: "Does the DUT-server support the SetYearDaySchedule command?"
-      id: DRLK.S.C0E.Rsp
+      id: DRLK.S.C0e.Rsp
 
     - label: "Does the DUT-server support the GetYearDaySchedule command?"
-      id: DRLK.S.C0F.Rsp
+      id: DRLK.S.C0f.Rsp
 
     - label: "Does the DUT-server support the ClearYearDaySchedule command?"
       id: DRLK.S.C10.Rsp
@@ -3742,13 +3760,13 @@ PICS:
       id: DRLK.S.C13.Rsp
 
     - label: "Does the DUT-server support the SetUser command?"
-      id: DRLK.S.C1A.Rsp
+      id: DRLK.S.C1a.Rsp
 
     - label: "Does the DUT-server support the GetUser command?"
-      id: DRLK.S.C1B.Rsp
+      id: DRLK.S.C1b.Rsp
 
     - label: "Does the DUT-server support the Clear User command?"
-      id: DRLK.S.C1D.Rsp
+      id: DRLK.S.C1d.Rsp
 
     - label: "Does the DUT-server support the SetCredential command?"
       id: DRLK.S.C22.Rsp
@@ -3761,18 +3779,18 @@ PICS:
 
     - label:
           "Does the DUT-server support the GetWeekDayScheduleResponse command?"
-      id: DRLK.S.C0C.Tx
+      id: DRLK.S.C0c.Tx
 
     - label:
           "Does the DUT-server support the GetYearDayResponseSchedule command?"
-      id: DRLK.S.C0F.Tx
+      id: DRLK.S.C0f.Tx
 
     - label:
           "Does the DUT-server support the GetHolidayScheduleResponse command?"
       id: DRLK.S.C12.Tx
 
     - label: "Does the DUT-server support the GetUserResponse command?"
-      id: DRLK.S.C1C.Tx
+      id: DRLK.S.C1c.Tx
 
     - label: "Does the DUT-server support the SetCredentialResponse command?"
       id: DRLK.S.C23.Tx
@@ -3972,19 +3990,19 @@ PICS:
       id: DRLK.C.C00.Tx
 
     - label: "Does the DUT(Client) support the Unlock Door command?"
-      id: DRLK.C.C1.Tx
+      id: DRLK.C.C01.Tx
 
     - label: "Does the DUT(Client) support the Unlock with Timeout command?"
-      id: DRLK.C.C3.Tx
+      id: DRLK.C.C03.Tx
 
     - label: "Does the DUT(Client) support the Set Week Day Schedule command?"
-      id: DRLK.C.C0B.Tx
+      id: DRLK.C.C0b.Tx
 
     - label: "Does the DUT(Client) support the Get Week Day Schedule command?"
-      id: DRLK.C.C0C.Tx
+      id: DRLK.C.C0c.Tx
 
     - label: "Does the DUT(Client) support the Clear Week Day Schedule command?"
-      id: DRLK.C.C0D.Tx
+      id: DRLK.C.C0d.Tx
 
     - label: "Does the DUT(Client) support the Set Year Day Schedule command?"
       id: DRLK.C.C0e.Tx
@@ -4513,3 +4531,29 @@ PICS:
           "Does the Mode Select Cluster depend on an On/Off cluster implemented
           on the same DUT?"
       id: MOD.S.F00
+
+    #Device Attestation
+    - label:
+          "Does Commissioner notify user that Commissionee is not a fully
+          trusted device on device attestation failure?"
+      id: MCORE.DA.ATTEST_WARNING
+
+    - label:
+          "Does commissionee-provided certification declaration make use of
+          dac_origin_vendor_id field?"
+      id: MCORE.DA.CERTDECL_ORIGIN_VENDORID
+
+    - label:
+          "Does commissionee-provided certification declaration make use of
+          dac_origin_product_id field?"
+      id: MCORE.DA.CERTDECL_ORIGIN_PRODUCTID
+
+    - label:
+          "Does commissionee-provided certification declaration make use of
+          authorized_paa_list field?"
+      id: MCORE.DA.CERTDECL_AUTH_PAA
+
+    - label:
+          "Does commissionee provide a Firmware Information field in the
+          AttestationResponse?"
+      id: MCORE.DA.ATTESTELEMENT_FW_INFO

@@ -51,7 +51,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OverrunCount attribute from TH"
-      PICS: DGTHREAD.C.A0007
+      PICS: DGTHREAD.C.A0006
       verification: |
           ./chip-tool threadnetworkdiagnostics read overrun-count 180 0
            Verify on the TH Log:
