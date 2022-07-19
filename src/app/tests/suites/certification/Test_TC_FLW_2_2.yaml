@@ -36,6 +36,8 @@ tests:
           saveAs: ValueBeforeChange
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "operate on DUT to change the flow significantly"
       cluster: "LogCommands"
@@ -55,4 +57,6 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
               notValue: ValueBeforeChange

@@ -35,6 +35,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Read the mandatory attribute: MinMeasuredValue"
       PICS: FLW.S.A0001
@@ -43,6 +45,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Read the mandatory attribute: MaxMeasuredValue"
       PICS: FLW.S.A0002
@@ -51,6 +55,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "read the optional attribute: Tolerance"
       PICS: FLW.S.A0003

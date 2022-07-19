@@ -54,6 +54,8 @@ tests:
           saveAs: OnOffTransitionTimeValue
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "writes the OnOffTransitionTime attribute on the DUT"
       PICS: LVL.S.A0010
@@ -80,6 +82,8 @@ tests:
           saveAs: OnLevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "writes the OnLevel attribute on the DUT"
       PICS: LVL.S.A0011
@@ -106,6 +110,8 @@ tests:
           saveAs: OnTransitionTimeValue
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Writes the OnTransitionTime attribute on the DUT"
       PICS: LVL.S.A0012
@@ -132,6 +138,8 @@ tests:
           saveAs: OffTransitionTimeValue
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Writes the OffTransitionTime attribute on the DUT"
       PICS: LVL.S.A0013
@@ -158,6 +166,8 @@ tests:
           saveAs: DefaultMoveRatevalue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Writes the DefaultMoveRate attribute on the DUT"
       PICS: LVL.S.A0014
@@ -184,6 +194,8 @@ tests:
           saveAs: StartUpCurrentLevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "writes the StartUpCurrentLevel attribute on the DUT"
       PICS: LVL.S.A4000
