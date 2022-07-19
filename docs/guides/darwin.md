@@ -26,6 +26,7 @@ Note: These steps are supported on:
     account as the Apple TV or HomePod with the Matter profile.
 -   A test iCloud account is highly recommended for Matter development to avoid
     interference with existing homes.
+-   Devices must support BLE pairing, and have it enabled
 
 ## Source Compatibility
 
@@ -87,9 +88,27 @@ Ensure the right device type is set for each endpoint.
     }
 ```
 
+-   Supported device types are (not exhaustive):
+
+| Type               | Decimal | HEX  |
+| ------------------ | ------- | ---- |
+| Lightbulb          | 256     | 0100 |
+| Lightbulb + Dimmer | 257     | 0101 |
+| Switch             | 259     | 0103 |
+| Contact Sensor     | 21      | 0015 |
+| Door Lock          | 10      | 000A |
+| Light Sensor       | 262     | 0106 |
+| Occupancy Sensor   | 263     | 0107 |
+| Outlet             | 266     | 010A |
+| Color Bulb         | 268     | 010C |
+| Window Covering    | 514     | 0202 |
+| Thermostat         | 769     | 0301 |
+| Temperature Sensor | 770     | 0302 |
+| Flow Sensor        | 774     | 0306 |
+
 #### Examples of how to setup a couple apps
 
-##### Case study 1: Configuring a development M5Stack to Work with iOS/iPadOS/tvOS
+##### Case study 1: Configuring a development M5Stack, as a multi-device to work with iOS/iPadOS/tvOS
 
 Note: These instructions are specific to getting started with the
 (Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be
@@ -103,27 +122,8 @@ generalised to work on most platforms (more listed below)
    [these](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32)
    instructions to initialize your development environment, compile the firmware
    and flash your hardware.
-3. Where instructions talk about accessory configuration and specifically
-   "menuconfig" for the ESP32-based M5Stack please defer to the next section for
-   iOS/iPadOS/tvOS specific configuration instructions.
 
-##### Use `idf.py menuconfig` to configure the M5Stack to interact with iOS/iPadOS/tvOS
-
-1. Navigate to "Demo"
-    - Ensure the "Device Type" is "M5Stack"
-    - Set "Rendezvous Mode" to "BLE"
-2. Navigate back to the main menu (use the back arrow keys)
-3. Navigate to "Component Config" → "CHIP Device Layer" → “Wi-Fi Station
-   Options"
-    - Ensure you do not have any entries for SSID and password
-4. Navigate to "Component Config" → "CHIP Device Layer" → "Device Identification
-   Options"
-    - Ensure you are using the correct Vendor ID and a supported Product ID from
-      the “Ensuring Your Matter Accessory Works with the iOS/iPadOS/tvOS section
-      above.
-5. Press "q" and "Y" to quit and save the settings
-
-##### Case Study 2: a development Nordic board (NRF52840) to Work with iOS/iPadOS/tvOS
+##### Case study 2: a development Nordic board (nRF52840), working as a light to work with iOS/iPadOS/tvOS
 
 Note: These instructions are specific to getting started with the
 (Matter-provided) "lighting-app" on an Nordic-based NRF52840, however can be
@@ -134,23 +134,10 @@ generalised to work on most platforms (more listed below)
    instructions
    [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
 
-2. Edit PRODUCT_ID value in the file
-   `connectedhomeip/examples/lighting-app/nrfconnect/main/include/CHIPProjectConfig.h`
-   to ensure you are using a supported Product ID from the “Ensuring Your Matter
-   Accessory Works with iOS iPadOS/tvOS” section above.
-    - Follow
-      [these instructions](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/nrfconnect#readme)
-      initialize your development environment, compile the firmware and flash
-      your hardware.
-
-##### Configuring Multiple Hardware Accessories
-
-1. Follow instructions 1 through 5 above for your 2nd of accessory hardware
-2. On your hardware, Navigate to "Component Config" → p device layer → Testing
-   Options.
-3. Edit both the "Use Test Setup Pin Code" and "Use t Setup discriminator" to be
-   unique values not shared with other Hardware. For example: change the last
-   digit of each.
+2. Follow
+   [these instructions](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app/nrfconnect#readme)
+   initialize your development environment, compile the firmware and flash your
+   hardware.
 
 #### General Platform Guides
 
