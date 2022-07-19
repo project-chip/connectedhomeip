@@ -140,7 +140,7 @@ Example:
 | Temperature Sensor | 770     | 0302 |
 | Flow Sensor        | 774     | 0306 |
 
-#### Examples of how to setup a couple apps
+#### Examples of how to setup devices
 
 ##### Case study 1: Configuring a development M5Stack, as a multi-device to work with iOS/iPadOS/tvOS
 
