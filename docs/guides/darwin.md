@@ -15,18 +15,22 @@ Note: These steps are supported on:
 -   HomePod _(tvOS)_
 -   Apple Watch _(watchOS)_
 
-### Matter functionality is currently a Developer Preview, current requirements include:
+### Current requires for testing with Apple Devices
 
+##### Note: Matter functionality is currently a Developer Preview
+
+-   Devices must support BLE pairing, and have it enabled
 -   An iPhone or iPad running iOS/iPadOS at least 15.6. You will need to install
-    a profile on it (instructions below).
+    a [profile](#profile-installation) on it.
 -   An Apple TV or HomePod running at least tvOS 15.6. You will need to install
-    a profile on it (instructions below). If you have multiple Apple TVs and/or
-    HomePods, you will need to install the profile on all of them.
--   The iPhone or iPad with the Matter profile must belong to the same iCloud
-    account as the Apple TV or HomePod with the Matter profile.
+    a [profile](#profile-installation) on it. If you have multiple Apple TVs
+    and/or HomePods, you will need to install the
+    [profile](#profile-installation) on all of them.
+-   The iPhone or iPad with the Matter [profile](#profile-installation) must
+    belong to the same iCloud account as the Apple TV or HomePod with the Matter
+    [profile](#profile-installation).
 -   A test iCloud account is highly recommended for Matter development to avoid
     interference with existing homes.
--   Devices must support BLE pairing, and have it enabled
 
 ## Source Compatibility
 
