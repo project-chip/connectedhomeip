@@ -44,6 +44,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reboot target device"
       PICS: PICS_SDK_CI_ONLY
@@ -106,6 +108,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFE
 
     - label: "Reboot target device"
       PICS: PICS_SDK_CI_ONLY

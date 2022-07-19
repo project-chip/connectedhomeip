@@ -35,6 +35,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.A0001 && CC.S.F00
@@ -43,6 +45,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads RemainingTime attribute from DUT"
       PICS: CC.S.A0002
@@ -51,6 +55,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003 && CC.S.F03
@@ -128,6 +134,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F02 && CC.S.A4001
@@ -146,6 +154,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads ColorLoopDirection attribute from DUT"
       PICS: CC.S.A4003 && CC.S.F02
@@ -154,6 +164,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads ColorLoopTime attribute from DUT"
       PICS: CC.S.A4004 && CC.S.F02
@@ -162,6 +174,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads ColorLoopStartEnhancedHue attribute from DUT"
       PICS: CC.S.A4005 && CC.S.F02
@@ -170,6 +184,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads ColorLoopStoredEnhancedHue attribute from DUT"
       PICS: CC.S.A4006 && CC.S.F02
@@ -178,6 +194,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads FeatureMap attribute from DUT"
       command: "readAttribute"
@@ -274,6 +292,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads Primary2X attribute from DUT"
       PICS: CC.S.A0015
@@ -302,6 +322,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads Primary3X attribute from DUT"
       PICS: CC.S.A0019
@@ -330,6 +352,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     #Additional Defined Primaries Information Attribute Set
     - label: "TH reads Primary4X attribute from DUT"
@@ -359,6 +383,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads Primary5X attribute from DUT"
       PICS: CC.S.A0024
@@ -387,6 +413,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads Primary6X attribute from DUT"
       PICS: CC.S.A0028
@@ -415,6 +443,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     #Defined Color Points Settings Attribute Set
     - label: "TH reads WhitePointX attribute from DUT"
@@ -464,6 +494,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads ColorPointGX attribute from DUT"
       PICS: CC.S.A0036
@@ -492,6 +524,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads ColorPointBX attribute from DUT"
       PICS: CC.S.A003a
@@ -520,3 +554,5 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255

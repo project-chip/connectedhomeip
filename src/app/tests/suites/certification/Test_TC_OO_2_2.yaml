@@ -134,7 +134,7 @@ tests:
 
     # Skipped this step because the above test need manual input
     - label: "Check on/off attribute value is true after on command"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:
@@ -153,7 +153,7 @@ tests:
 
     # Skipped the step because the above test need manual input
     - label: "Check on/off attribute value is false after off command"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && OO.S.A0000
       command: "readAttribute"
       attribute: "OnOff"
       response:

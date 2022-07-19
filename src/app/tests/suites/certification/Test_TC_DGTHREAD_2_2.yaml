@@ -35,6 +35,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxUnicastCount attribute value from DUT"
       PICS: DGTHREAD.S.A0017
@@ -43,6 +45,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxBroadcastCount attribute value from DUT"
       PICS: DGTHREAD.S.A0018
@@ -51,6 +55,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxAckRequestedCount attribute value from DUT"
       PICS: DGTHREAD.S.A0019
@@ -59,6 +65,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxAckedCount attribute value from DUT"
       PICS: DGTHREAD.S.A001a
@@ -67,6 +75,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxNoAckRequestedCount attribute value from DUT"
       PICS: DGTHREAD.S.A001b
@@ -75,6 +85,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxDataCount attribute value from DUT"
       PICS: DGTHREAD.S.A001c
@@ -83,6 +95,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxDataPollCount attribute value from DUT"
       PICS: DGTHREAD.S.A001d
@@ -91,6 +105,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxBeaconCount attribute value from DUT"
       PICS: DGTHREAD.S.A001e
@@ -99,6 +115,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxBeaconRequestCount attribute value from DUT"
       PICS: DGTHREAD.S.A002f
@@ -107,6 +125,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxOtherCount attribute value from DUT"
       PICS: DGTHREAD.S.A0020
@@ -115,6 +135,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxRetryCount attribute value from DUT"
       PICS: DGTHREAD.S.A0021
@@ -123,6 +145,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxDirectMaxRetryExpiryCount attribute value from DUT"
       PICS: DGTHREAD.S.A0022
@@ -131,6 +155,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxIndirectMaxRetryExpiryCount attribute value from DUT"
       PICS: DGTHREAD.S.A0023
@@ -139,6 +165,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxErrCcaCount attribute value from DUT"
       PICS: DGTHREAD.S.A0024
@@ -147,6 +175,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxErrAbortCount attribute value from DUT"
       PICS: DGTHREAD.S.A0025
@@ -155,6 +185,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads TxErrBusyChannelCount attribute value from DUT"
       PICS: DGTHREAD.S.A0026
@@ -163,3 +195,5 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
