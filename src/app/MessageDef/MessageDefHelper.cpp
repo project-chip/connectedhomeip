@@ -172,7 +172,7 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
         char value_s[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
         uint32_t readerLen = aReader.GetLength();
-        CHIP_ERROR err = aReader.GetString(value_s, sizeof(value_s));
+        CHIP_ERROR err     = aReader.GetString(value_s, sizeof(value_s));
         VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, err);
 
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
