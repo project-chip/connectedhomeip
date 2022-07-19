@@ -148,8 +148,10 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     [coder encodeObject:self.version forKey:MTRSetupPayloadCodingKeyVersion];
     [coder encodeObject:self.vendorID forKey:MTRSetupPayloadCodingKeyVendorID];
     [coder encodeObject:self.productID forKey:MTRSetupPayloadCodingKeyProductID];
-    [coder encodeInteger:self.commissioningFlow forKey:MTRSetupPayloadCodingKeyCommissioningFlow];
-    [coder encodeInteger:self.rendezvousInformation forKey:MTRSetupPayloadCodingKeyRendezvousFlags];
+    // Casts are safe because commissioning flow and rendezvous information
+    // values are all pretty small and non-negative.
+    [coder encodeInteger:static_cast<NSInteger>(self.commissioningFlow) forKey:MTRSetupPayloadCodingKeyCommissioningFlow];
+    [coder encodeInteger:static_cast<NSInteger>(self.rendezvousInformation) forKey:MTRSetupPayloadCodingKeyRendezvousFlags];
     [coder encodeObject:self.discriminator forKey:MTRSetupPayloadCodingKeyDiscriminator];
     [coder encodeObject:self.setUpPINCode forKey:MTRSetupPayloadCodingKeySetupPINCode];
     [coder encodeObject:self.serialNumber forKey:MTRSetupPayloadCodingKeySerialNumber];
@@ -160,8 +162,8 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     NSNumber * version = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVersion];
     NSNumber * vendorID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyVendorID];
     NSNumber * productID = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyProductID];
-    NSUInteger commissioningFlow = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyCommissioningFlow];
-    NSUInteger rendezvousInformation = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyRendezvousFlags];
+    NSInteger commissioningFlow = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyCommissioningFlow];
+    NSInteger rendezvousInformation = [decoder decodeIntegerForKey:MTRSetupPayloadCodingKeyRendezvousFlags];
     NSNumber * discriminator = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeyDiscriminator];
     NSNumber * setUpPINCode = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRSetupPayloadCodingKeySetupPINCode];
     NSString * serialNumber = [decoder decodeObjectOfClass:[NSString class] forKey:MTRSetupPayloadCodingKeySerialNumber];
@@ -170,8 +172,8 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     payload.version = version;
     payload.vendorID = vendorID;
     payload.productID = productID;
-    payload.commissioningFlow = (MTRCommissioningFlow) commissioningFlow;
-    payload.rendezvousInformation = (MTRRendezvousInformationFlags) rendezvousInformation;
+    payload.commissioningFlow = static_cast<MTRCommissioningFlow>(commissioningFlow);
+    payload.rendezvousInformation = static_cast<MTRRendezvousInformationFlags>(rendezvousInformation);
     payload.discriminator = discriminator;
     payload.setUpPINCode = setUpPINCode;
     payload.serialNumber = serialNumber;
