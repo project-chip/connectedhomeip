@@ -108,7 +108,7 @@ to the UART console.
 
         ```
         [INFO][CHIP]: [SVR]Copy/paste the below URL in a browser to see the QR Code:
-        [INFO][CHIP]: [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00CMVH7SR00
+        [INFO][CHIP]: [SVR]https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00CMVH7SR00
         ```
 
 -   Open URL from the console to display the QR in a web browser.
