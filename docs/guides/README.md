@@ -39,8 +39,8 @@
 
 -   [chip-tool](./chip_tool_guide.md)
 -   [Python Matter-Repl](./matter-repl.md)
--   [python-chip-contorller - Advanced](./python_chip_controller_advanced_usage.md)
--   [python-chip-contorller - Building](./python_chip_controller_building.md)
+-   [python-chip-controller - Advanced](./python_chip_controller_advanced_usage.md)
+-   [python-chip-controller - Building](./python_chip_controller_building.md)
 
 ## Build Guides
 
