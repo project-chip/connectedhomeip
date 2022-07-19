@@ -319,8 +319,16 @@ def main(argv: Sequence[str]) -> None:
                       dest="tty", metavar="TTY", default=None)
     parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
                       dest="use_zzz", action="store_true")
+
+    # Build CD params.
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
+    parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
+                      dest="dry_run", action="store_true")
+    parser.add_option("", "--build_exclude", help="For use with --build_all. Build labels to exclude. Accepts a regex pattern. Mutually exclusive with --build_include.",
+                      dest="build_exclude")
+    parser.add_option("", "--build_include", help="For use with --build_all. Build labels to include. Accepts a regex pattern. Mutually exclusive with --build_exclude.",
+                      dest="build_include")
     parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
     parser.add_option(
@@ -380,14 +388,25 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
+        if options.build_include and options.build_exclude:
+            flush_print(
+                "Error. --build_include and --build_exclude are mutually exclusive options.")
+            exit(1)
         flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
-        os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
             for platform, label_args in cicd_config["cd_platforms"].items():
                 for label, args in label_args.items():
+                    archive_name = f"{label}-{device_name}"
+                    if options.build_exclude and re.search(options.build_exclude, archive_name):
+                        continue
+                    elif options.build_include and not re.search(options.build_include, archive_name):
+                        continue
+                    if options.dry_run:
+                        flush_print(archive_name)
+                        continue
                     command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
@@ -409,7 +428,7 @@ def main(argv: Sequence[str]) -> None:
                         if not options.keep_going:
                             exit(1)
                         continue
-                    archive_name = f"{label}-{device_name}"
+                    os.makedirs(archive_prefix, exist_ok=True)
                     archive_full_name = archive_prefix + archive_name + archive_suffix
                     flush_print(f"Adding build output to archive {archive_full_name}")
                     if os.path.exists(archive_full_name):
