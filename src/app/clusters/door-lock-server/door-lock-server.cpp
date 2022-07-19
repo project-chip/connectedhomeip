@@ -2944,6 +2944,8 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
     case DlCredentialType::kFace:
         // So far there's no distinct data type for face credentials
         return DlLockDataType::kUnspecified;
+    case DlCredentialType::kUnknownEnumValue:
+        return DlLockDataType::kUnspecified;
     }
 
     return DlLockDataType::kUnspecified;
