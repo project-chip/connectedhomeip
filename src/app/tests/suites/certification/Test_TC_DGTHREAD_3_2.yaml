@@ -27,7 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxTotalCount attribute value from TH"
-      PICS: DGTHREAD.C.A0017
+      PICS: DGTHREAD.C.A0016
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-total-count 65 0
 
@@ -41,7 +41,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxUnicastCount attribute value from TH"
-      PICS: DGTHREAD.C.A0018
+      PICS: DGTHREAD.C.A0017
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-unicast-count 65 0
 
@@ -55,7 +55,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxBroadcastCount attribute value from TH"
-      PICS: DGTHREAD.C.A0019
+      PICS: DGTHREAD.C.A0018
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-broadcast-count 65 0
 
@@ -69,7 +69,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxAckRequestedCount attribute value from TH"
-      PICS: DGTHREAD.C.A001a
+      PICS: DGTHREAD.C.A0019
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-ack-requested-count 65 0
 
@@ -83,7 +83,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxAckedCount attribute value from TH"
-      PICS: DGTHREAD.C.A001b
+      PICS: DGTHREAD.C.A001a
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-acked-count 65 0
 
@@ -97,7 +97,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxNoAckRequestedCount attribute value from TH"
-      PICS: DGTHREAD.C.A001c
+      PICS: DGTHREAD.C.A001b
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-no-ack-requested-count 65 0
           Verify on the TH Log:
@@ -110,7 +110,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxDataCount attribute value from TH"
-      PICS: DGTHREAD.C.A001d
+      PICS: DGTHREAD.C.A001c
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-data-count 65 0
           Verify on the TH Log:
@@ -123,7 +123,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxDataPollCount attribute value from TH"
-      PICS: DGTHREAD.C.A001e
+      PICS: DGTHREAD.C.A001d
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-data-poll-count 65 0
           Verify on the TH Log:
@@ -136,7 +136,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxBeaconCount attribute value from TH"
-      PICS: DGTHREAD.C.A001f
+      PICS: DGTHREAD.C.A001e
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-beacon-count 65 0
            Verify on the TH Log:
@@ -149,7 +149,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxBeaconRequestCount attribute value from TH"
-      PICS: DGTHREAD.C.A0020
+      PICS: DGTHREAD.C.A001f
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-beacon-request-count 65 0
           Verify on the TH Log:
@@ -162,7 +162,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxOtherCount attribute value from TH"
-      PICS: DGTHREAD.C.A0021
+      PICS: DGTHREAD.C.A0020
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-other-count 65 0
           Verify on the TH Log:
@@ -175,7 +175,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxRetryCount attribute value from TH"
-      PICS: DGTHREAD.C.A0022
+      PICS: DGTHREAD.C.A0021
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-retry-count 65 0
           Verify on the TH Log:
@@ -188,7 +188,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxDirectMaxRetryExpiryCount attribute value from TH"
-      PICS: DGTHREAD.C.A0023
+      PICS: DGTHREAD.C.A0022
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-direct-max-retry-expiry-count 65 0
            Verify on the TH Log:
@@ -201,7 +201,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxIndirectMaxRetryExpiryCount attribute value from TH"
-      PICS: DGTHREAD.C.A0024
+      PICS: DGTHREAD.C.A0023
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-indirect-max-retry-expiry-count 65 0
           Verify on the TH Log:
@@ -214,7 +214,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxErrCcaCount attribute value from TH"
-      PICS: DGTHREAD.C.A0025
+      PICS: DGTHREAD.C.A0024
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-cca-count 65 0
           Verify on the TH Log:
@@ -227,7 +227,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxErrAbortCount attribute value from TH"
-      PICS: DGTHREAD.C.A0026
+      PICS: DGTHREAD.C.A0025
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-abort-count 65 0
            Verify on the TH Log:
@@ -240,7 +240,7 @@ tests:
       disabled: true
 
     - label: "DUT reads TxErrBusyChannelCount attribute value from TH"
-      PICS: DGTHREAD.C.A0027
+      PICS: DGTHREAD.C.A0026
       verification: |
           ./chip-tool threadnetworkdiagnostics read tx-err-busy-channel-count 65 0
           Verify on the TH Log:

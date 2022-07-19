@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads RxTotalCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0028
+      PICS: DGTHREAD.S.A0027
       command: "readAttribute"
       attribute: "RxTotalCount"
       response:
@@ -37,7 +37,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxUnicastCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0029
+      PICS: DGTHREAD.S.A0028
       command: "readAttribute"
       attribute: "RxUnicastCount"
       response:
@@ -45,7 +45,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxBroadcastCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002a
+      PICS: DGTHREAD.S.A0029
       command: "readAttribute"
       attribute: "RxBroadcastCount"
       response:
@@ -53,7 +53,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxDataCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002b
+      PICS: DGTHREAD.S.A002a
       command: "readAttribute"
       attribute: "RxDataCount"
       response:
@@ -61,7 +61,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxDataPollCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002c
+      PICS: DGTHREAD.S.A002b
       command: "readAttribute"
       attribute: "RxDataPollCount"
       response:
@@ -69,7 +69,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxBeaconCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002d
+      PICS: DGTHREAD.S.A002c
       command: "readAttribute"
       attribute: "RxBeaconCount"
       response:
@@ -77,7 +77,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxBeaconRequestCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002e
+      PICS: DGTHREAD.S.A002d
       command: "readAttribute"
       attribute: "RxBeaconRequestCount"
       response:
@@ -85,7 +85,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxOtherCount attribute value from DUT"
-      PICS: DGTHREAD.S.A002f
+      PICS: DGTHREAD.S.A002e
       command: "readAttribute"
       attribute: "RxOtherCount"
       response:
@@ -93,7 +93,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxAddressFilteredCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0030
+      PICS: DGTHREAD.S.A002f
       command: "readAttribute"
       attribute: "RxAddressFilteredCount"
       response:
@@ -101,7 +101,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxDestAddrFilteredCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0031
+      PICS: DGTHREAD.S.A0030
       command: "readAttribute"
       attribute: "RxDestAddrFilteredCount"
       response:
@@ -109,7 +109,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxDuplicatedCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0032
+      PICS: DGTHREAD.S.A0031
       command: "readAttribute"
       attribute: "RxDuplicatedCount"
       response:
@@ -117,7 +117,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxErrNoFrameCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0033
+      PICS: DGTHREAD.S.A0032
       command: "readAttribute"
       attribute: "RxErrNoFrameCount"
       response:
@@ -125,7 +125,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxErrUnknownNeighborCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0034
+      PICS: DGTHREAD.S.A0033
       command: "readAttribute"
       attribute: "RxErrUnknownNeighborCount"
       response:
@@ -146,7 +146,7 @@ tests:
            [1649826953.828346][3727:3732] CHIP:TOO:   RxErrInvalidSrcAddrCount: 0
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0035
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0034
       arguments:
           values:
               - name: "message"
@@ -155,7 +155,7 @@ tests:
                 value: "y"
 
     - label: "TH reads RxErrSecCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0036
+      PICS: DGTHREAD.S.A0035
       command: "readAttribute"
       attribute: "RxErrSecCount"
       response:
@@ -163,7 +163,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxErrFcsCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0037
+      PICS: DGTHREAD.S.A0036
       command: "readAttribute"
       attribute: "RxErrFcsCount"
       response:
@@ -171,7 +171,7 @@ tests:
               type: uint32
 
     - label: "TH reads RxErrOtherCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0038
+      PICS: DGTHREAD.S.A0037
       command: "readAttribute"
       attribute: "RxErrOtherCount"
       response:
