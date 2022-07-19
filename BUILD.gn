@@ -321,22 +321,32 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_tizen_lighting_app = enable_tizen_builds
   }
 
+  builds = []
+  extra_build_deps = []
+  extra_check_deps = []
+
   if (enable_host_clang_build) {
     chip_build("host_clang") {
       toolchain = "${build_root}/toolchain/host:${host_os}_${host_cpu}_clang"
     }
+
+    builds += [ ":host_clang" ]
   }
 
   if (enable_host_gcc_build) {
     chip_build("host_gcc") {
       toolchain = "${build_root}/toolchain/host:${host_os}_${host_cpu}_gcc"
     }
+
+    builds += [ ":host_gcc" ]
   }
 
   if (enable_host_gcc_mbedtls_build) {
     chip_build("host_gcc_mbedtls") {
       toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
     }
+
+    builds += [ ":host_gcc_mbedtls" ]
   }
 
   if (enable_android_builds) {
@@ -355,12 +365,21 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     chip_build("android_x86") {
       toolchain = "${build_root}/toolchain/android:android_x86"
     }
+
+    builds += [
+      ":android_arm",
+      ":android_arm64",
+      ":android_x64",
+      ":android_x86",
+    ]
   }
 
   if (enable_fake_tests) {
     chip_build("fake_platform") {
       toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
     }
+
+    builds += [ ":fake_platform" ]
   }
 
   standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
@@ -370,12 +389,16 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     group("standalone_chip_cert") {
       deps = [ "${chip_root}/src/tools/chip-cert(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":standalone_chip_cert" ]
   }
 
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
       deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":standalone_chip_tool" ]
   }
 
   if (enable_standalone_chip_tool_darwin_build) {
@@ -384,18 +407,24 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/darwin-framework-tool(${standalone_toolchain})",
       ]
     }
+
+    extra_build_deps += [ ":standalone_chip_tool_darwin" ]
   }
 
   if (enable_cc13x2x7_26x2x7_lock_app_build) {
     group("cc13x2x7_26x2x7_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/cc13x2x7_26x2x7(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2x7_26x2x7_lock_app)" ]
     }
+
+    extra_build_deps += [ ":cc13x2x7_26x2x7_lock_app" ]
   }
 
   if (enable_cc13x2x7_26x2x7_all_clusters_app_build) {
     group("cc13x2x7_26x2x7_all_clusters_app") {
       deps = [ "${chip_root}/examples/all-clusters-app/cc13x2x7_26x2x7(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2x7_26x2x7_all_clusters_app)" ]
     }
+
+    extra_build_deps += [ ":cc13x2x7_26x2x7_all_clusters_app" ]
   }
 
   if (enable_standalone_shell_build) {
@@ -403,6 +432,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps =
           [ "${chip_root}/examples/shell/standalone(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":standalone_shell" ]
   }
 
   if (enable_linux_all_clusters_app_build) {
@@ -411,6 +442,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/all-clusters-app/linux(${standalone_toolchain})",
       ]
     }
+
+    extra_build_deps += [ ":linux_all_clusters_app" ]
   }
 
   if (enable_linux_thermostat_app_build) {
@@ -418,12 +451,16 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps =
           [ "${chip_root}/examples/thermostat/linux(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":linux_thermostat_app" ]
   }
 
   if (enable_linux_tv_app_build) {
     group("linux_tv_app") {
       deps = [ "${chip_root}/examples/tv-app/linux(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":linux_tv_app" ]
   }
 
   if (enable_linux_tv_casting_app_build) {
@@ -432,6 +469,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/tv-casting-app/linux(${standalone_toolchain})",
       ]
     }
+
+    extra_build_deps += [ ":linux_tv_casting_app" ]
   }
 
   if (enable_linux_bridge_app_build) {
@@ -439,6 +478,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps =
           [ "${chip_root}/examples/bridge-app/linux(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":linux_bridge_app" ]
   }
 
   if (enable_linux_lighting_app_build) {
@@ -447,174 +488,107 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/examples/lighting-app/linux(${standalone_toolchain})",
       ]
     }
+
+    extra_build_deps += [ ":linux_lighting_app" ]
   }
 
   if (enable_linux_lock_app_build) {
     group("linux_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/linux(${standalone_toolchain})" ]
     }
+
+    extra_build_deps += [ ":linux_lock_app" ]
   }
 
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
     }
+
+    extra_build_deps += [ ":efr32_lock_app" ]
   }
 
   if (enable_p6_lock_app_build) {
     group("p6_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/p6(${chip_root}/config/p6/toolchain:p6_lock_app)" ]
     }
+
+    extra_build_deps += [ ":p6_lock_app" ]
   }
 
   if (enable_qpg_lock_app_build) {
     group("qpg_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/qpg(${chip_root}/config/qpg/toolchain:qpg_lock_app)" ]
     }
+
+    extra_build_deps += [ ":qpg_lock_app" ]
   }
 
   if (enable_efr32_lighting_app_build) {
     group("efr32_lighting_app") {
       deps = [ "${chip_root}/examples/lighting-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lighting_app)" ]
     }
+
+    extra_build_deps += [ ":efr32_lighting_app" ]
   }
 
   if (enable_efr32_window_app_build) {
     group("efr32_window_app") {
       deps = [ "${chip_root}/examples/window-app/efr32(${chip_root}/config/efr32/toolchain:efr32_window_app)" ]
     }
+
+    extra_build_deps += [ ":efr32_window_app" ]
   }
 
   if (enable_k32w_lighting_app_build) {
     group("k32w_lighting_app") {
       deps = [ "${chip_root}/examples/lighting-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
     }
+
+    extra_build_deps += [ ":k32w_lighting_app" ]
   }
 
   if (enable_k32w_lock_app_build) {
     group("k32w_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
     }
+
+    extra_build_deps += [ ":k32w_lock_app" ]
   }
 
   if (enable_k32w_shell_app_build) {
     group("k32w_shell_app") {
       deps = [ "${chip_root}/examples/shell/nxp/k32w/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
     }
+
+    extra_build_deps += [ ":k32w_shell_app" ]
   }
 
   if (enable_tizen_lighting_app) {
     group("tizen_lighting_app") {
       deps = [ "${chip_root}/examples/lighting-app/tizen/(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
     }
+
+    extra_build_deps += [ ":tizen_lighting_app" ]
   }
 
   if (enable_mw320_shell_build) {
     group("mw320_shell") {
       deps = [ "${chip_root}/examples/shell/mw320(${chip_root}/config/mw320/toolchain:mw320_shell)" ]
     }
+
+    extra_build_deps += [ ":mw320_shell" ]
   }
 
   group("default") {
-    deps = []
-    if (enable_host_clang_build) {
-      deps += [ ":host_clang" ]
-    }
-    if (enable_host_gcc_build) {
-      deps += [ ":host_gcc" ]
-    }
-    if (enable_host_gcc_mbedtls_build) {
-      deps += [ ":host_gcc_mbedtls" ]
-    }
-    if (enable_android_builds) {
-      deps += [
-        ":android_arm",
-        ":android_arm64",
-        ":android_x64",
-        ":android_x86",
-      ]
-    }
-    if (enable_tizen_builds) {
-      deps += [ ":tizen_lighting_app" ]
-    }
-    if (enable_standalone_chip_cert_build) {
-      deps += [ ":standalone_chip_cert" ]
-    }
-    if (enable_standalone_chip_tool_build) {
-      deps += [ ":standalone_chip_tool" ]
-    }
-    if (enable_standalone_chip_tool_darwin_build) {
-      deps += [ ":standalone_chip_tool_darwin" ]
-    }
-    if (enable_standalone_shell_build) {
-      deps += [ ":standalone_shell" ]
-    }
-    if (enable_linux_all_clusters_app_build) {
-      deps += [ ":linux_all_clusters_app" ]
-    }
-    if (enable_linux_thermostat_app_build) {
-      deps += [ ":linux_thermostat_app" ]
-    }
-    if (enable_linux_tv_app_build) {
-      deps += [ ":linux_tv_app" ]
-    }
-    if (enable_linux_tv_casting_app_build) {
-      deps += [ ":linux_tv_casting_app" ]
-    }
-    if (enable_linux_bridge_app_build) {
-      deps += [ ":linux_bridge_app" ]
-    }
-    if (enable_linux_lighting_app_build) {
-      deps += [ ":linux_lighting_app" ]
-    }
-    if (enable_linux_lock_app_build) {
-      deps += [ ":linux_lock_app" ]
-    }
-    if (enable_efr32_lock_app_build) {
-      deps += [ ":efr32_lock_app" ]
-    }
-    if (enable_efr32_lighting_app_build) {
-      deps += [ ":efr32_lighting_app" ]
-    }
-    if (enable_efr32_window_app_build) {
-      deps += [ ":efr32_window_app" ]
-    }
-    if (enable_p6_lock_app_build) {
-      deps += [ ":p6_lock_app" ]
-    }
-    if (enable_k32w_lighting_app_build) {
-      deps += [ ":k32w_lighting_app" ]
-    }
-    if (enable_k32w_lock_app_build) {
-      deps += [ ":k32w_lock_app" ]
-    }
-    if (enable_k32w_shell_app_build) {
-      deps += [ ":k32w_shell_app" ]
-    }
-    if (enable_qpg_lock_app_build) {
-      deps += [ ":qpg_lock_app" ]
-    }
-    if (enable_cc13x2x7_26x2x7_lock_app_build) {
-      deps += [ ":cc13x2x7_26x2x7_lock_app" ]
-    }
-    if (enable_cc13x2x7_26x2x7_all_clusters_app_build) {
-      deps += [ ":cc13x2x7_26x2x7_all_clusters_app" ]
-    }
+    deps = extra_build_deps + builds
   }
 
   group("check") {
-    deps = []
-    if (enable_host_clang_build) {
-      deps += [ ":check_host_clang" ]
-    }
-    if (enable_host_gcc_build) {
-      deps += [ ":check_host_gcc" ]
-    }
-    if (enable_host_gcc_mbedtls_build) {
-      deps += [ ":check_host_gcc_mbedtls" ]
-    }
-    if (enable_fake_tests) {
-      deps += [ ":check_fake_platform" ]
+    deps = extra_check_deps
+    foreach(_build, builds) {
+      deps += [ get_label_info(_build, "dir") + ":check_" +
+                get_label_info(_build, "name") ]
     }
   }
 }
