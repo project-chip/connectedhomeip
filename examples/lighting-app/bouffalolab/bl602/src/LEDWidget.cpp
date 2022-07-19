@@ -141,7 +141,7 @@ bool LEDWidget::IsTurnedOn()
 void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
 {
     uint8_t red, green, blue;
-    uint8_t brightness = mState ? mDefaultOnBrightness : 0;
+    uint8_t brightness = mDefaultOnBrightness;
     mHue               = static_cast<uint16_t>(Hue) * 360 / 254;        // mHue [0, 360]
     mSaturation        = static_cast<uint16_t>(Saturation) * 100 / 254; // mSaturation [0 , 100]
 
