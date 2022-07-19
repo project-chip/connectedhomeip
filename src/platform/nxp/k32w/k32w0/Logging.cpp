@@ -107,7 +107,7 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
 
     if (!isLogInitialized)
     {
-        isLogInitialized   = true;
+        isLogInitialized = true;
         otPlatUartEnable();
     }
 

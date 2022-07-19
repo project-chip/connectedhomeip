@@ -29,9 +29,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "PDM.h"
-#include "ram_storage.h"
-#include "pdm_ram_storage_glue.h"
 #include "fsl_os_abstraction.h"
+#include "pdm_ram_storage_glue.h"
+#include "ram_storage.h"
 
 namespace chip {
 namespace DeviceLayer {

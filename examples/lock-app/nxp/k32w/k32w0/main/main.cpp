@@ -40,13 +40,13 @@ using namespace ::chip::Logging;
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
 #include "Keyboard.h"
+#include "OtaSupport.h"
 #include "PWR_Configuration.h"
 #include "PWR_Interface.h"
 #include "RNG_Interface.h"
 #include "app_dual_mode_low_power.h"
 #include "app_dual_mode_switch.h"
 #include "radio.h"
-#include "OtaSupport.h"
 #endif
 
 #include "MacSched.h"
@@ -109,7 +109,7 @@ extern "C" void main_task(void const * argument)
     PWR_Init();
 
     /* Internal - MATTER-303: keep in retention the entire RAM1 for the moment */
-    PWR_vAddRamRetention((uint32_t)0x4020000, 0x10000);
+    PWR_vAddRamRetention((uint32_t) 0x4020000, 0x10000);
 
     PWR_RegisterLowPowerExitCallback(dm_switch_wakeupCallBack);
     PWR_RegisterLowPowerEnterCallback(dm_switch_preSleepCallBack);
@@ -212,13 +212,13 @@ uint32_t dm_switch_get15_4InitWakeUpTime(void)
 extern "C" bleResult_t App_PostCallbackMessage(appCallbackHandler_t handler, appCallbackParam_t param)
 {
     AppEvent event;
-    event.Type    = AppEvent::kEventType_Lp;
+    event.Type = AppEvent::kEventType_Lp;
 
     event.Handler = handler;
     event.param   = param;
 
 #if ENABLE_LOW_POWER_LOGS
-    K32W_LOG("App_PostCallbackMessage %d", (uint32_t)param);
+    K32W_LOG("App_PostCallbackMessage %d", (uint32_t) param);
 #endif
 
     GetAppTask().PostEvent(&event);
@@ -261,7 +261,6 @@ static void dm_switch_wakeupCallBack(void)
     }
     dm_lp_wakeup();
 }
-
 
 static void dm_switch_preSleepCallBack(void)
 {

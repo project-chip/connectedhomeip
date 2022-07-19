@@ -25,8 +25,8 @@
 
 #pragma once
 
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 #include "fsl_os_abstraction.h"
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -60,7 +60,7 @@ public:
     // Callback used by tinycrypt to generate random numbers.
     // It must be set before calling any sign operations,
     // which are used in both Matter and OT threads.
-    static int uECC_RNG_Function(uint8_t *dest, unsigned int size);
+    static int uECC_RNG_Function(uint8_t * dest, unsigned int size);
 #endif
 
 private:

@@ -733,7 +733,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
 #endif
 
-    if (aEvent->Handler)
+        if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
     }

@@ -517,7 +517,7 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
 
 #if defined(MBEDTLS_ECDSA_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = 0;
+    int result       = 0;
     mbedtls_mpi r, s;
     mbedtls_mpi_init(&r);
     mbedtls_mpi_init(&s);
@@ -584,7 +584,7 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
     VerifyOrReturnError(signature.Length() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = 0;
+    int result       = 0;
     mbedtls_mpi r, s;
 
     mbedtls_mpi_init(&r);
@@ -715,7 +715,7 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
 CHIP_ERROR P256Keypair::Initialize()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = 0;
+    int result       = 0;
 
     size_t pubkey_size = 0;
 
@@ -735,7 +735,7 @@ CHIP_ERROR P256Keypair::Initialize()
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(pubkey_size == mPublicKey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    keypair = nullptr;
+    keypair      = nullptr;
     mInitialized = true;
 
 exit:
@@ -752,11 +752,11 @@ exit:
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
-    size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
+    size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = 0;
+    int result       = 0;
 
     bbuf.Put(mPublicKey, mPublicKey.Length());
 
@@ -782,7 +782,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
-    int result = 0;
+    int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     Clear();
@@ -1003,12 +1003,12 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     mbedtls_mpi_init(&context->w1);
     mbedtls_mpi_init(&context->xy);
     mbedtls_mpi_init(&context->tempbn);
-    w0 = &context->w0;
-    w1 = &context->w1;
-    xy = &context->xy;
+    w0     = &context->w0;
+    w1     = &context->w1;
+    xy     = &context->xy;
     tempbn = &context->tempbn;
 
-    G = &context->curve.G;
+    G     = &context->curve.G;
     order = &context->curve.N;
 
     return error;
@@ -1185,7 +1185,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1,
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 {
-    mbedtls_ecp_point * Rp = (mbedtls_ecp_point *) R;
+    mbedtls_ecp_point * Rp    = (mbedtls_ecp_point *) R;
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
     if (mbedtls_mpi_sub_mpi(&Rp->CHIP_CRYPTO_PAL_PRIVATE(Y), &context->curve.P, &Rp->CHIP_CRYPTO_PAL_PRIVATE(Y)) != 0)

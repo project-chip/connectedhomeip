@@ -47,7 +47,6 @@
 #include "fsl_sha.h"
 #include "k32w0-chip-mbedtls-config.h"
 
-
 namespace chip {
 namespace DeviceLayer {
 

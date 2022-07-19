@@ -501,7 +501,6 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
     }
 }
 
-
 static inline mbedtls_uecc_keypair * to_keypair(P256KeypairContext * context)
 {
     return SafePointerCast<mbedtls_uecc_keypair *>(context);
@@ -906,7 +905,7 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     memset(&context->xy, 0, NUM_ECC_WORDS * sizeof(uECC_word_t));
     memset(&context->tempbn, 0, NUM_ECC_WORDS * sizeof(uECC_word_t));
 
-    G = NULL;
+    G     = NULL;
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 

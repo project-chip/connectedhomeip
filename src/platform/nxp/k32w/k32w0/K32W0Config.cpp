@@ -37,7 +37,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 osaMutexId_t K32WConfig::pdmMutexHandle = NULL;
-static ramBufferDescriptor * ramDescr = NULL;
+static ramBufferDescriptor * ramDescr   = NULL;
 
 constexpr uint16_t kNvmIdChipConfigData  = 0x5000;
 constexpr uint16_t kRamBufferInitialSize = 3072;
@@ -172,7 +172,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
 {
     CHIP_ERROR err;
     PDM_teStatus pdmStatus;
-    rsError      ramStatus = RS_ERROR_NONE;
+    rsError ramStatus = RS_ERROR_NONE;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     MutexLock(pdmMutexHandle, osaWaitForever_c);
@@ -189,8 +189,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
     SuccessOrExit(err = MapRamStorageStatus(ramStatus));
 
     /* schedule flash writing */
-    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr,
-                                              ramDescr->ramBufferLen + kRamDescHeaderSize);
+    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -202,7 +201,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, bool val)
 {
     CHIP_ERROR err;
     PDM_teStatus pdmStatus;
-    rsError      ramStatus = RS_ERROR_NONE;
+    rsError ramStatus = RS_ERROR_NONE;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     MutexLock(pdmMutexHandle, osaWaitForever_c);
@@ -221,8 +220,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueSync(Key key, bool val)
     // Interrupts are disabled to ensure there is no context switch during the actual
     // writing, thus avoiding race conditions.
     OSA_InterruptDisable();
-    pdmStatus = PDM_eSaveRecordData(kNvmIdChipConfigData, ramDescr,
-                                    ramDescr->ramBufferLen + kRamDescHeaderSize);
+    pdmStatus = PDM_eSaveRecordData(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     OSA_InterruptEnable();
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
@@ -235,12 +233,12 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
 {
     CHIP_ERROR err;
     PDM_teStatus pdmStatus;
-    rsError      ramStatus = RS_ERROR_NONE;
+    rsError ramStatus = RS_ERROR_NONE;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     MutexLock(pdmMutexHandle, osaWaitForever_c);
 
-     /* first delete all occurences of "key" */
+    /* first delete all occurences of "key" */
     ramStorageDelete(ramDescr, key, -1);
 
     /* resize RAM Buffer if needed */
@@ -248,12 +246,11 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint32_t val)
     SuccessOrExit(err = MapRamStorageStatus(ramStatus));
 
     /* add to RAM buffer */
-    ramStatus = ramStorageSet(ramDescr, key, (uint8_t *)&val, sizeof(uint32_t));
+    ramStatus = ramStorageSet(ramDescr, key, (uint8_t *) &val, sizeof(uint32_t));
     SuccessOrExit(err = MapRamStorageStatus(ramStatus));
 
     /* schedule flash writing */
-    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr,
-                                              ramDescr->ramBufferLen + kRamDescHeaderSize);
+    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -265,12 +262,12 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
 {
     CHIP_ERROR err;
     PDM_teStatus pdmStatus;
-    rsError      ramStatus = RS_ERROR_NONE;
+    rsError ramStatus = RS_ERROR_NONE;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     MutexLock(pdmMutexHandle, osaWaitForever_c);
 
-     /* first delete all occurences of "key" */
+    /* first delete all occurences of "key" */
     ramStorageDelete(ramDescr, key, -1);
 
     /* resize RAM Buffer if needed */
@@ -278,12 +275,11 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, uint64_t val)
     SuccessOrExit(err = MapRamStorageStatus(ramStatus));
 
     /* add to RAM buffer */
-    ramStatus = ramStorageSet(ramDescr, key, (uint8_t *)&val, sizeof(uint64_t));
+    ramStatus = ramStorageSet(ramDescr, key, (uint8_t *) &val, sizeof(uint64_t));
     SuccessOrExit(err = MapRamStorageStatus(ramStatus));
 
     /* schedule flash writing */
-    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr,
-                                              ramDescr->ramBufferLen + kRamDescHeaderSize);
+    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -300,7 +296,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
 {
     CHIP_ERROR err;
     PDM_teStatus pdmStatus;
-    rsError      ramStatus = RS_ERROR_NONE;
+    rsError ramStatus = RS_ERROR_NONE;
 
     VerifyOrExit(ValidConfigKey(key), err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND); // Verify key id.
     MutexLock(pdmMutexHandle, osaWaitForever_c);
@@ -324,8 +320,7 @@ CHIP_ERROR K32WConfig::WriteConfigValueStr(Key key, const char * str, size_t str
         SuccessOrExit(err = MapRamStorageStatus(ramStatus));
 
         /* schedule flash writing */
-        pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr,
-                                             ramDescr->ramBufferLen + kRamDescHeaderSize);
+        pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     }
 
 exit:
@@ -355,8 +350,7 @@ CHIP_ERROR K32WConfig::ClearConfigValue(Key key)
     status = ramStorageDelete(ramDescr, key, -1);
     SuccessOrExit(err = MapRamStorageStatus(status));
 
-    pdmStatus =
-        PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
+    pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr, ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
@@ -392,7 +386,7 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
 
 exit:
-    free((void*)ramDescr);
+    free((void *) ramDescr);
     ramDescr = NULL;
     MutexUnlock(pdmMutexHandle);
     return err;
