@@ -28,6 +28,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition Send On Command"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
@@ -36,6 +49,8 @@ tests:
           saveAs: MinlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
       PICS: LVL.S.C04.Rsp
@@ -43,7 +58,7 @@ tests:
       arguments:
           values:
               - name: "level"
-                value: 1
+                value: MinlevelValue
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
@@ -56,12 +71,15 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: MinlevelValue
           saveAs: CurrentlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends step up command to DUT"
-      PICS: LVL.S.C02.Rsp
+      PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "Step"
       arguments:
           values:
@@ -89,12 +107,13 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 65
           constraints:
               type: uint8
+              minValue: 60
+              maxValue: 68
 
     - label: "Sends a StepWithOnOff command"
-      PICS: LVL.S.C06.Rsp
+      PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate
       command: "StepWithOnOff"
       arguments:
           values:
@@ -145,3 +164,16 @@ tests:
           values:
               - name: "ms"
                 value: 100
+
+    - label: "Precondition send Off Command"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

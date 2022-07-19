@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 79.3.2. [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
+name: 80.3.2. [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
 
 config:
     nodeId: 0x12344321
@@ -25,6 +25,8 @@ tests:
       verification: |
           ./chip-tool modeselect read start-up-mode 1 1
 
+          Verify on the TH Log:
+
           [1645777708.406864][4841:4846] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003DataVersion: 3781469721
           [1645777708.406933][4841:4846] CHIP:TOO:   StartUpMode: 0
       disabled: true
@@ -33,13 +35,15 @@ tests:
       verification: |
           ./chip-tool modeselect read current-mode 1 1
 
+          Verify on the TH Log:
+
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 4
       disabled: true
 
     - label:
           "If the StartUpMode and CurrentMode attributes have the same value,
-          proceed to step 2c, Otherwise proceed to step 3a."
+          proceed to step 2c, Otherwise proceed to step 3a"
       verification: |
           If the StartUpMode and CurrentMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3a.
       disabled: true
@@ -47,6 +51,8 @@ tests:
     - label: "TH reads the SupportedModes attribute from the DUT"
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
+
+          Verify on the TH Log:
 
           [1654153500.212649][3409:3414] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 2392545814
           [1654153500.212776][3409:3414] CHIP:TOO:   SupportedModes: 3 entries
@@ -86,17 +92,21 @@ tests:
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
+          Verify on the TH Log:
+
           [1645778189.045030][4888:4893] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0050 Command=0x0000_0000 Status=0x0
       disabled: true
 
-    - label: "Physically power cycle the device."
+    - label: "Physically power cycle the device"
       verification: |
-
+          Physically power cycle the device.
       disabled: true
 
     - label: "TH reads the CurrentMode attribute from the DUT"
       verification: |
           ./chip-tool modeselect read current-mode 1 1
+
+          Verify on the TH Log:
 
           [1645778146.171510][4876:4881] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000DataVersion: 3781469721
           [1645778146.171602][4876:4881] CHIP:TOO:   CurrentMode: 0

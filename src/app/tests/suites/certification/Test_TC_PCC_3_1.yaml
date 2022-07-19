@@ -25,7 +25,11 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool pumpconfigurationandcontrol read max-pressure 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148412.273866][2336:2336] CHIP:IM: Received Read request
           [1651148412.273922][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -47,6 +51,8 @@ tests:
           [1651148412.274424][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool pumpconfigurationandcontrol read max-speed 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148440.471321][2336:2336] CHIP:IM: Received Read request
           [1651148440.471389][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -70,6 +76,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read max-flow 1 1
 
+          Verify in TH all-clusters-app log
+
           [1651148472.518933][2336:2336] CHIP:IM: Received Read request
           [1651148472.518993][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651148472.519023][2336:2336] CHIP:DMG: {
@@ -92,6 +100,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read effective-operation-mode 1 1
 
+          Verify in TH all-clusters-app log
+
           [1651570515.206834][9246:9246] CHIP:IM: Received Read request
           [1651570515.206917][9246:9246] CHIP:DMG: ReadRequestMessage =
           [1651570515.206966][9246:9246] CHIP:DMG: {
@@ -112,6 +122,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
 
+          Verify in TH all-clusters-app log
+
           [1651570975.559213][9246:9246] CHIP:IM: Received Read request
           [1651570975.559268][9246:9246] CHIP:DMG: ReadRequestMessage =
           [1651570975.559295][9246:9246] CHIP:DMG: {
@@ -129,6 +141,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read capacity  1 1
 
+          Verify in TH all-clusters-app log
+
           [1651571009.295069][9246:9246] CHIP:IM: Received Read request
           [1651571009.295158][9246:9246] CHIP:DMG: ReadRequestMessage =
           [1651571009.295203][9246:9246] CHIP:DMG: {
@@ -145,6 +159,8 @@ tests:
           [1651571009.295747][9246:9246] CHIP:DMG:
 
           ./chip-tool pumpconfigurationandcontrol read  operation-mode 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651571334.617100][9337:9337] CHIP:IM: Received Read request
           [1651571334.617155][9337:9337] CHIP:DMG: ReadRequestMessage =
@@ -166,7 +182,11 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          "./chip-tool pumpconfigurationandcontrol read min-const-pressure 1 1
+          verify on Reference app receives the right response for the data sent in the above commands
+
+          ./chip-tool pumpconfigurationandcontrol read min-const-pressure 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148507.711384][2336:2336] CHIP:IM: Received Read request
           [1651148507.711452][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -188,7 +208,9 @@ tests:
           [1651148507.712016][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1651148507.712119][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0"
 
-          "./chip-tool pumpconfigurationandcontrol read max-const-pressure 1 1
+          ./chip-tool pumpconfigurationandcontrol read max-const-pressure 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148537.336390][2336:2336] CHIP:IM: Received Read request
           [1651148537.336445][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -210,7 +232,9 @@ tests:
           [1651148537.337002][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1651148537.337095][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0"
 
-          "./chip-tool pumpconfigurationandcontrol read min-comp-pressure  1 1
+          ./chip-tool pumpconfigurationandcontrol read min-comp-pressure  1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148566.361843][2336:2336] CHIP:IM: Received Read request
           [1651148566.361897][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -228,8 +252,11 @@ tests:
           [1651148566.362201][2336:2336] CHIP:DMG:
           [1651148566.362226][2336:2336] CHIP:DMG:         isFabricFiltered = true,
           [1651148566.362251][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
-          [1651148566.362274][2336:2336] CHIP:DMG: },"
-          "./chip-tool pumpconfigurationandcontrol read max-comp-pressure  1 1
+          [1651148566.362274][2336:2336] CHIP:DMG: }
+
+          ./chip-tool pumpconfigurationandcontrol read max-comp-pressure  1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148595.417817][2336:2336] CHIP:IM: Received Read request
           [1651148595.417901][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -250,7 +277,10 @@ tests:
           [1651148595.418528][2336:2336] CHIP:DMG: },
           [1651148595.418660][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1651148595.418781][2336:2336] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0"
-          "./chip-tool pumpconfigurationandcontrol read min-const-speed 1 1
+
+          ./chip-tool pumpconfigurationandcontrol read min-const-speed 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148626.823098][2336:2336] CHIP:IM: Received Read request
           [1651148626.823201][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -269,7 +299,10 @@ tests:
           [1651148626.823623][2336:2336] CHIP:DMG:         isFabricFiltered = true,
           [1651148626.823652][2336:2336] CHIP:DMG:         InteractionModelRevision = 1
           [1651148626.823678][2336:2336] CHIP:DMG: },"
-          "./chip-tool pumpconfigurationandcontrol read max-const-speed 1 1
+
+          ./chip-tool pumpconfigurationandcontrol read max-const-speed 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564124.345958][8748:8748] CHIP:IM: Received Read request
           [1651564124.346033][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -289,7 +322,10 @@ tests:
           [1651564124.346787][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
           [1651564124.346826][8748:8748] CHIP:DMG: },
           [1651564124.346941][8748:8748] CHIP:DMG: IM RH moving to [GeneratingReports]"
-          "./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
+
+          ./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564163.319315][8748:8748] CHIP:IM: Received Read request
           [1651564163.319399][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -311,7 +347,9 @@ tests:
           [1651564163.320291][8748:8748] CHIP:DMG: IM RH moving to [GeneratingReports]"
 
 
-          "./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
+          ./chip-tool pumpconfigurationandcontrol read min-const-flow 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564163.319315][8748:8748] CHIP:IM: Received Read request
           [1651564163.319399][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -331,7 +369,10 @@ tests:
           [1651564163.320122][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
           [1651564163.320165][8748:8748] CHIP:DMG: },
           [1651564163.320291][8748:8748] CHIP:DMG: IM RH moving to [GeneratingReports]"
-          "./chip-tool pumpconfigurationandcontrol read max-const-flow  1 1
+
+          ./chip-tool pumpconfigurationandcontrol read max-const-flow  1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564281.857728][8748:8748] CHIP:IM: Received Read request
           [1651564281.857784][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -350,7 +391,10 @@ tests:
           [1651564281.858157][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564281.858183][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
           [1651564281.858206][8748:8748] CHIP:DMG: },"
-          "./chip-tool pumpconfigurationandcontrol read min-const-temp 1 1
+
+          ./chip-tool pumpconfigurationandcontrol read min-const-temp 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564317.488333][8748:8748] CHIP:IM: Received Read request
           [1651564317.488417][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -369,8 +413,10 @@ tests:
           [1651564317.489011][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564317.489038][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
           [1651564317.489063][8748:8748] CHIP:DMG: },"
-          "./chip-tool pumpconfigurationandcontrol read max-const-temp 1 1
 
+          ./chip-tool pumpconfigurationandcontrol read max-const-temp 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564350.267434][8748:8748] CHIP:IM: Received Read request
           [1651564350.267489][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -389,7 +435,10 @@ tests:
           [1651564350.267945][8748:8748] CHIP:DMG:         isFabricFiltered = true,
           [1651564350.267970][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
           [1651564350.268092][8748:8748] CHIP:DMG: },"
-          " ./chip-tool pumpconfigurationandcontrol read pump-status 1 1
+
+           ./chip-tool pumpconfigurationandcontrol read pump-status 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651564415.272861][8748:8748] CHIP:IM: Received Read request
           [1651564415.272946][8748:8748] CHIP:DMG: ReadRequestMessage =
@@ -409,7 +458,9 @@ tests:
           [1651564415.273562][8748:8748] CHIP:DMG:         InteractionModelRevision = 1
           [1651564415.273600][8748:8748] CHIP:DMG: },"
 
-          "./chip-tool pumpconfigurationandcontrol read speed  1 1
+          ./chip-tool pumpconfigurationandcontrol read speed  1 1
+
+          Verify in TH all-clusters-app log
 
           [1651571041.252491][9246:9246] CHIP:IM: Received Read request
           [1651571041.252548][9246:9246] CHIP:DMG: ReadRequestMessage =
@@ -429,7 +480,10 @@ tests:
           [1651571041.253016][9246:9246] CHIP:DMG:         InteractionModelRevision = 1
           [1651571041.253049][9246:9246] CHIP:DMG: },"
 
-          "./chip-tool pumpconfigurationandcontrol read lifetime-running-hours 1 1
+          ./chip-tool pumpconfigurationandcontrol read lifetime-running-hours 1 1
+
+          Verify in TH all-clusters-app log
+
           [1651571194.810592][9337:9337] CHIP:IM: Received Read request
           [1651571194.810647][9337:9337] CHIP:DMG: ReadRequestMessage =
           [1651571194.810673][9337:9337] CHIP:DMG: {
@@ -447,7 +501,10 @@ tests:
           [1651571194.811005][9337:9337] CHIP:DMG:         isFabricFiltered = true,
           [1651571194.811030][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
           [1651571194.811053][9337:9337] CHIP:DMG: },"
-          "./chip-tool pumpconfigurationandcontrol read  power 1 1
+
+          ./chip-tool pumpconfigurationandcontrol read  power 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651571264.121840][9337:9337] CHIP:IM: Received Read request
           [1651571264.121896][9337:9337] CHIP:DMG: ReadRequestMessage =
@@ -466,7 +523,10 @@ tests:
           [1651571264.122418][9337:9337] CHIP:DMG:         isFabricFiltered = true,
           [1651571264.122444][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
           [1651571264.122468][9337:9337] CHIP:DMG: },"
-          " ./chip-tool pumpconfigurationandcontrol read  lifetime-energy-consumed  1  1
+
+          ./chip-tool pumpconfigurationandcontrol read  lifetime-energy-consumed  1  1
+
+          Verify in TH all-clusters-app log
 
           [1651571293.017448][9337:9337] CHIP:IM: Received Read request
           [1651571293.017534][9337:9337] CHIP:DMG: ReadRequestMessage =
@@ -486,7 +546,9 @@ tests:
           [1651571293.018304][9337:9337] CHIP:DMG:         InteractionModelRevision = 1
           [1651571293.018348][9337:9337] CHIP:DMG: },"
 
-          "./chip-tool pumpconfigurationandcontrol read  control-mode 1 1
+          ./chip-tool pumpconfigurationandcontrol read  control-mode 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651571369.365807][9337:9337] CHIP:IM: Received Read request
           [1651571369.365907][9337:9337] CHIP:DMG: ReadRequestMessage =
@@ -511,7 +573,11 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool pumpconfigurationandcontrol write operation-mode 0 1 1
+
+          Verify in TH all-clusters-app log
 
           [1652858465.008652][2107:2107] CHIP:IM: Received Write request
           [1652858465.008695][2107:2107] CHIP:DMG: IM WH moving to [Initialized]
@@ -546,8 +612,11 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool pumpconfigurationandcontrol write control-mode 0 1 1
 
+          Verify in TH all-clusters-app log
 
           [1652858653.083434][2107:2107] CHIP:IM: Received Write request
           [1652858653.083469][2107:2107] CHIP:DMG: IM WH moving to [Initialized]
@@ -580,6 +649,8 @@ tests:
 
            ./chip-tool pumpconfigurationandcontrol write lifetime-running-hours 1 1 1
 
+          Verify in TH all-clusters-app log
+
           [1652858777.844427][2107:2107] CHIP:IM: Received Write request
           [1652858777.844450][2107:2107] CHIP:DMG: IM WH moving to [Initialized]
           [1652858777.844508][2107:2107] CHIP:DMG: WriteRequestMessage =
@@ -611,6 +682,7 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol write lifetime-energy-consumed  1 1 1
 
+          Verify in TH all-clusters-app log
 
           [1652858844.149759][2107:2107] CHIP:IM: Received Write request
           [1652858844.149801][2107:2107] CHIP:DMG: IM WH moving to [Initialized]
@@ -648,7 +720,12 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          ./chip-tool pumpconfigurationandcontrol read attribute-list  1 1
+          verify on Reference app receives the right response for the data sent in the above commands
+
+           ./chip-tool pumpconfigurationandcontrol read attribute-list  1 1
+
+          Verify in TH all-clusters-app log
+
           [1654247307401] [91803:4011207] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFFB DataVersion: 3055704159
           [1654247307401] [91803:4011207] CHIP: [TOO]   AttributeList: 12 entries
           [1654247307401] [91803:4011207] CHIP: [TOO]     [1]: 0
@@ -666,12 +743,17 @@ tests:
 
 
           ./chip-tool pumpconfigurationandcontrol  read feature-map  1 1
+
+          Verify in TH all-clusters-app log
+
           [1656478569086] [49565:5734437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0200 Attribute 0x0000_FFFC DataVersion: 1816685251
           [1656478569086] [49565:5734437] CHIP: [TOO]   FeatureMap: 0
 
 
 
-          "./chip-tool pumpconfigurationandcontrol read max-pressure 1 1
+          ./chip-tool pumpconfigurationandcontrol read max-pressure 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148412.273866][2336:2336] CHIP:IM: Received Read request
           [1651148412.273922][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -693,6 +775,8 @@ tests:
           [1651148412.274424][2336:2336] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool pumpconfigurationandcontrol read max-speed 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651148440.471321][2336:2336] CHIP:IM: Received Read request
           [1651148440.471389][2336:2336] CHIP:DMG: ReadRequestMessage =
@@ -716,6 +800,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read max-flow 1 1
 
+          Verify in TH all-clusters-app log
+
           [1651148472.518933][2336:2336] CHIP:IM: Received Read request
           [1651148472.518993][2336:2336] CHIP:DMG: ReadRequestMessage =
           [1651148472.519023][2336:2336] CHIP:DMG: {
@@ -738,6 +824,9 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read effective-operation-mode 1 1
 
+          Verify in TH all-clusters-app log
+
+
           [1651570515.206834][9246:9246] CHIP:IM: Received Read request
           [1651570515.206917][9246:9246] CHIP:DMG: ReadRequestMessage =
           [1651570515.206966][9246:9246] CHIP:DMG: {
@@ -758,6 +847,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read effective-control-mode 1 1
 
+          Verify in TH all-clusters-app log
+
           [1651570975.559213][9246:9246] CHIP:IM: Received Read request
           [1651570975.559268][9246:9246] CHIP:DMG: ReadRequestMessage =
           [1651570975.559295][9246:9246] CHIP:DMG: {
@@ -775,6 +866,8 @@ tests:
 
           ./chip-tool pumpconfigurationandcontrol read capacity  1 1
 
+          Verify in TH all-clusters-app log
+
           [1651571009.295069][9246:9246] CHIP:IM: Received Read request
           [1651571009.295158][9246:9246] CHIP:DMG: ReadRequestMessage =
           [1651571009.295203][9246:9246] CHIP:DMG: {
@@ -791,6 +884,8 @@ tests:
           [1651571009.295747][9246:9246] CHIP:DMG:
 
           ./chip-tool pumpconfigurationandcontrol read  operation-mode 1 1
+
+          Verify in TH all-clusters-app log
 
           [1651571334.617100][9337:9337] CHIP:IM: Received Read request
           [1651571334.617155][9337:9337] CHIP:DMG: ReadRequestMessage =
@@ -812,6 +907,8 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           "./chip-tool pumpconfigurationandcontrol read min-const-pressure 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
@@ -869,6 +966,8 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool pumpconfigurationandcontrol write control-mode 0 1 1
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 

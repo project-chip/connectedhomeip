@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 13.4.10. [TC-SC-4.10] Operational Discovery - Sleepy Node
+name: 14.4.10. [TC-SC-4.10] Operational Discovery - Sleepy Node
 
 config:
     nodeId: 0x12344321
@@ -29,10 +29,17 @@ tests:
     - label: "TH scans for DNS-SD advertising"
       verification: |
           avahi-browse -rt _matter._tcp
-          + veth5329b41 IPv6 68F6D747B9CD3DCD-0000000000000001             _matter._tcp         local
-          = veth5329b41 IPv6 68F6D747B9CD3DCD-0000000000000001             _matter._tcp         local
-             hostname = [EEAABADABAD0DDCA.local]
-             address = [fe80::acec:27ff:fe14:515d]
+          Verify on the TH Log:
+          +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+          +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+          =   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+             hostname = [D21165B5F440B033.local]
+             address = [fd11:22::4b31:9932:cffe:b41a]
              port = [5540]
-             txt = ["T=1" "CRA=300" "CRI=5000"]
+             txt = ["T=0" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+             hostname = [D21165B5F440B033.local]
+             address = [fd11:22::4b31:9932:cffe:b41a]
+             port = [5540]
+             txt = ["T=0" "SAI=300" "SII=5000"]
       disabled: true

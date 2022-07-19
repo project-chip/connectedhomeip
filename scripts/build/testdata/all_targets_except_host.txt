@@ -205,6 +205,7 @@ mbed-CY8CPROTO_062_4343W-pigweed-release
 mbed-CY8CPROTO_062_4343W-shell-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-shell-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-shell-release
+mw320-all-clusters-app
 nrf-native-posix-64-tests
 nrf-nrf52840dk-all-clusters
 nrf-nrf52840dk-all-clusters-minimal
@@ -231,6 +232,22 @@ qpg-persistent-storage
 qpg-shell
 telink-tlsr9518adk80d-light
 telink-tlsr9518adk80d-light-switch
+tizen-arm-all-clusters
+tizen-arm-all-clusters-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal
+tizen-arm-all-clusters-minimal-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-ble-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-minimal-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-ble-no-wifi-asan (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-wifi (NOGLOB: Reduce default build variants)
+tizen-arm-all-clusters-no-wifi-asan (NOGLOB: Reduce default build variants)
 tizen-arm-chip-tool
 tizen-arm-chip-tool-asan (NOGLOB: Reduce default build variants)
 tizen-arm-chip-tool-no-ble (NOGLOB: Reduce default build variants)

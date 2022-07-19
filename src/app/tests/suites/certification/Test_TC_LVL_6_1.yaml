@@ -28,6 +28,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition Send On Command"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
     - label: "Reads Minlevel attribute from DUT"
       PICS: LVL.S.A0002
       command: "readAttribute"
@@ -36,6 +49,8 @@ tests:
           saveAs: MinlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
       PICS: LVL.S.C04.Rsp
@@ -59,7 +74,7 @@ tests:
           saveAs: CurrentLevelValue
           constraints:
               minValue: 0
-              maxValue: 1
+              maxValue: 255
 
     - label: "Sends a move up command to DUT"
       PICS: LVL.S.C01.Rsp
@@ -89,9 +104,9 @@ tests:
       arguments:
           values:
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
@@ -110,8 +125,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 23
-              maxValue: 27
+              minValue: 22
+              maxValue: 28
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
@@ -141,9 +156,9 @@ tests:
       arguments:
           values:
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
@@ -162,12 +177,12 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 48
-              maxValue: 52
+              minValue: 45
+              maxValue: 55
               notValue: CurrentLevelValue
 
     - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "MoveToLevel"
       arguments:
           values:
@@ -187,3 +202,16 @@ tests:
           values:
               - name: "ms"
                 value: 100
+
+    - label: "Precondition send Off Command"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

@@ -46,20 +46,3 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label:
-          "Reads ConfigStatus attribute from DUT, value of bit 0 must be 1b
-          operational"
-      verification: |
-          ./chip-tool windowcovering read config-status 1 1
-          [1650882400.614314][8634:8639] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_0007 DataVersion: 366273182
-          [1650882400.614428][8634:8639] CHIP:TOO:   ConfigStatus: 27
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && WNCV.S.A0007 && WNCV.S.F01 && WNCV.S.F04
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"

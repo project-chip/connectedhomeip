@@ -29,7 +29,8 @@ tests:
                 value: nodeId
 
     # Temporary - see #13551
-    - label: "Reset level to 254"
+    - label: "Precondition: Reset level to 254"
+      PICS: PICS_SDK_CI_ONLY
       command: "MoveToLevel"
       arguments:
           values:
@@ -43,6 +44,7 @@ tests:
                 value: 1
 
     - label: "Wait 100ms"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -50,27 +52,36 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "Reads the CurrentLevel attribute"
+    - label: "Precondition: Reads the CurrentLevel attribute"
       PICS: LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 254
+
+    - label: "Reads the CurrentLevel attribute"
+      PICS: LVL.S.A0000
+      command: "readAttribute"
+      attribute: "current level"
+      response:
           saveAs: CurrentLevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the RemainingTime attribute"
       PICS: LVL.S.A0001
       command: "readAttribute"
       attribute: "remaining time"
       response:
-          value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the MinLevel attribute"
-      PICS: LVL.S.A0002
+      PICS: LVL.S.A0002 && LVL.S.F01
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -78,11 +89,9 @@ tests:
           saveAs: MinLevelValue
           constraints:
               type: uint8
-              minValue: 0
-              maxValue: 1
 
     - label: "Reads the MinLevel attribute"
-      PICS: LVL.S.A0002
+      PICS: LVL.S.A0002 && !LVL.S.F01
       command: "readAttribute"
       attribute: "min level"
       response:
@@ -90,10 +99,10 @@ tests:
           constraints:
               type: uint8
               minValue: 0
-              maxValue: 1
+              maxValue: 255
 
     - label: "Reads the MaxLevel attribute"
-      PICS: LVL.S.A0003
+      PICS: LVL.S.A0003 && LVL.S.F01
       command: "readAttribute"
       attribute: "max level"
       response:
@@ -101,22 +110,21 @@ tests:
           saveAs: MaxLevelValue
           constraints:
               type: uint8
-              minValue: 1
-              maxValue: 254
+              minValue: MinLevelValue
 
     - label: "Reads the MaxLevel attribute"
-      PICS: LVL.S.A0003
+      PICS: LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "max level"
       response:
           saveAs: MaxLevelValue1
           constraints:
               type: uint8
-              minValue: 1
+              minValue: MinLevelValue1
               maxValue: 254
 
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
-      PICS: LVL.S.F01
+      PICS: LVL.S.F01 && LVL.S.A0002 && LVL.S.A0003
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -126,7 +134,7 @@ tests:
               maxValue: MaxLevelValue
 
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
-      PICS: " !LVL.S.F01 "
+      PICS: LVL.S.A0002 && LVL.S.A0003 && !LVL.S.F01
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -142,6 +150,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the MinFrequency attribute"
       PICS: LVL.S.A0005
@@ -151,6 +161,8 @@ tests:
           saveAs: MinFrequencyValue
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the MaxFrequency attribute"
       PICS: LVL.S.A0006
@@ -160,9 +172,11 @@ tests:
           saveAs: MaxFrequencyValue
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Step 7b & 7C Reads the CurrentFrequency attribute"
-      PICS: LVL.S.A0004 && LVL.S.A0005
+      PICS: LVL.S.A0004 && LVL.S.A0005 && LVL.S.A0006
       command: "readAttribute"
       attribute: "current frequency"
       response:
@@ -176,12 +190,13 @@ tests:
       command: "readAttribute"
       attribute: "on off transition time"
       response:
-          value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the OnLevel attribute "
-      PICS: LVL.S.F01
+      PICS: LVL.S.F01 && LVL.S.A0011
       command: "readAttribute"
       attribute: "on level"
       response:
@@ -191,7 +206,7 @@ tests:
               maxValue: MaxLevelValue
 
     - label: "Reads the OnLevel attribute "
-      PICS: " !LVL.S.F01 "
+      PICS: LVL.S.A0011 && !LVL.S.F01
       command: "readAttribute"
       attribute: "on level"
       response:
@@ -207,6 +222,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the OffTransitionTime attribute "
       PICS: LVL.S.A0013
@@ -215,6 +232,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads the DefaultMoveRate attribute "
       PICS: LVL.S.A0014
@@ -223,6 +242,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the Options attribute "
       PICS: LVL.S.A000f
@@ -240,3 +261,5 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255

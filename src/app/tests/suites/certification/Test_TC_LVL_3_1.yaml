@@ -28,6 +28,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition Send On Command"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
     - label: "Reads the MinLevel attribute"
       PICS: LVL.S.A0002
       command: "readAttribute"
@@ -35,6 +48,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the MaxLevel attribute"
       PICS: LVL.S.A0003
@@ -43,10 +58,12 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
-    - label: "sends a Move to level command"
+    - label: "sends a MoveToLevelWithOnOff command"
       PICS: LVL.S.C00.Rsp
-      command: "MoveToLevel"
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
@@ -87,7 +104,7 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 100 second"
+    - label: "Wait 100 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -102,16 +119,8 @@ tests:
       response:
           value: 100
 
-    - label: "Reads On Off Transition Time attribute from DUT"
-      PICS: LVL.S.A0010
-      command: "readAttribute"
-      attribute: "On Off Transition Time"
-      response:
-          constraints:
-              type: uint16
-
     - label: "sends a Move to level command"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0010
+      PICS: LVL.S.C00.Rsp && LVL.S.M.VarRate
       command: "MoveToLevel"
       arguments:
           values:
@@ -146,7 +155,10 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
+    # Null is not supported here 0xFFFF is considerd as Null
     - label: "sends a Move to level command"
       PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
@@ -155,7 +167,7 @@ tests:
               - name: "level"
                 value: 64
               - name: "transitionTime"
-                value: 0
+                value: 0xFFFF
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -170,14 +182,14 @@ tests:
                 value: 1000
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 64
 
     - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "MoveToLevel"
       arguments:
           values:
@@ -197,3 +209,16 @@ tests:
           values:
               - name: "ms"
                 value: 100
+
+    - label: "Precondition send Off Command"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

@@ -46,20 +46,66 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
       response:
           values:
               - name: "status"
                 value: 0x8B
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
+
+    - label: "Add First Group (no keys)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0101
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0x7e
+              - name: "groupId"
+                value: 0x0101
+
+    - label: "Add KeySet"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "Write Group Keys"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+              ]
 
     - label: "Add First Group (new)"
       command: "AddGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
               - name: "groupName"
                 value: "Group #1"
       response:
@@ -67,20 +113,20 @@ tests:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
 
     - label: "View First Group (new)"
       command: "ViewGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
       response:
           values:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
               - name: "groupName"
                 value: "Group #1"
 
@@ -89,13 +135,13 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
       response:
           values:
               - name: "status"
                 value: 0x8B
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
 
     - label: "Get Group Membership 1 (all)"
       command: "GetGroupMembership"
@@ -108,16 +154,14 @@ tests:
               - name: "capacity"
                 value: null
               - name: "groupList"
-                value: [0x01]
+                value: [0x0101]
 
     - label: "Add Second Group (new)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "AddGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
               - name: "groupName"
                 value: "Group #2"
       response:
@@ -125,22 +169,20 @@ tests:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
 
     - label: "View Second Group (new)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "ViewGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
       response:
           values:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
               - name: "groupName"
                 value: "Group #2"
 
@@ -179,47 +221,43 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0x01
+                value: 0x0101
       response:
           values:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x01
+                value: 0x0101
               - name: "groupName"
                 value: "Group #1"
 
     - label: "View Second Group (existing)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "ViewGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
       response:
           values:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
               - name: "groupName"
                 value: "Group #2"
 
     - label: "Get Group Membership 2"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "GetGroupMembership"
       arguments:
           values:
               - name: "groupList"
-                value: [0x02, 0x03, 0x7fff]
+                value: [0x0102, 0x0103, 0x7fff]
       response:
           values:
               - name: "capacity"
                 value: null
               - name: "groupList"
-                value: [0x7fff]
+                value: [0x0102]
 
     - label: "View Group 3 (new)"
       # https://github.com/project-chip/connectedhomeip/issues/11312
@@ -256,41 +294,39 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0x04
+                value: 0x0104
       response:
           values:
               - name: "status"
                 value: 0x8B
               - name: "groupId"
-                value: 0x04
+                value: 0x0104
 
     - label: "Remove Second Group (existing)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "RemoveGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
       response:
           values:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
 
     - label: "View First Group (not removed)"
       command: "ViewGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
       response:
           values:
               - name: "status"
                 value: 0
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
               - name: "groupName"
                 value: "Group #1"
 
@@ -299,13 +335,13 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
       response:
           values:
               - name: "status"
                 value: 0x8B
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
 
     - label: "View Group 3 (not removed)"
       # https://github.com/project-chip/connectedhomeip/issues/11312
@@ -329,13 +365,13 @@ tests:
       arguments:
           values:
               - name: "groupList"
-                value: [0x01, 0x02, 0x1111, 0x03]
+                value: [0x01, 0x0101, 0x0102, 0x03]
       response:
           values:
               - name: "capacity"
                 value: null
               - name: "groupList"
-                value: [0x01]
+                value: [0x0101]
 
     - label: "Remove All"
       command: "RemoveAllGroups"
@@ -345,26 +381,26 @@ tests:
       arguments:
           values:
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
       response:
           values:
               - name: "status"
                 value: 0x8B
               - name: "groupId"
-                value: 0x0001
+                value: 0x0101
 
     - label: "View Second Group (still removed)"
       command: "ViewGroup"
       arguments:
           values:
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
       response:
           values:
               - name: "status"
                 value: 0x8B
               - name: "groupId"
-                value: 0x1111
+                value: 0x0102
 
     - label: "View Group 3 (removed)"
       command: "ViewGroup"
@@ -384,7 +420,7 @@ tests:
       arguments:
           values:
               - name: "groupList"
-                value: [0x01, 0x02, 0x1111, 0x03, 0x7fff]
+                value: [0x01, 0x0101, 0x0102, 0x03, 0x7fff]
       response:
           values:
               - name: "capacity"

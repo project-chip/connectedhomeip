@@ -37,7 +37,9 @@ tests:
           "TH reads Descriptor Cluster from the DUT with EP0 TH reads ServerList
           from the DUT"
       verification: |
-          buntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool descriptor read server-list 162 0
+          ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool descriptor read server-list 162 0
+
+          Verify on the TH Log:
 
           [1645772414.100694][3827:3832] CHIP:DMG:         SuppressResponse = true,
           [1645772414.100718][3827:3832] CHIP:DMG:         InteractionModelRevision = 1
@@ -73,6 +75,8 @@ tests:
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read feature-map 162 0
 
 
+          Verify on the TH Log:
+
           [1645772204.502545][3809:3814] CHIP:DMG:         SuppressResponse = true,
           [1645772204.502608][3809:3814] CHIP:DMG:         InteractionModelRevision = 1
           [1645772204.502683][3809:3814] CHIP:DMG: }
@@ -85,6 +89,8 @@ tests:
       PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
+
+          Verify on the TH Log:
 
 
           [1645772548.257320][3837:3842] CHIP:DMG:         SuppressResponse = true,
@@ -107,6 +113,8 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 
+          Verify on the TH Log:
+
           [1645772651.445097][3856:3861] CHIP:DMG:         SuppressResponse = true,
           [1645772651.445149][3856:3861] CHIP:DMG:         InteractionModelRevision = 1
           [1645772651.445209][3856:3861] CHIP:DMG: }
@@ -124,6 +132,8 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read scan-max-time-seconds 162 0
 
+          Verify on the TH Log:
+
           [1645772820.740795][3867:3872] CHIP:DMG:         SuppressResponse = true,
           [1645772820.740855][3867:3872] CHIP:DMG:         InteractionModelRevision = 1
           [1645772820.740903][3867:3872] CHIP:DMG: }
@@ -136,6 +146,8 @@ tests:
       PICS: CNET.S.A0003
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read connect-max-time-seconds 162 0
+
+          Verify on the TH Log:
 
           [1645772901.118880][3879:3884] CHIP:DMG:         SuppressResponse = true,
           [1645772901.119008][3879:3884] CHIP:DMG:         InteractionModelRevision = 1
@@ -150,6 +162,8 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read interface-enabled 162 0
 
+          Verify on the TH Log:
+
           [1645772984.653996][3895:3900] CHIP:DMG:         SuppressResponse = true,
           [1645772984.654043][3895:3900] CHIP:DMG:         InteractionModelRevision = 1
           [1645772984.654084][3895:3900] CHIP:DMG: }
@@ -162,6 +176,9 @@ tests:
       PICS: CNET.S.A0005
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-networking-status 162 0
+
+
+          Verify on the TH Log:
 
           [1645773078.930516][3905:3910] CHIP:DMG:         SuppressResponse = true,
           [1645773078.930579][3905:3910] CHIP:DMG:         InteractionModelRevision = 1
@@ -178,6 +195,9 @@ tests:
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-network-id 162 0
 
+
+          Verify on the TH Log:
+
           [1645773167.178501][3913:3918] CHIP:DMG:         SuppressResponse = true,
           [1645773167.178561][3913:3918] CHIP:DMG:         InteractionModelRevision = 1
           [1645773167.178618][3913:3918] CHIP:DMG: }
@@ -190,6 +210,9 @@ tests:
       PICS: CNET.S.A0007
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read last-connect-error-value 162 0
+
+
+          Verify on the TH Log:
 
           [1645773318.752774][3938:3943] CHIP:DMG:         SuppressResponse = true,
           [1645773318.752861][3938:3943] CHIP:DMG:         InteractionModelRevision = 1

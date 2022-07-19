@@ -36,7 +36,25 @@ tests:
           constraints:
               type: uint16
 
+    - label: "Read the global attribute: FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: map32
+
     - label: "Read the global attribute: AttributeList"
+      PICS: ACT.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2]
+
+    - label: "Read the global attribute: AttributeList"
+      PICS: " !ACT.S.A0002 "
       command: "readAttribute"
       attribute: "AttributeList"
       response:

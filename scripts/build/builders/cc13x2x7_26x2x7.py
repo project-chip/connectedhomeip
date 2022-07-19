@@ -85,6 +85,7 @@ class cc13x2x7_26x2x7Builder(GnBuilder):
             pass
         elif self.openthread_ftd:
             args.append('chip_openthread_ftd=true')
+            args.append('chip_progress_logging=false')
         else:
             args.append('chip_openthread_ftd=false')
 

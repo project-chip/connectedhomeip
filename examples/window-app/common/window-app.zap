@@ -1,5 +1,5 @@
 {
-  "featureLevel": 71,
+  "featureLevel": 72,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -90,7 +90,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "IdentifyTime",
+              "name": "identify time",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -106,7 +106,7 @@
               "reportableChange": 0
             },
             {
-              "name": "IdentifyType",
+              "name": "identify type",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -322,7 +322,7 @@
           ],
           "attributes": [
             {
-              "name": "NameSupport",
+              "name": "name support",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -792,7 +792,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "DeviceList",
+              "name": "device list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -808,7 +808,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerList",
+              "name": "server list",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -824,7 +824,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientList",
+              "name": "client list",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -840,7 +840,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PartsList",
+              "name": "parts list",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -2404,7 +2404,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "PowerSourceStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2448,7 +2448,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryVoltage",
+              "name": "BatVoltage",
               "code": 11,
               "mfgCode": null,
               "side": "server",
@@ -2464,7 +2464,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryPercentRemaining",
+              "name": "BatPercentRemaining",
               "code": 12,
               "mfgCode": null,
               "side": "server",
@@ -2480,7 +2480,7 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryTimeRemaining",
+              "name": "BatTimeRemaining",
               "code": 13,
               "mfgCode": null,
               "side": "server",
@@ -2496,11 +2496,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeLevel",
+              "name": "BatChargeLevel",
               "code": 14,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeLevel",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -2512,7 +2512,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveBatteryFaults",
+              "name": "ActiveBatFaults",
               "code": 18,
               "mfgCode": null,
               "side": "server",
@@ -2528,11 +2528,11 @@
               "reportableChange": 0
             },
             {
-              "name": "BatteryChargeState",
+              "name": "BatChargeState",
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "BatChargeState",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -6209,7 +6209,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "IdentifyTime",
+              "name": "identify time",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6225,7 +6225,7 @@
               "reportableChange": 0
             },
             {
-              "name": "IdentifyType",
+              "name": "identify type",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6441,7 +6441,7 @@
           ],
           "attributes": [
             {
-              "name": "NameSupport",
+              "name": "name support",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6919,7 +6919,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "DeviceList",
+              "name": "device list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6935,7 +6935,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerList",
+              "name": "server list",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6951,7 +6951,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientList",
+              "name": "client list",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6967,7 +6967,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PartsList",
+              "name": "parts list",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -7439,7 +7439,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "OperationalStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7615,7 +7615,7 @@
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap16",
+              "type": "SafetyStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7753,7 +7753,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "IdentifyTime",
+              "name": "identify time",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -7769,7 +7769,7 @@
               "reportableChange": 0
             },
             {
-              "name": "IdentifyType",
+              "name": "identify type",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7985,7 +7985,7 @@
           ],
           "attributes": [
             {
-              "name": "NameSupport",
+              "name": "name support",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8463,7 +8463,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "DeviceList",
+              "name": "device list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8479,7 +8479,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ServerList",
+              "name": "server list",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8495,7 +8495,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ClientList",
+              "name": "client list",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -8511,7 +8511,7 @@
               "reportableChange": 0
             },
             {
-              "name": "PartsList",
+              "name": "parts list",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -8983,7 +8983,7 @@
               "code": 10,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "OperationalStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -9159,7 +9159,7 @@
               "code": 26,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap16",
+              "type": "SafetyStatus",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -9283,6 +9283,5 @@
       "endpointVersion": 2,
       "deviceIdentifier": 514
     }
-  ],
-  "log": []
+  ]
 }

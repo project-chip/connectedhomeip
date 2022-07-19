@@ -37,14 +37,6 @@ namespace Internal {
  *
  * The members of this class are all inlined methods that do nothing, and return static return
  * values.  This allows the compiler to optimize away dead code without the use of \#ifdef's.
- * For example:
- *
- * ```
- * if (ConnectivityMgr().GetCHIPoBLEServiceMode() != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
- * {
- *     // ... do something on devices that support CHIPoBLE ...
- * }
- * ```
  */
 template <class ImplClass>
 class GenericConnectivityManagerImpl_NoBLE
@@ -53,8 +45,6 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     Ble::BleLayer * _GetBleLayer(void);
-    ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled(void);
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
     bool _IsBLEAdvertising(void);
@@ -72,19 +62,6 @@ template <class ImplClass>
 inline Ble::BleLayer * GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetBleLayer(void)
 {
     return nullptr;
-}
-
-template <class ImplClass>
-inline ConnectivityManager::CHIPoBLEServiceMode GenericConnectivityManagerImpl_NoBLE<ImplClass>::_GetCHIPoBLEServiceMode(void)
-{
-    return ConnectivityManager::kCHIPoBLEServiceMode_NotSupported;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR
-GenericConnectivityManagerImpl_NoBLE<ImplClass>::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>

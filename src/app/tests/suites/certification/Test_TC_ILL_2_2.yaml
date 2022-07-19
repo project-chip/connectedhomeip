@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 70.2.2. [TC-ILL-2.2] Primary functionality with server as DUT
+name: 71.2.2. [TC-ILL-2.2] Primary Functionality with Server as DUT
 
 config:
     nodeId: 0x12344321
@@ -21,17 +21,21 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       verification: |
 
       disabled: true
 
     - label:
-          "Test Harness Client reads MinMeasuredValue and MaxMeasuredValue from
-          Server DUT"
+          "Test Harness Client reads MinMeasuredValue attribute and
+          MaxMeasuredValue attribute from DUT."
       PICS: ILL.S.A0001 && ILL.S.A0002
       verification: |
-          ./chip-tool illuminancemeasurement read min-measured-value 1 1
+          Verify in TH Log
+
+
+           ./chip-tool illuminancemeasurement read min-measured-value 1 1
 
           [1650881571.375482][2777:2782] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0400 Attribute 0x0000_0001 DataVersion: 1034665079
           [1650881571.375596][2777:2782] CHIP:TOO:   MinMeasuredValue: 1
@@ -47,7 +51,7 @@ tests:
           currently we can't do this test-step in chip-tool
       disabled: true
 
-    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT"
+    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT."
       PICS: ILL.S.A0000
       verification: |
           ./chip-tool illuminancemeasurement read measured-value 1 1
@@ -58,7 +62,7 @@ tests:
           currently we can't do this test-step in chip-tool
       disabled: true
 
-    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT"
+    - label: "After a few seconds, TH reads MeasuredValue attribute from DUT."
       PICS: ILL.S.A0000
       verification: |
           ./chip-tool illuminancemeasurement read measured-value 1 1

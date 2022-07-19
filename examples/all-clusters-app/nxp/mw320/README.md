@@ -39,8 +39,8 @@ $ gn gen out/debug
 $ ninja -v -C out/debug
 ```
 
-Example application binary file "all-cluster-mw320.bin" will be generated under
-directory "out/debug".
+Example application binary file "chip-mw320-all-clusters-app.bin" will be
+generated under directory "out/debug".
 
 Note:
 
@@ -74,7 +74,7 @@ Prepare MW320 download firmware image:
 
 ```
 $ ln -sf third_party/connectedhomeip/third_party/nxp/mw320_sdk/repo mw320_sdk
-$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/all-cluster-mw320.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F010000
+$ mw320_sdk/tools/mw_img_conv/bin/mw_img_conv mcufw out/debug/chip-mw320-all-clusters-app.bin out/debug/all-cluster-mw320.mcufw.bin 0x1F010000
 $ cp out/debug/all-cluster-mw320.mcufw.bin mw320_sdk/mw320_matter_flash/Matter/.
 ```
 

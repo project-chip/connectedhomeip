@@ -124,6 +124,12 @@ public:
         }
     }
 
+    void Shutdown() override
+    {
+        mError = CHIP_NO_ERROR;
+        ModelCommand::Shutdown();
+    }
+
 protected:
     ClusterCommand(const char * commandName, CredentialIssuerCommands * credsIssuerConfig) :
         InteractionModelCommands(this), ModelCommand(commandName, credsIssuerConfig)

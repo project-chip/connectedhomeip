@@ -136,21 +136,24 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     EndpointId endpoint          = commandPath.mEndpointId;
+    EmberAfStatus status         = EMBER_ZCL_STATUS_SUCCESS;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
     auto & setupPin              = commandData.setupPIN;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
+    if (!delegate->HandleLogin(tempAccountIdentifier, setupPin))
+    {
+        status = EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+    }
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLoginCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
-
-    bool isLoggedIn      = delegate->HandleLogin(tempAccountIdentifier, setupPin);
-    EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -158,19 +161,25 @@ exit:
 bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::Logout::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EndpointId endpoint  = commandPath.mEndpointId;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    if (!delegate->HandleLogout())
+    {
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
 
-    bool isLoggedOut     = delegate->HandleLogout();
-    EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

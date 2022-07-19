@@ -13,8 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name:
-    21.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH. [{DUT_Client}]
+name: 3.6.3. [TC-IDM-6.3] Events Read Interaction from DUT to TH. [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -24,15 +23,13 @@ config:
 tests:
     - label: "DUT sends Read Request Message to the TH for a supported event."
       verification: |
-          In case of chip tool, here is an example command to use
-
-          On TH verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
           sudo ./chip-tool any  read-event-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
 
+          On TH verify that Read Request Message received has these fields  EventRequests, EventFilters, and FabricFiltered.
 
 
-          On TH
 
           [1655210591.986723][4218:4223] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
           [1655210591.986748][4218:4223] CHIP:TOO:          Event number: 65536

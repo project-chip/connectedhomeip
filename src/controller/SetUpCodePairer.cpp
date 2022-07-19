@@ -308,6 +308,11 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     ConnectToDiscoveredDevice();
 }
 
+void SetUpCodePairer::CommissionerShuttingDown()
+{
+    ResetDiscoveryState();
+}
+
 bool SetUpCodePairer::TryNextRendezvousParameters()
 {
     if (ConnectToDiscoveredDevice())

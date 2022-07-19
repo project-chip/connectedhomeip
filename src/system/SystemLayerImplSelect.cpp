@@ -182,22 +182,21 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CancelTimer(onComplete, appState);
-
-    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
-    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
-
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t dispatchQueue = GetDispatchQueue();
     if (dispatchQueue)
     {
-        (void) mTimerList.Add(timer);
         dispatch_async(dispatchQueue, ^{
-            this->HandleTimerComplete(timer);
+            onComplete(this, appState);
         });
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+    CancelTimer(onComplete, appState);
+
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
+    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
     {

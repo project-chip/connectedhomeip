@@ -315,6 +315,18 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         return AddStatus(concretePath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
+    if (CommandIsFabricScoped(concretePath.mClusterId, concretePath.mCommandId))
+    {
+        // Fabric-scoped commands are not allowed before a specific accessing fabric is available.
+        // This is mostly just during a PASE session before AddNOC.
+        if (GetAccessingFabricIndex() == kUndefinedFabricIndex)
+        {
+            // TODO: when wildcard invokes are supported, discard a
+            // wildcard-expanded path instead of returning a status.
+            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
+    }
+
     err = aCommandElement.GetFields(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
@@ -328,9 +340,9 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     {
         ChipLogDetail(DataManagement, "Received command for Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
                       concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
-        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
+        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor()));
         mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
-        MatterPostCommandReceivedCallback(concretePath);
+        MatterPostCommandReceivedCallback(concretePath, GetSubjectDescriptor());
     }
 
 exit:
@@ -395,6 +407,10 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
         ExitNow();
     }
 
+    // No check for `CommandIsFabricScoped` unlike in `ProcessCommandDataIB()` since group commands
+    // always have an accessing fabric, by definition.
+
+    // Find which endpoints can process the command, and dispatch to them.
     iterator = groupDataProvider->IterateEndpoints(fabric);
     VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
@@ -432,12 +448,11 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
                 continue;
             }
         }
-
-        if ((err = MatterPreCommandReceivedCallback(concretePath)) == CHIP_NO_ERROR)
+        if ((err = MatterPreCommandReceivedCallback(concretePath, GetSubjectDescriptor())) == CHIP_NO_ERROR)
         {
             TLV::TLVReader dataReader(commandDataReader);
             mpCallback->DispatchCommand(*this, concretePath, dataReader);
-            MatterPostCommandReceivedCallback(concretePath);
+            MatterPostCommandReceivedCallback(concretePath, GetSubjectDescriptor());
         }
         else
         {
@@ -675,8 +690,11 @@ void CommandHandler::Abort()
 } // namespace app
 } // namespace chip
 
-CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath)
+CHIP_ERROR __attribute__((weak)) MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                                                  const chip::Access::SubjectDescriptor & subjectDescriptor)
 {
     return CHIP_NO_ERROR;
 }
-void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath) {}
+void __attribute__((weak)) MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath,
+                                                             const chip::Access::SubjectDescriptor & subjectDescriptor)
+{}

@@ -17,16 +17,17 @@
  *    limitations under the License.
  */
 
+/**********************************************************
+ * Includes
+ *********************************************************/
+
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #include "LEDWidget.h"
-#endif // !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #include "binding-handler.h"
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #include "sl_simple_led_instances.h"
-#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
@@ -37,31 +38,31 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-
 #include <assert.h>
-
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/EFR32/freertos_bluetooth.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <platform/EFR32/freertos_bluetooth.h>
-
-#include <lib/support/CodeUtils.h>
-
-#include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#endif
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
-#endif /* SL_WIFI */
+#endif // SL_WIFI
+
+/**********************************************************
+ * Defines and Constants
+ *********************************************************/
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -70,9 +71,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define EXAMPLE_VENDOR_ID 0xcafe
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 #define SYSTEM_STATE_LED &sl_led_led0
-#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
@@ -81,38 +80,34 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
+
+/**********************************************************
+ * Variable declarations
+ *********************************************************/
+
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
+TimerHandle_t sLightTimer;
 
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 LEDWidget sStatusLED;
-#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 
 #ifdef SL_WIFI
-
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
-bool sIsWiFiProvisioned = false;
-bool sIsWiFiEnabled     = false;
-bool sIsWiFiAttached    = false;
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_SED
-
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
 #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
-#if CHIP_ENABLE_OPENTHREAD
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-#endif /* CHIP_ENABLE_OPENTHREAD */
-bool sHaveBLEConnections = false;
-#endif // !CHIP_DEVICE_CONFIG_ENABLE_SED
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+bool sIsProvisioned      = false;
+bool sIsEnabled          = false;
+bool sIsAttached         = false;
+bool sHaveBLEConnections = false;
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
@@ -120,16 +115,25 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+/**********************************************************
+ * Identify Callbacks
+ *********************************************************/
+
 namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
+    ChipLogProgress(Zcl, "Trigger Identify Complete");
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    GetAppTask().CancelLightTimer();
+#endif
 }
 } // namespace
 
 void OnTriggerIdentifyEffect(Identify * identify)
 {
+    ChipLogProgress(Zcl, "Trigger Identify Effect");
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
     if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
@@ -138,6 +142,10 @@ void OnTriggerIdentifyEffect(Identify * identify)
                         identify->mEffectVariant);
         sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    GetAppTask().StartLightTimer();
+#endif
 
     switch (sIdentifyEffect)
     {
@@ -162,17 +170,19 @@ void OnTriggerIdentifyEffect(Identify * identify)
 }
 
 Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    chip::EndpointId{ 1 },       GetAppTask().OnIdentifyStart,
+    GetAppTask().OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
     OnTriggerIdentifyEffect,
 };
-#endif // #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 
 } // namespace
+
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
+
+/**********************************************************
+ * AppTask Definitions
+ *********************************************************/
 
 AppTask AppTask::sAppTask;
 
@@ -187,7 +197,12 @@ CHIP_ERROR AppTask::StartAppTask()
 
     // Start App task.
     sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    return (sAppTaskHandle == nullptr) ? APP_ERROR_CREATE_TASK_FAILED : CHIP_NO_ERROR;
+    if (sAppTaskHandle == nullptr)
+    {
+        EFR32_LOG("Failed to create app task");
+        appError(APP_ERROR_CREATE_TASK_FAILED);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AppTask::Init()
@@ -210,11 +225,11 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     // Create FreeRTOS sw timer for Function Selection.
-    sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
-                                  1,                // == default timer period (mS)
-                                  false,            // no timer reload (==one-shot)
-                                  (void *) this,    // init timer id = app task obj context
-                                  TimerEventHandler // timer callback handler
+    sFunctionTimer = xTimerCreate("FnTmr",                  // Just a text name, not used by the RTOS kernel
+                                  1,                        // == default timer period (mS)
+                                  false,                    // no timer reload (==one-shot)
+                                  (void *) this,            // init timer id = app task obj context
+                                  FunctionTimerEventHandler // timer callback handler
     );
     if (sFunctionTimer == NULL)
     {
@@ -222,22 +237,23 @@ CHIP_ERROR AppTask::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-    err = LightMgr().Init();
-    if (err != CHIP_NO_ERROR)
+    // Create FreeRTOS sw timer for LED Management.
+    sLightTimer = xTimerCreate("LightTmr",            // Text Name
+                               10,                    // Default timer period (mS)
+                               true,                  // reload timer
+                               (void *) this,         // Timer Id
+                               LightTimerEventHandler // Timer callback handler
+    );
+    if (sLightTimer == NULL)
     {
-        EFR32_LOG("LightMgr().Init() failed");
-        appError(err);
+        EFR32_LOG("Light Timer create failed");
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-    // Initialize LEDs
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
     LEDWidget::InitGpio();
     sStatusLED.Init(SYSTEM_STATE_LED);
-#endif
-    UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -281,95 +297,38 @@ void AppTask::AppTaskMain(void * pvParameter)
         appError(err);
     }
 
-    EFR32_LOG("App Task started");
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+    sAppTask.StartLightTimer();
+#endif
 
+    EFR32_LOG("App Task started");
     while (true)
     {
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, 10);
-#else
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
-#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
-        // Collect connectivity and configuration state from the CHIP stack. Because
-        // the CHIP event loop is being run in a separate task, the stack must be
-        // locked while these values are queried.  However we use a non-blocking
-        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
-        // when the CHIP task is busy (e.g. with a long crypto operation).
-        if (PlatformMgr().TryLockChipStack())
-        {
-#ifdef SL_WIFI
-            sIsWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-            sIsWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-            sIsWiFiAttached    = ConnectivityMgr().IsWiFiStationConnected();
-#endif /* SL_WIFI */
-#if CHIP_ENABLE_OPENTHREAD
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-#endif /* CHIP_ENABLE_OPENTHREAD */
-            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-        // Update the status LED if factory reset has not been initiated.
-        //
-        // If system has "full connectivity", keep the LED On constantly.
-        //
-        // If thread and service provisioned, but not attached to the thread network
-        // yet OR no connectivity to the service OR subscriptions are not fully
-        // established THEN blink the LED Off for a short period of time.
-        //
-        // If the system has ble connection(s) uptill the stage above, THEN blink
-        // the LEDs at an even rate of 100ms.
-        //
-        // Otherwise, blink the LED ON for a very short time.
-        if (sAppTask.mFunction != kFunction_FactoryReset)
-        {
-            if (gIdentify.mActive)
-            {
-                sStatusLED.Blink(250, 250);
-            }
-            if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
-            {
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
-                {
-                    sStatusLED.Blink(50, 50);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
-                {
-                    sStatusLED.Blink(1000, 1000);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
-                {
-                    sStatusLED.Blink(300, 700);
-                }
-            }
-#if CHIP_ENABLE_OPENTHREAD
-            if (sIsThreadProvisioned && sIsThreadEnabled)
-#else
-            if (sIsWiFiProvisioned && sIsWiFiEnabled && !sIsWiFiAttached)
-#endif
-            {
-                sStatusLED.Blink(950, 50);
-            }
-            else if (sHaveBLEConnections)
-            {
-                sStatusLED.Blink(100, 100);
-            }
-            else
-            {
-                sStatusLED.Blink(50, 950);
-            }
-        }
-
-        sStatusLED.Animate();
-#endif // #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
     }
+}
+
+void AppTask::OnIdentifyStart(Identify * identify)
+{
+    ChipLogProgress(Zcl, "onIdentifyStart");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    sAppTask.StartLightTimer();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+}
+
+void AppTask::OnIdentifyStop(Identify * identify)
+{
+    ChipLogProgress(Zcl, "onIdentifyStop");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+    sAppTask.CancelLightTimer();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 }
 
 void AppTask::SwitchActionEventHandler(AppEvent * aEvent)
@@ -402,21 +361,26 @@ void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAc
     }
     else if (buttonHandle == APP_FUNCTION_BUTTON)
     {
-        button_event.Handler = FunctionHandler;
+        button_event.Handler = ButtonHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
 
-void AppTask::TimerEventHandler(TimerHandle_t xTimer)
+void AppTask::FunctionTimerEventHandler(TimerHandle_t xTimer)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = (void *) xTimer;
-    event.Handler            = FunctionTimerEventHandler;
+    event.Handler            = FunctionEventHandler;
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+void AppTask::LightTimerEventHandler(TimerHandle_t xTimer)
+{
+    sAppTask.LightEventHandler();
+}
+
+void AppTask::FunctionEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type != AppEvent::kEventType_Timer)
     {
@@ -431,26 +395,117 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
         // cancel, if required.
-        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        sAppTask.StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+        sAppTask.StartLightTimer();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
         sAppTask.mFunction = kFunction_FactoryReset;
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
         sStatusLED.Set(false);
         sStatusLED.Blink(500);
-#endif //  !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+        sAppTask.CancelLightTimer();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+
         chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
-void AppTask::FunctionHandler(AppEvent * aEvent)
+void AppTask::LightEventHandler()
+{
+    // Collect connectivity and configuration state from the CHIP stack. Because
+    // the CHIP event loop is being run in a separate task, the stack must be
+    // locked while these values are queried.  However we use a non-blocking
+    // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
+    // when the CHIP task is busy (e.g. with a long crypto operation).
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+    if (PlatformMgr().TryLockChipStack())
+    {
+#ifdef SL_WIFI
+        sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+        sIsEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+        sIsAttached    = ConnectivityMgr().IsWiFiStationConnected();
+#endif /* SL_WIFI */
+#if CHIP_ENABLE_OPENTHREAD
+        sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsEnabled     = ConnectivityMgr().IsThreadEnabled();
+        sIsAttached    = ConnectivityMgr().IsThreadAttached();
+#endif /* CHIP_ENABLE_OPENTHREAD */
+        sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
+        PlatformMgr().UnlockChipStack();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+
+    // Update the status LED if factory reset has not been initiated.
+    //
+    // If system has "full connectivity", keep the LED On constantly.
+    //
+    // If thread and service provisioned, but not attached to the thread network
+    // yet OR no connectivity to the service OR subscriptions are not fully
+    // established THEN blink the LED Off for a short period of time.
+    //
+    // If the system has ble connection(s) uptill the stage above, THEN blink
+    // the LEDs at an even rate of 100ms.
+    //
+    // Otherwise, blink the LED ON for a very short time.
+    if (sAppTask.mFunction != kFunction_FactoryReset)
+    {
+        if (gIdentify.mActive)
+        {
+            sStatusLED.Blink(250, 250);
+        }
+        else if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
+        {
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
+            {
+                sStatusLED.Blink(50, 50);
+            }
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
+            {
+                sStatusLED.Blink(1000, 1000);
+            }
+            if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
+            {
+                sStatusLED.Blink(300, 700);
+            }
+        }
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+        else if (sIsProvisioned && sIsEnabled)
+        {
+            if (sIsAttached)
+            {
+                sStatusLED.Set(true);
+            }
+            else
+            {
+                sStatusLED.Blink(950, 50);
+            }
+        }
+        else if (sHaveBLEConnections)
+        {
+            sStatusLED.Blink(100, 100);
+        }
+        else
+        {
+            sStatusLED.Blink(50, 950);
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
+    }
+
+    sStatusLED.Animate();
+}
+
+void AppTask::ButtonHandler(AppEvent * aEvent)
 {
     // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
     // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
@@ -463,7 +518,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
-            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+            sAppTask.StartFunctionTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
             sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
@@ -472,7 +527,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
         if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
-            sAppTask.CancelTimer();
+            sAppTask.CancelFunctionTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
 
 #ifdef SL_WIFI
@@ -487,10 +542,23 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             }
             else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+        {
+            sAppTask.CancelFunctionTimer();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED == 1
+            sAppTask.CancelLightTimer();
+#endif
+
+            // Change the function to none selected since factory reset has been
+            // canceled.
+            sAppTask.mFunction = kFunction_NoneSelected;
+            EFR32_LOG("Factory Reset has been Canceled");
+        }
     }
 }
 
-void AppTask::CancelTimer()
+void AppTask::CancelFunctionTimer()
 {
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
@@ -501,12 +569,22 @@ void AppTask::CancelTimer()
     mFunctionTimerActive = false;
 }
 
-void AppTask::StartTimer(uint32_t aTimeoutInMs)
+void AppTask::CancelLightTimer()
+{
+    sStatusLED.Set(false);
+    if (xTimerStop(sLightTimer, 100) != pdPASS)
+    {
+        EFR32_LOG("Light Time start failed");
+        appError(APP_ERROR_START_TIMER_FAILED);
+    }
+}
+
+void AppTask::StartFunctionTimer(uint32_t aTimeoutInMs)
 {
     if (xTimerIsTimerActive(sFunctionTimer))
     {
         EFR32_LOG("app timer already started!");
-        CancelTimer();
+        CancelFunctionTimer();
     }
 
     // timer is not active, change its period to required value (== restart).
@@ -521,20 +599,12 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::StartLightTimer()
 {
-    if (aActor == AppEvent::kEventType_Button)
+    if (pdPASS != xTimerStart(sLightTimer, 0))
     {
-        sAppTask.mSyncClusterToButtonAction = true;
-    }
-}
-
-void AppTask::ActionCompleted(LightingManager::Action_t aAction)
-{
-    if (sAppTask.mSyncClusterToButtonAction)
-    {
-        UpdateClusterState();
-        sAppTask.mSyncClusterToButtonAction = false;
+        EFR32_LOG("Light Time start failed");
+        appError(APP_ERROR_START_TIMER_FAILED);
     }
 }
 
@@ -562,7 +632,9 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         }
 
         if (!status)
+        {
             EFR32_LOG("Failed to post event to app task event queue");
+        }
     }
     else
     {
@@ -581,5 +653,3 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         EFR32_LOG("Event received with no handler. Dropping event.");
     }
 }
-
-void AppTask::UpdateClusterState(void) {}

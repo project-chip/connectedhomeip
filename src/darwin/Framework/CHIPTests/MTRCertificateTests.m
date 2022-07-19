@@ -68,9 +68,10 @@
     XCTAssertNotNil(operationalKeys);
 
     __auto_type * cats = [[NSMutableArray alloc] initWithCapacity:3];
-    [cats addObject:@1];
-    [cats addObject:@2];
-    [cats addObject:@3];
+    // High bits are identifier, low bits are version.
+    [cats addObject:@0x00010001];
+    [cats addObject:@0x00020001];
+    [cats addObject:@0x0003FFFF];
 
     __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
                                                                  signingCertificate:rootCert
@@ -125,11 +126,28 @@
     __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
     XCTAssertNotNil(operationalKeys);
 
-    __auto_type * cats = [[NSMutableArray alloc] initWithCapacity:4];
-    [cats addObject:@1];
-    [cats addObject:@2];
-    [cats addObject:@3];
-    [cats addObject:@4];
+    __auto_type * longCats = [[NSMutableArray alloc] initWithCapacity:4];
+    [longCats addObject:@0x00010001];
+    [longCats addObject:@0x00020001];
+    [longCats addObject:@0x00030001];
+    [longCats addObject:@0x00040001];
+
+    __auto_type * catsWithSameIdentifier = [[NSMutableArray alloc] initWithCapacity:3];
+    // High bits are identifier, low bits are version.
+    [catsWithSameIdentifier addObject:@0x00010001];
+    [catsWithSameIdentifier addObject:@0x00020001];
+    [catsWithSameIdentifier addObject:@0x00010002];
+
+    __auto_type * catsWithDuplicatedCAT = [[NSMutableArray alloc] initWithCapacity:3];
+    // High bits are identifier, low bits are version.
+    [catsWithDuplicatedCAT addObject:@0x00010001];
+    [catsWithDuplicatedCAT addObject:@0x00020001];
+    [catsWithDuplicatedCAT addObject:@0x00010001];
+
+    __auto_type * catsWithInvalidVersion = [[NSMutableArray alloc] initWithCapacity:2];
+    // High bits are identifier, low bits are version.
+    [catsWithInvalidVersion addObject:@0x00010001];
+    [catsWithInvalidVersion addObject:@0x00020000];
 
     // Check basic case works
     __auto_type * operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
@@ -147,7 +165,37 @@
                                                  operationalPublicKey:operationalKeys.publicKey
                                                              fabricId:@1
                                                                nodeId:@1
-                                                caseAuthenticatedTags:cats
+                                                caseAuthenticatedTags:longCats
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // Multiple CATs with the same identifier but different versions
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.publicKey
+                                                             fabricId:@1
+                                                               nodeId:@1
+                                                caseAuthenticatedTags:catsWithSameIdentifier
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // Multiple CATs with the same identifier and same version
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.publicKey
+                                                             fabricId:@1
+                                                               nodeId:@1
+                                                caseAuthenticatedTags:catsWithDuplicatedCAT
+                                                                error:nil];
+    XCTAssertNil(operationalCert);
+
+    // CAT with invalid version
+    operationalCert = [MTRCertificates generateOperationalCertificate:rootKeys
+                                                   signingCertificate:rootCert
+                                                 operationalPublicKey:operationalKeys.publicKey
+                                                             fabricId:@1
+                                                               nodeId:@1
+                                                caseAuthenticatedTags:catsWithInvalidVersion
                                                                 error:nil];
     XCTAssertNil(operationalCert);
 
