@@ -81,8 +81,8 @@ Ensure the right device type is set for each endpoint.
 
 ```
 // Array of device types
-    #define FIXED_DEVICE_TYPES \
-    { \
+    #define FIXED_DEVICE_TYPES       \
+    {                                \
         { 0x0016, 1 }, { 0x0100, 1 } \
     }
 ```
