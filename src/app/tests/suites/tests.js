@@ -817,6 +817,7 @@ function getTests() {
     ];
 
     const Others = [
+        "TestCASERecovery",
         "TestCluster",
         "TestClusterComplexTypes",
         "TestConstraints",
