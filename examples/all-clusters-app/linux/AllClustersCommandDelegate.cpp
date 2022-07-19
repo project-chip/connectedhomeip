@@ -247,10 +247,14 @@ void AllClustersCommandDelegate::OnSwitchEventHandler(uint32_t eventId)
     }
     else if (eventId == Clusters::Switch::Events::ShortRelease::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
     }
     else if (eventId == Clusters::Switch::Events::LongRelease::Id)
     {
+        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
         Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
     }
     else if (eventId == Clusters::Switch::Events::MultiPressOngoing::Id)
