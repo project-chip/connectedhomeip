@@ -30,8 +30,10 @@ group("k32w0_sdk") {
 }
 
 if (chip_crypto == "tinycrypt") {
-  assert(mbedtls_repo == "//third_party/connectedhomeip/third_party/nxp/libs/mbedtls",
-    "mbedtls_repo must be set to nxp mbedtls-tinycrypt library when chip_crypto == \"tinycrypt\"")
+  assert(
+      mbedtls_repo ==
+          "//third_party/connectedhomeip/third_party/nxp/libs/mbedtls",
+      "mbedtls_repo must be set to nxp mbedtls-tinycrypt library when chip_crypto == \"tinycrypt\"")
 }
 
 config("mbedtls_k32w0_config") {

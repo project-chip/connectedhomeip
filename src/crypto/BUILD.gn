@@ -102,8 +102,7 @@ static_library("crypto") {
   } else if (chip_crypto == "tinycrypt") {
     sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
     public_deps += [ "${mbedtls_root}:mbedtls" ]
-  }
-  else {
+  } else {
     assert(false, "Invalid CHIP crypto")
   }
 

@@ -26,7 +26,7 @@ config("openthread_k32w0_config") {
   include_dirs = [
     "${openthread_nxp_root}/src/k32w0/k32w061",
     "${openthread_nxp_root}/src/k32w0/platform",
-    "${openthread_nxp_root}/src/common"
+    "${openthread_nxp_root}/src/common",
   ]
   include_dirs += [ "${chip_root}/examples/platform/nxp/k32w/k32w0" ]
 

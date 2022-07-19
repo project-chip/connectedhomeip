@@ -64,33 +64,42 @@ template("k32w0_sdk") {
                chip_with_ot_cli == 0 && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
-  if(build_for_k32w041am == 1 || build_for_k32w041a == 1 || build_for_k32w041 == 1){
+  if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
+      build_for_k32w041 == 1) {
     build_for_k32w061 = 0
   }
 
-  if(build_for_k32w061 == 1){
-    assert(build_for_k32w061 == 1 && build_for_k32w041am == 0 && build_for_k32w041a == 0 && build_for_k32w041 == 0, "Please build for only one platform")
+  if (build_for_k32w061 == 1) {
+    assert(build_for_k32w061 == 1 && build_for_k32w041am == 0 &&
+               build_for_k32w041a == 0 && build_for_k32w041 == 0,
+           "Please build for only one platform")
     device = "K32W061"
     board = "k32w061dk6"
     chip_with_ntag = 1
     chip_with_high_power = 0
   }
-  if(build_for_k32w041am == 1){
-    assert(build_for_k32w041am == 1 && build_for_k32w061 == 0 && build_for_k32w041a == 0 && build_for_k32w041 == 0, "Please build for only one platform")
+  if (build_for_k32w041am == 1) {
+    assert(build_for_k32w041am == 1 && build_for_k32w061 == 0 &&
+               build_for_k32w041a == 0 && build_for_k32w041 == 0,
+           "Please build for only one platform")
     device = "K32W041AM"
     board = "k32w041amdk6"
     chip_with_high_power = 1
     chip_with_ntag = 0
   }
-  if(build_for_k32w041a == 1){
-    assert(build_for_k32w041a == 1 && build_for_k32w061 == 0 && build_for_k32w041am == 0 && build_for_k32w041 == 0, "Please build for only one platform")
+  if (build_for_k32w041a == 1) {
+    assert(build_for_k32w041a == 1 && build_for_k32w061 == 0 &&
+               build_for_k32w041am == 0 && build_for_k32w041 == 0,
+           "Please build for only one platform")
     device = "K32W041A"
     board = "k32w041adk6"
     chip_with_high_power = 1
     chip_with_ntag = 0
   }
-  if(build_for_k32w041== 1){
-    assert(build_for_k32w041 == 1 && build_for_k32w061 == 0 && build_for_k32w041am == 0 && build_for_k32w041a == 0, "Please build for only one platform")
+  if (build_for_k32w041 == 1) {
+    assert(build_for_k32w041 == 1 && build_for_k32w061 == 0 &&
+               build_for_k32w041am == 0 && build_for_k32w041a == 0,
+           "Please build for only one platform")
     device = "K32W041"
     board = "k32w041dk6"
     chip_with_ntag = 0
@@ -322,30 +331,19 @@ template("k32w0_sdk") {
     }
 
     if (build_for_k32w061 == 1) {
-      defines += [
-        "CPU_K32W061HN",
-      ]
-    }
-    else if(build_for_k32w041am == 1) {
-      defines += [
-        "CPU_K32W041AMZ",
-      ]
-    }
-    else if(build_for_k32w041a == 1) {
-      defines += [
-        "CPU_K32W041AZ",
-      ]
-    }
-    else if(build_for_k32w041 == 1) {
-      defines += [
-        "CPU_K32W041HN",
-      ]
+      defines += [ "CPU_K32W061HN" ]
+    } else if (build_for_k32w041am == 1) {
+      defines += [ "CPU_K32W041AMZ" ]
+    } else if (build_for_k32w041a == 1) {
+      defines += [ "CPU_K32W041AZ" ]
+    } else if (build_for_k32w041 == 1) {
+      defines += [ "CPU_K32W041HN" ]
     }
 
     if (chip_with_high_power == 1) {
       defines += [
         "K32WMCM_APP_BUILD",
-        "JENNIC_CHIP_FAMILY_JN518x"
+        "JENNIC_CHIP_FAMILY_JN518x",
       ]
       _sdk_include_dirs += [
         "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/Include",
@@ -358,7 +356,7 @@ template("k32w0_sdk") {
         "CONFIG_CHIP_NFC_COMMISSIONING=1",
         "CHIP_DEVICE_CONFIG_ENABLE_NFC=1",
       ]
-   }
+    }
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -469,23 +467,23 @@ template("k32w0_sdk") {
     ]
 
     if (chip_with_DK6) {
-        sources += [
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board_utility.c",
-          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/hardware_init.c",
-        ]
+      sources += [
+        "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board.c",
+        "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/board_utility.c",
+        "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/hardware_init.c",
+      ]
 
-        if (chip_with_se05x != 0) {
-          sources += [
-            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
-            "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
-          ]
-        } else {
-          sources += [
-            "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/clock_config.c",
-            "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/pin_mux.c",
-          ]
-        }
+      if (chip_with_se05x != 0) {
+        sources += [
+          "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+          "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
+        ]
+      } else {
+        sources += [
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/clock_config.c",
+          "${k32w0_sdk_root}/boards/${board}/wireless_examples/openthread/reed/bm/pin_mux.c",
+        ]
+      }
     }
 
     if (chip_with_low_power != 0) {
