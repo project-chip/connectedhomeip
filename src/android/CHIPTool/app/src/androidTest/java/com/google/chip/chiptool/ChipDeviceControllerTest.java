@@ -4,18 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
-import android.util.Log;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.Arrays;
-
 import chip.devicecontroller.ChipDeviceController;
 import chip.devicecontroller.PaseVerifierParams;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -24,22 +18,21 @@ import chip.devicecontroller.PaseVerifierParams;
  */
 @RunWith(AndroidJUnit4.class)
 public class ChipDeviceControllerTest {
-    @Test
-    public void PaseVerifierTest() {
-        long deviceId = 123L;
-        long setupPincode = 808080L;
-        long iterations = 1000L;
-        byte[] randomSalt = "hEvzbU:%h)?aB,h7+9fn[Lf[BhYB!=TA".getBytes();
+  @Test
+  public void PaseVerifierTest() {
+    long deviceId = 123L;
+    long setupPincode = 808080L;
+    long iterations = 1000L;
+    byte[] randomSalt = "hEvzbU:%h)?aB,h7+9fn[Lf[BhYB!=TA".getBytes();
 
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ChipDeviceController chipDeviceController =
-                ChipClient.INSTANCE.getDeviceController(appContext);
+    Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    ChipDeviceController chipDeviceController = ChipClient.INSTANCE.getDeviceController(appContext);
 
-        PaseVerifierParams params =
-                chipDeviceController.computePaseVerifier(deviceId, setupPincode, iterations, randomSalt);
+    PaseVerifierParams params =
+        chipDeviceController.computePaseVerifier(deviceId, setupPincode, iterations, randomSalt);
 
-        assertNotNull(params);
-        assertEquals(params.getSetupPincode(), setupPincode);
-        assertNotNull(params.getPakeVerifier());
-    }
+    assertNotNull(params);
+    assertEquals(params.getSetupPincode(), setupPincode);
+    assertNotNull(params.getPakeVerifier());
+  }
 }
