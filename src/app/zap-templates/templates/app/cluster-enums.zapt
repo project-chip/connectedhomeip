@@ -24,7 +24,7 @@ enum class {{asType label}} : {{asUnderlyingZclType name}} {
 {{#zcl_enum_items}}
 k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{/zcl_enum_items}}
-// kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
+kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
 };
 {{#if (isWeaklyTypedEnum label)}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
