@@ -858,27 +858,27 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-light-ota-se
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false chip_enable_ble=false chip_with_se05x=true' {out}/k32w-light-ota-se
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false chip_enable_ble=false chip_with_se05x=true' {out}/k32w-light-ota-se
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-light-release-no-ota
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false chip_enable_ota_requestor=false' {out}/k32w-light-release-no-ota
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 chip_pw_tokenizer_logging=true is_debug=false chip_enable_ota_requestor=false' {out}/k32w-light-release-no-ota
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-lock-low-power-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-lock-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
 # Generating k32w-shell-release
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W0_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
 
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
