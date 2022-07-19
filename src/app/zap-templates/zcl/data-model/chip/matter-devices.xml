@@ -240,9 +240,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
-                <requireAttribute>BINDING</requireAttribute>
-            </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddGroup</requireCommand>
@@ -289,7 +286,7 @@ limitations under the License.
                 <requireCommand>OnWithRecallGlobalScene</requireCommand>
                 <requireCommand>OnWithTimedOff</requireCommand>
             </include>
-            <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>CURRENT_LEVEL</requireAttribute>
                 <requireAttribute>OPTIONS</requireAttribute>
                 <requireAttribute>LEVEL_CONTROL_REMAINING_TIME</requireAttribute>
@@ -303,7 +300,7 @@ limitations under the License.
                 <requireCommand>StepWithOnOff</requireCommand>
                 <requireCommand>StopWithOnOff</requireCommand>
             </include>
-            <include cluster="Occupancy Sensing" client="true" server="false" clientLocked="false" serverLocked="true" />
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="true" />
         </clusters>
     </deviceType>
     <deviceType>
