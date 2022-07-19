@@ -170,7 +170,7 @@ def gen_test_certs(chip_cert_exe: str,
                              new_certificates["PAI_CERT"] + ".der")
 
 
-def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> dict:
+def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: bytes) -> dict:
     """ Generate Spake2+ params using external spake2p tool
 
     Args:
@@ -186,7 +186,7 @@ def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> 
     cmd = [
         spake2p_path, 'gen-verifier',
         '--iteration-count', str(it),
-        '--salt', salt,
+        '--salt', base64.b64encode(salt),
         '--pin-code', str(passcode),
         '--out', '-',
     ]
@@ -344,7 +344,7 @@ class FactoryDataGenerator:
     def _generate_spake2_verifier(self):
         """ If verifier has not been provided in arguments list it should be generated via external script """
         spake2_params = gen_spake2p_params(self._args.spake2p_path, self._args.passcode,
-                                           self._args.spake2_it, self._args.spake2_salt.decode('ascii'))
+                                           self._args.spake2_it, self._args.spake2_salt)
         return base64.b64decode(spake2_params["Verifier"])
 
     def _generate_rotating_device_uid(self):
