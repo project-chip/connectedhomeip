@@ -59,26 +59,31 @@ Note: The profile will expire automatically after some time
     - Example command for SHA cfc35951be66a664a6efdadea56d1b8ea6e63e96:
       `git checkout cfc35951be66a664a6efdadea56d1b8ea6e63e96`
 
-In order to work with the current iOS/iPadOS/tvOS 15.6 Developer Preview, device
-types as defined in the Matter Device Library spec are used to determine
-accessory categories. Ensure the right device type is set for each endpoint. For
-example, this can be set in `FIXED_DEVICE_TYPES` in `endpoint_config.h` file for
-the `all-clusters-app`.
+In order to work with iOS/iPadOS/tvOS 15.6 or greater, device types as defined
+in the Matter Device Library spec are used to determine accessory categories.
+Ensure the right device type is set for each endpoint.
 
-For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
-`endpoint_config.h` for `all-clusters-app` like so:
+-   For the `all-clusters-app` as an example, this can be set in
+    `FIXED_DEVICE_TYPES` in `endpoint_config.h`
+
+-   A light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
+    `endpoint_config.h` for `all-clusters-app` like so:
 
 ```
-//Array of device types
-#define FIXED_DEVICE_TYPES \
-{ \
- { 0x0016, 1 }, { 0x0100, 1 } \
- }
+// Array of device types
+    #define FIXED_DEVICE_TYPES \
+    { \
+        { 0x0016, 1 }, { 0x0100, 1 } \
+    }
 ```
 
-#### Configuring a development M5Stack to Work with iOS/iPadOS/tvOS
+#### Examples of how to setup a couple apps
 
-##### These instructions are specific to getting started with the (Matter-provided) `all-clusters-app` on an ESP32-based M5Stack.
+##### Case study 1: Configuring a development M5Stack to Work with iOS/iPadOS/tvOS
+
+Note: These instructions are specific to getting started with the
+(Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be
+generalised to work on most platforms (more listed below)
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
@@ -108,9 +113,11 @@ For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
       above.
 5. Press "q" and "Y" to quit and save the settings
 
-#### Configuring a development Nordic board (NRF52840) to Work with iOS/iPadOS/tvOS
+##### Case Study 2: a development Nordic board (NRF52840) to Work with iOS/iPadOS/tvOS
 
-##### These instructions are specific to getting started with the (Matter-provided) "lighting-app" on an Nordic-based NRF52840:
+Note: These instructions are specific to getting started with the
+(Matter-provided) "lighting-app" on an Nordic-based NRF52840, however can be
+generalised to work on most platforms (more listed below)
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
@@ -135,9 +142,12 @@ For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
    unique values not shared with other Hardware. For example: change the last
    digit of each.
 
-##### Configuring other Platforms
+#### General Platform Guides
 
-##### Note: Most platforms have very similar, if not the same configuration requirements
+##### Getting the SDK Ready
+
+Note: Most platforms have very similar, if not the same configuration
+requirements
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
@@ -149,7 +159,7 @@ For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
    [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
 3. Read the [platform guides](.) on how set up the hardware
 
-##### Example guides as of editing this page
+##### Guides
 
 -   [Bouffalo Lab](/examples/lighting-app/bouffalolab/bl602/README.md)
 -   [EFR32 Window Covering](/examples/window-app/efr32/README.md)
