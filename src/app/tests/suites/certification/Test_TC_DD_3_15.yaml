@@ -42,7 +42,7 @@ tests:
           [1651108891.390744][30833:30833] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651108891.390809][30833:30833] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
           [1651108891.390848][30833:30833] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651108891.390876][30833:30833] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
+          [1651108891.390876][30833:30833] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
           [1651108891.390917][30833:30833] CHIP:SVR: Manual pairing code: [34970112332]
       disabled: true
 
@@ -91,12 +91,12 @@ tests:
           [1651109167.022753][30980:30980] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651109167.022825][30980:30980] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
           [1651109167.022868][30980:30980] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651109167.022898][30980:30980] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
+          [1651109167.022898][30980:30980] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0AFN00KA0648G00
           [1651109167.022942][30980:30980] CHIP:SVR: Manual pairing code: [34970112332]
           [1651109167.022974][30980:30980] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1651109167.023050][30980:30980] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
           [1651109167.023090][30980:30980] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651109167.023120][30980:30980] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
+          [1651109167.023120][30980:30980] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
           [1651109167.023167][30980:30980] CHIP:SVR: Manual pairing code: [749701123365521327694]
       disabled: true
 
