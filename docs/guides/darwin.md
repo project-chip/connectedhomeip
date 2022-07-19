@@ -135,6 +135,41 @@ For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
    unique values not shared with other Hardware. For example: change the last
    digit of each.
 
+##### Configuring other Platforms
+
+##### Note: Most platforms have very similar, if not the same configuration requirements
+
+1. Checkout and setup
+   [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
+   instructions
+   [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
+2. Find and edit one of the platform
+   [examples](https://github.com/project-chip/connectedhomeip/tree/master/examples)
+   to support the fixed device types
+   [above](#ensuring-your-matter-accessory-works-with-iosipadostvos)
+3. Read the [platform guides](.) on how set up the hardware
+
+##### Example guides as of editing this page
+
+-   [Bouffalo Lab](/examples/lighting-app/bouffalolab/bl602/README.md)
+-   [EFR32 Window Covering](/examples/window-app/efr32/README.md)
+-   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
+-   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
+-   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
+-   [mbedOS](/examples/all-clusters-app/mbed/README.md)
+-   [nRF Connect All Clusters](./nrfconnect_examples_configuration.md)
+-   [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
+-   [NXP Examples](./nxp_imx8m_linux_examples.md)
+-   [NXP](/examples/all-clusters-app/nxp/mw320/README.md)
+-   [P6](/examples/all-clusters-app/p6/README.md)
+-   [Qorvo](/examples/lighting-app/qpg/README.md)
+-   [SiliconLabs](./silabs_efr32_building.md)
+-   [Simulated Linux](./simulated_device_linux.md)
+-   [Telink](/examples/lighting-app/telink/README.md)
+-   [TI Platform](./ti_platform_overview.md)
+-   [TI All Clusters](/examples/all-clusters-app/cc13x2x7_26x2x7/README.md)
+-   [Tizen](/examples/lighting-app/tizen/README.md)
+
 ### Release Notes & Known Issues
 
 -   Please refer to the iOS/iPadOS 15.6
