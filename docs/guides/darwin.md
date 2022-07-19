@@ -75,16 +75,30 @@ in the Matter Device Library spec are used to determine accessory categories.
 Ensure the right device type is set for each endpoint.
 
 -   For the `all-clusters-app` as an example, this can be set in
-    `FIXED_DEVICE_TYPES` in `endpoint_config.h`
+    `FIXED_DEVICE_TYPES`, `FIXED_DEVICE_TYPE_OFFSETS`, and
+    `FIXED_DEVICE_TYPE_LENGTHS` in `endpoint_config.h`
+-   Here's an example from `all-clusters-app` (feel free to search for more in
+    the tree by looking for the above keys)
 
--   A light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
-    `endpoint_config.h` for `all-clusters-app` like so:
+Example:
 
 ```
 // Array of device types
-    #define FIXED_DEVICE_TYPES       \
-    {                                \
-        { 0x0016, 1 }, { 0x0100, 1 } \
+#define FIXED_DEVICE_TYPES
+    {
+        { 0x0016, 1 }, { 0x0100, 1 }, { 0x0100, 1 }, { 0xF002, 1 }
+    }
+
+// Array of device type offsets
+#define FIXED_DEVICE_TYPE_OFFSETS
+    {
+        0, 1, 2, 3
+    }
+
+// Array of device type lengths
+#define FIXED_DEVICE_TYPE_LENGTHS
+    {
+        1, 1, 1, 1
     }
 ```
 
