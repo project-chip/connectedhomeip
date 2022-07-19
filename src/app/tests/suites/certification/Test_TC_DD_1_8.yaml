@@ -41,12 +41,12 @@ tests:
           [1653306603.740798][13293:13293] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1653306603.740846][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
           [1653306603.740877][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653306603.740898][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1653306603.740898][13293:13293] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
           [1653306603.740929][13293:13293] CHIP:SVR: Manual pairing code: [34970112332]
           [1653306603.740951][13293:13293] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1653306603.741000][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
           [1653306603.741028][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653306603.741049][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          [1653306603.741049][13293:13293] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
           [1653306603.741081][13293:13293] CHIP:SVR: Manual pairing code: [749701123365521327694]
 
           CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
@@ -54,11 +54,11 @@ tests:
           CHIP:DL:   Device Type: 65535 (0xFFFF)
           CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
           CHIP:SVR: Manual pairing code: [34970112332]
           CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
            CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-           CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+           CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
 
 
 
