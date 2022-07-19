@@ -177,8 +177,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 -   Download [K32W0 SDK 2.6.6 for Project CHIP](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2_6_6_K32W061DK6 (required for K32W061 flavour).
-    The SDK Builder UI selection should be similar with the one from the image below.
+    SDK_2_6_6_K32W061DK6 (required for K32W061 flavour). The SDK Builder UI
+    selection should be similar with the one from the image below.
     ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w0/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application either with Secure Element or without
@@ -235,8 +235,8 @@ Program the firmware using the official
 [OpenThread Flash Instructions](https://github.com/openthread/ot-nxp/tree/main/src/k32w0/k32w061#flash-binaries).
 
 All you have to do is to replace the Openthread binaries from the above
-documentation with _out/debug/chip-k32w0x-light-example.bin_ if DK6Programmer
-is used or with _out/debug/chip-k32w0x-light-example_ if MCUXpresso is used.
+documentation with _out/debug/chip-k32w0x-light-example.bin_ if DK6Programmer is
+used or with _out/debug/chip-k32w0x-light-example_ if MCUXpresso is used.
 
 <a name="tokenizer"></a>
 
@@ -252,7 +252,8 @@ needed for parsing the hashed scripts.
 ### Detokenizer script
 
 The python3 script detokenizer.py is a script that decodes the tokenized logs
-either from a file or from a serial port. It is located in the following path `examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py`.
+either from a file or from a serial port. It is located in the following path
+`examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py`.
 
 The script can be used in the following ways:
 
@@ -285,8 +286,9 @@ argument _chip_pw_tokenizer_logging=true_ was used.
 
 The detokenizer script must be run inside the example's folder after a
 successful run of the _scripts/activate.sh_ script. The pw_tokenizer module used
-by the script is loaded by the environment. An example of running the detokenizer
-script to see logs of a lighting app:
+by the script is loaded by the environment. An example of running the
+detokenizer script to see logs of a lighting app:
+
 ```
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-light-example-database.bin -o device.txt
 ```
@@ -326,8 +328,9 @@ In order to use the tinycrypt ecc operations, use the following build arguments:
     (_chip_crypto=\"tinycrypt\"_) and with the `NXPmicro/mbedtls` library
     (_mbedtls_repo=`\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"`_).
 
-To disable tinycrypt ecc operations, simply build with
-_chip_crypto=\"mbedtls\"_ and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls implementation from `NXPmicro/mbedtls` library will be used.
+To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
+and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
+implementation from `NXPmicro/mbedtls` library will be used.
 
 <a name="ota"></a>
 

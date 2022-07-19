@@ -30,6 +30,7 @@ network.
     -   [Notes](#detokenizer-notes)
     -   [Known issues](#detokenizer-known-issues)
 -   [Tinycrypt ECC operations](#tinycrypt)
+
     -   [Building steps](#tinycrypt-building-steps)
 
     </hr>
@@ -294,10 +295,10 @@ needed for parsing the hashed scripts.
 ### Detokenizer script
 
 The python3 script detokenizer.py is a script that decodes the tokenized logs
-either from a file or from a serial port. It is located in the following path `examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py`.
+either from a file or from a serial port. It is located in the following path
+`examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py`.
 
-The script can be used in the
-following ways:
+The script can be used in the following ways:
 
 ```
 usage: detokenizer.py serial [-h] -i INPUT -d DATABASE [-o OUTPUT]
@@ -328,8 +329,9 @@ argument _chip_pw_tokenizer_logging=true_ was used.
 
 The detokenizer script must be run inside the example's folder after a
 successful run of the _scripts/activate.sh_ script. The pw_tokenizer module used
-by the script is loaded by the environment. An example of running the detokenizer
-script to see logs of a lock app:
+by the script is loaded by the environment. An example of running the
+detokenizer script to see logs of a lock app:
+
 ```
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-lock-example-database.bin -o device.txt
 ```
@@ -369,5 +371,6 @@ In order to use the tinycrypt ecc operations, use the following build arguments:
     (_chip_crypto=\"tinycrypt\"_) and with the `NXPmicro/mbedtls` library
     (_mbedtls_repo=`\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"`_).
 
-To disable tinycrypt ecc operations, simply build with
-_chip_crypto=\"mbedtls\"_ and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls implementation from `NXPmicro/mbedtls` library will be used.
+To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
+and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
+implementation from `NXPmicro/mbedtls` library will be used.
