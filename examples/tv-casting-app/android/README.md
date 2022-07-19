@@ -9,12 +9,12 @@ the TV.
 
 <hr>
 
-- [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
-  - [Requirements for building](#requirements-for-building)
-    - [ABIs and TARGET_CPU](#abis-and-target_cpu)
-    - [Gradle & JDK Version](#gradle--jdk-version)
-  - [Preparing for build](#preparing-for-build)
-  - [Building & Installing the app](#building--installing-the-app)
+-   [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
+    -   [Requirements for building](#requirements-for-building)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle & JDK Version](#gradle--jdk-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building & Installing the app](#building--installing-the-app)
 
 <hr>
 
