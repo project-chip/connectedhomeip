@@ -56,9 +56,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * @param endpoint   Ver.: always
  *
  */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
-{
-}
+void emberAfOnOffClusterInitCallback(EndpointId endpoint) {}
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
 {
