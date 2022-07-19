@@ -148,7 +148,7 @@ Example:
 
 Note: These instructions are specific to getting started with the
 (Matter-provided) `all-clusters-app` on an ESP32-based M5Stack, however can be
-generalised to work on most platforms (more listed below)
+generalised to work on most platforms ([more listed below](#guides))
 
 1. Checkout and setup
    [Matter repo](https://github.com/project-chip/connectedhomeip.git) as per the
