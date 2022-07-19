@@ -49,6 +49,8 @@ tests:
           saveAs: MinlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "sends a MoveToLevelWithOnOff command"
       PICS: LVL.S.C00.Rsp
@@ -72,6 +74,8 @@ tests:
           saveAs: MaxlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "sends a Move up command"
       PICS: LVL.S.C01.Rsp
@@ -161,7 +165,7 @@ tests:
           value: MinlevelValue
           constraints:
               minValue: 0
-              maxValue: 1
+              maxValue: 255
 
     - label: "reads default move rate attribute from DUT"
       PICS: LVL.S.A0014
@@ -171,6 +175,8 @@ tests:
           saveAs: DefaultMoveRateValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "sends a Move up command at default move rate"
       PICS: LVL.S.C05.Rsp && LVL.S.A0014

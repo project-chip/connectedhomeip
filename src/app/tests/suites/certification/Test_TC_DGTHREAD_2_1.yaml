@@ -35,6 +35,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads RoutingRole attribute value from DUT"
       PICS: DGTHREAD.S.A0001
@@ -89,6 +91,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Read PanId attribute from DUT and verify response value, If value is
@@ -276,6 +280,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads DataVersion attribute value from DUT"
       PICS: DGTHREAD.S.A000b
@@ -284,6 +290,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads StableDataVersion attribute value from DUT"
       PICS: DGTHREAD.S.A000c
@@ -292,6 +300,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads LeaderRouterId attribute value from DUT"
       PICS: DGTHREAD.S.A000d
@@ -300,6 +310,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "TH reads DetachedRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A000e
@@ -308,6 +320,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads ChildRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A001f
@@ -316,6 +330,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads RouterRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A0010
@@ -324,6 +340,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads LeaderRoleCount attribute value from DUT"
       PICS: DGTHREAD.S.A0011
@@ -332,6 +350,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads AttachAttemptCount attribute value from DUT"
       PICS: DGTHREAD.S.A0012
@@ -340,6 +360,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads PartitionIdChangeCount attribute value from DUT"
       PICS: DGTHREAD.S.A0013
@@ -348,6 +370,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "TH reads BetterPartitionAttachAttemptCount attribute value from DUT"
@@ -357,6 +381,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads ParentChangeCount attribute value from DUT"
       PICS: DGTHREAD.S.A0015
@@ -365,6 +391,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads ActiveTimestamp attribute value from DUT"
       PICS: DGTHREAD.S.A0038

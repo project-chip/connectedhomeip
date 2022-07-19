@@ -37,13 +37,15 @@ tests:
           saveAs: OccupancyValue
 
     - label: "Operate on DUT to change the occupancy status"
-      PICS: OCC.M.OccupancyChange
       cluster: "LogCommands"
       command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && OCC.M.OccupancyChange
       arguments:
           values:
               - name: "message"
-                value: "Operate on DUT to change the occupancy status"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads back Occupancy attribute from DUT after few seconds"
       PICS: OCC.S.A0000

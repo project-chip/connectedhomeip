@@ -35,6 +35,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxUnicastCount attribute value from DUT"
       PICS: DGTHREAD.S.A0028
@@ -43,6 +45,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxBroadcastCount attribute value from DUT"
       PICS: DGTHREAD.S.A0029
@@ -51,6 +55,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxDataCount attribute value from DUT"
       PICS: DGTHREAD.S.A002a
@@ -59,6 +65,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxDataPollCount attribute value from DUT"
       PICS: DGTHREAD.S.A002b
@@ -67,6 +75,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxBeaconCount attribute value from DUT"
       PICS: DGTHREAD.S.A002c
@@ -75,6 +85,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxBeaconRequestCount attribute value from DUT"
       PICS: DGTHREAD.S.A002d
@@ -83,6 +95,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxOtherCount attribute value from DUT"
       PICS: DGTHREAD.S.A002e
@@ -91,6 +105,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxAddressFilteredCount attribute value from DUT"
       PICS: DGTHREAD.S.A002f
@@ -99,6 +115,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxDestAddrFilteredCount attribute value from DUT"
       PICS: DGTHREAD.S.A0030
@@ -107,6 +125,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxDuplicatedCount attribute value from DUT"
       PICS: DGTHREAD.S.A0031
@@ -115,6 +135,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxErrNoFrameCount attribute value from DUT"
       PICS: DGTHREAD.S.A0032
@@ -123,6 +145,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxErrUnknownNeighborCount attribute value from DUT"
       PICS: DGTHREAD.S.A0033
@@ -131,6 +155,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     #Issue #18335
     - label:
@@ -161,6 +187,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxErrFcsCount attribute value from DUT"
       PICS: DGTHREAD.S.A0036
@@ -169,6 +197,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "TH reads RxErrOtherCount attribute value from DUT"
       PICS: DGTHREAD.S.A0037
@@ -177,3 +207,5 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
