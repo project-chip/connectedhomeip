@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads Channel attribute value from DUT"
-      PICS: DGTHREAD.S.A0001
+      PICS: DGTHREAD.S.A0000
       command: "readAttribute"
       attribute: "channel"
       response:
@@ -37,7 +37,7 @@ tests:
               type: uint16
 
     - label: "TH reads RoutingRole attribute value from DUT"
-      PICS: DGTHREAD.S.A0002
+      PICS: DGTHREAD.S.A0001
       command: "readAttribute"
       attribute: "RoutingRole"
       response:
@@ -46,8 +46,10 @@ tests:
               minValue: 0
               maxValue: 6
 
-    - label: "TH reads Network Name attribute value from DUT"
-      PICS: DGTHREAD.S.A0003
+    - label:
+          "TH reads Network Name attribute value from DUT and Verify that
+          Network name is of the type string"
+      PICS: DGTHREAD.S.A0002
       command: "readAttribute"
       attribute: "NetworkName"
       response:
@@ -58,7 +60,9 @@ tests:
           "Read NetworkName attribute from DUT and verify response value, If
           value is NULL then verify that RoutingRole is set to 1"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read network-name 476 0
+          ./chip-tool threadnetworkdiagnostics read network-name 65 0
+
+           Verify on the TH Log:
 
            [1649823714.280544][3183:3188] CHIP:DMG:
            [1649823714.280605][3183:3188] CHIP:DMG:        SuppressResponse = true,
@@ -76,8 +80,10 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads PanId attribute value from DUT"
-      PICS: DGTHREAD.S.A0004
+    - label:
+          "TH reads PanId attribute value from DUT and Verify that PanId is of
+          the type uint16"
+      PICS: DGTHREAD.S.A0003
       command: "readAttribute"
       attribute: "PanId"
       response:
@@ -88,16 +94,18 @@ tests:
           "Read PanId attribute from DUT and verify response value, If value is
           NULL then verify that RoutingRole is set to 1"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read pan-id 476 0
+          ./chip-tool threadnetworkdiagnostics read pan-id 65 0
 
-           [1649824713.095280][3292:3297] CHIP:DMG:        SuppressResponse = true,
-           [1649824713.095343][3292:3297] CHIP:DMG:        InteractionModelRevision = 1
-           [1649824713.095402][3292:3297] CHIP:DMG: }
-           [1649824713.095703][3292:3297] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0003 DataVersion: 2758196590
-           [1649824713.095867][3292:3297] CHIP:TOO:   PanId: 4660
+          Verify on the TH Log:
+
+          [1649824713.095280][3292:3297] CHIP:DMG:        SuppressResponse = true,
+          [1649824713.095343][3292:3297] CHIP:DMG:        InteractionModelRevision = 1
+          [1649824713.095402][3292:3297] CHIP:DMG: }
+          [1649824713.095703][3292:3297] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0003 DataVersion: 2758196590
+          [1649824713.095867][3292:3297] CHIP:TOO:   PanId: 4660
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0003
       arguments:
           values:
               - name: "message"
@@ -105,8 +113,10 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH reads ExtendedPanId attribute value from DUT"
-      PICS: DGTHREAD.S.A0005
+    - label:
+          "TH reads ExtendedPanId attribute value from DUT and Verify that
+          ExtendedPanId is of the type uint64"
+      PICS: DGTHREAD.S.A0004
       command: "readAttribute"
       attribute: "ExtendedPanId"
       response:
@@ -117,16 +127,18 @@ tests:
           "Read ExtendedPanId attribute from DUT and verify response value, If
           value is NULL then verify that RoutingRole is set to 1"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read extended-pan-id 476 0
+          ./chip-tool threadnetworkdiagnostics read extended-pan-id 65 0
 
-           [1649824746.370824][3300:3305] CHIP:DMG:        SuppressResponse = true,
-           [1649824746.370887][3300:3305] CHIP:DMG:        InteractionModelRevision = 1
-           [1649824746.370946][3300:3305] CHIP:DMG: }
-           [1649824746.371245][3300:3305] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0004 DataVersion: 2758196590
-           [1649824746.371387][3300:3305] CHIP:TOO:   ExtendedPanId: 1229782942828601890
+          Verify on the TH Log:
+
+          [1649824746.370824][3300:3305] CHIP:DMG:        SuppressResponse = true,
+          [1649824746.370887][3300:3305] CHIP:DMG:        InteractionModelRevision = 1
+          [1649824746.370946][3300:3305] CHIP:DMG: }
+          [1649824746.371245][3300:3305] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0004 DataVersion: 2758196590
+          [1649824746.371387][3300:3305] CHIP:TOO:   ExtendedPanId: 1229782942828601890
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0004
       arguments:
           values:
               - name: "message"
@@ -139,16 +151,18 @@ tests:
           "Read MeshLocalPrefix attribute from DUT and verify response value, If
           value is NULL then verify that RoutingRole is set to 1"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 476 0
+          ./chip-tool threadnetworkdiagnostics read mesh-local-prefix 65 0
 
-           [1649824777.961973][3306:3311] CHIP:DMG:        SuppressResponse = true,
-           [1649824777.962035][3306:3311] CHIP:DMG:        InteractionModelRevision = 1
-           [1649824777.962093][3306:3311] CHIP:DMG: }
-           [1649824777.962401][3306:3311] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0005 DataVersion: 2758196590
-           [1649824777.962509][3306:3311] CHIP:TOO:   MeshLocalPrefix: 40FD7B3042ED5F42CF
+          Verify on the TH Log:
+
+          [1649824777.961973][3306:3311] CHIP:DMG:        SuppressResponse = true,
+          [1649824777.962035][3306:3311] CHIP:DMG:        InteractionModelRevision = 1
+          [1649824777.962093][3306:3311] CHIP:DMG: }
+          [1649824777.962401][3306:3311] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0005 DataVersion: 2758196590
+          [1649824777.962509][3306:3311] CHIP:TOO:   MeshLocalPrefix: 40FD7B3042ED5F42CF
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0002
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0005
       arguments:
           values:
               - name: "message"
@@ -157,7 +171,7 @@ tests:
                 value: "y"
 
     - label: "TH reads OverrunCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0007
+      PICS: DGTHREAD.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
@@ -168,16 +182,18 @@ tests:
           "read OverrunCount attribute from DUT and verify response value, If
           the Overruncount is greater than zero or not"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read overrun-count 476 0
+          ./chip-tool threadnetworkdiagnostics read overrun-count 65 0
 
-          [1649824808.714398][3314:3319] CHIP:DMG:        SuppressResponse = true,
-          [1649824808.714482][3314:3319] CHIP:DMG:        InteractionModelRevision = 1
-          [1649824808.714539][3314:3319] CHIP:DMG: }
-          [1649824808.714898][3314:3319] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0006 DataVersion: 2758196590
-          [1649824808.715038][3314:3319] CHIP:TOO:   OverrunCount: 0
+           Verify on the TH Log:
+
+           [1649824808.714398][3314:3319] CHIP:DMG:        SuppressResponse = true,
+           [1649824808.714482][3314:3319] CHIP:DMG:        InteractionModelRevision = 1
+           [1649824808.714539][3314:3319] CHIP:DMG: }
+           [1649824808.714898][3314:3319] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_0006 DataVersion: 2758196590
+           [1649824808.715038][3314:3319] CHIP:TOO:   OverrunCount: 0
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0007
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0006
       arguments:
           values:
               - name: "message"
@@ -190,7 +206,9 @@ tests:
           "read NeighborTableList attribute from DUT and Verify that the
           NeighborTable List size is Zero or greater and verify each node types"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read neighbor-table-list 476 0
+          ./chip-tool threadnetworkdiagnostics read neighbor-table-list 65 0
+
+           Verify on the TH Log:
 
            [1649824841.785721][3322:3327] CHIP:DMG:        SuppressResponse = true,
            [1649824841.785783][3322:3327] CHIP:DMG:        InteractionModelRevision = 1
@@ -199,7 +217,7 @@ tests:
            [1649824841.786317][3322:3327] CHIP:TOO:   NeighborTableList: 0 entries
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0008
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0007
       arguments:
           values:
               - name: "message"
@@ -211,7 +229,9 @@ tests:
           "Read RouteTableList attribute from DUT and Verify that the
           RouteTableList List size is Zero or greater and verify each node types"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read route-table-list 476 0
+          ./chip-tool threadnetworkdiagnostics read route-table-list 65 0
+
+          Verify on the TH Log:
 
           [1649824896.844773][3329:3334] CHIP:DMG:        SuppressResponse = true,
           [1649824896.844809][3329:3334] CHIP:DMG:        InteractionModelRevision = 1
@@ -233,7 +253,7 @@ tests:
           [1649824896.845829][3329:3334] CHIP:EM: Sending Standalone Ack for MessageCounter:14412289 on exchange 3041i
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0009
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A0008
       arguments:
           values:
               - name: "message"
@@ -242,7 +262,7 @@ tests:
                 value: "y"
 
     - label: "TH reads PartitionId attribute value from DUT"
-      PICS: DGTHREAD.S.A000a
+      PICS: DGTHREAD.S.A0009
       command: "readAttribute"
       attribute: "PartitionId"
       response:
@@ -250,7 +270,7 @@ tests:
               type: uint32
 
     - label: "TH reads Weighting attribute value from DUT"
-      PICS: DGTHREAD.S.A000b
+      PICS: DGTHREAD.S.A000a
       command: "readAttribute"
       attribute: "weighting"
       response:
@@ -258,7 +278,7 @@ tests:
               type: uint8
 
     - label: "TH reads DataVersion attribute value from DUT"
-      PICS: DGTHREAD.S.A000c
+      PICS: DGTHREAD.S.A000b
       command: "readAttribute"
       attribute: "DataVersion"
       response:
@@ -266,7 +286,7 @@ tests:
               type: uint8
 
     - label: "TH reads StableDataVersion attribute value from DUT"
-      PICS: DGTHREAD.S.A000d
+      PICS: DGTHREAD.S.A000c
       command: "readAttribute"
       attribute: "StableDataVersion"
       response:
@@ -274,7 +294,7 @@ tests:
               type: uint8
 
     - label: "TH reads LeaderRouterId attribute value from DUT"
-      PICS: DGTHREAD.S.A000e
+      PICS: DGTHREAD.S.A000d
       command: "readAttribute"
       attribute: "LeaderRouterId"
       response:
@@ -282,7 +302,7 @@ tests:
               type: uint8
 
     - label: "TH reads DetachedRoleCount attribute value from DUT"
-      PICS: DGTHREAD.S.A000f
+      PICS: DGTHREAD.S.A000e
       command: "readAttribute"
       attribute: "DetachedRoleCount"
       response:
@@ -290,7 +310,7 @@ tests:
               type: uint16
 
     - label: "TH reads ChildRoleCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0010
+      PICS: DGTHREAD.S.A001f
       command: "readAttribute"
       attribute: "ChildRoleCount"
       response:
@@ -298,7 +318,7 @@ tests:
               type: uint16
 
     - label: "TH reads RouterRoleCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0011
+      PICS: DGTHREAD.S.A0010
       command: "readAttribute"
       attribute: "RouterRoleCount"
       response:
@@ -306,7 +326,7 @@ tests:
               type: uint16
 
     - label: "TH reads LeaderRoleCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0012
+      PICS: DGTHREAD.S.A0011
       command: "readAttribute"
       attribute: "LeaderRoleCount"
       response:
@@ -314,7 +334,7 @@ tests:
               type: uint16
 
     - label: "TH reads AttachAttemptCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0013
+      PICS: DGTHREAD.S.A0012
       command: "readAttribute"
       attribute: "AttachAttemptCount"
       response:
@@ -322,7 +342,7 @@ tests:
               type: uint16
 
     - label: "TH reads PartitionIdChangeCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0014
+      PICS: DGTHREAD.S.A0013
       command: "readAttribute"
       attribute: "PartitionIdChangeCount"
       response:
@@ -331,7 +351,7 @@ tests:
 
     - label:
           "TH reads BetterPartitionAttachAttemptCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0015
+      PICS: DGTHREAD.S.A0014
       command: "readAttribute"
       attribute: "BetterPartitionAttachAttemptCount"
       response:
@@ -339,7 +359,7 @@ tests:
               type: uint16
 
     - label: "TH reads ParentChangeCount attribute value from DUT"
-      PICS: DGTHREAD.S.A0016
+      PICS: DGTHREAD.S.A0015
       command: "readAttribute"
       attribute: "ParentChangeCount"
       response:
@@ -347,7 +367,7 @@ tests:
               type: uint16
 
     - label: "TH reads ActiveTimestamp attribute value from DUT"
-      PICS: DGTHREAD.S.A0039
+      PICS: DGTHREAD.S.A0038
       command: "readAttribute"
       attribute: "ActiveTimestamp"
       response:
@@ -355,7 +375,7 @@ tests:
               type: uint64
 
     - label: "TH reads PendingTimestamp attribute value from DUT"
-      PICS: DGTHREAD.S.A003a
+      PICS: DGTHREAD.S.A0039
       command: "readAttribute"
       attribute: "PendingTimestamp"
       response:
@@ -363,7 +383,7 @@ tests:
               type: uint64
 
     - label: "TH reads Delay attribute value from DUT"
-      PICS: DGTHREAD.S.A003b
+      PICS: DGTHREAD.S.A003a
       command: "readAttribute"
       attribute: "delay"
       response:
@@ -388,7 +408,7 @@ tests:
           [1649825860.867921][3472:3477] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003c
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003b
       arguments:
           values:
               - name: "message"
@@ -397,7 +417,7 @@ tests:
                 value: "y"
 
     - label: "TH reads ChannelPage0Mask attribute value from DUT"
-      PICS: DGTHREAD.S.A003d
+      PICS: DGTHREAD.S.A003c
       command: "readAttribute"
       attribute: "ChannelMask"
       response:
@@ -409,20 +429,33 @@ tests:
           "Read OperationalDatasetComponents struct attribute from DUT and
           Verify the each field"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read security-policy 476 0
+          ./chip-tool threadnetworkdiagnostics read operational-dataset-components 65 0
 
-          [1649825860.866762][3472:3477] CHIP:DMG:        SuppressResponse = true,
-          [1649825860.866826][3472:3477] CHIP:DMG:        InteractionModelRevision = 1
-          [1649825860.866883][3472:3477] CHIP:DMG: }
-          [1649825860.867425][3472:3477] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_003B DataVersion: 2758196590
-          [1649825860.867583][3472:3477] CHIP:TOO:   SecurityPolicy: 1 entries
-          [1649825860.867743][3472:3477] CHIP:TOO:     [1]: {
-          [1649825860.867804][3472:3477] CHIP:TOO:       RotationTime: 672
-          [1649825860.867862][3472:3477] CHIP:TOO:       Flags: 8479
-          [1649825860.867921][3472:3477] CHIP:TOO:      }
+          Verify on the TH Log:
+
+
+          [1649825944.956668][3489:3494] CHIP:DMG:        SuppressResponse = true,
+          [1649825944.956730][3489:3494] CHIP:DMG:        InteractionModelRevision = 1
+          [1649825944.956877][3489:3494] CHIP:DMG: }
+          [1649825944.957504][3489:3494] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_003D DataVersion: 2758196590
+          [1649825944.957787][3489:3494] CHIP:TOO:   OperationalDatasetComponents: 1 entries
+          [1649825944.957942][3489:3494] CHIP:TOO:     [1]: {
+          [1649825944.958002][3489:3494] CHIP:TOO:       ActiveTimestampPresent: TRUE
+          [1649825944.958058][3489:3494] CHIP:TOO:       PendingTimestampPresent: FALSE
+          [1649825944.958113][3489:3494] CHIP:TOO:       MasterKeyPresent: TRUE
+          [1649825944.958169][3489:3494] CHIP:TOO:       NetworkNamePresent: TRUE
+          [1649825944.958222][3489:3494] CHIP:TOO:       ExtendedPanIdPresent: TRUE
+          [1649825944.958277][3489:3494] CHIP:TOO:       MeshLocalPrefixPresent: TRUE
+          [1649825944.958330][3489:3494] CHIP:TOO:       DelayPresent: FALSE
+          [1649825944.958480][3489:3494] CHIP:TOO:       PanIdPresent: TRUE
+          [1649825944.958537][3489:3494] CHIP:TOO:       ChannelPresent: TRUE
+          [1649825944.958590][3489:3494] CHIP:TOO:       PskcPresent: TRUE
+          [1649825944.958643][3489:3494] CHIP:TOO:       SecurityPolicyPresent: TRUE
+          [1649825944.958696][3489:3494] CHIP:TOO:       ChannelMaskPresent: TRUE
+          [1649825944.958753][3489:3494] CHIP:TOO:      }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003e
+      PICS: PICS_USER_PROMPT && DGTHREAD.S.A003d
       arguments:
           values:
               - name: "message"
@@ -432,7 +465,7 @@ tests:
 
     #issue #18145
     - label: "TH reads ActiveNetworkFaults attribute value from DUT"
-      PICS: DGTHREAD.S.A003f
+      PICS: DGTHREAD.S.A003e
       command: "readAttribute"
       attribute: "ActiveNetworkFaultsList"
       response:

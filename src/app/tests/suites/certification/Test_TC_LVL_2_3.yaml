@@ -26,301 +26,332 @@ tests:
           a manufacturer specific order"
       verification: |
           ./chip-tool levelcontrol read current-level 1 1
+          Verify in TH all-clusters-app
+          [1657279115.433005][4417:4417] CHIP:IM: Received Read request
+          [1657279115.433184][4417:4417] CHIP:DMG: ReadRequestMessage =
+          [1657279115.433258][4417:4417] CHIP:DMG: {
+          [1657279115.433313][4417:4417] CHIP:DMG:         AttributePathIBs =
+          [1657279115.433379][4417:4417] CHIP:DMG:         [
+          [1657279115.433438][4417:4417] CHIP:DMG:                 AttributePathIB =
+          [1657279115.433506][4417:4417] CHIP:DMG:                 {
+          [1657279115.433572][4417:4417] CHIP:DMG:                         Endpoint = 0x1,
+          [1657279115.433703][4417:4417] CHIP:DMG:                         Cluster = 0x8,
+          [1657279115.433781][4417:4417] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1657279115.433851][4417:4417] CHIP:DMG:                 }
+          [1657279115.433920][4417:4417] CHIP:DMG:                         
+          [1657279115.433980][4417:4417] CHIP:DMG:         ],
+          [1657279115.434047][4417:4417] CHIP:DMG:                 
+          [1657279115.434109][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279115.434169][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
+          [1657279115.434226][4417:4417] CHIP:DMG: },
 
-          [1652363362.205813][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363362.205844][2335:2335] CHIP:DMG: {
-          [1652363362.205947][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363362.205981][2335:2335] CHIP:DMG:         [
-          [1652363362.206009][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363362.206048][2335:2335] CHIP:DMG:                 {
-          [1652363362.206083][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363362.206120][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363362.206156][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1652363362.206189][2335:2335] CHIP:DMG:                 }
-          [1652363362.206221][2335:2335] CHIP:DMG:
-          [1652363362.206252][2335:2335] CHIP:DMG:         ],
-          [1652363362.206285][2335:2335] CHIP:DMG:
-          [1652363362.206317][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363362.206346][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363362.206373][2335:2335] CHIP:DMG: },
 
-           ./chip-tool levelcontrol read on-level 1 1
-          [1652363399.089823][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363399.089855][2335:2335] CHIP:DMG: {
-          [1652363399.089882][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363399.089915][2335:2335] CHIP:DMG:         [
-          [1652363399.089945][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363399.089981][2335:2335] CHIP:DMG:                 {
-          [1652363399.090018][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363399.090056][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363399.090098][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0011,
-          [1652363399.090135][2335:2335] CHIP:DMG:                 }
-          [1652363399.090172][2335:2335] CHIP:DMG:
-          [1652363399.090206][2335:2335] CHIP:DMG:         ],
-          [1652363399.090241][2335:2335] CHIP:DMG:
-          [1652363399.090273][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363399.090305][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363399.090334][2335:2335] CHIP:DMG: },
+          ./chip-tool levelcontrol read on-level 1 1
+          Verify in TH all-clusters-app
+          [1657279142.246433][4417:4417] CHIP:IM: Received Read request
+          [1657279142.246605][4417:4417] CHIP:DMG: ReadRequestMessage =
+          [1657279142.246670][4417:4417] CHIP:DMG: {
+          [1657279142.246725][4417:4417] CHIP:DMG:         AttributePathIBs =
+          [1657279142.246788][4417:4417] CHIP:DMG:         [
+          [1657279142.246848][4417:4417] CHIP:DMG:                 AttributePathIB =
+          [1657279142.246906][4417:4417] CHIP:DMG:                 {
+          [1657279142.246965][4417:4417] CHIP:DMG:                         Endpoint = 0x1,
+          [1657279142.247028][4417:4417] CHIP:DMG:                         Cluster = 0x8,
+          [1657279142.247100][4417:4417] CHIP:DMG:                         Attribute = 0x0000_0011,
+          [1657279142.247164][4417:4417] CHIP:DMG:                 }
+          [1657279142.247245][4417:4417] CHIP:DMG:                         
+          [1657279142.247310][4417:4417] CHIP:DMG:         ],
+          [1657279142.247375][4417:4417] CHIP:DMG:                 
+          [1657279142.247439][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279142.247500][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
+          [1657279142.247552][4417:4417] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read options 1 1
-          [1652363446.883210][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363446.883245][2335:2335] CHIP:DMG: {
-          [1652363446.883274][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363446.883308][2335:2335] CHIP:DMG:         [
-          [1652363446.883341][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363446.883371][2335:2335] CHIP:DMG:                 {
-          [1652363446.883401][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363446.883430][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363446.883521][2335:2335] CHIP:DMG:                         Attribute = 0x0000_000F,
-          [1652363446.883554][2335:2335] CHIP:DMG:                 }
-          [1652363446.883584][2335:2335] CHIP:DMG:
-          [1652363446.883611][2335:2335] CHIP:DMG:         ],
-          [1652363446.883639][2335:2335] CHIP:DMG:
-          [1652363446.883666][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363446.883691][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363446.883714][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657279166.425514][4417:4417] CHIP:IM: Received Read request
+          [1657279166.425770][4417:4417] CHIP:DMG: ReadRequestMessage =
+          [1657279166.425842][4417:4417] CHIP:DMG: {
+          [1657279166.425895][4417:4417] CHIP:DMG:         AttributePathIBs =
+          [1657279166.425960][4417:4417] CHIP:DMG:         [
+          [1657279166.426018][4417:4417] CHIP:DMG:                 AttributePathIB =
+          [1657279166.426093][4417:4417] CHIP:DMG:                 {
+          [1657279166.426161][4417:4417] CHIP:DMG:                         Endpoint = 0x1,
+          [1657279166.426245][4417:4417] CHIP:DMG:                         Cluster = 0x8,
+          [1657279166.426310][4417:4417] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1657279166.426389][4417:4417] CHIP:DMG:                 }
+          [1657279166.426465][4417:4417] CHIP:DMG:                         
+          [1657279166.426528][4417:4417] CHIP:DMG:         ],
+          [1657279166.426597][4417:4417] CHIP:DMG:                 
+          [1657279166.426660][4417:4417] CHIP:DMG:         isFabricFiltered = true, 
+          [1657279166.426721][4417:4417] CHIP:DMG:         InteractionModelRevision = 1
+          [1657279166.426777][4417:4417] CHIP:DMG: },
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool levelcontrol read remaining-time 112233 1
+          ./chip-tool levelcontrol read remaining-time 1 1
+          Verify in TH all-clusters-app
+          1657913316.919773][3126:3126] CHIP:IM: Received Read request
+          [1657913316.919880][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913316.919920][3126:3126] CHIP:DMG: {
+          [1657913316.919952][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913316.919995][3126:3126] CHIP:DMG:        [
+          [1657913316.920046][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913316.920135][3126:3126] CHIP:DMG:                {
+          [1657913316.920176][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913316.920341][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913316.920396][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1657913316.920457][3126:3126] CHIP:DMG:                }
+          [1657913316.920503][3126:3126] CHIP:DMG:
+          [1657913316.920543][3126:3126] CHIP:DMG:        ],
+          [1657913316.920584][3126:3126] CHIP:DMG:
+          [1657913316.920622][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913316.920673][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913316.920707][3126:3126] CHIP:DMG: },
 
-          [1652363491.826059][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363491.826085][2335:2335] CHIP:DMG: {
-          [1652363491.826107][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363491.826132][2335:2335] CHIP:DMG:         [
-          [1652363491.826155][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363491.826183][2335:2335] CHIP:DMG:                 {
-          [1652363491.826214][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363491.826246][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363491.826279][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0001,
-          [1652363491.826307][2335:2335] CHIP:DMG:                 }
-          [1652363491.826337][2335:2335] CHIP:DMG:
-          [1652363491.826365][2335:2335] CHIP:DMG:         ],
-          [1652363491.826393][2335:2335] CHIP:DMG:
-          [1652363491.826419][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363491.826441][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363491.826461][2335:2335] CHIP:DMG: },
 
+          ./chip-tool levelcontrol read min-level 1 1
+          Verify in TH all-clusters-app
+          [1657913332.319502][3126:3126] CHIP:IM: Received Read request
+          [1657913332.319628][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913332.319675][3126:3126] CHIP:DMG: {
+          [1657913332.319734][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913332.319782][3126:3126] CHIP:DMG:        [
+          [1657913332.319826][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913332.319898][3126:3126] CHIP:DMG:                {
+          [1657913332.319950][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913332.320006][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913332.320127][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0002,
+          [1657913332.320181][3126:3126] CHIP:DMG:                }
+          [1657913332.320239][3126:3126] CHIP:DMG:
+          [1657913332.320305][3126:3126] CHIP:DMG:        ],
+          [1657913332.320358][3126:3126] CHIP:DMG:
+          [1657913332.320405][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913332.320470][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913332.320514][3126:3126] CHIP:DMG: },
 
-
-          ./chip-tool levelcontrol read min-level 112233 1
-          [1652363537.483192][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363537.483221][2335:2335] CHIP:DMG: {
-          [1652363537.483246][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363537.483275][2335:2335] CHIP:DMG:         [
-          [1652363537.483303][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363537.483337][2335:2335] CHIP:DMG:                 {
-          [1652363537.483369][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363537.483404][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363537.483442][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0002,
-          [1652363537.483473][2335:2335] CHIP:DMG:                 }
-          [1652363537.483512][2335:2335] CHIP:DMG:
-          [1652363537.483541][2335:2335] CHIP:DMG:         ],
-          [1652363537.483573][2335:2335] CHIP:DMG:
-          [1652363537.483604][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363537.483633][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363537.483659][2335:2335] CHIP:DMG: },
 
           ./chip-tool levelcontrol read max-level 1 1
-          [1652363573.821260][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363573.821286][2335:2335] CHIP:DMG: {
-          [1652363573.821307][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363573.821333][2335:2335] CHIP:DMG:         [
-          [1652363573.821357][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363573.821387][2335:2335] CHIP:DMG:                 {
-          [1652363573.821417][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363573.821448][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363573.821479][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0003,
-          [1652363573.821508][2335:2335] CHIP:DMG:                 }
-          [1652363573.821537][2335:2335] CHIP:DMG:
-          [1652363573.821564][2335:2335] CHIP:DMG:         ],
-          [1652363573.821592][2335:2335] CHIP:DMG:
-          [1652363573.821615][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363573.821636][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363573.821659][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913350.880504][3126:3126] CHIP:IM: Received Read request
+          [1657913350.880648][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913350.880703][3126:3126] CHIP:DMG: {
+          [1657913350.880770][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913350.880838][3126:3126] CHIP:DMG:        [
+          [1657913350.880889][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913350.880965][3126:3126] CHIP:DMG:                {
+          [1657913350.881023][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913350.881090][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913350.881175][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0003,
+          [1657913350.881243][3126:3126] CHIP:DMG:                }
+          [1657913350.881437][3126:3126] CHIP:DMG:
+          [1657913350.881496][3126:3126] CHIP:DMG:        ],
+          [1657913350.881576][3126:3126] CHIP:DMG:
+          [1657913350.881630][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913350.881705][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913350.881756][3126:3126] CHIP:DMG: },
 
-          ./chip-tool levelcontrol read current-frequency 112233 1
-          [1652363623.270645][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363623.270675][2335:2335] CHIP:DMG: {
-          [1652363623.270696][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363623.270723][2335:2335] CHIP:DMG:         [
-          [1652363623.270746][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363623.270775][2335:2335] CHIP:DMG:                 {
-          [1652363623.270805][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363623.270834][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363623.270862][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0004,
-          [1652363623.270891][2335:2335] CHIP:DMG:                 }
-          [1652363623.270918][2335:2335] CHIP:DMG:
-          [1652363623.270943][2335:2335] CHIP:DMG:         ],
-          [1652363623.270971][2335:2335] CHIP:DMG:
-          [1652363623.270997][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363623.271022][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363623.271046][2335:2335] CHIP:DMG: },
+
+          ./chip-tool levelcontrol read current-frequency 1 1
+          Verify in TH all-clusters-app
+          [1657913381.091563][3126:3126] CHIP:IM: Received Read request
+          [1657913381.091690][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913381.091738][3126:3126] CHIP:DMG: {
+          [1657913381.091797][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913381.091844][3126:3126] CHIP:DMG:        [
+          [1657913381.091889][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913381.091958][3126:3126] CHIP:DMG:                {
+          [1657913381.092013][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913381.092105][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913381.092178][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0004,
+          [1657913381.092233][3126:3126] CHIP:DMG:                }
+          [1657913381.092284][3126:3126] CHIP:DMG:
+          [1657913381.092348][3126:3126] CHIP:DMG:        ],
+          [1657913381.092400][3126:3126] CHIP:DMG:
+          [1657913381.092448][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913381.092514][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913381.092557][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read min-frequency 1 1
-          [1652363650.520343][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363650.520370][2335:2335] CHIP:DMG: {
-          [1652363650.520393][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363650.520421][2335:2335] CHIP:DMG:         [
-          [1652363650.520447][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363650.520479][2335:2335] CHIP:DMG:                 {
-          [1652363650.520510][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363650.520564][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363650.520597][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0005,
-          [1652363650.520629][2335:2335] CHIP:DMG:                 }
-          [1652363650.520660][2335:2335] CHIP:DMG:
-          [1652363650.520688][2335:2335] CHIP:DMG:         ],
-          [1652363650.520718][2335:2335] CHIP:DMG:
-          [1652363650.520746][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363650.520773][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363650.520797][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913397.410411][3126:3126] CHIP:IM: Received Read request
+          [1657913397.410539][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913397.410588][3126:3126] CHIP:DMG: {
+          [1657913397.410629][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913397.410676][3126:3126] CHIP:DMG:        [
+          [1657913397.410720][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913397.410782][3126:3126] CHIP:DMG:                {
+          [1657913397.410834][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913397.410891][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913397.410948][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0005,
+          [1657913397.411002][3126:3126] CHIP:DMG:                }
+          [1657913397.411056][3126:3126] CHIP:DMG:
+          [1657913397.411103][3126:3126] CHIP:DMG:        ],
+          [1657913397.411161][3126:3126] CHIP:DMG:
+          [1657913397.411209][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913397.411255][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913397.411298][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read max-frequency 1 1
-          [1652363692.622936][2335:2335] CHIP:IM: Received Read request
-          [1652363692.623003][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363692.623038][2335:2335] CHIP:DMG: {
-          [1652363692.623068][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363692.623103][2335:2335] CHIP:DMG:         [
-          [1652363692.623136][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363692.623173][2335:2335] CHIP:DMG:                 {
-          [1652363692.623209][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363692.623240][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363692.623272][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0006,
-          [1652363692.623363][2335:2335] CHIP:DMG:                 }
-          [1652363692.623395][2335:2335] CHIP:DMG:
-          [1652363692.623423][2335:2335] CHIP:DMG:         ],
-          [1652363692.623452][2335:2335] CHIP:DMG:
-          [1652363692.623479][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363692.623505][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363692.623528][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913412.416960][3126:3126] CHIP:IM: Received Read request
+          [1657913412.417086][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913412.417134][3126:3126] CHIP:DMG: {
+          [1657913412.417175][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913412.417227][3126:3126] CHIP:DMG:        [
+          [1657913412.417271][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913412.417321][3126:3126] CHIP:DMG:                {
+          [1657913412.417372][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913412.417428][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913412.417487][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0006,
+          [1657913412.417542][3126:3126] CHIP:DMG:                }
+          [1657913412.417593][3126:3126] CHIP:DMG:
+          [1657913412.417642][3126:3126] CHIP:DMG:        ],
+          [1657913412.417693][3126:3126] CHIP:DMG:
+          [1657913412.417740][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913412.417786][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913412.417822][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read on-off-transition-time 1 1
-          [1652363727.411475][2335:2335] CHIP:IM: Received Read request
-          [1652363727.411532][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363727.411561][2335:2335] CHIP:DMG: {
-          [1652363727.411586][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363727.411615][2335:2335] CHIP:DMG:         [
-          [1652363727.411643][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363727.411678][2335:2335] CHIP:DMG:                 {
-          [1652363727.411710][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363727.411744][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363727.411776][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0010,
-          [1652363727.411808][2335:2335] CHIP:DMG:                 }
-          [1652363727.411840][2335:2335] CHIP:DMG:
-          [1652363727.411871][2335:2335] CHIP:DMG:         ],
-          [1652363727.411904][2335:2335] CHIP:DMG:
-          [1652363727.411934][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363727.411963][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363727.411989][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913438.117302][3126:3126] CHIP:IM: Received Read request
+          [1657913438.117462][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913438.117526][3126:3126] CHIP:DMG: {
+          [1657913438.117718][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913438.117782][3126:3126] CHIP:DMG:        [
+          [1657913438.117841][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913438.117907][3126:3126] CHIP:DMG:                {
+          [1657913438.117976][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913438.118061][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913438.118137][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0010,
+          [1657913438.118206][3126:3126] CHIP:DMG:                }
+          [1657913438.118279][3126:3126] CHIP:DMG:
+          [1657913438.118347][3126:3126] CHIP:DMG:        ],
+          [1657913438.118415][3126:3126] CHIP:DMG:
+          [1657913438.118474][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913438.118535][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913438.118592][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read on-transition-time 1 1
-          [1652363775.374700][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363775.374738][2335:2335] CHIP:DMG: {
-          [1652363775.374767][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363775.374802][2335:2335] CHIP:DMG:         [
-          [1652363775.374834][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363775.374866][2335:2335] CHIP:DMG:                 {
-          [1652363775.374897][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363775.374935][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363775.375062][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0012,
-          [1652363775.375091][2335:2335] CHIP:DMG:                 }
-          [1652363775.375119][2335:2335] CHIP:DMG:
-          [1652363775.375144][2335:2335] CHIP:DMG:         ],
-          [1652363775.375172][2335:2335] CHIP:DMG:
-          [1652363775.375198][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363775.375224][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363775.375247][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913454.127158][3126:3126] CHIP:IM: Received Read request
+          [1657913454.127241][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913454.127268][3126:3126] CHIP:DMG: {
+          [1657913454.127291][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913454.127317][3126:3126] CHIP:DMG:        [
+          [1657913454.127341][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913454.127368][3126:3126] CHIP:DMG:                {
+          [1657913454.127396][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913454.127461][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913454.127497][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0012,
+          [1657913454.127528][3126:3126] CHIP:DMG:                }
+          [1657913454.127556][3126:3126] CHIP:DMG:
+          [1657913454.127582][3126:3126] CHIP:DMG:        ],
+          [1657913454.127610][3126:3126] CHIP:DMG:
+          [1657913454.127636][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913454.127661][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913454.127685][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read off-transition-time 1 1
-          [1652363859.595028][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363859.595056][2335:2335] CHIP:DMG: {
-          [1652363859.595079][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363859.595108][2335:2335] CHIP:DMG:         [
-          [1652363859.595133][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363859.595164][2335:2335] CHIP:DMG:                 {
-          [1652363859.595195][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363859.595228][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363859.595263][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0013,
-          [1652363859.595296][2335:2335] CHIP:DMG:                 }
-          [1652363859.595403][2335:2335] CHIP:DMG:
-          [1652363859.595433][2335:2335] CHIP:DMG:         ],
-          [1652363859.595463][2335:2335] CHIP:DMG:
-          [1652363859.595491][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363859.595518][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363859.595543][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913518.488375][3126:3126] CHIP:IM: Received Read request
+          [1657913518.488457][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913518.488486][3126:3126] CHIP:DMG: {
+          [1657913518.488508][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913518.488534][3126:3126] CHIP:DMG:        [
+          [1657913518.488558][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913518.488585][3126:3126] CHIP:DMG:                {
+          [1657913518.488613][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913518.488649][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913518.488678][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0013,
+          [1657913518.488705][3126:3126] CHIP:DMG:                }
+          [1657913518.488733][3126:3126] CHIP:DMG:
+          [1657913518.488757][3126:3126] CHIP:DMG:        ],
+          [1657913518.488785][3126:3126] CHIP:DMG:
+          [1657913518.488812][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913518.488837][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913518.488860][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read default-move-rate 1 1
-          [1652363891.332385][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363891.332411][2335:2335] CHIP:DMG: {
-          [1652363891.332432][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363891.332461][2335:2335] CHIP:DMG:         [
-          [1652363891.332492][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363891.332540][2335:2335] CHIP:DMG:                 {
-          [1652363891.332577][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363891.332608][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363891.332640][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0014,
-          [1652363891.332666][2335:2335] CHIP:DMG:                 }
-          [1652363891.332696][2335:2335] CHIP:DMG:
-          [1652363891.332782][2335:2335] CHIP:DMG:         ],
-          [1652363891.332814][2335:2335] CHIP:DMG:
-          [1652363891.332843][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363891.332870][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363891.332894][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913537.304689][3126:3126] CHIP:IM: Received Read request
+          [1657913537.304828][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913537.304884][3126:3126] CHIP:DMG: {
+          [1657913537.304931][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913537.304996][3126:3126] CHIP:DMG:        [
+          [1657913537.305047][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913537.305108][3126:3126] CHIP:DMG:                {
+          [1657913537.305171][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913537.305238][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913537.305304][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0014,
+          [1657913537.305372][3126:3126] CHIP:DMG:                }
+          [1657913537.305434][3126:3126] CHIP:DMG:
+          [1657913537.305607][3126:3126] CHIP:DMG:        ],
+          [1657913537.305675][3126:3126] CHIP:DMG:
+          [1657913537.305729][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913537.305787][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913537.305836][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read start-up-current-level 1 1
-          [1652363926.814302][2335:2335] CHIP:IM: Received Read request
-          [1652363926.814367][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363926.814402][2335:2335] CHIP:DMG: {
-          [1652363926.814431][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363926.814519][2335:2335] CHIP:DMG:         [
-          [1652363926.814553][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363926.814600][2335:2335] CHIP:DMG:                 {
-          [1652363926.814639][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363926.814683][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363926.814725][2335:2335] CHIP:DMG:                         Attribute = 0x0000_4000,
-          [1652363926.814764][2335:2335] CHIP:DMG:                 }
-          [1652363926.814804][2335:2335] CHIP:DMG:
-          [1652363926.814831][2335:2335] CHIP:DMG:         ],
-          [1652363926.814859][2335:2335] CHIP:DMG:
-          [1652363926.814886][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363926.814987][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363926.815014][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913554.968190][3126:3126] CHIP:IM: Received Read request
+          [1657913554.968312][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913554.968343][3126:3126] CHIP:DMG: {
+          [1657913554.968366][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913554.968393][3126:3126] CHIP:DMG:        [
+          [1657913554.968416][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913554.968444][3126:3126] CHIP:DMG:                {
+          [1657913554.968473][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913554.968513][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913554.968546][3126:3126] CHIP:DMG:                        Attribute = 0x0000_4000,
+          [1657913554.968569][3126:3126] CHIP:DMG:                }
+          [1657913554.968594][3126:3126] CHIP:DMG:
+          [1657913554.968617][3126:3126] CHIP:DMG:        ],
+          [1657913554.968679][3126:3126] CHIP:DMG:
+          [1657913554.968717][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913554.968743][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913554.968766][3126:3126] CHIP:DMG: },
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          "./chip-tool levelcontrol write on-level 5 (replace with your value) 123123 1
-          [1636522781.877694][6671:6676] CHIP:DMG: WriteResponseMessage =
-          [1636522781.877752][6671:6676] CHIP:DMG: {
-          [1636522781.877795][6671:6676] CHIP:DMG:  AttributeStatuses =
-          [1636522781.877848][6671:6676] CHIP:DMG:  [
-          [1636522781.877889][6671:6676] CHIP:DMG:  AttributeStatusIB =
-          [1636522781.877938][6671:6676] CHIP:DMG:  {
-          [1636522781.877963][6671:6676] CHIP:DMG:  AttributePathIB =
-          [1636522781.878009][6671:6676] CHIP:DMG:  {
-          [1636522781.878060][6671:6676] CHIP:DMG:  Attribute = 0x0000_0011,
-          [1636522781.878102][6671:6676] CHIP:DMG:  Node = 0x0,
-          [1636522781.878142][6671:6676] CHIP:DMG:  Cluster = 0x8,
-          [1636522781.878178][6671:6676] CHIP:DMG:  Endpoint = 0x1,
-          [1636522781.878213][6671:6676] CHIP:DMG:  }
-          [1636522781.878255][6671:6676] CHIP:DMG:
-          [1636522781.878288][6671:6676] CHIP:DMG:  StatusIB =
-          [1636522781.878323][6671:6676] CHIP:DMG:  {
-          [1636522781.878359][6671:6676] CHIP:DMG:  status = 0x0,
-          [1636522781.878395][6671:6676] CHIP:DMG:  },
-          [1636522781.878432][6671:6676] CHIP:DMG:
-          [1636522781.878460][6671:6676] CHIP:DMG:  },
-          [1636522781.878495][6671:6676] CHIP:DMG:
-          [1636522781.878521][6671:6676] CHIP:DMG:  ],
-          [1636522781.878551][6671:6676] CHIP:DMG:
-          [1636522781.878573][6671:6676] CHIP:DMG: }
-          [1636522781.878631][6671:6676] CHIP:ZCL: WriteResponse:
-          [1636522781.878654][6671:6676] CHIP:ZCL:  status: Success  (0x0000)"
+          ./chip-tool levelcontrol write on-level 5 (replace with your value) 123123 1
+          Verify in TH all-clusters-app
+          [1657913667.893875][3126:3126] CHIP:DMG: WriteRequestMessage =
+          [1657913667.893923][3126:3126] CHIP:DMG: {
+          [1657913667.893965][3126:3126] CHIP:DMG:        suppressResponse = false,
+          [1657913667.894013][3126:3126] CHIP:DMG:        timedRequest = false,
+          [1657913667.894058][3126:3126] CHIP:DMG:        AttributeDataIBs =
+          [1657913667.894112][3126:3126] CHIP:DMG:        [
+          [1657913667.894157][3126:3126] CHIP:DMG:                AttributeDataIB =
+          [1657913667.894213][3126:3126] CHIP:DMG:                {
+          [1657913667.894264][3126:3126] CHIP:DMG:                        AttributePathIB =
+          [1657913667.894322][3126:3126] CHIP:DMG:                        {
+          [1657913667.894495][3126:3126] CHIP:DMG:                                Endpoint = 0x1,
+          [1657913667.894561][3126:3126] CHIP:DMG:                                Cluster = 0x8,
+          [1657913667.894622][3126:3126] CHIP:DMG:                                Attribute = 0x0000_0011,
+          [1657913667.894684][3126:3126] CHIP:DMG:                        }
+          [1657913667.894744][3126:3126] CHIP:DMG:
+          [1657913667.894808][3126:3126] CHIP:DMG:                        Data = 5,
+          [1657913667.894866][3126:3126] CHIP:DMG:                },
+          [1657913667.894914][3126:3126] CHIP:DMG:
+          [1657913667.894957][3126:3126] CHIP:DMG:        ],
+          [1657913667.895010][3126:3126] CHIP:DMG:
+          [1657913667.895055][3126:3126] CHIP:DMG:        moreChunkedMessages = false,
+          [1657913667.895105][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913667.895148][3126:3126] CHIP:DMG: },
       disabled: true
 
     - label:
@@ -328,141 +359,139 @@ tests:
           the TH one at a time in a manufacturer specific order"
       verification: |
           ./chip-tool levelcontrol write on-off-transition-time 5 (replace with your own value) 123123 1
-          [1652363991.647034][2335:2335] CHIP:DMG: WriteRequestMessage =
-          [1652363991.647059][2335:2335] CHIP:DMG: {
-          [1652363991.647081][2335:2335] CHIP:DMG:         suppressResponse = false,
-          [1652363991.647111][2335:2335] CHIP:DMG:         timedRequest = false,
-          [1652363991.647135][2335:2335] CHIP:DMG:         AttributeDataIBs =
-          [1652363991.647166][2335:2335] CHIP:DMG:         [
-          [1652363991.647190][2335:2335] CHIP:DMG:                 AttributeDataIB =
-          [1652363991.647218][2335:2335] CHIP:DMG:                 {
-          [1652363991.647243][2335:2335] CHIP:DMG:                         AttributePathIB =
-          [1652363991.647274][2335:2335] CHIP:DMG:                         {
-          [1652363991.647306][2335:2335] CHIP:DMG:                                 Endpoint = 0x1,
-          [1652363991.647339][2335:2335] CHIP:DMG:                                 Cluster = 0x8,
-          [1652363991.647372][2335:2335] CHIP:DMG:                                 Attribute = 0x0000_0010,
-          [1652363991.647403][2335:2335] CHIP:DMG:                         }
-          [1652363991.647436][2335:2335] CHIP:DMG:
-          [1652363991.647469][2335:2335] CHIP:DMG:                                 Data = 5,
-          [1652363991.647502][2335:2335] CHIP:DMG:                 },
-          [1652363991.647533][2335:2335] CHIP:DMG:
-          [1652363991.647556][2335:2335] CHIP:DMG:         ],
-          [1652363991.647584][2335:2335] CHIP:DMG:
-          [1652363991.647609][2335:2335] CHIP:DMG:         moreChunkedMessages = false,
-          [1652363991.647634][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363991.647657][2335:2335] CHIP:DMG: },
+          Verify in TH all-clusters-app
+          [1657913716.044424][3126:3126] CHIP:DMG: WriteRequestMessage =
+          [1657913716.044478][3126:3126] CHIP:DMG: {
+          [1657913716.044527][3126:3126] CHIP:DMG:        suppressResponse = false,
+          [1657913716.044583][3126:3126] CHIP:DMG:        timedRequest = false,
+          [1657913716.044634][3126:3126] CHIP:DMG:        AttributeDataIBs =
+          [1657913716.044696][3126:3126] CHIP:DMG:        [
+          [1657913716.044748][3126:3126] CHIP:DMG:                AttributeDataIB =
+          [1657913716.044806][3126:3126] CHIP:DMG:                {
+          [1657913716.044860][3126:3126] CHIP:DMG:                        AttributePathIB =
+          [1657913716.044932][3126:3126] CHIP:DMG:                        {
+          [1657913716.044994][3126:3126] CHIP:DMG:                                Endpoint = 0x1,
+          [1657913716.045061][3126:3126] CHIP:DMG:                                Cluster = 0x8,
+          [1657913716.045137][3126:3126] CHIP:DMG:                                Attribute = 0x0000_0010,
+          [1657913716.045202][3126:3126] CHIP:DMG:                        }
+          [1657913716.045270][3126:3126] CHIP:DMG:
+          [1657913716.045344][3126:3126] CHIP:DMG:                        Data = 5,
+          [1657913716.045407][3126:3126] CHIP:DMG:                },
+          [1657913716.045468][3126:3126] CHIP:DMG:
+          [1657913716.045519][3126:3126] CHIP:DMG:        ],
+          [1657913716.045579][3126:3126] CHIP:DMG:
+          [1657913716.045630][3126:3126] CHIP:DMG:        moreChunkedMessages = false,
+          [1657913716.045683][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913716.045732][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol write on-transition-time 5 (replace with your value) 1 1
-          [1636522899.652554][6689:6694] CHIP:DMG: WriteResponseMessage =
-          [1636522899.652575][6689:6694] CHIP:DMG: {
-          [1636522899.652599][6689:6694] CHIP:DMG:  AttributeStatuses =
-          [1636522899.652626][6689:6694] CHIP:DMG:  [
-          [1636522899.652650][6689:6694] CHIP:DMG:  AttributeStatusIB =
-          [1636522899.652684][6689:6694] CHIP:DMG:  {
-          [1636522899.652713][6689:6694] CHIP:DMG:  AttributePathIB =
-          [1636522899.652749][6689:6694] CHIP:DMG:  {
-          [1636522899.652785][6689:6694] CHIP:DMG:  Attribute = 0x0000_0012,
-          [1636522899.652821][6689:6694] CHIP:DMG:  Node = 0x0,
-          [1636522899.652858][6689:6694] CHIP:DMG:  Cluster = 0x8,
-          [1636522899.652892][6689:6694] CHIP:DMG:  Endpoint = 0x1,
-          [1636522899.652925][6689:6694] CHIP:DMG:  }
-          [1636522899.652964][6689:6694] CHIP:DMG:
-          [1636522899.652997][6689:6694] CHIP:DMG:  StatusIB =
-          [1636522899.653030][6689:6694] CHIP:DMG:  {
-          [1636522899.653063][6689:6694] CHIP:DMG:  status = 0x0,
-          [1636522899.653097][6689:6694] CHIP:DMG:  },
-          [1636522899.653130][6689:6694] CHIP:DMG:
-          [1636522899.653160][6689:6694] CHIP:DMG:  },
-          [1636522899.653192][6689:6694] CHIP:DMG:
-          [1636522899.653214][6689:6694] CHIP:DMG:  ],
-          [1636522899.653243][6689:6694] CHIP:DMG:
-          [1636522899.653264][6689:6694] CHIP:DMG: }
-          [1636522899.653318][6689:6694] CHIP:ZCL: WriteResponse:
-          [1636522899.653339][6689:6694] CHIP:ZCL:  status: Success  (0x0000)
+          Verify in TH all-clusters-app
+          [1657913743.728014][3126:3126] CHIP:DMG: WriteRequestMessage =
+          [1657913743.728046][3126:3126] CHIP:DMG: {
+          [1657913743.728145][3126:3126] CHIP:DMG:        suppressResponse = false,
+          [1657913743.728179][3126:3126] CHIP:DMG:        timedRequest = false,
+          [1657913743.728239][3126:3126] CHIP:DMG:        AttributeDataIBs =
+          [1657913743.728279][3126:3126] CHIP:DMG:        [
+          [1657913743.728308][3126:3126] CHIP:DMG:                AttributeDataIB =
+          [1657913743.728351][3126:3126] CHIP:DMG:                {
+          [1657913743.728383][3126:3126] CHIP:DMG:                        AttributePathIB =
+          [1657913743.728423][3126:3126] CHIP:DMG:                        {
+          [1657913743.728467][3126:3126] CHIP:DMG:                                Endpoint = 0x1,
+          [1657913743.728512][3126:3126] CHIP:DMG:                                Cluster = 0x8,
+          [1657913743.728553][3126:3126] CHIP:DMG:                                Attribute = 0x0000_0012,
+          [1657913743.728591][3126:3126] CHIP:DMG:                        }
+          [1657913743.728631][3126:3126] CHIP:DMG:
+          [1657913743.728671][3126:3126] CHIP:DMG:                        Data = 5,
+          [1657913743.728710][3126:3126] CHIP:DMG:                },
+          [1657913743.728746][3126:3126] CHIP:DMG:
+          [1657913743.728775][3126:3126] CHIP:DMG:        ],
+          [1657913743.728811][3126:3126] CHIP:DMG:
+          [1657913743.728842][3126:3126] CHIP:DMG:        moreChunkedMessages = false,
+          [1657913743.728872][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913743.728901][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol write off-transition-time 5 1 1
-          [1636523135.094185][6710:6715] CHIP:DMG: WriteResponseMessage =
-          [1636523135.094247][6710:6715] CHIP:DMG: {
-          [1636523135.094306][6710:6715] CHIP:DMG:  AttributeStatuses =
-          [1636523135.094366][6710:6715] CHIP:DMG:  [
-          [1636523135.094394][6710:6715] CHIP:DMG:  AttributeStatusIB =
-          [1636523135.094430][6710:6715] CHIP:DMG:  {
-          [1636523135.094458][6710:6715] CHIP:DMG:  AttributePathIB =
-          [1636523135.094496][6710:6715] CHIP:DMG:  {
-          [1636523135.094533][6710:6715] CHIP:DMG:  Attribute = 0x0000_0013,
-          [1636523135.094571][6710:6715] CHIP:DMG:  Node = 0x0,
-          [1636523135.094609][6710:6715] CHIP:DMG:  Cluster = 0x8,
-          [1636523135.094644][6710:6715] CHIP:DMG:  Endpoint = 0x1,
-          [1636523135.094677][6710:6715] CHIP:DMG:  }
-          [1636523135.094717][6710:6715] CHIP:DMG:
-          [1636523135.094750][6710:6715] CHIP:DMG:  StatusIB =
-          [1636523135.094777][6710:6715] CHIP:DMG:  {
-          [1636523135.094805][6710:6715] CHIP:DMG:  status = 0x0,
-          [1636523135.094840][6710:6715] CHIP:DMG:  },
-          [1636523135.094874][6710:6715] CHIP:DMG:
-          [1636523135.094896][6710:6715] CHIP:DMG:  },
-          [1636523135.094929][6710:6715] CHIP:DMG:
-          [1636523135.094954][6710:6715] CHIP:DMG:  ],
-          [1636523135.094983][6710:6715] CHIP:DMG:
-          [1636523135.095004][6710:6715] CHIP:DMG: }
-          [1636523135.095061][6710:6715] CHIP:ZCL: WriteResponse:
-          [1636523135.095082][6710:6715] CHIP:ZCL:  status: Success  (0x0000)
+          Verify in TH all-clusters-app
+
+          [1657913763.836957][3126:3126] CHIP:DMG: WriteRequestMessage =
+          [1657913763.837010][3126:3126] CHIP:DMG: {
+          [1657913763.837058][3126:3126] CHIP:DMG:        suppressResponse = false,
+          [1657913763.837119][3126:3126] CHIP:DMG:        timedRequest = false,
+          [1657913763.837170][3126:3126] CHIP:DMG:        AttributeDataIBs =
+          [1657913763.837230][3126:3126] CHIP:DMG:        [
+          [1657913763.837361][3126:3126] CHIP:DMG:                AttributeDataIB =
+          [1657913763.837424][3126:3126] CHIP:DMG:                {
+          [1657913763.837478][3126:3126] CHIP:DMG:                        AttributePathIB =
+          [1657913763.837544][3126:3126] CHIP:DMG:                        {
+          [1657913763.837580][3126:3126] CHIP:DMG:                                Endpoint = 0x1,
+          [1657913763.837613][3126:3126] CHIP:DMG:                                Cluster = 0x8,
+          [1657913763.837645][3126:3126] CHIP:DMG:                                Attribute = 0x0000_0013,
+          [1657913763.837755][3126:3126] CHIP:DMG:                        }
+          [1657913763.837790][3126:3126] CHIP:DMG:
+          [1657913763.837822][3126:3126] CHIP:DMG:                        Data = 5,
+          [1657913763.837850][3126:3126] CHIP:DMG:                },
+          [1657913763.837880][3126:3126] CHIP:DMG:
+          [1657913763.837904][3126:3126] CHIP:DMG:        ],
+          [1657913763.837932][3126:3126] CHIP:DMG:
+          [1657913763.837956][3126:3126] CHIP:DMG:        moreChunkedMessages = false,
+          [1657913763.837981][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913763.838004][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol write default-move-rate 5 1 1
-          [1636523200.238505][6728:6733] CHIP:DMG: WriteResponseMessage =
-          [1636523200.238533][6728:6733] CHIP:DMG: {
-          [1636523200.238559][6728:6733] CHIP:DMG:  AttributeStatuses =
-          [1636523200.238592][6728:6733] CHIP:DMG:  [
-          [1636523200.238621][6728:6733] CHIP:DMG:  AttributeStatusIB =
-          [1636523200.238659][6728:6733] CHIP:DMG:  {
-          [1636523200.238693][6728:6733] CHIP:DMG:  AttributePathIB =
-          [1636523200.238734][6728:6733] CHIP:DMG:  {
-          [1636523200.238773][6728:6733] CHIP:DMG:  Attribute = 0x0000_0014,
-          [1636523200.238817][6728:6733] CHIP:DMG:  Node = 0x0,
-          [1636523200.238860][6728:6733] CHIP:DMG:  Cluster = 0x8,
-          [1636523200.238898][6728:6733] CHIP:DMG:  Endpoint = 0x1,
-          [1636523200.238938][6728:6733] CHIP:DMG:  }
-          [1636523200.238980][6728:6733] CHIP:DMG:
-          [1636523200.239019][6728:6733] CHIP:DMG:  StatusIB =
-          [1636523200.239058][6728:6733] CHIP:DMG:  {
-          [1636523200.239098][6728:6733] CHIP:DMG:  status = 0x0,
-          [1636523200.239138][6728:6733] CHIP:DMG:  },
-          [1636523200.239178][6728:6733] CHIP:DMG:
-          [1636523200.239211][6728:6733] CHIP:DMG:  },
-          [1636523200.239249][6728:6733] CHIP:DMG:
-          [1636523200.239276][6728:6733] CHIP:DMG:  ],
-          [1636523200.239310][6728:6733] CHIP:DMG:
-          [1636523200.239334][6728:6733] CHIP:DMG: }
-          [1636523200.239396][6728:6733] CHIP:ZCL: WriteResponse:
-          [1636523200.239421][6728:6733] CHIP:ZCL:  status: Success  (0x0000)
+          Verify in TH all-clusters-app
+          [1657913781.895720][3126:3126] CHIP:DMG: WriteRequestMessage =
+          [1657913781.895799][3126:3126] CHIP:DMG: {
+          [1657913781.895824][3126:3126] CHIP:DMG:        suppressResponse = false,
+          [1657913781.895850][3126:3126] CHIP:DMG:        timedRequest = false,
+          [1657913781.895874][3126:3126] CHIP:DMG:        AttributeDataIBs =
+          [1657913781.895904][3126:3126] CHIP:DMG:        [
+          [1657913781.895929][3126:3126] CHIP:DMG:                AttributeDataIB =
+          [1657913781.895956][3126:3126] CHIP:DMG:                {
+          [1657913781.895982][3126:3126] CHIP:DMG:                        AttributePathIB =
+          [1657913781.896024][3126:3126] CHIP:DMG:                        {
+          [1657913781.896147][3126:3126] CHIP:DMG:                                Endpoint = 0x1,
+          [1657913781.896209][3126:3126] CHIP:DMG:                                Cluster = 0x8,
+          [1657913781.896247][3126:3126] CHIP:DMG:                                Attribute = 0x0000_0014,
+          [1657913781.896278][3126:3126] CHIP:DMG:                        }
+          [1657913781.896312][3126:3126] CHIP:DMG:
+          [1657913781.896345][3126:3126] CHIP:DMG:                        Data = 5,
+          [1657913781.896374][3126:3126] CHIP:DMG:                },
+          [1657913781.896403][3126:3126] CHIP:DMG:
+          [1657913781.896427][3126:3126] CHIP:DMG:        ],
+          [1657913781.896503][3126:3126] CHIP:DMG:
+          [1657913781.896531][3126:3126] CHIP:DMG:        moreChunkedMessages = false,
+          [1657913781.896558][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913781.896581][3126:3126] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol write start-up-current-level 5 (replace with your value) 123123 1
-          [1636523273.060220][6749:6754] CHIP:DMG: WriteResponseMessage =
-          [1636523273.060249][6749:6754] CHIP:DMG: {
-          [1636523273.060276][6749:6754] CHIP:DMG:  AttributeStatuses =
-          [1636523273.060313][6749:6754] CHIP:DMG:  [
-          [1636523273.060338][6749:6754] CHIP:DMG:  AttributeStatusIB =
-          [1636523273.060406][6749:6754] CHIP:DMG:  {
-          [1636523273.060432][6749:6754] CHIP:DMG:  AttributePathIB =
-          [1636523273.060472][6749:6754] CHIP:DMG:  {
-          [1636523273.060516][6749:6754] CHIP:DMG:  Attribute = 0x0000_4000,
-          [1636523273.060553][6749:6754] CHIP:DMG:  Node = 0x0,
-          [1636523273.060592][6749:6754] CHIP:DMG:  Cluster = 0x8,
-          [1636523273.060626][6749:6754] CHIP:DMG:  Endpoint = 0x1,
-          [1636523273.060663][6749:6754] CHIP:DMG:  }
-          [1636523273.060704][6749:6754] CHIP:DMG:
-          [1636523273.060736][6749:6754] CHIP:DMG:  StatusIB =
-          [1636523273.060770][6749:6754] CHIP:DMG:  {
-          [1636523273.060803][6749:6754] CHIP:DMG:  status = 0x0,
-          [1636523273.060835][6749:6754] CHIP:DMG:  },
-          [1636523273.060870][6749:6754] CHIP:DMG:
-          [1636523273.060899][6749:6754] CHIP:DMG:  },
-          [1636523273.060936][6749:6754] CHIP:DMG:
-          [1636523273.060961][6749:6754] CHIP:DMG:  ],
-          [1636523273.060992][6749:6754] CHIP:DMG:
-          [1636523273.061015][6749:6754] CHIP:DMG: }
-          [1636523273.061073][6749:6754] CHIP:ZCL: WriteResponse:
-          [1636523273.061097][6749:6754] CHIP:ZCL:  status: Success  (0x0000)
+          Verify in TH all-clusters-app
+          [1657913811.290764][3126:3126] CHIP:DMG: WriteRequestMessage =
+          [1657913811.290809][3126:3126] CHIP:DMG: {
+          [1657913811.290850][3126:3126] CHIP:DMG:        suppressResponse = false,
+          [1657913811.290898][3126:3126] CHIP:DMG:        timedRequest = false,
+          [1657913811.290942][3126:3126] CHIP:DMG:        AttributeDataIBs =
+          [1657913811.290995][3126:3126] CHIP:DMG:        [
+          [1657913811.291039][3126:3126] CHIP:DMG:                AttributeDataIB =
+          [1657913811.291094][3126:3126] CHIP:DMG:                {
+          [1657913811.291142][3126:3126] CHIP:DMG:                        AttributePathIB =
+          [1657913811.291258][3126:3126] CHIP:DMG:                        {
+          [1657913811.291326][3126:3126] CHIP:DMG:                                Endpoint = 0x1,
+          [1657913811.291394][3126:3126] CHIP:DMG:                                Cluster = 0x8,
+          [1657913811.291455][3126:3126] CHIP:DMG:                                Attribute = 0x0000_4000,
+          [1657913811.291512][3126:3126] CHIP:DMG:                        }
+          [1657913811.291630][3126:3126] CHIP:DMG:
+          [1657913811.291694][3126:3126] CHIP:DMG:                        Data = 5,
+          [1657913811.291748][3126:3126] CHIP:DMG:                },
+          [1657913811.291805][3126:3126] CHIP:DMG:
+          [1657913811.291848][3126:3126] CHIP:DMG:        ],
+          [1657913811.291949][3126:3126] CHIP:DMG:
+          [1657913811.291992][3126:3126] CHIP:DMG:        moreChunkedMessages = false,
+          [1657913811.292017][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913811.292039][3126:3126] CHIP:DMG: },
       disabled: true
 
     - label:
@@ -471,118 +500,365 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          ./chip-tool levelcontrol read attribute-list 1 1
+          ./chip-tool levelcontrol read current-level 1 1
+          Verify in TH all-clusters-app
+          [1657913862.815749][3126:3126] CHIP:IM: Received Read request
+          [1657913862.815884][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913862.815935][3126:3126] CHIP:DMG: {
+          [1657913862.815975][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913862.816023][3126:3126] CHIP:DMG:        [
+          [1657913862.816107][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913862.816161][3126:3126] CHIP:DMG:                {
+          [1657913862.816212][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913862.816268][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913862.816325][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0000,
+          [1657913862.816377][3126:3126] CHIP:DMG:                }
+          [1657913862.816431][3126:3126] CHIP:DMG:
+          [1657913862.816477][3126:3126] CHIP:DMG:        ],
+          [1657913862.816527][3126:3126] CHIP:DMG:
+          [1657913862.816573][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913862.816619][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913862.816662][3126:3126] CHIP:DMG: },
 
-          [1654242920752] [91296:3991263] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_FFFB DataVersion: 2296172474
-          [1654242920753] [91296:3991263] CHIP: [TOO]   AttributeList: 8 entries
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [1]: 0
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [2]: 15
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [3]: 17
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [4]: 65528
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [5]: 65529
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [6]: 65531
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [7]: 65532
-          [1654242920753] [91296:3991263] CHIP: [TOO]     [8]: 65533
 
+          ./chip-tool levelcontrol read on-level 1 1
+          Verify in TH all-clusters-app
+          [1657913877.850398][3126:3126] CHIP:IM: Received Read request
+          [1657913877.850525][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913877.850574][3126:3126] CHIP:DMG: {
+          [1657913877.850614][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913877.850725][3126:3126] CHIP:DMG:        [
+          [1657913877.850771][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913877.850821][3126:3126] CHIP:DMG:                {
+          [1657913877.850872][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913877.850932][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913877.850989][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0011,
+          [1657913877.851048][3126:3126] CHIP:DMG:                }
+          [1657913877.851103][3126:3126] CHIP:DMG:
+          [1657913877.851153][3126:3126] CHIP:DMG:        ],
+          [1657913877.851203][3126:3126] CHIP:DMG:
+          [1657913877.851251][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913877.851297][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913877.851343][3126:3126] CHIP:DMG: },
+          [1657913877.851471][3126:3126] CHIP:DMG: IM 
 
-          " ./chip-tool levelcontrol read current-level 1 1
-
-          [1652363362.205813][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363362.205844][2335:2335] CHIP:DMG: {
-          [1652363362.205947][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363362.205981][2335:2335] CHIP:DMG:         [
-          [1652363362.206009][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363362.206048][2335:2335] CHIP:DMG:                 {
-          [1652363362.206083][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363362.206120][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363362.206156][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0000,
-          [1652363362.206189][2335:2335] CHIP:DMG:                 }
-          [1652363362.206221][2335:2335] CHIP:DMG:
-          [1652363362.206252][2335:2335] CHIP:DMG:         ],
-          [1652363362.206285][2335:2335] CHIP:DMG:
-          [1652363362.206317][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363362.206346][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363362.206373][2335:2335] CHIP:DMG: },
-
-           ./chip-tool levelcontrol read on-level 1 1
-          [1652363399.089823][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363399.089855][2335:2335] CHIP:DMG: {
-          [1652363399.089882][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363399.089915][2335:2335] CHIP:DMG:         [
-          [1652363399.089945][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363399.089981][2335:2335] CHIP:DMG:                 {
-          [1652363399.090018][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363399.090056][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363399.090098][2335:2335] CHIP:DMG:                         Attribute = 0x0000_0011,
-          [1652363399.090135][2335:2335] CHIP:DMG:                 }
-          [1652363399.090172][2335:2335] CHIP:DMG:
-          [1652363399.090206][2335:2335] CHIP:DMG:         ],
-          [1652363399.090241][2335:2335] CHIP:DMG:
-          [1652363399.090273][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363399.090305][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363399.090334][2335:2335] CHIP:DMG: },
 
           ./chip-tool levelcontrol read options 1 1
-          [1652363446.883210][2335:2335] CHIP:DMG: ReadRequestMessage =
-          [1652363446.883245][2335:2335] CHIP:DMG: {
-          [1652363446.883274][2335:2335] CHIP:DMG:         AttributePathIBs =
-          [1652363446.883308][2335:2335] CHIP:DMG:         [
-          [1652363446.883341][2335:2335] CHIP:DMG:                 AttributePathIB =
-          [1652363446.883371][2335:2335] CHIP:DMG:                 {
-          [1652363446.883401][2335:2335] CHIP:DMG:                         Endpoint = 0x1,
-          [1652363446.883430][2335:2335] CHIP:DMG:                         Cluster = 0x8,
-          [1652363446.883521][2335:2335] CHIP:DMG:                         Attribute = 0x0000_000F,
-          [1652363446.883554][2335:2335] CHIP:DMG:                 }
-          [1652363446.883584][2335:2335] CHIP:DMG:
-          [1652363446.883611][2335:2335] CHIP:DMG:         ],
-          [1652363446.883639][2335:2335] CHIP:DMG:
-          [1652363446.883666][2335:2335] CHIP:DMG:         isFabricFiltered = true,
-          [1652363446.883691][2335:2335] CHIP:DMG:         InteractionModelRevision = 1
-          [1652363446.883714][2335:2335] CHIP:DMG: },"
+          Verify in TH all-clusters-app
+          [1657913895.195563][3126:3126] CHIP:IM: Received Read request
+          [1657913895.195705][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913895.195732][3126:3126] CHIP:DMG: {
+          [1657913895.195754][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913895.195780][3126:3126] CHIP:DMG:        [
+          [1657913895.195803][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913895.195901][3126:3126] CHIP:DMG:                {
+          [1657913895.195932][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913895.195963][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913895.195993][3126:3126] CHIP:DMG:                        Attribute = 0x0000_000F,
+          [1657913895.196022][3126:3126] CHIP:DMG:                }
+          [1657913895.196073][3126:3126] CHIP:DMG:
+          [1657913895.196101][3126:3126] CHIP:DMG:        ],
+          [1657913895.196161][3126:3126] CHIP:DMG:
+          [1657913895.196189][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913895.196214][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913895.196236][3126:3126] CHIP:DMG: },
+
+
+          ./chip-tool levelcontrol read attribute-list 1 1
+          Verify in TH all-clusters-app
+          [1657913906.648918][3126:3126] CHIP:IM: Received Read request
+          [1657913906.649061][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913906.649115][3126:3126] CHIP:DMG: {
+          [1657913906.649162][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913906.649225][3126:3126] CHIP:DMG:        [
+          [1657913906.649273][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913906.649330][3126:3126] CHIP:DMG:                {
+          [1657913906.649389][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913906.649462][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913906.649529][3126:3126] CHIP:DMG:                        Attribute = 0x0000_FFFB,
+          [1657913906.649569][3126:3126] CHIP:DMG:                }
+          [1657913906.649593][3126:3126] CHIP:DMG:
+          [1657913906.649618][3126:3126] CHIP:DMG:        ],
+          [1657913906.649645][3126:3126] CHIP:DMG:
+          [1657913906.649731][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913906.649757][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913906.649781][3126:3126] CHIP:DMG: },
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool levelcontrol read remaining-time 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          Verify in TH all-clusters-app 
 
-           ./chip-tool levelcontrol read min-level 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+           ./chip-tool levelcontrol read remaining-time 1 1
+          [1657913955.033202][3126:3126] CHIP:IM: Received Read request
+          [1657913955.033289][3126:3126] CHIP:DMG: ReadRequestMessage =
+          [1657913955.033319][3126:3126] CHIP:DMG: {
+          [1657913955.033345][3126:3126] CHIP:DMG:        AttributePathIBs =
+          [1657913955.033377][3126:3126] CHIP:DMG:        [
+          [1657913955.033404][3126:3126] CHIP:DMG:                AttributePathIB =
+          [1657913955.033436][3126:3126] CHIP:DMG:                {
+          [1657913955.033470][3126:3126] CHIP:DMG:                        Endpoint = 0x1,
+          [1657913955.033506][3126:3126] CHIP:DMG:                        Cluster = 0x8,
+          [1657913955.033540][3126:3126] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1657913955.033577][3126:3126] CHIP:DMG:                }
+          [1657913955.033611][3126:3126] CHIP:DMG:
+          [1657913955.033642][3126:3126] CHIP:DMG:        ],
+          [1657913955.033675][3126:3126] CHIP:DMG:
+          [1657913955.033706][3126:3126] CHIP:DMG:        isFabricFiltered = true,
+          [1657913955.033737][3126:3126] CHIP:DMG:        InteractionModelRevision = 1
+          [1657913955.033764][3126:3126] CHIP:DMG: },
 
-           ./chip-tool levelcontrol read max-level 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+
+           ./chip-tool levelcontrol read min-level 1 1     
+          [1657914034.938109][3245:3245] CHIP:DMG: ReadRequestMessage =
+          [1657914034.938157][3245:3245] CHIP:DMG: {
+          [1657914034.938197][3245:3245] CHIP:DMG:        AttributePathIBs =
+          [1657914034.938245][3245:3245] CHIP:DMG:        [
+          [1657914034.938351][3245:3245] CHIP:DMG:                AttributePathIB =
+          [1657914034.938417][3245:3245] CHIP:DMG:                {
+          [1657914034.938467][3245:3245] CHIP:DMG:                        Endpoint = 0x1,
+          [1657914034.938523][3245:3245] CHIP:DMG:                        Cluster = 0x8,
+          [1657914034.938582][3245:3245] CHIP:DMG:                        Attribute = 0x0000_0002,
+          [1657914034.938637][3245:3245] CHIP:DMG:                }
+          [1657914034.938741][3245:3245] CHIP:DMG:
+          [1657914034.938789][3245:3245] CHIP:DMG:        ],
+          [1657914034.938841][3245:3245] CHIP:DMG:
+          [1657914034.938889][3245:3245] CHIP:DMG:        isFabricFiltered = true,
+          [1657914034.938980][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914034.939024][3245:3245] CHIP:DMG: },
+
+
+           ./chip-tool levelcontrol read max-level 1 1  
+          [1657914049.937379][3245:3245] CHIP:IM: Received Read request
+          [1657914049.937458][3245:3245] CHIP:DMG: ReadRequestMessage =
+          [1657914049.937487][3245:3245] CHIP:DMG: {
+          [1657914049.937526][3245:3245] CHIP:DMG:        AttributePathIBs =
+          [1657914049.937555][3245:3245] CHIP:DMG:        [
+          [1657914049.937579][3245:3245] CHIP:DMG:                AttributePathIB =
+          [1657914049.937607][3245:3245] CHIP:DMG:                {
+          [1657914049.937659][3245:3245] CHIP:DMG:                        Endpoint = 0x1,
+          [1657914049.937693][3245:3245] CHIP:DMG:                        Cluster = 0x8,
+          [1657914049.937725][3245:3245] CHIP:DMG:                        Attribute = 0x0000_0003,
+          [1657914049.937758][3245:3245] CHIP:DMG:                }
+          [1657914049.937787][3245:3245] CHIP:DMG:
+          [1657914049.937809][3245:3245] CHIP:DMG:        ],
+          [1657914049.937833][3245:3245] CHIP:DMG:
+          [1657914049.937855][3245:3245] CHIP:DMG:        isFabricFiltered = true,
+          [1657914049.937891][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914049.937916][3245:3245] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read current-frequency 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914066.583478][3245:3245] CHIP:DMG: ReadRequestMessage =
+          [1657914066.583530][3245:3245] CHIP:DMG: {
+          [1657914066.583568][3245:3245] CHIP:DMG:        AttributePathIBs =
+          [1657914066.583610][3245:3245] CHIP:DMG:        [
+          [1657914066.583649][3245:3245] CHIP:DMG:                AttributePathIB =
+          [1657914066.583693][3245:3245] CHIP:DMG:                {
+          [1657914066.583759][3245:3245] CHIP:DMG:                        Endpoint = 0x1,
+          [1657914066.583810][3245:3245] CHIP:DMG:                        Cluster = 0x8,
+          [1657914066.583860][3245:3245] CHIP:DMG:                        Attribute = 0x0000_0004,
+          [1657914066.583920][3245:3245] CHIP:DMG:                }
+          [1657914066.583967][3245:3245] CHIP:DMG:
+          [1657914066.584008][3245:3245] CHIP:DMG:        ],
+          [1657914066.584110][3245:3245] CHIP:DMG:
+          [1657914066.584157][3245:3245] CHIP:DMG:        isFabricFiltered = true,
+          [1657914066.584198][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914066.584235][3245:3245] CHIP:DMG: },
+
 
           ./chip-tool levelcontrol read min-frequency 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914086.207991][3245:3245] CHIP:IM: Received Read request
+          [1657914086.208155][3245:3245] CHIP:DMG: ReadRequestMessage =
+          [1657914086.208207][3245:3245] CHIP:DMG: {
+          [1657914086.208264][3245:3245] CHIP:DMG:        AttributePathIBs =
+          [1657914086.208313][3245:3245] CHIP:DMG:        [
+          [1657914086.208357][3245:3245] CHIP:DMG:                AttributePathIB =
+          [1657914086.208400][3245:3245] CHIP:DMG:                {
+          [1657914086.208468][3245:3245] CHIP:DMG:                        Endpoint = 0x1,
+          [1657914086.208533][3245:3245] CHIP:DMG:                        Cluster = 0x8,
+          [1657914086.208606][3245:3245] CHIP:DMG:                        Attribute = 0x0000_0005,
+          [1657914086.208659][3245:3245] CHIP:DMG:                }
+          [1657914086.208709][3245:3245] CHIP:DMG:
+          [1657914086.208774][3245:3245] CHIP:DMG:        ],
+          [1657914086.208827][3245:3245] CHIP:DMG:
+          [1657914086.208874][3245:3245] CHIP:DMG:        isFabricFiltered = true,
+          [1657914086.208935][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914086.208980][3245:3245] CHIP:DMG: },
+
 
            ./chip-tool levelcontrol read max-frequency 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914105.798625][3245:3245] CHIP:IM: Received Read request
+          [1657914105.798770][3245:3245] CHIP:DMG: ReadRequestMessage =
+          [1657914105.798846][3245:3245] CHIP:DMG: {
+          [1657914105.798896][3245:3245] CHIP:DMG:        AttributePathIBs =
+          [1657914105.798943][3245:3245] CHIP:DMG:        [
+          [1657914105.798993][3245:3245] CHIP:DMG:                AttributePathIB =
+          [1657914105.799117][3245:3245] CHIP:DMG:                {
+          [1657914105.799190][3245:3245] CHIP:DMG:                        Endpoint = 0x1,
+          [1657914105.799303][3245:3245] CHIP:DMG:                        Cluster = 0x8,
+          [1657914105.799406][3245:3245] CHIP:DMG:                        Attribute = 0x0000_0006,
+          [1657914105.799520][3245:3245] CHIP:DMG:                }
+          [1657914105.799586][3245:3245] CHIP:DMG:
+          [1657914105.799643][3245:3245] CHIP:DMG:        ],
+          [1657914105.799722][3245:3245] CHIP:DMG:
+          [1657914105.799777][3245:3245] CHIP:DMG:        isFabricFiltered = true,
+          [1657914105.799809][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914105.799842][3245:3245] CHIP:DMG: },
 
           ./chip-tool levelcontrol read on-off-transition-time 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914125.515789][3245:3245] CHIP:IM: Received Read request
+          [1657914125.515917][3245:3245] CHIP:DMG: ReadRequestMessage =
+          [1657914125.515964][3245:3245] CHIP:DMG: {
+          [1657914125.516012][3245:3245] CHIP:DMG:        AttributePathIBs =
+          [1657914125.516097][3245:3245] CHIP:DMG:        [
+          [1657914125.516144][3245:3245] CHIP:DMG:                AttributePathIB =
+          [1657914125.516198][3245:3245] CHIP:DMG:                {
+          [1657914125.516248][3245:3245] CHIP:DMG:                        Endpoint = 0x1,
+          [1657914125.516307][3245:3245] CHIP:DMG:                        Cluster = 0x8,
+          [1657914125.516361][3245:3245] CHIP:DMG:                        Attribute = 0x0000_0010,
+          [1657914125.516420][3245:3245] CHIP:DMG:                }
+          [1657914125.516474][3245:3245] CHIP:DMG:
+          [1657914125.516521][3245:3245] CHIP:DMG:        ],
+          [1657914125.516572][3245:3245] CHIP:DMG:
+          [1657914125.516619][3245:3245] CHIP:DMG:        isFabricFiltered = true,
+          [1657914125.516665][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914125.516707][3245:3245] CHIP:DMG: },
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          ./chip-tool levelcontrol write on-off-transition-time 5 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          Verify in TH all-clusters-app 
+
+           ./chip-tool levelcontrol write on-off-transition-time 5 1 1
+          [1657914163.137445][3245:3245] CHIP:DMG: WriteRequestMessage =
+          [1657914163.137491][3245:3245] CHIP:DMG: {
+          [1657914163.137533][3245:3245] CHIP:DMG:        suppressResponse = false,
+          [1657914163.137581][3245:3245] CHIP:DMG:        timedRequest = false,
+          [1657914163.137626][3245:3245] CHIP:DMG:        AttributeDataIBs =
+          [1657914163.137679][3245:3245] CHIP:DMG:        [
+          [1657914163.137724][3245:3245] CHIP:DMG:                AttributeDataIB =
+          [1657914163.137774][3245:3245] CHIP:DMG:                {
+          [1657914163.137821][3245:3245] CHIP:DMG:                        AttributePathIB =
+          [1657914163.137883][3245:3245] CHIP:DMG:                        {
+          [1657914163.137940][3245:3245] CHIP:DMG:                                Endpoint = 0x1,
+          [1657914163.138000][3245:3245] CHIP:DMG:                                Cluster = 0x8,
+          [1657914163.138057][3245:3245] CHIP:DMG:                                Attribute = 0x0000_0010,
+          [1657914163.138115][3245:3245] CHIP:DMG:                        }
+          [1657914163.138176][3245:3245] CHIP:DMG:
+          [1657914163.138234][3245:3245] CHIP:DMG:                        Data = 5,
+          [1657914163.138291][3245:3245] CHIP:DMG:                },
+          [1657914163.138348][3245:3245] CHIP:DMG:
+          [1657914163.138391][3245:3245] CHIP:DMG:        ],
+          [1657914163.138443][3245:3245] CHIP:DMG:
+          [1657914163.138489][3245:3245] CHIP:DMG:        moreChunkedMessages = false,
+          [1657914163.138535][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914163.138575][3245:3245] CHIP:DMG: },
+
 
            ./chip-tool levelcontrol write on-transition-time 5 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914187.402168][3245:3245] CHIP:DMG: WriteRequestMessage =
+          [1657914187.402215][3245:3245] CHIP:DMG: {
+          [1657914187.402258][3245:3245] CHIP:DMG:        suppressResponse = false,
+          [1657914187.402306][3245:3245] CHIP:DMG:        timedRequest = false,
+          [1657914187.402357][3245:3245] CHIP:DMG:        AttributeDataIBs =
+          [1657914187.402406][3245:3245] CHIP:DMG:        [
+          [1657914187.402450][3245:3245] CHIP:DMG:                AttributeDataIB =
+          [1657914187.402504][3245:3245] CHIP:DMG:                {
+          [1657914187.402552][3245:3245] CHIP:DMG:                        AttributePathIB =
+          [1657914187.402608][3245:3245] CHIP:DMG:                        {
+          [1657914187.402667][3245:3245] CHIP:DMG:                                Endpoint = 0x1,
+          [1657914187.402729][3245:3245] CHIP:DMG:                                Cluster = 0x8,
+          [1657914187.402790][3245:3245] CHIP:DMG:                                Attribute = 0x0000_0012,
+          [1657914187.402846][3245:3245] CHIP:DMG:                        }
+          [1657914187.402905][3245:3245] CHIP:DMG:
+          [1657914187.402965][3245:3245] CHIP:DMG:                        Data = 5,
+          [1657914187.403017][3245:3245] CHIP:DMG:                },
+          [1657914187.403070][3245:3245] CHIP:DMG:
+          [1657914187.403114][3245:3245] CHIP:DMG:        ],
+          [1657914187.403167][3245:3245] CHIP:DMG:
+          [1657914187.403212][3245:3245] CHIP:DMG:        moreChunkedMessages = false,
+          [1657914187.403261][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914187.403304][3245:3245] CHIP:DMG: },
+
 
            ./chip-tool levelcontrol write off-transition-time 5 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914206.148363][3245:3245] CHIP:DMG: WriteRequestMessage =
+          [1657914206.148411][3245:3245] CHIP:DMG: {
+          [1657914206.148452][3245:3245] CHIP:DMG:        suppressResponse = false,
+          [1657914206.148500][3245:3245] CHIP:DMG:        timedRequest = false,
+          [1657914206.148545][3245:3245] CHIP:DMG:        AttributeDataIBs =
+          [1657914206.148599][3245:3245] CHIP:DMG:        [
+          [1657914206.148643][3245:3245] CHIP:DMG:                AttributeDataIB =
+          [1657914206.148693][3245:3245] CHIP:DMG:                {
+          [1657914206.148740][3245:3245] CHIP:DMG:                        AttributePathIB =
+          [1657914206.148803][3245:3245] CHIP:DMG:                        {
+          [1657914206.148861][3245:3245] CHIP:DMG:                                Endpoint = 0x1,
+          [1657914206.148922][3245:3245] CHIP:DMG:                                Cluster = 0x8,
+          [1657914206.148983][3245:3245] CHIP:DMG:                                Attribute = 0x0000_0013,
+          [1657914206.149040][3245:3245] CHIP:DMG:                        }
+          [1657914206.149098][3245:3245] CHIP:DMG:
+          [1657914206.149156][3245:3245] CHIP:DMG:                        Data = 5,
+          [1657914206.149207][3245:3245] CHIP:DMG:                },
+          [1657914206.149260][3245:3245] CHIP:DMG:
+          [1657914206.149303][3245:3245] CHIP:DMG:        ],
+          [1657914206.149356][3245:3245] CHIP:DMG:
+          [1657914206.149400][3245:3245] CHIP:DMG:        moreChunkedMessages = false,
+          [1657914206.149447][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914206.149489][3245:3245] CHIP:DMG: },
 
            ./chip-tool levelcontrol write default-move-rate 5 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914228.843788][3245:3245] CHIP:DMG: WriteRequestMessage =
+          [1657914228.843839][3245:3245] CHIP:DMG: {
+          [1657914228.843881][3245:3245] CHIP:DMG:        suppressResponse = false,
+          [1657914228.843929][3245:3245] CHIP:DMG:        timedRequest = false,
+          [1657914228.843974][3245:3245] CHIP:DMG:        AttributeDataIBs =
+          [1657914228.844028][3245:3245] CHIP:DMG:        [
+          [1657914228.844154][3245:3245] CHIP:DMG:                AttributeDataIB =
+          [1657914228.844215][3245:3245] CHIP:DMG:                {
+          [1657914228.844263][3245:3245] CHIP:DMG:                        AttributePathIB =
+          [1657914228.844319][3245:3245] CHIP:DMG:                        {
+          [1657914228.844383][3245:3245] CHIP:DMG:                                Endpoint = 0x1,
+          [1657914228.844446][3245:3245] CHIP:DMG:                                Cluster = 0x8,
+          [1657914228.844565][3245:3245] CHIP:DMG:                                Attribute = 0x0000_0014,
+          [1657914228.844625][3245:3245] CHIP:DMG:                        }
+          [1657914228.844686][3245:3245] CHIP:DMG:
+          [1657914228.844751][3245:3245] CHIP:DMG:                        Data = 5,
+          [1657914228.844858][3245:3245] CHIP:DMG:                },
+          [1657914228.844928][3245:3245] CHIP:DMG:
+          [1657914228.844975][3245:3245] CHIP:DMG:        ],
+          [1657914228.845028][3245:3245] CHIP:DMG:
+          [1657914228.845073][3245:3245] CHIP:DMG:        moreChunkedMessages = false,
+          [1657914228.845119][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914228.845162][3245:3245] CHIP:DMG: },
+
 
            ./chip-tool levelcontrol write start-up-current-level 5 1 1
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1657914257.054344][3245:3245] CHIP:DMG: WriteRequestMessage =
+          [1657914257.054391][3245:3245] CHIP:DMG: {
+          [1657914257.054433][3245:3245] CHIP:DMG:        suppressResponse = false,
+          [1657914257.054482][3245:3245] CHIP:DMG:        timedRequest = false,
+          [1657914257.054527][3245:3245] CHIP:DMG:        AttributeDataIBs =
+          [1657914257.054582][3245:3245] CHIP:DMG:        [
+          [1657914257.054627][3245:3245] CHIP:DMG:                AttributeDataIB =
+          [1657914257.054688][3245:3245] CHIP:DMG:                {
+          [1657914257.054736][3245:3245] CHIP:DMG:                        AttributePathIB =
+          [1657914257.054794][3245:3245] CHIP:DMG:                        {
+          [1657914257.054851][3245:3245] CHIP:DMG:                                Endpoint = 0x1,
+          [1657914257.054913][3245:3245] CHIP:DMG:                                Cluster = 0x8,
+          [1657914257.054975][3245:3245] CHIP:DMG:                                Attribute = 0x0000_4000,
+          [1657914257.055037][3245:3245] CHIP:DMG:                        }
+          [1657914257.055097][3245:3245] CHIP:DMG:
+          [1657914257.055153][3245:3245] CHIP:DMG:                        Data = 5,
+          [1657914257.055204][3245:3245] CHIP:DMG:                },
+          [1657914257.055258][3245:3245] CHIP:DMG:
+          [1657914257.055302][3245:3245] CHIP:DMG:        ],
+          [1657914257.055355][3245:3245] CHIP:DMG:
+          [1657914257.055402][3245:3245] CHIP:DMG:        moreChunkedMessages = false,
+          [1657914257.055448][3245:3245] CHIP:DMG:        InteractionModelRevision = 1
+          [1657914257.055491][3245:3245] CHIP:DMG: },
       disabled: true

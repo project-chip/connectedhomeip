@@ -101,7 +101,7 @@ tests:
               maxValue: 65534
 
     - label: "Send Set Week Day Schedule Command to DUT"
-      PICS: DRLK.S.F04 && DRLK.S.C0B.Rsp
+      PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
           values:
@@ -122,7 +122,7 @@ tests:
 
     #issue #18591
     - label: "send GetWeekDay Schedule Command "
-      PICS: DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
@@ -171,7 +171,7 @@ tests:
     - label:
           "Send Set Week Day Schedule Command to DUT and verify INVALID_COMMAND
           response"
-      PICS: DRLK.S.F04 && DRLK.S.C0B.Rsp
+      PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
           values:
@@ -195,7 +195,7 @@ tests:
     - label:
           "send GetWeekDay Schedule Command to DUT and verify INVALID_COMMAND
           response"
-      PICS: DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
@@ -228,7 +228,7 @@ tests:
                     hasValue: false
 
     - label: "Clear all week day schedules for the first user"
-      PICS: DRLK.S.F04 && DRLK.S.C0D.Rsp
+      PICS: DRLK.S.F04 && DRLK.S.C0d.Rsp
       command: "ClearWeekDaySchedule"
       arguments:
           values:
@@ -238,7 +238,7 @@ tests:
                 value: 1
 
     - label: "send GetWeekDay Schedule Command "
-      PICS: DRLK.S.F04 && DRLK.S.C0C.Rsp && DRLK.S.C0C.Tx
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
           values:
