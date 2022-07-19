@@ -49,6 +49,8 @@ tests:
           saveAs: MinlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
       PICS: LVL.S.C04.Rsp
@@ -73,6 +75,8 @@ tests:
           saveAs: CurrentlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends step up command to DUT"
       PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate

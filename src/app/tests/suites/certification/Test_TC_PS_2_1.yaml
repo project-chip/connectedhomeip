@@ -45,6 +45,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Test Harness Client reads Description attribute from Server DUT"
       PICS: PS.S.A0002
@@ -63,6 +65,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label:
           "Test Harness Client reads WiredAssessedInputFrequency attribute from
@@ -73,6 +77,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Test Harness Client reads WiredCurrentType attribute from Server DUT"
@@ -94,6 +100,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads WiredNominalVoltage from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0007
@@ -102,6 +110,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads WiredMaximumCurrent from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0008
@@ -110,6 +120,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads WiredPresent from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0009
@@ -135,6 +147,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads BatPercentRemaining from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000c
@@ -153,6 +167,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads BatChargeLevel from Server DUT"
       PICS: PS.S.A000e
@@ -254,6 +270,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads BatQuantity from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A0019
@@ -262,6 +280,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Test Harness Client reads BatChargeState from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001a
@@ -280,6 +300,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label:
           "Test Harness Client reads BatFunctionalWhileCharging from Server DUT"
@@ -297,6 +319,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Test Harness Client reads ActiveBatChargeFaults from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A001e
