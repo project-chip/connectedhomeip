@@ -14,12 +14,26 @@
 # limitations under the License.
 import argparse
 import os
-import subprocess
+from subprocess import PIPE, Popen
 
 
 def run_command(command):
+    returncode = -1
+    command_log = b''
     print("Running {}".format(command))
-    return str(subprocess.check_output(command.split()))
+    with Popen(command, cwd=os.getcwd(), stdout=PIPE, stderr=PIPE) as process:
+        for line in process.stdout:
+            command_log += line
+
+        for line in process.stderr:
+            command_log += line
+
+        process.wait()
+        returncode = process.returncode
+
+    with open(args.log_path, "wb") as f:
+        f.write(command_log)
+    return returncode
 
 
 def build_darwin_framework(args):
@@ -27,13 +41,11 @@ def build_darwin_framework(args):
     if not os.path.exists(abs_path):
         os.mkdir(abs_path)
 
-    command = "xcodebuild -target {target} -sdk macosx -project {project} CONFIGURATION_BUILD_DIR={outpath}".format(
-        target=args.target, project=args.project_path, outpath=abs_path)
+    command = ['xcodebuild', '-scheme', args.target, '-sdk', 'macosx', '-project', args.project_path, '-derivedDataPath', abs_path]
     command_result = run_command(command)
 
     print("Build Framework Result: {}".format(command_result))
-    with open(args.log_path, "w") as f:
-        f.write(command_result)
+    exit(command_result)
 
 
 if __name__ == "__main__":
