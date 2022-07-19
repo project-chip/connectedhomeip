@@ -282,7 +282,7 @@ void InitPlatform(void)
 {
     bl_sys_init();
 
-    hal_button_module_init(8,1000,4800,5000);
+    hal_button_module_init(8, 1000, 4800, 5000);
     Platform_Light_Init();
     aos_register_event_filter(EV_KEY, event_cb_key_event, NULL);
 }
