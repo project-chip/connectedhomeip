@@ -115,6 +115,7 @@ class AcceptNameWithSubstrings:
                 return True
         return False
 
+
 class RejectNameWithSubstrings:
     def __init__(self, substr: List[str]):
         self.substr = substr
@@ -293,11 +294,11 @@ def HostTargets():
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
     if cross_compile:
-      builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
-         "arm64"
-      )),
+        builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
+            "arm64"
+        )),
     else:
-      builder.AppendVariant(name="clang", use_clang=True)
+        builder.AppendVariant(name="clang", use_clang=True)
 
     builder.AppendVariant(name="test", extra_tests=True),
 

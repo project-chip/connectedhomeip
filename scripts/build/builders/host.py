@@ -214,7 +214,7 @@ class HostBuilder(GnBuilder):
                  separate_event_loop=True, use_libfuzzer=False, use_clang=False,
                  interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False,
-                 use_coverage=False, crypto_library: HostCryptoLibrary=None):
+                 use_coverage=False, crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
