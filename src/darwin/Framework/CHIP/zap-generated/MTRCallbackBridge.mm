@@ -7851,6 +7851,123 @@ void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
+void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    { // Scope for our temporary variables
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = value.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+        objCValue = array_0;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
@@ -13720,164 +13837,6 @@ void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceControl::ApplianceStatus value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<MTRApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceControl::CommandIdentification value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<MTRApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceControl::WarningEvent value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<MTRApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<MTRNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
 void MTRAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AccessControl::AuthMode value)
 {
@@ -19212,61 +19171,6 @@ void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSub
 {
     auto * self
         = static_cast<MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

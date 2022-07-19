@@ -120,13 +120,13 @@ gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_deta
 if [ "$enable_pybindings" == true ]; then
     ninja -C "$OUTPUT_ROOT" pycontroller
 else
-    ninja -C "$OUTPUT_ROOT" python
+    ninja -C "$OUTPUT_ROOT" chip-repl
 fi
 
 if [ "$enable_pybindings" == true ]; then
-    WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)
+    WHEEL=("$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl)
 else
-    WHEEL=$(ls "$OUTPUT_ROOT"/controller/python/chip-*.whl | head -n 1)
+    WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 fi
 
 if [ "$install_wheel" = "no" ]; then
@@ -137,7 +137,7 @@ elif [ "$install_wheel" = "separate" ]; then
 
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
-    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "$WHEEL"
+    "$ENVIRONMENT_ROOT"/bin/pip install --upgrade --force-reinstall --no-cache-dir "${WHEEL[@]}"
 
     echo ""
     echo_green "Compilation completed and WHL package installed in: "
@@ -146,7 +146,7 @@ elif [ "$install_wheel" = "separate" ]; then
     echo_green "To use please run:"
     echo_bold_white "  source $ENVIRONMENT_ROOT/bin/activate"
 elif [ "$install_wheel" = "build-env" ]; then
-    pip install --force-reinstall "$WHEEL"
+    pip install --force-reinstall "${WHEEL[@]}"
 
     echo ""
     echo_green "Compilation completed and WHL package installed in virtualenv for building sdk"

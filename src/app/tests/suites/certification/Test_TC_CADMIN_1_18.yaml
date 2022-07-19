@@ -15,7 +15,7 @@
 
 name:
     24.1.18. [TC-CADMIN-1.18] Removing Fabrics from DUT and Fabric index
-    enumeration using BCM [DUT - Commissionee]
+    enumeration using BCM [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -24,13 +24,11 @@ config:
 
 tests:
     - label: "Reset DUT_CE to factory defaults"
-      PICS: PICS_MF
       verification: |
 
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
-      PICS: PICS_MF
       verification: |
           "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
@@ -38,8 +36,8 @@ tests:
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.S.C0001
       verification: |
           On 1st controller chip tool, open commissioning window
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
@@ -78,12 +76,11 @@ tests:
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      PICS: PICS_MF
       verification: |
           On 2nd controller using chip tool connect to the accessory
 
 
-          ./chip-tool pairing onnetwork 1 20202021
+          ./chip-tool pairing onnetwork 2 20202021
 
           Verify you got below message
           Device commissioning completed with success
@@ -91,8 +88,8 @@ tests:
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.S.C0001
       verification: |
           On 1st controller chip tool, open commissioning window
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 2 0 --timedInteractionTimeoutMs 1000
@@ -131,7 +128,6 @@ tests:
       disabled: true
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
-      PICS: PICS_MF
       verification: |
           On 3rd controller using chip tool connect to the accessory
 
@@ -144,7 +140,7 @@ tests:
       disabled: true
 
     - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
-      PICS: PICS_MF
+      PICS: OPCREDS.S.A0001
       verification: |
           On 2nd controller using chip tool, read fabrics list
 
@@ -179,8 +175,8 @@ tests:
           CHIP:EM: Sending Standalone Ack for MessageCounter:9143157 on exchange 1147i
       disabled: true
 
-    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2 command to DUT_CE"
-      PICS: PICS_MF
+    - label: "TH_CR2 sends RemoveFabric with FabricIndex = 2command to DUT_CE"
+      PICS: OPCREDS.S.C0a.Rsp
       verification: |
           on 2nd controller using chip tool, remove fabric with FabricIndex=2
 
@@ -198,7 +194,7 @@ tests:
     - label:
           "TH_CR2 writes and reads the Basic Information Clusters NodeLabel
           mandatory attribute of DUT_CE"
-      PICS: PICS_MF
+      PICS: BINFO.S.A0005
       verification: |
           Using your 2nd controller, write attribute and read attribute to and from TH_CE
 
@@ -217,7 +213,7 @@ tests:
       disabled: true
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      PICS: PICS_MF
+      PICS: OPCREDS.S.A0001
       verification: |
           On 1st controller using chip tool, read fabrics list
 
@@ -249,8 +245,8 @@ tests:
 
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
-      PICS: PICS_MF
+          timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.S.C0001
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -291,7 +287,6 @@ tests:
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      PICS: PICS_MF
       verification: |
           On 2nd controller using chip tool connect to the accessory
 
@@ -303,7 +298,7 @@ tests:
       disabled: true
 
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
-      PICS: PICS_MF
+      PICS: OPCREDS.S.A0001
       verification: |
           On 1st controller, read fabrics list
 

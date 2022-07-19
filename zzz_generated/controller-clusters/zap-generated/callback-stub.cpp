@@ -47,6 +47,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_AUDIO_OUTPUT_CLUSTER_ID:
         emberAfAudioOutputClusterInitCallback(endpoint);
         break;
+    case ZCL_BALLAST_CONFIGURATION_CLUSTER_ID:
+        emberAfBallastConfigurationClusterInitCallback(endpoint);
+        break;
     case ZCL_BARRIER_CONTROL_CLUSTER_ID:
         emberAfBarrierControlClusterInitCallback(endpoint);
         break;
@@ -253,6 +256,11 @@ void __attribute__((weak)) emberAfApplicationLauncherClusterInitCallback(Endpoin
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfBallastConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -157,6 +157,9 @@ public final class ChipIdLookup {
     if (clusterId == 768L) {
       return "ColorControl";
     }
+    if (clusterId == 769L) {
+      return "BallastConfiguration";
+    }
     if (clusterId == 1024L) {
       return "IlluminanceMeasurement";
     }
@@ -2226,6 +2229,66 @@ public final class ChipIdLookup {
       }
       return "";
     }
+    if (clusterId == 769L) {
+      if (attributeId == 0L) {
+        return "PhysicalMinLevel";
+      }
+      if (attributeId == 1L) {
+        return "PhysicalMaxLevel";
+      }
+      if (attributeId == 2L) {
+        return "BallastStatus";
+      }
+      if (attributeId == 16L) {
+        return "MinLevel";
+      }
+      if (attributeId == 17L) {
+        return "MaxLevel";
+      }
+      if (attributeId == 20L) {
+        return "IntrinsicBalanceFactor";
+      }
+      if (attributeId == 21L) {
+        return "BallastFactorAdjustment";
+      }
+      if (attributeId == 32L) {
+        return "LampQuantity";
+      }
+      if (attributeId == 48L) {
+        return "LampType";
+      }
+      if (attributeId == 49L) {
+        return "LampManufacturer";
+      }
+      if (attributeId == 50L) {
+        return "LampRatedHours";
+      }
+      if (attributeId == 51L) {
+        return "LampBurnHours";
+      }
+      if (attributeId == 52L) {
+        return "LampAlarmMode";
+      }
+      if (attributeId == 53L) {
+        return "LampBurnHoursTripPoint";
+      }
+      if (attributeId == 65528L) {
+        return "GeneratedCommandList";
+      }
+      if (attributeId == 65529L) {
+        return "AcceptedCommandList";
+      }
+      if (attributeId == 65531L) {
+        return "AttributeList";
+      }
+      if (attributeId == 65532L) {
+        return "FeatureMap";
+      }
+      if (attributeId == 65533L) {
+        return "ClusterRevision";
+      }
+      return "";
+    }
     if (clusterId == 1024L) {
       if (attributeId == 0L) {
         return "MeasuredValue";
@@ -3324,6 +3387,9 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 768L) {
+      return "";
+    }
+    if (clusterId == 769L) {
       return "";
     }
     if (clusterId == 1024L) {

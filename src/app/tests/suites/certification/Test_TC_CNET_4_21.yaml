@@ -69,6 +69,16 @@ tests:
     - label: "DUT sends the ConnectNetwork command to the TH"
       PICS: CNET.C.C06.Tx
       verification: |
+          Executed during the commissioning
+
+          [1650388642.195472][9682:9687] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1650388642.195553][9682:9687] CHIP:CTL: Received ConnectNetwork response
+          [1650388642.195614][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ThreadNetworkEnable'
+      disabled: true
+
+    - label: "DUT sends the ReorderNetwork command to the TH"
+      PICS: CNET.C.C08.Tx
+      verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning reorder-network 0119100899082022 3 62 0
 
           [1650392602.379377][10158:10163] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
@@ -79,8 +89,8 @@ tests:
           [1650392602.379882][10158:10163] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "DUT sends the ReorderNetwork command to the TH"
-      PICS: CNET.C.C08.Tx
+    - label: "DUT sends the RemoveNetwork command to the TH"
+      PICS: CNET.C.C04.Tx
       verification: |
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network 0119100899082022 62 0
 
@@ -90,14 +100,4 @@ tests:
           [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 3
           [1650391420.469812][10048:10053] CHIP:TOO:    }
           [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
-
-    - label: "DUT sends the RemoveNetwork command to the TH"
-      PICS: CNET.C.C04.Tx
-      verification: |
-          Executed during the commissioning
-
-          [1650388642.195472][9682:9687] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
-          [1650388642.195553][9682:9687] CHIP:CTL: Received ConnectNetwork response
-          [1650388642.195614][9682:9687] CHIP:CTL: Successfully finished commissioning step 'ThreadNetworkEnable'
       disabled: true

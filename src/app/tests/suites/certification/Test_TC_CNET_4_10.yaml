@@ -27,7 +27,9 @@ tests:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 900"
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool generalcommissioning arm-fail-safe 900 0 62 0
+          ./chip-tool generalcommissioning arm-fail-safe 900 1 62 0
+
+          Verify on the TH Log:
 
           [1650391404.723087][10042:10047] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
           [1650391404.723164][10042:10047] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
@@ -38,51 +40,86 @@ tests:
           [1650391404.723479][10042:10047] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH reads the Networks attribute list from the DUT"
+    - label:
+          "TH1 reads Networks attribute from the DUT and save the number of
+          entries as 'NumNetworks'"
       PICS: CNET.S.A0001
       verification: |
+          ./chip-tool networkcommissioning read networks 1 0
 
+          Verify on the TH Log:
+
+          [1657790578.359665][5247:5252] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 2276799582
+          [1657790578.359820][5247:5252] CHIP:TOO:   Networks: 1 entries
+          [1657790578.359925][5247:5252] CHIP:TOO:     [1]: {
+          [1657790578.359992][5247:5252] CHIP:TOO:       NetworkID: 1850171990782922
+          [1657790578.360049][5247:5252] CHIP:TOO:       Connected: TRUE
+          [1657790578.360103][5247:5252] CHIP:TOO:      }
+          [1657790578.360277][5247:5252] CHIP:EM: Sending Standalone Ack for MessageCounter:195491393 on exchange 23374i
       disabled: true
 
     - label:
-          "TH finds the index of the Networks list entry with\r NetworkID field
-          value PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and saves it as
-          'Userwifi_netidx'"
+          "TH finds the index of the Networks list entry with NetworkID field
+          value PIXIT.CNET.THRE AD_1ST_OPERATI ONALDATASET and saves it as
+          'Userth_netidx'"
       verification: |
 
       disabled: true
 
     - label:
           "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+          PIXIT.CNET.THRE AD_1ST_OPERATI ONALDATASET and Breadcrumb field set to
+          1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
-          ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning  remove-network hex:0119100899082022 62 0
+          ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0
 
-          [1650391420.469341][10048:10053] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650391420.469452][10048:10053] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650391420.469634][10048:10053] CHIP:TOO:   NetworkConfigResponse: {
-          [1650391420.469746][10048:10053] CHIP:TOO:     networkingStatus: 0
-          [1650391420.469812][10048:10053] CHIP:TOO:    }
-          [1650391420.469902][10048:10053] CHIP:DMG: ICR moving to [AwaitingDe]
+          Verify on the TH Log:
+
+          [1657790635.532308][5254:5259] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1657790635.532395][5254:5259] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1657790635.532528][5254:5259] CHIP:TOO:   NetworkConfigResponse: {
+          [1657790635.532617][5254:5259] CHIP:TOO:     networkingStatus: 0
+          [1657790635.532671][5254:5259] CHIP:TOO:     networkIndex: 0
+          [1657790635.532718][5254:5259] CHIP:TOO:    }
+          [1657790635.532794][5254:5259] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657790635.532886][5254:5259] CHIP:EM: Sending Standalone Ack for MessageCounter:162806082 on exchange 55401i
       disabled: true
 
     - label: "TH1 reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
+          ./chip-tool networkcommissioning read networks 1 0
 
+          Verify on the TH Log:
+
+          [1657625584.426746][2703:2708] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1201757611
+          [1657625584.427014][2703:2708] CHIP:TOO:   Networks: 0 entries
+          [1657625584.427238][2703:2708] CHIP:EM: Sending Standalone Ack for MessageCounter:71370645 on exchange 9137i
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
       PICS: CNET.S.A0005
       verification: |
+          ./chip-tool networkcommissioning read last-networking-status 1 0
 
+          Verify on the TH Log:
+
+          [1657625631.550171][2710:2715] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1201757611
+          [1657625631.550337][2710:2715] CHIP:TOO:   LastNetworkingStatus: 0
+          [1657625631.550495][2710:2715] CHIP:EM: Sending Standalone Ack for MessageCounter:45041626 on exchange 48206i
       disabled: true
 
     - label: "TH reads LastNetworkID attribute from the DUT"
       PICS: CNET.S.A0006
       verification: |
+          ./chip-tool networkcommissioning read last-network-id 1 0
 
+          Verify on the TH Log:
+
+          [1657625691.050998][2718:2724] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 1201757611
+          [1657625691.051142][2718:2724] CHIP:TOO:   LastNetworkID: 1850171990782922
+          [1657625691.051317][2718:2724] CHIP:EM: Sending Standalone Ack for MessageCounter:151340993 on exchange 26558i
       disabled: true
 
     - label:
@@ -90,16 +127,34 @@ tests:
           of the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
+          ./chip-tool generalcommissioning read breadcrumb 1 0
 
+          Verify on the TH Log:
+
+          [1657625860.742472][2739:2744] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2669958173
+          [1657625860.742607][2739:2744] CHIP:TOO:   Breadcrumb: 1
+          [1657625860.742764][2739:2744] CHIP:EM: Sending Standalone Ack for MessageCounter:246118803 on exchange 50195i
       disabled: true
 
     - label:
           "TH sends ConnectNetwork command to the DUT with NetworkID field set
-          to PIXIT.CNET.WIFI_ 1ST_ACCESSPOINT _SSID and Breadcrumb field set to
-          2"
+          to the extended PAN ID of PIXIT.CNET.THRE AD_1ST_OPERATI ONALDATASET
+          and Breadcrumb field set to 2"
       PICS: CNET.S.C04.Rsp
       verification: |
+          ./chip-tool networkcommissioning connect-network hex:1850171990782922 1 0 --Breadcrumb 2
 
+          Verify on the TH Log:
+
+
+          [1657625912.836563][2747:2752] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
+          [1657625912.836768][2747:2752] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
+          [1657625912.836933][2747:2752] CHIP:TOO:   ConnectNetworkResponse: {
+          [1657625912.837012][2747:2752] CHIP:TOO:     networkingStatus: 3
+          [1657625912.837075][2747:2752] CHIP:TOO:     errorValue: 0
+          [1657625912.837131][2747:2752] CHIP:TOO:    }
+          [1657625912.837220][2747:2752] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657625912.837330][2747:2752] CHIP:EM: Sending Standalone Ack for MessageCounter:259218125 on exchange 18569i
       disabled: true
 
     - label:
@@ -107,41 +162,101 @@ tests:
           of the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
+          ./chip-tool generalcommissioning read breadcrumb 1 0
 
+          Verify on the TH Log:
+
+          [1657781070.617341][4823:4828] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0000 DataVersion: 2383846386
+          [1657781070.617458][4823:4828] CHIP:TOO:   Breadcrumb: 1
+          [1657781070.617656][4823:4828] CHIP:EM: Sending Standalone Ack for MessageCounter:198695370 on exchange 43070i
       disabled: true
 
     - label:
           "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 0"
       verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 0 0 1 0
 
+          Verify on the TH Log:
+
+          [1657626058.290176][2767:2772] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1657626058.290276][2767:2772] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1657626058.290399][2767:2772] CHIP:TOO:   ArmFailSafeResponse: {
+          [1657626058.290501][2767:2772] CHIP:TOO:     errorCode: 0
+          [1657626058.290560][2767:2772] CHIP:TOO:     debugText:
+          [1657626058.290613][2767:2772] CHIP:TOO:    }
+          [1657626058.290699][2767:2772] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
     - label: "TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
+          ./chip-tool networkcommissioning read networks 1 0
 
+          Verify on the TH Log:
+
+          [1657790810.454838][5308:5313] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 2276799582
+          [1657790810.454996][5308:5313] CHIP:TOO:   Networks: 1 entries
+          [1657790810.455100][5308:5313] CHIP:TOO:     [1]: {
+          [1657790810.455168][5308:5313] CHIP:TOO:       NetworkID: 1850171990782922
+          [1657790810.455225][5308:5313] CHIP:TOO:       Connected: TRUE
+          [1657790810.455280][5308:5313] CHIP:TOO:      }
+          [1657790810.455479][5308:5313] CHIP:EM: Sending Standalone Ack for MessageCounter:256297954 on exchange 23059i
       disabled: true
 
     - label:
-          "TH sends ArmFailSafe  command to the DUT with ExpiryLengthSeconds set
+          "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeco nds set
           to 90"
       verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 90 0 1 0
 
+          Verify on the TH Log:
+
+          [1657626161.611078][2780:2785] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1657626161.611183][2780:2785] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1657626161.611310][2780:2785] CHIP:TOO:   ArmFailSafeResponse: {
+          [1657626161.611412][2780:2785] CHIP:TOO:     errorCode: 0
+          [1657626161.611471][2780:2785] CHIP:TOO:     debugText:
+          [1657626161.611525][2780:2785] CHIP:TOO:    }
+          [1657626161.611613][2780:2785] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657626161.611722][2780:2785] CHIP:EM: Sending Standalone Ack for MessageCounter:216998470 on exchange 11517i
       disabled: true
 
     - label:
           "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
-          PIXIT.CNET.WIFI 1ST_ACCESSPOINT _SSID and Breadcrumb field set to 1"
+          extended PAN ID of PIXIT.CNET.THRE AD_1ST_OPERATI ONALDATASET and
+          Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
+          ./chip-tool networkcommissioning  remove-network hex:1850171990782922 32 0 --Breadcrumb 1
 
+          Verify on the TH Log:
+
+          [1657791030.761976][5336:5341] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
+          [1657791030.762070][5336:5341] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
+          [1657791030.762217][5336:5341] CHIP:TOO:   NetworkConfigResponse: {
+          [1657791030.762314][5336:5341] CHIP:TOO:     networkingStatus: 0
+          [1657791030.762375][5336:5341] CHIP:TOO:     networkIndex: 0
+          [1657791030.762427][5336:5341] CHIP:TOO:    }
+          [1657791030.762511][5336:5341] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657791030.762608][5336:5341] CHIP:EM: Sending Standalone Ack for MessageCounter:266194732 on exchange 7795i
       disabled: true
 
-    - label: "TH sends the CommissioningComplete command to the DUT"
+    - label: "TH sends the CommissioningCo mplete command to the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
+          ./chip-tool generalcommissioning commissioning-complete 1 0
 
+          Verify on the TH Log:
+
+          [1657626243.485752][2795:2801] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1657626243.485947][2795:2801] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0005
+          [1657626243.486108][2795:2801] CHIP:TOO:   CommissioningCompleteResponse: {
+          [1657626243.486232][2795:2801] CHIP:TOO:     errorCode: 0
+          [1657626243.486293][2795:2801] CHIP:TOO:     debugText:
+          [1657626243.486368][2795:2801] CHIP:TOO:    }
+          [1657626243.486455][2795:2801] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657626243.486572][2795:2801] CHIP:EM: Sending Standalone Ack for MessageCounter:8090042 on exchange 53943i
       disabled: true
 
     - label:
@@ -150,11 +265,29 @@ tests:
           failsafe context. This call should have no effect if Commissionining
           Complete call is handled correctly"
       verification: |
+          ./chip-tool generalcommissioning arm-fail-safe 0 0 62 0
 
+          Verify on the TH Log:
+
+
+          [1657626274.218994][2802:2807] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
+          [1657626274.219096][2802:2807] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
+          [1657626274.219220][2802:2807] CHIP:TOO:   ArmFailSafeResponse: {
+          [1657626274.219322][2802:2807] CHIP:TOO:     errorCode: 0
+          [1657626274.219381][2802:2807] CHIP:TOO:     debugText:
+          [1657626274.219436][2802:2807] CHIP:TOO:    }
+          [1657626274.219522][2802:2807] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657626274.219632][2802:2807] CHIP:EM: Sending Standalone Ack for MessageCounter:52231112 on exchange 13160i
       disabled: true
 
     - label: "TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
+          ./chip-tool networkcommissioning read networks 1 0
 
+          Verify on the TH Log:
+
+          [1657626300.861344][2808:2813] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1201757611
+          [1657626300.861492][2808:2813] CHIP:TOO:   Networks: 0 entries
+          [1657626300.861678][2808:2813] CHIP:EM: Sending Standalone Ack for MessageCounter:89835226 on exchange 41681i
       disabled: true

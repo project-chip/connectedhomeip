@@ -26,7 +26,10 @@ tests:
           a manufacturer specific order"
       verification: |
           On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
+
           ./chip-tool powersource read status 1 1
+
+          Verify in TH all-clusters-app log
 
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
@@ -55,6 +58,9 @@ tests:
           [1646010346.974150][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=v
 
           ./chip-tool powersource read order 1 1
+
+          Verify in TH all-clusters-app log
+
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
           [1653395573.862739][19412:19412] CHIP:DMG: {
@@ -76,6 +82,8 @@ tests:
           [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
 
           ./chip-tool powersource read description 1 1
+
+          Verify in TH all-clusters-app log
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -101,21 +109,21 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          No optional attribute is implemented
+          This cluster doesn't have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
@@ -127,6 +135,7 @@ tests:
           "On TestHarnes (all-cluster-app) a received read of Staus attribute (id 0) looks like this:
           ./chip-tool powersource read status 1 1
 
+          Verify in TH all-clusters-app log
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
           [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
@@ -154,6 +163,9 @@ tests:
           [1646010346.974150][33190:33190] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0003 e=1 p=v
 
           ./chip-tool powersource read order 1 1
+
+          Verify in TH all-clusters-app log
+
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
           [1653395573.862739][19412:19412] CHIP:DMG: {
@@ -175,6 +187,8 @@ tests:
           [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
 
           ./chip-tool powersource read description 1 1
+
+          Verify in TH all-clusters-app log
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -200,12 +214,12 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          No optional attribute is implemented
+          This cluster doesn't have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true

@@ -178,36 +178,13 @@ void CastingServer::OnDescriptorReadFailureResponse(void * context, CHIP_ERROR e
     ChipLogError(AppServer, "Descriptor: Default Failure Response: %" CHIP_ERROR_FORMAT, error.Format());
 }
 
-CHIP_ERROR CastingServer::ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
-                                                   std::function<void(CHIP_ERROR)> launchURLResponseCallback)
+[[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] CHIP_ERROR
+CastingServer::ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
+                                        std::function<void(CHIP_ERROR)> launchURLResponseCallback)
 {
-    OperationalDeviceProxy * operationalDeviceProxy = mTargetVideoPlayerInfo.GetOperationalDeviceProxy();
-    if (operationalDeviceProxy == nullptr)
-    {
-        ChipLogError(AppServer, "Failed in getting an instance of OperationalDeviceProxy");
-        return CHIP_ERROR_PEER_NODE_NOT_FOUND;
-    }
-
-    ContentLauncherCluster cluster(*operationalDeviceProxy->GetExchangeManager(),
-                                   operationalDeviceProxy->GetSecureSession().Value(), kTvEndpoint);
-    CastingServer::GetInstance()->mLaunchURLResponseCallback = launchURLResponseCallback;
-    LaunchURL::Type request;
-    request.contentURL          = chip::CharSpan::fromCharString(contentUrl);
-    request.displayString       = Optional<CharSpan>(chip::CharSpan::fromCharString(contentDisplayStr));
-    request.brandingInformation = MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type());
-    cluster.InvokeCommand(request, nullptr, CastingServer::OnContentLauncherSuccessResponse,
-                          CastingServer::OnContentLauncherFailureResponse);
-    return CHIP_NO_ERROR;
-}
-
-void CastingServer::OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
-{
-    CastingServer::GetInstance()->mLaunchURLResponseCallback(CHIP_NO_ERROR);
-}
-
-void CastingServer::OnContentLauncherFailureResponse(void * context, CHIP_ERROR error)
-{
-    CastingServer::GetInstance()->mLaunchURLResponseCallback(error);
+    return ContentLauncher_LaunchURL(contentUrl, contentDisplayStr,
+                                     MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type()),
+                                     launchURLResponseCallback);
 }
 
 void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
@@ -302,4 +279,118 @@ void CastingServer::SetDefaultFabricIndex()
         return;
     }
     ChipLogError(AppServer, " -- No initialized fabrics with video players");
+}
+
+CHIP_ERROR CastingServer::ContentLauncher_LaunchURL(
+    const char * contentUrl, const char * contentDisplayStr,
+    chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+    std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mLaunchURLCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLaunchURLCommand.Invoke(contentUrl, contentDisplayStr, brandingInformation, responseCallback);
+}
+
+CHIP_ERROR CastingServer::ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+                                                        bool autoPlay, chip::Optional<chip::CharSpan> data,
+                                                        std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mLaunchContentCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLaunchContentCommand.Invoke(search, autoPlay, data, responseCallback);
+}
+
+CHIP_ERROR CastingServer::LevelControl_Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize,
+                                            uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
+                                            std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStepCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStepCommand.Invoke(stepMode, stepSize, transitionTime, optionMask, optionOverride, responseCallback);
+}
+
+CHIP_ERROR CastingServer::LevelControl_MoveToLevel(uint8_t level, uint16_t transitionTime, uint8_t optionMask,
+                                                   uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mMoveToLevelCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mMoveToLevelCommand.Invoke(level, transitionTime, optionMask, optionOverride, responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPlayCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mPlayCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Pause(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPauseCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mPauseCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_StopPlayback(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStopPlaybackCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStopPlaybackCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Next(std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mNextCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mNextCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Seek(uint64_t position, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSeekCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSeekCommand.Invoke(position, responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SkipForward(uint64_t deltaPositionMilliseconds,
+                                                    std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSkipForwardCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSkipForwardCommand.Invoke(deltaPositionMilliseconds, responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_SkipBackward(uint64_t deltaPositionMilliseconds,
+                                                     std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSkipBackwardCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSkipBackwardCommand.Invoke(deltaPositionMilliseconds, responseCallback);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationLauncher_LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mLaunchAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mLaunchAppCommand.Invoke(application, data, responseCallback);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationLauncher_StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStopAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mStopAppCommand.Invoke(application, responseCallback);
+}
+
+CHIP_ERROR
+CastingServer::ApplicationLauncher_HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mHideAppCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mHideAppCommand.Invoke(application, responseCallback);
+}
+
+CHIP_ERROR CastingServer::TargetNavigator_NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
+                                                         std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mNavigateTargetCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mNavigateTargetCommand.Invoke(target, data, responseCallback);
+}
+
+CHIP_ERROR CastingServer::KeypadInput_SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+                                              std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mSendKeyCommand.SetTarget(mTargetVideoPlayerInfo, kTvEndpoint));
+    return mSendKeyCommand.Invoke(keyCode, responseCallback);
 }

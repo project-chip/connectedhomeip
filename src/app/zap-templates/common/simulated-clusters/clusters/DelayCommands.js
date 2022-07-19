@@ -35,7 +35,7 @@ const WaitForCommissioning = {
 
 const WaitForCommissionee = {
   name : 'WaitForCommissionee',
-  arguments : [ { type : 'NODE_ID', name : 'nodeId' } ],
+  arguments : [ { type : 'NODE_ID', name : 'nodeId' }, { type : 'BOOLEAN', name : 'expireExistingSession', isOptional : true } ],
 };
 
 const WaitForMessage = {

@@ -49,7 +49,7 @@ mw320_sdk("sdk") {
 mw320_executable("shell_mw320") {
   include_dirs = []
   defines = []
-  output_name = "all-cluster-mw320.out"
+  output_name = "chip-mw320-all-clusters-app.out"
 
   public_deps = [
     ":sdk",

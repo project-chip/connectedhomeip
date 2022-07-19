@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 58.3.1. [TC-I-3.1] Attributes with Client as DUT
+name: 59.3.1. [TC-I-3.1] Attributes with Client as DUT
 
 config:
     nodeId: 0x12344321
@@ -25,6 +25,10 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify in TH all-clusters-app log
+
           ./chip-tool identify read identify-time 1 1
 
           [1648015371.159715][2506:2506] CHIP:IM: Received Read request
@@ -76,6 +80,10 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify in TH all-clusters-app log
+
           On TestHarnes (all-cluster-app) a received write request looks like this (f.e identify-time (id 0) value 60):
            ./chip-tool identify  write   identify-time  1 1 1
           [1646012277.591912][33190:33190] CHIP:IM: Received Write request
@@ -119,6 +127,10 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify in TH all-clusters-app log
+
           ./chip-tool identify read attribute-list 1 1
 
           [1654242827039] [91286:3990827] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 2002457420
@@ -130,6 +142,13 @@ tests:
           [1654242827040] [91286:3990827] CHIP: [TOO]     [5]: 65531
           [1654242827040] [91286:3990827] CHIP: [TOO]     [6]: 65532
           [1654242827040] [91286:3990827] CHIP: [TOO]     [7]: 65533
+
+           ./chip-tool identify read feature-map 1 1
+
+          [1656477452568] [49420:5728891] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 2109194160
+          [1656477452569] [49420:5728891] CHIP: [TOO]   FeatureMap: 0
+
+
 
 
           "./chip-tool identify read identify-time 1 1

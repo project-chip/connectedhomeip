@@ -52,11 +52,14 @@ void ButtonHandler::GpioInit(void)
     }
 
     /* Configure GPIO interrupt. */
-    cyhal_gpio_register_callback(APP_LIGHT_BUTTON, lightbuttonIsr, NULL);
+    static cyhal_gpio_callback_data_t light_button_cbdata;
+    light_button_cbdata.callback     = light_button_callback;
+    light_button_cbdata.callback_arg = NULL;
+    cyhal_gpio_register_callback(APP_LIGHT_BUTTON, &light_button_cbdata);
     cyhal_gpio_enable_event(APP_LIGHT_BUTTON, CYHAL_GPIO_IRQ_FALL, GPIO_INTERRUPT_PRIORITY, true);
 }
 
-void ButtonHandler::lightbuttonIsr(void * handler_arg, cyhal_gpio_event_t event)
+void ButtonHandler::light_button_callback(void * handler_arg, cyhal_gpio_event_t event)
 {
     portBASE_TYPE taskWoken = pdFALSE;
     xTimerStartFromISR(buttonTimer, &taskWoken);

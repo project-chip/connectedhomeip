@@ -218,7 +218,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetSetupPasscode(uint32_t & se
 {
     ReturnErrorCodeIf(mFactoryData.passcode == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     setupPasscode = mFactoryData.passcode;
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 template <class FlashFactoryData>
@@ -316,6 +316,19 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetRotatingDeviceIdUniqueId(Mu
     ReturnErrorCodeIf(!mFactoryData.rd_uid.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     memcpy(uniqueIdSpan.data(), mFactoryData.rd_uid.data, mFactoryData.rd_uid.len);
+
+    return CHIP_NO_ERROR;
+}
+
+template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetEnableKey(MutableByteSpan & enableKey)
+{
+    ReturnErrorCodeIf(!mFactoryData.enable_key.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(enableKey.size() < mFactoryData.enable_key.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    memcpy(enableKey.data(), mFactoryData.enable_key.data, mFactoryData.enable_key.len);
+
+    enableKey.reduce_size(mFactoryData.enable_key.len);
 
     return CHIP_NO_ERROR;
 }

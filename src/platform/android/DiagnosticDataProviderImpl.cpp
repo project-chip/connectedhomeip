@@ -230,5 +230,10 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
     }
 }
 
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

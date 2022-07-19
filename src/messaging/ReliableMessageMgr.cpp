@@ -134,7 +134,19 @@ void ReliableMessageMgr::ExecuteActions()
 
             // Don't check whether the session in the exchange is valid, because when the session is released, the retrans entry is
             // cleared inside ExchangeContext::OnSessionReleased, so the session must be valid if the entry exists.
-            entry->ec->GetSessionHandle()->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+            SessionHandle session = entry->ec->GetSessionHandle();
+
+            // If the exchange is expecting a response, it will handle sending
+            // this notification once it detects that it has not gotten a
+            // response.  Otherwise, we need to do it.
+            if (!entry->ec->IsResponseExpected())
+            {
+                if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
+                {
+                    session->AsSecureSession()->MarkAsDefunct();
+                }
+                session->DispatchSessionEvent(&SessionDelegate::OnSessionHang);
+            }
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);

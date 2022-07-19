@@ -26,6 +26,7 @@ from builders.host import HostApp, HostBoard, HostBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
+from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
@@ -595,6 +596,12 @@ def IMXTargets():
     yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
 
 
+def MW320Targets():
+    target = Target('mw320', MW320Builder)
+
+    yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
+
+
 ALL = []
 
 target_generators = [
@@ -613,6 +620,7 @@ target_generators = [
     TizenTargets(),
     Bl602Targets(),
     IMXTargets(),
+    MW320Targets(),
 ]
 
 for generator in target_generators:

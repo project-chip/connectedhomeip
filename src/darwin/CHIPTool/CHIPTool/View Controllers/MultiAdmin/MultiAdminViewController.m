@@ -199,7 +199,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
 - (IBAction)openPairingWindow:(id)sender
 {
-    uint32_t setupPIN = arc4random();
+    NSUInteger setupPIN = [MTRSetupPayload generateRandomPIN];
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
         if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {

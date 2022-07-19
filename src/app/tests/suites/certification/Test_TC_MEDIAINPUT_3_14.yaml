@@ -22,7 +22,7 @@ config:
 
 tests:
     - label: "DUT sends SelectInput command to TH"
-      PICS: MC_MEDIAINPUT.C.C0000
+      PICS: MEDIAINPUT.C.C0000
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
           If the DUT knows the Index value, then those can be sent as the argument.
@@ -31,6 +31,9 @@ tests:
 
 
           ./chip-tool mediainput select-input 2 1 1
+
+
+          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
           [1651055405.266553][155495:155500] CHIP:DMG: InvokeResponseMessage =
           [1651055405.266572][155495:155500] CHIP:DMG: {

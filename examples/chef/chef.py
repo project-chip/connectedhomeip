@@ -134,18 +134,19 @@ def bundle(platform: str, device_name: str) -> None:
         platform: The platform to bundle.
         device_name: The example to bundle.
     """
+    bundler_name = f"bundle_{platform}"
     matter_file = f"{device_name}.matter"
     zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
     flush_print(f"Bundling {platform}", with_border=True)
     flush_print(f"Cleaning {_CD_STAGING_DIR}")
     shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
     os.mkdir(_CD_STAGING_DIR)
-    if platform == "linux":
-        bundle_linux(device_name)
-    elif platform == "nrfconnect":
-        bundle_nrfconnect(device_name)
-    elif platform == "esp32":
-        bundle_esp32(device_name)
+    flush_print(f"Checking for {bundler_name}")
+    chef_module = sys.modules[__name__]
+    if hasattr(chef_module, bundler_name):
+        flush_print(f"Found {bundler_name}")
+        bundler = getattr(chef_module, bundler_name)
+        bundler(device_name)
     else:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
@@ -318,8 +319,16 @@ def main(argv: Sequence[str]) -> None:
                       dest="tty", metavar="TTY", default=None)
     parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
                       dest="use_zzz", action="store_true")
+
+    # Build CD params.
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
+    parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
+                      dest="dry_run", action="store_true")
+    parser.add_option("", "--build_exclude", help="For use with --build_all. Build labels to exclude. Accepts a regex pattern. Mutually exclusive with --build_include.",
+                      dest="build_exclude")
+    parser.add_option("", "--build_include", help="For use with --build_all. Build labels to include. Accepts a regex pattern. Mutually exclusive with --build_exclude.",
+                      dest="build_include")
     parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
     parser.add_option(
@@ -328,7 +337,7 @@ def main(argv: Sequence[str]) -> None:
         "", "--ipv6only", help="Compile build which only supports ipv6. Linux only.",
         action="store_true")
     parser.add_option(
-        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "x64"])
+        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
 
     options, _ = parser.parse_args(argv)
 
@@ -342,7 +351,7 @@ def main(argv: Sequence[str]) -> None:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
             install_deps_cmd = """\
-            sudo apt-get install node node-yargs npm
+            sudo apt-get install nodejs node-yargs npm
             libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
             libjpeg9-dev libgif-dev node-typescript"""
             shell.run_cmd(unwrap_cmd(install_deps_cmd))
@@ -379,14 +388,25 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
+        if options.build_include and options.build_exclude:
+            flush_print(
+                "Error. --build_include and --build_exclude are mutually exclusive options.")
+            exit(1)
         flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
-        os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
             for platform, label_args in cicd_config["cd_platforms"].items():
                 for label, args in label_args.items():
+                    archive_name = f"{label}-{device_name}"
+                    if options.build_exclude and re.search(options.build_exclude, archive_name):
+                        continue
+                    elif options.build_include and not re.search(options.build_include, archive_name):
+                        continue
+                    if options.dry_run:
+                        flush_print(archive_name)
+                        continue
                     command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
@@ -408,7 +428,7 @@ def main(argv: Sequence[str]) -> None:
                         if not options.keep_going:
                             exit(1)
                         continue
-                    archive_name = f"{label}-{device_name}"
+                    os.makedirs(archive_prefix, exist_ok=True)
                     archive_full_name = archive_prefix + archive_name + archive_suffix
                     flush_print(f"Adding build output to archive {archive_full_name}")
                     if os.path.exists(archive_full_name):
@@ -620,24 +640,36 @@ def main(argv: Sequence[str]) -> None:
                 'chip_config_network_layer_ble = false',
                 f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
             ])
-            if options.cpu_type == "arm64":
-                uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
-                if "aarch" not in uname_resp and "arm" not in uname_resp:
-                    if (
-                            "aarch" not in uname_resp and
-                            "arm" not in uname_resp and
-                            "SYSROOT_AARCH64" not in shell.env):
+
+            uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+            if "aarch" not in uname_resp and "arm" not in uname_resp:
+                if options.cpu_type == "arm64":
+                    if "SYSROOT_AARCH64" not in shell.env:
                         flush_print(
                             "SYSROOT_AARCH64 env variable not set. "
                             "AARCH64 toolchain needed for cross-compiling for arm64.")
                         exit(1)
                     shell.env["PKG_CONFIG_PATH"] = (
                         f'{shell.env["SYSROOT_AARCH64"]}/lib/aarch64-linux-gnu/pkgconfig')
-                linux_args.append('target_cpu="arm64"')
-                linux_args.append('is_clang=true')
-                linux_args.append('chip_crypto="mbedtls"')
-                linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
-            elif options.cpu_type == "x64":
+                    linux_args.append('target_cpu="arm64"')
+                    linux_args.append('is_clang=true')
+                    linux_args.append('chip_crypto="mbedtls"')
+                    linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
+
+                elif options.cpu_type == "arm":
+                    if "SYSROOT_ARMHF" not in shell.env:
+                        flush_print(
+                            "SYSROOT_ARMHF env variable not set. "
+                            "ARMHF toolchain needed for cross-compiling for arm.")
+                        exit(1)
+                    shell.env["PKG_CONFIG_PATH"] = (
+                        f'{shell.env["SYSROOT_ARMHF"]}/lib/arm-linux-gnueabihf/pkgconfig')
+                    linux_args.append('target_cpu="arm"')
+                    linux_args.append('is_clang=true')
+                    linux_args.append('chip_crypto="mbedtls"')
+                    linux_args.append(f'sysroot="{shell.env["SYSROOT_ARMHF"]}"')
+
+            if options.cpu_type == "x64":
                 uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
                 if "x64" not in uname_resp and "x86_64" not in uname_resp:
                     flush_print(f"Unable to cross compile for x64 on {uname_resp}")

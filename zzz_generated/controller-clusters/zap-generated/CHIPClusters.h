@@ -439,6 +439,15 @@ public:
     ~ColorControlCluster() {}
 };
 
+class DLL_EXPORT BallastConfigurationCluster : public ClusterBase
+{
+public:
+    BallastConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BallastConfiguration::Id, endpoint)
+    {}
+    ~BallastConfigurationCluster() {}
+};
+
 class DLL_EXPORT IlluminanceMeasurementCluster : public ClusterBase
 {
 public:

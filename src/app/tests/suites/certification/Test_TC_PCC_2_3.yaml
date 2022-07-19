@@ -45,83 +45,83 @@ tests:
     - label: "Write 0 to the ControlMode attribute to DUT"
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: PCC.S.A0021
+      PICS: PCC.S.A0021 && PCC.M.ControlModeConstSpeed
       arguments:
           value: 0
 
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.A0012
+      PICS: PCC.S.A0012 && PCC.M.ControlModeConstSpeed
       response:
           value: 0
 
     - label: "Write 1 to the ControlMode attribute to DUT"
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: PCC.S.A0021
+      PICS: PCC.S.A0021 && PCC.M.ControlModeConstPressure
       arguments:
           value: 1
 
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.A0012
+      PICS: PCC.S.A0012 && PCC.M.ControlModeConstPressure
       response:
           value: 1
 
     - label: "Write 2 to the ControlMode attribute to DUT"
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: PCC.S.A0021
+      PICS: PCC.S.A0021 && PCC.M.ControlModeCompPressure
       arguments:
           value: 2
 
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.A0012
+      PICS: PCC.S.A0012 && PCC.M.ControlModeCompPressure
       response:
           value: 2
 
     - label: "Write 3 to the ControlMode attribute to DUT"
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: PCC.S.A0021
+      PICS: PCC.S.A0021 && PCC.M.ControlModeConstFlow
       arguments:
           value: 3
 
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.A0012
+      PICS: PCC.S.A0012 && PCC.M.ControlModeConstFlow
       response:
           value: 3
 
     - label: "Write 5 to the ControlMode attribute to DUT"
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: PCC.S.A0021
+      PICS: PCC.S.A0021 && PCC.M.ControlModeConstTemp
       arguments:
           value: 5
 
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.A0012
+      PICS: PCC.S.A0012 && PCC.M.ControlModeConstTemp
       response:
           value: 5
 
     - label: "Write 7 to the ControlMode attribute to DUT"
       command: "writeAttribute"
       attribute: "ControlMode"
-      PICS: PCC.S.A0021
+      PICS: PCC.S.A0021 && PCC.M.ControlModeAuto
       arguments:
           value: 7
 
     - label: "Reads the attribute: EffectiveControlMode"
       command: "readAttribute"
       attribute: "EffectiveControlMode"
-      PICS: PCC.S.A0012
+      PICS: PCC.S.A0012 && PCC.M.ControlModeAuto
       response:
           value: 7

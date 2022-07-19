@@ -288,6 +288,12 @@
 - (chip::Controller::ColorControlCluster **)cppClusterSlot;
 @end
 
+@interface MTRBaseClusterBallastConfiguration ()
+// Must only touch cppCluster on the Matter queue.
+@property (readonly) chip::Controller::BallastConfigurationCluster * cppCluster;
+- (chip::Controller::BallastConfigurationCluster **)cppClusterSlot;
+@end
+
 @interface MTRBaseClusterIlluminanceMeasurement ()
 // Must only touch cppCluster on the Matter queue.
 @property (readonly) chip::Controller::IlluminanceMeasurementCluster * cppCluster;

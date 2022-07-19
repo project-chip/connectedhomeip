@@ -26,9 +26,13 @@ attribute_access: "access"i "(" (attribute_access_entry ("," attribute_access_en
 
 attribute_with_access: attribute_access? struct_field
 
-attribute: attribute_tag* "attribute"i attribute_with_access ";"
+shared_tag: "fabric"i -> shared_tag_fabric
+shared_tags: shared_tag* -> shared_tags
+
+attribute: shared_tags attribute_tags "attribute"i attribute_with_access ";"
 attribute_tag: "readonly"i -> attr_readonly
              | "nosubscribe"i -> attr_nosubscribe
+attribute_tags: attribute_tag* -> attribute_tags
 
 request_struct: "request"i struct
 
@@ -38,12 +42,11 @@ response_struct: "response"i "struct"i id "=" positive_integer "{" (struct_field
 command_attribute: "timed"i -> timed_command
 command_attributes: command_attribute*
 
-
 command_access: "access"i "(" ("invoke"i ":" access_privilege)? ")"
 
 command_with_access: "command"i command_access? id
 
-command: command_attributes command_with_access "(" id? ")" ":" id "=" positive_integer ";"
+command: shared_tags command_attributes command_with_access "(" id? ")" ":" id "=" positive_integer ";"
 
 cluster: cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)* "}"
 ?cluster_side: "server"i -> server_cluster

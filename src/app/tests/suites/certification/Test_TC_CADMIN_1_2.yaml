@@ -29,15 +29,14 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_MF_BCM) TH_CR1 opens a commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM (Basic
-          Commissioning Method)"
+          "TH_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM
+          (Basic Commissioning Method)"
+      PICS: CADMIN.C.C0001
       verification: |
           On first controller, usinadministratorcommissioningg chip tool open commissioning window.
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
-
-
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -72,7 +71,8 @@ tests:
           [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH_CR1 reads the list of Fabrics on TH_CE"
+    - label: "TH_CR1 sends command to TH_CE to read the list of Fabrics"
+      PICS: OPCREDS.C.A0001
       verification: |
           On first controller, using chip tool read fabricList
 
@@ -103,9 +103,29 @@ tests:
           Device commissioning completed with success
       disabled: true
 
+    - label: "Verify TH_CE is now discoverable over DNS-SD with two SRV Records"
+      verification: |
+          On the raspi , Verify if the DUT is broadcasting using
+
+          ubuntu@ubuntu:~/may10_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          +   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
+          +   eth0 IPv6 7FF84D214A19B581-0000000000000001             _matter._tcp         local
+          =   eth0 IPv6 E0AF53B23E580769-0000000000000002             _matter._tcp         local
+             hostname = [E45F010F3BAF0000.local]
+             address = [fe80::e65f:1ff:fe0f:3baf]
+             port = [5540]
+             txt = ["T=1" "CRA=300" "CRI=5000"]
+          =   eth0 IPv6 7FF84D214A19B581-0000000000000001             _matter._tcp         local
+             hostname = [E45F010F3BAF0000.local]
+             address = [fe80::e65f:1ff:fe0f:3baf]
+             port = [5540]
+             txt = ["T=1" "CRA=300" "CRI=5000"]
+      disabled: true
+
     - label:
-          "DUT_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of TH_CE"
+          "DUT_CR2 sends command to TH_CE to write and read the Basic
+          Information Clusters NodeLabel mandatory attribute"
+      PICS: BINFO.C.A0005
       verification: |
           Using your DUT controller write attribute and read attribute to and from TH_CE
 
@@ -145,7 +165,9 @@ tests:
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
       disabled: true
 
-    - label: "DUT_CR2 reads the list of Fabrics on TH_CE"
+    - label:
+          "DUT_CR2 sends command to TH_CE to read the list of Fabrics on TH_CE"
+      PICS: OPCREDS.C.A0001
       verification: |
           On your DUT controller read fabricList
 
@@ -174,8 +196,9 @@ tests:
       disabled: true
 
     - label:
-          "TH_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of TH_CE using CASE"
+          "TH_CR1 sends command to TH_CE to write and read the Basic Information
+          Clusters NodeLabel mandatory attribute"
+      PICS: BINFO.C.A0005
       verification: |
           On first controller, using chip-tool write attribute, Verify read attribute returns the updated value written.
 
@@ -214,8 +237,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 reads, writes and then reads the Basic Information Clusters
-          NodeLabel mandatory attribute of TH_CE"
+          "DUT_CR2 sends command to TH_CE to read, write and then read the Basic
+          Information Clusters NodeLabel mandatory attribute"
+      PICS: BINFO.C.A0005
       verification: |
           Using your DUT controller read, write attribute and then read attribute to and from TH_CE
 
@@ -263,9 +287,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM (Basic Commissioning
-          Method)"
+          "DUT_CR2 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM
+          (Basic Commissioning Method)"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
@@ -307,8 +332,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 revokes the commissioning window on TH_CE using the Revoke
-          Commissioning command"
+          "DUT_CR2 sends command to TH_CE to revoke the commissioning window
+          using the Revoke Commissioning command"
+      PICS: CADMIN.C.C0002
       verification: |
           On your DUT controller using chip-tool run revoke command
 
@@ -363,8 +389,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR2 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of TH_CE"
+          "DUT_CR2 sends command to TH_CE to write and read the Basic
+          Information Clusters NodeLabel mandatory attribute"
+      PICS: BINFO.C.A0005
       verification: |
           Using your DUT controller, write attribute and read attribute to and from TH_CE
 
@@ -403,7 +430,10 @@ tests:
           [1649245950.007024][10116:10121] CHIP:EM: Sending Standalone Ack for MessageCounter:12495101 on exchange 24816i
       disabled: true
 
-    - label: "DUT_CR2 opens a commissioning window on TH_CE using BCM"
+    - label:
+          "DUT_CR2 sends command to TH_CE to open a commissioning window using
+          BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
@@ -450,7 +480,10 @@ tests:
           Wait for the timeout of commissioning window in the above step
       disabled: true
 
-    - label: "DUT_CR2 opens a commissioning window on TH_CE using BCM"
+    - label:
+          "DUT_CR2 sends command to TH_CE to open a commissioning window using
+          BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 

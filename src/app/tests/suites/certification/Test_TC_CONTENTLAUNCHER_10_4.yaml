@@ -1,0 +1,66 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.12.3. [TC-CONTENTLAUNCHER-10.4] Launch Content Verification (DUT as
+    Client)
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "DUT sends LaunchContent command to TH"
+      PICS: CONTENTLAUNCHER.C.C0000
+      verification: |
+          product maker needs to provide instructions for how to trigger the command:
+          Refer to device or application documentation for special argument values to each command, and/or additional steps required to put device into in correct state to exhibit test behavior.
+
+
+          ./chip-tool contentlauncher launch-content '{"parameterList": []}' 1 1 1
+          The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
+
+          [1653156346244] [89108:1739178] CHIP: [DMG] {
+          [1653156346244] [89108:1739178] CHIP: [DMG]         suppressResponse = false,
+          [1653156346244] [89108:1739178] CHIP: [DMG]         timedRequest = false,
+          [1653156346244] [89108:1739178] CHIP: [DMG]         InvokeRequests =
+          [1653156346244] [89108:1739178] CHIP: [DMG]         [
+          [1653156346244] [89108:1739178] CHIP: [DMG]                 CommandDataIB =
+          [1653156346244] [89108:1739178] CHIP: [DMG]                 {
+          [1653156346244] [89108:1739178] CHIP: [DMG]                         CommandPathIB =
+          [1653156346244] [89108:1739178] CHIP: [DMG]                         {
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 EndpointId = 0x1,
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 ClusterId = 0x50a,
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 CommandId = 0x0,
+          [1653156346244] [89108:1739178] CHIP: [DMG]                         },
+          [1653156346244] [89108:1739178] CHIP: [DMG]
+          [1653156346244] [89108:1739178] CHIP: [DMG]                         CommandData =
+          [1653156346244] [89108:1739178] CHIP: [DMG]                         {
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 0x0 =
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 {
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                         0x0 = [
+          [1653156346244] [89108:1739178] CHIP: [DMG]
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                         ],
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 },
+          [1653156346244] [89108:1739178] CHIP: [DMG]                                 0x1 = true,
+          [1653156346244] [89108:1739178] CHIP: [DMG]                         },
+          [1653156346244] [89108:1739178] CHIP: [DMG]                 },
+          [1653156346244] [89108:1739178] CHIP: [DMG]
+          [1653156346244] [89108:1739178] CHIP: [DMG]         ],
+          [1653156346244] [89108:1739178] CHIP: [DMG]
+          [1653156346244] [89108:1739178] CHIP: [DMG]         InteractionModelRevision = 1
+          [1653156346244] [89108:1739178] CHIP: [DMG] },
+      disabled: true

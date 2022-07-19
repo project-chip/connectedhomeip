@@ -59,25 +59,26 @@ tests:
               - name: "colorTemperature"
                 value: 100
               - name: "TransitionTime"
-                value: 10
+                value: 5
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 700ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 700
 
     - label: "Read current color temprature"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
+          value: 100
           constraints:
               type: uint16
               minValue: 0

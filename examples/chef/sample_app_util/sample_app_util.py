@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Utility to work with sample app device files.
 
 This utility helps with the following:

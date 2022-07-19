@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,11 +25,13 @@
  */
 
 #include "chip-cert.h"
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
 #include <protocols/Protocols.h>
 
 using namespace chip;
+using namespace chip::Encoding;
 using namespace chip::Protocols;
 using namespace chip::ASN1;
 using namespace chip::TLV;
@@ -41,115 +43,144 @@ namespace {
 KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
 {
     static uint32_t p256SerializedKeypairLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
+    static const uint8_t chipRawPrefix[]     = { 0x04 };
+    static const char * chipHexPrefix        = "04";
+    static const char * chipB64Prefix        = "B";
+    static const uint8_t derRawPrefix[]      = { 0x30, 0x77, 0x02, 0x01, 0x01, 0x04 };
+    static const char * derHexPrefix         = "307702010104";
     static const char * ecPEMMarker          = "-----BEGIN EC PRIVATE KEY-----";
     static const char * pkcs8PEMMarker       = "-----BEGIN PRIVATE KEY-----";
     static const char * ecPUBPEMMarker       = "-----BEGIN PUBLIC KEY-----";
-    static const char * chipHexPrefix        = "04c2";
-    static const size_t chipHexPrefixLen     = strlen(chipHexPrefix);
-    static const size_t chipHexMinLen        = HEX_ENCODED_LENGTH(p256SerializedKeypairLen);
 
-    if (keyLen == p256SerializedKeypairLen)
+    VerifyOrReturnError(key != nullptr, kKeyFormat_Unknown);
+
+    if ((keyLen == p256SerializedKeypairLen) && (memcmp(key, chipRawPrefix, sizeof(chipRawPrefix)) == 0))
     {
         return kKeyFormat_Chip_Raw;
     }
-
-    if (keyLen == BASE64_ENCODED_LEN(p256SerializedKeypairLen))
+    if ((keyLen == HEX_ENCODED_LENGTH(p256SerializedKeypairLen)) && (memcmp(key, chipHexPrefix, strlen(chipHexPrefix)) == 0))
+    {
+        return kKeyFormat_Chip_Hex;
+    }
+    if ((keyLen == BASE64_ENCODED_LEN(p256SerializedKeypairLen)) && (memcmp(key, chipB64Prefix, strlen(chipB64Prefix)) == 0))
     {
         return kKeyFormat_Chip_Base64;
     }
-
+    if ((keyLen == kP256_PublicKey_Length) && (memcmp(key, chipRawPrefix, sizeof(chipRawPrefix)) == 0))
+    {
+        return kKeyFormat_Chip_Pubkey_Raw;
+    }
+    if ((keyLen == (2 * kP256_PublicKey_Length)) && (memcmp(key, chipHexPrefix, strlen(chipHexPrefix)) == 0))
+    {
+        return kKeyFormat_Chip_Pubkey_Hex;
+    }
+    if ((keyLen == BASE64_ENCODED_LEN(kP256_PublicKey_Length)) && (memcmp(key, chipB64Prefix, strlen(chipB64Prefix)) == 0))
+    {
+        return kKeyFormat_Chip_Pubkey_Base64;
+    }
+    if ((keyLen > sizeof(derRawPrefix)) && (memcmp(key, derRawPrefix, sizeof(derRawPrefix)) == 0))
+    {
+        return kKeyFormat_X509_DER;
+    }
+    if ((keyLen > strlen(derHexPrefix)) && (memcmp(key, derHexPrefix, strlen(derHexPrefix)) == 0))
+    {
+        return kKeyFormat_X509_Hex;
+    }
     if (ContainsPEMMarker(ecPEMMarker, key, keyLen) || ContainsPEMMarker(pkcs8PEMMarker, key, keyLen))
     {
         return kKeyFormat_X509_PEM;
     }
-
     if (ContainsPEMMarker(ecPUBPEMMarker, key, keyLen))
     {
-        return kKeyFormat_X509_PUBKEY_PEM;
+        return kKeyFormat_X509_Pubkey_PEM;
     }
 
-    if (keyLen >= chipHexMinLen && memcmp(key, chipHexPrefix, chipHexPrefixLen) == 0)
-    {
-        return kKeyFormat_Chip_Hex;
-    }
+    return kKeyFormat_Unknown;
+}
 
-    return kKeyFormat_X509_DER;
+bool SetPublicKey(const uint8_t * pubkey, uint32_t pubkeyLen, EVP_PKEY * key)
+{
+    std::unique_ptr<EC_GROUP, void (*)(EC_GROUP *)> group(EC_GROUP_new_by_curve_name(gNIDChipCurveP256), &EC_GROUP_free);
+    std::unique_ptr<EC_POINT, void (*)(EC_POINT *)> ecPoint(EC_POINT_new(group.get()), &EC_POINT_free);
+    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EC_KEY_new_by_curve_name(gNIDChipCurveP256), &EC_KEY_free);
+
+    VerifyOrReturnError(EC_POINT_oct2point(group.get(), ecPoint.get(), pubkey, pubkeyLen, nullptr) == 1, false);
+
+    VerifyOrReturnError(EC_KEY_set_public_key(ecKey.get(), ecPoint.get()) == 1, false);
+
+    VerifyOrReturnError(EVP_PKEY_set1_EC_KEY(key, ecKey.get()) == 1, false);
+
+    return true;
+}
+
+bool ExtractPublicKey(EVP_PKEY * key, MutableByteSpan & pubKey)
+{
+    const EC_KEY * ecKey     = nullptr;
+    const EC_GROUP * group   = nullptr;
+    const EC_POINT * ecPoint = nullptr;
+
+    VerifyOrReturnError(pubKey.size() >= kP256_PublicKey_Length, false);
+
+    ecKey = EVP_PKEY_get1_EC_KEY(key);
+    VerifyOrReturnError(ecKey != nullptr, false);
+
+    group = EC_KEY_get0_group(ecKey);
+    VerifyOrReturnError(group != nullptr, false);
+
+    ecPoint = EC_KEY_get0_public_key(ecKey);
+    VerifyOrReturnError(ecPoint != nullptr, false);
+
+    VerifyOrReturnError(EC_POINT_point2oct(group, ecPoint, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubKey.data()),
+                                           kP256_PublicKey_Length, nullptr) == kP256_PublicKey_Length,
+                        false);
+
+    pubKey.reduce_size(static_cast<size_t>(kP256_PublicKey_Length));
+
+    return true;
 }
 
 bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY * key)
 {
-    bool res                = true;
-    int result              = 0;
-    const uint8_t * pubKey  = keyPair;
-    uint32_t pubKeyLen      = kP256_PublicKey_Length;
-    const uint8_t * privKey = keyPair + pubKeyLen;
-    uint32_t privKeyLen     = kP256_PrivateKey_Length;
-    std::unique_ptr<EC_GROUP, void (*)(EC_GROUP *)> group(EC_GROUP_new_by_curve_name(gNIDChipCurveP256), &EC_GROUP_free);
-    std::unique_ptr<EC_POINT, void (*)(EC_POINT *)> ecPoint(EC_POINT_new(group.get()), &EC_POINT_free);
-    std::unique_ptr<EC_KEY, void (*)(EC_KEY *)> ecKey(EC_KEY_new_by_curve_name(gNIDChipCurveP256), &EC_KEY_free);
     std::unique_ptr<BIGNUM, void (*)(BIGNUM *)> privKeyBN(BN_new(), &BN_clear_free);
 
     ERR_clear_error();
 
-    VerifyOrExit(key != nullptr, res = false);
-    VerifyOrExit(keyPair != nullptr, res = false);
-    VerifyOrExit(keyPairLen == privKeyLen + pubKeyLen, res = false);
+    VerifyOrReturnError(key != nullptr, false);
+    VerifyOrReturnError(keyPair != nullptr, false);
+    VerifyOrReturnError(keyPairLen == kP256_PublicKey_Length + kP256_PrivateKey_Length, false);
 
-    result = EC_POINT_oct2point(group.get(), ecPoint.get(), pubKey, pubKeyLen, nullptr);
-    VerifyOrExit(result == 1, res = false);
+    VerifyOrReturnError(SetPublicKey(keyPair, kP256_PublicKey_Length, key), false);
 
-    result = EC_KEY_set_public_key(ecKey.get(), ecPoint.get());
-    VerifyOrExit(result == 1, res = false);
+    VerifyOrReturnError(BN_bin2bn(keyPair + kP256_PublicKey_Length, kP256_PrivateKey_Length, privKeyBN.get()) != nullptr, false);
 
-    VerifyOrExit(BN_bin2bn(privKey, static_cast<int>(privKeyLen), privKeyBN.get()) != nullptr, res = false);
+    VerifyOrReturnError(EC_KEY_set_private_key(EVP_PKEY_get1_EC_KEY(key), privKeyBN.get()) == 1, false);
 
-    result = EC_KEY_set_private_key(ecKey.get(), privKeyBN.get());
-    VerifyOrExit(result == 1, res = false);
-
-    result = EVP_PKEY_set1_EC_KEY(key, ecKey.get());
-    VerifyOrExit(result == 1, res = false);
-
-exit:
-    return res;
+    return true;
 }
 
 } // namespace
 
 bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
 {
-    bool res                 = true;
-    const BIGNUM * privKeyBN = nullptr;
-    const EC_GROUP * group   = nullptr;
     const EC_KEY * ecKey     = nullptr;
-    const EC_POINT * ecPoint = nullptr;
-    uint8_t * pubKey         = serializedKeypair.Bytes();
-    uint8_t * privKey        = pubKey + kP256_PublicKey_Length;
-    size_t pubKeyLen         = 0;
-    int privKeyLen           = 0;
+    const BIGNUM * privKeyBN = nullptr;
+    MutableByteSpan pubKey(serializedKeypair.Bytes(), kP256_PublicKey_Length);
+
+    VerifyOrReturnError(ExtractPublicKey(key, pubKey), false);
 
     ecKey = EVP_PKEY_get1_EC_KEY(key);
-    VerifyOrExit(ecKey != nullptr, res = false);
+    VerifyOrReturnError(ecKey != nullptr, false);
 
     privKeyBN = EC_KEY_get0_private_key(ecKey);
-    VerifyOrExit(privKeyBN != nullptr, res = false);
+    VerifyOrReturnError(privKeyBN != nullptr, false);
 
-    group = EC_KEY_get0_group(ecKey);
-    VerifyOrExit(group != nullptr, res = false);
-
-    ecPoint = EC_KEY_get0_public_key(ecKey);
-    VerifyOrExit(ecPoint != nullptr, res = false);
-
-    pubKeyLen =
-        EC_POINT_point2oct(group, ecPoint, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubKey), kP256_PublicKey_Length, nullptr);
-    VerifyOrExit(pubKeyLen == kP256_PublicKey_Length, res = false);
-
-    privKeyLen = BN_bn2binpad(privKeyBN, privKey, kP256_PrivateKey_Length);
-    VerifyOrExit(privKeyLen == kP256_PrivateKey_Length, res = false);
+    VerifyOrReturnError(BN_bn2binpad(privKeyBN, serializedKeypair.Bytes() + kP256_PublicKey_Length, kP256_PrivateKey_Length) ==
+                            kP256_PrivateKey_Length,
+                        false);
 
     serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
 
-exit:
-    return res;
+    return true;
 }
 
 bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupportedCurve)
@@ -168,13 +199,23 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
     VerifyTrueOrExit(res);
 
     keyFormat = DetectKeyFormat(keyData.get(), keyDataLen);
+    if (keyFormat == kKeyFormat_Unknown)
+    {
+        fprintf(stderr, "Unrecognized Key Format in File: %s\n", fileName);
+        return false;
+    }
 
-    if (keyFormat == kKeyFormat_Chip_Base64)
+    if ((keyFormat == kKeyFormat_X509_Hex) || (keyFormat == kKeyFormat_Chip_Hex) || (keyFormat == kKeyFormat_Chip_Pubkey_Hex))
+    {
+        size_t len = HexToBytes(Uint8::to_char(keyData.get()), keyDataLen, keyData.get(), keyDataLen);
+        VerifyOrReturnError(CanCastTo<uint32_t>(2 * len), false);
+        VerifyOrReturnError(2 * len == keyDataLen, false);
+        keyDataLen = static_cast<uint32_t>(len);
+    }
+    else if ((keyFormat == kKeyFormat_Chip_Base64) || (keyFormat == kKeyFormat_Chip_Pubkey_Base64))
     {
         res = Base64Decode(keyData.get(), keyDataLen, keyData.get(), keyDataLen, keyDataLen);
         VerifyTrueOrExit(res);
-
-        keyFormat = kKeyFormat_Chip_Raw;
     }
     else if (keyFormat == kKeyFormat_Chip_Hex)
     {
@@ -187,9 +228,14 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
         keyFormat = kKeyFormat_Chip_Raw;
     }
 
-    if (keyFormat == kKeyFormat_Chip_Raw)
+    if (IsChipPrivateKeyFormat(keyFormat))
     {
         res = DeserializeKeyPair(keyData.get(), keyDataLen, key);
+        VerifyTrueOrExit(res);
+    }
+    else if (IsChipPublicKeyFormat(keyFormat))
+    {
+        res = SetPublicKey(keyData.get(), keyDataLen, key);
         VerifyTrueOrExit(res);
     }
     else
@@ -197,7 +243,7 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
         std::unique_ptr<BIO, void (*)(BIO *)> keyBIO(
             BIO_new_mem_buf(static_cast<const void *>(keyData.get()), static_cast<int>(keyDataLen)), &BIO_free_all);
 
-        if (keyFormat == kKeyFormat_X509_PUBKEY_PEM)
+        if (keyFormat == kKeyFormat_X509_Pubkey_PEM)
         {
             EC_KEY * ecKey = EC_KEY_new();
 
@@ -220,6 +266,13 @@ bool ReadKey(const char * fileName, EVP_PKEY * key, bool ignorErrorIfUnsupported
         }
         else
         {
+            if (keyFormat == kKeyFormat_X509_Hex)
+            {
+                size_t len = HexToBytes(reinterpret_cast<char *>(keyBIO.get()), keyDataLen,
+                                        reinterpret_cast<uint8_t *>(keyBIO.get()), keyDataLen);
+                VerifyOrReturnError(2 * len == keyDataLen, false);
+            }
+
             if (d2i_PrivateKey_bio(keyBIO.get(), &key) == nullptr)
             {
                 ReportOpenSSLErrorAndExit("d2i_PrivateKey_bio", res = false);
@@ -280,22 +333,19 @@ exit:
     return res;
 }
 
-bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
+bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 {
-    bool res               = true;
-    FILE * file            = nullptr;
-    uint8_t * keyToWrite   = nullptr;
-    uint32_t keyToWriteLen = 0;
-    P256SerializedKeypair serializedKeypair;
-    uint32_t chipKeySize        = serializedKeypair.Capacity();
-    uint32_t chipKeyDecodedSize = HEX_ENCODED_LENGTH(chipKeySize);
-    std::unique_ptr<uint8_t[]> chipKey(new uint8_t[chipKeySize]);
-    std::unique_ptr<uint8_t[]> chipKeyDecoded(new uint8_t[chipKeyDecodedSize]);
+    bool res              = true;
+    FILE * file           = nullptr;
+    uint8_t * derKey      = nullptr;
+    DataFormat dataFormat = kDataFormat_Unknown;
 
     VerifyOrExit(key != nullptr, res = false);
 
-    res = OpenFile(fileName, file, true);
-    VerifyTrueOrExit(res);
+    if (keyFmt == kKeyFormat_X509_PEM || keyFmt == kKeyFormat_X509_Pubkey_PEM || keyFmt == kKeyFormat_X509_DER)
+    {
+        VerifyOrExit(OpenFile(fileName, file, true), res = false);
+    }
 
     if (EVP_PKEY_type(EVP_PKEY_id(key)) != EVP_PKEY_EC)
     {
@@ -308,7 +358,13 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     case kKeyFormat_X509_PEM:
         if (PEM_write_ECPrivateKey(file, EVP_PKEY_get1_EC_KEY(key), nullptr, nullptr, 0, nullptr, nullptr) == 0)
         {
-            ReportOpenSSLErrorAndExit("PEM_write_PrivateKey", res = false);
+            ReportOpenSSLErrorAndExit("PEM_write_ECPrivateKey", res = false);
+        }
+        break;
+    case kKeyFormat_X509_Pubkey_PEM:
+        if (PEM_write_EC_PUBKEY(file, EVP_PKEY_get1_EC_KEY(key)) == 0)
+        {
+            ReportOpenSSLErrorAndExit("PEM_write_EC_PUBKEY", res = false);
         }
         break;
     case kKeyFormat_X509_DER:
@@ -317,45 +373,52 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
             ReportOpenSSLErrorAndExit("i2d_PrivateKey_fp", res = false);
         }
         break;
+    case kKeyFormat_X509_Hex: {
+        int derKeyLen = i2d_ECPrivateKey(EVP_PKEY_get1_EC_KEY(key), &derKey);
+        if (derKeyLen < 0)
+        {
+            ReportOpenSSLErrorAndExit("i2d_X509", res = false);
+        }
+        VerifyOrExit(CanCastTo<size_t>(derKeyLen), res = false);
+        VerifyOrExit(WriteDataIntoFile(fileName, derKey, static_cast<size_t>(derKeyLen), kDataFormat_Hex), res = false);
+    }
+    break;
     case kKeyFormat_Chip_Raw:
     case kKeyFormat_Chip_Hex:
     case kKeyFormat_Chip_Base64:
-        res = SerializeKeyPair(key, serializedKeypair);
-        VerifyTrueOrExit(res);
-
-        if (keyFmt == kKeyFormat_Chip_Base64)
-        {
-            res = Base64Encode(serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), chipKeyDecoded.get(),
-                               chipKeyDecodedSize, chipKeyDecodedSize);
-            VerifyTrueOrExit(res);
-
-            keyToWrite    = chipKeyDecoded.get();
-            keyToWriteLen = chipKeyDecodedSize;
-        }
-        else if (keyFmt == kKeyFormat_Chip_Hex)
-        {
-            char * keyHex = reinterpret_cast<char *>(chipKeyDecoded.get());
-
-            SuccessOrExit(Encoding::BytesToLowercaseHexBuffer(
-                serializedKeypair.Bytes(), static_cast<uint32_t>(serializedKeypair.Length()), keyHex, chipKeyDecodedSize));
-
-            keyToWrite    = chipKeyDecoded.get();
-            keyToWriteLen = chipKeyDecodedSize;
-        }
+        if (keyFmt == kKeyFormat_Chip_Raw)
+            dataFormat = kDataFormat_Raw;
+        else if (keyFmt == kKeyFormat_Chip_Base64)
+            dataFormat = kDataFormat_Base64;
         else
-        {
-            keyToWrite    = serializedKeypair.Bytes();
-            keyToWriteLen = static_cast<uint32_t>(serializedKeypair.Length());
-        }
+            dataFormat = kDataFormat_Hex;
 
-        if (fwrite(keyToWrite, 1, keyToWriteLen, file) != keyToWriteLen)
         {
-            fprintf(stderr, "Unable to write to %s\n%s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
-            ExitNow(res = false);
+            P256SerializedKeypair serializedKeypair;
+            VerifyOrExit(SerializeKeyPair(key, serializedKeypair), res = false);
+            VerifyOrExit(WriteDataIntoFile(fileName, serializedKeypair.Bytes(), serializedKeypair.Length(), dataFormat),
+                         res = false);
+        }
+        break;
+    case kKeyFormat_Chip_Pubkey_Raw:
+    case kKeyFormat_Chip_Pubkey_Base64:
+    case kKeyFormat_Chip_Pubkey_Hex:
+        if (keyFmt == kKeyFormat_Chip_Pubkey_Raw)
+            dataFormat = kDataFormat_Raw;
+        else if (keyFmt == kKeyFormat_Chip_Pubkey_Base64)
+            dataFormat = kDataFormat_Base64;
+        else
+            dataFormat = kDataFormat_Hex;
+
+        {
+            uint8_t pubkey[kP256_PublicKey_Length] = { 0 };
+            MutableByteSpan pubkeySpan(pubkey);
+            VerifyOrExit(ExtractPublicKey(key, pubkeySpan), res = false);
+            VerifyOrExit(WriteDataIntoFile(fileName, pubkeySpan.data(), pubkeySpan.size(), dataFormat), res = false);
         }
         break;
     default:
-        fprintf(stderr, "Unsupported private key format");
+        fprintf(stderr, "Unsupported private key format\n");
         ExitNow(res = false);
     }
 
@@ -363,6 +426,7 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
 
 exit:
     CloseFile(file);
+    OPENSSL_free(derKey);
 
     return res;
 }

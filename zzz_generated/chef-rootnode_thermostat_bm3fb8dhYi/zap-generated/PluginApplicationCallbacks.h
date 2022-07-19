@@ -25,7 +25,6 @@
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterScenesPluginServerInitCallback();                                                                                        \
-    MatterAlarmsPluginServerInitCallback();                                                                                        \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterBindingPluginClientInitCallback();                                                                                       \
     MatterAccessControlPluginServerInitCallback();                                                                                 \

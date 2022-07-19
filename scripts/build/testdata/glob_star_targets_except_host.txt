@@ -85,6 +85,7 @@ mbed-CY8CPROTO_062_4343W-light-release
 mbed-CY8CPROTO_062_4343W-lock-release
 mbed-CY8CPROTO_062_4343W-pigweed-release
 mbed-CY8CPROTO_062_4343W-shell-release
+mw320-all-clusters-app
 nrf-native-posix-64-tests
 nrf-nrf52840dk-all-clusters
 nrf-nrf52840dk-all-clusters-minimal

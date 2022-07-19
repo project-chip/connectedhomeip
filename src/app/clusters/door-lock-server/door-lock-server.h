@@ -117,28 +117,50 @@ public:
     bool GetNumberOfCredentialsSupportedPerUser(chip::EndpointId endpointId, uint8_t & numberOfCredentialsSupportedPerUser);
     bool GetNumberOfHolidaySchedulesSupported(chip::EndpointId endpointId, uint8_t & numberOfHolidaySchedules);
 
-    bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
+    chip::BitFlags<DoorLockFeature> GetFeatures(chip::EndpointId endpointId);
 
-    inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
+    inline bool SupportsPIN(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(DoorLockFeature::kPINCredentials); }
 
-    inline bool SupportsRFID(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials); }
+    inline bool SupportsRFID(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(DoorLockFeature::kRFIDCredentials); }
 
-    inline bool SupportsFingers(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFingerCredentials); }
+    inline bool SupportsFingers(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(DoorLockFeature::kFingerCredentials);
+    }
 
-    inline bool SupportsFace(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFaceCredentials); }
+    inline bool SupportsFace(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(DoorLockFeature::kFaceCredentials); }
 
-    inline bool SupportsSchedules(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kAccessSchedules); }
+    inline bool SupportsWeekDaySchedules(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(DoorLockFeature::kWeekDaySchedules);
+    }
+
+    inline bool SupportsYearDaySchedules(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(DoorLockFeature::kYearDaySchedules);
+    }
+
+    inline bool SupportsHolidaySchedules(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(DoorLockFeature::kHolidaySchedules);
+    }
+
+    inline bool SupportsAnyCredential(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId)
+            .HasAny(DoorLockFeature::kPINCredentials, DoorLockFeature::kRFIDCredentials, DoorLockFeature::kFingerCredentials,
+                    DoorLockFeature::kFaceCredentials);
+    }
 
     inline bool SupportsCredentialsOTA(chip::EndpointId endpointId)
     {
-        return HasFeature(endpointId, DoorLockFeature::kCredentialsOTA);
+        return GetFeatures(endpointId).Has(DoorLockFeature::kCredentialsOTA);
     }
 
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
-        // TODO: Add missing functions to check if RID, FGP or FACE are supported
-        return HasFeature(endpointId, DoorLockFeature::kUsersManagement) && SupportsPIN(endpointId);
+        return GetFeatures(endpointId).Has(DoorLockFeature::kUsersManagement) && SupportsAnyCredential(endpointId);
     }
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);

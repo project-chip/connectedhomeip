@@ -466,6 +466,8 @@ void DeviceCommissioner::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
+    mSetUpCodePairer.CommissionerShuttingDown();
+
     // Check to see if pairing in progress before shutting down
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
     if (device != nullptr && device->IsSessionSetupInProgress())
@@ -1281,6 +1283,9 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    case OperationalCertStatus::kUnknownEnumValue:
+        // Is this a reasonable value?
+        return CHIP_ERROR_CERT_LOAD_FAILED;
     }
 
     return CHIP_ERROR_CERT_LOAD_FAILED;

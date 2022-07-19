@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 21.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [{DUT_Client}]
+name: 3.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -27,9 +27,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          verify on TH receives the right write Request Message for the data sent in the above command
 
           sudo ./chip-tool levelcontrol write on-level 2 1 1
+
+          verify on TH receives the right write Request Message for the data sent in the above command
+
           [1655795552.551487][7331:7331] CHIP:EM: Handling via exchange: 41640r, Delegate: 0xaaaad9aed418
           [1655795552.551552][7331:7331] CHIP:IM: Received Write request
           [1655795552.551589][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -77,9 +79,10 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+           ./chip-tool basic write local-config-disabled 1 1 0
+
           verify on TH receives the right write Request Message for the data sent in the above command
 
-           ./chip-tool basic write local-config-disabled 1 1 0
           [1655795795.033946][7331:7331] CHIP:EM: Handling via exchange: 11668r, Delegate: 0xaaaad9aed418
           [1655795795.034011][7331:7331] CHIP:IM: Received Write request
           [1655795795.034050][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -120,9 +123,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          verify on TH receives the right write Request Message for the data sent in the above command
 
            ./chip-tool basic write node-label node 1 0
+
+
+          verify on TH receives the right write Request Message for the data sent in the above command
 
           [1655796035.022296][7331:7331] CHIP:EM: Handling via exchange: 64908r, Delegate: 0xaaaad9aed418
           [1655796035.022365][7331:7331] CHIP:IM: Received Write request
@@ -165,9 +170,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          verify on TH receives the right write Request Message for the data sent in the above command
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
+
+          verify on TH receives the right write Request Message for the data sent in the above command
+
           [1655796141.166846][7331:7331] CHIP:IM: Received Write request
           [1655796141.166889][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796141.166973][7331:7331] CHIP:DMG: WriteRequestMessage =
@@ -244,9 +251,10 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+           ./chip-tool any write-by-id 0x0204 0  1  1 1
+
           verify on TH receives the right write Request Message for the data sent in the above command
 
-           ./chip-tool any write-by-id 0x0204 0  1  1 1
           [1655796297.607841][7331:7331] CHIP:EM: Handling via exchange: 37495r, Delegate: 0xaaaad9aed418
           [1655796297.607911][7331:7331] CHIP:IM: Received Write request
           [1655796297.607954][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -288,9 +296,12 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+
 
            ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
+
+          verify on TH receives the right write Request Message for the data sent in the above command
+
           [1655796429.696904][7331:7331] CHIP:IM: Received Write request
           [1655796429.696947][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
           [1655796429.697031][7331:7331] CHIP:DMG: WriteRequestMessage =
@@ -339,9 +350,11 @@ tests:
       verification: |
           In case of chip tool, here is an example command to use
 
+          ./chip-tool any write-by-id 0x0204 0  1  1 1
+
+
           verify on TH receives the right write Request Message for the data sent in the above command
 
-          ./chip-tool any write-by-id 0x0204 0  1  1 1
           [1655796724.510633][7331:7331] CHIP:EM: Handling via exchange: 51058r, Delegate: 0xaaaad9aed418
           [1655796724.510711][7331:7331] CHIP:IM: Received Write request
           [1655796724.510759][7331:7331] CHIP:DMG: IM WH moving to [Initialized]

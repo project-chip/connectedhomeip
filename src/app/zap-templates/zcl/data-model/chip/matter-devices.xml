@@ -1954,11 +1954,49 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-videoplayer</name>
+        <name>MA-casting-videoplayer</name>
         <domain>CHIP</domain>
-        <typeName>Matter Video Player</typeName>
+        <typeName>Matter Casting Video Player</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0023</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>IDENTIFY_TIME</requireAttribute>
+                <requireAttribute>IDENTIFY_TYPE</requireAttribute>
+                <requireCommand>Identify</requireCommand>
+                <requireCommand>IdentifyQuery</requireCommand>
+                <requireCommand>TriggerEffect</requireCommand>
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
+                <requireAttribute>SERVER_LIST</requireAttribute>
+                <requireAttribute>CLIENT_LIST</requireAttribute>
+                <requireAttribute>PARTS_LIST</requireAttribute>
+            </include>
+            <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
+                <requireAttribute>BINDING</requireAttribute>
+            </include>
+            <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Account Login" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Content Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+
+    <deviceType>
+        <name>MA-basic-videoplayer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Basic Video Player</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0028</deviceId>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -2018,9 +2056,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-contentapplication</name>
+        <name>MA-contentapp</name>
         <domain>CHIP</domain>
-        <typeName>Matter Content Application</typeName>
+        <typeName>Matter Content App</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0024</deviceId>
         <clusters lockOthers="true">
@@ -2047,7 +2085,7 @@ limitations under the License.
             <include cluster="Content Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
-            <include cluster="TV Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
