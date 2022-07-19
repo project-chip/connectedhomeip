@@ -33,12 +33,6 @@
 typedef void (*BindingBindingListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & data);
-typedef void (*BindingGeneratedCommandListListAttributeCallback)(void * context,
-                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BindingAcceptedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BindingAttributeListListAttributeCallback)(void * context,
-                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
