@@ -35,7 +35,6 @@ enum CommissioningStage : uint8_t
     kSecurePairing,
     kReadCommissioningInfo,
     kArmFailsafe,
-    kScanNetworks,
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
@@ -46,6 +45,8 @@ enum CommissioningStage : uint8_t
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,
+    // ScanNetworks can happen anytime after kArmFailsafe
+    kScanNetworks,
     kWiFiNetworkSetup,
     kThreadNetworkSetup,
     kWiFiNetworkEnable,
