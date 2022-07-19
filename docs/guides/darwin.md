@@ -31,6 +31,8 @@ Note: These steps are supported on:
     [profile](#profile-installation).
 -   A test iCloud account is highly recommended for Matter development to avoid
     interference with existing homes.
+-   To pair and control Matter Thread devices, you'll need to have a HomePod
+    Mini or Apple TV 4K
 
 ## Source Compatibility
 
@@ -51,20 +53,34 @@ Note: The profile will expire automatically after some time
 1. Download the
    [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
    and install it on the iOS/iPadOS 15.6 device. If necessary, email the profile
-   or use AirDrop to transfer the profile to the iOS/iPadOS 15.6 device.
-2. Restart the device.
+   or use AirDrop to transfer the profile to the iOS/iPadOS 15.6 (or greater)
+   device
+2. Restart the device
 
-### Install the Matter Profile on your Apple TV or HomePod
+### Install the Matter Profile on your HomePod
 
 Note: The profile will expire automatically after some time
 
 1. Download the
    [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
-   and install it on the the Apple TV or HomePod running tvOS 15.6. If
-   necessary, use
-   [Apple Configurator 2](https://support.apple.com/guide/apple-configurator-2/connect-devices-to-your-mac-cad9d4b2211e/2.14/mac/11.3.1)
-   to transfer the profile to the Apple TV or HomePod.
-2. Restart the device.
+   and install it on the the HomePod running tvOS 15.6 or greater.
+2. Email the profile to an account that is configured on your device running
+   iOS/iPadOS 15.6 (or greater)
+3. Selecting the profile in Mail on your iOS/iPadOS 15.6 (or greater) device
+   will present an option to install the profile on the HomePod
+4. Restart the device
+
+### Install the Matter Profile on your Apple TV
+
+Note: The profile will expire automatically after some time
+
+1. Download the
+   [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
+   and install it on the the Apple TV running tvOS 15.6 or greater.
+2. If necessary, use
+   [Apple Configurator](https://apps.apple.com/us/app/apple-configurator/id1037126344?mt=12)
+   to transfer the profile to the Apple TV
+3. Restart the device
 
 ### Ensuring Your Matter Accessory Works with iOS/iPadOS/tvOS
 
