@@ -343,7 +343,7 @@ def main(argv: Sequence[str]) -> None:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
             install_deps_cmd = """\
-            sudo apt-get install node node-yargs npm
+            sudo apt-get install nodejs node-yargs npm
             libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
             libjpeg9-dev libgif-dev node-typescript"""
             shell.run_cmd(unwrap_cmd(install_deps_cmd))
