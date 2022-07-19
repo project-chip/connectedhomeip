@@ -16,6 +16,7 @@ import argparse
 import os
 from subprocess import PIPE, Popen
 
+
 def run_command(command):
     returncode = -1
     command_log = b''
@@ -30,7 +31,7 @@ def run_command(command):
         process.wait()
         returncode = process.returncode
 
-    with  open(args.log_path, "wb") as f:
+    with open(args.log_path, "wb") as f:
         f.write(command_log)
     return returncode
 
