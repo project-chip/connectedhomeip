@@ -1,4 +1,4 @@
-# Testing with iOS/macOS/tvOS
+# Testing with Apple Devices
 
 ### Matter is the foundation for connected things.
 
@@ -6,15 +6,24 @@ Learn more about Matter on the [here](https://buildwithmatter.com/)
 
 ## Setup Requirements
 
-#### Matter functionality is currently a Developer Preview, current requirements include:
+Note: These steps are supported on:
+
+-   iPhone _(iOS)_
+-   iPad _(iPadOS)_
+-   mac _(macOS)_
+-   AppleTV _(tvOS)_
+-   HomePod _(tvOS)_
+-   Apple Watch _(watchOS)_
+
+### Matter functionality is currently a Developer Preview, current requirements include:
 
 -   An iPhone or iPad running iOS/iPadOS at least 15.6. You will need to install
     a profile on it (instructions below).
--   An Apple TV running at least tvOS 15.6. You will need to install a profile
-    on it (instructions below). If you have multiple Apple TVs, you will need to
-    install the profile on all of them.
+-   An Apple TV or HomePod running at least tvOS 15.6. You will need to install
+    a profile on it (instructions below). If you have multiple Apple TVs and/or
+    HomePods, you will need to install the profile on all of them.
 -   The iPhone or iPad with the Matter profile must belong to the same iCloud
-    account as the Apple TV with the Matter profile.
+    account as the Apple TV or HomePod with the Matter profile.
 -   A test iCloud account is highly recommended for Matter development to avoid
     interference with existing homes.
 
@@ -26,7 +35,7 @@ repository.
 -   iOS/iPadOS/tvOS 15.6 Developer Preview:
     [`cfc35951be66a664a6efdadea56d1b8ea6e63e96`](https://github.com/project-chip/connectedhomeip/commits/cfc35951be66a664a6efdadea56d1b8ea6e63e96)
 -   iOS/iPadOS/tvOS 16.0 Developer Preview:
-    [`9cc0fb36dbc1508159788cac6adf26322ec5f558`](https://github.com/project-chip/connectedhomeip/commits/9cc0fb36dbc1508159788cac6adf26322ec5f558)
+    [`cfc35951be66a664a6efdadea56d1b8ea6e63e96`](https://github.com/project-chip/connectedhomeip/commits/cfc35951be66a664a6efdadea56d1b8ea6e63e96)
 
 ## Profile Installation
 
@@ -40,15 +49,16 @@ Note: The profile will expire automatically after some time
    or use AirDrop to transfer the profile to the iOS/iPadOS 15.6 device.
 2. Restart the device.
 
-### Install the Matter Profile on your Apple TV
+### Install the Matter Profile on your Apple TV or HomePod
 
 Note: The profile will expire automatically after some time
 
 1. Download the
    [profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableMatter.mobileconfig)
-   and install it on the the Apple TV running tvOS 15.6. If necessary, use
+   and install it on the the Apple TV or HomePod running tvOS 15.6. If
+   necessary, use
    [Apple Configurator 2](https://support.apple.com/guide/apple-configurator-2/connect-devices-to-your-mac-cad9d4b2211e/2.14/mac/11.3.1)
-   to transfer the profile to the Apple TV.
+   to transfer the profile to the Apple TV or HomePod.
 2. Restart the device.
 
 ### Ensuring Your Matter Accessory Works with iOS/iPadOS/tvOS
