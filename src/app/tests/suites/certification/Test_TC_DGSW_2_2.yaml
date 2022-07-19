@@ -21,6 +21,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label:
           "Reads a list of SoftwareFault struct from DUT and data type in each
           field of the struct must match the value listed in spec"

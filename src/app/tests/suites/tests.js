@@ -817,6 +817,7 @@ function getTests() {
     ];
 
     const Others = [
+        "TestCASERecovery",
         "TestCluster",
         "TestClusterComplexTypes",
         "TestConstraints",
@@ -840,6 +841,7 @@ function getTests() {
         "TestUserLabelClusterConstraints",
         "TestArmFailSafe",
         "TestFanControl",
+        "TestAccessControlConstraints",
     ];
 
     const MultiAdmin = [

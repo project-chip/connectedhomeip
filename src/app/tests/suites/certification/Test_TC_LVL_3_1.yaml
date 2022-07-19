@@ -48,6 +48,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the MaxLevel attribute"
       PICS: LVL.S.A0003
@@ -56,6 +58,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "sends a MoveToLevelWithOnOff command"
       PICS: LVL.S.C00.Rsp
@@ -151,6 +155,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     # Null is not supported here 0xFFFF is considerd as Null
     - label: "sends a Move to level command"

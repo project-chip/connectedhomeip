@@ -42,6 +42,7 @@ extern "C" {
 #include "cy_utils.h"
 #include "wiced_bt_stack.h"
 
+#include "wiced_memory.h"
 #include <wiced_bt_ble.h>
 #include <wiced_bt_gatt.h>
 
@@ -49,6 +50,10 @@ using namespace ::chip;
 using namespace ::chip::Ble;
 
 #define BLE_SERVICE_DATA_SIZE 10
+#define BT_STACK_HEAP_SIZE (1024 * 6)
+typedef void (*pfn_free_buffer_t)(uint8_t *);
+wiced_bt_heap_t * p_heap   = NULL;
+static bool heap_allocated = false;
 
 namespace chip {
 namespace DeviceLayer {
@@ -93,6 +98,22 @@ wiced_result_t BLEManagerImpl::BLEManagerCallback(wiced_bt_management_evt_t even
     return WICED_BT_SUCCESS;
 }
 
+uint8_t * BLEManagerImpl::gatt_alloc_buffer(uint16_t len)
+{
+    uint8_t * p = (uint8_t *) wiced_bt_get_buffer(len);
+    return p;
+}
+
+void BLEManagerImpl::gatt_free_buffer(uint8_t * p_data)
+{
+    wiced_bt_free_buffer(p_data);
+}
+
+static void gatt_free_buffer_cb(uint8_t * p_data)
+{
+    BLEManagerImpl::sInstance.gatt_free_buffer(p_data);
+}
+
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -108,7 +129,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // configuration structure */
     if (WICED_SUCCESS != wiced_bt_stack_init(BLEManagerCallback, &wiced_bt_cfg_settings))
     {
-        printf("Error initializing BT stack\n");
+        ChipLogError(DeviceLayer, "Error initializing BT stack\n");
         CY_ASSERT(0);
     }
 
@@ -154,9 +175,6 @@ exit:
     return err;
 }
 
-/*
- * TODO
- */
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
     (void) (mode);
@@ -290,7 +308,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     wiced_bt_gatt_status_t gatt_err = wiced_bt_gatt_disconnect((uint16_t) conId);
     if (gatt_err != WICED_BT_GATT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "wiced_bt_gatt_disconnect() failed: %ld", gatt_err);
+        ChipLogError(DeviceLayer, "wiced_bt_gatt_disconnect() failed: %d", gatt_err);
     }
 
     return (gatt_err == WICED_BT_GATT_SUCCESS);
@@ -305,7 +323,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 
     if (!p_conn)
     {
-        return wiced_bt_cfg_settings.gatt_cfg.max_mtu_size;
+        return wiced_bt_cfg_settings.p_ble_cfg->ble_max_rx_pdu_size;
     }
     else
     {
@@ -328,12 +346,13 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 #endif
 
     // Send a notification for the CHIPoBLE TX characteristic to the client containing the supplied data.
-    gatt_err = wiced_bt_gatt_send_notification((uint16_t) conId, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, dataLen, data->Start());
+    gatt_err =
+        wiced_bt_gatt_server_send_notification((uint16_t) conId, HDLC_CHIP_SERVICE_CHAR_C2_VALUE, dataLen, data->Start(), NULL);
 
 exit:
     if (gatt_err != WICED_BT_GATT_SUCCESS)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %ld", gatt_err);
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %d", gatt_err);
         return false;
     }
     else
@@ -435,6 +454,13 @@ void BLEManagerImpl::DriveBLEState(void)
 
             ChipLogProgress(DeviceLayer, "CHIPoBLE stop advertising");
             wiced_bt_start_advertisements(BTM_BLE_ADVERT_OFF, BLE_ADDR_PUBLIC, NULL);
+
+            /* Delete the heap allocated during BLE Advertisment Stop */
+            if (p_heap)
+            {
+                wiced_bt_delete_heap(p_heap);
+                heap_allocated = false;
+            }
         }
     }
 
@@ -466,51 +492,110 @@ gatt_db_lookup_table_t * BLEManagerImpl::GetGattAttr(uint16_t handle)
     return NULL;
 }
 
-/*
- * Currently there is no reason to pass Read Req to CHIP. Only process request for
- * attributes in the GATT DB attribute table
- */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRead(uint16_t conn_id, wiced_bt_gatt_read_t * p_read_data)
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRead(uint16_t conn_id, wiced_bt_gatt_opcode_t opcode,
+                                                             wiced_bt_gatt_read_t * p_read_req, uint16_t len_requested)
 {
-    gatt_db_lookup_table_t * puAttribute;
-    int attr_len_to_copy;
+    gatt_db_lookup_table_t * p_attribute;
+    uint8_t * from;
 
-    /* Get the right address for the handle in Gatt DB */
-    if (NULL == (puAttribute = GetGattAttr(p_read_data->handle)))
+    if ((p_attribute = GetGattAttr(p_read_req->handle)) == NULL)
     {
-        ChipLogError(DeviceLayer, "Read handle attribute not found. Handle:0x%X\n", p_read_data->handle);
+        ChipLogError(DeviceLayer, "[%s]  attr not found handle: 0x%04x\n", __FUNCTION__, p_read_req->handle);
+        wiced_bt_gatt_server_send_error_rsp(conn_id, opcode, p_read_req->handle, WICED_BT_GATT_INVALID_HANDLE);
         return WICED_BT_GATT_INVALID_HANDLE;
     }
 
-    attr_len_to_copy = puAttribute->cur_len;
-
-    ChipLogProgress(DeviceLayer, "GATT Read handler: conn_id:%04x handle:%04x len:%d", conn_id, p_read_data->handle,
-                    attr_len_to_copy);
-
-    /* If the incoming offset is greater than the current length in the GATT DB
-    then the data cannot be read back*/
-    if (p_read_data->offset >= puAttribute->cur_len)
+    if (p_read_req->offset >= p_attribute->cur_len)
     {
-        attr_len_to_copy = 0;
+        ChipLogError(DeviceLayer, "[%s] offset:%d larger than attribute length:%d\n", __FUNCTION__, p_read_req->offset,
+                     p_attribute->cur_len);
+
+        wiced_bt_gatt_server_send_error_rsp(conn_id, opcode, p_read_req->handle, WICED_BT_GATT_INVALID_OFFSET);
+        return (WICED_BT_GATT_INVALID_OFFSET);
+    }
+    else if (len_requested + p_read_req->offset > p_attribute->cur_len)
+    {
+        len_requested = p_attribute->cur_len - p_read_req->offset;
     }
 
-    /* Calculate the number of bytes and the position of the data and copy it to
-     the given pointer */
-    if (attr_len_to_copy != 0)
-    {
-        uint8_t * from;
-        int size_to_copy = attr_len_to_copy - p_read_data->offset;
+    from = ((uint8_t *) p_attribute->p_data) + p_read_req->offset;
 
-        if (size_to_copy > *p_read_data->p_val_len)
+    wiced_bt_gatt_server_send_read_handle_rsp(conn_id, opcode, len_requested, from, NULL);
+
+    return WICED_BT_GATT_SUCCESS;
+}
+/*
+ * Currently there is no reason to pass Read Req by type handler to CHIP. Only process request for
+ * attributes in the GATT DB attribute table
+ */
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceReadByTypeHandler(uint16_t conn_id, wiced_bt_gatt_opcode_t opcode,
+                                                                          wiced_bt_gatt_read_by_type_t * p_read_req,
+                                                                          uint16_t len_requested)
+{
+    gatt_db_lookup_table_t * puAttribute;
+    uint16_t attr_handle = p_read_req->s_handle;
+    uint8_t * p_rsp      = NULL;
+    uint8_t pair_len     = 0;
+    int used             = 0;
+
+    if (heap_allocated == false)
+    {
+        p_heap         = wiced_bt_create_heap("default_heap", NULL, BT_STACK_HEAP_SIZE, NULL, WICED_TRUE);
+        heap_allocated = true;
+    }
+
+    /* Allocate buffer for GATT Read */
+    p_rsp = gatt_alloc_buffer(len_requested);
+    if (p_rsp == NULL)
+    {
+        ChipLogError(DeviceLayer, "[%s]  no memory len_requested: %d!!\n", __FUNCTION__, len_requested);
+        wiced_bt_gatt_server_send_error_rsp(conn_id, opcode, attr_handle, WICED_BT_GATT_INSUF_RESOURCE);
+        return WICED_BT_GATT_INSUF_RESOURCE;
+    }
+
+    /* Read by type returns all attributes of the specified type, between the start and end handles */
+    while (WICED_TRUE)
+    {
+        attr_handle = wiced_bt_gatt_find_handle_by_type(attr_handle, p_read_req->e_handle, &p_read_req->uuid);
+
+        if (attr_handle == 0)
+            break;
+
+        if ((puAttribute = GetGattAttr(attr_handle)) == NULL)
         {
-            size_to_copy = *p_read_data->p_val_len;
+            ChipLogError(DeviceLayer, "[%s]  found type but no attribute ??\n", __FUNCTION__);
+            wiced_bt_gatt_server_send_error_rsp(conn_id, opcode, p_read_req->s_handle, WICED_BT_GATT_ERR_UNLIKELY);
+            gatt_free_buffer(p_rsp);
+            return WICED_BT_GATT_INVALID_HANDLE;
         }
 
-        from                    = ((uint8_t *) puAttribute->p_data) + p_read_data->offset;
-        *p_read_data->p_val_len = size_to_copy;
+        {
+            int filled = wiced_bt_gatt_put_read_by_type_rsp_in_stream(p_rsp + used, len_requested - used, &pair_len, attr_handle,
+                                                                      puAttribute->cur_len, puAttribute->p_data);
+            if (filled == 0)
+            {
+                break;
+            }
+            used += filled;
+        }
 
-        memcpy(p_read_data->p_val, from, size_to_copy);
+        /* Increment starting handle for next search to one past current */
+        attr_handle++;
     }
+
+    if (used == 0)
+    {
+        ChipLogError(DeviceLayer, "[%s]  attr not found  start_handle: 0x%04x  end_handle: 0x%04x  Type: 0x%04x\n", __FUNCTION__,
+                     p_read_req->s_handle, p_read_req->e_handle, p_read_req->uuid.uu.uuid16);
+        wiced_bt_gatt_server_send_error_rsp(conn_id, opcode, p_read_req->s_handle, WICED_BT_GATT_INVALID_HANDLE);
+        gatt_free_buffer(p_rsp);
+        return WICED_BT_GATT_INVALID_HANDLE;
+    }
+
+    /* Send the response */
+    wiced_bt_gatt_server_send_read_by_type_rsp(conn_id, opcode, pair_len, used, p_rsp,
+                                               (wiced_bt_gatt_app_context_t) gatt_free_buffer_cb);
+
     return WICED_BT_GATT_SUCCESS;
 }
 
@@ -518,25 +603,19 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRead(uint16_t conn_id, w
  * If Attribute is for CHIP, pass it through. Otherwise process request for
  * attributes in the GATT DB attribute table.
  */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, wiced_bt_gatt_write_t * p_data)
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, wiced_bt_gatt_write_req_t * p_data)
 {
     wiced_bt_gatt_status_t result = WICED_BT_GATT_SUCCESS;
     gatt_db_lookup_table_t * puAttribute;
     const uint16_t valLen = p_data->val_len;
-
     // special handling for CHIP RX path
     if (p_data->handle == HDLC_CHIP_SERVICE_CHAR_C1_VALUE)
     {
-        chip::System::PacketBuffer * buf;
-        const uint16_t minBufSize = chip::System::PacketBuffer::kMaxSize + valLen;
+        System::PacketBufferHandle buf;
 
-        // Attempt to allocate a packet buffer with enough space to hold the characteristic value.
-        // Note that we must use pbuf_alloc() directly, as PacketBuffer::New() is not interrupt-safe.
-        if ((buf = (chip::System::PacketBuffer *) pbuf_alloc(PBUF_RAW, minBufSize, PBUF_POOL)) != NULL)
+        buf = System::PacketBufferHandle::NewWithData(p_data->p_val, valLen, 0, 0);
+        if (!buf.IsNull())
         {
-            // Copy the characteristic value into the packet buffer.
-            memcpy(buf->Start(), p_data->p_val, valLen);
-            buf->SetDataLength(valLen);
 #ifdef BLE_DEBUG
             ChipLogDetail(DeviceLayer, "Write received for CHIPoBLE RX characteristic con %04x len %d", conn_id, valLen);
 #endif
@@ -545,7 +624,7 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
                 ChipDeviceEvent event;
                 event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
                 event.CHIPoBLEWriteReceived.ConId = conn_id;
-                event.CHIPoBLEWriteReceived.Data  = buf;
+                event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
                 CHIP_ERROR status                 = PlatformMgr().PostEvent(&event);
                 if (status != CHIP_NO_ERROR)
                 {
@@ -597,11 +676,9 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceWrite(uint16_t conn_id, 
 /*
  * Process MTU request received from the GATT client
  */
-wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceMtuReq(wiced_bt_gatt_attribute_request_t * p_data,
-                                                               CHIPoBLEConState * p_conn)
+wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceMtuReq(uint16_t conn_id, uint16_t mtu)
 {
-    p_data->data.mtu = p_conn->Mtu;
-
+    wiced_bt_gatt_server_send_mtu_rsp(conn_id, mtu, wiced_bt_cfg_settings.p_ble_cfg->ble_max_rx_pdu_size);
     return WICED_BT_GATT_SUCCESS;
 }
 
@@ -612,19 +689,29 @@ wiced_bt_gatt_status_t BLEManagerImpl::HandleGattServiceRequestEvent(wiced_bt_ga
                                                                      CHIPoBLEConState * p_conn)
 {
     wiced_bt_gatt_status_t result = WICED_BT_GATT_INVALID_PDU;
-
-    switch (p_request->request_type)
+    switch (p_request->opcode)
     {
-    case GATTS_REQ_TYPE_READ:
-        result = HandleGattServiceRead(p_request->conn_id, &(p_request->data.read_req));
+    case GATT_REQ_READ:
+    case GATT_REQ_READ_BLOB:
+        result =
+            HandleGattServiceRead(p_request->conn_id, p_request->opcode, &(p_request->data.read_req), p_request->len_requested);
         break;
-
-    case GATTS_REQ_TYPE_WRITE:
+    case GATT_REQ_READ_BY_TYPE:
+        result = HandleGattServiceReadByTypeHandler(p_request->conn_id, p_request->opcode, &p_request->data.read_by_type,
+                                                    p_request->len_requested);
+        break;
+    case GATT_REQ_WRITE:
+    case GATT_CMD_WRITE:
         result = HandleGattServiceWrite(p_request->conn_id, &(p_request->data.write_req));
+        if ((p_request->opcode == GATT_REQ_WRITE) && (result == WICED_BT_GATT_SUCCESS))
+        {
+            wiced_bt_gatt_write_req_t * p_write_request = &p_request->data.write_req;
+            wiced_bt_gatt_server_send_write_rsp(p_request->conn_id, p_request->opcode, p_write_request->handle);
+        }
         break;
 
-    case GATTS_REQ_TYPE_MTU:
-        result = HandleGattServiceMtuReq(p_request, p_conn);
+    case GATT_REQ_MTU:
+        result = HandleGattServiceMtuReq(p_request->conn_id, p_request->data.remote_mtu);
         break;
 
     default:
@@ -725,6 +812,28 @@ wiced_bt_gatt_status_t app_gatts_callback(wiced_bt_gatt_evt_t event, wiced_bt_ga
 
     case GATT_CONGESTION_EVT:
         conn_id = p_data->congestion.conn_id;
+        break;
+
+    case GATT_GET_RESPONSE_BUFFER_EVT:
+        if (heap_allocated == false)
+        {
+            p_heap         = wiced_bt_create_heap("default_heap", NULL, BT_STACK_HEAP_SIZE, NULL, WICED_TRUE);
+            heap_allocated = true;
+        }
+        p_data->buffer_request.buffer.p_app_rsp_buffer =
+            BLEManagerImpl::sInstance.gatt_alloc_buffer(p_data->buffer_request.len_requested);
+        p_data->buffer_request.buffer.p_app_ctxt = (wiced_bt_gatt_app_context_t) gatt_free_buffer_cb;
+        return WICED_BT_GATT_SUCCESS;
+        break;
+
+    case GATT_APP_BUFFER_TRANSMITTED_EVT: {
+        pfn_free_buffer_t pfn_free = (pfn_free_buffer_t) p_data->buffer_xmitted.p_app_ctxt;
+        if (pfn_free)
+        {
+            pfn_free(p_data->buffer_xmitted.p_app_data);
+        }
+    }
+        return WICED_BT_GATT_SUCCESS;
         break;
 
     default:
@@ -851,7 +960,7 @@ BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::AllocConnectionState(uint16_t
         if (mCons[i].connected == false)
         {
             mCons[i].ConId     = conId;
-            mCons[i].Mtu       = wiced_bt_cfg_settings.gatt_cfg.max_mtu_size;
+            mCons[i].Mtu       = wiced_bt_cfg_settings.p_ble_cfg->ble_max_rx_pdu_size;
             mCons[i].connected = false;
 
             mNumCons++;

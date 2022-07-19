@@ -51,6 +51,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "read LT attribute: OffWaitTime"
       PICS: OO.S.A4002
@@ -59,6 +61,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "read LT attribute: StartUpOnOff"
       PICS: OO.S.A4003

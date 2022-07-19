@@ -77,5 +77,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
     return CHIP_NO_ERROR;
 }
 
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -128,12 +128,16 @@ public:
     void SetAdvertisingData(void);
 
     wiced_bt_gatt_status_t HandleGattConnectEvent(wiced_bt_gatt_connection_status_t * p_conn_status, CHIPoBLEConState * p_conn);
-    wiced_bt_gatt_status_t HandleGattServiceRead(uint16_t conn_id, wiced_bt_gatt_read_t * p_read_data);
-    wiced_bt_gatt_status_t HandleGattServiceWrite(uint16_t conn_id, wiced_bt_gatt_write_t * p_data);
-    wiced_bt_gatt_status_t HandleGattServiceMtuReq(wiced_bt_gatt_attribute_request_t * p_data, CHIPoBLEConState * p_conn);
+    wiced_bt_gatt_status_t HandleGattServiceRead(uint16_t conn_id, wiced_bt_gatt_opcode_t opcode, wiced_bt_gatt_read_t * p_read_req,
+                                                 uint16_t len_requested);
+    wiced_bt_gatt_status_t HandleGattServiceReadByTypeHandler(uint16_t conn_id, wiced_bt_gatt_opcode_t opcode,
+                                                              wiced_bt_gatt_read_by_type_t * p_read_req, uint16_t len_requested);
+    wiced_bt_gatt_status_t HandleGattServiceWrite(uint16_t conn_id, wiced_bt_gatt_write_req_t * p_data);
+    wiced_bt_gatt_status_t HandleGattServiceMtuReq(uint16_t conn_id, uint16_t mtu);
     wiced_bt_gatt_status_t HandleGattServiceIndCfm(uint16_t conn_id, uint16_t handle);
     wiced_bt_gatt_status_t HandleGattServiceRequestEvent(wiced_bt_gatt_attribute_request_t * p_request, CHIPoBLEConState * p_conn);
-
+    uint8_t * gatt_alloc_buffer(uint16_t len);
+    void gatt_free_buffer(uint8_t * p_data);
     static wiced_result_t BLEManagerCallback(wiced_bt_management_evt_t event, wiced_bt_management_evt_data_t * p_event_data);
 
     CHIPoBLEConState * AllocConnectionState(uint16_t conId);
