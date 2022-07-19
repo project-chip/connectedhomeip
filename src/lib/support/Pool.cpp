@@ -118,7 +118,6 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
 {
     ++mIterationDepth;
     Loop result            = Loop::Finish;
-    bool anyReleased       = false;
     HeapObjectListNode * p = mNext;
     while (p != this)
     {
@@ -130,14 +129,10 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
                 break;
             }
         }
-        if (p->mObject == nullptr)
-        {
-            anyReleased = true;
-        }
         p = p->mNext;
     }
     --mIterationDepth;
-    if (mIterationDepth == 0 && anyReleased)
+    if (mIterationDepth == 0 && mHaveDeferredNodeRemovals)
     {
         // Remove nodes for released objects.
         p = mNext;
@@ -151,6 +146,8 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
             }
             p = next;
         }
+
+        mHaveDeferredNodeRemovals = false;
     }
     return result;
 }
