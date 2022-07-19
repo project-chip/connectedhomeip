@@ -2056,9 +2056,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-contentapplication</name>
+        <name>MA-contentapp</name>
         <domain>CHIP</domain>
-        <typeName>Matter Content Application</typeName>
+        <typeName>Matter Content App</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0024</deviceId>
         <clusters lockOthers="true">
