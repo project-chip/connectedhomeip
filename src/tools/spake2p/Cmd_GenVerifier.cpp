@@ -196,7 +196,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         gSaltDecodedLen = static_cast<uint8_t>(chip::Base64Decode32(arg, static_cast<uint32_t>(strlen(arg)), gSalt));
 
         // The first check was just to make sure Base64Decode32 would not write beyond the buffer.
-        // Now double-check is the length is correct.
+        // Now double-check if the length is correct.
         if (gSaltDecodedLen > chip::kSpake2p_Max_PBKDF_Salt_Length)
         {
             fprintf(stderr, "%s: Salt parameter too long: %s\n", progName, arg);
