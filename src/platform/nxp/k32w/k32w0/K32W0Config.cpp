@@ -192,7 +192,7 @@ CHIP_ERROR K32WConfig::WriteConfigValue(Key key, bool val)
     pdmStatus = PDM_eSaveRecordDataInIdleTask(kNvmIdChipConfigData, ramDescr,
                                               ramDescr->ramBufferLen + kRamDescHeaderSize);
     SuccessOrExit(err = MapPdmStatus(pdmStatus));
-  
+
 exit:
     MutexUnlock(pdmMutexHandle);
     return err;
