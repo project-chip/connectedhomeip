@@ -62,6 +62,8 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
+class DiagnosticDataProviderImpl;
+
 /**
  * Defines the WiFi Diagnostics Delegate class to notify WiFi network events.
  */
@@ -184,11 +186,20 @@ private:
 };
 
 /**
- * Returns a reference to a DiagnosticDataProvider object.
+ * Returns a reference to the public interface of the DiagnosticDataProvider singleton object.
  *
- * Applications should use this to access the features of the DiagnosticDataProvider.
+ * Applications should use this to access features of the DiagnosticDataProvider object
+ * that are common to all platforms.
  */
 DiagnosticDataProvider & GetDiagnosticDataProvider();
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+extern DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 /**
  * Sets a reference to a DiagnosticDataProvider object.

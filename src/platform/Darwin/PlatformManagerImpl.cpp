@@ -53,7 +53,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 #endif // CHIP_DISABLE_PLATFORM_KVS
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     mRunLoopSem = dispatch_semaphore_create(0);
 
