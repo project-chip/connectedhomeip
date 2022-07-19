@@ -175,5 +175,8 @@ For example, a Light on Endpoint 1 can be set in `FIXED_DEVICE_TYPES` in
 -   Please refer to the iOS/iPadOS 15.6
     [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-15_6-release-notes)
     for currently known issues.
+-   Please refer to the iOS/iPadOS 16.0
+    [Release Notes](https://developer.apple.com/documentation/ios-ipados-release-notes/ios-ipados-16-release-notes)
+    for currently known issues.
 -   Further issues should be reported
     [here](https://github.com/project-chip/connectedhomeip/issues)
