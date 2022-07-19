@@ -24,7 +24,7 @@
 
 #if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
-#endif
+#endif // CHIP_HAVE_CONFIG_H
 
 #include <system/SystemConfig.h>
 
