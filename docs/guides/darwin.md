@@ -2,7 +2,7 @@
 
 ### Matter is the foundation for connected things.
 
-Learn more about Matter on the [here](https://buildwithmatter.com/)
+Learn more about Matter [here](https://buildwithmatter.com/)
 
 ## Setup Requirements
 
