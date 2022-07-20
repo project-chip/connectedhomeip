@@ -43,7 +43,7 @@ tests:
               type: list
 
     - label: "TH sends a ChangeChannelByNumber command"
-      PICS: CHANNEL.S.C0002
+      PICS: CHANNEL.S.C02.Rsp
       command: "ChangeChannelByNumber"
       arguments:
           values:

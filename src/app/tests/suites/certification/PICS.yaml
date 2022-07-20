@@ -1890,16 +1890,16 @@ PICS:
     - label:
           "Does the DUT support the Channel server cluster ChangeChannel
           command?"
-      id: CHANNEL.S.C0000
+      id: CHANNEL.S.C00.Rsp
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannelByNumber
           command?"
-      id: CHANNEL.S.C0002
+      id: CHANNEL.S.C02.Rsp
 
     - label:
           "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: CHANNEL.S.C0003
+      id: CHANNEL.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
@@ -2056,18 +2056,8 @@ PICS:
       id: CHANNEL.S.A0002
 
     - label:
-          "Does the DUT support the Channel server cluster ChangeChannel
-          command?"
-      id: CHANNEL.S.C0000
-
-    - label:
-          "Does the DUT support the Channel server cluster ChangeChannelByNumber
-          command?"
-      id: CHANNEL.S.C0002
-
-    - label:
-          "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: CHANNEL.S.C0003
+          "Does the DUT support the Channel server cluster ChangeChannelResponse command?"
+      id: CHANNEL.S.C01.Tx
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
@@ -2129,40 +2119,40 @@ PICS:
     - label:
           "Does the DUT support the Media Playback server cluster StartOver
           command?"
-      id: MEDIAPLAYBACK.S.C0003
+      id: MEDIAPLAYBACK.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Previous
           command?"
-      id: MEDIAPLAYBACK.S.C0004
+      id: MEDIAPLAYBACK.S.C04.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Next command?"
-      id: MEDIAPLAYBACK.S.C0005
+      id: MEDIAPLAYBACK.S.C05.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Rewind
           command?"
-      id: MEDIAPLAYBACK.S.C0006
+      id: MEDIAPLAYBACK.S.C06.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster FastForward
           command?"
-      id: MEDIAPLAYBACK.S.C0007
+      id: MEDIAPLAYBACK.S.C07.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipForward
           command?"
-      id: MEDIAPLAYBACK.S.C0008
+      id: MEDIAPLAYBACK.S.C08.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipBackward
           command?"
-      id: MEDIAPLAYBACK.S.C0009
+      id: MEDIAPLAYBACK.S.C09.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Seek command?"
-      id: MEDIAPLAYBACK.S.C000B
+      id: MEDIAPLAYBACK.S.C0B.Rsp
 
     - label:
           "Does the DUT support the Media Playback client cluster Play command?"
