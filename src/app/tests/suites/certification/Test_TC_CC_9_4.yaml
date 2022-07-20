@@ -105,7 +105,7 @@ tests:
           30, and StartHue attribute to 0xA0 to TH."
       PICS: CC.C.C44.Rsp
       verification: |
-          ./chip-tool colorcontrol color-loop-set 15 0 0 30 160 0 0 1 1 
+          ./chip-tool colorcontrol color-loop-set 15 0 0 30 160 0 0 1 1
 
           Verify in DUT as client side log:
           [1657912387.432732][3126:3126] CHIP:DMG: InvokeRequestMessage =
