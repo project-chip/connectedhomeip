@@ -20,21 +20,25 @@
 
 #include <jni.h>
 
+#include "Constants.h"
 #include "MatterCallbackHandler-JNI.h"
 
 class TvCastingAppJNI
 {
 public:
-    MatterCallbackHandlerJNI & getLaunchURLResponseHandler() { return mLaunchURLResponseHandler; }
     MatterCallbackHandlerJNI & getCommissioningCompleteHandler() { return mCommissioningCompleteHandler; }
+    MatterCallbackHandlerJNI & getMediaCommandResponseHandler(enum MediaCommandName name)
+    {
+        return mMediaCommandResponseHandler[name];
+    }
 
 private:
     friend TvCastingAppJNI & TvCastingAppJNIMgr();
 
     static TvCastingAppJNI sInstance;
 
-    MatterCallbackHandlerJNI mLaunchURLResponseHandler;
     MatterCallbackHandlerJNI mCommissioningCompleteHandler;
+    MatterCallbackHandlerJNI mMediaCommandResponseHandler[MEDIA_COMMAND_COUNT];
 };
 
 inline class TvCastingAppJNI & TvCastingAppJNIMgr()
