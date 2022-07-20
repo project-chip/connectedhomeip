@@ -170,7 +170,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     SuccessOrExit(err);
 
     jmethodID getControllerVendorId;
-    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getControllerVendorId", "()I", &getControllerVendorId);
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getControllerVendorId", "()I",
+                                                            &getControllerVendorId);
     SuccessOrExit(err);
 
     jmethodID getKeypairDelegate;
