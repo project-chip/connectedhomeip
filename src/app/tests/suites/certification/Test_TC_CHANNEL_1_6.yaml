@@ -92,7 +92,9 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Read the optional command(ChangeChannelByNumber) in AcceptedCommandList"
+    - label:
+          "Read the optional command(ChangeChannelByNumber) in
+          AcceptedCommandList"
       PICS: CHANNEL.S.C02.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
