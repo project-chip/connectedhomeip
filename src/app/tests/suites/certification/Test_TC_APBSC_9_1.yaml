@@ -44,7 +44,7 @@ tests:
       response:
           constraints:
               type: vendor-id
-              saveAs: vendorID
+          saveAs: vendorID
 
     - label: "Reads the ApplicationName attribute"
       PICS: APBSC.S.A0002
