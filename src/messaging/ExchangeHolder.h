@@ -132,9 +132,7 @@ private:
         mpExchangeDelegate.OnExchangeClosing(ec);
     }
 
-    ExchangeMessageDispatch & GetMessageDispatch() override {
-        return mpExchangeDelegate.GetMessageDispatch();
-    }
+    ExchangeMessageDispatch & GetMessageDispatch() override { return mpExchangeDelegate.GetMessageDispatch(); }
 
     ExchangeDelegate & mpExchangeDelegate;
     ExchangeContext * mpExchangeCtx = nullptr;
