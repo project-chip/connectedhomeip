@@ -45,8 +45,6 @@ enum CommissioningStage : uint8_t
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,
-    // ScanNetworks can happen anytime after kArmFailsafe
-    kScanNetworks,
     kWiFiNetworkSetup,
     kThreadNetworkSetup,
     kWiFiNetworkEnable,
@@ -54,6 +52,8 @@ enum CommissioningStage : uint8_t
     kFindOperational,
     kSendComplete,
     kCleanup,
+    // ScanNetworks can happen anytime after kArmFailsafe. Adding to the end to try to fix circ tests
+    kScanNetworks,
 };
 
 const char * StageToString(CommissioningStage stage);

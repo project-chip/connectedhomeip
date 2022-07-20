@@ -1573,6 +1573,7 @@ void DeviceCommissioner::ResumeCommissioning()
     mDeviceBeingCommissioned = nullptr;
     CommissioningDelegate::CommissioningReport report;
 
+    mCommissioningPaused = false;
     if (mCommissioningDelegate == nullptr)
     {
         return;
@@ -1766,7 +1767,8 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
-                        ChipLogError(Controller, "----- NetworkCommissioning Features: has WiFi.");
+                        ChipLogError(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %d",
+                                     path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
