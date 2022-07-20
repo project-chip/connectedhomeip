@@ -146,7 +146,9 @@ tests:
       response:
           value: "chiptest"
 
-    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
+    - label:
+          "TH_CR1 opens a new commissioning window on DUT_CE using wrong
+          PakeVerifier value"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       PICS: CADMIN.S.C0000
@@ -202,7 +204,7 @@ tests:
               - name: "salt"
                 value: "SPAKE2P Key Salt"
       response:
-          error: 1
+          error: FAILURE
 
     #Disabled due to issue 17666
     - label: "TH_CR2 starts a commissioning process with DUT_CE"

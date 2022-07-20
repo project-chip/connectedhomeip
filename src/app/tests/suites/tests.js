@@ -372,6 +372,8 @@ function getManualTests() {
         "Test_TC_CC_7_5",
         "Test_TC_CC_9_4",
         // Slow tests that should not run in CI because they take many minutes each
+        "Test_TC_CC_3_1",
+        "Test_TC_CC_7_1",
         "Test_TC_CC_9_1",
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3",
@@ -579,7 +581,6 @@ function getTests() {
     const ColorControl = [
         "Test_TC_CC_1_1",
         "Test_TC_CC_2_1",
-        "Test_TC_CC_3_1",
         "Test_TC_CC_3_2",
         "Test_TC_CC_3_3",
         "Test_TC_CC_4_1",
@@ -592,7 +593,6 @@ function getTests() {
         "Test_TC_CC_6_1",
         "Test_TC_CC_6_2",
         "Test_TC_CC_6_3",
-        "Test_TC_CC_7_1",
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",

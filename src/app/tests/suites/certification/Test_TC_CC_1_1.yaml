@@ -54,86 +54,13 @@ tests:
               type: list
               contains: [8, 15, 16385, 16394, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Read the feature dependent attribute(CC.S.F00) in AttributeList"
-      PICS: CC.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [0, 1]
-
-    - label: "Read the feature dependent attribute(CC.S.F03) in AttributeList"
-      PICS: CC.S.F03
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [3, 4]
-
-    - label: "Read the feature dependent attribute(CC.S.F04) in AttributeList"
-      PICS: CC.S.F04
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [7, 16395, 16396]
-
-    - label:
-          "Read the feature dependent attribute(CC.S.F04) or
-          ColorTemperatureMireds in AttributeList"
-      PICS: CC.S.F04 && CC.S.A4010
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [16397, 16400]
-
-    - label: "Read the feature dependent attribute(CC.S.F01) in AttributeList"
-      PICS: CC.S.F01
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [16384]
-
-    - label: "Read the feature dependent attribute(CC.S.F02) in AttributeList"
-      PICS: CC.S.F02
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [16386, 16387, 16388, 16389, 16390]
-
-    - label: "Read the feature dependent attribute(CC.S.F00) in AttributeList"
-      PICS: CC.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: []
-
-    - label: "Read the feature dependent attribute(CC.S.F00) in AttributeList"
-      PICS: CC.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: []
-
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
+              contains: []
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

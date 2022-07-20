@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.13. [TC-CADMIN-1.15] Open commissioning window twice on DUT using BCM
+    24.1.13. [TC-CADMIN-1.13] Open commissioning window twice on DUT using BCM
     then ECM [DUT - Commissionee]
 
 config:
