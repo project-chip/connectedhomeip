@@ -50,6 +50,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#define CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING 1
+
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;

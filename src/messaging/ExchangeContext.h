@@ -54,6 +54,7 @@ public:
  *    This class represents an ongoing conversation (ExchangeContext) between two or more nodes.
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
+ *    
  */
 class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
                                    public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
@@ -78,8 +79,7 @@ public:
     bool IsInitiator() const;
 
     bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
-
-    bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
+bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
     // Implement SessionDelegate
     NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }

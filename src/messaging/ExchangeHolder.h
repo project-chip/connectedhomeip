@@ -85,13 +85,14 @@ public:
             /**
              * Shutting down the exchange requires calling Abort() on the exchange selectively in the following scenarios:
              *      1. The exchange is currently awaiting a response. This would have happened if our consumer just sent a message
-             * on the exchange and is awaiting a response. Since we no longer have an interest in this exchange anymore, we should
-             * abort it to release our reference.
+             * on the exchange and is awaiting a response. Since we no longer care to wait for the response, we don't care about
+             * doing MRP retries for the send we just did, so abort the exchange.
              *
              *      2. Our consumer has signaled an interest in sending a message. This could have been signaled right at exchange
              * creation time as the initiator, or when handling a message and the consumer intends to send a response, albeit,
              * asynchronously. In both cases, the stack expects the exchange consumer to close/abort the EC if it no longer has
-             * interest in it.
+             * interest in it. Since we don't have a pending message at this point, calling Abort is OK here as well.
+             *
              */
             if (mpExchangeCtx->IsResponseExpected() || mpExchangeCtx->IsSendExpected())
             {
@@ -129,6 +130,10 @@ private:
         }
 
         mpExchangeDelegate.OnExchangeClosing(ec);
+    }
+
+    ExchangeMessageDispatch & GetMessageDispatch() override { 
+        return mpExchangeDelegate.GetMessageDispatch();
     }
 
     ExchangeDelegate & mpExchangeDelegate;
