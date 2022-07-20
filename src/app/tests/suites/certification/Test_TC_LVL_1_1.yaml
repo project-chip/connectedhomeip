@@ -85,7 +85,7 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Read the optonal attribute(MinLevel) in AttributeList"
+    - label: "Read the optonal attribute(MaxLevel) in AttributeList"
       PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "AttributeList"
