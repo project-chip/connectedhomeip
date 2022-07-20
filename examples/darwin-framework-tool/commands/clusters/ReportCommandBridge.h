@@ -150,10 +150,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
@@ -219,10 +216,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
