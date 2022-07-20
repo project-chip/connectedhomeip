@@ -76,6 +76,17 @@ const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
 const P6Config::Key P6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
 const P6Config::Key P6Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
+const P6Config::Key P6Config::kConfigKey_LockUser           = { kConfigNamespace_ChipConfig, "lock-user" };
+const P6Config::Key P6Config::kConfigKey_Credential         = { kConfigNamespace_ChipConfig, "credential" };
+const P6Config::Key P6Config::kConfigKey_LockUserName       = { kConfigNamespace_ChipConfig, "lock-user-name" };
+const P6Config::Key P6Config::kConfigKey_CredentialData     = { kConfigNamespace_ChipConfig, "credential-data" };
+const P6Config::Key P6Config::kConfigKey_UserCredentials    = { kConfigNamespace_ChipConfig, "user-credentials" };
+const P6Config::Key P6Config::kConfigKey_WeekDaySchedules   = { kConfigNamespace_ChipConfig, "weekday-schedules" };
+;
+const P6Config::Key P6Config::kConfigKey_YearDaySchedules = { kConfigNamespace_ChipConfig, "yearday-schedules" };
+;
+const P6Config::Key P6Config::kConfigKey_HolidaySchedules = { kConfigNamespace_ChipConfig, "holiday-schedules" };
+;
 
 // Keys stored in the Chip-counters namespace
 const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
