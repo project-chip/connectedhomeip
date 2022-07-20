@@ -567,6 +567,9 @@
         (EmberAfGenericClusterFunction) emberAfTimeFormatLocalizationClusterServerInitCallback,                                    \
         (EmberAfGenericClusterFunction) MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback,                      \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayUnitLocalizationServer[] = {                                                  \
+        (EmberAfGenericClusterFunction) MatterUnitLocalizationClusterServerPreAttributeChangedCallback,                            \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
         (EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback,                                                    \
     };                                                                                                                             \
@@ -803,8 +806,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(52), \
       .attributeCount = 3, \
       .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .functions = chipFuncArrayUnitLocalizationServer, \
       .acceptedCommandList = nullptr ,\
       .generatedCommandList = nullptr ,\
     },\
