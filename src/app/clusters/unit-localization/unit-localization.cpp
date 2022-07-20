@@ -14,16 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/util/attribute-metadata.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::UnitLocalization;
 
-Protocols::InteractionModel::Status
-MatterUnitLocalizationClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
-                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+using chip::app::ConcreteAttributePath;
+using Status = Protocols::InteractionModel::Status;
+
+Status MatterUnitLocalizationClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
+                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      uint8_t * value)
 {
     Protocols::InteractionModel::Status res;
 
