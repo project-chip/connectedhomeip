@@ -96,11 +96,6 @@ void ExchangeManager::Shutdown()
 {
     VerifyOrReturn(mState != State::kState_NotInitialized);
 
-    mContextPool.ForEachActiveObject([](ExchangeContext *context) {
-        context->OnSessionReleased();
-        return Loop::Continue;
-    });
-
     mReliableMessageMgr.Shutdown();
 
     if (mSessionManager != nullptr)

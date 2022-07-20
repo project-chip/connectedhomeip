@@ -709,8 +709,8 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
     CancelLivenessCheckTimer();
 
-    VerifyOrReturnError(mExchange, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mExchange->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mExchange->HasSessionHandle(), CHIP_ERROR_INCORRECT_STATE);
 
     System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mExchange->GetSessionHandle()->GetAckTimeout();
 

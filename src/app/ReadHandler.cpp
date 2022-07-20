@@ -178,13 +178,13 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
     }
     else
     {
-        VerifyOrReturnLogError(mExchangeCtx.Get() == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
         auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
         mExchangeCtx.Grab(exchange);
     }
 
-    VerifyOrReturnLogError(mExchangeCtx.Get() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     return StatusResponse::Send(aStatus, mExchangeCtx.Get(), /* aExpectResponse = */ false);
 }
 
@@ -197,13 +197,13 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     }
     else
     {
-        VerifyOrReturnLogError(mExchangeCtx.Get() == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnLogError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
         auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
         mExchangeCtx.Grab(exchange);
     }
 
-    VerifyOrReturnLogError(mExchangeCtx.Get() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
     if (!IsReporting())
     {
         mCurrentReportsBeginGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
@@ -636,7 +636,7 @@ CHIP_ERROR ReadHandler::SendSubscribeResponse()
     ReturnErrorOnFailure(response.GetError());
 
     ReturnErrorOnFailure(writer.Finalize(&packet));
-    VerifyOrReturnLogError(mExchangeCtx.Get() != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnLogError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(RefreshSubscribeSyncTimer());
 
