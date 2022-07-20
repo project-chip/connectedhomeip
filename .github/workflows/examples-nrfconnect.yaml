@@ -83,6 +83,9 @@ jobs:
             - name: Update nRF Connect SDK revision to the currently recommended.
               timeout-minutes: 10
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow"
+            - name: Run unit tests of factory data generation script
+              timeout-minutes: 10
+              run: scripts/run_in_build_env.sh "./scripts/tools/nrfconnect/tests/test_generate_factory_data.py"
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
               timeout-minutes: 10
