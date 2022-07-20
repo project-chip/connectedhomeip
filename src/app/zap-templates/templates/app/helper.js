@@ -60,31 +60,32 @@ var endpointClusterWithInit = [
   'Identify',
   'Level Control',
   'Localization Configuration',
+  'Mode Select',
   'Occupancy Sensing',
   'On/Off',
   'Pump Configuration and Control',
   'Scenes',
-  'Time Format Localization',
   'Thermostat',
-  'Mode Select',
+  'Time Format Localization',
 ];
 var endpointClusterWithAttributeChanged = [
   'Bridged Device Basic',
   'Door Lock',
+  'Fan Control',
   'Identify',
   'Pump Configuration and Control',
   'Window Covering',
-  'Fan Control',
 ];
 var endpointClusterWithPreAttribute = [
   'Door Lock',
-  'Pump Configuration and Control',
-  'Thermostat User Interface Configuration',
-  'Time Format Localization',
+  'Fan Control',
   'Localization Configuration',
   'Mode Select',
-  'Fan Control',
+  'Pump Configuration and Control',
   'Thermostat',
+  'Thermostat User Interface Configuration',
+  'Time Format Localization',
+  'Unit Localization',
 ];
 
 /**
