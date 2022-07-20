@@ -50,8 +50,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#define CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING 1
-
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;
@@ -315,7 +313,11 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     // If we're an initiator and we just created this exchange, we obviously did so to send a message. Let's go ahead and
     // set the flag on this to correctly mark it as so.
     //
-    if (Initiator)
+    // This only applies to non-ephemeral exchanges. Ephemeral exchanges do not have an intention of sending out a message
+    // since they're created expressly for the purposes of sending out a standalone ACK when the message could not be handled
+    // through normal means.
+    //
+    if (Initiator && !isEphemeralExchange)
     {
         WillSendMessage();
     }
@@ -569,7 +571,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
     DefaultOnMessageReceived(this, payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), messageCounter,
                              std::move(msgBuf));
-
     return CHIP_NO_ERROR;
 }
 
