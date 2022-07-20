@@ -81,6 +81,7 @@ def load_config() -> None:
         config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
+        config["silabs-thread"]["EFR32_BOARD"] = None
 
         flush_print(yaml.dump(config))
         yaml.dump(config, configStream)
@@ -474,6 +475,10 @@ def main(argv: Sequence[str]) -> None:
         pass
     elif options.build_target == "silabs-thread":
         flush_print('Path to gecko sdk is configured within Matter.')
+        if 'EFR32_BOARD' not in config['silabs-thread'] or config['silabs-thread']['EFR32_BOARD'] is None:
+            flush_print('EFR32_BOARD was not configured. Make sure silabs-thread.EFR32_BOARD is set on your config.yaml file')
+            exit(1)
+        efr32_board = config['silabs-thread']['EFR32_BOARD']
     else:
         flush_print(f"Target {options.build_target} not supported")
 
@@ -622,8 +627,21 @@ def main(argv: Sequence[str]) -> None:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
-            shell.run_cmd(
-                f"""{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh ./ out/{options.sample_device_type_name} BRD4186A \'sample_name=\"{options.sample_device_type_name}\"\' enable_openthread_cli=true chip_build_libshell=true \'{'import("//with_pw_rpc.gni")' if options.do_rpc else ""}\'""")
+            efr32_cmd_args = []
+            efr32_cmd_args.append(f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
+            efr32_cmd_args.append('./')
+            efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
+            efr32_cmd_args.append(f'{efr32_board}')
+            efr32_cmd_args.append(f'\'sample_name=\"{options.sample_device_type_name}\"\'')
+            if sw_ver_string:
+                efr32_cmd_args.append(f'\'chip_device_config_device_software_version_string=\"{sw_ver_string}\"\'')
+            efr32_cmd_args.append('enable_openthread_cli=true')
+            if options.do_rpc:
+                efr32_cmd_args.append('chip_build_libshell=false')
+                efr32_cmd_args.append('\'import("//with_pw_rpc.gni")\'')
+            else:
+                efr32_cmd_args.append('chip_build_libshell=true')
+            shell.run_cmd(" ".join(efr32_cmd_args))
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
         elif options.build_target == "linux":
@@ -719,7 +737,7 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd("west flash")
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
-            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/BRD4186A/chip-efr32-chef-example.flash.py")
+            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/{efr32_board}/chip-efr32-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
