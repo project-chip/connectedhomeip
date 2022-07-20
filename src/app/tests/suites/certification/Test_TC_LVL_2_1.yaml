@@ -28,37 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    # Temporary - see #13551
-    - label: "Precondition: Reset level to 254"
-      PICS: PICS_SDK_CI_ONLY
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 100ms"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Precondition: Reads the CurrentLevel attribute"
-      PICS: LVL.S.A0000
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: 254
-
     - label: "Reads the CurrentLevel attribute"
       PICS: LVL.S.A0000
       command: "readAttribute"
@@ -95,7 +64,7 @@ tests:
       command: "readAttribute"
       attribute: "min level"
       response:
-          saveAs: MinLevelValue1
+          saveAs: MinLevelFeatureMapNotSupportedValue
           constraints:
               type: uint8
               minValue: 0
@@ -117,10 +86,10 @@ tests:
       command: "readAttribute"
       attribute: "max level"
       response:
-          saveAs: MaxLevelValue1
+          saveAs: MaxLevelFeatureMapNotSupportedValue
           constraints:
               type: uint8
-              minValue: MinLevelValue1
+              minValue: MinLevelFeatureMapNotSupportedValue
               maxValue: 254
 
     - label: "Step 4b & 4C Reads the CurrentLevel attribute"
@@ -140,8 +109,8 @@ tests:
       response:
           constraints:
               type: uint8
-              minValue: MinLevelValue1
-              maxValue: MaxLevelValue1
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: MaxLevelFeatureMapNotSupportedValue
 
     - label: "Reads the CurrentFrequency attribute"
       PICS: LVL.S.A0004
@@ -212,8 +181,8 @@ tests:
       response:
           constraints:
               type: uint8
-              minValue: MinLevelValue1
-              maxValue: MaxLevelValue1
+              minValue: MinLevelFeatureMapNotSupportedValue
+              maxValue: MaxLevelFeatureMapNotSupportedValue
 
     - label: "Reads the OnTransitionTime attribute "
       PICS: LVL.S.A0012

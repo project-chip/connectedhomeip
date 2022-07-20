@@ -39,9 +39,9 @@ tests:
       response:
           value: 1
 
-    - label: "Check current x attribute value  matched before any change"
+    - label: "TH reads CurrentX attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0003
+      PICS: CC.S.F03 && CC.S.A0003
       attribute: "CurrentX"
       response:
           constraints:
@@ -49,9 +49,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Check current y attribute  value  matched before any change"
+    - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0004
+      PICS: CC.S.F03 && CC.S.A0004
       attribute: "CurrentY"
       response:
           constraints:
@@ -59,9 +59,9 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Step Color command"
+    - label: "TH sends StepColor command to DUT"
       command: "StepColor"
-      PICS: CC.S.C09.Rsp
+      PICS: CC.S.F03 && CC.S.C09.Rsp
       arguments:
           values:
               - name: "stepX"
@@ -69,24 +69,22 @@ tests:
               - name: "stepY"
                 value: 20
               - name: "TransitionTime"
-                value: 50
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 50ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 50
+                value: 1000
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0003
+    - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -95,10 +93,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0004
+    - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:

@@ -32,6 +32,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -40,7 +41,7 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -84,6 +85,7 @@ tests:
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -160,7 +162,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -188,7 +190,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -200,6 +202,7 @@ tests:
           from step 12"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"

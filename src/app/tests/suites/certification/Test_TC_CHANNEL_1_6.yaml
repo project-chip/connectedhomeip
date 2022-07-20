@@ -37,7 +37,7 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: CHANNEL.S.CL || CHANNEL.S.LI
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -83,21 +83,43 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Read the optional command(ChangeChannel) in AcceptedCommandList"
+      PICS: CHANNEL.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              contains: [0, 2, 3]
+              contains: [0]
+
+    - label:
+          "Read the optional command(ChangeChannelByNumber) in
+          AcceptedCommandList"
+      PICS: CHANNEL.S.C02.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Read the optional command(SkipChannel) in AcceptedCommandList"
+      PICS: CHANNEL.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
     - label: "Read the global attribute: GeneratedCommandList"
+      PICS: CHANNEL.S.C01.Tx
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
-              contains: []
+              contains: [1]
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label:

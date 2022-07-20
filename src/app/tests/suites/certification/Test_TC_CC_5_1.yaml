@@ -39,8 +39,8 @@ tests:
       response:
           value: 1
 
-    - label: "Check current x attribute value matched before any change"
-      PICS: CC.S.A0003
+    - label: "TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -49,8 +49,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Check current y attribute value matched before any change"
-      PICS: CC.S.A0004
+    - label: "TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -59,8 +59,8 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Move to Color command"
-      PICS: CC.S.C07.Rsp
+    - label: "TH sends MoveToColor command to DUT"
+      PICS: CC.S.F03 && CC.S.C07.Rsp
       command: "MoveToColor"
       arguments:
           values:
@@ -69,39 +69,37 @@ tests:
               - name: "colorY"
                 value: 300
               - name: "TransitionTime"
-                value: 20
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 20ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 20
+                value: 1500
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0003
+    - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
+          value: 200
           constraints:
               type: uint16
               minValue: 0
               maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0004
+    - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
+          value: 300
           constraints:
               type: uint16
               minValue: 0

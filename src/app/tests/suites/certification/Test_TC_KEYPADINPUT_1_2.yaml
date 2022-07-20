@@ -38,7 +38,7 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: KEYPADINPUT.S.NV || KEYPADINPUT.S.LK || KEYPADINPUT.S.NK
       command: "readAttribute"
       attribute: "FeatureMap"

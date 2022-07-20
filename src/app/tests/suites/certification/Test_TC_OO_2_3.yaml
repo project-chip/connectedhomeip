@@ -294,8 +294,8 @@ tests:
       PICS: OO.S.A4001
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
     - label: "9b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -389,8 +389,8 @@ tests:
       PICS: OO.S.A4001
       response:
           constraints:
-              minValue: 270
-              maxValue: 325
+              minValue: 255
+              maxValue: 345
 
     - label: "10e:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -437,8 +437,8 @@ tests:
       PICS: OO.S.A4002
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -480,8 +480,8 @@ tests:
       PICS: OO.S.A4002
       response:
           constraints:
-              minValue: 180
-              maxValue: 220
+              minValue: 170
+              maxValue: 230
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -570,8 +570,8 @@ tests:
       PICS: OO.S.A4002
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
     - label: "Wait 30000ms"
       cluster: "DelayCommands"
@@ -683,7 +683,9 @@ tests:
       attribute: "OnTime"
       PICS: OO.S.A4001
       response:
-          value: 300
+          constraints:
+              minValue: 255
+              maxValue: 345
 
     - label: "17c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -743,29 +745,26 @@ tests:
               - name: "OffWaitTime"
                 value: 300
 
-    # Issue 19159 onOff value mismatch: expected 1 but got 0
     - label: "18b:Reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
-      PICS: OO.S.A0000 && PICS_SKIP_SAMPLE_APP
+      PICS: OO.S.A0000
       response:
           value: 1
 
-    # Issue 19159 onTime value mismatch: expected 300 but got 0
     - label: "18b:Reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
-      PICS: OO.S.A4001 && PICS_SKIP_SAMPLE_APP
+      PICS: OO.S.A4001
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
-    # Issue 19159 OffWaitTime value mismatch: expected 300 but got 0
     - label: "18b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
-      PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP
+      PICS: OO.S.A4002
       response:
           value: 300
 
@@ -822,8 +821,8 @@ tests:
       PICS: OO.S.A4001
       response:
           constraints:
-              minValue: 180
-              maxValue: 220
+              minValue: 170
+              maxValue: 230
 
     - label: "19c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -856,8 +855,8 @@ tests:
       PICS: OO.S.A4002
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
     - label: "21a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
@@ -891,8 +890,8 @@ tests:
       PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP
       response:
           constraints:
-              minValue: 180
-              maxValue: 220
+              minValue: 170
+              maxValue: 230
 
     - label: "22a:Send On Command"
       PICS: OO.S.C01.Rsp
@@ -963,8 +962,8 @@ tests:
       PICS: OO.S.A4002
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
     - label: "Wait 40000ms"
       cluster: "DelayCommands"
@@ -995,7 +994,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 10
+              maxValue: 15
 
     - label: "24a:Sends OnWithTimedOff command to DUT"
       command: "OnWithTimedOff"
@@ -1022,8 +1021,8 @@ tests:
       PICS: OO.S.A4001
       response:
           constraints:
-              minValue: 270
-              maxValue: 320
+              minValue: 255
+              maxValue: 345
 
     - label: "24b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -1061,7 +1060,7 @@ tests:
       response:
           constraints:
               minValue: 0
-              maxValue: 10
+              maxValue: 15
 
     - label: "Send Off Command"
       command: "Off"
