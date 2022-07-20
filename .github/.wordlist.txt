@@ -54,6 +54,7 @@ APIs
 apk
 AppConfig
 AppImpl
+AppleTV
 appliable
 ApplianceControl
 applianceeventsandalert
@@ -278,8 +279,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -543,6 +544,7 @@ GDB
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
+generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
@@ -601,6 +603,8 @@ HKDF
 HMAC
 hoc
 homebrew
+HomePod
+HomePods
 hostapd
 hostname
 href
@@ -614,6 +618,7 @@ IasWd
 iaszone
 ibb
 ICA
+iCloud
 ICMP
 IDF
 IDL
@@ -659,6 +664,7 @@ InvokeCommandRequests
 InvokeCommandResponse
 IoT
 ipaddr
+iPadOS
 ipadr
 ipp
 iptables
@@ -1090,8 +1096,8 @@ REPL
 repo
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1137,8 +1143,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1324,6 +1330,7 @@ ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
 TvCasting
+tvOS
 TXD
 txt
 uargument
@@ -1370,8 +1377,8 @@ util
 utils
 UUID
 ux
-VCP
 validator
+VCP
 Vectorcall
 VendorID
 VendorName
@@ -1395,6 +1402,7 @@ WaitNewInputEvent
 WakeOnLan
 WantedBy
 watchdogTimeout
+watchOS
 webpage
 wg
 wget
