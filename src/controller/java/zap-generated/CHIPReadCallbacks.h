@@ -897,6 +897,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPLevelControlCurrentLevelAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterCurrentLevelAttributeCallbackType>
+{
+public:
+    CHIPLevelControlCurrentLevelAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlCurrentLevelAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlCurrentLevelAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlCurrentLevelAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPLevelControlCurrentLevelAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPLevelControlOnLevelAttributeCallback
     : public chip::Callback::Callback<CHIPLevelControlClusterOnLevelAttributeCallbackType>
 {

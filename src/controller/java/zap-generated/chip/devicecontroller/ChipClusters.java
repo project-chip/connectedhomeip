@@ -1719,6 +1719,14 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    public interface CurrentLevelAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface OnLevelAttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -1783,12 +1791,12 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readCurrentLevelAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentLevelAttribute(CurrentLevelAttributeCallback callback) {
       readCurrentLevelAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeCurrentLevelAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        CurrentLevelAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeCurrentLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -2018,10 +2026,13 @@ public class ChipClusters {
     }
 
     private native void readCurrentLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentLevelAttributeCallback callback);
 
     private native void subscribeCurrentLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        CurrentLevelAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readRemainingTimeAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
