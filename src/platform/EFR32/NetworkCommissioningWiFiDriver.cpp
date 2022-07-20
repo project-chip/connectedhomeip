@@ -130,7 +130,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
     wfx_wifi_provision_t wifiConfig = {};
     memcpy(wifiConfig.ssid, ssid, ssidLen);
     memcpy(wifiConfig.passkey, key, keyLen);
-    wifiConfig.security = WFX_SEC_WPA2;
+    wifiConfig.security = WFX_SEC_WPA_WPA2_MIXED;
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
     // Configure the WFX WiFi interface.
