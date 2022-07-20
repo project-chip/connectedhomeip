@@ -58,7 +58,7 @@ contextlib2==21.6.0
     #   schema
 cryptography==3.4.7
     # via
-    #   -r requirements.esp32.txt
+    #   -c constraints.esp32.txt
     #   -r requirements.txt
 cxxfilt==0.2.2
     # via -r requirements.txt
@@ -203,8 +203,6 @@ py==1.11.0
     # via pytest
 pycparser==2.20
     # via cffi
-pyelftools==0.27
-    # via -r requirements.esp32.txt
 pygdbmi==0.9.0.2
     # via
     #   -r requirements.esp32.txt
@@ -223,7 +221,7 @@ pyrsistent==0.18.1
     # via jsonschema
 pyserial==3.5
     # via
-    #   -r requirements.esp32.txt
+    #   -c constraints.esp32.txt
     #   mbed-os-tools
     #   mobly
 pytest==6.2.5 ; platform_machine != "aarch64" and sys_platform == "linux"

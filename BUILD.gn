@@ -23,6 +23,7 @@ import("//build_overrides/pigweed.gni")
 import("//src/lwip/lwip.gni")
 import("//src/platform/device.gni")
 import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
 
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
@@ -56,8 +57,11 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   # Python packages for supporting specific targets.
   pw_python_group("python_packages") {
     python_deps = [
+      ":pip_install_chip_packages",
+      ":pip_install_editable_chip_packages",
       "$dir_pw_build/py",
       "$dir_pw_doctor/py",
+      "$dir_pw_env_setup:pip_install_pigweed_package",
       "$dir_pw_env_setup/py",
       "$dir_pw_hdlc/py",
       "$dir_pw_log:protos.python",
@@ -72,8 +76,19 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       "$dir_pw_unit_test/py",
       "$dir_pw_watch/py",
       "integrations/mobly:chip_mobly",
-      "scripts:requirements",
     ]
+  }
+
+  pw_internal_pip_install("pip_install_editable_chip_packages") {
+    packages = [
+      "//integrations/mobly:chip_mobly",
+      "//examples/chef",
+    ]
+    editable = true
+  }
+
+  pw_internal_pip_install("pip_install_chip_packages") {
+    packages = [ "//examples/common/pigweed/rpc_console:chip_rpc_distribution" ]
   }
 
   # This is a real toolchain. Build CHIP.
