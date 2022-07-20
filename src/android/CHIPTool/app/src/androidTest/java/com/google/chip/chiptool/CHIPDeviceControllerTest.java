@@ -4,15 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
-
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import chip.devicecontroller.ChipDeviceController;
 import chip.devicecontroller.PaseVerifierParams;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -29,8 +26,7 @@ public class CHIPDeviceControllerTest {
         byte[] randomSalt = "hEvzbU:%h)?aB,h7+9fn[Lf[BhYB!=TA".getBytes();
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        ChipDeviceController chipDeviceController =
-                ChipClient.INSTANCE.getDeviceController(appContext);
+        ChipDeviceController chipDeviceController = ChipClient.INSTANCE.getDeviceController(appContext);
 
         PaseVerifierParams params =
                 chipDeviceController.computePaseVerifier(deviceId, setupPincode, iterations, randomSalt);
