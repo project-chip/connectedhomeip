@@ -21,4 +21,19 @@
 
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
-#define MATTER_PLUGINS_INIT MatterAdministratorCommissioningPluginServerInitCallback(); MatterBasicPluginServerInitCallback(); MatterDescriptorPluginServerInitCallback(); MatterDiagnosticLogsPluginServerInitCallback(); MatterGeneralCommissioningPluginServerInitCallback(); MatterGeneralDiagnosticsPluginServerInitCallback(); MatterGroupsPluginClientInitCallback(); MatterIdentifyPluginClientInitCallback(); MatterIdentifyPluginServerInitCallback(); MatterIlluminanceMeasurementPluginServerInitCallback(); MatterNetworkCommissioningPluginServerInitCallback(); MatterOccupancySensingPluginServerInitCallback(); MatterOperationalCredentialsPluginServerInitCallback(); MatterSoftwareDiagnosticsPluginServerInitCallback(); MatterThreadNetworkDiagnosticsPluginServerInitCallback();
+#define MATTER_PLUGINS_INIT                                                                                                        \
+    MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
+    MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterDescriptorPluginServerInitCallback();                                                                                    \
+    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
+    MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
+    MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterGroupsPluginClientInitCallback();                                                                                        \
+    MatterIdentifyPluginClientInitCallback();                                                                                      \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
+    MatterIlluminanceMeasurementPluginServerInitCallback();                                                                        \
+    MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOccupancySensingPluginServerInitCallback();                                                                              \
+    MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
+    MatterThreadNetworkDiagnosticsPluginServerInitCallback();
