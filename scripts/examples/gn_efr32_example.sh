@@ -98,6 +98,8 @@ if [ "$#" == "0" ]; then
             For minimum consumption, disable openthread cli and qr code
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
+        --additional_data_advertising
+            enable Addition data advertissing and rotating device ID
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -139,6 +141,10 @@ else
                 ;;
             --chip_enable_wifi_ipv4)
                 optArgs+="chip_enable_wifi_ipv4=true "
+                shift
+                ;;
+            --additional_data_advertising)
+                optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
                 shift
                 ;;
             *)
