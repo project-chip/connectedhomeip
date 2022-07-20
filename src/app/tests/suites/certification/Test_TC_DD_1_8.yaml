@@ -27,7 +27,7 @@ tests:
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Get the QR code from the TH
-          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi 
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
 
           [13293:13293] CHIP:DL: Device Configuration:
           [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
@@ -99,7 +99,7 @@ tests:
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Get QR code from TH as server side:
-          $ ./out/all-clusters-app/chip-all-clusters-app 
+          $ ./out/all-clusters-app/chip-all-clusters-app
           ...
           [1657211128.302755][365927:365927] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
           [1657211128.302783][365927:365927] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:

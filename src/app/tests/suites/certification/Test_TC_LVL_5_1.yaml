@@ -91,7 +91,7 @@ tests:
               type: uint8
               minValue: 0
               maxValue: 255
-    
+
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.A0000 && !LVL.S.A0002
       command: "readAttribute"
@@ -167,7 +167,7 @@ tests:
       attribute: "current level"
       response:
           value: CurrentlevelValue
-    
+
     - label: "Reads current level attribute from DUT"
       PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002
       command: "readAttribute"

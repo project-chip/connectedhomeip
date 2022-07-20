@@ -42,10 +42,10 @@ tests:
           [1658215472.478921][3413:3413] CHIP:DMG:                         Cluster = 0x300,
           [1658215472.479000][3413:3413] CHIP:DMG:                         Attribute = 0x0000_400B,
           [1658215472.479071][3413:3413] CHIP:DMG:                 }
-          [1658215472.479140][3413:3413] CHIP:DMG:                         
+          [1658215472.479140][3413:3413] CHIP:DMG:
           [1658215472.479202][3413:3413] CHIP:DMG:         ],
-          [1658215472.479271][3413:3413] CHIP:DMG:                 
-          [1658215472.479335][3413:3413] CHIP:DMG:         isFabricFiltered = true, 
+          [1658215472.479271][3413:3413] CHIP:DMG:
+          [1658215472.479335][3413:3413] CHIP:DMG:         isFabricFiltered = true,
           [1658215472.479397][3413:3413] CHIP:DMG:         InteractionModelRevision = 1
           [1658215472.479453][3413:3413] CHIP:DMG: },
           [1658215472.479633][3413:3413] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -70,10 +70,10 @@ tests:
           [1658215497.167349][3413:3413] CHIP:DMG:                         Cluster = 0x300,
           [1658215497.167418][3413:3413] CHIP:DMG:                         Attribute = 0x0000_400C,
           [1658215497.167488][3413:3413] CHIP:DMG:                 }
-          [1658215497.167559][3413:3413] CHIP:DMG:                         
+          [1658215497.167559][3413:3413] CHIP:DMG:
           [1658215497.167621][3413:3413] CHIP:DMG:         ],
-          [1658215497.167687][3413:3413] CHIP:DMG:                 
-          [1658215497.167750][3413:3413] CHIP:DMG:         isFabricFiltered = true, 
+          [1658215497.167687][3413:3413] CHIP:DMG:
+          [1658215497.167750][3413:3413] CHIP:DMG:         isFabricFiltered = true,
           [1658215497.167810][3413:3413] CHIP:DMG:         InteractionModelRevision = 1
           [1658215497.167866][3413:3413] CHIP:DMG: },
           [1658215497.168046][3413:3413] CHIP:DMG: IM RH moving to [GeneratingReports]

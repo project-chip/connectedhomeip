@@ -64,7 +64,7 @@ tests:
           commissioning, and for completing the commissioning process using BLE."
       PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          TH all-clusters-app: 
+          TH all-clusters-app:
           [1657235088.040328][370941:370941] CHIP:SVR: Commissioning completed successfully
           [1657235088.040371][370941:370941] CHIP:DIS: Updating services using commissioning mode 0
 

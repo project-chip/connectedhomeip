@@ -126,7 +126,7 @@ tests:
           constraints:
               type: list
               contains: [3]
-              
+
     - label: "Read the optional command(Previous) in AcceptedCommandList"
       PICS: MEDIAPLAYBACK.S.C04.Rsp
       command: "readAttribute"

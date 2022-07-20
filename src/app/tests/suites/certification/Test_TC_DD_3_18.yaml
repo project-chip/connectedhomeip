@@ -69,7 +69,7 @@ tests:
           [1657240914.891250][372173:372173] CHIP:SVR: Commissioning completed successfully
           [1657240914.891297][372173:372173] CHIP:DIS: Updating services using commissioning mode 0
 
-          DUT Commissioner: 
+          DUT Commissioner:
           $ ./chip-tool pairing code 1 MT:-24J0IRV01KA0648G00
 
           [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
@@ -92,7 +92,7 @@ tests:
           [1657240985.801360][112581:112581] CHIP:SVR: Commissioning completed successfully
           [1657240985.801406][112581:112581] CHIP:DIS: Updating services using commissioning mode 0
 
-          DUT Commissioner: 
+          DUT Commissioner:
           $ ./chip-tool pairing code 2 MT:-24J04QI14KA0648G00
 
           [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'

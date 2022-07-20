@@ -63,7 +63,7 @@ tests:
       verification: |
           1. Follow vendor-specific steps from the pairing hint to put DUT into commissioning mode
 
-          2. Verify DUT is advertising in commissioning mode. On DUT, 
+          2. Verify DUT is advertising in commissioning mode. On DUT,
 
           $  ./chip-tool discover commissionables
           [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
