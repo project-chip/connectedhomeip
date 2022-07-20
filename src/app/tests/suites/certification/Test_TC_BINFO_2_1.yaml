@@ -317,7 +317,7 @@ tests:
           saveAs: SoftwareVersionStringValue
           constraints:
               minLength: 1
-              maxLenght: 64
+              maxLength: 64
 
     - label: "TH writes SoftwareVersionString from the DUT."
       PICS: BINFO.S.A000a
