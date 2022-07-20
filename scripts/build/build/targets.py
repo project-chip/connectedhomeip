@@ -295,7 +295,7 @@ def HostTargets():
                           "clang"], use_libfuzzer=True),
     if cross_compile:
         builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
-            "arm64"
+            ['arm64']
         )),
     else:
         builder.AppendVariant(name="clang", use_clang=True)
