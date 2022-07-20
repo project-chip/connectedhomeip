@@ -13133,6 +13133,7 @@ void registerClusterAny(Commands & commands, CredentialIssuerCommands * credsIss
         make_unique<ReadEvent>(credsIssuerConfig),          //
         make_unique<SubscribeEvent>(credsIssuerConfig),     //
         make_unique<ReadAll>(credsIssuerConfig),            //
+        make_unique<SubscribeAll>(credsIssuerConfig),       //
     };
 
     commands.Register(clusterName, clusterCommands);
