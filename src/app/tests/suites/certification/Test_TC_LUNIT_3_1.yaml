@@ -19,10 +19,18 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Unit Localization"
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
     - label: "TH reads TemperatureUnit attribute from DUT"
       PICS: LUNIT.S.A0000
       verification: |
@@ -161,8 +169,12 @@ tests:
 
     - label: "TH writes 5 to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000
-      verification: |
-          Verify in TH log:
-
-          Verify that the write request fails with 0x87 (Constraint Error)
-      disabled: true
+      cluster: "Unit Localization"
+      command: "writeAttribute"
+      attribute: "temperature-unit"
+      arguments:
+        # Per spec, if [TEMP] feature is enabled, then this attribute can be
+        # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
+        value: 5  # INVALID
+      response:
+        error: CONSTRAINT_ERROR
