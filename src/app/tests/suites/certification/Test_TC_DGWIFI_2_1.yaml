@@ -63,6 +63,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads RSSI attribute constraints"
       PICS: DGWIFI.S.A0004
@@ -81,6 +83,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads BeaconRxCount attribute constraints"
       PICS: DGWIFI.S.A0006
@@ -89,6 +93,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketMulticastRxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0007
@@ -97,6 +103,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketMulticastTxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0008
@@ -105,6 +113,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketUnicastRxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A0009
@@ -113,6 +123,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads PacketUnicastTxCount attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000a
@@ -121,6 +133,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Reads CurrentMaxRate attribute constraints"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.A000b

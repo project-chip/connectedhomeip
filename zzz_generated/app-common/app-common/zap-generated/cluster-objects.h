@@ -27783,6 +27783,7 @@ public:
 } // namespace Clusters
 
 bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand);
 
 } // namespace app
 } // namespace chip

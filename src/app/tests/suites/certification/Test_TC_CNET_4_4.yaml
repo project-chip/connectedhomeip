@@ -30,6 +30,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid null --Breadcrumb 1
 
+          Verify on the TH Log:
           [1653475026.012811][29937:29942] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475026.012942][29937:29942] CHIP:TOO:   ScanNetworksResponse: {
           [1653475026.012983][29937:29942] CHIP:TOO:     networkingStatus: 0
@@ -166,6 +167,7 @@ tests:
       verification: |
           ./chip-tool networkcommissioning scan-networks 1 0 --Ssid 47524C50726976617465 --Breadcrumb 1
 
+          Verify on the TH Log:
           [1653475824.575642][30076:30081] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0001
           [1653475824.575807][30076:30081] CHIP:TOO:   ScanNetworksResponse: {
           [1653475824.575888][30076:30081] CHIP:TOO:     networkingStatus: 0

@@ -44,7 +44,7 @@ tests:
           [1651101335.733693][22353:22353] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1651101335.734598][22353:22353] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
           [1651101335.735182][22353:22353] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1651101335.735618][22353:22353] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1651101335.735618][22353:22353] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
 
 
           ubuntu@ubuntu:~/apps$ ./chip-tool payload parse-setup-payload MT:-24J0YXE00KA0648G00

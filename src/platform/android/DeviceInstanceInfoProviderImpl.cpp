@@ -19,9 +19,7 @@
 #include "DeviceInstanceInfoProviderImpl.h"
 
 #include <platform/CHIPDeviceConfig.h>
-#include <platform/CHIPDeviceError.h>
 #include <platform/android/AndroidConfig.h>
-#include <platform/internal/GenericDeviceInstanceInfoProvider.ipp>
 
 namespace chip {
 namespace DeviceLayer {

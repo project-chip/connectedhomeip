@@ -35,6 +35,6 @@ public:
 
 private:
     static void GpioInit(void);
-    static void lightbuttonIsr(void * handler_arg, cyhal_gpio_event_t event);
+    static void light_button_callback(void * handler_arg, cyhal_gpio_event_t event);
     static void TimerCallback(TimerHandle_t xTimer);
 };

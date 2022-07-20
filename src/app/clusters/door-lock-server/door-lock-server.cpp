@@ -1949,7 +1949,7 @@ DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endp
     // Not in the spec, but common sense: I don't think we need to modify the credential if user slot is not occupied
     if (user.userStatus == DlUserStatus::kAvailable)
     {
-        emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to user: user clot is empty "
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to user: user slot is empty "
                                       "[endpointId=%d,credentialIndex=%d,userIndex=%d]",
                                       endpointId, credential.CredentialIndex, userIndex);
         return DlStatus::kInvalidField;
@@ -2943,6 +2943,8 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
         return DlLockDataType::kFingerprint;
     case DlCredentialType::kFace:
         // So far there's no distinct data type for face credentials
+        return DlLockDataType::kUnspecified;
+    case DlCredentialType::kUnknownEnumValue:
         return DlLockDataType::kUnspecified;
     }
 

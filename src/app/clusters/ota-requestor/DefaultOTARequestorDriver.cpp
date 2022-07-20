@@ -98,7 +98,7 @@ bool DefaultOTARequestorDriver::CanConsent()
 
 uint16_t DefaultOTARequestorDriver::GetMaxDownloadBlockSize()
 {
-    return 1024;
+    return maxDownloadBlockSize;
 }
 
 void DefaultOTARequestorDriver::SetMaxDownloadBlockSize(uint16_t blockSize)

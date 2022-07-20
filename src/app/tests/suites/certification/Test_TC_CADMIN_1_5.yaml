@@ -48,6 +48,7 @@ tests:
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -73,6 +74,7 @@ tests:
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
+      PICS: CADMIN.S.C0000
       command: "PairWithCode"
       arguments:
           values:
@@ -86,6 +88,7 @@ tests:
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -103,6 +106,7 @@ tests:
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
+      PICS: CADMIN.S.C0002
       timedInteractionTimeoutMs: 10000
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -121,6 +125,7 @@ tests:
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
+      PICS: CADMIN.S.C0002
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
@@ -129,6 +134,7 @@ tests:
       cluster: "Basic"
       command: "writeAttribute"
       attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
       arguments:
           value: "chiptest"
 
@@ -136,12 +142,34 @@ tests:
       cluster: "Basic"
       command: "readAttribute"
       attribute: "NodeLabel"
+      PICS: BINFO.S.A0005
       response:
           value: "chiptest"
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a"
+              - name: "discriminator"
+                value: 3840
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: FAILURE
+
+    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -155,6 +183,26 @@ tests:
                 value: 1000
               - name: "salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenCommissioningWindow"
+      PICS: CADMIN.S.C0000
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEVerifier"
+                value: "\x06\xc7\x56\xdf\xfc\xd7\x22\x65\x34\x52\xa1\x2d\xcd\x94\x5d\x8c\x54\xda\x2b\x0f\x3c\xbd\x1b\x4d\xc3\xf1\xad\xb2\x23\xae\xb2\x6b\x04\x7c\xd2\x4c\x96\x86\x6f\x97\x9b\x1d\x83\xec\x50\xe2\xb4\xae\x30\xcd\xf2\xfd\xb3\x2b\xd8\xa2\x11\xb8\x37\xdc\x94\xed\xcd\x56\xf4\xd1\x43\x77\x19\x10\x76\xbf\xc5\x9d\x99\xb7\xdd\x30\x53\xef\xd6\xf0\x2c\x44\x34\xf2\xbd\xd2\x7a\xa4\xf9\xce\xa7\x0d\x73\x8e\x4c"
+              - name: "discriminator"
+                value: 3840
+              - name: "iterations"
+                value: 1000
+              - name: "salt"
+                value: "SPAKE2P Key Salt"
+      response:
+          error: 1
 
     #Disabled due to issue 17666
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
@@ -168,6 +216,16 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: payload
+
+    - label:
+          "TH_CR1 tries to revoke the commissioning window on DUT_CE using
+          RevokeCommissioning command"
+      cluster: "AdministratorCommissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C0002 && PICS_SKIP_SAMPLE_APP
+      timedInteractionTimeoutMs: 10000
+      response:
+          error: FAILURE
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
       identity: "gamma"

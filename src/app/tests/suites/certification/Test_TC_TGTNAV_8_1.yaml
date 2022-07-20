@@ -41,6 +41,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the TargetList attribute"
       PICS: TGTNAV.S.A0000

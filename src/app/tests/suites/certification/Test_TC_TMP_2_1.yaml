@@ -35,6 +35,8 @@ tests:
       response:
           constraints:
               type: int16
+              minValue: -27315
+              maxValue: 32767
 
     - label: "read the mandatory attribute: MinMeasuredValue"
       PICS: TMP.S.A0001
@@ -44,7 +46,7 @@ tests:
           constraints:
               type: int16
               minValue: -27315
-              maxValue: 32766
+              maxValue: 32767
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
       PICS: TMP.S.A0002
@@ -58,7 +60,6 @@ tests:
 
     - label: "read the optional attribute: Tolerance"
       PICS: TMP.S.A0003
-      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:

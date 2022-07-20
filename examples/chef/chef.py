@@ -81,6 +81,7 @@ def load_config() -> None:
         config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
+        config["silabs-thread"]["EFR32_BOARD"] = None
 
         flush_print(yaml.dump(config))
         yaml.dump(config, configStream)
@@ -319,8 +320,16 @@ def main(argv: Sequence[str]) -> None:
                       dest="tty", metavar="TTY", default=None)
     parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
                       dest="use_zzz", action="store_true")
+
+    # Build CD params.
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
+    parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
+                      dest="dry_run", action="store_true")
+    parser.add_option("", "--build_exclude", help="For use with --build_all. Build labels to exclude. Accepts a regex pattern. Mutually exclusive with --build_include.",
+                      dest="build_exclude")
+    parser.add_option("", "--build_include", help="For use with --build_all. Build labels to include. Accepts a regex pattern. Mutually exclusive with --build_exclude.",
+                      dest="build_include")
     parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
     parser.add_option(
@@ -343,7 +352,7 @@ def main(argv: Sequence[str]) -> None:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
             install_deps_cmd = """\
-            sudo apt-get install node node-yargs npm
+            sudo apt-get install nodejs node-yargs npm
             libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
             libjpeg9-dev libgif-dev node-typescript"""
             shell.run_cmd(unwrap_cmd(install_deps_cmd))
@@ -380,14 +389,25 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
+        if options.build_include and options.build_exclude:
+            flush_print(
+                "Error. --build_include and --build_exclude are mutually exclusive options.")
+            exit(1)
         flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
-        os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
             for platform, label_args in cicd_config["cd_platforms"].items():
                 for label, args in label_args.items():
+                    archive_name = f"{label}-{device_name}"
+                    if options.build_exclude and re.search(options.build_exclude, archive_name):
+                        continue
+                    elif options.build_include and not re.search(options.build_include, archive_name):
+                        continue
+                    if options.dry_run:
+                        flush_print(archive_name)
+                        continue
                     command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
@@ -409,7 +429,7 @@ def main(argv: Sequence[str]) -> None:
                         if not options.keep_going:
                             exit(1)
                         continue
-                    archive_name = f"{label}-{device_name}"
+                    os.makedirs(archive_prefix, exist_ok=True)
                     archive_full_name = archive_prefix + archive_name + archive_suffix
                     flush_print(f"Adding build output to archive {archive_full_name}")
                     if os.path.exists(archive_full_name):
@@ -455,6 +475,10 @@ def main(argv: Sequence[str]) -> None:
         pass
     elif options.build_target == "silabs-thread":
         flush_print('Path to gecko sdk is configured within Matter.')
+        if 'EFR32_BOARD' not in config['silabs-thread'] or config['silabs-thread']['EFR32_BOARD'] is None:
+            flush_print('EFR32_BOARD was not configured. Make sure silabs-thread.EFR32_BOARD is set on your config.yaml file')
+            exit(1)
+        efr32_board = config['silabs-thread']['EFR32_BOARD']
     else:
         flush_print(f"Target {options.build_target} not supported")
 
@@ -603,8 +627,21 @@ def main(argv: Sequence[str]) -> None:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
-            shell.run_cmd(
-                f"""{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh ./ out/{options.sample_device_type_name} BRD4186A \'sample_name=\"{options.sample_device_type_name}\"\' enable_openthread_cli=true chip_build_libshell=true \'{'import("//with_pw_rpc.gni")' if options.do_rpc else ""}\'""")
+            efr32_cmd_args = []
+            efr32_cmd_args.append(f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
+            efr32_cmd_args.append('./')
+            efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
+            efr32_cmd_args.append(f'{efr32_board}')
+            efr32_cmd_args.append(f'\'sample_name=\"{options.sample_device_type_name}\"\'')
+            if sw_ver_string:
+                efr32_cmd_args.append(f'\'chip_device_config_device_software_version_string=\"{sw_ver_string}\"\'')
+            efr32_cmd_args.append('enable_openthread_cli=true')
+            if options.do_rpc:
+                efr32_cmd_args.append('chip_build_libshell=false')
+                efr32_cmd_args.append('\'import("//with_pw_rpc.gni")\'')
+            else:
+                efr32_cmd_args.append('chip_build_libshell=true')
+            shell.run_cmd(" ".join(efr32_cmd_args))
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
         elif options.build_target == "linux":
@@ -700,7 +737,7 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd("west flash")
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
-            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/BRD4186A/chip-efr32-chef-example.flash.py")
+            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/{efr32_board}/chip-efr32-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 

@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 73.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
+name: 74.1.1. [TC-SWTCH-1.1] Global attributes with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -29,6 +29,8 @@ tests:
     - label: "Read FeatureMap (global attribute 65532)"
       verification: |
           ./chip-tool switch read feature-map 1 1
+
+          Verify on the TH Log:
 
           [1655271856.827371][2855:2860] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFC DataVersion: 4291766665
           [1655271856.827493][2855:2860] CHIP:TOO:   FeatureMap: 1
@@ -68,6 +70,7 @@ tests:
       verification: |
           ./chip-tool switch read cluster-revision 1 1
 
+          Verify on the TH Log:
 
           [1651563714.073979][8331:8336] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFD DataVersion: 3331396879
           [1651563714.074140][8331:8336] CHIP:TOO:   ClusterRevision: 1
@@ -77,6 +80,7 @@ tests:
       verification: |
           ./chip-tool switch read attribute-list 1 1
 
+          Verify on the TH Log:
 
           [1651563753.140074][8338:8343] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFFB DataVersion: 3331396879
           [1651563753.140200][8338:8343] CHIP:TOO:   AttributeList: 8 entries
@@ -99,6 +103,7 @@ tests:
       verification: |
           ./chip-tool switch read  accepted-command-list 1 1
 
+          Verify on the TH Log:
 
           [1651563822.164319][8348:8353] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFF9 DataVersion: 3331396879
           [1651563822.164424][8348:8353] CHIP:TOO:   AcceptedCommandList: 0 entries
@@ -107,6 +112,8 @@ tests:
     - label: "Read GeneratedCommandList (global attribute 65528)"
       verification: |
           ./chip-tool switch read  generated-command-list   1 1
+
+          Verify on the TH Log:
 
           [1651563849.608873][8355:8361] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_FFF8 DataVersion: 3331396879
           [1651563849.608977][8355:8361] CHIP:TOO:   GeneratedCommandList: 0 entries

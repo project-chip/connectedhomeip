@@ -1283,6 +1283,9 @@ CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCrede
         return CHIP_ERROR_INVALID_ARGUMENT;
     case OperationalCertStatus::kInvalidFabricIndex:
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
+    case OperationalCertStatus::kUnknownEnumValue:
+        // Is this a reasonable value?
+        return CHIP_ERROR_CERT_LOAD_FAILED;
     }
 
     return CHIP_ERROR_CERT_LOAD_FAILED;

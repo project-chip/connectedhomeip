@@ -17,6 +17,7 @@
 
 #include "QueryResponder.h"
 
+#include <lib/dnssd/minimal_mdns/core/QNameString.h>
 #include <lib/dnssd/minimal_mdns/records/Ptr.h>
 
 #include <lib/support/logging/CHIPLogging.h>
@@ -56,6 +57,7 @@ QueryResponderSettings QueryResponderBase::AddResponder(RecordResponder * respon
     {
         return QueryResponderSettings();
     }
+    ChipLogDetail(Discovery, "Responding with %s", QNameString(responder->GetQName()).c_str());
 
     for (size_t i = 0; i < mResponderInfoSize; i++)
     {

@@ -2062,15 +2062,15 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
     _xpcDisconnectExpectation = [self expectationWithDescription:@"XPC Disconnected"];
 
     // Multi-subscriptions
-    for (int i = 0; i < 2; i++) {
+    for (unsigned int i = 0; i < 2; i++) {
         myNodeId = nodeIds[i];
         myEndpointId = endpointIds[i];
         myClusterId = clusterIds[i];
         myAttributeId = attributeIds[i];
         myMinInterval = minIntervals[i];
         myMaxInterval = maxIntervals[i];
-        callExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"XPC call (%d) received", i]];
-        establishExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Established (%d) called", i]];
+        callExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"XPC call (%u) received", i]];
+        establishExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Established (%u) called", i]];
         [_remoteDeviceController
                 getBaseDevice:myNodeId
                         queue:dispatch_get_main_queue()
@@ -2122,7 +2122,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:123457 + count * 100] }
             } ]
         ];
-        for (int i = 0; i < 2; i++) {
+        for (unsigned int i = 0; i < 2; i++) {
             NSUInteger nodeId = nodeIds[i];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [clientObject handleReportWithController:uuid
@@ -2180,7 +2180,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
-        for (int i = 0; i < 2; i++) {
+        for (unsigned int i = 0; i < 2; i++) {
             NSUInteger nodeId = nodeIds[i];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [clientObject handleReportWithController:uuid
@@ -2242,7 +2242,7 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
                 @"data" : @ { @"type" : @"SignedInteger", @"value" : [NSNumber numberWithInteger:223457 + count * 100] }
             } ]
         ];
-        for (int i = 0; i < 2; i++) {
+        for (unsigned int i = 0; i < 2; i++) {
             NSUInteger nodeId = nodeIds[i];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [clientObject handleReportWithController:uuid
