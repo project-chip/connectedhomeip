@@ -12,7 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """
 Test for GN Java build rules. This test should be executed using ninja.
 """
@@ -29,8 +28,8 @@ class JavaBuildTest(unittest.TestCase):
     local_test_dir = '/build/chip/java/tests'
     test_dir = chip_root + local_test_dir
 
-    jars_dir = 'python/lib' + local_test_dir
-    configs_dir = 'python/gen' + local_test_dir
+    jars_dir = 'lib' + local_test_dir
+    configs_dir = 'gen' + local_test_dir
 
     # Target names in the BUILD.gn
     targets_to_check = [
@@ -39,10 +38,7 @@ class JavaBuildTest(unittest.TestCase):
         'child_library_2',
         'grandchild_library',
     ]
-    prebuilt_targets_to_check = [
-        'java_prebuilt',
-        'child_prebuilt'
-    ]
+    prebuilt_targets_to_check = ['java_prebuilt', 'child_prebuilt']
 
     def testExpectedJarsCreated(self):
         jars_dir = JavaBuildTest.jars_dir
@@ -58,18 +54,22 @@ class JavaBuildTest(unittest.TestCase):
         configs_dir = JavaBuildTest.configs_dir
         expected_dir = JavaBuildTest.test_dir + '/expected_output'
 
-        for target in (JavaBuildTest.targets_to_check + JavaBuildTest.prebuilt_targets_to_check):
-            with open(expected_dir + '/' + target + '_expected.json', 'r') as expected_config, open(configs_dir + '/' + target + '.json', 'r') as actual_config:
+        for target in (JavaBuildTest.targets_to_check +
+                       JavaBuildTest.prebuilt_targets_to_check):
+            with open(expected_dir + '/' + target + '_expected.json',
+                      'r') as expected_config, open(
+                          configs_dir + '/' + target + '.json',
+                          'r') as actual_config:
                 expected_json = json.load(expected_config)['deps_info']
                 actual_json = json.load(actual_config)['deps_info']
 
                 self.assertEqual(expected_json['name'], actual_json['name'])
-                self.assertEqual(
-                    expected_json['jar_path'], actual_json['jar_path'])
-                self.assertCountEqual(
-                    expected_json['deps_configs'], actual_json['deps_configs'])
-                self.assertCountEqual(
-                    expected_json['deps_jars'], actual_json['deps_jars'])
+                self.assertEqual(expected_json['jar_path'],
+                                 actual_json['jar_path'])
+                self.assertCountEqual(expected_json['deps_configs'],
+                                      actual_json['deps_configs'])
+                self.assertCountEqual(expected_json['deps_jars'],
+                                      actual_json['deps_jars'])
 
 
 if __name__ == '__main__':

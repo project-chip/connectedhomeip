@@ -23,6 +23,8 @@ import("//build_overrides/pigweed.gni")
 import("//src/lwip/lwip.gni")
 import("//src/platform/device.gni")
 import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
+import("$dir_pw_build/python_venv.gni")
 
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
@@ -53,27 +55,83 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
   }
 
-  # Python packages for supporting specific targets.
+  # Pigweed Python packages expected to be used in the :matter_build_venv
+  # target. If all packages are needed this list should match
+  # _pigweed_python_deps in:
+  # https://cs.opensource.google/pigweed/pigweed/+/master:pw_env_setup/BUILD.gn?q=_pigweed_python_deps
+  _pigweed_python_packages = [
+    "$dir_pw_allocator/py",
+    "$dir_pw_arduino_build/py",
+    "$dir_pw_bloat/py",
+    "$dir_pw_build/py",
+    "$dir_pw_build_info/py",
+    "$dir_pw_build_mcuxpresso/py",
+    "$dir_pw_cli/py",
+    "$dir_pw_console/py",
+    "$dir_pw_cpu_exception_cortex_m/py",
+    "$dir_pw_docgen/py",
+    "$dir_pw_doctor/py",
+    "$dir_pw_env_setup/py",
+    "$dir_pw_hdlc/py",
+    "$dir_pw_log:protos.python",
+    "$dir_pw_log_tokenized/py",
+    "$dir_pw_metric/py",
+    "$dir_pw_module/py",
+    "$dir_pw_package/py",
+    "$dir_pw_presubmit/py",
+    "$dir_pw_protobuf/py",
+    "$dir_pw_protobuf_compiler/py",
+    "$dir_pw_rpc/py",
+    "$dir_pw_snapshot/py:pw_snapshot",
+    "$dir_pw_snapshot/py:pw_snapshot_metadata",
+    "$dir_pw_software_update/py",
+    "$dir_pw_status/py",
+    "$dir_pw_stm32cube_build/py",
+    "$dir_pw_symbolizer/py",
+    "$dir_pw_system/py",
+    "$dir_pw_thread/py",
+    "$dir_pw_tls_client/py",
+    "$dir_pw_tokenizer/py",
+    "$dir_pw_toolchain/py",
+    "$dir_pw_trace/py",
+    "$dir_pw_trace_tokenized/py",
+    "$dir_pw_transfer/py",
+    "$dir_pw_unit_test/py",
+    "$dir_pw_watch/py",
+  ]
+
+  # Matter's in-tree pw_python_package or pw_create_python_source_tree targets.
+  _matter_python_packages = [
+    "//integrations/mobly:chip_mobly",
+    "//examples/chef",
+    "//examples/common/pigweed/rpc_console/py:chip_rpc",
+  ]
+
+  pw_python_venv("matter_build_venv") {
+    path = "$root_build_dir/python-venv"
+    constraints = pw_build_PIP_CONSTRAINTS
+    requirements = pw_build_PIP_REQUIREMENTS
+
+    # Packages available to import within GN's build venv.
+    source_packages = _matter_python_packages + _pigweed_python_packages
+  }
+
+  # Python packages installed during bootstrap.
   pw_python_group("python_packages") {
     python_deps = [
-      "$dir_pw_build/py",
-      "$dir_pw_doctor/py",
-      "$dir_pw_env_setup/py",
-      "$dir_pw_hdlc/py",
-      "$dir_pw_log:protos.python",
-      "$dir_pw_module/py",
-      "$dir_pw_protobuf/py",
-      "$dir_pw_protobuf_compiler/py",
-      "$dir_pw_rpc/py",
-      "$dir_pw_status/py",
-      "$dir_pw_toolchain/py",
-      "$dir_pw_trace/py",
-      "$dir_pw_trace_tokenized/py",
-      "$dir_pw_unit_test/py",
-      "$dir_pw_watch/py",
-      "integrations/mobly:chip_mobly",
-      "scripts:requirements",
+      ":pip_install_editable_matter_packages",
+      "$dir_pw_env_setup:pip_install_pigweed_package",
     ]
+  }
+
+  # These pw_python_package targets will be installed using 'pip install --editable'
+  pw_internal_pip_install("pip_install_editable_matter_packages") {
+    packages = [
+      "//integrations/mobly:chip_mobly",
+      "//examples/chef",
+      "//examples/common/pigweed/rpc_console/py:chip_rpc",
+    ]
+    editable = true
   }
 
   # This is a real toolchain. Build CHIP.
