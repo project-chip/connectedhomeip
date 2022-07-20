@@ -54,5 +54,5 @@ tests:
                   { label: "roomType", value: "bedroom" },
               ]
           constraints:
-              - type: list
-              - minLength: 4
+              type: list
+              minLength: 4
