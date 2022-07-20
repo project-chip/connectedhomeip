@@ -515,19 +515,6 @@ public:
     ConstFabricIterator end() const { return cend(); }
 
     /**
-     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
-     *
-     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
-     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
-     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
-     *       entries used during fail-safe.
-     *
-     * @param fabricIndex - fabric index for which to get a mutable FabricInfo entry
-     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
-     */
-    FabricInfo * GetMutableFabricByIndex(FabricIndex fabricIndex);
-
-    /**
      * @brief Get the RCAC (operational root certificate) associated with a fabric.
      *
      * If a root is pending for `fabricIndex` from `AddNewPendingTrustedRootCert`, it is returned.
@@ -540,6 +527,22 @@ public:
      * @retval other CHIP_ERROR values on invalid arguments or internal errors.
      */
     CHIP_ERROR FetchRootCert(FabricIndex fabricIndex, MutableByteSpan & outCert) const;
+
+    /**
+     * @brief Get the pending root certificate which is not associated with a fabric, if there is one.
+     *
+     * If a root is pending from `AddNewPendingTrustedRootCert`, and there is no
+     * fabric associated with the corresponding fabric index yet
+     * (i.e. `AddNewPendingFabric*` has not been called yet) it is returned.
+     *
+     * @param outCert - MutableByteSpan to receive the certificate. Resized to actual size.
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outCert` is too small.
+     * @retval CHIP_ERROR_NOT_FOUND if there is no pending root certificate
+     *                              that's not yet associated with a fabric.
+     * @retval other CHIP_ERROR values on invalid arguments or internal errors.
+     */
+    CHIP_ERROR FetchPendingNonFabricAssociatedRootCert(MutableByteSpan & outCert) const;
 
     /**
      * @brief Get the ICAC (operational intermediate certificate) associated with a fabric.
@@ -947,6 +950,19 @@ private:
         FabricIndex fabricIndex = kUndefinedFabricIndex;
         bool isAddition         = false;
     };
+
+    /**
+     * @brief Get a mutable FabricInfo entry from the table by FabricIndex.
+     *
+     * NOTE: This is private for use within the FabricTable itself. All mutations have to go through the
+     *       FabricTable public methods that take a FabricIndex so that there are no mutations about which
+     *       the FabricTable is unaware, since this would break expectations regarding shadow/pending
+     *       entries used during fail-safe.
+     *
+     * @param fabricIndex - fabric index for which to get a mutable FabricInfo entry
+     * @return the FabricInfo entry for the fabricIndex if found, or nullptr if not found
+     */
+    FabricInfo * GetMutableFabricByIndex(FabricIndex fabricIndex);
 
     // Load a FabricInfo metatada item from storage for a given new fabric index. Returns internal error on failure.
     CHIP_ERROR LoadFromStorage(FabricInfo * fabric, FabricIndex newFabricIndex);
