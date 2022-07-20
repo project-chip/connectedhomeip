@@ -27,6 +27,8 @@ tests:
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 60 0 1 0
 
+          Verify on the TH Log:
+
           [1653477320.523480][30238:30243] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
           [1653477320.523608][30238:30243] CHIP:TOO:   ArmFailSafeResponse: {
           [1653477320.523675][30238:30243] CHIP:TOO:     errorCode: 0
@@ -44,6 +46,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:63686970736574757033 matter123 1 0
 
+          Verify on the TH Log:
+
           1653477413.528761][30261:30266] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
           [1653477413.528863][30261:30266] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
           [1653477413.529035][30261:30266] CHIP:TOO:   NetworkConfigResponse: {
@@ -59,6 +63,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read max-networks 1 0
 
+          Verify on the TH Log:
+
           [1653477467.285273][30270:30275] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000 DataVersion: 1600858167
           [1653477467.285409][30270:30275] CHIP:TOO:   MaxNetworks: 1
           [1653477467.285585][30270:30275] CHIP:EM: Sending Standalone Ack for MessageCounter:2688725 on exchange 43816i
@@ -69,6 +75,8 @@ tests:
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 1 0
 
+          Verify on the TH Log:
+
           [1653477574.502812][30306:30311] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 1600858167
           [1653477574.502935][30306:30311] CHIP:TOO:   LastNetworkingStatus: 0
           [1653477574.503104][30306:30311] CHIP:EM: Sending Standalone Ack for MessageCounter:12420113 on exchange 5762i
@@ -78,6 +86,8 @@ tests:
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0
+
+          Verify on the TH Log:
 
           [1653477517.257488][30295:30300] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 1600858167
           [1653477517.257649][30295:30300] CHIP:TOO:   Networks: 1 entries

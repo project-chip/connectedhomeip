@@ -1667,12 +1667,14 @@ server cluster DoorLock = 257 {
     kRFIDCredentials = 0x2;
     kFingerCredentials = 0x4;
     kLogging = 0x8;
-    kAccessSchedules = 0x10;
+    kWeekDaySchedules = 0x10;
     kDoorPositionSensor = 0x20;
     kFaceCredentials = 0x40;
     kCredentialsOTA = 0x80;
     kUsersManagement = 0x100;
     kNotifications = 0x200;
+    kYearDaySchedules = 0x400;
+    kHolidaySchedules = 0x800;
   }
 
   struct DlCredential {
@@ -2273,7 +2275,7 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation;
-    ram      attribute featureMap default = 0x1B3;
+    ram      attribute featureMap default = 0xDB3;
     ram      attribute clusterRevision default = 6;
   }
 }

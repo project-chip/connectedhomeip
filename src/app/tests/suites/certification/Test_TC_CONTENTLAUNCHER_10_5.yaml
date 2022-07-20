@@ -24,7 +24,7 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known good content URL
           string"
-      PICS: MC_CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.C.C0001
       verification: |
           ./chip-tool contentlauncher launch-url "exampleUrl"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
@@ -43,7 +43,7 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known good content URL
           string and a display string"
-      PICS: MC_CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.C.C0001
       verification: |
           ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1 --DisplayString "Custom Display String"
 
@@ -62,7 +62,7 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known good content URL
           string and a brand information object."
-      PICS: MC_CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.C.C0001
       verification: |
           ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
@@ -81,7 +81,7 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known unreachable
           content URL string."
-      PICS: MC_CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.C.C0001
       verification: |
           ./chip-tool contentlauncher launch-url "https://badurl"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
@@ -102,7 +102,7 @@ tests:
     - label:
           "TH sends a LaunchURL command to the DUT with a known un-authorized
           content URL string."
-      PICS: MC_CONTENTLAUNCHER.C.C0001
+      PICS: CONTENTLAUNCHER.C.C0001
       verification: |
           ./chip-tool contentlauncher launch-url "https://csa-iot.org/badauth"   '{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 

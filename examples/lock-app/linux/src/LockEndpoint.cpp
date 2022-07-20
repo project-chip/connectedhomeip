@@ -385,6 +385,8 @@ const char * LockEndpoint::lockStateToString(DlLockState lockState) const
         return "Locked";
     case DlLockState::kUnlocked:
         return "Unlocked";
+    case DlLockState::kUnknownEnumValue:
+        break;
     }
 
     return "Unknown";

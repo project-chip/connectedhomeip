@@ -34,20 +34,6 @@ config:
         defaultValue: 5
 
 tests:
-    - label: "Stop target device"
-      cluster: "SystemCommands"
-      command: "Stop"
-
-    - label:
-          "Start target device with the provided discriminator for basic
-          commissioning advertisement"
-      cluster: "SystemCommands"
-      command: "Start"
-      arguments:
-          values:
-              - name: "discriminator"
-                value: discriminator
-
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"

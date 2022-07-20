@@ -35,14 +35,14 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MC_MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C0001
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Sends a Seek command"
-      PICS: MC_MEDIAPLAYBACK.S.C000B
+      PICS: MEDIAPLAYBACK.S.C000B
       command: "Seek"
       arguments:
           values:
@@ -68,7 +68,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute"
-      PICS: MC_MEDIAPLAYBACK.S.A0003
+      PICS: MEDIAPLAYBACK.S.A0003
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
@@ -76,7 +76,7 @@ tests:
 
     #Issue 10988
     - label: "TH reads the StartTime attribute from the DUT"
-      PICS: MC_MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
+      PICS: MEDIAPLAYBACK.S.A0001 && PICS_USER_PROMPT
       verification: |
           ./chip-tool mediaplayback read start-time 1 1
           [1654001778189] [97015:7707437] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0506 Attribute 0x0000_0001 DataVersion: 775839144
@@ -98,7 +98,7 @@ tests:
           [1654002119527] [97409:7712444] CHIP: [TOO]   SeekRangeEnd: 80000
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0005
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0005
       arguments:
           values:
               - name: "message"
@@ -115,7 +115,7 @@ tests:
           [1654751320.161941][2491:2496] CHIP:EM: Sending Standalone Ack for MessageCounter:120565821 on exchange 1929
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0006
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0006
       arguments:
           values:
               - name: "message"
@@ -131,7 +131,7 @@ tests:
           [1654001869267] [97168:7708957] CHIP: [TOO]   Duration: 80000
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MC_MEDIAPLAYBACK.S.A0002
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.A0002
       arguments:
           values:
               - name: "message"
@@ -142,7 +142,7 @@ tests:
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      PICS: MC_MEDIAPLAYBACK.S.C000B
+      PICS: MEDIAPLAYBACK.S.C000B
       command: "Seek"
       arguments:
           values:

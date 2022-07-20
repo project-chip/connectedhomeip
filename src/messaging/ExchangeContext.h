@@ -79,7 +79,8 @@ public:
     bool IsInitiator() const;
 
     bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
-bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
+
+    bool IsGroupExchangeContext() const { return mSession && mSession->IsGroupSession(); }
 
     // Implement SessionDelegate
     NewSessionHandlingPolicy GetNewSessionHandlingPolicy() override { return NewSessionHandlingPolicy::kStayAtOldSession; }

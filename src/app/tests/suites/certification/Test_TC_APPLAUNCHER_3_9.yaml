@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "TH sends HideApp command to DUT"
-      PICS: MC_APPLAUNCHER.S.C0002
+      PICS: APPLAUNCHER.S.C0002
       command: "HideApp"
       arguments:
           values:

@@ -29,8 +29,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 opens a commissioning window on TH_CE using a commissioning
-          timeout of PIXIT_COMM_WIN seconds using BCM"
+          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller open commissioning widow using BCM.
 
@@ -72,29 +73,30 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_User Interface Display) A User Consent screen pops up asking
-          for Users permission to allow second commissioner to control TH_CE"
+          "A User Consent screen pops up asking for Users permission to allow
+          second commissioner to control TH_CE"
+      PICS: CADMIN.UserInterfaceDisplay
       verification: |
           Verify the User Consent pop up screen. Verify that the pop up closes after user gives permission
       disabled: true
 
     - label:
-          "If (PICS_User Interface Display) 11 digit Manual Code is displayed on
-          the screen in textual format for User to see"
+          "11 digit Manual Code is displayed on the screen in textual format for
+          User to see"
+      PICS: CADMIN.UserInterfaceDisplay
       verification: |
           Verify that the displayed Manual Code is 11 digits long and doesn’t contain Vendor_ID or Product_ID.
       disabled: true
 
-    - label:
-          "If (PICS_Audio Interface) A voice prompt of the Manual Code format
-          should be heard"
+    - label: "A voice prompt of the Manual Code format should be heard"
+      PICS: CADMIN.AudioInterface
       verification: |
           Verify voice prompt saying the manual code. Verify the voice prompt repeats if user asks.
       disabled: true
 
     - label:
-          "TH_CR2 starts a commissioning process with TH_CE after PIXIT_COMM_WIN
-          (that was given in step 2) + 10 seconds"
+          "TH_CR2 starts a commissioning process with TH_CE after
+          PIXIT.CADMIN.CwDuration (that was given in step 2) + 10 seconds"
       verification: |
           On the 2nd controller using chip-tool , connect to the accessory
 
@@ -107,8 +109,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 opens a new commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
+          "DUT_CR1 sends command to TH_CE to open a new commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller open commissioning widow using BCM.
 
@@ -150,9 +154,8 @@ tests:
           [1650278416.250634][11064:11069] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label:
-          "DUT_CR1 revokes the commissioning window on TH_CE using
-          RevokeCommissioning command"
+    - label: "DUT_CR1 sends command to TH_CE to revoke the commissioning window"
+      PICS: CADMIN.C.C0002
       verification: |
           On your DUT controller revoke commissioning
 
@@ -204,9 +207,8 @@ tests:
           CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
       disabled: true
 
-    - label:
-          "DUT_CR1 revokes the commissioning window on TH_CE using
-          RevokeCommissioning command"
+    - label: "DUT_CR1 sends command to TH_CE to revoke the commissioning window"
+      PICS: CADMIN.C.C0002
       verification: |
           On your DUT controller revoke commissioning
 
@@ -249,8 +251,9 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 writes and reads the Basic Information Clusters NodeLabel
-          mandatory attribute of TH_CE"
+          "DUT_CR1 sends commands to TH_CE to write and read the Basic
+          Information Clusters NodeLabel mandatory attribute"
+      PICS: BINFO.C.A0005
       verification: |
           Using your DUT controller, write attribute and read attribute to and from TH_CE
 
@@ -290,8 +293,10 @@ tests:
       disabled: true
 
     - label:
-          "DUT_CR1 opens a new commissioning window on TH_CE using a
-          commissioning timeout of PIXIT_COMM_WIN seconds using BCM"
+          "DUT_CR1 sends command to TH_CE to open a new commissioning window
+          with a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using
+          BCM"
+      PICS: CADMIN.C.C0001
       verification: |
           On your DUT controller open commissioning widow using BCM.
 

@@ -156,6 +156,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _operationalCredentialsDelegate = nullptr;
     }
 
+    if (_otaProviderDelegateBridge) {
+        delete _otaProviderDelegateBridge;
+        _otaProviderDelegateBridge = nullptr;
+    }
+
     if (_pairingDelegateBridge) {
         delete _pairingDelegateBridge;
         _pairingDelegateBridge = nullptr;
@@ -583,7 +588,13 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         return rv;
     }
 
-    setupPIN &= ((1 << chip::kSetupPINCodeFieldLengthInBits) - 1);
+    if (!chip::CanCastTo<uint32_t>(setupPIN) || !chip::SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(setupPIN))) {
+        MTR_LOG_ERROR("Error: Setup pin %lu is not valid", setupPIN);
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return rv;
+    }
 
     dispatch_sync(_chipWorkQueue, ^{
         VerifyOrReturn([self checkIsRunning:error]);

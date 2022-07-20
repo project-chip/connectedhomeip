@@ -278,7 +278,7 @@ class HostBuilder(GnBuilder):
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'python'
+            self.build_command = 'chip-repl'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

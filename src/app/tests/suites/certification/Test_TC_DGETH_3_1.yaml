@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.1. [TC-DGETH-3.1] Attributes with client as DUT
+name: 3.3.1. [TC-DGETH-3.1] Attributes [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -29,6 +29,9 @@ tests:
     - label: "DUT reads PHYRate attribute from TH."
       PICS: DGETH.S.A0000
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read phyrate 1 0
           Verify the value of PHYRate is in range of PHYRate enum
 
@@ -39,6 +42,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0001
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read full-duplex 1 0
           Verify the value of FullDuplex is boolean
 
@@ -49,6 +55,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0002
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
           Verify the value of PacketRxCount is in range uint64
 
@@ -59,6 +68,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0003
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
           Verify the value of PacketTxCount is in range uint64
 
@@ -69,6 +81,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0004
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 1
           Verify the value of TxErrCount is in range uint64
 
@@ -79,6 +94,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0005
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read collision-count 1 1
           Verify the value of  CollisionCount is in range uint64
 
@@ -89,8 +107,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0006
       verification: |
-          Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+          verify on Reference app receives the right response for the data sent in the below commands
 
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 1
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 3872576452
@@ -100,6 +119,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0007
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 1
           Verify the value of CarrierDetect is either bool or null
 
@@ -110,6 +132,9 @@ tests:
     - label: "DUT reads a attribute value from TH."
       PICS: DGETH.S.A0008
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
           ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 1
           Verify the value of TimeSinceReset is in range uint64
 

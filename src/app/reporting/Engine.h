@@ -70,11 +70,6 @@ public:
 #endif
 
     /**
-     * Main work-horse function that executes the run-loop.
-     */
-    void Run();
-
-    /**
      * Should be invoked when the device receives a Status report, or when the Report data request times out.
      * This allows the engine to do some clean-up.
      *
@@ -131,6 +126,11 @@ public:
 #endif
 
 private:
+    /**
+     * Main work-horse function that executes the run-loop.
+     */
+    void Run();
+
     friend class TestReportingEngine;
 
     struct AttributePathParamsWithGeneration : public AttributePathParams

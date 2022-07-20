@@ -34,6 +34,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "TH reads the IdentifyType attribute from the DUT"
       command: "readAttribute"
