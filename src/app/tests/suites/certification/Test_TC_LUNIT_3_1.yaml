@@ -173,8 +173,8 @@ tests:
       command: "writeAttribute"
       attribute: "temperature-unit"
       arguments:
-        # Per spec, if [TEMP] feature is enabled, then this attribute can be
-        # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
-        value: 5  # INVALID
+          # Per spec, if [TEMP] feature is enabled, then this attribute can be
+          # one of 0 (Farenheit), 1 (Celsius) or 2 (Kelvin)
+          value: 5 # INVALID
       response:
-        error: CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
