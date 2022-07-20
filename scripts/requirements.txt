@@ -2,6 +2,7 @@ pip-tools
 virtualenv
 
 # esp-idf
+-c constraints.esp32.txt
 -r requirements.esp32.txt
 
 # mbed-os

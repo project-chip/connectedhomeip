@@ -11,15 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """chip_mobly"""
 
 import setuptools  # type: ignore
 
-setuptools.setup(
-    name='chip_mobly',
-    version='0.0.1',
-    author='CHIP Authors',
-    description='Integration of Mobly with CHIP devices',
-    packages=setuptools.find_packages(),
-)
+setuptools.setup()  # Package definition in setup.cfg
