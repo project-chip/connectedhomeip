@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 76.2.3. [TC-ACT-3.1] GLobal attributes with client as DUT
+name: 77.2.3. [TC-ACT-3.1] GLobal attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -26,28 +26,58 @@ tests:
           a manufacturer specific order"
       verification: |
           ./chip-tool bridgedactions  read action-list 1 1
+
+          Verify in DUT as client side log
+          [1657608767.991103][57130:57135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 2843363251
+          [1657608767.991158][57130:57135] CHIP:TOO:   action list: 0 entries
+
+
           ./chip-tool bridgedactions  read endpoint-list   1 1
+
+          Verify in DUT as client side log
+          [1657608786.230461][57139:57144] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2843363251
+          [1657608786.230485][57139:57144] CHIP:TOO:   endpoint list: 2 entries
+          [1657608786.230504][57139:57144] CHIP:TOO:     [1]: {
+          [1657608786.230514][57139:57144] CHIP:TOO:       EndpointListID: 57345
+          [1657608786.230519][57139:57144] CHIP:TOO:       Name: Room 1
+          [1657608786.230525][57139:57144] CHIP:TOO:       Type: 1
+          [1657608786.230531][57139:57144] CHIP:TOO:       Endpoints: 2 entries
+          [1657608786.230538][57139:57144] CHIP:TOO:         [1]: 10
+          [1657608786.230544][57139:57144] CHIP:TOO:         [2]: 11
+          [1657608786.230549][57139:57144] CHIP:TOO:      }
+          [1657608786.230558][57139:57144] CHIP:TOO:     [2]: {
+          [1657608786.230563][57139:57144] CHIP:TOO:       EndpointListID: 57346
+          [1657608786.230567][57139:57144] CHIP:TOO:       Name: Room 2
+          [1657608786.230572][57139:57144] CHIP:TOO:       Type: 1
+          [1657608786.230578][57139:57144] CHIP:TOO:       Endpoints: 2 entries
+          [1657608786.230583][57139:57144] CHIP:TOO:         [1]: 12
+          [1657608786.230589][57139:57144] CHIP:TOO:         [2]: 13
+          [1657608786.230594][57139:57144] CHIP:TOO:      }
       disabled: true
 
     - label:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          Optional attibute
+          Verify in DUT as client side log
+
           ./chip-tool bridgedactions  read  setup-url  1 1
+          Needs an SDK Implementation
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writeable attribute
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writeable attribute
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
@@ -57,7 +87,33 @@ tests:
           AttributeList. Commission DUT to TH again"
       verification: |
           ./chip-tool bridgedactions  read action-list 1 1
+
+          Verify in DUT as client side log
+          [1657608767.991103][57130:57135] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0000 DataVersion: 2843363251
+          [1657608767.991158][57130:57135] CHIP:TOO:   action list: 0 entries
+
+
           ./chip-tool bridgedactions  read endpoint-list   1 1
+
+          Verify in DUT as client side log
+          [1657608786.230461][57139:57144] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_0001 DataVersion: 2843363251
+          [1657608786.230485][57139:57144] CHIP:TOO:   endpoint list: 2 entries
+          [1657608786.230504][57139:57144] CHIP:TOO:     [1]: {
+          [1657608786.230514][57139:57144] CHIP:TOO:       EndpointListID: 57345
+          [1657608786.230519][57139:57144] CHIP:TOO:       Name: Room 1
+          [1657608786.230525][57139:57144] CHIP:TOO:       Type: 1
+          [1657608786.230531][57139:57144] CHIP:TOO:       Endpoints: 2 entries
+          [1657608786.230538][57139:57144] CHIP:TOO:         [1]: 10
+          [1657608786.230544][57139:57144] CHIP:TOO:         [2]: 11
+          [1657608786.230549][57139:57144] CHIP:TOO:      }
+          [1657608786.230558][57139:57144] CHIP:TOO:     [2]: {
+          [1657608786.230563][57139:57144] CHIP:TOO:       EndpointListID: 57346
+          [1657608786.230567][57139:57144] CHIP:TOO:       Name: Room 2
+          [1657608786.230572][57139:57144] CHIP:TOO:       Type: 1
+          [1657608786.230578][57139:57144] CHIP:TOO:       Endpoints: 2 entries
+          [1657608786.230583][57139:57144] CHIP:TOO:         [1]: 12
+          [1657608786.230589][57139:57144] CHIP:TOO:         [2]: 13
+          [1657608786.230594][57139:57144] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -66,34 +122,35 @@ tests:
       verification: |
           ./chip-tool bridgedactions  read  setup-url  1 1
 
+          Verify in DUT as client side log
           [1656480136859] [49753:5741500] CHIP: [DMG] ReportDataMessage =
           [1656480136859] [49753:5741500] CHIP: [DMG] {
-          [1656480136859] [49753:5741500] CHIP: [DMG] 	AttributeReportIBs =
-          [1656480136859] [49753:5741500] CHIP: [DMG] 	[
-          [1656480136859] [49753:5741500] CHIP: [DMG] 		AttributeReportIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG] 		{
-          [1656480136859] [49753:5741500] CHIP: [DMG] 			AttributeStatusIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG] 			{
-          [1656480136859] [49753:5741500] CHIP: [DMG] 				AttributePathIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG] 				{
-          [1656480136859] [49753:5741500] CHIP: [DMG] 					Endpoint = 0x1,
-          [1656480136859] [49753:5741500] CHIP: [DMG] 					Cluster = 0x25,
-          [1656480136859] [49753:5741500] CHIP: [DMG] 					Attribute = 0x0000_0002,
-          [1656480136859] [49753:5741500] CHIP: [DMG] 				}
+          [1656480136859] [49753:5741500] CHIP: [DMG]         AttributeReportIBs =
+          [1656480136859] [49753:5741500] CHIP: [DMG]         [
+          [1656480136859] [49753:5741500] CHIP: [DMG]                 AttributeReportIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG]                 {
+          [1656480136859] [49753:5741500] CHIP: [DMG]                         AttributeStatusIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG]                         {
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                 AttributePathIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                 {
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                         Endpoint = 0x1,
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                         Cluster = 0x25,
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                         Attribute = 0x0000_0002,
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                 }
           [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG] 				StatusIB =
-          [1656480136859] [49753:5741500] CHIP: [DMG] 				{
-          [1656480136859] [49753:5741500] CHIP: [DMG] 					status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1656480136859] [49753:5741500] CHIP: [DMG] 				},
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                 StatusIB =
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                 {
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1656480136859] [49753:5741500] CHIP: [DMG]                                 },
           [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG] 			},
+          [1656480136859] [49753:5741500] CHIP: [DMG]                         },
           [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG] 		},
+          [1656480136859] [49753:5741500] CHIP: [DMG]                 },
           [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG] 	],
+          [1656480136859] [49753:5741500] CHIP: [DMG]         ],
           [1656480136859] [49753:5741500] CHIP: [DMG]
-          [1656480136859] [49753:5741500] CHIP: [DMG] 	SuppressResponse = true,
-          [1656480136859] [49753:5741500] CHIP: [DMG] 	InteractionModelRevision = 1
+          [1656480136859] [49753:5741500] CHIP: [DMG]         SuppressResponse = true,
+          [1656480136859] [49753:5741500] CHIP: [DMG]         InteractionModelRevision = 1
           [1656480136859] [49753:5741500] CHIP: [DMG] }
           [1656480136859] [49753:5741500] CHIP: [TOO] Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
@@ -102,5 +159,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writeable attribute
+          This cluster doesn't have any writable attributes
       disabled: true

@@ -41,8 +41,8 @@ tests:
       response:
           value: 1
 
-    - label: "Reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.A4000
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -51,8 +51,8 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Enhanced move to hue and saturation command"
-      PICS: CC.S.C43.Rsp
+    - label: "TH sends EnhancedMoveToHueAndSaturation command to DUT"
+      PICS: CC.S.F01 && CC.S.C43.Rsp
       command: "EnhancedMoveToHueAndSaturation"
       arguments:
           values:
@@ -67,21 +67,22 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1500
 
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      PICS: CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
+          value: 1200
           constraints:
               type: uint16
               minValue: 0

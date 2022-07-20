@@ -1766,13 +1766,13 @@ PICS:
       id: CADMIN.AudioInterface
     #server
     - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
-      id: CADMIN.S.C0000
+      id: CADMIN.S.C00.Rsp
 
     - label: "Does the Device support Basic Commissioning Method (BCM)?"
-      id: CADMIN.S.C0001
+      id: CADMIN.S.C01.Rsp
 
     - label: "Does the Device support revoking commissioning window?"
-      id: CADMIN.S.C0002
+      id: CADMIN.S.C02.Rsp
 
     - label: "Does the Device implement receiving the RemoveFabric command?"
       id: OPCREDS.S.C0a.Rsp
@@ -1788,13 +1788,13 @@ PICS:
 
     #client
     - label: "Does the Device support Enhanced Commissioning Method (ECM)?"
-      id: CADMIN.C.C0000
+      id: CADMIN.C.C00.Tx
 
     - label: "Does the Device support Basic Commissioning Method (BCM)?"
-      id: CADMIN.C.C0001
+      id: CADMIN.C.C01.Tx
 
     - label: "Does the Device support revoking commissioning window?"
-      id: CADMIN.C.C0002
+      id: CADMIN.C.C02.Tx
 
     - label: "Does the Device implement receiving the RemoveFabric command?"
       id: OPCREDS.C.C0a.Tx
@@ -1807,6 +1807,12 @@ PICS:
 
     - label: "Does the Device support WindowStatus attribute?"
       id: CADMIN.C.A0000
+
+    - label: "Does the Device implement the Multi Fabric cluster as a server?"
+      id: CADMIN.S
+
+    - label: "Does the Device implement the Multi Fabric cluster as a client?"
+      id: CADMIN.C
 
     #User Label cluster
     - label: "Does the DUT Server support LabelList attribute?"
@@ -1890,16 +1896,16 @@ PICS:
     - label:
           "Does the DUT support the Channel server cluster ChangeChannel
           command?"
-      id: CHANNEL.S.C0000
+      id: CHANNEL.S.C00.Rsp
 
     - label:
           "Does the DUT support the Channel server cluster ChangeChannelByNumber
           command?"
-      id: CHANNEL.S.C0002
+      id: CHANNEL.S.C02.Rsp
 
     - label:
           "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: CHANNEL.S.C0003
+      id: CHANNEL.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
@@ -2056,18 +2062,9 @@ PICS:
       id: CHANNEL.S.A0002
 
     - label:
-          "Does the DUT support the Channel server cluster ChangeChannel
+          "Does the DUT support the Channel server cluster ChangeChannelResponse
           command?"
-      id: CHANNEL.S.C0000
-
-    - label:
-          "Does the DUT support the Channel server cluster ChangeChannelByNumber
-          command?"
-      id: CHANNEL.S.C0002
-
-    - label:
-          "Does the DUT support the Channel server cluster SkipChannel command?"
-      id: CHANNEL.S.C0003
+      id: CHANNEL.S.C01.Tx
 
     - label:
           "Does the DUT support the Media Playback server cluster Advanced Seek
@@ -2129,40 +2126,40 @@ PICS:
     - label:
           "Does the DUT support the Media Playback server cluster StartOver
           command?"
-      id: MEDIAPLAYBACK.S.C0003
+      id: MEDIAPLAYBACK.S.C03.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Previous
           command?"
-      id: MEDIAPLAYBACK.S.C0004
+      id: MEDIAPLAYBACK.S.C04.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Next command?"
-      id: MEDIAPLAYBACK.S.C0005
+      id: MEDIAPLAYBACK.S.C05.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Rewind
           command?"
-      id: MEDIAPLAYBACK.S.C0006
+      id: MEDIAPLAYBACK.S.C06.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster FastForward
           command?"
-      id: MEDIAPLAYBACK.S.C0007
+      id: MEDIAPLAYBACK.S.C07.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipForward
           command?"
-      id: MEDIAPLAYBACK.S.C0008
+      id: MEDIAPLAYBACK.S.C08.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster SkipBackward
           command?"
-      id: MEDIAPLAYBACK.S.C0009
+      id: MEDIAPLAYBACK.S.C09.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Seek command?"
-      id: MEDIAPLAYBACK.S.C000B
+      id: MEDIAPLAYBACK.S.C0B.Rsp
 
     - label:
           "Does the DUT support the Media Playback client cluster Play command?"
@@ -2812,10 +2809,10 @@ PICS:
       id: MCORE.DD.CONTROLLER
 
     - label: "Does the DUT support Discovery Capability over IP Network?"
-      id: MCORE.DD.DT_IP
+      id: MCORE.DD.DISCOVERY_IP
 
     - label: "Does the DUT support Discovery Capability over SoftAP?"
-      id: MCORE.DD.DT_SOFTAP
+      id: MCORE.DD.DISCOVERY_SOFTAP
 
     - label: "Does the DUT support Standard Commissioning Flow?"
       id: MCORE.DD.STANDARD_COMM_FLOW
@@ -2856,6 +2853,19 @@ PICS:
 
     - label: "Does the device support Wifi or Thread interfaces?"
       id: MCORE.DD.WIRELESS
+
+    - label:
+          "Does the device support TXT Key 'VP' (Vendor ID / Product ID) in it’s
+          DNS-SD TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_VP
+
+    - label:
+          "Does the device support TXT Key 'DT' (Device Type) in it’s DNS-SD TXT
+          Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_DT
+
+    - label: "Does the Commissioner support Discovery Capability over BLE?"
+      id: MCORE.DD.DISCOVERY_BLE
 
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
@@ -4338,6 +4348,11 @@ PICS:
 
     #Node Operational Credential
     #Server Attributes
+    - label:
+          "Factory Reset DUT (to ensure NOC list is empty at the beginning of
+          the following steps)"
+      id: MCORE.FACTORY_RESET
+
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
 
