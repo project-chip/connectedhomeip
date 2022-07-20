@@ -29,6 +29,7 @@ tests:
       disabled: true
 
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.C
       verification: |
           "1. Provision the device using 1st controller chip tool(use above instructions) ,
           "
@@ -37,7 +38,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -57,6 +58,7 @@ tests:
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
       verification: |
           On 2nd controller using chip tool connect to the accessory
 
@@ -70,7 +72,7 @@ tests:
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -90,6 +92,7 @@ tests:
       disabled: true
 
     - label: "TH_CR3 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
       verification: |
           On 3rd controller using chip tool connect to the accessory
 
@@ -204,10 +207,29 @@ tests:
           [1647863260.287515][9294:9299] CHIP:EM: Sending Standalone Ack for MessageCounter:11301761 on exchange 13180i"
       disabled: true
 
+    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+      verification: |
+          On 1st controller using chip tool, read fabrics list
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          + wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+          + wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+          = wlp5s0 IPv6 8E50A59FAF52A809-0000000000000001             _matter._tcp         local
+          hostname = [E45F010F27530000.local]
+          address = [fe80::e65f:1ff:fe0f:2753]
+          port = [5540]
+          txt = ["T=1" "SAI=300" "SII=5000"]
+          = wlp5s0 IPv6 03E707466A904C7E-0000000000000003             _matter._tcp         local
+          hostname = [E45F010F27530000.local]
+          address = [fe80::e65f:1ff:fe0f:2753]
+          port = [5540]
+          txt = ["T=1" "SAI=300" "SII=5000"]
+          grl@grl-ThinkPad-L480:~/may16_cntrl03/connectedhomeip/examples/chip-tool/out/debug$
+      disabled: true
+
     - label:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       verification: |
           On 1st controller chip tool, open commissioning window
 
@@ -227,6 +249,7 @@ tests:
       disabled: true
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
+      PICS: CADMIN.S
       verification: |
           On 2nd controller using chip tool connect to the accessory
 

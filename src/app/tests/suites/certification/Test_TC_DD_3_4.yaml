@@ -32,7 +32,7 @@ tests:
       disabled: true
 
     - label:
-          "TH start scanning for available commissioners using Commissioner
+          "TH starts scanning for available commissioners using Commissioner
           Discovery"
       verification: |
           ubuntu@ubuntu:~/may23_cntrl/connectedhomeip/examples/chip-tool/out/debug$  avahi-browse -rt _matterd._udp
@@ -53,26 +53,26 @@ tests:
 
     - label:
           "TH is instructed to start the commissioning procedure with the DUT
-          found at step 2"
+          found at Step 2"
       verification: |
-          This particular step is Out of scope for V1.0
+          Out of scope for V1.0 - IDM functionality
 
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1312
+          https://github.com/project-chip/connectedhomeip/issues/11004
       disabled: true
 
-    - label: "DUT verify the Identification Declaration message"
+    - label: "DUT verifies the Identification Declaration message"
       verification: |
-          This particular step is Out of scope for V1.0
+          Out of scope for V1.0 - IDM functionality
 
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1312
+          https://github.com/project-chip/connectedhomeip/issues/11004
       disabled: true
 
-    - label: "By any means DUT prompt user for onboarding payload"
+    - label: "By any means, DUT prompts user for onboarding payload"
       verification: |
 
       disabled: true
 
-    - label: "DUT start the commissioning procedure with TH"
+    - label: "DUT starts the commissioning procedure with TH"
       verification: |
           ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
 

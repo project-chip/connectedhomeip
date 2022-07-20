@@ -64,7 +64,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the playback state attribute"
+    - label: "Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"
@@ -90,7 +90,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the playback state attribute"
+    - label: "Reads the CurrentState attribute"
       command: "readAttribute"
       attribute: "CurrentState"
       response:
@@ -115,7 +115,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Reads the playback state attribute"
+    - label: "Reads the CurrentState attribute"
       PICS: MEDIAPLAYBACK.S.A0000
       command: "readAttribute"
       attribute: "CurrentState"

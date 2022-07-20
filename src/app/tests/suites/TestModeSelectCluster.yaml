@@ -58,9 +58,9 @@ tests:
                   },
               ]
           constraints:
-              - type: list
-              - minLength: 3
-              - maxLength: 3
+              type: list
+              minLength: 3
+              maxLength: 3
 
     - label: "Read CurrentMode"
       command: "readAttribute"

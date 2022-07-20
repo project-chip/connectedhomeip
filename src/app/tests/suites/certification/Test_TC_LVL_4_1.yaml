@@ -156,7 +156,6 @@ tests:
               - name: "ms"
                 value: 5000
 
-    # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C05.Rsp && LVL.S.A0000
       command: "readAttribute"
@@ -212,28 +211,6 @@ tests:
                 value: "Please enter 'y' for success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"

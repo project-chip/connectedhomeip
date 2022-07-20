@@ -1000,13 +1000,29 @@ async function chip_tests_only_cluster_response_parameters(options)
 
 function chip_tests_iterate_expected_list(values, options)
 {
-  values = values.map(value => {
+  let context = options.hash.context || this;
+  values      = values.map(value => {
     return {
-      global: this.global, parent: this.parent, name: this.name, type: this.type, isArray: false, isNullable: false, value: value,
+      global: context.global, parent: context.parent, name: context.name, type: context.type, isArray: false, isNullable: false,
+          value: value,
     }
   });
 
   return asBlocks.call(this, Promise.resolve(values), options);
+}
+
+function chip_tests_iterate_constraints(constraints, options)
+{
+  let values = [];
+  for (let key of Object.keys(constraints)) {
+    // Skip "global", because that's not an actual constraint.
+    if (key == "global") {
+      continue;
+    }
+    values.push({ global : this.global, constraint : key, value : constraints[key] })
+  }
+
+  return asBlocks.call(this, Promise.resolve(values), options)
 }
 
 //
@@ -1040,3 +1056,4 @@ exports.isHexString                                 = isHexString;
 exports.octetStringLengthFromHexString              = octetStringLengthFromHexString;
 exports.octetStringFromHexString                    = octetStringFromHexString;
 exports.chip_tests_iterate_expected_list            = chip_tests_iterate_expected_list;
+exports.chip_tests_iterate_constraints              = chip_tests_iterate_constraints;

@@ -372,6 +372,30 @@ protected:
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
     }
 
+    using ConstraintsChecker::CheckConstraintMinLength;
+
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, [current length], expected);
+    }
+
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, [current count], expected);
+    }
+
+    using ConstraintsChecker::CheckConstraintMaxLength;
+
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, [current length], expected);
+    }
+
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, [current count], expected);
+    }
+
     using ConstraintsChecker::CheckConstraintMinValue;
 
     // Used when the minValue is a saved variable, since ConstraintsChecker does
