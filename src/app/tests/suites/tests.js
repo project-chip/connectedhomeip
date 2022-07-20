@@ -63,6 +63,7 @@ function getManualTests() {
         "Test_TC_DD_3_18",
         "Test_TC_DD_3_19",
         "Test_TC_DD_3_20",
+        "Test_TC_DD_3_21",
     ];
 
     const Groups = [
