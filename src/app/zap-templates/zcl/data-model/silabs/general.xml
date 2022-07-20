@@ -191,14 +191,14 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="5"/>
-    <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
+    <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" isNullable="true" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">remaining time</attribute>
     <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">min level</attribute>
     <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFE" optional="true">max level</attribute>
     <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current frequency</attribute>
     <attribute side="server" code="0x0005" define="MIN_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">min frequency</attribute>
     <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">max frequency</attribute>
-    
+
     <attribute side="server" code="0x0010" define="ON_OFF_TRANSITION_TIME" type="INT16U" writable="true" default="0x0000" optional="true">on off transition time</attribute>
     <attribute side="server" code="0x0011" define="ON_LEVEL" type="INT8U" isNullable="true" writable="true" optional="false">on level</attribute>
     <attribute side="server" code="0x0012" define="ON_TRANSITION_TIME" type="INT16U" isNullable="true" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">on transition time</attribute>
@@ -299,13 +299,13 @@ limitations under the License.
     <attribute side="server" code="0x0100" define="APPLICATION_TYPE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">application type</attribute>
   </cluster>
   <bitmap name="LevelControlFeature" type="BITMAP32">
-      <cluster code="0x0008"/>
-      <field name="OnOff" mask="0x1"/>
-      <field name="Lighting" mask="0x2"/>
-      <field name="Frequency" mask="0x4"/>
-  </bitmap>  
+    <cluster code="0x0008"/>
+    <field name="OnOff" mask="0x1"/>
+    <field name="Lighting" mask="0x2"/>
+    <field name="Frequency" mask="0x4"/>
+  </bitmap>
   <bitmap name="GroupClusterFeature" type="BITMAP32">
-      <cluster code="0x0004"/>
-      <field name="GroupNames" mask="0x1"/>
+    <cluster code="0x0004"/>
+    <field name="GroupNames" mask="0x1"/>
   </bitmap>
 </configurator>
