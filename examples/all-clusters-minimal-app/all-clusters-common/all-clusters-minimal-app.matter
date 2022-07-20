@@ -269,7 +269,7 @@ server cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
-  readonly attribute int8u currentLevel = 0;
+  readonly attribute nullable int8u currentLevel = 0;
   attribute bitmap8 options = 15;
   attribute nullable int8u onLevel = 17;
   readonly attribute bitmap32 featureMap = 65532;
