@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    3.3.20. [TC-DD-3.20] Commissioning Flow - Commission, Unpair and
-    Re-commission Device [DUT - Commissioner]
+    3.3.21. [TC-DD-3.21] Commissioning Flow - Commission Multiple-Endpoint
+    Device [DUT - Commissioner]
 
 config:
     nodeId: 0x12344321
@@ -70,62 +70,36 @@ tests:
       disabled: true
 
     - label:
-          "Using DUT Commissioner, unpair the TH Commissionee from the Matter
-          network."
+          "For each TH Endpoint that implements the On/Off light device, verify
+          that the DUT acknowledges the existence of the Endpoint through DUT
+          issuing an On command to the respective Endpoint (e.g. through some
+          user action to trigger such command)."
       verification: |
-          ./chip-tool operationalcredentials remove-fabric 1 1 0
+          1. Send 'on' command from Commissioner to TH Endpoint 1
+          On DUT=chip-tool:
+          $ ./chip-tool onoff on 1 1
+          [...]
+          [1657930715416] [56399:2451384] CHIP: [DMG] Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
 
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
-          CHIP:TOO:   NOCResponse: {
-          CHIP:TOO:     statusCode: 0
-          CHIP:TOO:     fabricIndex: 2
-          CHIP:TOO:    }
-          CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+          On TH=all-clusters-app:
+          [...]
+          [1657930715.432295][2911:2911] CHIP:ZCL: On/Off set value: 1 1
+          [1657930715.432341][2911:2911] CHIP:ZCL: Toggle on/off from 0 to 1
+          [1657930715.432383][2911:2911] CHIP:ZCL: On Command - OffWaitTime :  0
+          [1657930715.432422][2911:2911] CHIP:DMG: Endpoint 1, Cluster 0x0000_0006 update version to ce1d8e1f
+          [1657930715.432468][2911:2911] CHIP:ZCL: On/Toggle Command - Stop Timer
+          [1657930715.432509][2911:2911] CHIP:DMG: Endpoint 1, Cluster 0x0000_0006 update version to ce1d8e20
 
-    - label:
-          "Place TH Commissionee back into commissioning mode using the TH
-          manufacturers means to be discovered by the DUT Commissioner"
-      verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3840
 
-          [1651110721.112368][31791:31791] CHIP:DL: Device Configuration:
-          [1651110721.112448][31791:31791] CHIP:DL:   Serial Number: TEST_SN
-          [1651110721.112501][31791:31791] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651110721.112552][31791:31791] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651110721.112597][31791:31791] CHIP:DL:   Hardware Version: 0
-          [1651110721.112630][31791:31791] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651110721.112662][31791:31791] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1651110721.112703][31791:31791] CHIP:DL:   Manufacturing Date: (not set)
-          [1651110721.112737][31791:31791] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651110721.112767][31791:31791] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1651110721.112838][31791:31791] CHIP:SVR: SetupQRCode: [MT:-24J0AFN00KA0648G00]
-      disabled: true
+          2. Send 'on' command from Commissioner to TH Endpoint 2
+          On DUT=chip-tool:
+          $ ./chip-tool onoff on 1 2
+          [...]
+          [1657930953792] [56404:2453640] CHIP: [DMG] Received Command Response Status for Endpoint=2 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
 
-    - label: "Scan THs QR code using the DUT Commissioner."
-      PICS: MCORE.DD.SCAN_QR_CODE
-      verification: |
-          1. Verify the QR code is scanned by DUT
-          Note: chip-tool does not support physically scanning QR codes
-      disabled: true
-
-    - label:
-          "DUT parses THs QR code. Follow any steps needed for the
-          Commissioner/Commissionee to complete the commissioning process over
-          the TH Commissionees method of device discovery"
-      verification: |
-          TH Commissionee:
-          [1651110724.759825][31791:31791] CHIP:SVR: Commissioning completed successfully
-          [1651110724.759869][31791:31791] CHIP:DIS: Updating services using commissioning mode 0
-
-          DUT Commissioner: 
-          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
-
-          [1651110724689] [95810:65669790] CHIP: [CTL] Received CommissioningComplete response
-          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651110724689] [95810:65669790] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651110724689] [95810:65669790] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1651110724689] [95810:65669790] CHIP: [TOO] Device commissioning completed with success
+          On TH=all-clusters-app:
+          [...]
+          [1657930953.816805][2911:2911] CHIP:ZCL: On/Off set value: 2 1
+          [1657930953.816841][2911:2911] CHIP:ZCL: Toggle on/off from 0 to 1
+          [1657930953.816870][2911:2911] CHIP:DMG: Endpoint 2, Cluster 0x0000_0006 update version to 6475f591
       disabled: true

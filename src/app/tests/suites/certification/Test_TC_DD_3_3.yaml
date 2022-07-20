@@ -30,7 +30,7 @@ tests:
 
     - label: "TH is instructed to advertise Commissioner Discovery service"
       verification: |
-          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app
+          ubuntu@ubuntu:~/may23_DUT/connectedhomeip/examples/tv-app/linux/out/tv-app$ sudo ./chip-tv-app 
 
           CHIP:DL: Using wifi MAC for hostname
           CHIP:DIS: Advertise operational node DFC28FF9FE811EF2-FFFFFFEFFFFFFFFF
@@ -70,22 +70,35 @@ tests:
           [1653478433.098023][3785:3785] CHIP:DIS:         Device Type: 35
           [1653478433.098056][3785:3785] CHIP:DIS:         Instance Name: 02DEC0D7B8A76577
           [1653478433.098076][3785:3785] CHIP:DIS:         Commissioning Mode: 0
-          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from:
+          [1653478433.098103][3785:3785] CHIP:SVR: 2 commissioner(s) discovered. Select one (by number# above) to request commissioning from: 
           [1653478433.098124][3785:3785] CHIP:SVR: Example: cast request 0
       disabled: true
 
     - label:
           "DUT is instructed to start the commissioning procedure with the TH
-          found at step 2"
+          found at Step 3"
       verification: |
-          This particular step is Out of scope for V1.0
+          Out of scope for V1.0 - IDM functionality
 
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1312
+          https://github.com/project-chip/connectedhomeip/issues/11004
       disabled: true
 
     - label: "TH verifies the Identification Declaration message"
       verification: |
-          This particular step is Out of scope for V1.0
+          Out of scope for V1.0 - IDM functionality
 
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1312
+          https://github.com/project-chip/connectedhomeip/issues/11004
+      disabled: true
+
+    - label: "TH start the commissioning procedure with DUT"
+      verification: |
+          ./chip-tool pairing ethernet 1 20202021 3840   fe80::e65f:1ff:fe0f:2755  5640
+
+          [1653559159.021348][4240:4246] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1653559159.021432][4240:4246] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1653559159.021499][4240:4246] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1653559159.021554][4240:4246] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1653559159.021611][4240:4246] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1653559159.021725][4240:4246] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653559159.021790][4240:4246] CHIP:TOO: Device commissioning completed with success
       disabled: true
