@@ -56,7 +56,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "Wait for PIXIT_COMM_WIN(180) + 10"
+    - label: "Wait for PIXIT.CADMIN.CwDuration + 10"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -94,7 +94,7 @@ tests:
       PICS: CADMIN.S.C0002
       timedInteractionTimeoutMs: 10000
 
-    - label: "Commission from beta"
+    - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -144,7 +144,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+    - label: "TH_CR1 opens another commissioning window on DUT_CE"
       identity: "alpha"
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
@@ -155,7 +155,7 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
       response:
-          error: 1
+          error: FAILURE
 
     - label: "Commission from beta"
       identity: "beta"
