@@ -39,7 +39,7 @@ tests:
       response:
           value: 1
 
-    - label: "Move hue up command"
+    - label: "TH sends MoveHue command to DUT"
       PICS: CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -53,7 +53,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads CurrentHue attribute from DUT"
+    - label: "TH reads CurrentHue attribute from DUT"
       PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
@@ -63,7 +63,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Stop Move Step command"
+    - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
@@ -73,11 +73,12 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads CurrentHue attribute from DUT"
+    - label: "TH reads CurrentHue attribute from DUT"
       PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
+          saveAs: CurrentHueValue
           constraints:
               type: uint8
               minValue: 0
@@ -91,19 +92,18 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          attribute"
+    - label: "TH reads CurrentHue attribute from DUT"
       PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
+          value: CurrentHueValue
           constraints:
               type: uint8
               minValue: 0
               maxValue: 254
 
-    - label: "Move saturation up command"
+    - label: "TH sends MoveSaturation command to DUT"
       PICS: CC.S.C04.Rsp
       command: "MoveSaturation"
       arguments:
@@ -117,9 +117,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
+    - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -129,7 +127,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Stop Move Step command"
+    - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
@@ -139,11 +137,12 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads CurrentSaturation attribute from DUT."
+    - label: "TH reads CurrentSaturation attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.A0001
       attribute: "CurrentSaturation"
       response:
+          saveAs: CurrentSaturationValue
           constraints:
               type: uint8
               minValue: 0
@@ -157,19 +156,18 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label:
-          "Check Saturation attribute value matched the value sent by the last
-          attribute"
+    - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
+          value: CurrentSaturationValue
           constraints:
               type: uint8
               minValue: 0
               maxValue: 254
 
-    - label: "Move Color command"
+    - label: "TH sends MoveColor command to DUT"
       PICS: CC.S.C08.Rsp
       command: "MoveColor"
       arguments:
@@ -183,7 +181,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads CurrentX attribute from DUT"
+    - label: "TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
@@ -193,7 +191,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Reads CurrentY attribute from DUT"
+    - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
@@ -203,7 +201,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Stop Move Step command"
+    - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
@@ -213,21 +211,23 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads CurrentX attribute from DUT"
+    - label: "TH reads CurrentX attribute from DUT"
       PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXValue
           constraints:
               type: uint16
               minValue: 0
               maxValue: 65279
 
-    - label: "Reads CurrentY attribute from DUT"
+    - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYValue
           constraints:
               type: uint16
               minValue: 0
@@ -241,31 +241,29 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          attribute"
+    - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
+          value: CurrentXValue
           constraints:
               type: uint16
               minValue: 0
               maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          attribute"
+    - label: "TH reads CurrentY attribute from DUT"
       PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
+          value: CurrentYValue
           constraints:
               type: uint16
               minValue: 0
               maxValue: 65279
 
-    - label: "Move up color temperature command"
+    - label: "TH sends MoveColorTemperature command to DUT"
       PICS: CC.S.C4B.Rsp
       command: "MoveColorTemperature"
       arguments:
@@ -283,7 +281,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads current color temprature from DUT"
+    - label: "TH reads ColorTemperatureMireds attribute from DUT"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
@@ -293,7 +291,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "Stop Move Step command"
+    - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
@@ -303,11 +301,12 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads current color temprature from DUT"
+    - label: "TH reads ColorTemperatureMireds attribute from DUT"
       PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
+          saveAs: ColorTemperatureMiredsValue
           constraints:
               type: uint16
               minValue: 0
@@ -328,12 +327,13 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
+          value: ColorTemperatureMiredsValue
           constraints:
               type: uint16
               minValue: 0
               maxValue: 65279
 
-    - label: "Enhanced Move Hue Up command"
+    - label: "TH sends EnhancedMoveHue command to DUT."
       PICS: CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
@@ -347,7 +347,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads EnhancedCurrentHue attribute value from DUT"
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
@@ -357,7 +357,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Stop Move Step command"
+    - label: "TH sends StopMoveStep command to DUT"
       PICS: CC.S.C47.Rsp
       command: "StopMoveStep"
       arguments:
@@ -367,11 +367,12 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Reads EnhancedCurrentHue attribute value from DUT"
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
+          saveAs: EnhancedCurrentHueValue
           constraints:
               type: uint16
               minValue: 0
@@ -385,13 +386,12 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last attribute"
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
+          value: EnhancedCurrentHueValue
           constraints:
               type: uint16
               minValue: 0

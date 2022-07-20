@@ -59,7 +59,7 @@ tests:
           value: [majorNumber: majornumber, minorNumber: minornumber]
 
     - label: "Sends a SkipChannel command to the DUT"
-      PICS: CHANNEL.S.C0003
+      PICS: CHANNEL.S.C03.Rsp
       command: "SkipChannel"
       arguments:
           values:

@@ -29,74 +29,56 @@ tests:
           Discovery Capability. Commissionee is NOT in commissioning mode.
           Ensure the Version bit string follows the current Matter spec.
           documentation."
-      PICS: MCORE.DD.DT_BLE
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
-          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2 --custom-flow 1
+          $ ./out/ble/all-clusters-app/chip-all-clusters-app --capabilities 2 --custom-flow 1 --ble-device 1
           ...
-          [1651101726.415743][23212:23212] CHIP:DL: Device Configuration:
-          [1651101726.415810][23212:23212] CHIP:DL:   Serial Number: TEST_SN
-          [1651101726.415845][23212:23212] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651101726.415880][23212:23212] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651101726.415911][23212:23212] CHIP:DL:   Hardware Version: 0
-          [1651101726.415933][23212:23212] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651101726.415954][23212:23212] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1651101726.415983][23212:23212] CHIP:DL:   Manufacturing Date: (not set)
-          [1651101726.416004][23212:23212] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651101726.416046][23212:23212] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1651101726.416115][23212:23212] CHIP:SVR: SetupQRCode: [MT:-24J00ID00KA0648G00]
-
-
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J00ID00KA0648G00
-          [1653992397.769301][2532:2532] CHIP:SPL: Parsing base38Representation: MT:-24J00ID00KA0648G00
-          [1653992397.769449][2532:2532] CHIP:SPL: Version:       0
-          [1653992397.769476][2532:2532] CHIP:SPL: VendorID:      65521
-          [1653992397.769496][2532:2532] CHIP:SPL: ProductID:     32769
-          [1653992397.769515][2532:2532] CHIP:SPL: Custom flow:   1    (USER ACTION REQUIRED)
-          [1653992397.769537][2532:2532] CHIP:SPL: Capabilities:  0x02 (BLE)
-          [1653992397.769558][2532:2532] CHIP:SPL: Discriminator: 3840
-          [1653992397.769577][2532:2532] CHIP:SPL: Passcode:      20202021
+          [1657234110.765139][370717:370717] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1657234110.765249][370717:370717] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+          [1657234110.765314][370717:370717] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657234110.765364][370717:370717] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
-    - label: "DUT parses QR code and DUT presents User with a pairing hint."
-      PICS: MCORE.DD.DT_BLE
+    - label: "DUT parses QR code."
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           1. Follow the steps given in the TH's pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
 
-          ./chip-tool pairing code 1 MT:-24J00ID00KA0648G00
-
-          [1653992449.765427][2535:2540] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:748: CHIP Error 0x0000002D: Not Implemented at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:450
-          [1653992449.765485][2535:2540] CHIP:CTL: Stopping commissioning discovery over DNS-SD
-          [1653992449.765541][2535:2540] CHIP:TOO: Secure Pairing Failed
+          On DUT=chip-tool:
+          ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "Follow any steps from the resources provided by the pairing hint for
-          putting the TH Commissionee into commissioning mode and to complete
-          the commissioning process using BLE."
-      PICS: MCORE.DD.DT_BLE
+          "Follow any steps from the resources provided by the pairing hint or
+          by the THs manufacturer for putting the TH Commissionee device into
+          commissioning mode and to complete the commissioning process using
+          BLE."
+      PICS: MCORE.DD.DISCOVERY_BLE
       verification: |
           TH Commissionee:
           [1651101988.943015][23212:23212] CHIP:SVR: Commissioning completed successfully
           [1651101988.943058][23212:23212] CHIP:DIS: Updating services using commissioning mode 0
 
 
-          DUT Commissioner:
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-wifi 1 zigbee-thread matter123 20202021 3840
-
-
-
-          [1651101988809] [94439:65564515] CHIP: [CTL] Received CommissioningComplete response
-          [1651101988809] [94439:65564515] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651101988809] [94439:65564515] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651101988809] [94439:65564515] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651101988809] [94439:65564515] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1651101988809] [94439:65564515] CHIP: [TOO] Device commissioning completed with success
+          On DUT Commissioner=chip-tool:
+          ./chip-tool pairing code 1 MT:-24J0YXE00KA0648G00
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234147237] [31454:16822562] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
@@ -105,63 +87,55 @@ tests:
           its Discovery Capability. Commissionee is NOT in commissioning mode.
           Ensure the Version bit string follows the current Matter spec.
           documentation."
-      PICS: MCORE.DD.DT_IP
+      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           $ ./out/all-clusters-app/chip-all-clusters-app --custom-flow 1 --capabilities 4
-          [1651105004.718882][27096:27096] CHIP:DL: Device Configuration:
-          [1651105004.718943][27096:27096] CHIP:DL:   Serial Number: TEST_SN
-          [1651105004.718975][27096:27096] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651105004.719010][27096:27096] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651105004.719040][27096:27096] CHIP:DL:   Hardware Version: 0
-          [1651105004.719062][27096:27096] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651105004.719083][27096:27096] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1651105004.719111][27096:27096] CHIP:DL:   Manufacturing Date: (not set)
-          [1651105004.719133][27096:27096] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651105004.719153][27096:27096] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
-          [1651105004.719209][27096:27096] CHIP:SVR: SetupQRCode: [MT:-24J06VO00KA0648G00]
-
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J06VO00KA0648G00
-          [1653996764.810698][2819:2819] CHIP:SPL: Parsing base38Representation: MT:-24J06VO00KA0648G00
-          [1653996764.810876][2819:2819] CHIP:SPL: Version:       0
-          [1653996764.810903][2819:2819] CHIP:SPL: VendorID:      65521
-          [1653996764.810923][2819:2819] CHIP:SPL: ProductID:     32769
-          [1653996764.810943][2819:2819] CHIP:SPL: Custom flow:   1    (USER ACTION REQUIRED)
-          [1653996764.810966][2819:2819] CHIP:SPL: Capabilities:  0x04 (On IP network)
-          [1653996764.810987][2819:2819] CHIP:SPL: Discriminator: 3840
-          [1653996764.811006][2819:2819] CHIP:SPL: Passcode:      20202021
-          ubuntu@ubuntu:~/may30_cntrl/connectedhomeip/examples/chip-tool/out/debug$
+          [1657234233.898170][370755:370755] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1657234233.898195][370755:370755] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1657234233.898227][370755:370755] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657234233.898248][370755:370755] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
-    - label: "DUT parses QR code and DUT presents User with a pairing hint."
-      PICS: MCORE.DD.DT_IP
+    - label: "DUT parses QR code."
+      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           1. Follow the steps given in the TH's pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+
+
+          On DUT=chip-tool:
+          ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "Follow any steps from the resources provided by the pairing hint for
-          putting the TH Commissionee into commissioning mode and to complete
-          the commissioning process using IP Network."
-      PICS: MCORE.DD.DT_IP
+          "Follow any steps from the resources provided by the pairing hint or
+          by the THs manufacturer for putting the TH Commissionee device into
+          commissioning mode and to complete the commissioning process using IP
+          Network."
+      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           TH all-clusters-app:
-          [1651105158.168056][27096:27096] CHIP:SVR: Commissioning completed successfully
-          [1651105158.168100][27096:27096] CHIP:DIS: Updating services using commissioning mode 0
+          [1657234324.992098][370755:370755] CHIP:SVR: Commissioning completed successfully
+          [1657234324.992146][370755:370755] CHIP:DIS: Updating services using commissioning mode 0
 
-          DUT chip-tool:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1  MT:-24J06VO00KA0648G00
-          [1651105158065] [95045:65602272] CHIP: [CTL] Received CommissioningComplete response
-          [1651105158065] [95045:65602272] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651105158065] [95045:65602272] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651105158065] [95045:65602272] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651105158065] [95045:65602272] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1651105158065] [95045:65602272] CHIP: [TOO] Device commissioning completed with success
+          On DUT=chip-tool:
+          ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657234324847] [31475:16824564] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
@@ -170,28 +144,33 @@ tests:
           Discovery Capability. Commissionee is NOT in commissioning mode.
           Ensure the Version bit string follows the current Matter spec.
           documentation."
-      PICS: MCORE.DD.DT_SOFTAP
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
       disabled: true
 
     - label: "Scan the QR code from the previous step using the DUT."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
       disabled: true
 
-    - label: "DUT parses QR code and DUT presents User with a pairing hint."
-      PICS: MCORE.DD.DT_SOFTAP
+    - label: "DUT parses QR code."
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          1. Follow the steps given in the TH's pairing hint to allow for commissioning to happen. TH should not be commissioned until these steps were followed and indicate DUT can proceed with commissioning the TH to the Matter network
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
       disabled: true
 
     - label:
-          "Follow any steps from the resources provided by the pairing hint for
-          putting the TH Commissionee into commissioning mode and to complete
-          the commissioning process using SoftAP."
-      PICS: MCORE.DD.DT_SOFTAP
+          "Follow any steps from the resources provided by the pairing hint or
+          by the THs manufacturer for putting the TH Commissionee device into
+          commissioning mode and to complete the commissioning process using
+          SoftAP."
+      PICS: MCORE.DD.DISCOVERY_SOFTAP
       verification: |
-          BLOCKED: SoftAP commissioning not currently supported
+          Out of Scope for V1.0
+          SoftAP commissioning not currently supported
       disabled: true
