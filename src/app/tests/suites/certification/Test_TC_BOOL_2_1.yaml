@@ -33,6 +33,5 @@ tests:
       command: "readAttribute"
       attribute: "StateValue"
       response:
-          value: 0
           constraints:
               type: bool

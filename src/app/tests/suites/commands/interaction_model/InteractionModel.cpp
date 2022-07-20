@@ -449,35 +449,129 @@ void InteractionModelReports::CleanupReadClient(ReadClient * aReadClient)
         mReadClients.end());
 }
 
-CHIP_ERROR InteractionModelReports::ReadAll(DeviceProxy * device, std::vector<EndpointId> endpointIds,
-                                            const Optional<bool> & fabricFiltered)
+CHIP_ERROR InteractionModelReports::ReportAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
+                                              std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
+                                              std::vector<chip::EventId> eventIds,
+                                              chip::app::ReadClient::InteractionType interactionType, uint16_t minInterval,
+                                              uint16_t maxInterval, const chip::Optional<bool> & fabricFiltered,
+                                              const chip::Optional<std::vector<chip::DataVersion>> & dataVersions,
+                                              const chip::Optional<chip::EventNumber> & eventNumber,
+                                              const chip::Optional<bool> & keepSubscriptions)
 {
+    const size_t endpointCount  = endpointIds.size();
+    const size_t clusterCount   = clusterIds.size();
+    const size_t attributeCount = attributeIds.size();
+    const size_t eventCount     = eventIds.size();
+
+    // TODO Add data version supports
+    // TODO Add isUrgents supports
+
+    VerifyOrReturnError(endpointCount > 0 && endpointCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(clusterCount > 0 && clusterCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(attributeCount > 0 && attributeCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(eventCount > 0 && eventCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const bool hasSameIdsCount = (clusterCount == (attributeCount + eventCount)) && (clusterCount == endpointCount);
+    if (!hasSameIdsCount)
+    {
+        ChipLogError(chipTool,
+                     "\nCommand targetting a combination of attribute and event paths needs to have has many clusters and "
+                     "endpoints than the number of attribute and events combined.\n"
+                     "For example if there are 2 attributes and 1 event, the command expects 3 clusters and 3 endpoints.\n"
+                     "Clusters and endpoints ids will be consumed first to populate the attribute paths of the request, and then "
+                     "to populate the event paths of the request.\n\n"
+                     "For example the following arguments:\n"
+                     "\tcluster-ids: 6,6,0X28\n"
+                     "\tendpoint-ids: 1,1,0\n"
+                     "\tattribute-ids: 0,0x4001\n"
+                     "\tevent-ids: 0\n"
+                     "\n"
+                     "will create the following paths:\n"
+                     "\t{cluster: 6, endpoint: 1, attribute: 0}\n"
+                     "\t{cluster: 6, endpoint: 1, attribute: 0x4001}\n"
+                     "\t{cluster: 0x28, endpoint: 0, event: 0}\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     AttributePathParams attributePathParams[kMaxAllowedPaths];
     EventPathParams eventPathParams[kMaxAllowedPaths];
 
-    auto pathsCount = endpointIds.size();
-    VerifyOrReturnError(pathsCount > 0 && pathsCount <= kMaxAllowedPaths, CHIP_ERROR_INVALID_ARGUMENT);
-
+    size_t attributeIndex = 0;
+    size_t eventIndex     = 0;
+    size_t pathsCount     = clusterCount;
     for (size_t i = 0; i < pathsCount; i++)
     {
-        auto endpointId                    = endpointIds.at(i);
-        attributePathParams[i].mEndpointId = endpointId;
-        eventPathParams[i].mEndpointId     = endpointId;
+        auto clusterId  = clusterIds.at(i);
+        auto endpointId = endpointIds.at(i);
+
+        if (attributeIndex < attributeIds.size())
+        {
+            auto attributeId = attributeIds.at(attributeIndex);
+
+            if (endpointId != kInvalidEndpointId)
+            {
+                attributePathParams[attributeIndex].mEndpointId = endpointId;
+            }
+
+            if (clusterId != kInvalidClusterId)
+            {
+                attributePathParams[attributeIndex].mClusterId = clusterId;
+            }
+
+            if (attributeId != kInvalidAttributeId)
+            {
+                attributePathParams[attributeIndex].mAttributeId = attributeId;
+            }
+
+            attributeIndex++;
+        }
+        else if (eventIndex < eventIds.size())
+        {
+            auto eventId = eventIds.at(eventIndex);
+
+            if (endpointId != kInvalidEndpointId)
+            {
+                eventPathParams[eventIndex].mEndpointId = endpointId;
+            }
+
+            if (clusterId != kInvalidClusterId)
+            {
+                eventPathParams[eventIndex].mClusterId = clusterId;
+            }
+
+            if (eventId != kInvalidEventId)
+            {
+                eventPathParams[eventIndex].mEventId = eventId;
+            }
+
+            eventIndex++;
+        }
     }
 
     ReadPrepareParams params(device->GetSecureSession().Value());
     params.mpEventPathParamsList        = eventPathParams;
-    params.mEventPathParamsListSize     = pathsCount;
+    params.mEventPathParamsListSize     = eventCount;
+    params.mEventNumber                 = eventNumber;
     params.mpAttributePathParamsList    = attributePathParams;
-    params.mAttributePathParamsListSize = pathsCount;
+    params.mAttributePathParamsListSize = attributeCount;
 
     if (fabricFiltered.HasValue())
     {
         params.mIsFabricFiltered = fabricFiltered.Value();
     }
 
+    if (interactionType == ReadClient::InteractionType::Subscribe)
+    {
+        params.mMinIntervalFloorSeconds   = minInterval;
+        params.mMaxIntervalCeilingSeconds = maxInterval;
+        if (keepSubscriptions.HasValue())
+        {
+            params.mKeepSubscriptions = keepSubscriptions.Value();
+        }
+    }
+
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-                                               mBufferedReadAdapter, ReadClient::InteractionType::Read);
+                                               mBufferedReadAdapter, interactionType);
     ReturnErrorOnFailure(client->SendRequest(params));
     mReadClients.push_back(std::move(client));
     return CHIP_NO_ERROR;

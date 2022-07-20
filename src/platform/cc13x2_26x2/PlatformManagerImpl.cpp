@@ -108,7 +108,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::CC13X2_26X2Config::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // DMM Addition
     DMMPolicy_Params dmmPolicyParams;

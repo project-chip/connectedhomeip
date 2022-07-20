@@ -28,18 +28,28 @@ tests:
           DUT in any format supported by DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $ ./out/all-clusters-app/chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+          On TH:
+          $ ./out/all-clusters-app/chip-all-clusters-app
 
-          [1651165486.365306][4112:4112] CHIP:DL: Device Configuration:
-          [1651165486.365374][4112:4112] CHIP:DL:   Serial Number: TEST_SN
-          [1651165486.365415][4112:4112] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1651165486.365449][4112:4112] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1651165486.365479][4112:4112] CHIP:DL:   Hardware Version: 0
-          [1651165486.365502][4112:4112] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          [1651165486.365522][4112:4112] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
-          [1651165486.365549][4112:4112] CHIP:DL:   Manufacturing Date: (not set)
-          [1651165486.365570][4112:4112] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1651165486.365646][4112:4112] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1657203632.334400][13827:13827] CHIP:DL: Device Configuration:
+          [1657203632.334663][13827:13827] CHIP:DL:   Serial Number: (not set)
+          [1657203632.334724][13827:13827] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1657203632.334801][13827:13827] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1657203632.334879][13827:13827] CHIP:DL:   Hardware Version: 0
+          [1657203632.334934][13827:13827] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1657203632.334983][13827:13827] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1657203632.335054][13827:13827] CHIP:DL:   Manufacturing Date: (not set)
+          [1657203632.335109][13827:13827] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1657203632.335158][13827:13827] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1657203632.335234][13827:13827] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
+          [1657203632.335298][13827:13827] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657203632.335348][13827:13827] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1657203632.335420][13827:13827] CHIP:SVR: Manual pairing code: [34970112332]
+          [1657203632.335470][13827:13827] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1657203632.335532][13827:13827] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+          [1657203632.335589][13827:13827] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657203632.335637][13827:13827] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          [1657203632.335712][13827:13827] CHIP:SVR: Manual pairing code: [749701123365521327694]
       disabled: true
 
     - label:
@@ -48,10 +58,13 @@ tests:
           2"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $ chip-tool/out/debug$ ./chip-tool payload verhoeff-generate  849701123365521327693
-          [1652423715.746979][23816:23816] CHIP:SPL: Generating Character for: 849701123365521327693
-          [1652423715.747112][23816:23816] CHIP:SPL: Generated Char: 0
-          $ chip-tool/out/debug$
+          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
+
+          $ ./chip-tool payload verhoeff-generate  84970112336552132769
+          [1657238290868] [31968:16868160] CHIP: [SPL] Generating Character for: 84970112336552132769
+          [1657238290868] [31968:16868160] CHIP: [SPL] Generated Char: 3
+
+          Manual code: 8497011233655213276930
       disabled: true
 
     - label:
@@ -59,12 +72,9 @@ tests:
           the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing code 1 849701123365521327693
+          $  ./chip-tool pairing code 1 849701123365521327693
 
-          [1651186987544] [13533:359998] CHIP: [SPL] Failed decoding base10. Input length 20 was not expected length 10
-          ...
-
-          Run command failure: ../../third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
+          [1657238348848] [31971:16868925] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:137: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
     - label:
@@ -73,7 +83,8 @@ tests:
           invalid VID_PID_PRESENT set to 0"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $ ./out/chip-tool/chip-tool payload verhoeff-generate 34970112336552132769
+          1. Use chip-tool's "payload verhoeff-generate" command to help generate the new, invalid Manual code
+          $ ./chip-tool payload verhoeff-generate 34970112336552132769
           [1651186492744] [13434:353094] CHIP: [SPL] Generating Character for: 34970112336552132769
           [1651186492744] [13434:353094] CHIP: [SPL] Generated Char: 6
 
@@ -85,11 +96,11 @@ tests:
           the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing code 1 349701123365521327696
+          $  ./chip-tool pairing code 1 349701123365521327696
 
-          [1651187185899] [13557:362337] CHIP: [SPL] Failed decoding base10. Input length 20 was not expected length 10
+          [1657238541643] [31975:16871084] CHIP: [SPL] Failed decoding base10. Input length 20 was not expected length 10
           ...
-          [1651187185900] [13557:362333] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:63: CHIP Error 0x0000001E: Invalid string length
+          [1657238541644] [31975:16871079] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:63: CHIP Error 0x0000001E: Invalid string length
       disabled: true
 
     - label:
@@ -102,10 +113,10 @@ tests:
           "Discriminator value")'
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $ ./out/chip-tool/chip-tool payload verhoeff-generate  733317123365521327692
-          [1651186243492] [13415:349553] CHIP: [SPL] Generating Character for: 8497011233
-          [1651186243492] [13415:349553] CHIP: [SPL] Generated Char: 1
-          Manual Code:  733317123365521327692
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+
+          $ ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --discriminator 3584
+          [1657238783501] [31989:16873588] CHIP: [TOO] Manual Code: 733317123365521327692
       disabled: true
 
     - label:
@@ -113,7 +124,7 @@ tests:
           the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing code 1 733317123365521327692
+          $  ./chip-tool pairing code 1 733317123365521327692
 
           [1655814152.716988][3723:3726] CHIP:CTL: Commissioning discovery over BLE failed: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:829: CHIP Error 0x00000032: Timeout
           [1655814152.717099][3723:3726] CHIP:-: ../../third_party/connectedhomeip/src/platform/Linux/BLEManagerImpl.cpp:829: CHIP Error 0x00000032: Timeout at ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:270
@@ -132,10 +143,12 @@ tests:
           55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          1. Use this as an example of how to generate a manual code with an invalid passcode
+          1. Use this as an example of how to generate a manual code with an invalid passcode. In this example the invalid passcode=00000000
 
-          $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 3840  --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1 --allow-invalid-payload 1 --setup-pin-code 00000000
-          [1651188323732] [14068:388953] CHIP: [TOO] Manual Code: 749152000065521327698
+          Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+
+          $ ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --setup-pin-code 00000000
+          [1657239062245] [32164:16876812] CHIP: [TOO] Manual Code: 749152000065521327698
       disabled: true
 
     - label:
@@ -144,61 +157,61 @@ tests:
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           (00000000)
-           $  ./out/chip-tool/chip-tool pairing code 1 749152000065521327698
+           $  ./chip-tool pairing code 1 749152000065521327698
           [1651187937232] [13896:372977] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:161: CHIP Error 0x0000002F: Invalid argument
 
            (11111111)
-           $  ./out/chip-tool/chip-tool pairing code 1 751911067865521327698
+           $  ./chip-tool pairing code 1 751911067865521327698
           [1655814240.531424][3747:3747] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (22222222)
-           $  ./out/chip-tool/chip-tool pairing code 1 754670135665521327694
+           $  ./chip-tool pairing code 1 754670135665521327694
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (33333333)
-           $  ./out/chip-tool/chip-tool pairing code 1 757429203465521327699
+           $  ./chip-tool pairing code 1 757429203465521327699
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (44444444)
-           $  ./out/chip-tool/chip-tool pairing code 1 760188271265521327697
+           $  ./chip-tool pairing code 1 760188271265521327697
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (55555555)
-           $  ./out/chip-tool/chip-tool pairing code 1 762947339065521327695
+           $  ./chip-tool pairing code 1 762947339065521327695
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (66666666)
-           $  ./out/chip-tool/chip-tool pairing code 1 749322406965521327695
+           $  ./chip-tool pairing code 1 749322406965521327695
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (77777777)
-           $  ./out/chip-tool/chip-tool pairing code 1 752081474765521327697
+           $  ./chip-tool pairing code 1 752081474765521327697
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (88888888)
-           $  ./out/chip-tool/chip-tool pairing code 1 754840542565521327693
+           $  ./chip-tool pairing code 1 754840542565521327693
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (99999999)
-           $  ./out/chip-tool/chip-tool pairing code 1 757599610365521327695
+           $  ./chip-tool pairing code 1 757599610365521327695
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (12345678)
-           $  ./out/chip-tool/chip-tool pairing code 1 757678075365521327695
+           $  ./chip-tool pairing code 1 757678075365521327695
           [1655814269.264731][3754:3754] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
 
 
            (87654321)
-           $  ./out/chip-tool/chip-tool pairing code 1 765457534965521327696
+           $  ./chip-tool pairing code 1 765457534965521327696
           [1655814323.718122][3761:3761] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
@@ -213,7 +226,7 @@ tests:
       verification: |
           1. Use this as an example of how to generate a manual code with an invalid vendor IDs
 
-          $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1
+          $ ./chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 1
           [1651189120686] [14218:398626] CHIP: [TOO] Manual Code: 749701123365521327694
       disabled: true
 
@@ -223,22 +236,18 @@ tests:
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
           (0xFFF1)
-           $  ./out/chip-tool/chip-tool pairing manualcode 1 749701123365521327694
-          Error: chip-tool pairs to chip-all-clusters-app with this invalid vendor ID but that is expected of chip-tool
+           $  ./chip-tool pairing code 1 749701123365521327694
 
            (0xFFF2)
-           $  ./out/chip-tool/chip-tool pairing manualcode 1 749701123365522327692
-          Error: chip-tool pairs to chip-all-clusters-app with this invalid vendor ID but that is expected of chip-tool
+           $  ./chip-tool pairing code 1 749701123365522327692
 
 
            (0xFFF3)
-           $  ./out/chip-tool/chip-tool pairing manualcode 1 749701123365523327697
-          Error: chip-tool pairs to chip-all-clusters-app with this invalid vendor ID but that is expected of chip-tool
+           $  ./chip-tool pairing code 1 749701123365523327697
 
 
            (0xFFF4)
-           $  ./out/chip-tool/chip-tool pairing manualcode 1 749701123365524327693
-          Error: chip-tool pairs to chip-all-clusters-app with this invalid vendor ID but that is expected of chip-tool
+           $  ./chip-tool pairing code 1 749701123365524327693
       disabled: true
 
     - label:
@@ -248,8 +257,10 @@ tests:
           Identifier")'
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $ ./out/chip-tool/chip-tool payload generate-manualcode --discriminator 3840 --setup-pin-code 20202021 --version 0 --vendor-id 0xFFF1 --product-id 0x0000 --commissioning-mode 1 --allow-invalid-payload 1
-          [1651187401077] [13610:366251] CHIP: [TOO] Manual Code: 749701123365521000006
+          1. Use chip-tool's "payload generate-manualcode" command to help generate the new, invalid Manual code
+
+          $ ./chip-tool payload generate-manualcode --existing-payload 749701123365521327694 --allow-invalid-payload 1 --product-id 0x0000
+          [1657239418656] [32180:16880488] CHIP: [TOO] Manual Code: 749701123365521000006
       disabled: true
 
     - label:
@@ -257,9 +268,10 @@ tests:
           the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing manualcode 1 749701123365521000006
+          On DUT:
+          $  ./chip-tool pairing code 1 749701123365521000006
 
-          [1655380389.096806][35861:35861] CHIP:TOO: Run command failure: ../../third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
+          [1657239565895] [32193:16881922] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/controller/SetUpCodePairer.cpp:55: CHIP Error 0x0000002F: Invalid argument
       disabled: true
 
     - label:
@@ -270,7 +282,9 @@ tests:
           Product IDs included (VID_PID_Present == 1))"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $ ./out/chip-tool/chip-tool payload verhoeff-verify 749701123365521327693 20
+          1. Use chip-tool's "payload verhoeff-verify" command to help verify that the check-digit is invalid
+
+          $ ./chip-tool payload verhoeff-verify 749701123365521327693 20
           [1651187504088] [13629:367627] CHIP: [SPL] Verifying Manual Code: 74970112336552132769
           [1651187504088] [13629:367627] CHIP: [SPL] 749701123365521327693 is INVALID at position 20
       disabled: true
@@ -280,7 +294,7 @@ tests:
           the DUT in any format supported by the DUT"
       PICS: MCORE.DD.21_MANUAL_PC
       verification: |
-          $  ./out/chip-tool/chip-tool pairing code 1 749701123365521327693
+          $  ./chip-tool pairing code 1 749701123365521327693
 
           [1651187528666] [13631:367920] CHIP: [TOO] Run command failure: ../../examples/chip-tool/third_party/connectedhomeip/src/setup_payload/ManualSetupPayloadParser.cpp:50: CHIP Error 0x00000013: Integrity check failed
       disabled: true

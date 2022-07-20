@@ -21,6 +21,8 @@ static_library("core") {
     "DnsHeader.h",
     "QName.cpp",
     "QName.h",
+    "QNameString.cpp",
+    "QNameString.h",
     "RecordWriter.cpp",
     "RecordWriter.h",
   ]

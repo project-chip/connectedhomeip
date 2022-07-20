@@ -117,5 +117,10 @@ void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetr
     }
 }
 
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

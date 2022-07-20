@@ -133,6 +133,7 @@ public:
     // Matter Counter Keys
     static constexpr Key kConfigKey_BootCount             = EFR32ConfigKey(kMatterCounter_KeyBase, 0x00);
     static constexpr Key kConfigKey_TotalOperationalHours = EFR32ConfigKey(kMatterCounter_KeyBase, 0x01);
+    static constexpr Key kConfigKey_LifeTimeCounter       = EFR32ConfigKey(kMatterCounter_KeyBase, 0x02);
 
     // Matter KVS storage Keys
     static constexpr Key kConfigKey_KvsStringKeyMap = EFR32ConfigKey(kMatterKvs_KeyBase, 0x00);

@@ -52,13 +52,11 @@ void LEDWidget::Init(int ledNum)
     mLedNum           = ledNum;
     mState            = 0;
     mbrightness       = LED_MAX_BRIGHTNESS;
-    if (CY_RSLT_SUCCESS != cyhal_pwm_init(&pwm_led, (cyhal_gpio_t) ledNum, NULL))
+
+    if (CY_RSLT_SUCCESS !=
+        cyhal_gpio_init((cyhal_gpio_t) ledNum, CYHAL_GPIO_DIR_OUTPUT, CYHAL_GPIO_DRIVE_STRONG, CYBSP_LED_STATE_OFF))
     {
-        printf("LED PWM Init failed!");
-    }
-    if (CY_RSLT_SUCCESS != cyhal_pwm_set_duty_cycle(&pwm_led, GET_DUTY_CYCLE(LED_MAX_BRIGHTNESS), PWM_LED_FREQ_HZ))
-    {
-        printf("PWM failed to set dutycycle!");
+        printf("GPIO Init failed for Led %d \r\n", ledNum);
     }
 }
 
@@ -110,7 +108,7 @@ void LEDWidget::DoSet(bool state)
 {
     if (mState != state)
     {
-        (state) ? PWM_start() : PWM_stop();
+        cyhal_gpio_write((cyhal_gpio_t) mLedNum, ((state) ? CYBSP_LED_STATE_ON : CYBSP_LED_STATE_OFF));
     }
     mState = state;
 }

@@ -29,22 +29,12 @@ tests:
                 value: nodeId
 
     # Issue 13029
+    #this step implicitly validating the attribute(CurrentApp)constraints, as long as the payload is being parsed successfully
     - label:
           "TH reads CurrentApp attribute from the DUT and Verify the in-focus
           application attributes, which should include the display Application
           ID(type:uint16) Catalog Vendor ID(type:string) or Null if there is no
           current in-focus application"
-      verification: |
-          ./chip-tool applicationlauncher read current-app 1 1
-          [1653909423.450195][16364:16369] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050C Attribute 0x0000_0001 DataVersion: 2386582479
-          [1653909423.450227][16364:16369] CHIP:TOO:   CurrentApp: null
-          [1653909423.450318][16364:16369] CHIP:EM: Sending Standalone Ack for MessageCounter:2071603 on exchange 4134i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && APPLAUNCHER.S.A0001
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: APPLAUNCHER.S.A0001
+      command: "readAttribute"
+      attribute: "CurrentApp"

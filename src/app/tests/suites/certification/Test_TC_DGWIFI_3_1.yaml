@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.1. [TC-DGWIFI-3.1] Attributes with client as DUT
+name: 3.3.1. [TC-DGWIFI-3.1]Attributes [DUT as Client]
 
 config:
     nodeId: 0x12344321
@@ -29,7 +29,9 @@ tests:
     - label: "DUT reads NetworkInterface structure attribute from TH."
       PICS: DGWIFI.S.A0000
       verification: |
-          Verify that the attribute value is non-zero and the value data type matches
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
 
           ./chip-tool wifinetworkdiagnostics read bssid 1 0
           [1650451782.025188][9063:9068] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0000 DataVersion: 1028539580
@@ -39,7 +41,9 @@ tests:
     - label: "DUT reads a SecurityType attribute value from TH."
       PICS: DGWIFI.S.A0001
       verification: |
-          Verify that the attribute value is non-zero and the value data type matches
+          verify on Reference app receives the right response for the data sent in the below commands
+
+          Verify in TH all-clusters-app log
 
           ./chip-tool wifinetworkdiagnostics read security-type 1 0
           [1650451927.587236][9086:9091] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0001 DataVersion: 1028539580
@@ -49,7 +53,10 @@ tests:
     - label: "DUT reads a WiFiVersion attribute value from TH."
       PICS: DGWIFI.S.A0002
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
           ./chip-tool wifinetworkdiagnostics read wi-fi-version 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650451948.677197][9092:9097] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0002 DataVersion: 1028539580
           [1650451948.677299][9092:9097] CHIP:TOO:   WiFiVersion: 3
@@ -58,7 +65,11 @@ tests:
     - label: "DUT reads a ChannelNumber attribute value from TH."
       PICS: DGWIFI.S.A0003
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           ./chip-tool wifinetworkdiagnostics read channel-number 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650451989.021486][9112:9117] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0003 DataVersion: 1028539580
           [1650451989.021547][9112:9117] CHIP:TOO:   ChannelNumber: 1
@@ -67,7 +78,11 @@ tests:
     - label: "DUT reads a RSSI attribute value from TH."
       PICS: DGWIFI.S.A0004
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+
+          Verify in TH all-clusters-app log
 
           ./chip-tool wifinetworkdiagnostics read rssi 1 0
           [1650452156.130334][9132:9137] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0004 DataVersion: 1028539580
@@ -77,9 +92,13 @@ tests:
     - label: "DUT reads a BeaconLostCount attribute value from TH."
       PICS: DGWIFI.S.A0005
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read beacon-lost-count 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650450239.341208][5252:5257] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0005 DataVersion: 1626643502
           [1650450239.341280][5252:5257] CHIP:TOO:   BeaconLostCount: 0
@@ -88,9 +107,14 @@ tests:
     - label: "DUT reads a BeaconRxCount attribute value from TH."
       PICS: DGWIFI.S.A0006
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read beacon-rx-count 1 0
+
+          Verify in TH all-clusters-app log
+
           [1650454625.960728][9290:9295] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0006 DataVersion: 1028539580
           [1650454625.960813][9290:9295] CHIP:TOO:   BeaconRxCount: 0
       disabled: true
@@ -98,9 +122,14 @@ tests:
     - label: "DUT reads a PacketMultiRxCount attribute value from TH."
       PICS: DGWIFI.S.A0007
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read packet-multicast-rx-count 1 0
+
+          Verify in TH all-clusters-app log
+
           [1650454695.550436][9303:9308] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0007 DataVersion: 1028539580
           [1650454695.550515][9303:9308] CHIP:TOO:   PacketMulticastRxCount: 401028
       disabled: true
@@ -108,9 +137,13 @@ tests:
     - label: "DUT reads a PacketMultiTxCount attribute value from TH."
       PICS: DGWIFI.S.A0008
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read packet-multicast-tx-count 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650454724.371654][9311:9316] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0008 DataVersion: 1028539580
           [1650454724.371740][9311:9316] CHIP:TOO:   PacketMulticastTxCount: 0
@@ -119,9 +152,12 @@ tests:
     - label: "DUT reads a PacketUniRxCount attribute value from TH."
       PICS: DGWIFI.S.A0009
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read packet-unicast-rx-count 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650454751.954086][9317:9322] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_0009 DataVersion: 1028539580
           [1650454751.954174][9317:9322] CHIP:TOO:   PacketUnicastRxCount:  4855
@@ -130,7 +166,11 @@ tests:
     - label: "DUT reads a PacketUniTxCount attribute value from TH."
       PICS: DGWIFI.S.A000a
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
+
+          Verify in TH all-clusters-app log
 
           ./chip-tool wifinetworkdiagnostics read packet-unicast-tx-count 1 0
           [1650454782.789340][9323:9328] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_000A DataVersion: 1028539580
@@ -140,9 +180,13 @@ tests:
     - label: "DUT reads CurrentMaxRate attribute value from TH."
       PICS: DGWIFI.S.A000b
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read current-max-rate 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650451685.092993][5470:5475] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_000B DataVersion: 1626643502
           [1650451685.093078][5470:5475] CHIP:TOO:   CurrentMaxRate: 24000000
@@ -151,9 +195,13 @@ tests:
     - label: "DUT reads a OverrunCount attribute value from TH."
       PICS: DGWIFI.S.A000c
       verification: |
+          verify on Reference app receives the right response for the data sent in the below commands
+
           Verify that the attribute data value is present. If the value is 0, no packet loss was recorded or it was just reset from a node reboot.
 
           ./chip-tool wifinetworkdiagnostics read overrun-count 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650451635.634814][9056:9061] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_000C DataVersion: 1028539580
           [1650451635.634882][9056:9061] CHIP:TOO:   OverrunCount: 0

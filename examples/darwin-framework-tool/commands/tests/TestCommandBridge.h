@@ -159,9 +159,11 @@ public:
         // Invalidate our existing CASE session; otherwise getConnectedDevice
         // will just hand it right back to us without establishing a new CASE
         // session when a reboot is done on the server.
-        if (GetDevice(identity) != nil) {
-            [GetDevice(identity) invalidateCASESession];
-            mConnectedDevices[identity] = nil;
+        if (value.expireExistingSession.ValueOr(true)) {
+            if (GetDevice(identity) != nil) {
+                [GetDevice(identity) invalidateCASESession];
+                mConnectedDevices[identity] = nil;
+            }
         }
 
         [controller getBaseDevice:value.nodeId
@@ -368,6 +370,30 @@ protected:
     {
         NSNumber * currentValue = @(MTRErrorToCHIPErrorCode(current).AsInteger());
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
+    }
+
+    using ConstraintsChecker::CheckConstraintMinLength;
+
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, [current length], expected);
+    }
+
+    bool CheckConstraintMinLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMinLength(itemName, [current count], expected);
+    }
+
+    using ConstraintsChecker::CheckConstraintMaxLength;
+
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSString * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, [current length], expected);
+    }
+
+    bool CheckConstraintMaxLength(const char * _Nonnull itemName, NSArray * _Nonnull current, uint64_t expected)
+    {
+        return CheckConstraintMaxLength(itemName, [current count], expected);
     }
 
     using ConstraintsChecker::CheckConstraintMinValue;

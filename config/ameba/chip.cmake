@@ -105,6 +105,12 @@ string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
 string(APPEND CHIP_GN_ARGS "chip_inet_config_enable_ipv4 = false\n")
 
+# Enable persistent storage audit
+if (matter_enable_persistentstorage_audit)
+string(APPEND CHIP_GN_ARGS "chip_support_enable_storage_api_audit = true\n")
+endif (matter_enable_persistentstorage_audit)
+#endif
+
 # Build RPC
 if (matter_enable_rpc)
 #string(APPEND CHIP_GN_ARGS "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]\n")

@@ -44,7 +44,7 @@ tests:
     - label: "DUT executes a blink effect"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -68,7 +68,7 @@ tests:
     - label: "DUT executes a breathe effect"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -92,7 +92,7 @@ tests:
     - label: "DUT executes an okay effect"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -116,7 +116,7 @@ tests:
     - label: "DUT executes a channel change effect"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -140,7 +140,7 @@ tests:
     - label: "DUT executes a breathe effect"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -164,7 +164,7 @@ tests:
     - label: "DUT stops the breathe effect after the current effect sequence"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -188,7 +188,7 @@ tests:
     - label: "DUT executes a breathe effect"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -212,7 +212,7 @@ tests:
     - label: "DUT stops the breathe effect as soon as possible."
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -236,7 +236,7 @@ tests:
     - label: "Check DUT executes a blink effect."
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"
@@ -261,7 +261,7 @@ tests:
           "DUT stops any effect that may be still running as soon as possible"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C40.Rsp
       arguments:
           values:
               - name: "message"

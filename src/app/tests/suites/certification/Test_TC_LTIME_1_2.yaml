@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 109.1.2. [TC-LTIME-1.2] Global Attributes [DUT as Server]
+name: 4.1.2. [TC-LTIME-1.2] Global Attributes [DUT as Server]
 
 config:
     nodeId: 0x12344321
@@ -21,8 +21,15 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Commission TH to DUT"
+      verification: |
+
+      disabled: true
+
     - label: "TH reads from the DUT the (0xFFFD) ClusterRevision attribute"
       verification: |
+          Verify in TH log:
+
           ./chip-tool timeformatlocalization read  cluster-revision 1 0
 
           [1651185991606] [10988:109915] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFD DataVersion: 3316530441
@@ -31,6 +38,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFFC) FeatureMap attribute"
       verification: |
+          Verify in TH log:
+
           ./chip-tool timeformatlocalization read feature-map 1 0
 
           [1653400472.682259][11385:11390] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFC DataVersion: 4156010624
@@ -40,16 +49,20 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFFB) AttributeList attribute"
       verification: |
+          Verify in TH log:
+
           ./chip-tool timeformatlocalization read attribute-list 1 0
-          [1651186148313] [11054:111653] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFB DataVersion: 3316530441
-          [1651186148314] [11054:111653] CHIP: [TOO]   AttributeList: 7 entries
-          [1651186148314] [11054:111653] CHIP: [TOO]     [1]: 0
-          [1651186148314] [11054:111653] CHIP: [TOO]     [2]: 1
-          [1651186148314] [11054:111653] CHIP: [TOO]     [3]: 2
-          [1651186148314] [11054:111653] CHIP: [TOO]     [4]: 65528
-          [1651186148314] [11054:111653] CHIP: [TOO]     [5]: 65529
-          [1651186148314] [11054:111653] CHIP: [TOO]     [6]: 65531
-          [1651186148314] [11054:111653] CHIP: [TOO]     [7]: 65533
+          [1653999139.214139][7477:7482] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFB DataVersion: 3201720795
+          [1653999139.214208][7477:7482] CHIP:TOO:   AttributeList: 8 entries
+          [1653999139.214241][7477:7482] CHIP:TOO:     [1]: 0
+          [1653999139.214267][7477:7482] CHIP:TOO:     [2]: 1
+          [1653999139.214293][7477:7482] CHIP:TOO:     [3]: 2
+          [1653999139.214320][7477:7482] CHIP:TOO:     [4]: 65528
+          [1653999139.214345][7477:7482] CHIP:TOO:     [5]: 65529
+          [1653999139.214371][7477:7482] CHIP:TOO:     [6]: 65531
+          [1653999139.214397][7477:7482] CHIP:TOO:     [7]: 65532
+          [1653999139.214422][7477:7482] CHIP:TOO:     [8]: 65533
+          [1653999139.214522][7477:7482] CHIP:EM: Sending Standalone Ack for MessageCounter:5643805 on exchange 4737i
       disabled: true
 
     - label: "TH reads from the DUT the (0xFFFA) EventList attribute"
@@ -59,6 +72,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFF9) AcceptedCommandList attribute"
       verification: |
+          Verify in TH log:
+
           ./chip-tool timeformatlocalization read accepted-command-list 1 0
           [1651186189564] [11076:112595] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF9 DataVersion: 3316530441
           [1651186189564] [11076:112595] CHIP: [TOO]   AcceptedCommandList: 0 entries
@@ -66,6 +81,8 @@ tests:
 
     - label: "TH reads from the DUT the (0xFFF8) GeneratedCommandList attribute"
       verification: |
+          Verify in TH log:
+
           ./chip-tool timeformatlocalization read generated-command-list 1 0
           [1651191789962] [13591:180646] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFF8 DataVersion: 3316530441
           [1651191789963] [13591:180646] CHIP: [TOO]   GeneratedCommandList: 0 entries

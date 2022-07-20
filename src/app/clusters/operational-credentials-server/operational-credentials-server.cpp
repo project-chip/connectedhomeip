@@ -206,6 +206,24 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId end
             ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
         }
 
+        {
+            uint8_t certBuf[kMaxCHIPCertLength];
+            MutableByteSpan cert{ certBuf };
+            CHIP_ERROR err = fabricTable.FetchPendingNonFabricAssociatedRootCert(cert);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                // No pending root cert, do nothing
+            }
+            else if (err != CHIP_NO_ERROR)
+            {
+                return err;
+            }
+            else
+            {
+                ReturnErrorOnFailure(encoder.Encode(ByteSpan{ cert }));
+            }
+        }
+
         return CHIP_NO_ERROR;
     });
 }
@@ -561,6 +579,10 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
         return OperationalCertStatus::kInvalidNodeOpId;
     }
     if (err == CHIP_ERROR_UNSUPPORTED_CERT_FORMAT)
+    {
+        return OperationalCertStatus::kInvalidNOC;
+    }
+    if (err == CHIP_ERROR_WRONG_CERT_DN)
     {
         return OperationalCertStatus::kInvalidNOC;
     }

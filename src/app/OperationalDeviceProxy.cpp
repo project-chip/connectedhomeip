@@ -354,7 +354,7 @@ void OperationalDeviceProxy::OnFirstMessageDeliveryFailed()
 
 void OperationalDeviceProxy::OnSessionHang()
 {
-    // TODO: establish a new session
+    Disconnect();
 }
 
 void OperationalDeviceProxy::ShutdownSubscriptions()

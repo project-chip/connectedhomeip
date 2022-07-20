@@ -72,7 +72,7 @@ tests:
           value: 0
 
     - label: "Sends a StartOver command to the DUT"
-      PICS: MEDIAPLAYBACK.S.C0003
+      PICS: MEDIAPLAYBACK.S.C03.Rsp
       command: "StartOver"
       response:
           values:
@@ -91,7 +91,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Next command to the DUT"
-      PICS: MEDIAPLAYBACK.S.C0005
+      PICS: MEDIAPLAYBACK.S.C05.Rsp
       command: "Next"
       response:
           values:
@@ -111,7 +111,7 @@ tests:
                 value: "y"
 
     - label: "Sends a Previous command to the DUT"
-      PICS: MEDIAPLAYBACK.S.C0004
+      PICS: MEDIAPLAYBACK.S.C04.Rsp
       command: "Previous"
       response:
           values:
@@ -132,7 +132,7 @@ tests:
                 value: "y"
 
     - label: "Sends a SkipForward command to the DUT "
-      PICS: MEDIAPLAYBACK.S.C0008
+      PICS: MEDIAPLAYBACK.S.C08.Rsp
       command: "SkipForward"
       arguments:
           values:
@@ -163,7 +163,7 @@ tests:
           value: 10000
 
     - label: "Sends a SkipBackward command to the DUT "
-      PICS: MEDIAPLAYBACK.S.C0009
+      PICS: MEDIAPLAYBACK.S.C09.Rsp
       command: "SkipBackward"
       arguments:
           values:

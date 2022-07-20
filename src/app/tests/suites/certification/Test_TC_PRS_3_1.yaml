@@ -25,7 +25,11 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool pressuremeasurement read measured-value 1 1
+
+          Verify in TH all-clusters-app log
 
           [1653992317.047323][2347:2347] CHIP:IM: Received Read request
           [1653992317.047382][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -47,6 +51,9 @@ tests:
           [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool pressuremeasurement read  min-measured-value 1 1
+
+          Verify in TH all-clusters-app log
+
           [1653992385.759474][2347:2347] CHIP:IM: Received Read request
           [1653992385.759533][2347:2347] CHIP:DMG: ReadRequestMessage =
           [1653992385.759561][2347:2347] CHIP:DMG: {
@@ -67,6 +74,8 @@ tests:
 
 
           ./chip-tool pressuremeasurement read  max-measured-value 1 1
+
+          Verify in TH all-clusters-app log
 
           [1653992415.580348][2347:2347] CHIP:IM: Received Read request
           [1653992415.580414][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -91,7 +100,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          NOT IMPLEMENTED
+          OPTIONAL ATTRIBUTES ARE NOT IMPLEMENTED IN SDK
 
           ./chip-tool pressuremeasurement read  tolerance 1 1
           ./chip-tool pressuremeasurement read scaled-value 1 1
@@ -105,14 +114,14 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
@@ -121,7 +130,12 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
-          ./chip-tool pressuremeasurement read attribute-list  1 1
+          verify on Reference app receives the right response for the data sent in the above
+
+           ./chip-tool pressuremeasurement read attribute-list  1 1
+
+          Verify in TH all-clusters-app log
+
           [1654246805586] [91746:4008896] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_FFFB DataVersion: 2053900777
           [1654246805586] [91746:4008896] CHIP: [TOO]   AttributeList: 8 entries
           [1654246805586] [91746:4008896] CHIP: [TOO]     [1]: 0
@@ -134,7 +148,9 @@ tests:
           [1654246805586] [91746:4008896] CHIP: [TOO]     [8]: 65533
 
 
-          " ./chip-tool pressuremeasurement read measured-value 1 1
+           ./chip-tool pressuremeasurement read measured-value 1 1
+
+          Verify in TH all-clusters-app log
 
           [1653992317.047323][2347:2347] CHIP:IM: Received Read request
           [1653992317.047382][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -156,6 +172,9 @@ tests:
           [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
 
           ./chip-tool pressuremeasurement read  min-measured-value 1 1
+
+          Verify in TH all-clusters-app log
+
           [1653992385.759474][2347:2347] CHIP:IM: Received Read request
           [1653992385.759533][2347:2347] CHIP:DMG: ReadRequestMessage =
           [1653992385.759561][2347:2347] CHIP:DMG: {
@@ -176,6 +195,8 @@ tests:
 
 
           ./chip-tool pressuremeasurement read  max-measured-value 1 1
+
+          Verify in TH all-clusters-app log
 
           [1653992415.580348][2347:2347] CHIP:IM: Received Read request
           [1653992415.580414][2347:2347] CHIP:DMG: ReadRequestMessage =
@@ -200,6 +221,8 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool pressuremeasurement read  tolerance 1 1
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
@@ -223,5 +246,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true

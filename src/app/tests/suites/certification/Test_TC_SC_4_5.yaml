@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 13.4.5. [TC-SC-4.5] Operational Discovery - Thread Node
+name: 14.4.5. [TC-SC-4.5] Operational Discovery - Thread Node
 
 config:
     nodeId: 0x12344321
@@ -27,7 +27,7 @@ tests:
       verification: |
           1. On the raspi controller, publish matter service, using below command
 
-          $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 CRI=3000 CRA=4000 T=0
+          $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 SII=3000 SAI=4000 T=0
       disabled: true
 
     - label:
@@ -49,13 +49,31 @@ tests:
              MRP retry interval (idle): 3000ms
              MRP retry interval (active): 4000ms
              Supports TCP: no
+
+
+          avahi-browse -rt _matter._tcp
+
+
+
+          +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+          +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+          =   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+             hostname = [D21165B5F440B033.local]
+             address = [fd11:22::4b31:9932:cffe:b41a]
+             port = [5540]
+             txt = ["T=0" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+             hostname = [D21165B5F440B033.local]
+             address = [fd11:22::4b31:9932:cffe:b41a]
+             port = [5540]
+             txt = ["T=0" "SAI=300" "SII=5000"]
       disabled: true
 
     - label: "TH performs a change in one of the services configured at step 1"
       verification: |
           1. On the raspi controller, publish matter service chanding the T value 1, using below command
 
-          $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 CRI=3000 CRA=4000 T=1
+          $avahi-publish-service 87E1B004E235A130-8FC7772401CD0696 _matter._tcp 22222 SII=3000 SAI=4000 T=1
       disabled: true
 
     - label: "DUT must receive a notification with new data"
@@ -73,4 +91,20 @@ tests:
              MRP retry interval (idle): 3000ms
              MRP retry interval (active): 4000ms
              Supports TCP: yes
+
+
+
+          avahi-browse -rt _matter._tcp
+          +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+          +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+          =   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+             hostname = [D21165B5F440B033.local]
+             address = [fd11:22::4b31:9932:cffe:b41a]
+             port = [5540]
+             txt = ["T=0" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
+             hostname = [D21165B5F440B033.local]
+             address = [fd11:22::4b31:9932:cffe:b41a]
+             port = [5540]
+             txt = ["T=0" "SAI=300" "SII=5000"]
       disabled: true

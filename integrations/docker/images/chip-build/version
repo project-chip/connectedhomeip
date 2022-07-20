@@ -1,1 +1,1 @@
-0.5.85 Version bump reason: remove two Yocto SDKs to decrease the imx docker image size
+0.5.87 Version bump reason: K32W0-SDK 2.6.6 update

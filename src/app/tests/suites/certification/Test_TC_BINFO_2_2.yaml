@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 11.2.2. [TC-BINFO-2.2] Events [DUT-Server]
 
@@ -20,130 +21,46 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
-    - label: "Query SoftwareVersion"
-      command: "readAttribute"
-      attribute: "SoftwareVersion"
-      response:
-          saveAs: SoftwareVersionValue
-          constraints:
-              type: uint8
-
-    - label: "Query Reachable Fabrics"
-      command: "readAttribute"
-      attribute: "Reachable"
-      response:
-          constraints:
-              type: bool
-
-    - label: "Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Reboot target device(DUT)"
+    - label: "Reboot the DUT TH reads the StartUp event from DUT"
+      PICS: BINFO.S.E00
       verification: |
-          Not implemented in YAML
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
+          ./chip-tool basic read-event start-up 1 0
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+          Verify on the TH Log:
 
-    - label: "Query SoftwareVersion"
-      command: "readAttribute"
-      attribute: "SoftwareVersion"
-      response:
-          value: SoftwareVersionValue
+          [1657193007.841105][5422:5427] CHIP:DMG:         ],
+          [1657193007.841137][5422:5427] CHIP:DMG:
+          [1657193007.841162][5422:5427] CHIP:DMG:         SuppressResponse = true,
+          [1657193007.841186][5422:5427] CHIP:DMG:         InteractionModelRevision = 1
+          [1657193007.841209][5422:5427] CHIP:DMG: }
+          [1657193007.841358][5422:5427] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1657193007.841387][5422:5427] CHIP:TOO:          Event number: 0
+          [1657193007.841409][5422:5427] CHIP:TOO:          Priority: Critical
+          [1657193007.841431][5422:5427] CHIP:TOO:          Timestamp: 132146
+          [1657193007.841531][5422:5427] CHIP:TOO:   StartUp: {
+          [1657193007.841570][5422:5427] CHIP:TOO:     SoftwareVersion: 1
+          [1657193007.841594][5422:5427] CHIP:TOO:    }
+          [1657193007.841691][5422:5427] CHIP:EM: Sending Standalone Ack for MessageCounter:91740387 on exchange 60385i
+      disabled: true
 
-    ##Event 11343 implementation not done
-    - label: "Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Reboot target device(DUT)"
+    - label: "TH subscribes to the ShutDown event on the DUT. Shutdown DUT."
+      PICS: BINFO.S.E01
       verification: |
-          Not implemented in YAML
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
+          1. Launch chip-tool into interactive mode with the command
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
+          ./chip-tool interactive start
+          basic subscribe-event shut-down 20 100 1 0
 
-    - label: "Factory Reset the accessory"
-      cluster: "SystemCommands"
-      command: "FactoryReset"
+          2. Turn down the DUT and run below command in interactive mode shell
 
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
 
-    - label: "Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
+          Verify on the TH Log:
 
-    - label: "Reboot target device(DUT)"
-      verification: |
-          Not implemented in YAML
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
-    ###Event 11343 implementation not done
-    - label: "Query Reachable Fabrics"
-      command: "readAttribute"
-      attribute: "Reachable"
-      response:
-          constraints:
-              type: bool
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
+          [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5
+          [1653050528.900295][119367:119372] CHIP:TOO:          Priority: Critical
+          [1653050528.900386][119367:119372] CHIP:TOO:          Timestamp: 289436805
+          [1653050528.900630][119367:119372] CHIP:TOO:   ShutDown: {
+          [1653050528.900732][119367:119372] CHIP:TOO:    }
+          [1653050528.900892][119367:119372] CHIP:DMG: Refresh LivenessCheckTime for 28000 milliseconds with SubscriptionId = 0x27408c83 Peer = 01:0000000000000001
+      disabled: true

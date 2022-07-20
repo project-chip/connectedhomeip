@@ -156,6 +156,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _operationalCredentialsDelegate = nullptr;
     }
 
+    if (_otaProviderDelegateBridge) {
+        delete _otaProviderDelegateBridge;
+        _otaProviderDelegateBridge = nullptr;
+    }
+
     if (_pairingDelegateBridge) {
         delete _pairingDelegateBridge;
         _pairingDelegateBridge = nullptr;

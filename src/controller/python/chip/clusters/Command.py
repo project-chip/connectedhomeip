@@ -30,6 +30,11 @@ import chip.interaction_model
 import inspect
 import sys
 import builtins
+import logging
+
+
+logger = logging.getLogger('chip.cluster.Command')
+logger.setLevel(logging.ERROR)
 
 
 @dataclass
@@ -94,7 +99,7 @@ class AsyncCommandTransaction:
         self._event_loop.call_soon_threadsafe(
             self._handleResponse, path, status, response)
 
-    def _handleError(self, imError: int, chipError: int, exception: Exception):
+    def _handleError(self, imError: Status, chipError: int, exception: Exception):
         if exception:
             self._future.set_exception(exception)
         elif chipError != 0:
@@ -103,8 +108,9 @@ class AsyncCommandTransaction:
         else:
             try:
                 self._future.set_exception(
-                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(status.IMStatus)))
-            except:
+                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus)))
+            except Exception as e2:
+                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
 
