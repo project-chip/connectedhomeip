@@ -68,7 +68,6 @@ tests:
           constraints:
               type: string
               maxLength: 32
-              value: "chiptest"
 
     - label: "Commission from beta"
       identity: "beta"
@@ -132,7 +131,6 @@ tests:
           constraints:
               type: string
               maxLength: 32
-              value: "chiptest"
 
     - label:
           "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
@@ -157,7 +155,6 @@ tests:
           constraints:
               type: string
               maxLength: 32
-              value: "chiptest"
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"

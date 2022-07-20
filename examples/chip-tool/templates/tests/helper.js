@@ -33,13 +33,15 @@ function asPropertyValue(options)
 {
   let rootObject = 'value';
 
+  let context = options.hash.context || this;
+
   // The decodable type for commands is a struct by default, even if the
   // command just returns a single value.
-  if (this.parent.isCommand) {
-    rootObject += '.' + asLowerCamelCase(this.name);
+  if (context.parent.isCommand) {
+    rootObject += '.' + asLowerCamelCase(context.name);
   }
 
-  if (this.isOptional && !options.hash.dontUnwrapValue) {
+  if (context.isOptional && !options.hash.dontUnwrapValue) {
     rootObject += '.Value()';
   }
 

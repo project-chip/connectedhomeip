@@ -53,4 +53,4 @@ tests:
       attribute: "occupancy"
       response:
           constraints:
-              notvalue: OccupancyValue
+              notValue: OccupancyValue
