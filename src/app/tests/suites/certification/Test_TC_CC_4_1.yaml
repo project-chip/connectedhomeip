@@ -103,13 +103,13 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Wait 500ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 500
+                value: 1000
 
     - label:
           "Check current saturation attribute value matched the value sent by
