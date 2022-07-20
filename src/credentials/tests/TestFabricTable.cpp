@@ -478,7 +478,21 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, saw1 == false);
         }
 
+        uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+        {
+            // No pending root cert yet.
+            MutableByteSpan fetchedSpan{ rcacBuf };
+            NL_TEST_ASSERT(inSuite, fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan) == CHIP_ERROR_NOT_FOUND);
+        }
+
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+        {
+            // Now have a pending root cert.
+            MutableByteSpan fetchedSpan{ rcacBuf };
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan));
+            NL_TEST_ASSERT(inSuite, fetchedSpan.data_equal(rcac));
+        }
+
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
         bool keyIsExternallyOwned  = true;
 
@@ -488,6 +502,11 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
                                                                                 keyIsExternallyOwned, &newFabricIndex));
         NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        {
+            // No more pending root cert; it's associated with a fabric now.
+            MutableByteSpan fetchedSpan{ rcacBuf };
+            NL_TEST_ASSERT(inSuite, fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan) == CHIP_ERROR_NOT_FOUND);
+        }
 
         // No storage yet
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageKeysAtStart);
@@ -1750,6 +1769,51 @@ void TestUpdateNocFailSafe(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestAddRootCertFailSafe(nlTestSuite * inSuite, void * inContext)
+{
+    Credentials::TestOnlyLocalCertificateAuthority fabric11CertAuthority;
+
+    chip::TestPersistentStorageDelegate storage;
+
+    NL_TEST_ASSERT(inSuite, fabric11CertAuthority.Init().IsSuccess());
+
+    // Initialize a fabric table.
+    ScopedFabricTable fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
+
+    // Add a root cert, see that pending works, and that revert works
+    {
+        ByteSpan rcac = fabric11CertAuthority.GetRcac();
+
+        uint8_t rcacBuf[Credentials::kMaxCHIPCertLength];
+        {
+            // No pending root cert yet.
+            MutableByteSpan fetchedSpan{ rcacBuf };
+            NL_TEST_ASSERT(inSuite, fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan) == CHIP_ERROR_NOT_FOUND);
+        }
+
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcac));
+        {
+            // Now have a pending root cert.
+            MutableByteSpan fetchedSpan{ rcacBuf };
+            NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan));
+            NL_TEST_ASSERT(inSuite, fetchedSpan.data_equal(rcac));
+        }
+
+        // Revert
+        fabricTable.RevertPendingFabricData();
+
+        {
+            // No pending root cert anymore.
+            MutableByteSpan fetchedSpan{ rcacBuf };
+            NL_TEST_ASSERT(inSuite, fabricTable.FetchPendingNonFabricAssociatedRootCert(fetchedSpan) == CHIP_ERROR_NOT_FOUND);
+        }
+    }
+}
+
 void TestSequenceErrors(nlTestSuite * inSuite, void * inContext)
 {
     // TODO: Write test
@@ -2436,6 +2500,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Validate fabrics are loaded from persistence at FabricTable::init", TestPersistence),
     NL_TEST_DEF("Test fail-safe handling during AddNOC", TestAddNocFailSafe),
     NL_TEST_DEF("Test fail-safe handling during UpdateNoc", TestUpdateNocFailSafe),
+    NL_TEST_DEF("Test fail-safe handling for root cert", TestAddRootCertFailSafe),
     NL_TEST_DEF("Test interlock sequencing errors", TestSequenceErrors),
     NL_TEST_DEF("Test fabric label changes", TestFabricLabelChange),
     NL_TEST_DEF("Test compressed fabric ID is properly generated", TestCompressedFabricId),
