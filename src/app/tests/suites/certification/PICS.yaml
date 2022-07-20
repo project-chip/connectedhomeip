@@ -2062,7 +2062,8 @@ PICS:
       id: CHANNEL.S.A0002
 
     - label:
-          "Does the DUT support the Channel server cluster ChangeChannelResponse command?"
+          "Does the DUT support the Channel server cluster ChangeChannelResponse
+          command?"
       id: CHANNEL.S.C01.Tx
 
     - label:
