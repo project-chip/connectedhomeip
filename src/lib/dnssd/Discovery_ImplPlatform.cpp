@@ -70,8 +70,11 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
 
     nodeData.resolutionData.port = result->mPort;
 
+    ChipLogDetail(Discovery, "Node with instance name %s discovered. TXT:", nodeData.commissionData.instanceName);
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
+        ChipLogDetail(Discovery, "  %s: %.*s", result->mTextEntries[i].mKey, static_cast<int>(result->mTextEntries[i].mDataSize),
+                      result->mTextEntries[i].mData);
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, nodeData.resolutionData);
@@ -134,8 +137,11 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, const Spa
     }
     nodeData.resolutionData.numIPs = addressesFound;
 
+    ChipLogDetail(Discovery, "Node with operational ID %s resolved. TXT:", result->mName);
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
+        ChipLogDetail(Discovery, "  %s: %.*s", result->mTextEntries[i].mKey, static_cast<int>(result->mTextEntries[i].mDataSize),
+                      result->mTextEntries[i].mData);
         ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
         ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
         FillNodeDataFromTxt(key, val, nodeData.resolutionData);
