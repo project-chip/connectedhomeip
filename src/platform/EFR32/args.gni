@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/examples/platform/efr32/args.gni")
 
 # ARM architecture flags will be set based on efr32_family.
@@ -24,6 +25,7 @@ arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
 openthread_external_mbedtls = mbedtls_target
+chip_crypto = "platform"
 
 chip_device_platform = "efr32"
 

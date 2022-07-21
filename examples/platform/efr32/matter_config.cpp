@@ -57,6 +57,9 @@ using namespace ::chip::DeviceLayer;
 #include <openthread/platform/openthread-system.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+#include <platform/EFR32/Efr32PsaOperationalKeystore.h>
+
+static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 
 // ================================================================================
 // Matter Networking Callbacks
@@ -146,7 +149,10 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 
     // Init Matter Server and Start Event Loop
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+    gOperationalKeystore.Init();
+
     static chip::CommonCaseDeviceServerInitParams initParams;
+    initParams.operationalKeystore = &gOperationalKeystore;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 #if CHIP_ENABLE_OPENTHREAD
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
