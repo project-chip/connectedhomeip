@@ -337,5 +337,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     esp_restart();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

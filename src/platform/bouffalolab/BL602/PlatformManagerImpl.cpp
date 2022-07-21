@@ -188,8 +188,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-
     // Initialize the configuration system.
     err = Internal::BL602Config::Init();
     log_error("err: %d\r\n", err);

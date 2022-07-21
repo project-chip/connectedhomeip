@@ -39,7 +39,6 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
