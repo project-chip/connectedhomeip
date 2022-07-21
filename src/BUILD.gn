@@ -128,4 +128,12 @@ if (chip_build_tests) {
   chip_test_group("fake_platform_tests") {
     deps = [ "${chip_root}/src/lib/dnssd/platform/tests" ]
   }
+
+  # Tests to run with each Crypto PAL
+  chip_test_group("crypto_tests") {
+    deps = [
+      "${chip_root}/src/credentials/tests",
+      "${chip_root}/src/crypto/tests",
+    ]
+  }
 }
