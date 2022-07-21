@@ -804,7 +804,6 @@ PICS:
     - label: "Does the device implement the GetRelayStatusLog command?"
       id: TSTAT.S.C04.Rsp
 
-
     #Client Commands
     - label: "Does the device implement sending the SetpointRaiseLower command?"
       id: TSTAT.C.C00.Tx
