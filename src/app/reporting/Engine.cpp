@@ -290,11 +290,78 @@ exit:
     return err;
 }
 
+CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::Writer & aWriter, bool & aItemRemoved, ReadHandler * apReadHandler)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ObjectList<EventPathParams> * deletedEventPathList = nullptr;
+    ObjectList<EventPathParams> ** previousIteratedEventPathListNextPtr = &(apReadHandler->mpEventPathList);
+
+    aItemRemoved = false;
+
+    for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
+    {
+        if (current->mValue.HasEventWildcard())
+        {
+            current = current->mpNext;
+            continue;
+        }
+
+        Access::RequestPath requestPath{ .cluster = current.mValue.mClusterId, .endpoint = current.mValue.mEndpointId };
+        Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
+
+        err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
+        if (err != CHIP_ERROR_ACCESS_DENIED)
+        {
+            SuccessOrExit(err);
+
+            // Proceed to the next item
+            previousIteratedEventPathListNextPtr = &(current->mpNext);
+            current = current->mpNext;
+        }
+        else
+        {
+            TLV::TLVWriter checkpoint = aWriter;
+            err = WriteEventStatusIB(aWriter, ConcreteEventPath(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId),
+                                    StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
+
+            if (err != CHIP_NO_ERROR)
+            {
+                aWriter = checkpoint;
+                break;
+            }
+
+            ChipLogDetail(DataManagement, "Removed event path (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege", current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId), ChipLogValueMEI(current->mValue.mEventId));
+
+            auto next = current->mpNext;
+
+            // Detach current item from the interested path list
+            *previousIteratedEventPathListNextPtr = next;
+
+            // Append current item to the deleted event path list
+            current->mpNext = deletedEventPathList;
+            deletedEventPathList = current;
+
+            // proceed to the next item
+            current = next;
+        }
+    }
+
+exit:
+    // Always release the items in deletedEventPathList to avoid memory leak
+    if (deletedEventPathList != nullptr)
+    {
+        aItemRemoved = true;
+        InteractionModelEngine::GetInstance()->ReleaseEventPathList(deletedEventPathList);
+    }
+    return err;
+}
+
 CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler,
                                                      bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
+    bool hasEncodedData = false;
     TLV::TLVWriter backup;
     bool eventClean                = true;
     const auto * eventList         = apReadHandler->GetEventPathList();
@@ -322,10 +389,19 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         // Just like what we do in BuildSingleReportDataAttributeReportIBs(), we need to reserve one byte for end of container tag
         // when encoding events to ensure we can close the container successfully.
         const uint32_t kReservedSizeEndOfReportIBs = 1;
+        bool eventPathCleaned = false;
         EventReportIBs::Builder & eventReportIBs   = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
         VerifyOrExit(eventReportIBs.GetWriter() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = eventReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs));
+
+        err = RemoveUnaccessableEventPaths(*(eventReportIBs.GetWriter()), eventPathCleaned, apReadHandler);
+        if (eventPathCleaned)
+        {
+            hasEncodedData = true;
+        }
+        SuccessOrExit(err);
+
         err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), eventList, eventMin, eventCount,
                                             apReadHandler->GetSubjectDescriptor());
 
@@ -373,14 +449,14 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     ChipLogDetail(DataManagement, "Fetched %u events", static_cast<unsigned int>(eventCount));
 
 exit:
+    hasEncodedData = hasEncodedData || (eventCount != 0);
     if (apHasEncodedData != nullptr)
     {
-        *apHasEncodedData = !(eventCount == 0 || eventClean);
+        *apHasEncodedData = hasEncodedData;
     }
 
     // Maybe encoding the attributes has already used up all space.
-    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) &&
-        (eventCount == 0 || eventClean))
+    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) && !hasEncodedData))
     {
         aReportDataBuilder.Rollback(backup);
         aReportDataBuilder.ResetError();
