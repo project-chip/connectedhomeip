@@ -2755,13 +2755,12 @@ void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * 
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
 
-        auto exchange =
-            readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        auto exchange = readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
         NL_TEST_ASSERT(apSuite, exchange != nullptr);
         readClient.mExchange.Grab(exchange);
         readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
         err = readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-                                                    Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mError != CHIP_NO_ERROR);
@@ -2937,13 +2936,12 @@ void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, vo
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
 
-        auto exchange =
-            readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        auto exchange = readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
         NL_TEST_ASSERT(apSuite, exchange != nullptr);
         readClient.mExchange.Grab(exchange);
         readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
         err = readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
-                                                    Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, delegate.mError != CHIP_NO_ERROR);
