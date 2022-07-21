@@ -135,7 +135,7 @@ public:
     public:
         /**
          * @brief Callback for the network driver pushing the event of network status change to the network commissioning cluster.
-         * The platforms is explected to push the status from operations such as autonomous connection after loss of connectivity or
+         * The platforms is expected to push the status from operations such as autonomous connection after loss of connectivity or
          * during initial establishment.
          *
          * This function must be called in a thread-safe manner with CHIP stack.
