@@ -262,3 +262,15 @@ Room::Room(std::string name, uint16_t endpointListId, EndpointListTypeEnum type,
     mType           = type;
     mIsVisible      = isVisible;
 }
+
+Action::Action(uint16_t actionId, std::string name, ActionTypeEnum type, uint16_t endpointListId, uint16_t supportedCommands,
+               ActionStateEnum status, bool isVisible)
+{
+    mActionId          = actionId;
+    mName              = name;
+    mType              = type;
+    mEndpointListId    = endpointListId;
+    mSupportedCommands = supportedCommands;
+    mStatus            = status;
+    mIsVisible         = isVisible;
+}
