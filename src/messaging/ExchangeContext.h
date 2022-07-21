@@ -196,7 +196,6 @@ public:
     // SecureSession.
     void AbortAllOtherCommunicationOnFabric();
 
-<<<<<<< HEAD
     /**
      *  Determine whether a response is currently expected for a message that was sent over
      *  this exchange.  While this is true, attempts to send other messages that expect a response
@@ -213,8 +212,6 @@ public:
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
-=======
->>>>>>> 32c530c6c (address comments)
 private:
     class ExchangeSessionHolder : public SessionHolderWithDelegate
     {
@@ -233,25 +230,6 @@ private:
     uint16_t mExchangeId;           // Assigned exchange ID.
 
     /**
-<<<<<<< HEAD
-=======
-     *  Determine whether a response is currently expected for a message that was sent over
-     *  this exchange.  While this is true, attempts to send other messages that expect a response
-     *  will fail.
-     *
-     *  @return Returns 'true' if response expected, else 'false'.
-     */
-    bool IsResponseExpected() const;
-
-    /**
-     * Determine whether we are expecting our consumer to send a message on
-     * this exchange (i.e. WillSendMessage was called and the message has not
-     * yet been sent).
-     */
-    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
-
-    /**
->>>>>>> 32c530c6c (address comments)
      *  Track whether we are now expecting a response to a message sent via this exchange (because that
      *  message had the kExpectResponse flag set in its sendFlags).
      *

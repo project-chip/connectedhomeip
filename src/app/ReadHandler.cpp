@@ -170,10 +170,6 @@ exit:
         if (!suppressErrorStatusResponse)
         {
             err = StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
-            if (err == CHIP_NO_ERROR)
-            {
-                mpExchangeCtx = nullptr;
-            }
         }
         Close();
     }
@@ -280,16 +276,8 @@ bool ReadHandler::IsFromSubscriber(Messaging::ExchangeContext & apExchangeContex
 
 CHIP_ERROR ReadHandler::OnUnknownMsgType()
 {
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err =
-        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mpExchangeCtx, false /*aExpectResponse*/);
-    if (err != CHIP_NO_ERROR)
-    {
-        // We have to manually close the exchange, because we called
-        // WillSendMessage already.
-        mpExchangeCtx->Close();
-    }
-    mpExchangeCtx = nullptr;
+        StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     Close();
     return err;
 }

@@ -2754,10 +2754,13 @@ void TestReadInteraction::TestReadInvalidMessage1(nlTestSuite * apSuite, void * 
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
-        readClient.mpExchangeCtx =
+
+        auto exchange =
             readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        NL_TEST_ASSERT(apSuite, exchange != nullptr);
+        readClient.mExchange.Grab(exchange);
         readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
-        err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+        err = readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
@@ -2820,11 +2823,11 @@ void TestReadInteraction::TestReadInvalidMessage2(nlTestSuite * apSuite, void * 
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-        rm->ClearRetransTable(readClient.mpExchangeCtx);
+        rm->ClearRetransTable(readClient.mExchange.Get());
         ctx.GetLoopback().mSentMessageCount            = 0;
         ctx.GetLoopback().mNumMessagesToDrop           = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
-        readClient.OnMessageReceived(readClient.mpExchangeCtx, payloadHeader, std::move(msgBuf));
+        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     }
@@ -2880,10 +2883,10 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
         ctx.GetLoopback().mNumMessagesToDrop           = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
 
-        rm->ClearRetransTable(readClient.mpExchangeCtx);
+        rm->ClearRetransTable(readClient.mExchange.Get());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mpExchangeCtx);
+        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
 
         System::PacketBufferHandle msgBuf;
         ReadRequestMessage::Builder request;
@@ -2892,7 +2895,7 @@ void TestReadInteraction::TestSubscribeInvalidMessage1(nlTestSuite * apSuite, vo
         request.Init(&writer);
         writer.Finalize(&msgBuf);
 
-        err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf));
+        err = readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(msgBuf));
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 4);
     }
@@ -2933,10 +2936,13 @@ void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, vo
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
-        readClient.mpExchangeCtx =
+        
+        auto exchange =
             readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
+        NL_TEST_ASSERT(apSuite, exchange != nullptr);
+        readClient.mExchange.Grab(exchange);
         readClient.MoveToState(app::ReadClient::ClientState::AwaitingInitialReport);
-        err = readClient.mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
+        err = readClient.mExchange->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         ctx.DrainAndServiceIO();
@@ -3002,14 +3008,14 @@ void TestReadInteraction::TestSubscribeInvalidMessage3(nlTestSuite * apSuite, vo
         payloadHeader.SetExchangeID(0);
         payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::StatusResponse);
 
-        rm->ClearRetransTable(readClient.mpExchangeCtx);
+        rm->ClearRetransTable(readClient.mExchange.Get());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
-        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mpExchangeCtx);
+        rm->ClearRetransTable(engine->ActiveHandlerAt(0)->mExchangeCtx.Get());
         ctx.GetLoopback().mSentMessageCount            = 0;
         ctx.GetLoopback().mNumMessagesToDrop           = 0;
         ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
-        readClient.OnMessageReceived(readClient.mpExchangeCtx, payloadHeader, std::move(msgBuf));
+        readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(msgBuf));
         ctx.DrainAndServiceIO();
         NL_TEST_ASSERT(apSuite, ctx.GetLoopback().mSentMessageCount == 2);
     }

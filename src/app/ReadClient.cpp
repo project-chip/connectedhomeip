@@ -421,11 +421,7 @@ void ReadClient::ResponseMessageHandled(CHIP_ERROR aError, Messaging::ExchangeCo
 {
     if (aError != CHIP_NO_ERROR)
     {
-        CHIP_ERROR err = StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
-        if (err == CHIP_NO_ERROR)
-        {
-            mpExchangeCtx = nullptr;
-        }
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || aError != CHIP_NO_ERROR)
