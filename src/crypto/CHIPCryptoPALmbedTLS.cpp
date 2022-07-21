@@ -1634,7 +1634,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
     /* Verify the chain against the root */
-    mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, NULL, NULL, &flags, NULL, NULL);
+    mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, nullptr, nullptr, &flags, nullptr, nullptr);
 
     switch (mbedResult)
     {
