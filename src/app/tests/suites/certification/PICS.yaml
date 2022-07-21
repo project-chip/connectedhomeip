@@ -617,7 +617,7 @@ PICS:
     - label: "Supports Occupied and Unoccupied setpoints"
       id: TSTAT.S.F02
 
-    - label: "Supports a weekly schedule of setpoint transitions(Schedule)
+    - label: "Supports a weekly schedule of setpoint transitions(Schedule)"
       id: TSTAT.S.F03
 
     - label: "Supports configurable setback (or span)"
