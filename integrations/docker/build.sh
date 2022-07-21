@@ -33,6 +33,12 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 # version
 VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
+if [[ $OSTYPE == 'darwin'* ]]; then
+    DOCKER_VOLUME_PATH=~/Library/Containers/com.docker.docker/Data/vms/0/
+else
+    DOCKER_VOLUME_PATH=/var/lib/docker/
+fi
+
 [[ ${*/--help//} != "${*}" ]] && {
     set +x
     echo "Usage: $me <OPTIONS>
@@ -59,12 +65,7 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-#Fix storage location of Docker images and containers for osx or linux
-if [[ $OSTYPE == 'darwin'* ]]; then
-    mb_space_before=$(df -m ~/Library/Containers/com.docker.docker/Data/vms/0/ | awk 'FNR==2{print $3}')
-else
-    mb_space_before=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
-fi
+mb_space_before=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
 
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
@@ -96,15 +97,9 @@ docker image prune --force
     }
 }
 
-#Fix storage location of Docker images and containers for osx or linux
 docker images --filter=reference="$ORG/*"
-if [[ $OSTYPE == 'darwin'* ]]; then
-    df -h ~/Library/Containers/com.docker.docker/Data/vms/0/
-    mb_space_after=$(df -m ~/Library/Containers/com.docker.docker/Data/vms/0/ | awk 'FNR==2{print $3}')
-else
-    df -h /var/lib/docker/
-    mb_space_after=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
-fi
+df -h "$DOCKER_VOLUME_PATH"
+mb_space_after=$(df -m "$DOCKER_VOLUME_PATH" | awk 'FNR==2{print $3}')
 
 printf "%'.f MB total used\n" "$((mb_space_before - mb_space_after))"
 
