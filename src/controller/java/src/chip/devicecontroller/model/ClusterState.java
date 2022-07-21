@@ -23,23 +23,39 @@ import java.util.Map;
 /** Class for tracking CHIP cluster state in a hierarchical manner. */
 public final class ClusterState {
   private Map<Long, AttributeState> attributes;
+  private Map<Long, EventState> events;
 
-  public ClusterState(Map<Long, AttributeState> attributes) {
+  public ClusterState(Map<Long, AttributeState> attributes, Map<Long, EventState> events) {
     this.attributes = attributes;
+    this.events = events;
   }
 
   public Map<Long, AttributeState> getAttributeStates() {
     return attributes;
   }
 
+  public Map<Long, EventState> getEventStates() {
+    return events;
+  }
+
   /**
-   * Convenience utility for getting an {@code ClusterState}.
+   * Convenience utility for getting an {@code AttributeState}.
    *
-   * @return the {@code ClusterState} for the specified id, or null if not found.
+   * @return the {@code AttributeState} for the specified id, or null if not found.
    */
   @Nullable
   public AttributeState getAttributeState(long attributeId) {
     return attributes.get(attributeId);
+  }
+
+  /**
+   * Convenience utility for getting an {@code EventState}.
+   *
+   * @return the {@code EventState} for the specified id, or null if not found.
+   */
+  @Nullable
+  public EventState getEventState(long eventId) {
+    return events.get(eventId);
   }
 
   @Override
@@ -52,6 +68,14 @@ public final class ClusterState {
           builder.append(": ");
           builder.append(
               attributeState.getValue() == null ? "null" : attributeState.getValue().toString());
+          builder.append("\n");
+        });
+    events.forEach(
+        (eventId, eventState) -> {
+          builder.append("Event ");
+          builder.append(eventId);
+          builder.append(": ");
+          builder.append(eventState.getValue() == null ? "null" : eventState.getValue().toString());
           builder.append("\n");
         });
     return builder.toString();

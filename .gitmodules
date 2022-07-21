@@ -241,7 +241,7 @@
 	path = third_party/ti_simplelink_sdk/repo_cc32xx
 	url = https://github.com/TexasInstruments/cc32xx_open_sdk.git
 	branch = main
-	platform = cc32xx
+	platforms = cc32xx
 [submodule "third_party/nxp/mw320_sdk/repo"]
 	path = third_party/nxp/mw320_sdk/repo
 	url = https://github.com/nxptest/mw320_sdk
@@ -266,3 +266,9 @@
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
 	branch = master
 	platforms = efr32
+[submodule "editline"]
+	path = third_party/editline/repo
+	url = https://github.com/troglobit/editline.git
+[submodule "third_party/boringssl/repo/src"]
+	path = third_party/boringssl/repo/src
+	url = https://github.com/google/boringssl.git

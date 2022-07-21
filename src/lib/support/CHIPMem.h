@@ -160,6 +160,11 @@ inline T * New(Args &&... args)
 template <typename T>
 inline void Delete(T * p)
 {
+    if (p == nullptr)
+    {
+        return;
+    }
+
     p->~T();
     MemoryFree(p);
 }

@@ -17,11 +17,13 @@
  */
 
 #pragma once
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <map>
 #include <string>
+
+#include "../provider/OTAProviderDelegate.h"
 
 #pragma once
 
@@ -48,6 +50,8 @@ public:
         StopWaiting();
     }
 
+    static OTAProviderDelegate * mOTADelegate;
+
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
     // stack. The rules for Run() are as follows:
@@ -67,9 +71,9 @@ protected:
     void SetIdentity(const char * identity);
 
     // This method returns the commissioner instance to be used for running the command.
-    CHIPDeviceController * CurrentCommissioner();
+    MTRDeviceController * CurrentCommissioner();
 
-    CHIPDeviceController * GetCommissioner(const char * identity);
+    MTRDeviceController * GetCommissioner(const char * identity);
 
     // Will log the given string and given error (as progress if success, error
     // if failure).
@@ -106,13 +110,14 @@ private:
     void MaybeTearDownStack();
 
     // Our three controllers: alpha, beta, gamma.
-    static std::map<std::string, CHIPDeviceController *> mControllers;
+    static std::map<std::string, MTRDeviceController *> mControllers;
 
     // The current controller; the one the current command should be using.
-    CHIPDeviceController * mCurrentController;
+    MTRDeviceController * mCurrentController;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     chip::Optional<char *> mCommissionerName;
     bool mWaitingForResponse{ true };
+    static dispatch_queue_t mOTAProviderCallbackQueue;
 };

@@ -125,10 +125,10 @@ public:
     // Register the CASESession commands
     void Register();
 
-    void SetFabricInfo(FabricInfo * fabricInfo) { mFabricInfo = fabricInfo; }
+    void SetFabricInfo(const FabricInfo * fabricInfo) { mFabricInfo = fabricInfo; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
     void SetOnConnecting(bool onConnecting) { mOnConnecting = onConnecting; }
-    FabricInfo * GetFabricInfo(void) { return mFabricInfo; }
+    const FabricInfo * GetFabricInfo(void) { return mFabricInfo; }
     NodeId GetNodeId(void) { return mNodeId; }
     bool GetOnConnecting(void) { return mOnConnecting; }
 
@@ -167,7 +167,7 @@ private:
             return CHIP_ERROR_INCORRECT_STATE;
         }
         const FabricIndex fabricIndex = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
-        FabricInfo * fabricInfo       = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
 
         if (fabricInfo == nullptr)
         {
@@ -201,9 +201,9 @@ private:
     static Callback::Callback<OnDeviceConnected> sOnConnectedCallback;
     static Callback::Callback<OnDeviceConnectionFailure> sOnConnectionFailureCallback;
     static Shell::Engine sSubShell;
-    FabricInfo * mFabricInfo = nullptr;
-    NodeId mNodeId           = 0;
-    bool mOnConnecting       = false;
+    const FabricInfo * mFabricInfo = nullptr;
+    NodeId mNodeId                 = 0;
+    bool mOnConnecting             = false;
 };
 
 } // namespace Shell

@@ -151,7 +151,7 @@ void emberAfPrintAttributeTable(void)
                 emberAfAttributesPrint(
                     " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
                     (metaData->IsReadOnly() ? "RO" : "RW"),
-                    (metaData->IsNonVolatile() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
+                    (metaData->IsAutomaticallyPersisted() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
                 emberAfAttributesFlush();
                 status =
                     emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId, data, ATTRIBUTE_LARGEST, nullptr);

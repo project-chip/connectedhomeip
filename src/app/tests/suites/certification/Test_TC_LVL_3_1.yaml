@@ -28,22 +28,42 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition Send On Command"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
     - label: "Reads the MinLevel attribute"
+      PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "min level"
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the MaxLevel attribute"
+      PICS: LVL.S.A0003
       command: "readAttribute"
       attribute: "max level"
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
-    - label: "sends a Move to level command"
-      command: "MoveToLevel"
+    - label: "sends a MoveToLevelWithOnOff command"
+      PICS: LVL.S.C00.Rsp
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
@@ -64,12 +84,14 @@ tests:
                 value: 100
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C04.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 64
 
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp
       command: "MoveToLevel"
       arguments:
           values:
@@ -82,7 +104,7 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 100 second"
+    - label: "Wait 100 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -91,19 +113,14 @@ tests:
                 value: 100
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 100
 
-    - label: "Reads On Off Transition Time attribute from DUT"
-      command: "readAttribute"
-      attribute: "On Off Transition Time"
-      response:
-          constraints:
-              type: uint16
-
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp && LVL.S.M.VarRate
       command: "MoveToLevel"
       arguments:
           values:
@@ -116,7 +133,7 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait10000ms"
+    - label: "Wait 11000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -125,26 +142,32 @@ tests:
                 value: 11000
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 128
 
     - label: "Reads the OnOffTransitionTime attribute from the DUT"
+      PICS: LVL.S.A0010
       command: "readAttribute"
       attribute: "on off transition time"
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
+    # Null is not supported here 0xFFFF is considerd as Null
     - label: "sends a Move to level command"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010
       command: "MoveToLevel"
       arguments:
           values:
               - name: "level"
                 value: 64
               - name: "transitionTime"
-                value: 0
+                value: 0xFFFF
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -159,28 +182,21 @@ tests:
                 value: 1000
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C00.Rsp && LVL.S.A0010 && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 64
 
-    - label: "Reset level to 254"
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+    - label: "Precondition send Off Command"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
 
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

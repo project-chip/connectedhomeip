@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -41,8 +41,10 @@ bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 OptionDef gCmdOptionDefs[] =
 {
     { "x509-pem",   kNoArgument, 'p' },
-    { "x509-der",   kNoArgument, 'x' },
+    { "x509-der",   kNoArgument, 'd' },
+    { "x509-hex",   kNoArgument, 'X' },
     { "chip",       kNoArgument, 'c' },
+    { "chip-hex",   kNoArgument, 'x' },
     { "chip-b64",   kNoArgument, 'b' },
     { }
 };
@@ -52,13 +54,21 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Output certificate in X.509 PEM format.\n"
     "\n"
-    "  -x, --x509-der\n"
+    "  -d, --x509-der\n"
     "\n"
     "       Output certificate in X.509 DER format.\n"
+    "\n"
+    "  -X, --x509-hex\n"
+    "\n"
+    "       Output certificate in X.509 DER hex encoded format.\n"
     "\n"
     "  -c, --chip\n"
     "\n"
     "       Output certificate in raw CHIP TLV format.\n"
+    "\n"
+    "  -x, --chip-hex\n"
+    "\n"
+    "       Output certificate in CHIP TLV hexadecimal format.\n"
     "\n"
     "  -b --chip-b64\n"
     "\n"
@@ -105,7 +115,7 @@ OptionSet * gCmdOptionSets[] =
 
 const char * gInFileName  = nullptr;
 const char * gOutFileName = nullptr;
-CertFormat gOutCertFormat = kCertFormat_Chip_Base64;
+CertFormat gOutCertFormat = kCertFormat_Default;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -114,8 +124,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     case 'p':
         gOutCertFormat = kCertFormat_X509_PEM;
         break;
-    case 'x':
+    case 'd':
         gOutCertFormat = kCertFormat_X509_DER;
+        break;
+    case 'X':
+        gOutCertFormat = kCertFormat_X509_Hex;
+        break;
+    case 'x':
+        gOutCertFormat = kCertFormat_Chip_Hex;
         break;
     case 'b':
         gOutCertFormat = kCertFormat_Chip_Base64;

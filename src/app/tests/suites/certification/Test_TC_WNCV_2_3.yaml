@@ -30,12 +30,12 @@ tests:
                 value: nodeId
 
     ### ------------------------------------------------------
-    ### Step 1x -> Check Lift Reversal (If PICS_WNCV_REVERSAL)
+    ### Step 1x -> Check Lift Reversal (If PICS_WNCV.S.M.Reversal)
     ## Set b0
     - label: "1a: TH set the Mode Attribute bit0 of the DUT"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: "WNCV_REVERSAL"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0017"
       arguments:
           value: 0x01
 
@@ -43,7 +43,7 @@ tests:
     - label: "1b: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: "WNCV_REVERSAL"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0007"
       response:
           constraints:
               minValue: 0x04
@@ -53,7 +53,7 @@ tests:
     - label: "1c: TH clear the Mode Attribute bit0 of the DUT"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: "WNCV_REVERSAL"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0017"
       arguments:
           value: 0x00
 
@@ -61,7 +61,7 @@ tests:
     - label: "1d: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: "WNCV_REVERSAL"
+      PICS: "WNCV.S.M.Reversal && WNCV.S.A0007"
       response:
           constraints:
               minValue: 0x00
@@ -73,7 +73,7 @@ tests:
     - label: "2a: TH set the Mode Attribute bit1 of the DUT"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0017"
       arguments:
           value: 0x02
 
@@ -81,7 +81,7 @@ tests:
     - label: "2b: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0007"
       response:
           saveAs: configStatusValA
           constraints:
@@ -93,7 +93,7 @@ tests:
           "2c: If (ConfigStatus bit0 == 0) TH send DownOrClose command to the
           DUT"
       command: "DownOrClose"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.C01.Rsp"
       response:
           error: FAILURE
 
@@ -101,7 +101,7 @@ tests:
     - label: "2d: TH clear the Mode Attribute bit1 of the DUT"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0017"
       arguments:
           value: 0x00
 
@@ -109,7 +109,7 @@ tests:
     - label: "2e: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0007"
       response:
           constraints:
               minValue: 0x01
@@ -119,7 +119,7 @@ tests:
     - label: "2f: TH reads the Mode Attribute from the DUT"
       command: "readAttribute"
       attribute: "Mode"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.A0017"
       response:
           constraints:
               minValue: 0x00
@@ -128,7 +128,7 @@ tests:
     ## Verify DUT responds with SUCCESS status response
     - label: "2g: TH send DownOrClose command to the DUT"
       command: "DownOrClose"
-      PICS: "WNCV_CALIBRATION"
+      PICS: "WNCV.S.M.Calibration && WNCV.S.C01.Rsp"
 
     ### ------------------------------------------------------
     ### Step 3x -> Check Maintenance mode
@@ -136,14 +136,21 @@ tests:
     - label: "3a: TH set the Mode Attribute bit2 of the DUT"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: "WNCV_MAINTENANCE"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0017"
       arguments:
           value: 0x04
+
+    ## If Verify DUT responds with BUSY (value 0x9c) status response
+    - label: "3b: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.C01.Rsp"
+      response:
+          error: BUSY
 
     ## Value of bitO must be 0b
     - label: "3c: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
-      PICS: "WNCV_MAINTENANCE"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0007"
       attribute: "ConfigStatus"
       response:
           saveAs: configStatusValB
@@ -151,42 +158,25 @@ tests:
               minValue: 0x00
               maxValue: 0x7F
 
-    ## If Verify DUT responds with BUSY (value 0x9c) status response
-    - label: "3c: TH send DownOrClose command to the DUT"
-      command: "DownOrClose"
-      PICS: "WNCV_MAINTENANCE"
-      response:
-          error: BUSY
-
     ## Clear b2
     - label: "3d: TH clear the Mode Attribute bit2 of the DUT"
       command: "writeAttribute"
       attribute: "Mode"
-      PICS: "WNCV_MAINTENANCE"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0017"
       arguments:
           value: 0x00
 
+    ## Verify DUT responds with SUCCESS status response
+    - label: "3e: TH send DownOrClose command to the DUT"
+      command: "DownOrClose"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.C01.Rsp"
+
     ## Value of bitO must be 1b
-    - label: "3e: TH reads ConfigStatus attribute from DUT"
+    - label: "3f: TH reads ConfigStatus attribute from DUT"
       command: "readAttribute"
       attribute: "ConfigStatus"
-      PICS: "WNCV_MAINTENANCE"
+      PICS: "WNCV.S.M.Maintenance && WNCV.S.A0007"
       response:
           constraints:
               minValue: 0x01
               maxValue: 0x7F
-
-    ## Value of bit2 must be 0b
-    - label: "3f: TH reads the Mode Attribute from the DUT"
-      command: "readAttribute"
-      attribute: "Mode"
-      PICS: "WNCV_MAINTENANCE"
-      response:
-          constraints:
-              minValue: 0x00
-              maxValue: 0x7F
-
-    ## Verify DUT responds with SUCCESS status response
-    - label: "3g: TH send DownOrClose command to the DUT"
-      command: "DownOrClose"
-      PICS: "WNCV_MAINTENANCE"

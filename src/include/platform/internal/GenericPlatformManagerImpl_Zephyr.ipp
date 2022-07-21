@@ -44,10 +44,13 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
+
 System::LayerSocketsLoop & SystemLayerSocketsLoop()
 {
     return static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer());
 }
+
+K_WORK_DEFINE(sSignalWork, [](k_work *) { SystemLayerSocketsLoop().Signal(); });
 
 } // anonymous namespace
 
@@ -57,7 +60,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (mInitialized)
-      return err;
+        return err;
 
     k_mutex_init(&mChipStackLock);
 
@@ -121,16 +124,24 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
-    // For some reasons mentioned in https://github.com/zephyrproject-rtos/zephyr/issues/22301
-    // k_msgq_put takes `void*` instead of `const void*`. Nonetheless, it should be safe to
-    // const_cast here and there are components in Zephyr itself which do the same.
-    int status = k_msgq_put(&mChipEventQueue, const_cast<ChipDeviceEvent *>(event), K_NO_WAIT);
+    int status = k_msgq_put(&mChipEventQueue, event, K_NO_WAIT);
     if (status != 0)
     {
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         return System::MapErrorZephyr(status);
     }
-    SystemLayerSocketsLoop().Signal(); // Trigger wake on CHIP thread
+
+    // Wake CHIP thread to process the event. If the function is called from ISR, such as a Zephyr
+    // timer handler, do not signal the thread directly because that involves taking a mutex, which
+    // is forbidden in ISRs. Instead, submit a task to the system work queue to do the singalling.
+    if (k_is_in_isr())
+    {
+        (void) k_work_submit(&sSignalWork);
+    }
+    else
+    {
+        SystemLayerSocketsLoop().Signal();
+    }
     return CHIP_NO_ERROR;
 }
 

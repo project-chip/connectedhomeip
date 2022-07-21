@@ -123,10 +123,10 @@ Thread * Init()
 
     ChipLogProgress(NotSpecified, "RPC service starting...\r\n");
 
-    auto error = rpcThread.start(RunRpcService);
+    long error = rpcThread.start(RunRpcService);
     if (error != osOK)
     {
-        ChipLogError(NotSpecified, "Run RPC service failed[%d]", error);
+        ChipLogError(NotSpecified, "Run RPC service failed[%ld]", error);
         return NULL;
     }
 

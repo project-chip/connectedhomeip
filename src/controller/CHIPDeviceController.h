@@ -288,11 +288,14 @@ public:
         return mSystemState->Fabrics();
     }
 
+    // TODO(#20452): This should be removed/renamed once #20452 is fixed
     void ReleaseOperationalDevice(NodeId remoteNodeId);
 
     OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
     /**
+     * TODO(#20452): This needs to be refactored to reflect what it actually does (which is not disconnecting anything)
+     *
      * TEMPORARY - DO NOT USE or if you use please request review on why/how to
      * officially support such an API.
      *
@@ -830,8 +833,7 @@ private:
                            CommandResponseSuccessCallback<typename RequestObjectT::ResponseType> successCb,
                            CommandResponseFailureCallback failureCb, EndpointId endpoint, Optional<System::Clock::Timeout> timeout)
     {
-        ClusterObjectT cluster;
-        cluster.Associate(device, endpoint);
+        ClusterObjectT cluster(*device->GetExchangeManager(), device->GetSecureSession().Value(), endpoint);
         cluster.SetCommandTimeout(timeout);
 
         return cluster.InvokeCommand(request, this, successCb, failureCb);

@@ -331,6 +331,10 @@ CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
     {
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
+    if (error == ESP_ERR_NVS_INVALID_LENGTH)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     return CHIP_ERROR(ChipError::Range::kPlatform, error);
 }
 

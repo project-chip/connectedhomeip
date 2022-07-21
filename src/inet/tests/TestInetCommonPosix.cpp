@@ -41,7 +41,6 @@
 #include <vector>
 
 #include <inttypes.h>
-#include <signal.h>
 #include <stdint.h>
 #include <string.h>
 #include <sys/types.h>

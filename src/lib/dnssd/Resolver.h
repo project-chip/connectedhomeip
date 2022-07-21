@@ -125,6 +125,7 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tMrp Interval active: not present");
         }
+        ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
     }
 };
 
@@ -243,6 +244,7 @@ struct DiscoveredNodeData
 
     void LogDetail() const
     {
+        ChipLogDetail(Discovery, "Discovered node:");
         resolutionData.LogDetail();
         commissionData.LogDetail();
     }
@@ -378,7 +380,7 @@ public:
      * Whenever a new matching node is found and a resolver delegate has been registered,
      * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
      */
-    virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /**
      * Finds all commissioner nodes matching the given filter.
@@ -386,7 +388,7 @@ public:
      * Whenever a new matching node is found and a resolver delegate has been registered,
      * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
      */
-    virtual CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /**
      * Provides the system-wide implementation of the service resolver

@@ -1,0 +1,71 @@
+{{> header}}
+
+#import <Foundation/Foundation.h>
+#import <stdint.h>
+
+#pragma mark - Clusters IDs
+
+typedef NS_ENUM(uint32_t, MTRClusterIDType) {
+{{#zcl_clusters}}
+MTRCluster{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+{{/zcl_clusters}}
+};
+
+#pragma mark - Attributes IDs
+
+typedef NS_ENUM(uint32_t, MTRClusterAttributeIDType) {
+// Global attributes
+{{#zcl_attributes_server}}
+{{#unless clusterRef}}
+MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+{{/unless}}
+{{/zcl_attributes_server}}
+
+{{#zcl_clusters}}
+{{#zcl_attributes_server}}
+{{#first}}
+// Cluster {{asUpperCamelCase parent.label}} attributes
+{{/first}}
+{{#if clusterRef}}
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+{{else}}
+MTRCluster{{asUpperCamelCase parent.label}}Attribute{{asUpperCamelCase label}}ID = MTRClusterGlobalAttribute{{asUpperCamelCase label}}ID,
+{{/if}}
+{{#last}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Commands IDs
+
+typedef NS_ENUM(uint32_t, MTRClusterCommandIDType) {
+{{#zcl_clusters}}
+{{#zcl_commands}}
+{{#first}}
+// Cluster {{asUpperCamelCase parent.label}} commands
+{{/first}}
+MTRCluster{{asUpperCamelCase parent.label}}Command{{asUpperCamelCase label}}ID = {{asMEI manufacturerCode code}},
+{{#last}}
+
+{{/last}}
+{{/zcl_commands}}
+{{/zcl_clusters}}
+};
+
+#pragma mark - Events IDs
+
+typedef NS_ENUM(uint32_t, MTRClusterEventIDType) {
+{{#zcl_clusters}}
+{{#zcl_events}}
+{{#first}}
+// Cluster {{asUpperCamelCase parent.label}} events
+{{/first}}
+MTRCluster{{asUpperCamelCase parent.label}}Event{{asUpperCamelCase name}}ID = {{asMEI manufacturerCode code}},
+{{#last}}
+
+{{/last}}
+{{/zcl_events}}
+{{/zcl_clusters}}
+};

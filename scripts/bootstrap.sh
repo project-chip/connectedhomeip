@@ -26,9 +26,8 @@ _bootstrap_or_activate() {
 
     local _CONFIG_FILE="scripts/environment.json"
 
-    if [ "$_BOOTSTRAP_NAME" = "no_cipd_bootstrap.sh" ]; then
-        _CONFIG_FILE="scripts/environment_no_cipd.json"
-        _BOOTSTRAP_NAME="bootstrap.sh"
+    if [ ! -z "$PW_CONFIG_FILE" ]; then
+        _CONFIG_FILE="$PW_CONFIG_FILE"
     fi
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
@@ -36,19 +35,18 @@ _bootstrap_or_activate() {
         git submodule update --init
     fi
 
-    local _CHIP_BANNER="$(
-        cat <<EOF
-           ░▓░
-           ▓█▓
-           ▓█▓                                                     ▒█     ▒█
-      ▒██▒▒▓██▒███▒                ░▒▓▒░  ░▒▓▒░       ░░▓█▒░ ░█  █████████████░    ░▒█▒░       ░░▒░
-       ░▓█████▓██░               ▒█▒░░▒▓██▓▒░░▒█▒   ░█▓▒░░▒████    █▓░    █▓░    ▒█▒░░░▒█▓░   ██▒░░
-    ▒█▒░         ░██▒           ░█░     █▓     ░█░ ░▓▒      ░▓█    █▓     █▓    ▒█░░    ░██  ▒▓
-    ░▓██▓░     ░██▓█░           ░█      ▓█      █░ ░█░       ██    █▓     █▓    ▓██████████  ▒█
-     ░▓███▒   ▒███▒░            ░█      ▓█      █░  ██░    ░███    █▓     █▓    ░█▒░         ▒█
- ░▒████████░ ░███▓▓█▓▓▒         ░█      ▒▒      █░   ░█▓██▓█░▒█    ░▓▓█░  ░▓▓█░   ▒▓▓██▓█░   ▒▓
- ░██▒░  ▒██▒ ▒██░  ░▒█▓
-         ░▓░ ░▓░
+    local _MATTER_BANNER="$(
+        cat <<-EOF
+
+        █
+        █
+    ▄   █   ▄                                 █     ▌
+    ▀▀█████▀▀     ▄▓▀▀▀▄,▄▀▀▀▀▄   ╓▄▀▀▀▀▄█  ▀▀█▀▀▀▀▀█▀▀  ,▄▀▀▀▀▄    ▄▀▀
+  ▀█▄       ▄█▀   █     █     █  ▐▌      █    █     █   .█▄▄▄▄▄▄█⌐ ▐▌
+    ▀█▄   ▄█▀     █     █     █  ▐▌      █    █     █    █         ▐▌
+ ▄██▀▀█   █▀▀██▄  █     █     █   ╙▀▄▄▄Φ▀█    ▀▄▄   ▀▄▄   ▀▄▄▄▄▀^  ▐▌
+▀▀    █   █    ▀▀
+
 EOF
     )"
 
@@ -62,7 +60,7 @@ EOF
 
     _chip_bootstrap_banner() {
         if [ -z "$PW_ENVSETUP_QUIET" ] && [ -z "$PW_ENVSETUP_NO_BANNER" ]; then
-            pw_bold_white "$_CHIP_BANNER\n"
+            pw_bold_white "$_MATTER_BANNER\n"
         fi
     }
 

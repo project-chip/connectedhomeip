@@ -18,7 +18,7 @@
 
 #pragma once
 #include "../common/CHIPCommandBridge.h"
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 
 enum class PairingMode
 {

@@ -43,6 +43,7 @@ tests:
           "During the commissioning process, TH sends AddOrUpdateThreadNetwork
           command to the DUT with OperationalDataset argument value as
           'Userth_op' and Breadcrumb argument value as 1"
+      PICS: CNET.S.C03.Rsp && CNET.S.C05.Tx
       verification: |
           Executed during the commissioning
           ubuntu@ubuntu:~/cntl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool pairing ble-thread 62 hex:0e080000000000010000000300001035060004001fffe0020801191008990820220708fd067fa7635e1066051009116253045736078899aabbccddeeff030e4f70656e686b72657069446f6e6f01021234041029282c49503302ea4536648015d1ff180c0402a0fff8 20202021 3840
@@ -62,6 +63,7 @@ tests:
     - label:
           "After commissioning completes, TH reads MaxNetworks attribute from
           the DUT"
+      PICS: CNET.S.A0000
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read max-networks 162 0
 
@@ -75,6 +77,7 @@ tests:
       disabled: true
 
     - label: "TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 51 0
 
@@ -84,6 +87,7 @@ tests:
       disabled: true
 
     - label: "TH reads Networks attribute from the DUT"
+      PICS: CNET.S.A0001
       verification: |
           ubuntu@ubuntu:~/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool networkcommissioning read networks 162 0
 

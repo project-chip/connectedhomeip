@@ -155,7 +155,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
                                                            const Commands::ArmFailSafe::DecodableType & commandData)
 {
     MATTER_TRACE_EVENT_SCOPE("ArmFailSafe", "GeneralCommissioning");
-    FailSafeContext & failSafeContext = DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFailSafeContext();
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
     Commands::ArmFailSafeResponse::Type response;
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received ArmFailSafe (%us)",
@@ -219,9 +219,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
 {
     MATTER_TRACE_EVENT_SCOPE("CommissioningComplete", "GeneralCommissioning");
 
-    DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    auto & failSafe              = server->GetFailSafeContext();
-    auto & fabricTable           = Server::GetInstance().GetFabricTable();
+    DeviceControlServer * devCtrl = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
+    auto & failSafe               = Server::GetInstance().GetFailSafeContext();
+    auto & fabricTable            = Server::GetInstance().GetFabricTable();
 
     ChipLogProgress(FailSafe, "GeneralCommissioning: Received CommissioningComplete");
 
@@ -267,7 +267,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
              */
             failSafe.DisarmFailSafe();
             CheckSuccess(
-                server->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
+                devCtrl->PostCommissioningCompleteEvent(handle->AsSecureSession()->GetPeerNodeId(), handle->GetFabricIndex()),
                 Failure);
 
             Breadcrumb::Set(commandPath.mEndpointId, 0);

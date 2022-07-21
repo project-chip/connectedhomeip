@@ -17,6 +17,8 @@
 
 #pragma once
 
+#import <Matter/Matter.h>
+
 #include "../common/CHIPCommandBridge.h"
 
 class OpenCommissioningWindowCommand : public CHIPCommandBridge

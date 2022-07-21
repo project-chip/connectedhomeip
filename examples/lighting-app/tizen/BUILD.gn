@@ -21,10 +21,6 @@ import("${tizen_sdk_build_root}/tizen_sdk.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [ "include" ]
-}
-
 executable("chip-lighting-app") {
   sources = [
     "include/CHIPProjectAppConfig.h",
@@ -44,8 +40,11 @@ executable("chip-lighting-app") {
 }
 
 tizen_sdk_package("chip-lighting-app:tpk") {
-  deps = [ ":chip-lighting-app" ]
-  manifest = rebase_path("tizen-manifest.xml")
+  deps = [
+    ":chip-lighting-app",
+    "${chip_root}/examples/platform/tizen:author-certificate-CHIP",
+  ]
+  manifest = "tizen-manifest.xml"
   sign_security_profile = "CHIP"
 }
 

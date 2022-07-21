@@ -16,3 +16,8 @@ declare_args() {
   # Root directory for P6 SDK.
   p6_sdk_build_root = "//third_party/connectedhomeip/third_party/p6"
 }
+
+declare_args() {
+  # Root directory for p6 SDK sources.
+  p6_sdk_root = "${p6_sdk_build_root}/p6_sdk"
+}

@@ -48,7 +48,7 @@ CHIP_ERROR ModelCommand::RunCommand()
     }
 
     Server * server           = &(chip::Server::GetInstance());
-    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
+    const FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
     if (fabric == nullptr)
     {
         ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);

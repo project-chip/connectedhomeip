@@ -247,9 +247,9 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
 
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
         // provider supplying the response is not the provider supplying the OTA image.
-        FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
-        FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
+        FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
+        const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        NodeId nodeId                 = fabricInfo->GetPeerId().GetNodeId();
 
         // Generate the ImageURI if one is not already preset
         if (strlen(mImageUri) == 0)

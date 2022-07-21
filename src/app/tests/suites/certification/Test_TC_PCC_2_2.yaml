@@ -31,41 +31,41 @@ tests:
     - label: "Write 1 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.A0020
       arguments:
           value: 1
 
     - label: "Reads the attribute: EffectiveOperationMode"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.A0011
       response:
           value: 1
 
     - label: "Write 2 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.A0020
       arguments:
           value: 2
 
     - label: "Reads the attribute: EffectiveOperationMode"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.A0011
       response:
           value: 2
 
     - label: "Write 3 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
       attribute: "OperationMode"
-      PICS: A_OPERATIONMODE
+      PICS: PCC.S.A0020
       arguments:
           value: 3
 
     - label: "Reads the attribute: EffectiveOperationMode"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
-      PICS: A_EFFECTIVEOPERATIONMODE
+      PICS: PCC.S.A0011
       response:
           value: 3

@@ -31,6 +31,8 @@
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
+#include <lib/support/ScopedBuffer.h>
 #include <protocols/Protocols.h>
 
 #include <stdlib.h>
@@ -208,6 +210,52 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string 
     // 6.1.2.2. Table: Packed Binary Data Structure
     // The TLV Data should be 0 length if TLV is not included.
     return payloadBase38Representation(base38Representation, nullptr, 0);
+}
+
+CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38RepresentationWithAutoTLVBuffer(std::string & base38Representation)
+{
+    // Estimate the size of the needed buffer.
+    size_t estimate = 0;
+
+    auto dataItemSizeEstimate = [](const OptionalQRCodeInfo & item) {
+        // Each data item needs a control byte and a context tag.
+        size_t size = 2;
+
+        if (item.type == optionalQRCodeInfoTypeString)
+        {
+            // We'll need to encode the string length and then the string data.
+            // Length is at most 8 bytes.
+            size += 8;
+            size += item.data.size();
+        }
+        else
+        {
+            // Integer.  Assume it might need up to 8 bytes, for simplicity.
+            size += 8;
+        }
+        return size;
+    };
+
+    auto vendorData = mPayload.getAllOptionalVendorData();
+    for (auto & data : vendorData)
+    {
+        estimate += dataItemSizeEstimate(data);
+    }
+
+    auto extensionData = mPayload.getAllOptionalExtensionData();
+    for (auto & data : extensionData)
+    {
+        estimate += dataItemSizeEstimate(data);
+    }
+
+    estimate = TLV::EstimateStructOverhead(estimate);
+
+    VerifyOrReturnError(CanCastTo<uint32_t>(estimate), CHIP_ERROR_NO_MEMORY);
+
+    Platform::ScopedMemoryBuffer<uint8_t> buf;
+    VerifyOrReturnError(buf.Alloc(estimate), CHIP_ERROR_NO_MEMORY);
+
+    return payloadBase38Representation(base38Representation, buf.Get(), static_cast<uint32_t>(estimate));
 }
 
 CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart,

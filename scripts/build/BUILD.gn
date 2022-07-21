@@ -44,6 +44,7 @@ pw_python_package("build_examples") {
     "builders/infineon.py",
     "builders/k32w.py",
     "builders/mbed.py",
+    "builders/mw320.py",
     "builders/nrf.py",
     "builders/qpg.py",
     "builders/telink.py",

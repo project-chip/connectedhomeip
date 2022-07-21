@@ -39,7 +39,7 @@ tests:
           DUT"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
-      PICS: WNCV_LF && WNCV_PA_LF
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           saveAs: attrCurrentPositionLiftPercent100ths
           constraints:
@@ -52,7 +52,7 @@ tests:
           CurrentPositionLiftPercentage"
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF && A_CURRENTPOSITIONLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008 && WNCV.S.A000e
       response:
           value: attrCurrentPositionLiftPercent100ths / 100
           constraints:
@@ -68,7 +68,7 @@ tests:
 
     - label: "2b: TH sends GoToLiftPercentage command with BadParam to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -82,7 +82,7 @@ tests:
     ### Step 3x -> Verify the GoToLiftPercentage with 10001 as param
     - label: "3a: TH sends GoToLiftPercentage command with 10001 to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"
@@ -96,7 +96,7 @@ tests:
     ### Step 4x -> Verify the GoToLiftPercentage with 0xFFFF as param
     - label: "4a: TH sends GoToLiftPercentage command with 0xFFFF to DUT"
       command: "GoToLiftPercentage"
-      PICS: WNCV_LF && WNCV_PA_LF || WNCV_LF && CR_GOTOLIFTPERCENTAGE
+      PICS: WNCV.S.F00 && WNCV.S.F02 || WNCV.S.F00 && WNCV.S.C05.Rsp
       arguments:
           values:
               - name: "LiftPercent100thsValue"

@@ -25,4 +25,6 @@ public interface ReportCallback {
   void onError(ChipAttributePath attributePath, Exception e);
 
   void onReport(NodeState nodeState);
+
+  default void onDone() {}
 }

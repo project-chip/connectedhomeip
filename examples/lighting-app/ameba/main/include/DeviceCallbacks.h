@@ -39,6 +39,5 @@ public:
 
 private:
     void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

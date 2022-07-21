@@ -39,6 +39,7 @@ source_set("qpg-matter-shell") {
     defines = [
       "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
       "ENABLE_CHIP_SHELL",
+      "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
     ]
 
     sources = [

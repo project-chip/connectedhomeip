@@ -220,7 +220,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::LightActionEventHandler(AppEvent * aEvent)
+void AppTask::LightActionEventHandler(AppEvent * event)
 {
     /* ON/OFF Light Led based on Button interrupt */
     sLightLED.Invert();
@@ -248,7 +248,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     }
 }
 
-void AppTask::PostEvent(const AppEvent * aEvent)
+void AppTask::PostEvent(const AppEvent * event)
 {
     if (sAppEventQueue != NULL)
     {
@@ -256,7 +256,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, event, &higherPrioTaskWoken);
 
 #ifdef portYIELD_FROM_ISR
             portYIELD_FROM_ISR(higherPrioTaskWoken);
@@ -268,7 +268,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         }
         else
         {
-            status = xQueueSend(sAppEventQueue, aEvent, 1);
+            status = xQueueSend(sAppEventQueue, event, 1);
         }
 
         if (!status)
@@ -280,11 +280,11 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
 }
 
-void AppTask::DispatchEvent(AppEvent * aEvent)
+void AppTask::DispatchEvent(AppEvent * event)
 {
-    if (aEvent->Handler)
+    if (event->Handler)
     {
-        aEvent->Handler(aEvent);
+        event->Handler(event);
     }
     else
     {

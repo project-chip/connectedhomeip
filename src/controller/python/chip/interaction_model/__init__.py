@@ -74,12 +74,12 @@ class Status(enum.IntEnum):
 
 
 class InteractionModelError(ChipStackException):
-    def __init__(self, state: Status):
-        self._state = state
+    def __init__(self, status: Status):
+        self._status = status
 
     def __str__(self):
-        return f"InteractionModelError: {self._state.name} (0x{self._state.value:x})"
+        return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
 
     @property
-    def state(self) -> Status:
-        return self._state
+    def status(self) -> Status:
+        return self._status

@@ -28,20 +28,51 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Precondition Send On Command"
+      cluster: "On/Off"
+      PICS: OO.S.C01.Rsp
+      command: "On"
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
     - label: "Reads Minlevel attribute from DUT"
+      PICS: LVL.S.A0002
       command: "readAttribute"
       attribute: "min level"
       response:
           saveAs: MinlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
+      PICS: LVL.S.C04.Rsp && LVL.S.A0002
       command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
+                value: MinlevelValue + 1
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
                 value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Sends MoveToLevelWithOnOff command to DUT"
+      PICS: LVL.S.C04.Rsp && !LVL.S.A0002
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "level"
+                value: 2
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
@@ -50,14 +81,30 @@ tests:
                 value: 1
 
     - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
+          value: MinlevelValue + 1
           saveAs: CurrentlevelValue
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
+
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.A0000 && !LVL.S.A0002
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 2
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Sends step up command to DUT"
+      PICS: LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "Step"
       arguments:
           values:
@@ -81,14 +128,17 @@ tests:
                 value: 4000
 
     - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.A0000 && LVL.S.C02.Rsp
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 65
           constraints:
               type: uint8
+              minValue: 60
+              maxValue: 68
 
     - label: "Sends a StepWithOnOff command"
+      PICS: LVL.S.C06.Rsp && LVL.S.M.VarRate
       command: "StepWithOnOff"
       arguments:
           values:
@@ -112,28 +162,28 @@ tests:
                 value: 4000
 
     - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           value: CurrentlevelValue
 
-    - label: "Reset level to 254"
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 2
 
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
+    - label: "Precondition send Off Command"
+      cluster: "On/Off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

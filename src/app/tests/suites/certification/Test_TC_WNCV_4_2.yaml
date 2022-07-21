@@ -39,6 +39,7 @@ tests:
           "1a: TH sends DownOrClose command to preposition the DUT in the
           opposite direction"
       command: "DownOrClose"
+      PICS: WNCV.S.C01.Rsp
 
     ### Step 5x -> Verify the DUT has moved
     ### DUT moves toward its DownOrClose position
@@ -56,7 +57,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000f
       response:
           constraints:
               notValue: 0
@@ -65,7 +66,7 @@ tests:
     ### Step 2x ->  Check GoToTiltPercentage 30% Long-Run effects
     - label: "2a: TH sends GoToTiltPercentage command with 30 percent to DUT"
       command: "GoToTiltPercentage"
-      PICS: "WNCV_TL && CR_GOTOTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "tiltPercent100thsValue"
@@ -88,7 +89,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           value: 3000
 
@@ -106,6 +107,7 @@ tests:
     - label: "3b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -115,7 +117,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: 3000
 
@@ -125,7 +127,7 @@ tests:
           attribute from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
-      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           value: 30
 
@@ -133,7 +135,7 @@ tests:
     ### Step 4x ->  Check GoToTiltPercentage 60.20% Long-Run effects
     - label: "4a: TH sends GoToTiltPercentage command with 60.20 percent to DUT"
       command: "GoToTiltPercentage"
-      PICS: "WNCV_TL && CR_GOTOTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.C08.Rsp
       arguments:
           values:
               - name: "tiltPercent100thsValue"
@@ -156,7 +158,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           value: 6005
 
@@ -174,6 +176,7 @@ tests:
     - label: "5b: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
+      PICS: WNCV.S.A000a
       response:
           value: 0
 
@@ -183,7 +186,7 @@ tests:
           from DUT"
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
-      PICS: "WNCV_PA_TL && WNCV_TL"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           value: 6005
 
@@ -191,7 +194,7 @@ tests:
     - label:
           "5d: If (PA & TL) TH reads CurrentPositionTiltPercentage optional
           attribute from DUT"
-      PICS: "WNCV_PA_TL && WNCV_TL && A_CURRENTPOSITIONTILTPERCENTAGE"
+      PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:

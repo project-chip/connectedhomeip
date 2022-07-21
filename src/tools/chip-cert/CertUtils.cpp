@@ -36,6 +36,7 @@ using namespace chip;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
 using namespace chip::TLV;
+using namespace chip::Encoding;
 
 bool ToolChipDN::SetCertName(X509_NAME * name) const
 {
@@ -168,21 +169,40 @@ void ToolChipDN::PrintDN(FILE * file, const char * name) const
 
 namespace {
 
-CertFormat DetectCertFormat(uint8_t * cert, uint32_t certLen)
+CertFormat DetectCertFormat(const uint8_t * cert, uint32_t certLen)
 {
     static const uint8_t chipRawPrefix[] = { 0x15, 0x30, 0x01 };
+    static const char * chipHexPrefix    = "153001";
     static const char * chipB64Prefix    = "FTAB";
-    static const size_t chipB64PrefixLen = strlen(chipB64Prefix);
+    static const uint8_t derRawPrefix[]  = { 0x30, 0x82 };
+    static const char * derHexPrefix     = "30820";
     static const char * pemMarker        = "-----BEGIN CERTIFICATE-----";
 
-    if (certLen > sizeof(chipRawPrefix) && memcmp(cert, chipRawPrefix, sizeof(chipRawPrefix)) == 0)
+    VerifyOrReturnError(cert != nullptr, kCertFormat_Unknown);
+
+    if ((certLen > sizeof(chipRawPrefix)) && (memcmp(cert, chipRawPrefix, sizeof(chipRawPrefix)) == 0))
     {
         return kCertFormat_Chip_Raw;
     }
 
-    if (certLen > chipB64PrefixLen && memcmp(cert, chipB64Prefix, chipB64PrefixLen) == 0)
+    if ((certLen > strlen(chipHexPrefix)) && (memcmp(cert, chipHexPrefix, strlen(chipHexPrefix)) == 0))
+    {
+        return kCertFormat_Chip_Hex;
+    }
+
+    if ((certLen > strlen(chipB64Prefix)) && (memcmp(cert, chipB64Prefix, strlen(chipB64Prefix)) == 0))
     {
         return kCertFormat_Chip_Base64;
+    }
+
+    if ((certLen > sizeof(derRawPrefix)) && (memcmp(cert, derRawPrefix, sizeof(derRawPrefix)) == 0))
+    {
+        return kCertFormat_X509_DER;
+    }
+
+    if ((certLen > strlen(derHexPrefix)) && (memcmp(cert, derHexPrefix, strlen(derHexPrefix)) == 0))
+    {
+        return kCertFormat_X509_Hex;
     }
 
     if (ContainsPEMMarker(pemMarker, cert, certLen))
@@ -190,7 +210,7 @@ CertFormat DetectCertFormat(uint8_t * cert, uint32_t certLen)
         return kCertFormat_X509_PEM;
     }
 
-    return kCertFormat_X509_DER;
+    return kCertFormat_Unknown;
 }
 
 bool SetCertSerialNumber(X509 * cert)
@@ -530,24 +550,37 @@ bool ReadCert(const char * fileName, X509 * cert, CertFormat & certFmt)
     VerifyTrueOrExit(res);
 
     certFmt = DetectCertFormat(certBuf.get(), certLen);
+    if (certFmt == kCertFormat_Unknown)
+    {
+        fprintf(stderr, "Unrecognized Cert Format in File: %s\n", fileName);
+        return false;
+    }
+
+    if ((certFmt == kCertFormat_X509_Hex) || (certFmt == kCertFormat_Chip_Hex))
+    {
+        size_t len = chip::Encoding::HexToBytes(Uint8::to_char(certBuf.get()), certLen, certBuf.get(), certLen);
+        VerifyOrReturnError(CanCastTo<uint32_t>(2 * len), false);
+        VerifyOrReturnError(2 * len == certLen, false);
+        certLen = static_cast<uint32_t>(len);
+    }
 
     if (certFmt == kCertFormat_X509_PEM)
     {
         res = ReadCertPEM(fileName, cert);
         VerifyTrueOrExit(res);
     }
-    else if (certFmt == kCertFormat_X509_DER)
+    else if ((certFmt == kCertFormat_X509_DER) || (certFmt == kCertFormat_X509_Hex))
     {
-        const uint8_t * outCert = certBuf.get();
-
         VerifyOrReturnError(chip::CanCastTo<int>(certLen), false);
+
+        const uint8_t * outCert = certBuf.get();
 
         if (d2i_X509(&cert, &outCert, static_cast<int>(certLen)) == nullptr)
         {
             ReportOpenSSLErrorAndExit("d2i_X509", res = false);
         }
     }
-    // Otherwise, it is either CHIP TLV or CHIP TLV Base64 encoded.
+    // Otherwise, it is either CHIP TLV in raw, Base64, or hex encoded format.
     else
     {
         if (certFmt == kCertFormat_Chip_Base64)
@@ -624,6 +657,7 @@ bool X509ToChipCert(X509 * cert, MutableByteSpan & chipCert)
     }
 
 exit:
+    OPENSSL_free(derCert);
     return res;
 }
 
@@ -662,13 +696,37 @@ exit:
 
 bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
 {
-    bool res    = true;
-    FILE * file = nullptr;
+    bool res          = true;
+    FILE * file       = nullptr;
+    uint8_t * derCert = nullptr;
 
-    VerifyOrExit(cert != nullptr, res = false);
+    VerifyOrReturnError(cert != nullptr, false);
+    VerifyOrReturnError(certFmt != kCertFormat_Unknown, false);
 
-    res = OpenFile(fileName, file, true);
-    VerifyTrueOrExit(res);
+    if (IsChipCertFormat(certFmt))
+    {
+        uint8_t chipCertBuf[kMaxCHIPCertLength];
+        MutableByteSpan chipCert(chipCertBuf);
+
+        VerifyOrReturnError(X509ToChipCert(cert, chipCert), false);
+
+        return WriteChipCert(fileName, chipCert, certFmt);
+    }
+
+    if (certFmt == kCertFormat_X509_Hex)
+    {
+        int derCertLen = i2d_X509(cert, &derCert);
+        if (derCertLen < 0)
+        {
+            ReportOpenSSLErrorAndExit("i2d_X509", res = false);
+        }
+
+        VerifyOrExit(CanCastTo<uint32_t>(derCertLen), res = false);
+        VerifyOrExit(WriteDataIntoFile(fileName, derCert, static_cast<uint32_t>(derCertLen), kDataFormat_Hex), res = false);
+        ExitNow(res = true);
+    }
+
+    VerifyOrExit(OpenFile(fileName, file, true), res = false);
 
     if (certFmt == kCertFormat_X509_PEM)
     {
@@ -684,83 +742,34 @@ bool WriteCert(const char * fileName, X509 * cert, CertFormat certFmt)
             ReportOpenSSLErrorAndExit("i2d_X509_fp", res = false);
         }
     }
-    else if (certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64)
+    else
     {
-        uint8_t * certToWrite      = nullptr;
-        size_t certToWriteLen      = 0;
-        uint32_t chipCertBase64Len = BASE64_ENCODED_LEN(kMaxCHIPCertLength);
-        std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
-        uint8_t chipCertBuf[kMaxCHIPCertLength];
-        MutableByteSpan chipCert(chipCertBuf);
-
-        res = X509ToChipCert(cert, chipCert);
-        VerifyTrueOrExit(res);
-
-        if (certFmt == kCertFormat_Chip_Base64)
-        {
-            res = Base64Encode(chipCert.data(), static_cast<uint32_t>(chipCert.size()), chipCertBase64.get(), chipCertBase64Len,
-                               chipCertBase64Len);
-            VerifyTrueOrExit(res);
-
-            certToWrite    = chipCertBase64.get();
-            certToWriteLen = chipCertBase64Len;
-        }
-        else
-        {
-            certToWrite    = chipCert.data();
-            certToWriteLen = chipCert.size();
-        }
-
-        if (fwrite(certToWrite, 1, certToWriteLen, file) != certToWriteLen)
-        {
-            fprintf(stderr, "Unable to write to %s: %s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
-            ExitNow(res = false);
-        }
+        fprintf(stderr, "Unsupported certificate format\n");
+        ExitNow(res = false);
     }
 
+    printf("\r\n");
+
 exit:
+    OPENSSL_free(derCert);
     CloseFile(file);
     return res;
 }
 
 bool WriteChipCert(const char * fileName, const ByteSpan & chipCert, CertFormat certFmt)
 {
-    bool res                    = true;
-    FILE * file                 = nullptr;
-    const uint8_t * certToWrite = nullptr;
-    size_t certToWriteLen       = 0;
-    uint32_t chipCertBase64Len  = BASE64_ENCODED_LEN(static_cast<uint32_t>(chipCert.size()));
-    std::unique_ptr<uint8_t[]> chipCertBase64(new uint8_t[chipCertBase64Len]);
+    DataFormat dataFormat = kDataFormat_Unknown;
 
-    VerifyOrReturnError(certFmt == kCertFormat_Chip_Raw || certFmt == kCertFormat_Chip_Base64, false);
+    VerifyOrReturnError(IsChipCertFormat(certFmt), false);
 
-    if (certFmt == kCertFormat_Chip_Base64)
-    {
-        res = Base64Encode(chipCert.data(), static_cast<uint32_t>(chipCert.size()), chipCertBase64.get(), chipCertBase64Len,
-                           chipCertBase64Len);
-        VerifyTrueOrExit(res);
-
-        certToWrite    = chipCertBase64.get();
-        certToWriteLen = chipCertBase64Len;
-    }
+    if (certFmt == kCertFormat_Chip_Raw)
+        dataFormat = kDataFormat_Raw;
+    else if (certFmt == kCertFormat_Chip_Base64)
+        dataFormat = kDataFormat_Base64;
     else
-    {
-        certToWrite    = chipCert.data();
-        certToWriteLen = chipCert.size();
-    }
+        dataFormat = kDataFormat_Hex;
 
-    res = OpenFile(fileName, file, true);
-    VerifyTrueOrExit(res);
-
-    if (fwrite(certToWrite, 1, certToWriteLen, file) != certToWriteLen)
-    {
-        fprintf(stderr, "Unable to write to %s: %s\n", fileName, strerror(ferror(file) ? errno : ENOSPC));
-        ExitNow(res = false);
-    }
-
-exit:
-    CloseFile(file);
-    return res;
+    return WriteDataIntoFile(fileName, chipCert.data(), static_cast<uint32_t>(chipCert.size()), dataFormat);
 }
 
 bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,

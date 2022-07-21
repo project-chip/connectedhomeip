@@ -222,9 +222,7 @@ tests:
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.A4005
       response:
-          saveAs: ColorLoopStartEnhancedHue
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStartEnhancedHueStep5d
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -233,7 +231,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue
+              minValue: ColorLoopStartEnhancedHueStep5d
               maxValue: 65535
 
     - label: "Wait for 30S"
@@ -251,7 +249,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue
+              minValue: ColorLoopStartEnhancedHueStep5d
               maxValue: 65535
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
@@ -286,16 +284,14 @@ tests:
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.A4006
       response:
-          saveAs: ColorLoopStoredEnhancedHueValue1
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStoredEnhancedHueStep6c
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.A4000
       response:
-          value: ColorLoopStoredEnhancedHueValue1
+          value: ColorLoopStoredEnhancedHueStep6c
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
@@ -371,9 +367,7 @@ tests:
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.A4005
       response:
-          saveAs: ColorLoopStartEnhancedHue2
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStartEnhancedHueStep8d
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -382,7 +376,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue2
+              minValue: ColorLoopStartEnhancedHueStep8d
               maxValue: 65535
 
     - label: "Wait for 30S"
@@ -400,7 +394,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue2
+              minValue: ColorLoopStartEnhancedHueStep8d
               maxValue: 65535
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
@@ -435,16 +429,14 @@ tests:
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.A4006
       response:
-          saveAs: ColorLoopStoredEnhancedHueValue2
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStoredEnhancedHueStep9c
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.A4000
       response:
-          value: ColorLoopStoredEnhancedHueValue2
+          value: ColorLoopStoredEnhancedHueStep9c
 
     - label: "Enhanced Move To Hue command"
       command: "EnhancedMoveToHue"
@@ -551,9 +543,7 @@ tests:
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.A4005
       response:
-          saveAs: ColorLoopStartEnhancedHue3
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStartEnhancedHueStep12d
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -562,7 +552,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue3
+              minValue: ColorLoopStartEnhancedHueStep12d
               maxValue: 65535
 
     - label: "Wait for 30S"
@@ -580,7 +570,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue3
+              minValue: ColorLoopStartEnhancedHueStep12d
               maxValue: 65535
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
@@ -615,16 +605,14 @@ tests:
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.A4006
       response:
-          saveAs: ColorLoopStoredEnhancedHueValue3
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStoredEnhancedHueStep13c
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.A4000
       response:
-          value: ColorLoopStoredEnhancedHueValue3
+          value: ColorLoopStoredEnhancedHueStep13c
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
@@ -700,9 +688,7 @@ tests:
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.A4005
       response:
-          saveAs: ColorLoopStartEnhancedHue4
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStartEnhancedHueStep15d
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -711,7 +697,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue3
+              minValue: ColorLoopStartEnhancedHueStep15d
               maxValue: 65535
 
     - label: "Wait for 30S"
@@ -729,7 +715,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: ColorLoopStartEnhancedHue4
+              minValue: ColorLoopStartEnhancedHueStep15d
               maxValue: 65535
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
@@ -764,16 +750,14 @@ tests:
       attribute: "ColorLoopStoredEnhancedHue"
       PICS: CC.S.A4006
       response:
-          saveAs: ColorLoopStoredEnhancedHue4
-          constraints:
-              type: uint16
+          saveAs: ColorLoopStoredEnhancedHueStep16b
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       PICS: CC.S.A4000
       response:
-          value: ColorLoopStoredEnhancedHue4
+          value: ColorLoopStoredEnhancedHueStep16b
 
     - label: "Turn Off light for color control tests"
       cluster: "On/Off"

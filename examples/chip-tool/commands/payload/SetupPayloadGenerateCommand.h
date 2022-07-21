@@ -26,7 +26,7 @@ class SetupPayloadGenerateCommand : public Command
 public:
     SetupPayloadGenerateCommand(const char * name) : Command(name)
     {
-        AddArgument("payload", &mPayload);
+        AddArgument("existing-payload", &mExistingPayload, "An existing setup payload to modify based on the other arguments.");
         AddArgument("discriminator", 0, UINT16_MAX, &mDiscriminator);
         AddArgument("setup-pin-code", 0, UINT32_MAX, &mSetUpPINCode);
         AddArgument("version", 0, UINT8_MAX, &mVersion);
@@ -44,7 +44,7 @@ protected:
     chip::Optional<uint8_t> mVersion;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
-    chip::Optional<char *> mPayload;
+    chip::Optional<char *> mExistingPayload;
     chip::Optional<uint8_t> mCommissioningMode;
     chip::Optional<bool> mAllowInvalidPayload;
 };
@@ -55,11 +55,18 @@ public:
     SetupPayloadGenerateQRCodeCommand() : SetupPayloadGenerateCommand("generate-qrcode")
     {
         AddArgument("rendezvous", 0, UINT8_MAX, &mRendezvous);
+        AddArgument(
+            "tlvBytes", &mTLVBytes,
+            "Pre-encoded TLV for the optional part of the payload.  A nonempty value should be passed as \"hex:\" followed by the "
+            "bytes in hex encoding.  Passing an empty string to override the TLV in an existing payload is allowed.");
     }
     CHIP_ERROR Run() override;
 
 private:
+    static CHIP_ERROR PopulatePayloadTLVFromBytes(chip::SetupPayload & payload, const chip::ByteSpan & tlvBytes);
+
     chip::Optional<uint8_t> mRendezvous;
+    chip::Optional<chip::ByteSpan> mTLVBytes;
 };
 
 class SetupPayloadGenerateManualCodeCommand : public SetupPayloadGenerateCommand

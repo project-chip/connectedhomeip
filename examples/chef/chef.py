@@ -81,6 +81,7 @@ def load_config() -> None:
         config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
+        config["silabs-thread"]["EFR32_BOARD"] = None
 
         flush_print(yaml.dump(config))
         yaml.dump(config, configStream)
@@ -134,26 +135,24 @@ def bundle(platform: str, device_name: str) -> None:
         platform: The platform to bundle.
         device_name: The example to bundle.
     """
+    bundler_name = f"bundle_{platform}"
     matter_file = f"{device_name}.matter"
     zap_file = os.path.join(_DEVICE_FOLDER, f"{device_name}.zap")
     flush_print(f"Bundling {platform}", with_border=True)
     flush_print(f"Cleaning {_CD_STAGING_DIR}")
     shutil.rmtree(_CD_STAGING_DIR, ignore_errors=True)
     os.mkdir(_CD_STAGING_DIR)
-    if platform == "linux":
-        bundle_linux(device_name)
-    elif platform == "nrfconnect":
-        bundle_nrfconnect(device_name)
-    elif platform == "esp32":
-        bundle_esp32(device_name)
+    flush_print(f"Checking for {bundler_name}")
+    chef_module = sys.modules[__name__]
+    if hasattr(chef_module, bundler_name):
+        flush_print(f"Found {bundler_name}")
+        bundler = getattr(chef_module, bundler_name)
+        bundler(device_name)
     else:
         flush_print(f"No bundle function for {platform}!")
         exit(1)
     flush_print(f"Copying {matter_file}")
-    src_item = os.path.join(_REPO_BASE_PATH,
-                            "zzz_generated",
-                            "chef-"+device_name,
-                            "zap-generated",
+    src_item = os.path.join(_DEVICE_FOLDER,
                             matter_file)
     dest_item = os.path.join(_CD_STAGING_DIR, matter_file)
     shutil.copy(src_item, dest_item)
@@ -307,7 +306,8 @@ def main(argv: Sequence[str]) -> None:
                       choices=['nrfconnect', 'esp32', 'linux', 'silabs-thread'],
                       metavar="TARGET",
                       default="esp32")
-    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c", action="store_true", dest="do_rpc")
+    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c",
+                      action="store_true", dest="do_rpc", default=False)
     parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
                       action="store_true", dest="do_automated_test_stamp")
     parser.add_option("-v", "--vid", dest="vid", type=int,
@@ -320,10 +320,25 @@ def main(argv: Sequence[str]) -> None:
                       dest="tty", metavar="TTY", default=None)
     parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
                       dest="use_zzz", action="store_true")
+
+    # Build CD params.
     parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
                       dest="build_all", action="store_true")
+    parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
+                      dest="dry_run", action="store_true")
+    parser.add_option("", "--build_exclude", help="For use with --build_all. Build labels to exclude. Accepts a regex pattern. Mutually exclusive with --build_include.",
+                      dest="build_exclude")
+    parser.add_option("", "--build_include", help="For use with --build_all. Build labels to include. Accepts a regex pattern. Mutually exclusive with --build_exclude.",
+                      dest="build_include")
+    parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
+                      dest="keep_going", action="store_true")
     parser.add_option(
         "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+    parser.add_option(
+        "", "--ipv6only", help="Compile build which only supports ipv6. Linux only.",
+        action="store_true")
+    parser.add_option(
+        "", "--cpu_type", help="CPU type to compile for. Linux only.", choices=["arm64", "arm", "x64"])
 
     options, _ = parser.parse_args(argv)
 
@@ -337,7 +352,7 @@ def main(argv: Sequence[str]) -> None:
         if sys.platform == "linux" or sys.platform == "linux2":
             flush_print("Installing ZAP OS package dependencies")
             install_deps_cmd = """\
-            sudo apt-get install node node-yargs npm
+            sudo apt-get install nodejs node-yargs npm
             libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
             libjpeg9-dev libgif-dev node-typescript"""
             shell.run_cmd(unwrap_cmd(install_deps_cmd))
@@ -356,7 +371,10 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.ci:
-        for device_name in [d for d in _DEVICE_LIST if d in cicd_config["ci_allow_list"]]:
+        for device_name in cicd_config["ci_allow_list"]:
+            if device_name not in _DEVICE_LIST:
+                flush_print(f"{device_name} in CICD config but not {_DEVICE_FOLDER}!")
+                exit(1)
             if options.build_target == "nrfconnect":
                 shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -371,36 +389,53 @@ def main(argv: Sequence[str]) -> None:
     #
 
     if options.build_all:
+        if options.build_include and options.build_exclude:
+            flush_print(
+                "Error. --build_include and --build_exclude are mutually exclusive options.")
+            exit(1)
         flush_print("Building all chef examples")
         archive_prefix = "/workspace/artifacts/"
         archive_suffix = ".tar.gz"
-        os.makedirs(archive_prefix, exist_ok=True)
         failed_builds = []
         for device_name in _DEVICE_LIST:
-            for platform, label in cicd_config["cd_platforms"].items():
-                command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform}"
-                flush_print(f"Building {command}", with_border=True)
-                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-                shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
-                try:
-                    shell.run_cmd(command)
-                except RuntimeError as build_fail_error:
-                    failed_builds.append((device_name, platform, "build"))
-                    flush_print(str(build_fail_error))
-                    break
-                try:
-                    bundle(platform, device_name)
-                except FileNotFoundError as bundle_fail_error:
-                    failed_builds.append((device_name, platform, "bundle"))
-                    flush_print(str(bundle_fail_error))
-                    break
-                archive_name = f"{label}-{device_name}"
-                archive_full_name = archive_prefix + archive_name + archive_suffix
-                flush_print(f"Adding build output to archive {archive_full_name}")
-                if os.path.exists(archive_full_name):
-                    os.remove(archive_full_name)
-                with tarfile.open(archive_full_name, "w:gz") as tar:
-                    tar.add(_CD_STAGING_DIR, arcname=".")
+            for platform, label_args in cicd_config["cd_platforms"].items():
+                for label, args in label_args.items():
+                    archive_name = f"{label}-{device_name}"
+                    if options.build_exclude and re.search(options.build_exclude, archive_name):
+                        continue
+                    elif options.build_include and not re.search(options.build_include, archive_name):
+                        continue
+                    if options.dry_run:
+                        flush_print(archive_name)
+                        continue
+                    command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
+                    command += " ".join(args)
+                    flush_print(f"Building {command}", with_border=True)
+                    shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
+                    shell.run_cmd("export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
+                    try:
+                        shell.run_cmd(command)
+                    except RuntimeError as build_fail_error:
+                        failed_builds.append((device_name, platform, "build"))
+                        flush_print(str(build_fail_error))
+                        if not options.keep_going:
+                            exit(1)
+                        continue
+                    try:
+                        bundle(platform, device_name)
+                    except FileNotFoundError as bundle_fail_error:
+                        failed_builds.append((device_name, platform, "bundle"))
+                        flush_print(str(bundle_fail_error))
+                        if not options.keep_going:
+                            exit(1)
+                        continue
+                    os.makedirs(archive_prefix, exist_ok=True)
+                    archive_full_name = archive_prefix + archive_name + archive_suffix
+                    flush_print(f"Adding build output to archive {archive_full_name}")
+                    if os.path.exists(archive_full_name):
+                        os.remove(archive_full_name)
+                    with tarfile.open(archive_full_name, "w:gz") as tar:
+                        tar.add(_CD_STAGING_DIR, arcname=".")
         if len(failed_builds) == 0:
             flush_print("No build failures", with_border=True)
         else:
@@ -440,6 +475,10 @@ def main(argv: Sequence[str]) -> None:
         pass
     elif options.build_target == "silabs-thread":
         flush_print('Path to gecko sdk is configured within Matter.')
+        if 'EFR32_BOARD' not in config['silabs-thread'] or config['silabs-thread']['EFR32_BOARD'] is None:
+            flush_print('EFR32_BOARD was not configured. Make sure silabs-thread.EFR32_BOARD is set on your config.yaml file')
+            exit(1)
+        efr32_board = config['silabs-thread']['EFR32_BOARD']
     else:
         flush_print(f"Target {options.build_target} not supported")
 
@@ -502,6 +541,7 @@ def main(argv: Sequence[str]) -> None:
 
     if options.do_build:
         sw_ver_string = ""
+
         if options.do_automated_test_stamp:
             branch = ""
             for branch_text in shell.run_cmd("git branch", return_cmd_output=True).split("\n"):
@@ -587,23 +627,79 @@ def main(argv: Sequence[str]) -> None:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out/{options.sample_device_type_name}")
-            shell.run_cmd(
-                f"""{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh ./ out/{options.sample_device_type_name} BRD4186A \'sample_name=\"{options.sample_device_type_name}\"\' enable_openthread_cli=true chip_build_libshell=true \'{'import("//with_pw_rpc.gni")' if options.do_rpc else ""}\'""")
+            efr32_cmd_args = []
+            efr32_cmd_args.append(f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
+            efr32_cmd_args.append('./')
+            efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
+            efr32_cmd_args.append(f'{efr32_board}')
+            efr32_cmd_args.append(f'\'sample_name=\"{options.sample_device_type_name}\"\'')
+            if sw_ver_string:
+                efr32_cmd_args.append(f'\'chip_device_config_device_software_version_string=\"{sw_ver_string}\"\'')
+            efr32_cmd_args.append('enable_openthread_cli=true')
+            if options.do_rpc:
+                efr32_cmd_args.append('chip_build_libshell=false')
+                efr32_cmd_args.append('\'import("//with_pw_rpc.gni")\'')
+            else:
+                efr32_cmd_args.append('chip_build_libshell=true')
+            shell.run_cmd(" ".join(efr32_cmd_args))
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
         elif options.build_target == "linux":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/linux")
+
+            linux_args = []
+            if options.do_rpc:
+                linux_args.append('import("//with_pw_rpc.gni")')
+            linux_args.extend([
+                'import("//build_overrides/chip.gni")',
+                'import("${chip_root}/config/standalone/args.gni")',
+                'chip_shell_cmd_server = false',
+                'chip_build_libshell = true',
+                'chip_config_network_layer_ble = false',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
+            ])
+
+            uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+            if "aarch" not in uname_resp and "arm" not in uname_resp:
+                if options.cpu_type == "arm64":
+                    if "SYSROOT_AARCH64" not in shell.env:
+                        flush_print(
+                            "SYSROOT_AARCH64 env variable not set. "
+                            "AARCH64 toolchain needed for cross-compiling for arm64.")
+                        exit(1)
+                    shell.env["PKG_CONFIG_PATH"] = (
+                        f'{shell.env["SYSROOT_AARCH64"]}/lib/aarch64-linux-gnu/pkgconfig')
+                    linux_args.append('target_cpu="arm64"')
+                    linux_args.append('is_clang=true')
+                    linux_args.append('chip_crypto="mbedtls"')
+                    linux_args.append(f'sysroot="{shell.env["SYSROOT_AARCH64"]}"')
+
+                elif options.cpu_type == "arm":
+                    if "SYSROOT_ARMHF" not in shell.env:
+                        flush_print(
+                            "SYSROOT_ARMHF env variable not set. "
+                            "ARMHF toolchain needed for cross-compiling for arm.")
+                        exit(1)
+                    shell.env["PKG_CONFIG_PATH"] = (
+                        f'{shell.env["SYSROOT_ARMHF"]}/lib/arm-linux-gnueabihf/pkgconfig')
+                    linux_args.append('target_cpu="arm"')
+                    linux_args.append('is_clang=true')
+                    linux_args.append('chip_crypto="mbedtls"')
+                    linux_args.append(f'sysroot="{shell.env["SYSROOT_ARMHF"]}"')
+
+            if options.cpu_type == "x64":
+                uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
+                if "x64" not in uname_resp and "x86_64" not in uname_resp:
+                    flush_print(f"Unable to cross compile for x64 on {uname_resp}")
+                    exit(1)
+            if options.ipv6only:
+                linux_args.append("chip_inet_config_enable_ipv4=false")
+
+            if sw_ver_string:
+                linux_args.append(
+                    f'chip_device_config_device_software_version_string = "{sw_ver_string}"')
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
-                sw_ver_string_config_text = f"chip_device_config_device_software_version_string = \"{sw_ver_string}\"" if sw_ver_string else ""
-                f.write(textwrap.dedent(f"""\
-                        import("//build_overrides/chip.gni")
-                        import("${{chip_root}}/config/standalone/args.gni")
-                        chip_shell_cmd_server = false
-                        chip_build_libshell = true
-                        chip_config_network_layer_ble = false
-                        target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={'1' if options.do_rpc else '0'}"]
-                        {sw_ver_string_config_text}
-                        """))
+                f.write("\n".join(linux_args))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         sample_zap_file = "{options.sample_device_type_name}.zap"
@@ -611,11 +707,7 @@ def main(argv: Sequence[str]) -> None:
                         """))
             if options.do_clean:
                 shell.run_cmd(f"rm -rf out")
-            if options.do_rpc:
-                shell.run_cmd(
-                    "gn gen out --args='import(\"//with_pw_rpc.gni\")'")
-            else:
-                shell.run_cmd("gn gen out --args=''")
+            shell.run_cmd("gn gen out")
             shell.run_cmd("ninja -C out")
 
     #
@@ -645,7 +737,7 @@ def main(argv: Sequence[str]) -> None:
                 shell.run_cmd("west flash")
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
-            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/BRD4186A/chip-efr32-chef-example.flash.py")
+            shell.run_cmd(f"python3 out/{options.sample_device_type_name}/{efr32_board}/chip-efr32-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 

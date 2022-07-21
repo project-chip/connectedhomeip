@@ -66,6 +66,8 @@ tests:
           value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Reads optional attribute constrains: PIRUnoccupiedToOccupiedDelay"
       PICS: OCC.S.A0011
@@ -75,6 +77,8 @@ tests:
           value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Reads optional attribute constrains: PIRUnoccupiedToOccupiedThreshold"
@@ -96,6 +100,8 @@ tests:
           value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Read attribute: UltrasonicUnoccupiedToOccupiedDelay"
       PICS: OCC.S.A0021
@@ -105,6 +111,8 @@ tests:
           value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Read attribute: UltrasonicUnoccupiedToOccupiedThreshold"
       PICS: OCC.S.A0022
@@ -127,6 +135,8 @@ tests:
           value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Reads optional attribute constrains:
@@ -138,6 +148,8 @@ tests:
           value: 0
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "Reads optional attribute constrains:

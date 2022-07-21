@@ -384,11 +384,15 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     {
         if (context.mEffectiveTime.Get<CurrentChipEpochTime>().count() < cert->mNotBeforeTime)
         {
+            ChipLogDetail(SecureChannel, "Certificate's mNotBeforeTime (%" PRIu32 ") is after current time (%" PRIu32 ")",
+                          cert->mNotBeforeTime, context.mEffectiveTime.Get<CurrentChipEpochTime>().count());
             validityResult = CertificateValidityResult::kNotYetValid;
         }
         else if (cert->mNotAfterTime != kNullCertTime &&
                  context.mEffectiveTime.Get<CurrentChipEpochTime>().count() > cert->mNotAfterTime)
         {
+            ChipLogDetail(SecureChannel, "Certificate's mNotAfterTime (%" PRIu32 ") is before current time (%" PRIu32 ")",
+                          cert->mNotAfterTime, context.mEffectiveTime.Get<CurrentChipEpochTime>().count());
             validityResult = CertificateValidityResult::kExpired;
         }
         else
@@ -407,6 +411,8 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         // certificate in question is expired.  Check for this.
         if (cert->mNotAfterTime != 0 && context.mEffectiveTime.Get<LastKnownGoodChipEpochTime>().count() > cert->mNotAfterTime)
         {
+            ChipLogDetail(SecureChannel, "Certificate's mNotAfterTime (%" PRIu32 ") is before last known good time (%" PRIu32 ")",
+                          cert->mNotAfterTime, context.mEffectiveTime.Get<LastKnownGoodChipEpochTime>().count());
             validityResult = CertificateValidityResult::kExpiredAtLastKnownGoodTime;
         }
         else
@@ -649,6 +655,8 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
 
 CHIP_ERROR ChipDN::AddCATs(const chip::CATValues & cats)
 {
+    VerifyOrReturnError(cats.AreValid(), CHIP_ERROR_INVALID_ARGUMENT);
+
     for (auto & cat : cats.values)
     {
         if (cat != kUndefinedCAT)
@@ -677,9 +685,9 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrinta
 
 CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
     uint8_t lCertType    = kCertType_NotSpecified;
     bool fabricIdPresent = false;
+    bool catsPresent     = false;
     uint8_t rdnCount     = RDNCount();
 
     certType = kCertType_NotSpecified;
@@ -688,46 +696,55 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
     {
         if (rdn[i].mAttrOID == kOID_AttributeType_MatterRCACId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_Root;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterICACId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_ICA;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
             VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_NODE_ID);
             lCertType = kCertType_Node;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFirmwareSigningId)
         {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
             lCertType = kCertType_FirmwareSigning;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFabricId)
         {
             // Only one fabricId attribute is allowed per DN.
-            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(!fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
             VerifyOrReturnError(IsValidFabricId(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
             fabricIdPresent = true;
+        }
+        else if (rdn[i].mAttrOID == kOID_AttributeType_MatterCASEAuthTag)
+        {
+            VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn[i].mChipVal), CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(IsValidCASEAuthTag(static_cast<CASEAuthTag>(rdn[i].mChipVal)), CHIP_ERROR_WRONG_CERT_DN);
+            catsPresent = true;
         }
     }
 
     if (lCertType == kCertType_Node)
     {
-        VerifyOrExit(fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_DN);
+        VerifyOrReturnError(fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
+    }
+    else
+    {
+        VerifyOrReturnError(!catsPresent, CHIP_ERROR_WRONG_CERT_DN);
     }
 
     certType = lCertType;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
@@ -1145,6 +1162,38 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+    ValidationContext validContext;
+    uint8_t certType;
+
+    // Note that this function doesn't check RCAC NotBefore / NotAfter time validity.
+    // It is assumed that RCAC should be valid at the time of installation by definition.
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(rcac, CertDecodeFlags::kGenerateTBSHash));
+
+    ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
+    VerifyOrReturnError(certType == kCertType_Root, CHIP_ERROR_WRONG_CERT_TYPE);
+
+    VerifyOrReturnError(certData.mSubjectDN.IsEqual(certData.mIssuerDN), CHIP_ERROR_WRONG_CERT_TYPE);
+
+    VerifyOrReturnError(certData.mSubjectKeyId.data_equal(certData.mAuthKeyId), CHIP_ERROR_WRONG_CERT_TYPE);
+
+    VerifyOrReturnError(certData.mCertFlags.Has(CertFlags::kIsCA), CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+    if (certData.mCertFlags.Has(CertFlags::kPathLenConstraintPresent))
+    {
+        VerifyOrReturnError(certData.mPathLenConstraint <= 1, CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+    }
+
+    VerifyOrReturnError(certData.mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign), CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
+    return ChipCertificateSet::VerifySignature(&certData, &certData);
+}
+
 CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint16_t rawIntLen)
 {
     VerifyOrReturnError(!derInt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1327,6 +1376,9 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
     {
         cats.values[i] = kUndefinedCAT;
     }
+
+    // Make sure the set contained valid data, otherwise it's an invalid cert
+    VerifyOrReturnError(cats.AreValid(), CHIP_ERROR_WRONG_CERT_DN);
 
     return CHIP_NO_ERROR;
 }

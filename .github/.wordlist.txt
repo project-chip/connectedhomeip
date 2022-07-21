@@ -54,6 +54,7 @@ APIs
 apk
 AppConfig
 AppImpl
+AppleTV
 appliable
 ApplianceControl
 applianceeventsandalert
@@ -177,6 +178,7 @@ CaseAdminNode
 CatalogVendorId
 CBB
 cbd
+CBOR
 ccf
 CCMP
 CCS
@@ -277,8 +279,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -459,6 +461,7 @@ emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
 EnableNetwork
 EnableWiFiNetwork
+endian
 EndpointId
 endpointName
 endsWith
@@ -541,6 +544,7 @@ GDB
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
+generalised
 GenericConfigurationManagerImpl
 GenericConnectivityManagerImpl
 GenericImpl
@@ -599,6 +603,8 @@ HKDF
 HMAC
 hoc
 homebrew
+HomePod
+HomePods
 hostapd
 hostname
 href
@@ -612,6 +618,7 @@ IasWd
 iaszone
 ibb
 ICA
+iCloud
 ICMP
 IDF
 IDL
@@ -657,6 +664,7 @@ InvokeCommandRequests
 InvokeCommandResponse
 IoT
 ipaddr
+iPadOS
 ipadr
 ipp
 iptables
@@ -759,6 +767,7 @@ LTE
 LTS
 LwIP
 LwIP's
+LZMA
 macaddr
 machineType
 MacOS
@@ -882,6 +891,7 @@ NodeId
 nongnu
 nordicsemi
 NotAvailable
+NotifyUpdateApplied
 notValue
 npm
 nRF
@@ -942,6 +952,7 @@ OTARequestorDriver
 OTARequestorInterface
 OTARequestorSerialPort
 OTARequestorStorage
+otasoftwareupdateapp
 OtaSoftwareUpdateProvider
 otasoftwareupdaterequestor
 otatesting
@@ -1085,8 +1096,8 @@ REPL
 repo
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1132,8 +1143,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1177,6 +1188,7 @@ smoketest
 SMP
 socat
 socio
+SoCs
 SodiumConcentrationMeasurement
 softap
 SoftDevice
@@ -1318,6 +1330,7 @@ ttymxc
 ttyUSB
 TurbidityConcentrationMeasurement
 TvCasting
+tvOS
 TXD
 txt
 uargument
@@ -1364,6 +1377,7 @@ util
 utils
 UUID
 ux
+validator
 VCP
 Vectorcall
 VendorID
@@ -1388,6 +1402,7 @@ WaitNewInputEvent
 WakeOnLan
 WantedBy
 watchdogTimeout
+watchOS
 webpage
 wg
 wget

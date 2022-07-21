@@ -88,10 +88,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
     }
 
     if (chip_device_platform == "linux") {
-      test_sources += [
-        "TestConnectivityMgr.cpp",
-        "TestFailSafeContext.cpp",
-      ]
+      test_sources += [ "TestConnectivityMgr.cpp" ]
     }
   }
 } else {

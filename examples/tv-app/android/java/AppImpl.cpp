@@ -357,7 +357,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentApp(const CatalogVendorApp & vend
     return nullptr;
 }
 
-EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app)
+EndpointId ContentAppFactoryImpl::AddContentApp(ContentAppImpl * app, jobject contentAppEndpointManager)
 {
     DataVersion dataVersionBuf[ArraySize(contentAppClusters)];
     EndpointId epId = ContentAppPlatform::GetInstance().AddContentApp(app, &contentAppEndpoint, Span<DataVersion>(dataVersionBuf),
@@ -471,7 +471,7 @@ EndpointId AddContentApp(const char * szVendorName, uint16_t vendorId, const cha
     ContentAppImpl * app =
         new ContentAppImpl(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion, "20202021", manager);
     ChipLogProgress(DeviceLayer, "AppImpl: AddContentApp vendorId=%d applicationName=%s ", vendorId, szApplicationName);
-    return gFactory.AddContentApp(app);
+    return gFactory.AddContentApp(app, manager);
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     return 0;
 }

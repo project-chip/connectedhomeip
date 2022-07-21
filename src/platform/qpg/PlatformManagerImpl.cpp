@@ -45,7 +45,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::QPGConfig::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.

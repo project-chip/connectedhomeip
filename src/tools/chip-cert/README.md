@@ -258,6 +258,7 @@ COMMAND OPTIONS
            x509-pem  - X.509 PEM format
            x509-der  - X.509 DER format
            chip      - raw CHIP TLV format
+           chip-hex  - hex encoded CHIP TLV format
            chip-b64  - base-64 encoded CHIP TLV format (default)
 
    -V, --valid-from <YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ]
@@ -306,13 +307,17 @@ COMMAND OPTIONS
 
        Output certificate in X.509 PEM format.
 
-  -x, --x509-der
+  -d, --x509-der
 
        Output certificate in X.509 DER format.
 
   -c, --chip
 
        Output certificate in raw CHIP TLV format.
+
+  -x, --chip-hex
+
+       Output certificate in CHIP TLV hexadecimal format.
 
   -b --chip-b64
 
@@ -353,13 +358,16 @@ COMMAND OPTIONS
 
        Output the private key in SEC1/RFC-5915 PEM format.
 
-   -x, --x509-der
+   -d, --x509-der
 
        Output the private key in SEC1/RFC-5915 DER format.
 
    -c, --chip
 
        Output the private key in raw CHIP serialized format.
+   -x, --chip-hex
+
+       Output the private key in hex encoded CHIP serialized format.
 
    -b, --chip-b64
 

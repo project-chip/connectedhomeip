@@ -93,9 +93,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
             thread->id = taskStatusArray[x].xTaskNumber;
 
             thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
-            /* Unsupported metrics */
-            // thread->stackSize;
-            // thread->stackFreeCurrent;
+            thread->stackSize.Emplace(uxTaskGetStackSize(taskStatusArray[x].xHandle));
+            thread->stackFreeCurrent.Emplace(uxTaskGetFreeStackSize(taskStatusArray[x].xHandle));
 
             thread->Next = head;
             head         = thread;
@@ -423,6 +422,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -98,13 +98,6 @@ void DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 
         break;
 
-    case DeviceEventType::kSessionEstablished:
-        if (event->SessionEstablished.IsCommissioner)
-        {
-            ChipLogProgress(Shell, "Commissioner detected!");
-        }
-        break;
-
     case DeviceEventType::kCHIPoBLEConnectionEstablished:
         ChipLogProgress(Shell, "CHIPoBLE connection established");
         break;

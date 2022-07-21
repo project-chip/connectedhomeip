@@ -45,7 +45,7 @@ namespace Python {
 using PyObject = void;
 
 using SyncSetKeyValueCb    = void (*)(PyObject * appContext, const char * key, const void * value, uint16_t size);
-using SetGetKeyValueCb     = void (*)(PyObject * appContext, const char * key, char * value, uint16_t * size);
+using SetGetKeyValueCb     = void (*)(PyObject * appContext, const char * key, char * value, uint16_t * size, bool * isFound);
 using SyncDeleteKeyValueCb = void (*)(PyObject * appContext, const char * key);
 
 class StorageAdapter : public PersistentStorageDelegate
@@ -68,8 +68,6 @@ private:
     SetGetKeyValueCb mGetKeyCb;
     SyncDeleteKeyValueCb mDeleteKeyCb;
     PyObject * mContext;
-
-    std::map<std::string, std::string> mStorage;
 };
 
 } // namespace Python

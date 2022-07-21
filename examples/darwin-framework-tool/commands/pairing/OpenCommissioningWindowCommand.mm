@@ -15,7 +15,7 @@
  *   limitations under the License.
  */
 
-#import <CHIP/CHIP.h>
+#import <Matter/Matter.h>
 
 #include "OpenCommissioningWindowCommand.h"
 
@@ -30,7 +30,7 @@ CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
         pairingCode = [controller openPairingWindowWithPIN:mNodeId
                                                   duration:mCommissioningWindowTimeoutMs
                                              discriminator:mDiscriminator
-                                                  setupPIN:arc4random()
+                                                  setupPIN:[MTRSetupPayload generateRandomPIN]
                                                      error:&error];
     }
 

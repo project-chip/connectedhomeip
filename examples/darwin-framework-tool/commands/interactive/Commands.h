@@ -18,6 +18,8 @@
 
 #pragma once
 
+#import <Matter/Matter.h>
+
 #include "../common/CHIPCommandBridge.h"
 #include <commands/common/Command.h>
 

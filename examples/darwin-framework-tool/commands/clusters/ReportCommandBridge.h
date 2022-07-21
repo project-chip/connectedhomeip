@@ -50,10 +50,10 @@ public:
 
     ~ReadAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPReadParams * params = [[CHIPReadParams alloc] init];
+        MTRReadParams * params = [[MTRReadParams alloc] init];
         params.fabricFiltered = mFabricFiltered.HasValue() ? [NSNumber numberWithBool:mFabricFiltered.Value()] : nil;
         [device
             readAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
@@ -94,7 +94,6 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
@@ -107,7 +106,6 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
@@ -119,16 +117,15 @@ public:
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("fabric-filtered", 0, 1, &mFabricFiltered);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~SubscribeAttribute() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         [device subscribeAttributeWithEndpointId:[NSNumber numberWithUnsignedShort:endpointId]
@@ -144,9 +141,7 @@ public:
                         NSLog(@"Response Item: %@", [item description]);
                     }
                 }
-                if (error || !mWait) {
-                    SetCommandExitStatus(error);
-                }
+                SetCommandExitStatus(error);
             }
             subscriptionEstablished:^() {
                 mSubscriptionEstablished = YES;
@@ -155,10 +150,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
@@ -166,7 +158,6 @@ protected:
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 
     void Shutdown() override
     {
@@ -189,17 +180,16 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("keepSubscriptions", 0, 1, &mKeepSubscriptions);
-        AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
     ~SubscribeEvent() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
 
-        CHIPSubscribeParams * params = [[CHIPSubscribeParams alloc] init];
+        MTRSubscribeParams * params = [[MTRSubscribeParams alloc] init];
         params.keepPreviousSubscriptions
             = mKeepSubscriptions.HasValue() ? [NSNumber numberWithBool:mKeepSubscriptions.Value()] : nil;
         [device subscribeWithQueue:callbackQueue
@@ -208,22 +198,16 @@ public:
             params:params
             cacheContainer:nil
             attributeReportHandler:^(NSArray * value) {
-                if (!mWait) {
-                    SetCommandExitStatus(CHIP_NO_ERROR);
-                }
+                SetCommandExitStatus(CHIP_NO_ERROR);
             }
             eventReportHandler:^(NSArray * value) {
                 for (id item in value) {
                     NSLog(@"Response Item: %@", [item description]);
                 }
-                if (!mWait) {
-                    SetCommandExitStatus(CHIP_NO_ERROR);
-                }
+                SetCommandExitStatus(CHIP_NO_ERROR);
             }
             errorHandler:^(NSError * error) {
-                if (error && !mWait) {
-                    SetCommandExitStatus(error);
-                }
+                SetCommandExitStatus(error);
             }
             subscriptionEstablished:^() {
                 mSubscriptionEstablished = YES;
@@ -232,10 +216,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
 protected:
     chip::Optional<bool> mKeepSubscriptions;
@@ -243,5 +224,4 @@ protected:
     bool mSubscriptionEstablished = NO;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
-    bool mWait;
 };

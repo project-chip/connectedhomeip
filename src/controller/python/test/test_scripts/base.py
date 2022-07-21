@@ -32,6 +32,7 @@ import time
 import ctypes
 import chip.clusters as Clusters
 import chip.clusters.Attribute as Attribute
+from chip.utils import CommissioningBuildingBlocks
 from chip.ChipStack import *
 import chip.FabricAdmin
 import copy
@@ -170,14 +171,18 @@ class TestResult:
 class BaseTestHelper:
     def __init__(self, nodeid: int, paaTrustStorePath: str, testCommissioner: bool = False):
         self.chipStack = ChipStack('/tmp/repl_storage.json')
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
-            fabricId=1, fabricIndex=1)
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
+                                                        fabricId=1, fabricIndex=1)
         self.devCtrl = self.fabricAdmin.NewController(
             nodeid, paaTrustStorePath, testCommissioner)
         self.controllerNodeId = nodeid
         self.logger = logger
         self.paaTrustStorePath = paaTrustStorePath
         logging.getLogger().setLevel(logging.DEBUG)
+
+    async def _GetCommissonedFabricCount(self, nodeid: int):
+        data = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.OperationalCredentials.Attributes.CommissionedFabrics)])
+        return data[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CommissionedFabrics]
 
     def _WaitForOneDiscoveredDevice(self, timeoutSeconds: int = 2):
         print("Waiting for device responses...")
@@ -188,7 +193,7 @@ class BaseTestHelper:
             time.sleep(0.2)
         if time.time() > timeout:
             return None
-        return ctypes.string_at(addrStrStorage)
+        return ctypes.string_at(addrStrStorage).decode("utf-8")
 
     def TestDiscovery(self, discriminator: int):
         self.logger.info(
@@ -207,7 +212,7 @@ class BaseTestHelper:
         self.logger.info(
             "Attempting to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
         if self.devCtrl.EstablishPASESessionIP(
-                ip.encode("utf-8"), setuppin, nodeid) is not None:
+                ip, setuppin, nodeid) is not None:
             self.logger.info(
                 "Failed to establish PASE session with device id: {} addr: {}".format(str(nodeid), ip))
             return False
@@ -261,7 +266,7 @@ class BaseTestHelper:
 
     def TestCommissioning(self, ip: str, setuppin: int, nodeid: int):
         self.logger.info("Commissioning device {}".format(ip))
-        if not self.devCtrl.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish commissioning device {}".format(ip))
             return False
@@ -356,6 +361,58 @@ class BaseTestHelper:
         if resp.errorCode is Clusters.GeneralCommissioning.Enums.CommissioningError.kBusyWithOtherAdmin:
             return True
         return False
+
+    async def TestAddUpdateRemoveFabric(self, nodeid: int):
+        logger.info("Testing AddNOC, UpdateNOC and RemoveFabric")
+
+        self.logger.info("Waiting for attribute read for CommissionedFabrics")
+        startOfTestFabricCount = await self._GetCommissonedFabricCount(nodeid)
+
+        tempFabric = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1)
+        tempDevCtrl = tempFabric.NewController(self.controllerNodeId, self.paaTrustStorePath)
+
+        self.logger.info("Starting AddNOC using same node ID")
+        if not await CommissioningBuildingBlocks.AddNOCForNewFabricFromExisting(self.devCtrl, tempDevCtrl, nodeid, nodeid):
+            self.logger.error("AddNOC failed")
+            return False
+
+        expectedFabricCountUntilRemoveFabric = startOfTestFabricCount + 1
+        if expectedFabricCountUntilRemoveFabric != await self._GetCommissonedFabricCount(nodeid):
+            self.logger.error("Expected commissioned fabric count to change after AddNOC")
+            return False
+
+        self.logger.info("Starting UpdateNOC using same node ID")
+        if not await CommissioningBuildingBlocks.UpdateNOC(tempDevCtrl, nodeid, nodeid):
+            self.logger.error("UpdateNOC using same node ID failed")
+            return False
+
+        if expectedFabricCountUntilRemoveFabric != await self._GetCommissonedFabricCount(nodeid):
+            self.logger.error("Expected commissioned fabric count to remain unchanged after UpdateNOC")
+            return False
+
+        self.logger.info("Starting UpdateNOC using different node ID")
+        newNodeIdForUpdateNoc = nodeid + 1
+        if not await CommissioningBuildingBlocks.UpdateNOC(tempDevCtrl, nodeid, newNodeIdForUpdateNoc):
+            self.logger.error("UpdateNOC using different node ID failed")
+            return False
+
+        if expectedFabricCountUntilRemoveFabric != await self._GetCommissonedFabricCount(nodeid):
+            self.logger.error("Expected commissioned fabric count to remain unchanged after UpdateNOC with new node ID")
+            return False
+
+        # TODO Read using old node ID and expect that it fails.
+
+        currentFabricIndexResponse = await tempDevCtrl.ReadAttribute(newNodeIdForUpdateNoc, [(Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
+        updatedNOCFabricIndex = currentFabricIndexResponse[0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.CurrentFabricIndex]
+        removeFabricResponse = await tempDevCtrl.SendCommand(newNodeIdForUpdateNoc, 0, Clusters.OperationalCredentials.Commands.RemoveFabric(updatedNOCFabricIndex))
+
+        if startOfTestFabricCount != await self._GetCommissonedFabricCount(nodeid):
+            self.logger.error("Expected fabric count to be the same at the end of test as when it started")
+            return False
+
+        tempDevCtrl.Shutdown()
+        tempFabric.Shutdown()
+        return True
 
     async def TestCaseEviction(self, nodeid: int):
         self.logger.info("Testing CASE eviction")
@@ -476,14 +533,14 @@ class BaseTestHelper:
         await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000)
 
         self.logger.info("Creating 2nd Fabric Admin")
-        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(
-            fabricId=2, fabricIndex=2)
+        self.fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
+                                                         fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
         self.devCtrl2 = self.fabricAdmin2.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
 
-        if not self.devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
+        if not self.devCtrl2.CommissionIP(ip, setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
             return False
@@ -499,9 +556,10 @@ class BaseTestHelper:
 
         self.logger.info("Shutdown completed, starting new controllers...")
 
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
-            fabricId=1, fabricIndex=1)
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(vendorId=0XFFF1,
+                                                        fabricId=1, fabricIndex=1)
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(vendorId=0xFFF1,
+                                                    fabricId=2, fabricIndex=2)
 
         self.devCtrl = self.fabricAdmin.NewController(
             self.controllerNodeId, self.paaTrustStorePath)
@@ -954,3 +1012,17 @@ class BaseTestHelper:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False
         return True
+
+    def TestFabricScopedCommandDuringPase(self, nodeid: int):
+        '''Validates that fabric-scoped commands fail during PASE with UNSUPPORTED_ACCESS
+
+        The nodeid is the PASE pseudo-node-ID used during PASE establishment
+        '''
+        status = None
+        try:
+            response = asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.OperationalCredentials.Commands.UpdateFabricLabel("roboto")))
+        except IM.InteractionModelError as ex:
+            status = ex.status
+
+        return status == IM.Status.UnsupportedAccess

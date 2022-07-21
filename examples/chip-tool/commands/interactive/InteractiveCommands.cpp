@@ -18,9 +18,8 @@
 
 #include "InteractiveCommands.h"
 
+#include <editline.h>
 #include <iomanip>
-#include <readline/history.h>
-#include <readline/readline.h>
 #include <sstream>
 
 char kInteractiveModeName[]                            = "";
@@ -30,8 +29,6 @@ constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history
 constexpr const char * kInteractiveModeStopCommand     = "quit()";
 
 namespace {
-
-bool gIsCommandRunning = false;
 
 void ClearLine()
 {
@@ -43,11 +40,6 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     ClearLine();
     chip::Logging::Platform::LogV(module, category, msg, args);
     ClearLine();
-
-    if (gIsCommandRunning == false)
-    {
-        rl_forced_update_display();
-    }
 }
 } // namespace
 
@@ -107,13 +99,11 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     std::string arg;
 
     std::stringstream ss(command);
-    while (ss >> std::quoted(arg))
+    while (ss >> std::quoted(arg, '\''))
     {
         if (argsCount == kInteractiveModeArgumentsMaxLength)
         {
-            gIsCommandRunning = true;
             ChipLogError(chipTool, "Too many arguments. Ignoring.");
-            gIsCommandRunning = false;
             return true;
         }
 
@@ -123,9 +113,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     }
 
     ClearLine();
-    gIsCommandRunning = true;
     mHandler->RunInteractive(argsCount, args);
-    gIsCommandRunning = false;
 
     // Do not delete arg[0]
     while (--argsCount)

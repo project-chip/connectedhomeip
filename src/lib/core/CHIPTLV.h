@@ -56,12 +56,12 @@
 namespace chip {
 namespace TLV {
 
-inline uint8_t operator|(TLVElementType lhs, TLVTagControl rhs)
+constexpr inline uint8_t operator|(TLVElementType lhs, TLVTagControl rhs)
 {
     return static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs);
 }
 
-inline uint8_t operator|(TLVTagControl lhs, TLVElementType rhs)
+constexpr inline uint8_t operator|(TLVTagControl lhs, TLVElementType rhs)
 {
     return static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs);
 }

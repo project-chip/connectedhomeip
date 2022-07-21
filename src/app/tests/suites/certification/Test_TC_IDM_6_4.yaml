@@ -14,8 +14,8 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    19.8.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH [DUT -
-    Controller]
+    3.6.4. [TC-IDM-6.4] Events Subscribe Interaction from DUT to TH.
+    [{DUT_Client}]
 
 config:
     nodeId: 0x12344321
@@ -26,40 +26,79 @@ tests:
     - label:
           "DUT sends Subscribe Request Message to the TH for a supported event."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
+          basic subscribe-event start-up 10 100 1 0
 
-          sudo ./chip-tool any subscribe-event-by-id 0x0033 0x01 0 100 0 1 1
+          On TH (On the reference app), On reference app verify that  the subscription message received has the all fields which mentioned in expected outcome
+
+          colId (0, 1) and MessageCounter:190733237 on exchange 33689r
+          [1657455555.193832][11525:11525] CHIP:EM: Handling via exchange: 33689r, Delegate: 0xaaaae00c1430
+          [1657455555.193912][11525:11525] CHIP:IM: Received Subscribe request
+          [1657455555.194063][11525:11525] CHIP:IM: Deleting previous subscription from NodeId: 000000000001B669, FabricIndex: 1
+          [1657455555.194186][11525:11525] CHIP:DMG: SubscribeRequestMessage =
+          [1657455555.194252][11525:11525] CHIP:DMG: {
+          [1657455555.194312][11525:11525] CHIP:DMG:      KeepSubscriptions = false,
+          [1657455555.194395][11525:11525] CHIP:DMG:      MinIntervalFloorSeconds = 0xa,
+          [1657455555.194461][11525:11525] CHIP:DMG:      MaxIntervalCeilingSeconds = 0x64,
+          [1657455555.194522][11525:11525] CHIP:DMG:      EventPathIBs =
+          [1657455555.194586][11525:11525] CHIP:DMG:      [
+          [1657455555.194646][11525:11525] CHIP:DMG:              EventPath =
+          [1657455555.194708][11525:11525] CHIP:DMG:              {
+          [1657455555.194776][11525:11525] CHIP:DMG:                      Endpoint = 0x0,
+          [1657455555.194853][11525:11525] CHIP:DMG:                      Cluster = 0x28,
+          [1657455555.194931][11525:11525] CHIP:DMG:                      Event = 0x0,
+          [1657455555.195002][11525:11525] CHIP:DMG:              },
+          [1657455555.195075][11525:11525] CHIP:DMG:
+          [1657455555.195135][11525:11525] CHIP:DMG:      ],
+          [1657455555.195202][11525:11525] CHIP:DMG:
+          [1657455555.195263][11525:11525] CHIP:DMG:      isFabricFiltered = true,
+          [1657455555.195325][11525:11525] CHIP:DMG:      InteractionModelRevision = 1
+          [1657455555.195382][11525:11525] CHIP:DMG: },
+          [1657455555.195593][11525:11525] CHIP:DMG: Final negotiated min/max parameters: Min = 10s, Max = 100s
+          [1657455555.195766][11525:11525] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657455555.195955][11525:11525] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
       disabled: true
 
     - label:
-          "DUT sends Subscribe Request Message to the TH + TH sends Report Data
+          "DUT sends Subscribe Request Message to the TH. TH sends Report Data
           message to DUT."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          sudo ./chip-tool softwarediagnostics subscribe-by-id 0xFFFFFFFF 0 100 0 1 0
+          basic subscribe-event-by-id 0x000 20 400 1 0
+          Verify DUT is responsds with  status response  for the data sent in the above command
+          On TH (On the reference app)
+          6 from Retrans Table on exchange 33690r
+          [1657455691.695355][11525:11525] CHIP:EM: Removed CHIP MessageCounter:11056066 from RetransTable on exchange 33690r
+          [1657455691.695430][11525:11525] CHIP:DMG: StatusResponseMessage =
+          [1657455691.695483][11525:11525] CHIP:DMG: {
+          [1657455691.695510][11525:11525] CHIP:DMG:      Status = 0x00 (SUCCESS),
+          [1657455691.695549][11525:11525] CHIP:DMG:      InteractionModelRevision = 1
+          [1657455691.695574][11525:11525] CHIP:DMG: }
+          [1657455691.695600][11525:11525] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+          [1657455691.695643][11525:11525] CHIP:DMG: Refresh Subscribe Sync Timer with max 400 seconds
       disabled: true
 
     - label:
           "DUT sends Subscribe Request Message to the TH and TH does not respond
           with Report Data message to DUT."
       verification: |
-
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
 
     - label:
-          "DUT sends Subscribe Request Message to the TH + TH sends Report Data
-          message to DUT + DUT sends Status Response Message to the TH + TH does
+          "DUT sends Subscribe Request Message to the TH. TH sends Report Data
+          message to DUT. DUT sends Status Response Message to the TH. TH does
           not respond with Subscribe Response message to DUT."
       verification: |
-
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
 
     - label:
           "With an active Event subscription from DUT to TH, TH sends Report
           Data message to DUT with an inactive SubscriptionId."
       verification: |
-
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true
 
     - label:
@@ -67,16 +106,5 @@ tests:
           Data message to DUT after the maximum interval from the last Report
           Data."
       verification: |
-
-      disabled: true
-
-    - label:
-          "TH sends Subscribe Request Message to DUT with EventRequests set to a
-          specific event. Once the subscription is active, reboot the TH. On the
-          DUT, perform actions to trigger the event. (Trigger it multiple
-          times). TH resubscribes to the same event after bootup to the DUT."
-      verification: |
-          In case of chip tool, here is an example command to use
-
-          sudo ./chip-tool softwarediagnostics subscribe-by-id 0x0 0 100 0 1 0
+          This is not testable in normal scenario, and needs to be tested as part of Unit test.
       disabled: true

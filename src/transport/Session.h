@@ -21,6 +21,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/core/ScopedNodeId.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/LockTracker.h>
 #include <transport/SessionHolder.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -55,12 +56,14 @@ public:
 
     void AddHolder(SessionHolder & holder)
     {
+        assertChipStackLockedByCurrentThread();
         VerifyOrDie(!holder.IsInList());
         mHolders.PushBack(&holder);
     }
 
     void RemoveHolder(SessionHolder & holder)
     {
+        assertChipStackLockedByCurrentThread();
         VerifyOrDie(mHolders.Contains(&holder));
         mHolders.Remove(&holder);
     }
@@ -100,9 +103,13 @@ public:
 
     void DispatchSessionEvent(SessionDelegate::Event event)
     {
-        for (auto & holder : mHolders)
+        // Holders might remove themselves when notified.
+        auto holder = mHolders.begin();
+        while (holder != mHolders.end())
         {
-            holder.DispatchSessionEvent(event);
+            auto cur = holder;
+            ++holder;
+            cur->DispatchSessionEvent(event);
         }
     }
 

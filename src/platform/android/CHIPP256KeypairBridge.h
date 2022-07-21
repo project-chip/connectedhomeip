@@ -55,9 +55,6 @@ public:
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length,
                               chip::Crypto::P256ECDSASignature & out_signature) const override;
 
-    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length,
-                               chip::Crypto::P256ECDSASignature & out_signature) const override;
-
     CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key,
                                   chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
 

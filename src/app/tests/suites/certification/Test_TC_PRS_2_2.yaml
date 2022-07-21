@@ -27,13 +27,17 @@ tests:
       disabled: true
 
     - label: "TH reads from the DUT the MeasuredValue attribute"
+      PICS: PRS.S.A0000
       verification: |
+          Verify on the TH Log:
+
           ./chip-tool pressuremeasurement read measured-value 1 1
 
           CHIP:TOO:   MeasuredValue: 0
       disabled: true
 
     - label: "Operate on device to change the pressure significantly"
+      PICS: PRS.M.PressureChange
       verification: |
           Operate at device
       disabled: true
@@ -41,6 +45,7 @@ tests:
     - label:
           "After a few seconds, TH reads from the DUT the MeasuredValue
           attribute"
+      PICS: PRS.S.A0000
       verification: |
           ./chip-tool pressuremeasurement read measured-value 1 1
 

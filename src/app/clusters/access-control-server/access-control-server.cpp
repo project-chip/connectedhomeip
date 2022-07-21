@@ -55,7 +55,14 @@ class AccessControlAttribute : public AttributeAccessInterface, public EntryList
 public:
     AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
 
+    /// IM-level implementation of read
+    ///
+    /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    /// IM-level implementation of write
+    ///
+    /// Returns appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 public:
@@ -63,6 +70,12 @@ public:
                         ChangeType changeType) override;
 
 private:
+    /// Business logic implementation of write, returns generic CHIP_ERROR.
+    CHIP_ERROR ReadImpl(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
+
+    /// Business logic implementation of write, returns generic CHIP_ERROR.
+    CHIP_ERROR WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+
     CHIP_ERROR ReadAcl(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadExtension(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteAcl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
@@ -96,7 +109,36 @@ CHIP_ERROR LogExtensionChangedEvent(const AccessControlCluster::Structs::Extensi
     return err;
 }
 
-CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR CheckExtensionEntryDataFormat(const ByteSpan & data)
+{
+    CHIP_ERROR err;
+
+    TLV::TLVReader reader;
+    reader.Init(data);
+
+    auto containerType = chip::TLV::kTLVType_List;
+    err                = reader.Next(containerType, chip::TLV::AnonymousTag());
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    err = reader.EnterContainer(containerType);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(chip::TLV::IsProfileTag(reader.GetTag()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    err = reader.ExitContainer(containerType);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    err = reader.Next();
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AccessControlAttribute::ReadImpl(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -176,7 +218,7 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
     });
 }
 
-CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -294,6 +336,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
             auto & item = iterator.GetValue();
             // TODO(#13590): generated code doesn't automatically handle max length so do it manually
             ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+            ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
+
             ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
                                                          static_cast<uint16_t>(item.data.size())));
             ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
@@ -313,6 +358,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         ReturnErrorOnFailure(aDecoder.Decode(item));
         // TODO(#13590): generated code doesn't automatically handle max length so do it manually
         ReturnErrorCodeIf(item.data.size() > kExtensionDataMaxLength, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+        ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
+
         ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
                                                      static_cast<uint16_t>(item.data.size())));
         ReturnErrorOnFailure(
@@ -378,6 +426,47 @@ void AccessControlAttribute::OnEntryChanged(const SubjectDescriptor * subjectDes
 
 exit:
     ChipLogError(DataManagement, "AccessControlCluster: event failed %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+CHIP_ERROR ChipErrorToImErrorMap(CHIP_ERROR err)
+{
+    // Map some common errors into an underlying IM error
+    // Separate logging is done to not lose the original error location in case such
+    // this are available.
+    CHIP_ERROR mappedError = err;
+
+    if (err == CHIP_ERROR_INVALID_ARGUMENT)
+    {
+        mappedError = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    else if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        // Not found is generally also illegal argument: caused a lookup into an invalid location,
+        // like invalid subjects or targets.
+        mappedError = CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+    else if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        mappedError = CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    if (mappedError != err)
+    {
+        ChipLogError(DataManagement, "Re-mapped %" CHIP_ERROR_FORMAT " into %" CHIP_ERROR_FORMAT " for IM return codes",
+                     err.Format(), mappedError.Format());
+    }
+
+    return mappedError;
+}
+
+CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    return ChipErrorToImErrorMap(ReadImpl(aPath, aEncoder));
+}
+
+CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    return ChipErrorToImErrorMap(WriteImpl(aPath, aDecoder));
 }
 
 } // namespace

@@ -17,6 +17,7 @@
  */
 
 #include "SetupPayloadGenerateCommand.h"
+#include <lib/core/CHIPTLV.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -62,9 +63,14 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::Run()
 {
     SetupPayload payload;
 
-    if (mPayload.HasValue())
+    if (mExistingPayload.HasValue())
     {
-        QRCodeSetupPayloadParser(mPayload.Value()).populatePayload(payload);
+        CHIP_ERROR err = QRCodeSetupPayloadParser(mExistingPayload.Value()).populatePayload(payload);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Invalid existing payload: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
     }
 
     ConfigurePayload(payload);
@@ -74,12 +80,119 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::Run()
         payload.rendezvousInformation.SetRaw(mRendezvous.Value());
     }
 
+    if (mTLVBytes.HasValue())
+    {
+        CHIP_ERROR err = PopulatePayloadTLVFromBytes(payload, mTLVBytes.Value());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Unable to populate payload TLV: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
+    }
+
     QRCodeSetupPayloadGenerator generator(payload);
     generator.SetAllowInvalidPayload(mAllowInvalidPayload.ValueOr(false));
 
     std::string code;
-    ReturnErrorOnFailure(generator.payloadBase38Representation(code));
+    ReturnErrorOnFailure(generator.payloadBase38RepresentationWithAutoTLVBuffer(code));
     ChipLogProgress(chipTool, "QR Code: %s", code.c_str());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetupPayloadGenerateQRCodeCommand::PopulatePayloadTLVFromBytes(SetupPayload & payload, const ByteSpan & tlvBytes)
+{
+    // First clear out all the existing TVL bits from the payload.  Ignore
+    // errors here, because we don't care if those bits are not present.
+    payload.removeSerialNumber();
+
+    auto existingVendorData = payload.getAllOptionalVendorData();
+    for (auto & data : existingVendorData)
+    {
+        payload.removeOptionalVendorData(data.tag);
+    }
+
+    if (tlvBytes.empty())
+    {
+        // Used to just clear out the existing TLV.
+        return CHIP_NO_ERROR;
+    }
+
+    TLV::TLVReader reader;
+    reader.Init(tlvBytes);
+
+    // Data is a TLV structure.
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    CHIP_ERROR err;
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = reader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            ChipLogError(chipTool, "Unexpected non-context TLV tag.");
+            return CHIP_ERROR_INVALID_TLV_TAG;
+        }
+
+        uint8_t tagNum = static_cast<uint8_t>(TLV::TagNumFromTag(tag));
+        if (tagNum < 0x80)
+        {
+            // Matter-common tag.
+            if (tagNum != kSerialNumberTag)
+            {
+                ChipLogError(chipTool, "No support yet for Matter-common tags other than serial number");
+                return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+            }
+
+            // Serial number can be a string or an unsigned integer.
+            if (reader.GetType() == TLV::kTLVType_UTF8String)
+            {
+                CharSpan data;
+                ReturnErrorOnFailure(reader.Get(data));
+                ReturnErrorOnFailure(payload.addSerialNumber(std::string(data.data(), data.size())));
+                continue;
+            }
+
+            if (reader.GetType() == TLV::kTLVType_UnsignedInteger)
+            {
+                uint32_t value;
+                ReturnErrorOnFailure(reader.Get(value));
+                ReturnErrorOnFailure(payload.addSerialNumber(value));
+                continue;
+            }
+
+            ChipLogError(chipTool, "Unexpected type for serial number: %d", to_underlying(reader.GetType()));
+            return CHIP_ERROR_WRONG_TLV_TYPE;
+        }
+
+        // Vendor tag.  We support strings and signed integers.
+        if (reader.GetType() == TLV::kTLVType_UTF8String)
+        {
+            CharSpan data;
+            ReturnErrorOnFailure(reader.Get(data));
+            ReturnErrorOnFailure(payload.addOptionalVendorData(tagNum, std::string(data.data(), data.size())));
+            continue;
+        }
+
+        if (reader.GetType() == TLV::kTLVType_SignedInteger)
+        {
+            int32_t value;
+            ReturnErrorOnFailure(reader.Get(value));
+            ReturnErrorOnFailure(payload.addOptionalVendorData(tagNum, value));
+            continue;
+        }
+
+        ChipLogError(chipTool, "Unexpected type for vendor data: %d", to_underlying(reader.GetType()));
+        return CHIP_ERROR_WRONG_TLV_TYPE;
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+
+    ReturnErrorOnFailure(reader.ExitContainer(outerType));
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
     return CHIP_NO_ERROR;
 }
@@ -88,9 +201,14 @@ CHIP_ERROR SetupPayloadGenerateManualCodeCommand::Run()
 {
     SetupPayload payload;
 
-    if (mPayload.HasValue())
+    if (mExistingPayload.HasValue())
     {
-        ManualSetupPayloadParser(mPayload.Value()).populatePayload(payload);
+        CHIP_ERROR err = ManualSetupPayloadParser(mExistingPayload.Value()).populatePayload(payload);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Invalid existing payload: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
+        }
     }
 
     ConfigurePayload(payload);

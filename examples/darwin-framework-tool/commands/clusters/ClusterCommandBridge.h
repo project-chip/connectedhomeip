@@ -18,9 +18,8 @@
 
 #pragma once
 
-#import <CHIP/CHIP.h>
-#import <CHIP/CHIPDevice_Internal.h> // For NSObjectFromCHIPTLV
-#include <lib/support/UnitTestUtils.h>
+#import "MTRError_Utils.h"
+#import <Matter/Matter.h>
 
 #include "ModelCommandBridge.h"
 
@@ -46,7 +45,7 @@ public:
 
     ~ClusterCommand() {}
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId) override
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId) override
     {
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
@@ -67,7 +66,7 @@ public:
         return ClusterCommand::SendCommand(device, endpointId, mClusterId, mCommandId, commandFields);
     }
 
-    CHIP_ERROR SendCommand(CHIPDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
+    CHIP_ERROR SendCommand(MTRBaseDevice * _Nonnull device, chip::EndpointId endpointId, chip::ClusterId clusterId,
         chip::CommandId commandId, id _Nonnull commandFields)
     {
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
@@ -96,10 +95,16 @@ public:
                                      }];
 
             if (mRepeatDelayInMs.HasValue()) {
-                chip::test_utils::SleepMillis(mRepeatDelayInMs.Value());
+                [NSThread sleepForTimeInterval:((double) mRepeatDelayInMs.Value()) / 1000];
             }
         }
         return CHIP_NO_ERROR;
+    }
+
+    void Shutdown() override
+    {
+        mError = nil;
+        ModelCommand::Shutdown();
     }
 
 protected:

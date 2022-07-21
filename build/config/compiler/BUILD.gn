@@ -453,7 +453,7 @@ config("coverage_default") {
 
 declare_args() {
   # Enable Runtime Type Information (RTTI)
-  enable_rtti = false
+  enable_rtti = current_os == "mac" || current_os == "ios"
 }
 
 config("no_rtti") {

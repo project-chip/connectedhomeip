@@ -805,6 +805,31 @@ CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & ses
     return CHIP_NO_ERROR;
 }
 
+/* Operational Group Key Group, PrivacyKey Info: "PrivacyKey" */
+static const uint8_t kGroupPrivacyInfo[] = { 'P', 'r', 'i', 'v', 'a', 'c', 'y', 'K', 'e', 'y' };
+
+/*
+    PrivacyKey =
+         Crypto_KDF
+         (
+            InputKey = EncryptionKey,
+            Salt = [],
+            Info = "PrivacyKey",
+            Length = CRYPTO_SYMMETRIC_KEY_LENGTH_BITS
+         )
+*/
+CHIP_ERROR DeriveGroupPrivacyKey(const ByteSpan & encryption_key, MutableByteSpan & out_key)
+{
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == encryption_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES <= out_key.size(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    const ByteSpan null_span = ByteSpan(nullptr, 0);
+
+    Crypto::HKDF_sha crypto;
+    return crypto.HKDF_SHA256(encryption_key.data(), encryption_key.size(), null_span.data(), null_span.size(), kGroupPrivacyInfo,
+                              sizeof(kGroupPrivacyInfo), out_key.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+}
+
 CHIP_ERROR ExtractVIDPIDFromAttributeString(DNAttrType attrType, const ByteSpan & attr,
                                             AttestationCertVidPid & vidpidFromMatterAttr, AttestationCertVidPid & vidpidFromCNAttr)
 {

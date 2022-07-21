@@ -24,11 +24,13 @@ enum class {{asType label}} : {{asUnderlyingZclType name}} {
 {{#zcl_enum_items}}
 k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{/zcl_enum_items}}
+kUnknownEnumValue = {{first_unused_enum_value mode="first_unused"}},
 };
 {{#if (isWeaklyTypedEnum label)}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using {{asType label}} = EmberAf{{asType label}};
-#endif
+static {{asType label}} __attribute__((unused)) k{{asType label}}kUnknownEnumValue = static_cast<{{asType label}}>({{first_unused_enum_value mode="first_unused"}});
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 {{/if}}
 {{/zcl_enums}}
 {{#zcl_bitmaps}}

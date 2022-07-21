@@ -46,8 +46,11 @@ public:
 
     static constexpr size_t kMaxEntries = KVS_MAX_ENTRIES;
 
+    static void ForceKeyMapSave();
+
 private:
     static void OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState);
+
     void ScheduleKeyMapSave(void);
     bool IsValidKvsNvm3Key(const uint32_t nvm3Key) const;
     CHIP_ERROR MapKvsKeyToNvm3(const char * key, uint32_t & nvm3Key, bool isSlotNeeded = false) const;

@@ -100,7 +100,7 @@ void LogOnFailure(const char * name, DNSServiceErrorType err)
 {
     if (kDNSServiceErr_NoError != err)
     {
-        ChipLogError(DeviceLayer, "%s (%s)", name, Error::ToString(err));
+        ChipLogError(Discovery, "%s (%s)", name, Error::ToString(err));
     }
 }
 
@@ -165,7 +165,7 @@ namespace {
 static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType err, const char * name, const char * type,
                        const char * domain, void * context)
 {
-    ChipLogDetail(DeviceLayer, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d", __func__, name, type, domain, flags);
+    ChipLogDetail(Discovery, "Mdns: %s name: %s, type: %s, domain: %s, flags: %d", __func__, name, type, domain, flags);
 
     auto sdCtx = reinterpret_cast<RegisterContext *>(context);
     sdCtx->Finalize(err);
@@ -174,7 +174,7 @@ static void OnRegister(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErr
 CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t interfaceId, const char * type, const char * name,
                     uint16_t port, ScopedTXTRecord & record)
 {
-    ChipLogProgress(DeviceLayer, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, name, port, type,
+    ChipLogProgress(Discovery, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, name, port, type,
                     interfaceId);
 
     RegisterContext * sdCtx = nullptr;
@@ -198,7 +198,7 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
 
 void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, name, type, domain,
+    ChipLogDetail(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, name, type, domain,
                   interfaceId);
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
@@ -225,7 +225,7 @@ void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, 
 
 void OnBrowseRemove(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
 {
-    ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, name, type, domain,
+    ChipLogDetail(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, name, type, domain,
                   interfaceId);
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
@@ -259,7 +259,7 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     auto sdCtx = chip::Platform::New<BrowseContext>(context, callback, protocol);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    ChipLogProgress(DeviceLayer, "Browsing for: %s", type);
+    ChipLogProgress(Discovery, "Browsing for: %s", type);
     DNSServiceRef sdRef;
     auto err = DNSServiceBrowse(&sdRef, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
@@ -329,7 +329,7 @@ static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t inter
 static CHIP_ERROR Resolve(void * context, DnssdResolveCallback callback, uint32_t interfaceId,
                           chip::Inet::IPAddressType addressType, const char * type, const char * name)
 {
-    ChipLogDetail(DeviceLayer, "Resolve type=%s name=%s interface=%" PRIu32, type, name, interfaceId);
+    ChipLogDetail(Discovery, "Resolve type=%s name=%s interface=%" PRIu32, type, name, interfaceId);
 
     auto sdCtx = chip::Platform::New<ResolveContext>(context, callback, addressType);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);

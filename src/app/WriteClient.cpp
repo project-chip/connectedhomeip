@@ -425,7 +425,8 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 
     System::PacketBufferHandle data = mChunks.PopHead();
 
-    if (!mChunks.IsNull() && mpExchangeCtx->IsGroupExchangeContext())
+    bool isGroupWrite = mpExchangeCtx->IsGroupExchangeContext();
+    if (!mChunks.IsNull() && isGroupWrite)
     {
         // Reject this request if we have more than one chunk (mChunks is not null after PopHead()), and this is a group
         // exchange context.
@@ -434,6 +435,12 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
+    if (isGroupWrite)
+    {
+        // Exchange is closed now, since there are no group responses.  Drop our
+        // ref to it.
+        mpExchangeCtx = nullptr;
+    }
     MoveToState(State::AwaitingResponse);
     return CHIP_NO_ERROR;
 }

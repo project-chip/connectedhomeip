@@ -201,10 +201,12 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
         {
             mImageProcessor->Abort();
         }
-        SetState(State::kIdle, OTAChangeReasonEnum::kSuccess);
 
         // Because AbortTransfer() will generate a StatusReport to send.
         PollTransferSession();
+
+        // Now that we've sent our report, we're idle.
+        SetState(State::kIdle, OTAChangeReasonEnum::kSuccess);
     }
     else
     {

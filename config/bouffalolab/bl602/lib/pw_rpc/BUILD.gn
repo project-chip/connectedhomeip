@@ -24,7 +24,7 @@ static_library("pw_rpc") {
   public_deps = [
     "$dir_pw_rpc:server",
     "$dir_pw_rpc/nanopb:echo_service",
-    "${chip_root}/examples/platform/bl602/pw_sys_io:pw_sys_io_bl602",
+    "${chip_root}/examples/platform/bouffalolab/bl602/pw_sys_io:pw_sys_io_bl602",
     "${dir_pigweed}/pw_hdlc:pw_rpc",
     dir_pw_assert,
     dir_pw_checksum,

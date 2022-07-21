@@ -74,7 +74,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
     chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, AndroidOperationalCredentialsIssuerPtr opCredsIssuerPtr,
     jobject keypairDelegate, jbyteArray rootCertificate, jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate,
-    jbyteArray ipkEpochKey, uint16_t listenPort, CHIP_ERROR * errInfoOnFailure)
+    jbyteArray ipkEpochKey, uint16_t listenPort, uint16_t controllerVendorId, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -143,6 +143,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     initParams.listenPort                      = listenPort;
+    setupParams.controllerVendorId             = static_cast<chip::VendorId>(controllerVendorId);
     setupParams.pairingDelegate                = wrapper.get();
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     initParams.fabricIndependentStorage        = wrapperStorage;
@@ -193,6 +194,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     MutableByteSpan rcacSpan(rcac.Get(), kMaxCHIPDERCertLength);
 
+    // The lifetime of the ephemeralKey variable must be kept until SetupParams is saved.
+    Crypto::P256Keypair ephemeralKey;
+
     if (rootCertificate != nullptr && intermediateCertificate != nullptr && nodeOperationalCertificate != nullptr &&
         keypairDelegate != nullptr)
     {
@@ -217,7 +221,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     }
     else
     {
-        Crypto::P256Keypair ephemeralKey;
         *errInfoOnFailure = ephemeralKey.Initialize();
         if (*errInfoOnFailure != CHIP_NO_ERROR)
         {

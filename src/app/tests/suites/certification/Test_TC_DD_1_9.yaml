@@ -27,31 +27,35 @@ tests:
           "Provide the 11-digit/21-digit Manual Pairing Code from the TH Device
           in text, speech or any format supported by DUT"
       verification: |
-          1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log, Controller should be able to parse the Manual Pairing code
+          1. Launch all-clusters-app on the raspi , get the Manual Pairing code from the log
 
-          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi --discriminator 3841
+          ubuntu@matter-7:~/Apr18_dut/connectedhomeip/examples/all-clusters-app/linux/out/all-clusters-app$ sudo ./chip-all-clusters-app --wifi
 
-          CHIP:SPT: PASE PBKDF iterations set to 1000
-          CHIP:SPT: LinuxCommissionableDataProvider didn't get a PASE salt, generating one.
-          CHIP:DL: Device Configuration:
-          CHIP:DL:   Serial Number: TEST_SN
-          CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          CHIP:DL:   Product Id: 32769 (0x8001)
-          CHIP:DL:   Hardware Version: 0
-          CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
-          CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
-          CHIP:DL:   Manufacturing Date: (not set)
-          CHIP:DL:   Device Type: 65535 (0xFFFF)
-          CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
-          CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
-          CHIP:SVR: Manual pairing code: [34970112332]
-          CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
-           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-           CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [13293:13293] CHIP:DL: Device Configuration:
+          [1653306603.740569][13293:13293] CHIP:DL:   Serial Number: TEST_SN
+          [1653306603.740607][13293:13293] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
+          [1653306603.740644][13293:13293] CHIP:DL:   Product Id: 32769 (0x8001)
+          [1653306603.740676][13293:13293] CHIP:DL:   Hardware Version: 0
+          [1653306603.740700][13293:13293] CHIP:DL:   Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          [1653306603.740722][13293:13293] CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          [1653306603.740752][13293:13293] CHIP:DL:   Manufacturing Date: (not set)
+          [1653306603.740777][13293:13293] CHIP:DL:   Device Type: 65535 (0xFFFF)
+          [1653306603.740798][13293:13293] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
+          [1653306603.740846][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
+          [1653306603.740877][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653306603.740898][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1653306603.740929][13293:13293] CHIP:SVR: Manual pairing code: [34970112332]
+          [1653306603.740951][13293:13293] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
+          [1653306603.741000][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
+          [1653306603.741028][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1653306603.741049][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          [1653306603.741081][13293:13293] CHIP:SVR: Manual pairing code: [749701123365521327694]
 
 
+          2. Parse 11-digit Manual Pairing code
           ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload 34970112332
+
+          Verify in DUT as client side:
           CHIP:SPL: Parsing decimalRepresentation: 34970112332
           CHIP:SPL: CommissioningFlow: 0
           CHIP:SPL: VendorID: 0
@@ -61,7 +65,10 @@ tests:
           CHIP:SPL: SetUpPINCode: 20202021
           CHIP:SPL: RendezvousInformation: 0
 
+          3. Parse 21-digit Manual Pairing code
           ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload 749701123365521327694
+
+          Verify in DUT as client side:
           CHIP:SPL: Parsing decimalRepresentation: 749701123365521327694
           CHIP:SPL: CommissioningFlow: 2
           CHIP:SPL: VendorID: 65521
@@ -70,4 +77,18 @@ tests:
           CHIP:SPL: Discriminator: 3840
           CHIP:SPL: SetUpPINCode: 20202021
           CHIP:SPL: RendezvousInformation: 0
+
+          4. Parse payload by commissioning the TH
+          ./chip-tool pairing code 1 34970112332
+
+          Verify in DUT as client side:
+          [1653556303.582797][4071:4076] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1653556303.582850][4071:4076] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1653556303.582891][4071:4076] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1653556303.582927][4071:4076] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1653556303.582964][4071:4076] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1653556303.583040][4071:4076] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1653556303.583110][4071:4076] CHIP:TOO: Device commissioning completed with success
+          [1653556303.583209][4071:4076] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1653556303.583255][4071:4076] CHIP:EM: Sending Standalone Ack for MessageCounter:9735725 on exchange 24476i
       disabled: true

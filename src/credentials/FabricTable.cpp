@@ -51,6 +51,27 @@ constexpr TLV::Tag kFabricLabelTag = TLV::ContextTag(1);
 constexpr TLV::Tag kNextAvailableFabricIndexTag = TLV::ContextTag(0);
 constexpr TLV::Tag kFabricIndicesTag            = TLV::ContextTag(1);
 
+// Tags for commit marker storage
+constexpr TLV::Tag kMarkerFabricIndexTag = TLV::ContextTag(0);
+constexpr TLV::Tag kMarkerIsAdditionTag  = TLV::ContextTag(1);
+
+constexpr size_t CommitMarkerContextTLVMaxSize()
+{
+    // Add 2x uncommitted uint64_t to leave space for backwards/forwards
+    // versioning for this critical feature that runs at boot.
+    return TLV::EstimateStructOverhead(sizeof(FabricIndex), sizeof(bool), sizeof(uint64_t), sizeof(uint64_t));
+}
+
+constexpr size_t IndexInfoTLVMaxSize()
+{
+    // We have a single next-available index and an array of anonymous-tagged
+    // fabric indices.
+    //
+    // The max size of the list is (1 byte control + bytes for actual value)
+    // times max number of list items, plus one byte for the list terminator.
+    return TLV::EstimateStructOverhead(sizeof(FabricIndex), CHIP_CONFIG_MAX_FABRICS * (1 + sizeof(FabricIndex)) + 1);
+}
+
 } // anonymous namespace
 
 CHIP_ERROR FabricInfo::Init(const FabricInfo::InitParams & initParams)
@@ -205,8 +226,18 @@ CHIP_ERROR FabricTable::DeleteMetadataFromStorage(FabricIndex fabricIndex)
 
     if (deleteErr != CHIP_NO_ERROR)
     {
-        ChipLogError(FabricProvisioning, "Error deleting part of fabric %d: %" CHIP_ERROR_FORMAT, fabricIndex, deleteErr.Format());
+        if (deleteErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            ChipLogError(FabricProvisioning, "Warning: metadata not found during delete of fabric 0x%x",
+                         static_cast<unsigned>(fabricIndex));
+        }
+        else
+        {
+            ChipLogError(FabricProvisioning, "Error deleting metadata for fabric fabric 0x%x: %" CHIP_ERROR_FORMAT,
+                         static_cast<unsigned>(fabricIndex), deleteErr.Format());
+        }
     }
+
     return deleteErr;
 }
 
@@ -446,7 +477,7 @@ const FabricInfo * FabricTable::FindFabric(const Crypto::P256PublicKey & rootPub
     return nullptr;
 }
 
-FabricInfo * FabricTable::FindFabricWithIndex(FabricIndex fabricIndex)
+FabricInfo * FabricTable::GetMutableFabricByIndex(FabricIndex fabricIndex)
 {
     // Try to match pending fabric first if available
     if (HasPendingFabricUpdate() && (mPendingFabric.GetFabricIndex() == fabricIndex))
@@ -523,6 +554,24 @@ CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan &
     return mOpCertStore->GetCertificate(fabricIndex, CertChainElement::kRcac, outCert);
 }
 
+CHIP_ERROR FabricTable::FetchPendingNonFabricAssociatedRootCert(MutableByteSpan & outCert) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (!mStateFlags.Has(StateFlags::kIsTrustedRootPending))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (mStateFlags.Has(StateFlags::kIsAddPending))
+    {
+        // The root certificate is already associated with a pending fabric, so
+        // does not exist for purposes of this API.
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return FetchRootCert(mFabricIndexWithPendingState, outCert);
+}
+
 CHIP_ERROR FabricTable::FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -553,6 +602,15 @@ CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256Pub
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
     ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     return fabricInfo->FetchRootPubkey(outPublicKey);
+}
+
+CHIP_ERROR FabricTable::FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const
+{
+    uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
+    MutableByteSpan nocSpan{ nocBuf };
+    ReturnErrorOnFailure(FetchNOCCert(fabricIndex, nocSpan));
+    ReturnErrorOnFailure(ExtractCATsFromOpCert(nocSpan, cats));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FabricTable::StoreFabricMetadata(const FabricInfo * fabricInfo) const
@@ -849,13 +907,13 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
-    FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     if (fabricInfo == &mPendingFabric)
     {
         // Asked to Delete while pending an update: reset the pending state and
         // get back to the underlying fabric data for existing fabric.
         RevertPendingFabricData();
-        fabricInfo = FindFabricWithIndex(fabricIndex);
+        fabricInfo = GetMutableFabricByIndex(fabricIndex);
     }
 
     bool fabricIsInitialized = fabricInfo != nullptr && fabricInfo->IsInitialized();
@@ -994,7 +1052,35 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
         TLV::ContiguousBufferTLVReader reader;
         reader.Init(buf, size);
 
-        ReturnErrorOnFailure(ReadFabricInfo(reader));
+        // TODO: A safer way would be to just clean-up the entire fabric table on this situation...
+        err = ReadFabricInfo(reader);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(FabricProvisioning, "Error loading fabric table: %" CHIP_ERROR_FORMAT ", we are in a bad state!",
+                         err.Format());
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+
+    CommitMarker commitMarker;
+    err = GetCommitMarker(commitMarker);
+    if (err == CHIP_NO_ERROR)
+    {
+        // Found a commit marker! We need to possibly delete a loaded fabric
+        ChipLogError(FabricProvisioning, "Found a FabricTable aborted commit for index 0x%x (isAddition: %d), removing!",
+                     static_cast<unsigned>(commitMarker.fabricIndex), static_cast<int>(commitMarker.isAddition));
+
+        mDeletedFabricIndexFromInit = commitMarker.fabricIndex;
+
+        // Can't do better on error. We just have to hope for the best.
+        (void) Delete(commitMarker.fabricIndex);
+    }
+    else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // Got an error, but somehow value is not missing altogether: inconsistent state but touch nothing.
+        ChipLogError(FabricProvisioning, "Error loading Table commit marker: %" CHIP_ERROR_FORMAT ", hope for the best!",
+                     err.Format());
     }
 
     return CHIP_NO_ERROR;
@@ -1004,7 +1090,7 @@ void FabricTable::Forget(FabricIndex fabricIndex)
 {
     ChipLogProgress(FabricProvisioning, "Forgetting fabric 0x%x", static_cast<unsigned>(fabricIndex));
 
-    auto * fabricInfo = FindFabricWithIndex(fabricIndex);
+    auto * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     VerifyOrReturn(fabricInfo != nullptr);
 
     RevertPendingFabricData();
@@ -1034,6 +1120,16 @@ void FabricTable::Shutdown()
     }
 
     mStorage = nullptr;
+}
+
+FabricIndex FabricTable::GetDeletedFabricFromCommitMarker()
+{
+    FabricIndex retVal = mDeletedFabricIndexFromInit;
+
+    // Reset for next read
+    mDeletedFabricIndexFromInit = kUndefinedFabricIndex;
+
+    return retVal;
 }
 
 CHIP_ERROR FabricTable::AddFabricDelegate(FabricTable::Delegate * delegate)
@@ -1273,6 +1369,80 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
     EnsureNextAvailableFabricIndexUpdated();
 
     return CHIP_NO_ERROR;
+}
+
+Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypairForCASE()
+{
+    if (mOperationalKeystore != nullptr)
+    {
+        return mOperationalKeystore->AllocateEphemeralKeypairForCASE();
+    }
+
+    return Platform::New<Crypto::P256Keypair>();
+}
+
+void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
+{
+    if (mOperationalKeystore != nullptr)
+    {
+        mOperationalKeystore->ReleaseEphemeralKeypair(keypair);
+    }
+    else
+    {
+        Platform::Delete<Crypto::P256Keypair>(keypair);
+    }
+}
+
+CHIP_ERROR FabricTable::StoreCommitMarker(const CommitMarker & commitMarker)
+{
+    DefaultStorageKeyAllocator keyAlloc;
+    uint8_t tlvBuf[CommitMarkerContextTLVMaxSize()];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuf);
+
+    TLV::TLVType outerType;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(writer.Put(kMarkerFabricIndexTag, commitMarker.fabricIndex));
+    ReturnErrorOnFailure(writer.Put(kMarkerIsAdditionTag, commitMarker.isAddition));
+    ReturnErrorOnFailure(writer.EndContainer(outerType));
+
+    const auto markerContextTLVLength = writer.GetLengthWritten();
+    VerifyOrReturnError(CanCastTo<uint16_t>(markerContextTLVLength), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    return mStorage->SyncSetKeyValue(keyAlloc.FailSafeCommitMarkerKey(), tlvBuf, static_cast<uint16_t>(markerContextTLVLength));
+}
+
+CHIP_ERROR FabricTable::GetCommitMarker(CommitMarker & outCommitMarker)
+{
+    DefaultStorageKeyAllocator keyAlloc;
+    uint8_t tlvBuf[CommitMarkerContextTLVMaxSize()];
+    uint16_t tlvSize = sizeof(tlvBuf);
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(keyAlloc.FailSafeCommitMarkerKey(), tlvBuf, tlvSize));
+
+    // If buffer was too small, we won't reach here.
+    TLV::ContiguousBufferTLVReader reader;
+    reader.Init(tlvBuf, tlvSize);
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+
+    TLV::TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+
+    ReturnErrorOnFailure(reader.Next(kMarkerFabricIndexTag));
+    ReturnErrorOnFailure(reader.Get(outCommitMarker.fabricIndex));
+
+    ReturnErrorOnFailure(reader.Next(kMarkerIsAdditionTag));
+    ReturnErrorOnFailure(reader.Get(outCommitMarker.isAddition));
+
+    // Don't try to exit container: we got all we needed. This allows us to
+    // avoid erroring-out on newer versions.
+
+    return CHIP_NO_ERROR;
+}
+
+void FabricTable::ClearCommitMarker()
+{
+    DefaultStorageKeyAllocator keyAlloc;
+    mStorage->SyncDeleteKeyValue(keyAlloc.FailSafeCommitMarkerKey());
 }
 
 bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const
@@ -1591,6 +1761,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     bool isAdding                = mStateFlags.Has(StateFlags::kIsAddPending);
     bool isUpdating              = mStateFlags.Has(StateFlags::kIsUpdatePending);
     bool hasPending              = mStateFlags.Has(StateFlags::kIsPendingFabricDataPresent);
+    bool onlyHaveNewTrustedRoot  = hasPending && haveNewTrustedRoot && !(isAdding || isUpdating);
     bool hasInvalidInternalState = hasPending && (!IsValidFabricIndex(mFabricIndexWithPendingState) || !(isAdding || isUpdating));
 
     FabricIndex fabricIndexBeingCommitted = mFabricIndexWithPendingState;
@@ -1608,7 +1779,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     }
 
     // Make sure we actually have a pending fabric
-    FabricInfo * pendingFabricEntry = FindFabricWithIndex(fabricIndexBeingCommitted);
+    FabricInfo * pendingFabricEntry = GetMutableFabricByIndex(fabricIndexBeingCommitted);
 
     if (isUpdating && hasPending && !hasInvalidInternalState)
     {
@@ -1641,20 +1812,20 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
 
     // If there was nothing pending, we are either in a completely OK state, or weird internally inconsistent
     // state. In either case, let's clear all pending state anyway, in case it was partially stale!
-    if (!hasPending || hasInvalidInternalState)
+    if (!hasPending || onlyHaveNewTrustedRoot || hasInvalidInternalState)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        if (hasInvalidInternalState)
-        {
-            ChipLogError(FabricProvisioning, "Failed to commit: internally inconsistent state!");
-            err = CHIP_ERROR_INTERNAL;
-        }
-        else if (haveNewTrustedRoot)
+
+        if (onlyHaveNewTrustedRoot)
         {
             ChipLogError(FabricProvisioning,
                          "Failed to commit: tried to commit with only a new trusted root cert. No data committed.");
-            hasInvalidInternalState = true;
-            err                     = CHIP_ERROR_INCORRECT_STATE;
+            err = CHIP_ERROR_INCORRECT_STATE;
+        }
+        else if (hasInvalidInternalState)
+        {
+            ChipLogError(FabricProvisioning, "Failed to commit: internally inconsistent state!");
+            err = CHIP_ERROR_INTERNAL;
         }
         else
         {
@@ -1677,8 +1848,13 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     }
 
     // ==== Start of actual commit transaction after pre-flight checks ====
+    CHIP_ERROR stickyError  = StoreCommitMarker(CommitMarker{ fabricIndexBeingCommitted, isAdding });
+    bool failedCommitMarker = (stickyError != CHIP_NO_ERROR);
+    if (failedCommitMarker)
+    {
+        ChipLogError(FabricProvisioning, "Failed to store commit marker, may be inconsistent if reboot happens during fail-safe!");
+    }
 
-    CHIP_ERROR stickyError = CHIP_NO_ERROR;
     {
         // This scope block is to illustrate the complete commit transaction
         // state. We can see it contains a LARGE number of items...
@@ -1690,7 +1866,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         if (isUpdating)
         {
             // This will get the non-pending fabric
-            FabricInfo * existingFabricToUpdate = FindFabricWithIndex(fabricIndexBeingCommitted);
+            FabricInfo * existingFabricToUpdate = GetMutableFabricByIndex(fabricIndexBeingCommitted);
 
             // Multiple interlocks validated the below, so it's fatal if we are somehow incoherent here
             VerifyOrDie((existingFabricToUpdate != nullptr) && (existingFabricToUpdate != &mPendingFabric));
@@ -1701,7 +1877,7 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
         }
 
         // Store pending metadata first
-        FabricInfo * liveFabricEntry = FindFabricWithIndex(fabricIndexBeingCommitted);
+        FabricInfo * liveFabricEntry = GetMutableFabricByIndex(fabricIndexBeingCommitted);
         VerifyOrDie(liveFabricEntry != nullptr);
 
         CHIP_ERROR metadataErr = StoreFabricMetadata(liveFabricEntry);
@@ -1725,6 +1901,23 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
             }
         }
         stickyError = (stickyError != CHIP_NO_ERROR) ? stickyError : keyErr;
+
+        // For testing only, early return (NEVER OCCURS OTHERWISE) during the commit
+        // so that clean-ups using the commit marker can be tested.
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        {
+            if (mStateFlags.Has(StateFlags::kAbortCommitForTest))
+            {
+                // Clear state so that shutdown doesn't attempt clean-up
+                mStateFlags.ClearAll();
+                mFabricIndexWithPendingState = kUndefinedFabricIndex;
+                mPendingFabric.Reset();
+
+                ChipLogError(FabricProvisioning, "Aborting commit in middle of transaction for testing.");
+                return CHIP_ERROR_INTERNAL;
+            }
+        }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
         // Commit operational certs
         CHIP_ERROR opCertErr = mOpCertStore->CommitOpCertsForFabric(fabricIndexBeingCommitted);
@@ -1779,6 +1972,10 @@ CHIP_ERROR FabricTable::CommitPendingFabricData()
     {
         NotifyFabricCommitted(fabricIndexBeingCommitted);
     }
+
+    // Clear commit marker no matter what: if we got here, there was no reboot and previous clean-ups
+    // did their job.
+    ClearCommitMarker();
 
     return stickyError;
 }
@@ -1837,13 +2034,13 @@ void FabricTable::RevertPendingOpCertsExceptRoot()
 CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan & fabricLabel)
 {
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     ReturnErrorCodeIf(fabricLabel.size() > kFabricLabelMaxLengthInBytes, CHIP_ERROR_INVALID_ARGUMENT);
 
-    FabricInfo * fabricInfo  = FindFabricWithIndex(fabricIndex);
+    FabricInfo * fabricInfo  = GetMutableFabricByIndex(fabricIndex);
     bool fabricIsInitialized = (fabricInfo != nullptr) && fabricInfo->IsInitialized();
-    VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(fabricIsInitialized, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Update fabric table current in-memory entry, whether pending or not
     ReturnErrorOnFailure(fabricInfo->SetFabricLabel(fabricLabel));
@@ -1854,6 +2051,15 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
         ReturnErrorOnFailure(StoreFabricMetadata(fabricInfo));
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR FabricTable::GetFabricLabel(FabricIndex fabricIndex, CharSpan & outFabricLabel)
+{
+    const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    outFabricLabel = fabricInfo->GetFabricLabel();
     return CHIP_NO_ERROR;
 }
 

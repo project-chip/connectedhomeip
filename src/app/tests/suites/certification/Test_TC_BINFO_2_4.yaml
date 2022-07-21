@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 11.2.4. [TC-BINFO-2.4] Events [DUT-Client]
+name: 3.1.4. [TC-BINFO-2.4] Basic Information Cluster Events [DUT - Controller]
 
 config:
     nodeId: 0x12344321
@@ -45,9 +45,27 @@ tests:
           [1651229405.704707][2825:2825] CHIP:DMG:        isFabricFiltered = true,
           [1651229405.704737][2825:2825] CHIP:DMG:        InteractionModelRevision = 1
           [1651229405.704766][2825:2825] CHIP:DMG: },
+
+          On TH side:
+          " ./chip-tool basic read-event start-up 1 0
+
+
+
+          [1646996282.798986][2283:2288] CHIP:DMG:
+          [1646996282.799030][2283:2288] CHIP:DMG:        SuppressResponse = true,
+          [1646996282.799075][2283:2288] CHIP:DMG:        InteractionModelRevision = 1
+          [1646996282.799117][2283:2288] CHIP:DMG: }
+          [1646996282.799379][2283:2288] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1646996282.799425][2283:2288] CHIP:TOO:         Event number: 0
+          [1646996282.799465][2283:2288] CHIP:TOO:         Priority: Critical
+          [1646996282.799505][2283:2288] CHIP:TOO:         Timestamp: 429117
+          [1646996282.799725][2283:2288] CHIP:TOO:   StartUp: {
+          [1646996282.799787][2283:2288] CHIP:TOO:     SoftwareVersion: 0
+          [1646996282.799832][2283:2288] CHIP:TOO:    }"
       disabled: true
 
     - label: "Simulate a Shut down on the TH"
+      PICS: BINFO.C.E01
       verification: |
           1. Launch chip-tool into interactive mode with the command ./chip-tool interactive start
 
@@ -86,7 +104,17 @@ tests:
 
     - label: "Simulate a Factory Reset the TH"
       verification: |
-          ./chip-tool basic read-event  leave 1 0
+          To verify leave event follow the below commands
+          1. ./chip-tool interactive start
+          2. basic subscribe-event leave 1 100 1 0
+          3. operationalcredentials remove-fabric 1 1 0
+
+          [1655369668.996192][2323:2328] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0002
+          [1655369668.996235][2323:2328] CHIP:TOO: 	 Event number: 2
+          [1655369668.996273][2323:2328] CHIP:TOO: 	 Priority: Info
+          [1655369668.996311][2323:2328] CHIP:TOO: 	 Timestamp: 659361
+          [1655369668.998931][2323:2328] CHIP:TOO:   Leave: {
+          [1655369668.998986][2323:2328] CHIP:TOO:    }
       disabled: true
 
     - label: "Simulate a reboot on the TH"
@@ -116,6 +144,13 @@ tests:
       disabled: true
 
     - label: "Simulate a Reachable attribute change on the TH"
+      PICS: BINFO.C.E03
       verification: |
-          ./chip-tool basic read-event reachable-changed 1 0
+          ./chip-tool basic read-event  reachable-changed 1 0
+
+          [1655369993.433630][2377:2382] CHIP:DMG: ReportDataMessage =
+          [1655369993.433667][2377:2382] CHIP:DMG: {
+          [1655369993.433699][2377:2382] CHIP:DMG: 	SuppressResponse = true,
+          [1655369993.433742][2377:2382] CHIP:DMG: 	InteractionModelRevision = 1
+          [1655369993.433775][2377:2382] CHIP:DMG: }
       disabled: true

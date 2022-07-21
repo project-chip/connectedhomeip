@@ -112,9 +112,9 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
 
 static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr uint8_t kExampleDigest[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
-                                           0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
-                                           0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
+    constexpr uint8_t kExampleMessage[] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x10, 0x11, 0x12,
+                                            0x13, 0x14, 0x15, 0x16, 0x17, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25,
+                                            0x26, 0x27, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 };
 
     DeviceAttestationCredentialsProvider * example_dac_provider = Examples::GetExampleDACProvider();
     NL_TEST_ASSERT(inSuite, example_dac_provider != nullptr);
@@ -122,7 +122,7 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     // Sign using the example attestation private key
     P256ECDSASignature da_signature;
     MutableByteSpan out_sig_span(da_signature.Bytes(), da_signature.Capacity());
-    CHIP_ERROR err = example_dac_provider->SignWithDeviceAttestationKey(ByteSpan{ kExampleDigest }, out_sig_span);
+    CHIP_ERROR err = example_dac_provider->SignWithDeviceAttestationKey(ByteSpan{ kExampleMessage }, out_sig_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, out_sig_span.size() == kP256_ECDSA_Signature_Length_Raw);
@@ -144,7 +144,7 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
 
     // Verify round trip signature
-    err = dac_public_key.ECDSA_validate_hash_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
+    err = dac_public_key.ECDSA_validate_msg_signature(&kExampleMessage[0], sizeof(kExampleMessage), da_signature);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

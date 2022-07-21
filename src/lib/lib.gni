@@ -20,4 +20,7 @@ declare_args() {
   # a Commissioner or Administrator that employs different or more complex
   # logic, this should be set to false.
   chip_build_default_attestation_verifier = true
+
+  # Set to true to enable device-specific attestation credentials
+  chip_build_platform_attestation_credentials_provider = false
 }

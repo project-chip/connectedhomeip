@@ -49,16 +49,6 @@
             "path": "commands.zapt",
             "name": "Tests Commands header",
             "output": "test/Commands.h"
-        },
-        {
-            "path": "CHIPTestClustersObjc.zapt",
-            "name": "Test Objc API Header",
-            "output": "cluster/CHIPTestClustersObjc.h"
-        },
-        {
-            "path": "CHIPTestClustersObjc-src.zapt",
-            "name": "Test Objc API",
-            "output": "cluster/CHIPTestClustersObjc.mm"
         }
     ]
 }
