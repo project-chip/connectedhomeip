@@ -138,7 +138,7 @@ tests:
       response:
           constraints:
               type: list
-              maxlength: 8
+              maxLength: 8
 
     - label: "Test Harness Client reads BatVoltage from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000b
@@ -157,8 +157,8 @@ tests:
       response:
           constraints:
               type: uint8
-              minvalue: 0
-              maxvalue: 200
+              minValue: 0
+              maxValue: 200
 
     - label: "Test Harness Client reads BatTimeRemaining from Server DUT"
       PICS: PICS_SKIP_SAMPLE_APP && PS.S.A000d
@@ -213,7 +213,7 @@ tests:
       response:
           constraints:
               type: list
-              maxlength: 8
+              maxLength: 8
 
     - label:
           "Test Harness Client reads BatReplacementDescription from Server DUT"

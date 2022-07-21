@@ -40,39 +40,57 @@ tests:
       command: "readAttribute"
       attribute: "BeaconLostCount"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 4294967295
 
     - label: "Reads BeaconRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "readAttribute"
       attribute: "BeaconRxCount"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 4294967295
 
     - label: "Reads PacketMulticastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "readAttribute"
       attribute: "PacketMulticastRxCount"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 4294967295
 
     - label: "Reads PacketMulticastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "readAttribute"
       attribute: "PacketMulticastTxCount"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 4294967295
 
     - label: "Reads PacketUnicastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "readAttribute"
       attribute: "PacketUnicastRxCount"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 4294967295
 
     - label: "Reads PacketUnicastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "readAttribute"
       attribute: "PacketUnicastTxCount"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 4294967295

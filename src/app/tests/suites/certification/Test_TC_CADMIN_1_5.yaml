@@ -40,6 +40,7 @@ tests:
     - label: "TH_CR1 starts a commissioning process with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -48,7 +49,7 @@ tests:
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -74,7 +75,7 @@ tests:
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       command: "PairWithCode"
       arguments:
           values:
@@ -88,7 +89,7 @@ tests:
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -106,13 +107,14 @@ tests:
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
-      PICS: CADMIN.S.C0002
+      PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -125,7 +127,7 @@ tests:
     - label: "TH_CR1 revokes the commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
-      PICS: CADMIN.S.C0002
+      PICS: CADMIN.S.C02.Rsp
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
@@ -146,10 +148,12 @@ tests:
       response:
           value: "chiptest"
 
-    - label: "TH_CR1 opens a new commissioning window on DUT_CE"
+    - label:
+          "TH_CR1 opens a new commissioning window on DUT_CE using wrong
+          PakeVerifier value"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -169,7 +173,7 @@ tests:
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -187,7 +191,7 @@ tests:
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
@@ -202,11 +206,11 @@ tests:
               - name: "salt"
                 value: "SPAKE2P Key Salt"
       response:
-          error: 1
+          error: FAILURE
 
     #Disabled due to issue 17666
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -222,7 +226,7 @@ tests:
           RevokeCommissioning command"
       cluster: "AdministratorCommissioning"
       command: "RevokeCommissioning"
-      PICS: CADMIN.S.C0002 && PICS_SKIP_SAMPLE_APP
+      PICS: CADMIN.S.C02.Rsp && PICS_SKIP_SAMPLE_APP
       timedInteractionTimeoutMs: 10000
       response:
           error: FAILURE
@@ -231,6 +235,7 @@ tests:
       identity: "gamma"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"

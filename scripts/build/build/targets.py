@@ -22,7 +22,7 @@ from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
-from builders.host import HostApp, HostBoard, HostBuilder
+from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
@@ -114,6 +114,17 @@ class AcceptNameWithSubstrings:
             if s in name:
                 return True
         return False
+
+
+class RejectNameWithSubstrings:
+    def __init__(self, substr: List[str]):
+        self.substr = substr
+
+    def Accept(self, name: str):
+        for s in self.substr:
+            if s in name:
+                return False
+        return True
 
 
 class BuildVariant:
@@ -226,7 +237,7 @@ def HostTargets():
     # x64 linux  supports cross compile
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
     if cross_compile:
-        targets.append(target.Extend('arm64', board=HostBoard.ARM64))
+        targets.append(target.Extend('arm64-clang', board=HostBoard.ARM64, use_clang=True))
 
     app_targets = []
 
@@ -276,11 +287,19 @@ def HostTargets():
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
     builder.AppendVariant(name="no-thread", enable_thread=False),
+    builder.AppendVariant(name="mbedtls", conflicts=['boringssl'], crypto_library=HostCryptoLibrary.MBEDTLS),
+    builder.AppendVariant(name="boringssl", conflicts=['mbedtls'], crypto_library=HostCryptoLibrary.BORINGSSL),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
-    builder.AppendVariant(name="clang", use_clang=True),
+    if cross_compile:
+        builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
+            ['arm64']
+        )),
+    else:
+        builder.AppendVariant(name="clang", use_clang=True)
+
     builder.AppendVariant(name="test", extra_tests=True),
 
     builder.WhitelistVariantNameForGlob('ipv6only')
@@ -310,8 +329,10 @@ def HostTargets():
                                use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
     yield target_native.Extend('tests', app=HostApp.TESTS)
-    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True)
-    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True)
+    yield target_native.Extend('tests-mbedtls', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.MBEDTLS).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-boringssl', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.BORINGSSL).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True).GlobBlacklist("Non-default test")
 
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)

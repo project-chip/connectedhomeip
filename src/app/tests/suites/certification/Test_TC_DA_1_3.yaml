@@ -439,6 +439,24 @@ tests:
           [1655979686.741451][22876:22881] CHIP:CTL: Commissioning stage next step: 'SendAttestationRequest' -> 'AttestationVerification'
       disabled: true
 
+    #Verify that DUT Completes the commissioning process successfully
+    - label: "TH1 responds with a well-formed AttestationResponse Command"
+      verification: |
+          Both on DUT and TH side
+          DUT as commissioner side:
+
+          [1655979694.071847][22876:22881] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1655979694.071913][22876:22881] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1655979694.071968][22876:22881] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1655979694.072031][22876:22881] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1655979694.072081][22876:22881] CHIP:DIS: Closing all BLE connections
+          [1655979694.072136][22876:22881] CHIP:IN: Clearing BLE pending packets.
+          [1655979694.072268][22876:22881] CHIP:BLE: Auto-closing end point's BLE connection.
+          [1655979694.072328][22876:22881] CHIP:DL: Closing BLE GATT connection (con 0xffffa806f3f0)
+          [1655979694.072477][22876:22881] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1655979694.072547][22876:22881] CHIP:TOO: Device commissioning completed with success
+      disabled: true
+
     - label: "Factory Reset TH1 so that it is commissionable again"
       verification: |
           Both on DUT and TH side
@@ -715,4 +733,12 @@ tests:
           Nonce_2"
       verification: |
           See above
+      disabled: true
+
+    #Verify that the Nonce_1 and Nonce_2 are different.
+    - label:
+          "TH1 records the AttestationNonce received in AttestationRequest as
+          Nonce_2"
+      verification: |
+          Verify the value of NONCE in step 9 and 3 are different
       disabled: true

@@ -29,7 +29,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000 && CC.S.F00
+      PICS: CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -39,7 +39,7 @@ tests:
               maxValue: 255
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001 && CC.S.F00
+      PICS: CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -59,7 +59,7 @@ tests:
               maxValue: 65535
 
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.A0003 && CC.S.F03
+      PICS: CC.S.A0003
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -69,7 +69,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0004 && CC.S.F04
+      PICS: CC.S.A0004
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -98,7 +98,7 @@ tests:
               maxLength: 254
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT"
-      PICS: CC.S.A0007 && CC.S.F04
+      PICS: CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -128,7 +128,7 @@ tests:
               maxValue: 4
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.A4000 && CC.S.F01
+      PICS: CC.S.A4000
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -138,7 +138,7 @@ tests:
               maxValue: 65535
 
     - label: "TH reads EnhancedColorMode attribute from DUT"
-      PICS: CC.S.F02 && CC.S.A4001
+      PICS: CC.S.F02
       command: "readAttribute"
       attribute: "EnhancedColorMode"
       response:
@@ -148,7 +148,7 @@ tests:
               maxValue: 3
 
     - label: "TH reads ColorLoopActive attribute from DUT"
-      PICS: CC.S.A4002 && CC.S.F02
+      PICS: CC.S.A4002
       command: "readAttribute"
       attribute: "ColorLoopActive"
       response:
@@ -158,7 +158,7 @@ tests:
               maxValue: 255
 
     - label: "TH reads ColorLoopDirection attribute from DUT"
-      PICS: CC.S.A4003 && CC.S.F02
+      PICS: CC.S.A4003
       command: "readAttribute"
       attribute: "ColorLoopDirection"
       response:
@@ -168,7 +168,7 @@ tests:
               maxValue: 255
 
     - label: "TH reads ColorLoopTime attribute from DUT"
-      PICS: CC.S.A4004 && CC.S.F02
+      PICS: CC.S.A4004
       command: "readAttribute"
       attribute: "ColorLoopTime"
       response:
@@ -178,7 +178,7 @@ tests:
               maxValue: 65535
 
     - label: "TH reads ColorLoopStartEnhancedHue attribute from DUT"
-      PICS: CC.S.A4005 && CC.S.F02
+      PICS: CC.S.A4005
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       response:
@@ -188,7 +188,7 @@ tests:
               maxValue: 65535
 
     - label: "TH reads ColorLoopStoredEnhancedHue attribute from DUT"
-      PICS: CC.S.A4006 && CC.S.F02
+      PICS: CC.S.A4006
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       response:
@@ -215,7 +215,7 @@ tests:
               maxValue: 31
 
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
-      PICS: CC.S.A400b && CC.S.F04
+      PICS: CC.S.A400b
       command: "readAttribute"
       attribute: "ColorTempPhysicalMinMireds"
       response:
@@ -225,7 +225,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT"
-      PICS: CC.S.A400c && CC.S.F04
+      PICS: CC.S.A400c
       command: "readAttribute"
       attribute: "ColorTempPhysicalMaxMireds"
       response:
@@ -235,7 +235,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CoupleColorTempToLevelMinMireds attribute from DUT"
-      PICS: CC.S.A400d && CC.S.F04
+      PICS: CC.S.A400d
       command: "readAttribute"
       attribute: "CoupleColorTempToLevelMinMireds"
       response:
@@ -245,7 +245,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads StartUpColorTemperatureMireds attribute from DUT"
-      PICS: CC.S.A4010 && CC.S.F04
+      PICS: CC.S.A4010
       command: "readAttribute"
       attribute: "StartUpColorTemperatureMireds"
       response:
@@ -265,186 +265,378 @@ tests:
               minValue: 0
               maxValue: 6
 
-    - label: "TH reads Primary1X attribute from DUT"
-      PICS: CC.S.A0011
-      command: "readAttribute"
-      attribute: "Primary1X"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH reads Primary1X attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          1 or more"
+      verification: |
+          ./chip-tool colorcontrol read  primary1x 1 1
 
-    - label: "TH reads Primary1Y attribute from DUT"
-      PICS: CC.S.A0012
-      command: "readAttribute"
-      attribute: "Primary1Y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
+          [1651483665.109697][3245:3250] CHIP:TOO:   primary 1 x: 0
+          [1651483665.109797][3245:3250] CHIP:EM: Sending Standalone Ack for MessageCounter:12731123 on exchange 55053i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0011
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary1Intensity attribute from DUT"
-      PICS: CC.S.A0013
-      command: "readAttribute"
-      attribute: "Primary1Intensity"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+    - label:
+          "TH reads Primary1Y attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          1 or more"
+      verification: |
+          ./chip-tool colorcontrol read  primary1y 1 1
 
-    - label: "TH reads Primary2X attribute from DUT"
-      PICS: CC.S.A0015
-      command: "readAttribute"
-      attribute: "Primary2X"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
+          [1651483698.733322][3253:3259] CHIP:TOO:   primary 1 y: 0
+          [1651483698.733420][3253:3259] CHIP:EM: Sending Standalone Ack for MessageCounter:7863787 on exchange 13103i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0012
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary2Y attribute from DUT"
-      PICS: CC.S.A0016
-      command: "readAttribute"
-      attribute: "Primary2Y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH reads Primary1Intensity attribute from DUT and Verify that the DUT
+          response contains an uint8 if NumberOfPrimaries is 1 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary1intensity 1 1
 
-    - label: "TH reads Primary2Intensity attribute from DUT"
-      PICS: CC.S.A0017
-      command: "readAttribute"
-      attribute: "Primary2Intensity"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
+          [1651483742.297459][3263:3268] CHIP:TOO:   primary 1 intensity: 0
+          [1651483742.297558][3263:3268] CHIP:EM: Sending Standalone Ack for MessageCounter:10210809 on exchange 7007i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0013
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary3X attribute from DUT"
-      PICS: CC.S.A0019
-      command: "readAttribute"
-      attribute: "Primary3X"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH reads Primary2X attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2x 1 1
 
-    - label: "TH reads Primary3Y attribute from DUT"
-      PICS: CC.S.A001a
-      command: "readAttribute"
-      attribute: "Primary3Y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
+          [1651483777.233498][3270:3275] CHIP:TOO:   primary 2 x: 0
+          [1651483777.233614][3270:3275] CHIP:EM: Sending Standalone Ack for MessageCounter:1684573 on exchange 21377i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0015
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary3Intensity attribute from DUT"
-      PICS: CC.S.A001b
-      command: "readAttribute"
-      attribute: "Primary3Intensity"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+    - label:
+          "TH reads Primary2Y attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2y 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
+          [1651483805.650796][3279:3284] CHIP:TOO:   primary 2 y: 0
+          [1651483805.650942][3279:3284] CHIP:EM: Sending Standalone Ack for MessageCounter:16277541 on exchange 10435i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0016
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary2Intensity attribute from DUT and Verify that the DUT
+          response contains an uint8 if NumberOfPrimaries is 2 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary2intensity 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
+          [1651483834.596380][3285:3290] CHIP:TOO:   primary 2 intensity: 0
+          [1651483834.596470][3285:3290] CHIP:EM: Sending Standalone Ack for MessageCounter:5986355 on exchange 855i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0017
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary3X attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3x 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
+          [1651483937.072323][3298:3303] CHIP:TOO:   primary 3 x: 0
+          [1651483937.072405][3298:3303] CHIP:EM: Sending Standalone Ack for MessageCounter:6092298 on exchange 12519i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0019
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary3Y attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3y 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
+          [1651483967.386334][3305:3310] CHIP:TOO:   primary 3 y: 0
+          [1651483967.386427][3305:3310] CHIP:EM: Sending Standalone Ack for MessageCounter:3329418 on exchange 11657i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A001a
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary3Intensity attribute from DUT and Verify that the DUT
+          response contains an uint8 if NumberOfPrimaries is 3 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary3intensity 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
+          [1651484113.812178][3316:3321] CHIP:TOO:   primary 3 intensity: 0
+          [1651484113.812270][3316:3321] CHIP:EM: Sending Standalone Ack for MessageCounter:41658 on exchange 9618i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A001b
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     #Additional Defined Primaries Information Attribute Set
-    - label: "TH reads Primary4X attribute from DUT"
-      PICS: CC.S.A0020
-      command: "readAttribute"
-      attribute: "Primary4X"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH reads Primary4X attribute from DUT Verify that the DUT response
+          contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is 4 or
+          more"
+      verification: |
+          ./chip-tool colorcontrol read primary4x 1 1
 
-    - label: "TH reads Primary4Y attribute from DUT"
-      PICS: CC.S.A0021
-      command: "readAttribute"
-      attribute: "Primary4Y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
+          [1651484143.778301][3324:3329] CHIP:TOO:   primary 4 x: 0
+          [1651484143.778392][3324:3329] CHIP:EM: Sending Standalone Ack for MessageCounter:2094184 on exchange 50270i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0020
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary4Intensity attribute from DUT"
-      PICS: CC.S.A0022
-      command: "readAttribute"
-      attribute: "Primary4Intensity"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+    - label:
+          "TH reads Primary4Y attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          4 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary4y 1 1
 
-    - label: "TH reads Primary5X attribute from DUT"
-      PICS: CC.S.A0024
-      command: "readAttribute"
-      attribute: "Primary5X"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
+          [1651484171.921901][3334:3339] CHIP:TOO:   primary 4 y: 0
+          [1651484171.921984][3334:3339] CHIP:EM: Sending Standalone Ack for MessageCounter:3701827 on exchange 16726i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0021
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary5Y attribute from DUT"
-      PICS: CC.S.A0025
-      command: "readAttribute"
-      attribute: "Primary5Y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH reads Primary4Intensity attribute from DUT and Verify that the DUT
+          response contains an uint8 if NumberOfPrimaries is 4 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary4intensity 1 1
 
-    - label: "TH reads Primary5Intensity attribute from DUT"
-      PICS: CC.S.A0026
-      command: "readAttribute"
-      attribute: "Primary5Intensity"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
+          [1651484198.443415][3341:3346] CHIP:TOO:   primary 4 intensity: 0
+          [1651484198.443528][3341:3346] CHIP:EM: Sending Standalone Ack for MessageCounter:1740063 on exchange 36245i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0022
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary6X attribute from DUT"
-      PICS: CC.S.A0028
-      command: "readAttribute"
-      attribute: "Primary6X"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+    - label:
+          "TH reads Primary5X attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5x 1 1
 
-    - label: "TH reads Primary6Y attribute from DUT"
-      PICS: CC.S.A0029
-      command: "readAttribute"
-      attribute: "Primary6Y"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 65279
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
+          [1651484241.467661][3350:3355] CHIP:TOO:   primary 5 x: 0
+          [1651484241.467788][3350:3355] CHIP:EM: Sending Standalone Ack for MessageCounter:5350139 on exchange 63040i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0024
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "TH reads Primary6Intensity attribute from DUT"
-      PICS: CC.S.A002a
-      command: "readAttribute"
-      attribute: "Primary6Intensity"
-      response:
-          constraints:
-              type: uint8
-              minValue: 0
-              maxValue: 255
+    - label:
+          "TH reads Primary5Y attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5y 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
+          [1651484286.709863][3358:3363] CHIP:TOO:   primary 5 y: 0
+          [1651484286.709964][3358:3363] CHIP:EM: Sending Standalone Ack for MessageCounter:7199124 on exchange 47604i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0025
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary5Intensity attribute from DUT and Verify that the DUT
+          response contains an uint8 if NumberOfPrimaries is 5 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary5intensity 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
+          [1651484304.715731][3365:3370] CHIP:TOO:   primary 5 intensity: 0
+          [1651484304.715829][3365:3370] CHIP:EM: Sending Standalone Ack for MessageCounter:8654922 on exchange 29272i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0026
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary6X attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6x 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
+          [1651484349.601181][3372:3377] CHIP:TOO:   primary 6 x: 0
+          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0028
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary6Y attribute from DUT and Verify that the DUT
+          response contains an uint16 [Min:0 Max:0xfeff] if NumberOfPrimaries is
+          6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6y 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
+          [1651484349.601181][3372:3377] CHIP:TOO:   primary 6 x: 0
+          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A0029
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "TH reads Primary6Intensity attribute from DUT and Verify that the DUT
+          response contains an uint8 if NumberOfPrimaries is 6 or more"
+      verification: |
+          ./chip-tool colorcontrol read primary6intensity 1 1
+
+          Verify in  TH  Logs:
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
+          [1651484392.490974][3378:3383] CHIP:TOO:   primary 6 intensity: 0
+          [1651484392.491074][3378:3383] CHIP:EM: Sending Standalone Ack for MessageCounter:2427165 on exchange 17769i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CC.S.A002a
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     #Defined Color Points Settings Attribute Set
     - label: "TH reads WhitePointX attribute from DUT"

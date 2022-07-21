@@ -37,7 +37,7 @@ tests:
     - label:
           "DUT_CR1 sends command to TH_CE to open a commissioning window with a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
-      PICS: CADMIN.C.C0001
+      PICS: CADMIN.S.C01.Rsp
       verification: |
           On your DUT controller chip tool, open commissioning window
 
@@ -93,7 +93,7 @@ tests:
     - label:
           "Repeat Step 3 an additional (SupportedFabrics - 2) times to reach an
           index value of SupportedFabrics on TH_CE"
-      PICS: CADMIN.C.C0001
+      PICS: CADMIN.S.C01.Rsp
       verification: |
           Repeat Step 3 an additional (SupportedFabrics - 2) times to reach an index value of SupportedFabrics on TH_CE
       disabled: true
