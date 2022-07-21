@@ -34,9 +34,9 @@ namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest) :
     mExchangeCtx(*this),
-    mpCallback(apCallback), 
-    mpExchangeMgr(apExchangeMgr), 
-    mSuppressResponse(false), 
+    mpCallback(apCallback),
+    mpExchangeMgr(apExchangeMgr),
+    mSuppressResponse(false),
     mTimedRequest(aIsTimedRequest)
 {}
 
