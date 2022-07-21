@@ -18,11 +18,23 @@ steps:
       args:
           - ./examples/chef/chef.py --build_all --keep_going --build_exclude
             noip
-          - ./examples/chef/chef.py --build_all --keep_going --build_include
-            linux_arm64_ipv6only.*noip
       id: CompileAll
       waitFor:
           - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+    - name: "connectedhomeip/chip-build-vscode:0.5.84"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - ./examples/chef/chef.py --build_all --keep_going --build_include
+            linux_arm64_ipv6only.*noip
+      id: CompileNoip
+      waitFor:
+          - CompileAll
       entrypoint: ./scripts/run_in_build_env.sh
       volumes:
           - name: pwenv

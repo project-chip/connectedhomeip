@@ -29,7 +29,7 @@ tests:
       verification: |
           1. Parse payload for DUT1
 
-          $  ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
+          $  ./chip-tool payload parse-setup-payload MT:-24J0AFN00KA0648G00
           [1651194471211] [16050:465158] CHIP: [SPL] Parsing base38Representation: MT:-24J0AFN00KA0648G00
           [1651194471211] [16050:465158] CHIP: [SPL] CommissioningFlow: 0
           [1651194471211] [16050:465158] CHIP: [SPL] VendorID: 65521
@@ -42,7 +42,7 @@ tests:
 
     - label:
           "Using the TH, parse the Onboarding payload from previous step and
-          verify that the Descriminator and Passcode for DUT1 are present."
+          verify that the Discriminator and Passcode for DUT1 are present."
       verification: |
           DUT1 Descriminator: 3840
           DUT1 Passcode: 20202021
@@ -54,7 +54,7 @@ tests:
       verification: |
           1. Parse payload for DUT2
 
-          $  ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J0IRV01WCCN68G00
+          $  ./chip-tool payload parse-setup-payload MT:-24J0IRV01WCCN68G00
           [1651194577916] [16053:466154] CHIP: [SPL] Parsing base38Representation: MT:-24J0IRV01WCCN68G00
           [1651194577916] [16053:466154] CHIP: [SPL] CommissioningFlow: 0
           [1651194577916] [16053:466154] CHIP: [SPL] VendorID: 65521
@@ -67,21 +67,21 @@ tests:
 
     - label:
           "Using the TH, parse the Onboarding payload from previous step and
-          verify that the Descriminator and Passcode for DUT2 are present."
+          verify that the Discriminator and Passcode for DUT2 are present."
       verification: |
           DUT2 Descriminator: 3841
           DUT2 Passcode: 20212022
       disabled: true
 
     - label:
-          "Compare the Descriminator values for DUT1 (Step 1.b) and DUT2 (Step
+          "Compare the Discriminator values for DUT1 (Step 1.b) and DUT2 (Step
           2.b)"
       verification: |
-          1. Verify DUT1 Descriminator does not equal DUT2 Descriminator
+          1. Verify DUT1 Descriminator in Step 1.b is NOT equal to DUT2 Descriminator in Step 2.b
       disabled: true
 
     - label:
           "Compare the Passcode values for DUT1 (Step 1.b) and DUT2 (Step 2.b)"
       verification: |
-          1. Verify DUT1 Passcode does not equal DUT2 Passcode
+          Verify DUT1 Passcode in step 1b is not equal DUT2 Passcode in step 2b
       disabled: true

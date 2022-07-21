@@ -74,6 +74,7 @@ static void DefaultResubscribePolicy(uint32_t aNumCumulativeRetries, uint32_t & 
 
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
+    mExchange(*this),
     mpCallback(apCallback)
 {
     // Error if already initialized.
@@ -110,8 +111,6 @@ void ReadClient::StopResubscription()
 
 ReadClient::~ReadClient()
 {
-    Abort();
-
     if (IsSubscriptionType())
     {
         CancelLivenessCheckTimer();
@@ -129,18 +128,6 @@ ReadClient::~ReadClient()
 
 void ReadClient::Close(CHIP_ERROR aError)
 {
-    // OnDone below can destroy us before we unwind all the way back into the
-    // exchange code and it tries to close itself.  Make sure that it doesn't
-    // try to notify us that it's closing, since we will be dead.
-    //
-    // For more details, see #10344.
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->SetDelegate(nullptr);
-    }
-
-    mpExchangeCtx = nullptr;
-
     if (IsReadType())
     {
         if (aError != CHIP_NO_ERROR)
@@ -284,20 +271,22 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    auto exchange = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
+    VerifyOrReturnError(exchange != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    mExchange.Grab(exchange);
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
     else
     {
-        mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
+        mExchange->SetResponseTimeout(aReadPrepareParams.mTimeout);
     }
 
-    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
-                                                    Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchange->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
+                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
     mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
     mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();
@@ -355,6 +344,7 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
                 break;
             }
         }
+
         if (!intersected)
         {
             continue;
@@ -405,20 +395,13 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeResponse))
     {
-        VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(apExchangeContext == mExchange.Get(), err = CHIP_ERROR_INCORRECT_STATE);
         err = ProcessSubscribeResponse(std::move(aPayload));
         SuccessOrExit(err);
-
-        //
-        // Null out the delegate and context as SubscribeResponse is the last message the Subscribe transaction and
-        // the exchange layer will automatically close the exchange.
-        //
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx = nullptr;
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
-        VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(apExchangeContext == mExchange.Get(), err = CHIP_ERROR_INCORRECT_STATE);
         err = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         SuccessOrExit(err);
     }
@@ -436,38 +419,10 @@ exit:
     return err;
 }
 
-void ReadClient::Abort()
-{
-    //
-    // If the exchange context hasn't already been gracefully closed
-    // (signaled by setting it to null), then we need to forcibly
-    // tear it down.
-    //
-    if (mpExchangeCtx != nullptr)
-    {
-        // We might be a delegate for this exchange, and we don't want the
-        // OnExchangeClosing notification in that case.  Null out the delegate
-        // to avoid that.
-        //
-        // TODO: This makes all sorts of assumptions about what the delegate is
-        // (notice the "might" above!) that might not hold in practice.  We
-        // really need a better solution here....
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-}
-
 CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
                                                System::PacketBufferHandle && aPayload)
 {
-    mpExchangeCtx = apExchangeContext;
-
-    //
-    // Let's take over further message processing on this exchange from the IM.
-    // This is only relevant for reports during post-subscription.
-    //
-    mpExchangeCtx->SetDelegate(this);
+    mExchange.Grab(apExchangeContext);
 
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
     if (err != CHIP_NO_ERROR)
@@ -591,12 +546,7 @@ exit:
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
                                                         : Protocols::InteractionModel::Status::InvalidSubscription,
-                                   mpExchangeCtx, !noResponseExpected);
-
-        if (noResponseExpected || (err != CHIP_NO_ERROR))
-        {
-            mpExchangeCtx = nullptr;
-        }
+                                   mExchange.Get(), !noResponseExpected);
     }
 
     mIsPrimingReports = false;
@@ -756,11 +706,14 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    CancelLivenessCheckTimer();
-    VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
+    CancelLivenessCheckTimer();
+
+    VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mExchange->HasSessionHandle(), CHIP_ERROR_INCORRECT_STATE);
+
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mExchange->GetSessionHandle()->GetAckTimeout();
+
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
     ChipLogProgress(DataManagement,
                     "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32
@@ -944,20 +897,22 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     VerifyOrReturnError(aReadPrepareParams.mSessionHolder, CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto exchange = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get().Value(), this);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    mExchange.Grab(exchange);
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
     else
     {
-        mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
+        mExchange->SetResponseTimeout(aReadPrepareParams.mTimeout);
     }
 
-    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
-                                                    Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
+    ReturnErrorOnFailure(mExchange->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
+                                                Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
     mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
     mFabricIndex = aReadPrepareParams.mSessionHolder->GetFabricIndex();

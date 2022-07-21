@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    24.1.2. [TC-CADMIN-1.2] Administrator Behavior using BCM [DUT -
+    25.1.2. [TC-CADMIN-1.2] Administrator Behavior using BCM [DUT -
     Commissioner]
 
 config:
@@ -24,6 +24,7 @@ config:
 
 tests:
     - label: "TH_CR1 starts a commissioning process with TH_CE"
+      PICS: CADMIN.C
       verification: |
           Provision the device using chip tool on first controller
       disabled: true
@@ -32,11 +33,13 @@ tests:
           "TH_CR1 sends command to TH_CE to open a commissioning window with a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM
           (Basic Commissioning Method)"
-      PICS: CADMIN.C.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On first controller, usinadministratorcommissioningg chip tool open commissioning window.
 
           ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
+
+
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
@@ -93,6 +96,7 @@ tests:
       disabled: true
 
     - label: "DUT_CR2 starts a commissioning process with TH_CE"
+      PICS: CADMIN.C
       verification: |
           Using your DUT Controller connect to the accessory.
 
@@ -290,7 +294,7 @@ tests:
           "DUT_CR2 sends command to TH_CE to open a commissioning window with a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM
           (Basic Commissioning Method)"
-      PICS: CADMIN.C.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
@@ -334,7 +338,7 @@ tests:
     - label:
           "DUT_CR2 sends command to TH_CE to revoke the commissioning window
           using the Revoke Commissioning command"
-      PICS: CADMIN.C.C0002
+      PICS: CADMIN.C.C02.Tx
       verification: |
           On your DUT controller using chip-tool run revoke command
 
@@ -378,6 +382,7 @@ tests:
     - label:
           "TH_CR3 attempts to execute a PASE to starts a commissioning process
           with TH_CE"
+      PICS: CADMIN.C
       verification: |
           1. On third controller, using chip-tool connect to the accessory. Connect attempt should fail, i.e
           ./chip-tool pairing onnetwork 3 20202021
@@ -433,7 +438,7 @@ tests:
     - label:
           "DUT_CR2 sends command to TH_CE to open a commissioning window using
           BCM"
-      PICS: CADMIN.C.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
@@ -483,7 +488,7 @@ tests:
     - label:
           "DUT_CR2 sends command to TH_CE to open a commissioning window using
           BCM"
-      PICS: CADMIN.C.C0001
+      PICS: CADMIN.C.C01.Tx
       verification: |
           On your DUT controller using chip-tool open commissioning widow using BCM.
 
@@ -527,6 +532,7 @@ tests:
     - label:
           "TH_CR1 starts a commissioning process with TH_CE before the timeout
           from step 15"
+      PICS: CADMIN.C
       verification: |
           Using your 1st Controller connect to the accessory.
 

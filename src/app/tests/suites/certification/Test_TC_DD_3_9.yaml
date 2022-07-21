@@ -25,15 +25,15 @@ tests:
     - label: "TH receives Onboarding Payload from the DUT"
       verification: |
           1. Parse the DUT's QR Code using the TH commissioner: chip-tool
-          $ ./out/chip-tool/chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
-          [1651077458589] [91233:65331701] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
-          [1651077458590] [91233:65331701] CHIP: [SPL] CommissioningFlow: 2
-          [1651077458590] [91233:65331701] CHIP: [SPL] VendorID: 65521
-          [1651077458590] [91233:65331701] CHIP: [SPL] Version: 0
-          [1651077458590] [91233:65331701] CHIP: [SPL] ProductID: 32769
-          [1651077458590] [91233:65331701] CHIP: [SPL] Discriminator: 3840
-          [1651077458590] [91233:65331701] CHIP: [SPL] SetUpPINCode: 20202021
-          [1651077458590] [91233:65331701] CHIP: [SPL] RendezvousInformation: 4
+          $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          [1657230447725] [31078:16782733] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
+          [1657230447725] [31078:16782733] CHIP: [SPL] Version:       0
+          [1657230447725] [31078:16782733] CHIP: [SPL] VendorID:      65521
+          [1657230447725] [31078:16782733] CHIP: [SPL] ProductID:     32769
+          [1657230447725] [31078:16782733] CHIP: [SPL] Custom flow:   2    (CUSTOM)
+          [1657230447725] [31078:16782733] CHIP: [SPL] Capabilities:  0x04 (On IP network)
+          [1657230447725] [31078:16782733] CHIP: [SPL] Discriminator: 3840
+          [1657230447725] [31078:16782733] CHIP: [SPL] Passcode:      20202021
 
           2. Verify that the CommissioningFlow is set to 2 (Custom Flow)
       disabled: true

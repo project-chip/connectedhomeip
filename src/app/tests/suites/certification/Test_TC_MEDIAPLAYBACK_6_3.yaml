@@ -42,7 +42,7 @@ tests:
                 value: 0
 
     - label: "Sends a Seek command"
-      PICS: MEDIAPLAYBACK.S.C000B
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
       command: "Seek"
       arguments:
           values:
@@ -142,7 +142,7 @@ tests:
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      PICS: MEDIAPLAYBACK.S.C000B
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
       command: "Seek"
       arguments:
           values:

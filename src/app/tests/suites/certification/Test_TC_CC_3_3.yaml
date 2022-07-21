@@ -40,7 +40,7 @@ tests:
           value: 1
 
     - label: "Reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -50,7 +50,7 @@ tests:
               maxValue: 254
 
     - label: "Step hue up command"
-      PICS: CC.S.C02.Rsp
+      PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
           values:
@@ -65,7 +65,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    #delay step is necessary to let the attribute value change over time
+    #Delay step is necessary to let the attribute value change over time
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -75,7 +75,7 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -85,7 +85,7 @@ tests:
               maxValue: 254
 
     - label: "Step hue down command"
-      PICS: CC.S.C02.Rsp
+      PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
           values:
@@ -109,7 +109,7 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:

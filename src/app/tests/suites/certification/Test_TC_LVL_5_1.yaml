@@ -53,12 +53,26 @@ tests:
               maxValue: 255
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
-      PICS: LVL.S.C04.Rsp
+      PICS: LVL.S.C04.Rsp && LVL.S.A0002
       command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
-                value: MinlevelValue
+                value: MinlevelValue + 1
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Sends MoveToLevelWithOnOff command to DUT"
+      PICS: LVL.S.C04.Rsp && !LVL.S.A0002
+      command: "MoveToLevelWithOnOff"
+      arguments:
+          values:
+              - name: "level"
+                value: 2
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
@@ -71,8 +85,19 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: MinlevelValue
+          value: MinlevelValue + 1
           saveAs: CurrentlevelValue
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 255
+
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.A0000 && !LVL.S.A0002
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 2
           constraints:
               type: uint8
               minValue: 0
@@ -143,27 +168,12 @@ tests:
       response:
           value: CurrentlevelValue
 
-    - label: "Reset level to 254"
-      PICS: LVL.S.C00.Rsp
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
+    - label: "Reads current level attribute from DUT"
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 2
 
     - label: "Precondition send Off Command"
       cluster: "On/Off"
