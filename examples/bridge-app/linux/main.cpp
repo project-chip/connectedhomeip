@@ -482,7 +482,7 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID) && (maxReadLength == 4))
     {
-        *buffer =(uint32_t) ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP;
+        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_FEATURE_MAP;
     }
     else
     {
