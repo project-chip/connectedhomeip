@@ -400,13 +400,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-    wfx_wifi_scan_ext_t extra_info;
+    /*wfx_wifi_scan_ext_t extra_info;
     int32_t err = wfx_get_ap_ext(&extra_info);
     if (err == 0)
     {
         beaconLostCount = extra_info.beacon_lost_count;
         return CHIP_NO_ERROR;
-    }
+    }*/
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
@@ -417,61 +417,61 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    wfx_wifi_scan_ext_t extra_info;
+    /*wfx_wifi_scan_ext_t extra_info;
     int32_t err = wfx_get_ap_ext(&extra_info);
     if (err == 0)
     {
         packetMulticastRxCount = extra_info.mcast_rx_count;
         return CHIP_NO_ERROR;
-    }
+    }*/
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    wfx_wifi_scan_ext_t extra_info;
+    /*wfx_wifi_scan_ext_t extra_info;
     int32_t err = wfx_get_ap_ext(&extra_info);
     if (err == 0)
     {
         packetMulticastTxCount = extra_info.mcast_tx_count;
         return CHIP_NO_ERROR;
-    }
+    }*/
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    wfx_wifi_scan_ext_t extra_info;
+    /*wfx_wifi_scan_ext_t extra_info;
     int32_t err = wfx_get_ap_ext(&extra_info);
     if (err == 0)
     {
         packetUnicastRxCount = extra_info.ucast_rx_count;
         return CHIP_NO_ERROR;
-    }
+    }*/
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    wfx_wifi_scan_ext_t extra_info;
+    /*wfx_wifi_scan_ext_t extra_info;
     int32_t err = wfx_get_ap_ext(&extra_info);
     if (err == 0)
     {
         packetUnicastTxCount = extra_info.ucast_tx_count;
         return CHIP_NO_ERROR;
-    }
+    }*/
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-    wfx_wifi_scan_ext_t extra_info;
+    /*wfx_wifi_scan_ext_t extra_info;
     int32_t err = wfx_get_ap_ext(&extra_info);
     if (err == 0)
     {
         overrunCount = extra_info.overrun_count;
         return CHIP_NO_ERROR;
-    }
+    }*/
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
@@ -480,11 +480,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     return CHIP_NO_ERROR;
 }
 #endif // SL_WIFI
-
-DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
-{
-    return DiagnosticDataProviderImpl::GetDefaultInstance();
-}
 
 } // namespace DeviceLayer
 } // namespace chip
