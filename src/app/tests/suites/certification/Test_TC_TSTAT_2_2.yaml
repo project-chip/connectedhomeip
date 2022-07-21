@@ -347,7 +347,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015
       response:
           value: 700
           constraints:
@@ -360,7 +360,7 @@ tests:
           MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015
       arguments:
           value: 800
 
@@ -369,14 +369,14 @@ tests:
           MinHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0015
       response:
           value: 800
 
     - label: "Writes a value back that is different but violates the deadband"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      PICS: TSTAT.S.A0015 && TSTAT.S.F05
       arguments:
           value: 2000
       response:
@@ -387,7 +387,7 @@ tests:
           AbsMinHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015
       arguments:
           value: 650
       response:
@@ -398,7 +398,7 @@ tests:
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0015
       arguments:
           value: 4050
       response:
@@ -409,7 +409,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0015
       arguments:
           value: 700
 
@@ -418,7 +418,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F00  && TSTAT.S.A0015 && !TSTAT.S.F05
       arguments:
           value: 3000
 
@@ -427,7 +427,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05
       response:
           value: 3000
           constraints:
@@ -440,7 +440,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0015
       arguments:
           value: 700
 
@@ -449,7 +449,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      PICS: TSTAT.S.A0015 && TSTAT.S.F05
       arguments:
           value: 3000
       response:
@@ -460,7 +460,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
       arguments:
           value: 2900
 
@@ -469,7 +469,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05
       response:
           value: 2900
 
@@ -478,7 +478,7 @@ tests:
           AbsMinHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0016
       arguments:
           value: 500
       response:
@@ -489,7 +489,7 @@ tests:
           AbsMaxHeatSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0016
       arguments:
           value: 4000
       response:
@@ -500,7 +500,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F00  && TSTAT.S.A0016
       arguments:
           value: 700
 
@@ -509,7 +509,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00  && A_MAXHEATSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F00  && TSTAT.S.A0016 && !TSTAT.S.F05
       arguments:
           value: 3000
 
@@ -518,7 +518,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       response:
           value: 1600
           constraints:
@@ -531,7 +531,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 2000
 
@@ -540,7 +540,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       response:
           value: 2000
 
@@ -549,7 +549,7 @@ tests:
           AbsMinCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 1000
       response:
@@ -559,7 +559,7 @@ tests:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 4000
       response:
@@ -570,7 +570,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 1600
 
@@ -579,7 +579,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 3200
 
@@ -588,7 +588,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 1600
 
@@ -597,7 +597,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
       response:
           value: 3200
           constraints:
@@ -610,7 +610,7 @@ tests:
           MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
       arguments:
           value: 2000
 
@@ -619,7 +619,7 @@ tests:
           MaxCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT && !TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018 && !TSTAT.S.F05
       response:
           value: 2000
 
@@ -628,7 +628,7 @@ tests:
           AbsMinCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
       arguments:
           value: 1000
       response:
@@ -638,7 +638,7 @@ tests:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
       arguments:
           value: 4000
       response:
@@ -649,7 +649,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
       arguments:
           value: 1600
 
@@ -658,42 +658,42 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
       arguments:
           value: 3200
 
     - label: "Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINHEATSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0015
       arguments:
           value: 700
 
     - label: "Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 &&!TSTAT.S.F05
       arguments:
           value: 3000
 
     - label: "Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXHEATSETPOINTLIMIT &&!TSTAT.S.F05
+      PICS: TSTAT.S.F01 && TSTAT.S.A0016 &&!TSTAT.S.F05
       arguments:
           value: 2950
 
     - label: "Writes (sets back) default value of MinCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MinCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MINCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
       arguments:
           value: 1600
 
     - label: "Writes (sets back) default value of MaxCoolSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxCoolSetpointLimit"
-      PICS: TSTAT.S.F01 && A_MAXCOOLSETPOINTLIMIT
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
       arguments:
           value: 3200
 
@@ -794,7 +794,7 @@ tests:
           meet deadband constraint"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F00 && A_MINHEATSETPOINTLIMIT && TSTAT.S.F05
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.F05
       arguments:
           value: 2950
 
