@@ -31,7 +31,6 @@ tests:
     - label: "Reads mandatory attributes from DUT: LocalTemperature"
       command: "readAttribute"
       attribute: "LocalTemperature"
-      PICS: TSTAT.S.A0000
       response:
           constraints:
               type: int16
@@ -49,7 +48,7 @@ tests:
               maxValue: 32767
 
     - label: "Read Occupancy attribute from the DUT"
-      PICS: TSTAT.S.A0002
+      PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "Occupancy"
       response:
@@ -139,56 +138,56 @@ tests:
               maxValue: -25
 
     - label: "Reads optional attributes from DUT: OccupiedCoolingSetpoint"
-      PICS: TSTAT.S.A0011
+      PICS: TSTAT.S.F01
       command: "readAttribute"
       attribute: "OccupiedCoolingSetpoint"
       response:
           constraints:
               type: int16
-              minValue: -27315
-              maxValue: 32767
+              minValue: 1600
+              maxValue: 3200
 
     - label: "Reads mandatory attributes from DUT: OccupiedHeatingSetpoint"
-      PICS: TSTAT.S.A0012
+      PICS: TSTAT.S.F00
       command: "readAttribute"
       attribute: "OccupiedHeatingSetpoint"
       response:
           constraints:
               type: int16
-              minValue: -27315
-              maxValue: 32767
+              minValue: 700
+              maxValue: 3000
 
     - label: "Read UnoccupiedCoolingSetpoint attribute from the DUT"
-      PICS: TSTAT.S.A0013
+      PICS: TSTAT.S.F01 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
       response:
           constraints:
               type: int16
-              minValue: -27315
-              maxValue: 32767
+              minValue: 1600
+              maxValue: 3200
 
     - label: "Read UnoccupiedHeatingSetpoint attribute from the DUT"
-      PICS: TSTAT.S.A0014
+      PICS: TSTAT.S.F00 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "UnoccupiedHeatingSetpoint"
       response:
           constraints:
               type: int16
-              minValue: -27315
-              maxValue: 32767
+              minValue: 700
+              maxValue: 3000
 
-    - label: "Reads mandatory attributes from DUT: MinHeatSetpointLimit"
+    - label: "Reads attribute from DUT: MinHeatSetpointLimit"
       PICS: TSTAT.S.A0015
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       response:
           constraints:
               type: int16
-              minValue: -27315
-              maxValue: 32767
+              minValue: 700
+              maxValue: 3000
 
-    - label: "Reads mandatory attributes from DUT: MaxHeatSetpointLimit"
+    - label: "Reads attribute from DUT: MaxHeatSetpointLimit"
       PICS: TSTAT.S.A0016
       command: "readAttribute"
       attribute: "MaxHeatSetpointLimit"
@@ -219,7 +218,7 @@ tests:
               maxValue: 32767
 
     - label: "Reads optional attributes from DUT: MinSetpointDeadBand"
-      PICS: TSTAT.S.A0019
+      PICS: TSTAT.S.F05
       command: "readAttribute"
       attribute: "MinSetpointDeadBand"
       response:
@@ -239,7 +238,6 @@ tests:
               maxValue: 7
 
     - label: "Reads mandatory attributes from DUT: ControlSequenceOfOperation"
-      PICS: TSTAT.S.A001b
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
       response:
@@ -249,7 +247,6 @@ tests:
               maxValue: 5
 
     - label: "Reads mandatory attributes from DUT: SystemMode"
-      PICS: TSTAT.S.A001c
       command: "readAttribute"
       attribute: "SystemMode"
       response:
@@ -257,52 +254,6 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 9
-
-    - label:
-          "Read AlarmMask attribute from the DUT and Verify that the DUT
-          responds with a map8 value.The value has to be in the range of 0x00 to
-          0x07."
-      verification: |
-          ./apps/chip-tool thermostat read alarm-mask 54321 1
-          [1651147597.962878][10583:10588] CHIP:DMG: ReportDataMessage =
-          [1651147597.962928][10583:10588] CHIP:DMG: {
-          [1651147597.962957][10583:10588] CHIP:DMG:         AttributeReportIBs =
-          [1651147597.963014][10583:10588] CHIP:DMG:         [
-          [1651147597.963047][10583:10588] CHIP:DMG:                 AttributeReportIB =
-          [1651147597.963103][10583:10588] CHIP:DMG:                 {
-          [1651147597.963138][10583:10588] CHIP:DMG:                         AttributeStatusIB =
-          [1651147597.963177][10583:10588] CHIP:DMG:                         {
-          [1651147597.963226][10583:10588] CHIP:DMG:                                 AttributePathIB =
-          [1651147597.963286][10583:10588] CHIP:DMG:                                 {
-          [1651147597.963329][10583:10588] CHIP:DMG:                                         Endpoint = 0x1,
-          [1651147597.963389][10583:10588] CHIP:DMG:                                         Cluster = 0x201,
-          [1651147597.963449][10583:10588] CHIP:DMG:                                         Attribute = 0x0000_001D,
-          [1651147597.963575][10583:10588] CHIP:DMG:                                 }
-          [1651147597.963641][10583:10588] CHIP:DMG:
-          [1651147597.963683][10583:10588] CHIP:DMG:                                 StatusIB =
-          [1651147597.963724][10583:10588] CHIP:DMG:                                 {
-          [1651147597.963785][10583:10588] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1651147597.963846][10583:10588] CHIP:DMG:                                 },
-          [1651147597.963892][10583:10588] CHIP:DMG:
-          [1651147597.963945][10583:10588] CHIP:DMG:                         },
-          [1651147597.963991][10583:10588] CHIP:DMG:
-          [1651147597.964040][10583:10588] CHIP:DMG:                 },
-          [1651147597.964092][10583:10588] CHIP:DMG:
-          [1651147597.964125][10583:10588] CHIP:DMG:         ],
-          [1651147597.964180][10583:10588] CHIP:DMG:
-          [1651147597.964213][10583:10588] CHIP:DMG:         SuppressResponse = true,
-          [1651147597.964258][10583:10588] CHIP:DMG:         InteractionModelRevision = 1
-          [1651147597.964290][10583:10588] CHIP:DMG: }
-          [1651147597.964450][10583:10588] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && TSTAT.S.A001d
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     - label: "Read ThermostatRunningMode attribute from the DUT"
       PICS: TSTAT.S.A001e
@@ -312,10 +263,10 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 4
+              maxValue: 9
 
     - label: "Reads constraints of optional attributes from DUT: StartOfWeek"
-      PICS: TSTAT.S.A0020
+      PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "StartOfWeek"
       response:
@@ -325,7 +276,7 @@ tests:
               maxValue: 6
 
     - label: "Reads optional attributes from DUT: NumberOfWeeklyTransitions"
-      PICS: TSTAT.S.A0021
+      PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "NumberOfWeeklyTransitions"
       response:
@@ -335,7 +286,7 @@ tests:
               maxValue: 255
 
     - label: "Reads optional attributes from DUT: NumberOfDailyTransitions"
-      PICS: TSTAT.S.A0022
+      PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "NumberOfDailyTransitions"
       response:
@@ -413,7 +364,7 @@ tests:
               type: utc
 
     - label: "Read OccupiedSetback attribute from the DUT"
-      PICS: TSTAT.S.A0034
+      PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "OccupiedSetback"
       response:
@@ -423,7 +374,7 @@ tests:
               maxValue: 255
 
     - label: "Read OccupiedSetbackMin attribute from the DUT"
-      PICS: TSTAT.S.A0035
+      PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "OccupiedSetbackMin"
       response:
@@ -433,7 +384,7 @@ tests:
               maxValue: 255
 
     - label: "Read OccupiedSetbackMax attribute from the DUT"
-      PICS: TSTAT.S.A0036
+      PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "OccupiedSetbackMax"
       response:
@@ -443,7 +394,7 @@ tests:
               maxValue: 255
 
     - label: "Read UnoccupiedSetback attribute from the DUT"
-      PICS: TSTAT.S.A0037
+      PICS: TSTAT.S.F02 && TSTAT.S.F04
       command: "readAttribute"
       attribute: "UnoccupiedSetback"
       response:
@@ -453,7 +404,7 @@ tests:
               maxValue: 255
 
     - label: "Read UnoccupiedSetbackMin attribute from the DUT"
-      PICS: TSTAT.S.A0038
+      PICS: TSTAT.S.F02 && TSTAT.S.F04
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMin"
       response:
@@ -463,7 +414,7 @@ tests:
               maxValue: 255
 
     - label: "Read UnoccupiedSetbackMax attribute from the DUT"
-      PICS: TSTAT.S.A0039
+      PICS: TSTAT.S.F02 && TSTAT.S.F04
       command: "readAttribute"
       attribute: "UnoccupiedSetbackMax"
       response:
