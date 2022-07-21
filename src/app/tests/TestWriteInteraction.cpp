@@ -306,15 +306,6 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
             }
             else
             {
-                //
-                // In a normal execution flow, the exchange manager would have closed out the exchange after the
-                // message dispatch call path had unwound. In this test however, we've manually allocated the exchange
-                // ourselves (as opposed to the exchange manager), so we need to take ownership of closing out the exchange.
-                //
-                // Note that this doesn't happen in the success case above, since that results in a call to send a message through
-                // the exchange context, which results in the exchange manager correctly closing it.
-                //
-                exchange->Close();
                 NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
             }
 
