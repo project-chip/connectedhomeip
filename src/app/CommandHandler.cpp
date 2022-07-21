@@ -111,7 +111,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
         err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mExchangeCtx.Get(),
                                    /* aExpectResponse = */ false);
-        if (err == CHIP_NO_ERROR) {
+        if (err == CHIP_NO_ERROR)
+        {
             mSentStatusResponse = true;
         }
 

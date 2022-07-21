@@ -453,7 +453,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
 
     TestExchangeDelegate delegate;
     commandHandler.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
-    err                          = commandHandler.SendCommandResponse();
+    err = commandHandler.SendCommandResponse();
 
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 }

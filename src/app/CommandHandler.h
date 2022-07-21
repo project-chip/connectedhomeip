@@ -250,14 +250,16 @@ private:
     friend class CommandHandler::Handle;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                         System::PacketBufferHandle && payload) override {
+                                 System::PacketBufferHandle && payload) override
+    {
         //
         // We shouldn't be receiving any further messages on this exchange.
         //
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
+    {
         //
         // We're not expecting responses to any messages we send out on this EC.
         //
@@ -356,7 +358,7 @@ private:
     }
 
     Messaging::ExchangeHolder mExchangeCtx;
-    Callback * mpCallback                      = nullptr;
+    Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;

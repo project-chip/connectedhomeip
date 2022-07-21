@@ -33,10 +33,7 @@ namespace chip {
 namespace app {
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest) :
-    mExchangeCtx(*this),
-    mpCallback(apCallback),
-    mpExchangeMgr(apExchangeMgr),
-    mSuppressResponse(false),
+    mExchangeCtx(*this), mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false),
     mTimedRequest(aIsTimedRequest)
 {}
 
@@ -113,8 +110,8 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
-    ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
-                                                    SendMessageFlags::kExpectResponse));
+    ReturnErrorOnFailure(
+        mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
     MoveToState(State::CommandSent);
 
     return CHIP_NO_ERROR;

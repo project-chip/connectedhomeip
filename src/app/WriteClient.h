@@ -125,16 +125,15 @@ public:
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this),
-        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mSuppressResponse(aSuppressResponse)
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mSuppressResponse(aSuppressResponse)
     {}
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
-        mExchangeCtx(*this),
-        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
     {}
 #endif
 
@@ -373,8 +372,8 @@ private:
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeHolder mExchangeCtx;
-    Callback * mpCallback                      = nullptr;
-    State mState                               = State::Initialized;
+    Callback * mpCallback = nullptr;
+    State mState          = State::Initialized;
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequestMessage::Builder mWriteRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it

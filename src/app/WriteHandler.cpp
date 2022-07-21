@@ -172,8 +172,8 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
-                                     mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
-                                                    : Messaging::SendMessageFlags::kNone);
+                                    mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
+                                                   : Messaging::SendMessageFlags::kNone);
     SuccessOrExit(err);
 
     MoveToState(State::Sending);
