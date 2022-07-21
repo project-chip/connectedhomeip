@@ -2936,7 +2936,7 @@ void TestReadInteraction::TestSubscribeInvalidMessage2(nlTestSuite * apSuite, vo
         chip::app::InitWriterWithSpaceReserved(writer, 0);
         err = request.Init(&writer);
         err = writer.Finalize(&msgBuf);
-        
+
         auto exchange =
             readClient.mpExchangeMgr->NewContext(readPrepareParams.mSessionHolder.Get().Value(), &readClient);
         NL_TEST_ASSERT(apSuite, exchange != nullptr);
