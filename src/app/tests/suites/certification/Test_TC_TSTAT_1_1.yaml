@@ -119,7 +119,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [17,18,25]
+              contains: [17, 18, 25]
 
     - label:
           "Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
