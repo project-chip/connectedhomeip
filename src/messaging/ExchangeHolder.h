@@ -23,21 +23,22 @@
 namespace chip {
 namespace Messaging {
 
-/** @brief
- *      This provides a RAII'fied wrapper for an ExchangeContext that automatically manages
- *      cleaning up the EC when the holder ceases to exist, or acquires a new exchange. This is
- *      meant to be used by application and protocol logic code that would otherwise need to closely
- *      manage their internal pointers to an ExchangeContext and correctly
- *      null-it out/abort it depending on the circumstances. This relies on clear rules
- *      established by ExchangeContext and the transfer of ownership at various points
- *      in its lifetime.
+/**
+ * @brief
+ *   This provides a RAII'fied wrapper for an ExchangeContext that automatically manages
+ *   cleaning up the EC when the holder ceases to exist, or acquires a new exchange. This is
+ *   meant to be used by application and protocol logic code that would otherwise need to closely
+ *   manage their internal pointers to an ExchangeContext and correctly
+ *   null-it out/abort it depending on the circumstances. This relies on clear rules
+ *   established by ExchangeContext and the transfer of ownership at various points
+ *   in its lifetime.
  *
- *      It does this by intercepting OnExchangeClosing and looking at the various
- *      states the exchange might be in to decide how best to correctly shutdown the exchange.
- *      (see AbortIfNeeded()).
+ *   It does this by intercepting OnExchangeClosing and looking at the various
+ *   states the exchange might be in to decide how best to correctly shutdown the exchange.
+ *   (see AbortIfNeeded()).
  *
- *      This is a delegate forwarder - consumers can still register to be an ExchangeDelegate
- *      and get notified of all relevant happenings on that delegate interface.
+ *   This is a delegate forwarder - consumers can still register to be an ExchangeDelegate
+ *   and get notified of all relevant happenings on that delegate interface.
  *
  */
 class ExchangeHolder : public ExchangeDelegate
@@ -45,9 +46,8 @@ class ExchangeHolder : public ExchangeDelegate
 public:
     /**
      * @brief
-     *
-     * Constructor that takes an ExchangeDelegate that is forwarded all relevant
-     * calls from the underlying exchange.
+     *    Constructor that takes an ExchangeDelegate that is forwarded all relevant
+     *    calls from the underlying exchange.
      */
     ExchangeHolder(ExchangeDelegate & delegate) : mpExchangeDelegate(delegate) {}
 
@@ -57,11 +57,10 @@ public:
 
     /**
      * @brief
-     *
-     * Replaces the held exchange and associated delegate to instead track the given ExchangeContext, aborting
-     * and dereferencing any previously held exchange as necessary. This method should be called whenever protocol logic
-     * that is managing this holder is transitioning from an outdated Exchange to a new one, often during
-     * the start of a new transaction.
+     *    Replaces the held exchange and associated delegate to instead track the given ExchangeContext, aborting
+     *    and dereferencing any previously held exchange as necessary. This method should be called whenever protocol logic
+     *    that is managing this holder is transitioning from an outdated Exchange to a new one, often during
+     *    the start of a new transaction.
      */
     void Grab(ExchangeContext * exchange)
     {
@@ -73,8 +72,7 @@ public:
 
     /*
      * @brief
-     *
-     * This shuts down the exchange (if a valid one is being tracked) and releases our reference to it.
+     *    This shuts down the exchange (if a valid one is being tracked) and releases our reference to it.
      */
     void Release()
     {
