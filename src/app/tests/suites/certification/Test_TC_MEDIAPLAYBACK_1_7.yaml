@@ -38,7 +38,7 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the optional global attribute: FeatureMap"
+    - label: "Read the global attribute: FeatureMap"
       PICS: MEDIAPLAYBACK.S.AS || MEDIAPLAYBACK.S.VS
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -117,6 +117,77 @@ tests:
           constraints:
               type: list
               contains: [0, 1, 2]
+
+    - label: "Read the optional command(StartOver) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label: "Read the optional command(Previous) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Read the optional command(Next) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C05.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label: "Read the optional command(Rewind) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+    - label: "Read the optional command(FastForward) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C07.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label: "Read the optional command(SkipForward) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C08.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label: "Read the optional command(SkipBackward) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C09.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label: "Read the optional command(Seek) in AcceptedCommandList"
+      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

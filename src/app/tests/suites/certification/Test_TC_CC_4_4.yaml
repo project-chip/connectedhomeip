@@ -40,8 +40,8 @@ tests:
       response:
           value: 1
 
-    - label: "Check current hue attribute value matched before any change"
-      PICS: CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F01 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -50,8 +50,8 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Check Saturation attribute value matched before any change"
-      PICS: CC.S.A0001
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -60,8 +60,8 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Move To current hue and saturation command"
-      PICS: CC.S.C06.Rsp
+    - label: "TH sends MoveToHueAndSaturation command to DUT."
+      PICS: CC.S.F01 && CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
@@ -76,18 +76,16 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 10ms"
+    - label: "Wait 1000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.A0000
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -97,9 +95,8 @@ tests:
               maxValue: 254
 
     - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.A0001
+          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

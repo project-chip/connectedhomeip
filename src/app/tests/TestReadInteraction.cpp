@@ -2045,9 +2045,6 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
         NL_TEST_ASSERT(apSuite, engine.ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine.ActiveHandlerAt(0);
         NL_TEST_ASSERT(apSuite, delegate.mpReadHandler != nullptr);
-
-        // Shutdown the subscription
-        readClient.Abort();
     }
 
     // Cleanup

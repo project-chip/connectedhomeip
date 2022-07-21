@@ -42,7 +42,7 @@ tests:
           [1651111142.370760][32024:32024] CHIP:SVR: SetupQRCode: [MT:-24J0ALY01KA0648G00]
 
           TH Commissioner:
-          $ ./out/chip-tool/chip-tool discover commissionables
+          $ ./chip-tool discover commissionables
 
           [1651111150395] [95835:65674062] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111150395] [95835:65674062] CHIP: [DIS]         Vendor ID: 65521
@@ -70,7 +70,7 @@ tests:
           [1651111335.475204][32130:32130] CHIP:DIS: Updating services using commissioning mode 0
 
           TH Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0ALY01KA0648G00
+          $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111335378] [95843:65675989] CHIP: [CTL] Received CommissioningComplete response
           [1651111335378] [95843:65675989] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
@@ -84,6 +84,7 @@ tests:
           "Using TH Commissioner, unpair the DUT Commissionee from the Matter
           network."
       verification: |
+          TH Commissioner:
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
@@ -103,7 +104,7 @@ tests:
           2. On RasPi DUT $ ./out/all-clusters-app/chip-all-clusters-app --discriminator 3841
 
           On TH chip-tool:
-          $ ./out/chip-tool/chip-tool discover commissionables
+          $ ./chip-tool discover commissionables
           [1651111576350] [95850:65678872] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651111576350] [95850:65678872] CHIP: [DIS]         Vendor ID: 65521
           [1651111576350] [95850:65678872] CHIP: [DIS]         Product ID: 32769
@@ -130,7 +131,7 @@ tests:
           [1651111614.006893][32259:32259] CHIP:DIS: Updating services using commissioning mode 0
 
           TH Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0ALY01KA0648G00
+          $ ./chip-tool pairing code 1 MT:-24J0ALY01KA0648G00
 
           [1651111613912] [95856:65679504] CHIP: [CTL] Received CommissioningComplete response
           [1651111613912] [95856:65679504] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'

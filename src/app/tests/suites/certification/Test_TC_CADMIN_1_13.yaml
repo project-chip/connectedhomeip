@@ -42,6 +42,7 @@ tests:
       identity: "alpha"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -52,7 +53,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.S.C01.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -73,6 +74,7 @@ tests:
       identity: "gamma"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      PICS: CADMIN.S
       arguments:
           values:
               - name: "nodeId"
@@ -83,7 +85,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.S.C01.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -114,7 +116,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0001
+      PICS: CADMIN.S.C01.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -125,7 +127,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -171,7 +173,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -190,7 +192,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -236,7 +238,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"
@@ -255,7 +257,7 @@ tests:
       cluster: "AdministratorCommissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
-      PICS: CADMIN.S.C0000
+      PICS: CADMIN.S.C00.Rsp
       arguments:
           values:
               - name: "CommissioningTimeout"

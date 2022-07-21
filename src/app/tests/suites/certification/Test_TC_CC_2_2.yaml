@@ -32,9 +32,33 @@ tests:
       PICS: CC.C.A0000
       verification: |
           ./chip-tool colorcontrol read current-hue 1 1
-          [1649661322.115302][7976:7981] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274515
-          [1649661322.115376][7976:7981] CHIP:TOO:   current hue: 0
-          [1649661322.115473][7976:7981] CHIP:EM: Sending Standalone Ack for MessageCounter:14511861 on exchange 26516i
+
+          Verify in DUT as client side log:
+
+          [1657908705.581609][2861:2861] CHIP:IM: Received Read request
+          [1657908705.581752][2861:2861] CHIP:DMG: ReadRequestMessage =
+          [1657908705.581807][2861:2861] CHIP:DMG: {
+          [1657908705.581874][2861:2861] CHIP:DMG:        AttributePathIBs =
+          [1657908705.581941][2861:2861] CHIP:DMG:        [
+          [1657908705.581993][2861:2861] CHIP:DMG:                AttributePathIB =
+          [1657908705.582069][2861:2861] CHIP:DMG:                {
+          [1657908705.582128][2861:2861] CHIP:DMG:                        Endpoint = 0x1,
+          [1657908705.582193][2861:2861] CHIP:DMG:                        Cluster = 0x300,
+          [1657908705.582279][2861:2861] CHIP:DMG:                        Attribute = 0x0000_0000,
+          [1657908705.582341][2861:2861] CHIP:DMG:                }
+          [1657908705.582399][2861:2861] CHIP:DMG:
+          [1657908705.582456][2861:2861] CHIP:DMG:        ],
+          [1657908705.582513][2861:2861] CHIP:DMG:
+          [1657908705.582569][2861:2861] CHIP:DMG:        isFabricFiltered = true,
+          [1657908705.582622][2861:2861] CHIP:DMG:        InteractionModelRevision = 1
+          [1657908705.582671][2861:2861] CHIP:DMG: },
+          [1657908705.582814][2861:2861] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657908705.582973][2861:2861] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657908705.583034][2861:2861] CHIP:DMG: <RE:Run> Cluster 300, Attribute 0 is dirty
+          [1657908705.583079][2861:2861] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0000 (expanded=0)
+          [1657908705.583133][2861:2861] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657908705.583195][2861:2861] CHIP:DMG: AccessControl: allowed
+          [1657908705.583290][2861:2861] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label:
@@ -43,9 +67,29 @@ tests:
       PICS: CC.C.A0001
       verification: |
           ./chip-tool colorcontrol read current-saturation 1 1
-          [1649661322.558054][7982:7987] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0001 DataVersion: 4087274515
-          [1649661322.558128][7982:7987] CHIP:TOO:   current saturation: 0
-          [1649661322.558225][7982:7987] CHIP:EM: Sending Standalone Ack for MessageCounter:13666860 on exchange 22550i
+
+          Verify in DUT as client side log:
+          [1657908593.710273][2861:2861] CHIP:IM: Received Read request
+          [1657908593.710359][2861:2861] CHIP:DMG: ReadRequestMessage =
+          [1657908593.710389][2861:2861] CHIP:DMG: {
+          [1657908593.710438][2861:2861] CHIP:DMG:        AttributePathIBs =
+          [1657908593.710469][2861:2861] CHIP:DMG:        [
+          [1657908593.710496][2861:2861] CHIP:DMG:                AttributePathIB =
+          [1657908593.710540][2861:2861] CHIP:DMG:                {
+          [1657908593.710572][2861:2861] CHIP:DMG:                        Endpoint = 0x1,
+          [1657908593.710607][2861:2861] CHIP:DMG:                        Cluster = 0x300,
+          [1657908593.710653][2861:2861] CHIP:DMG:                        Attribute = 0x0000_0001,
+          [1657908593.710686][2861:2861] CHIP:DMG:                }
+          [1657908593.710718][2861:2861] CHIP:DMG:
+          [1657908593.710757][2861:2861] CHIP:DMG:        ],
+          [1657908593.710790][2861:2861] CHIP:DMG:
+          [1657908593.710820][2861:2861] CHIP:DMG:        isFabricFiltered = true,
+          [1657908593.710861][2861:2861] CHIP:DMG:        InteractionModelRevision = 1
+          [1657908593.710888][2861:2861] CHIP:DMG: },
+          [1657908593.710983][2861:2861] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657908593.711095][2861:2861] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657908593.711129][2861:2861] CHIP:DMG: <RE:Run> Cluster 300, Attribute 1 is dirty
+          [1657908593.711154][2861:2861] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1
       disabled: true
 
     - label:
@@ -54,9 +98,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read remaining-time 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0002 DataVersion: 540305990
-          [1651485342.420726][3496:3501] CHIP:TOO:   remaining time: 0
-          [1651485342.420816][3496:3501] CHIP:EM: Sending Standalone Ack for MessageCounter:6536290 on exchange 31520i
+          Verify in DUT as client side log:
+          [1657908803.102070][2933:2933] CHIP:IM: Received Read request
+          [1657908803.102154][2933:2933] CHIP:DMG: ReadRequestMessage =
+          [1657908803.102182][2933:2933] CHIP:DMG: {
+          [1657908803.102204][2933:2933] CHIP:DMG:        AttributePathIBs =
+          [1657908803.102230][2933:2933] CHIP:DMG:        [
+          [1657908803.102254][2933:2933] CHIP:DMG:                AttributePathIB =
+          [1657908803.102282][2933:2933] CHIP:DMG:                {
+          [1657908803.102310][2933:2933] CHIP:DMG:                        Endpoint = 0x1,
+          [1657908803.102344][2933:2933] CHIP:DMG:                        Cluster = 0x300,
+          [1657908803.102376][2933:2933] CHIP:DMG:                        Attribute = 0x0000_0002,
+          [1657908803.102405][2933:2933] CHIP:DMG:                }
+          [1657908803.102433][2933:2933] CHIP:DMG:
+          [1657908803.102459][2933:2933] CHIP:DMG:        ],
+          [1657908803.102493][2933:2933] CHIP:DMG:
+          [1657908803.102521][2933:2933] CHIP:DMG:        isFabricFiltered = true,
+          [1657908803.102546][2933:2933] CHIP:DMG:        InteractionModelRevision = 1
+          [1657908803.102568][2933:2933] CHIP:DMG: },
+          [1657908803.102647][2933:2933] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657908803.102755][2933:2933] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657908803.102790][2933:2933] CHIP:DMG: <RE:Run> Cluster 300, Attribute 2 is dirty
+          [1657908803.102812][2933:2933] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0002 (expanded=0)
+          [1657908803.102841][2933:2933] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657908803.102875][2933:2933] CHIP:DMG: AccessControl: allowed
+          [1657908803.102936][2933:2933] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label:
@@ -65,9 +131,32 @@ tests:
       PICS: CC.C.A0003
       verification: |
           ./chip-tool colorcontrol read current-x 1 1
-          [1649661322.994696][7988:7993] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0003 DataVersion: 4087274515
-          [1649661322.994764][7988:7993] CHIP:TOO:   current x: 24939
-          [1649661322.994850][7988:7993] CHIP:EM: Sending Standalone Ack for MessageCounter:15274073 on exchange 48270i
+
+          Verify in DUT as client side log:
+          [1657908856.780574][2933:2933] CHIP:IM: Received Read request
+          [1657908856.780702][2933:2933] CHIP:DMG: ReadRequestMessage =
+          [1657908856.780750][2933:2933] CHIP:DMG: {
+          [1657908856.780790][2933:2933] CHIP:DMG:        AttributePathIBs =
+          [1657908856.780837][2933:2933] CHIP:DMG:        [
+          [1657908856.780881][2933:2933] CHIP:DMG:                AttributePathIB =
+          [1657908856.780930][2933:2933] CHIP:DMG:                {
+          [1657908856.780981][2933:2933] CHIP:DMG:                        Endpoint = 0x1,
+          [1657908856.781112][2933:2933] CHIP:DMG:                        Cluster = 0x300,
+          [1657908856.781177][2933:2933] CHIP:DMG:                        Attribute = 0x0000_0003,
+          [1657908856.781230][2933:2933] CHIP:DMG:                }
+          [1657908856.781283][2933:2933] CHIP:DMG:
+          [1657908856.781330][2933:2933] CHIP:DMG:        ],
+          [1657908856.781441][2933:2933] CHIP:DMG:
+          [1657908856.781492][2933:2933] CHIP:DMG:        isFabricFiltered = true,
+          [1657908856.781539][2933:2933] CHIP:DMG:        InteractionModelRevision = 1
+          [1657908856.781581][2933:2933] CHIP:DMG: },
+          [1657908856.781710][2933:2933] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657908856.781911][2933:2933] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657908856.781965][2933:2933] CHIP:DMG: <RE:Run> Cluster 300, Attribute 3 is dirty
+          [1657908856.782004][2933:2933] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0003 (expanded=0)
+          [1657908856.782053][2933:2933] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657908856.782108][2933:2933] CHIP:DMG: AccessControl: allowed
+          [1657908856.782247][2933:2933] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -76,9 +165,32 @@ tests:
       PICS: CC.C.A0004
       verification: |
           ./chip-tool colorcontrol read current-y 1 1
-          [1649661323.433317][7994:7999] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0004 DataVersion: 4087274515
-          [1649661323.433391][7994:7999] CHIP:TOO:   current y: 24701
-          [1649661323.433490][7994:7999] CHIP:EM: Sending Standalone Ack for MessageCounter:12384629 on exchange 18947i
+
+          Verify in DUT as client side log:
+          [1657909305.413625][2933:2933] CHIP:IM: Received Read request
+          [1657909305.413743][2933:2933] CHIP:DMG: ReadRequestMessage =
+          [1657909305.413786][2933:2933] CHIP:DMG: {
+          [1657909305.413822][2933:2933] CHIP:DMG:        AttributePathIBs =
+          [1657909305.413864][2933:2933] CHIP:DMG:        [
+          [1657909305.413903][2933:2933] CHIP:DMG:                AttributePathIB =
+          [1657909305.413946][2933:2933] CHIP:DMG:                {
+          [1657909305.413991][2933:2933] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909305.414039][2933:2933] CHIP:DMG:                        Cluster = 0x300,
+          [1657909305.414089][2933:2933] CHIP:DMG:                        Attribute = 0x0000_0004,
+          [1657909305.414136][2933:2933] CHIP:DMG:                }
+          [1657909305.414181][2933:2933] CHIP:DMG:
+          [1657909305.414223][2933:2933] CHIP:DMG:        ],
+          [1657909305.414268][2933:2933] CHIP:DMG:
+          [1657909305.414311][2933:2933] CHIP:DMG:        isFabricFiltered = true,
+          [1657909305.414352][2933:2933] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909305.414387][2933:2933] CHIP:DMG: },
+          [1657909305.414502][2933:2933] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909305.414634][2933:2933] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909305.414682][2933:2933] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4 is dirty
+          [1657909305.414717][2933:2933] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0004 (expanded=0)
+          [1657909305.414761][2933:2933] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909305.414812][2933:2933] CHIP:DMG: AccessControl: allowed
+          [1657909305.414892][2933:2933] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -88,9 +200,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read drift-compensation 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0005 DataVersion: 540305990
-          [1651485386.691700][3506:3511] CHIP:TOO:   drift compensation: 0
-          [1651485386.691805][3506:3511] CHIP:EM: Sending Standalone Ack for MessageCounter:12144117 on exchange 57338i
+          Verify in DUT as client side log:
+          [1657909433.948649][2933:2933] CHIP:IM: Received Read request
+          [1657909433.948766][2933:2933] CHIP:DMG: ReadRequestMessage =
+          [1657909433.948809][2933:2933] CHIP:DMG: {
+          [1657909433.948844][2933:2933] CHIP:DMG:        AttributePathIBs =
+          [1657909433.948885][2933:2933] CHIP:DMG:        [
+          [1657909433.948923][2933:2933] CHIP:DMG:                AttributePathIB =
+          [1657909433.948966][2933:2933] CHIP:DMG:                {
+          [1657909433.949010][2933:2933] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909433.949063][2933:2933] CHIP:DMG:                        Cluster = 0x300,
+          [1657909433.949113][2933:2933] CHIP:DMG:                        Attribute = 0x0000_0005,
+          [1657909433.949158][2933:2933] CHIP:DMG:                }
+          [1657909433.949207][2933:2933] CHIP:DMG:
+          [1657909433.949248][2933:2933] CHIP:DMG:        ],
+          [1657909433.949292][2933:2933] CHIP:DMG:
+          [1657909433.949334][2933:2933] CHIP:DMG:        isFabricFiltered = true,
+          [1657909433.949375][2933:2933] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909433.949413][2933:2933] CHIP:DMG: },
+          [1657909433.949528][2933:2933] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909433.949656][2933:2933] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909433.949702][2933:2933] CHIP:DMG: <RE:Run> Cluster 300, Attribute 5 is dirty
+          [1657909433.949738][2933:2933] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0005 (expanded=0)
+          [1657909433.949786][2933:2933] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909433.949836][2933:2933] CHIP:DMG: AccessControl: allowed
+          [1657909433.949917][2933:2933] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label:
@@ -100,9 +234,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read compensation-text 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0006 DataVersion: 540305990
-          [1651485417.552058][3512:3517] CHIP:TOO:   compensation text:
-          [1651485417.552171][3512:3517] CHIP:EM: Sending Standalone Ack for MessageCounter:354764 on exchange 31359i
+          Verify in DUT as client side log:
+          [1657909470.827379][2933:2933] CHIP:IM: Received Read request
+          [1657909470.827505][2933:2933] CHIP:DMG: ReadRequestMessage =
+          [1657909470.827553][2933:2933] CHIP:DMG: {
+          [1657909470.827593][2933:2933] CHIP:DMG:        AttributePathIBs =
+          [1657909470.827639][2933:2933] CHIP:DMG:        [
+          [1657909470.827683][2933:2933] CHIP:DMG:                AttributePathIB =
+          [1657909470.827732][2933:2933] CHIP:DMG:                {
+          [1657909470.827782][2933:2933] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909470.827834][2933:2933] CHIP:DMG:                        Cluster = 0x300,
+          [1657909470.827904][2933:2933] CHIP:DMG:                        Attribute = 0x0000_0006,
+          [1657909470.827956][2933:2933] CHIP:DMG:                }
+          [1657909470.828008][2933:2933] CHIP:DMG:
+          [1657909470.828088][2933:2933] CHIP:DMG:        ],
+          [1657909470.828145][2933:2933] CHIP:DMG:
+          [1657909470.828192][2933:2933] CHIP:DMG:        isFabricFiltered = true,
+          [1657909470.828238][2933:2933] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909470.828280][2933:2933] CHIP:DMG: },
+          [1657909470.828411][2933:2933] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909470.828560][2933:2933] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909470.828614][2933:2933] CHIP:DMG: <RE:Run> Cluster 300, Attribute 6 is dirty
+          [1657909470.828654][2933:2933] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0006 (expanded=0)
+          [1657909470.828703][2933:2933] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909470.828757][2933:2933] CHIP:DMG: AccessControl: allowed
+          [1657909470.828845][2933:2933] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label:
@@ -111,27 +267,97 @@ tests:
       PICS: CC.C.A0007
       verification: |
           ./chip-tool colorcontrol read color-temperature 1 1
-          [1649661323.873246][8000:8005] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0007 DataVersion: 4087274515
-          [1649661323.873316][8000:8005] CHIP:TOO:   color temperature: 0
-          [1649661323.873405][8000:8005] CHIP:EM: Sending Standalone Ack for MessageCounter:16436117 on exchange 33080i
+
+          Verify in DUT as client side log:
+
+          [1657909522.420348][2977:2977] CHIP:IM: Received Read request
+          [1657909522.420471][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909522.420518][2977:2977] CHIP:DMG: {
+          [1657909522.420579][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909522.420627][2977:2977] CHIP:DMG:        [
+          [1657909522.420670][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909522.420726][2977:2977] CHIP:DMG:                {
+          [1657909522.420806][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909522.420872][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909522.420931][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0007,
+          [1657909522.420984][2977:2977] CHIP:DMG:                }
+          [1657909522.421051][2977:2977] CHIP:DMG:
+          [1657909522.421104][2977:2977] CHIP:DMG:        ],
+          [1657909522.421156][2977:2977] CHIP:DMG:
+          [1657909522.421204][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909522.421266][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909522.421310][2977:2977] CHIP:DMG: },
+          [1657909522.421455][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909522.421605][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909522.421674][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 7 is dirty
+          [1657909522.421714][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0007 (expanded=0)
+          [1657909522.421762][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909522.421816][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909522.421923][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0008) ColorMode attribute"
       PICS: CC.C.A0008
       verification: |
           ./chip-tool colorcontrol read color-mode 1 1
-          [1649661324.315688][8006:8011] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0008 DataVersion: 4087274515
-          [1649661324.315767][8006:8011] CHIP:TOO:   color mode: 2
-          [1649661324.315877][8006:8011] CHIP:EM: Sending Standalone Ack for MessageCounter:15003063 on exchange 8273i
+
+          Verify in DUT as client side log:
+          [1657909555.028998][2977:2977] CHIP:IM: Received Read request
+          [1657909555.029124][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909555.029171][2977:2977] CHIP:DMG: {
+          [1657909555.029227][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909555.029278][2977:2977] CHIP:DMG:        [
+          [1657909555.029322][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909555.029392][2977:2977] CHIP:DMG:                {
+          [1657909555.029445][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909555.029502][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909555.029575][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0008,
+          [1657909555.029631][2977:2977] CHIP:DMG:                }
+          [1657909555.029682][2977:2977] CHIP:DMG:
+          [1657909555.029744][2977:2977] CHIP:DMG:        ],
+          [1657909555.029797][2977:2977] CHIP:DMG:
+          [1657909555.029844][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909555.029890][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909555.029949][2977:2977] CHIP:DMG: },
+          [1657909555.030093][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909555.030253][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909555.030306][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 8 is dirty
+          [1657909555.030346][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0008 (expanded=0)
+          [1657909555.030394][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909555.030465][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909555.030553][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x000f) Options attribute"
       PICS: CC.C.A000f
       verification: |
           ./chip-tool colorcontrol read options 1 1
-          [1649661324.748577][8012:8017] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 4087274515
-          [1649661324.748641][8012:8017] CHIP:TOO:    Options: 0
-          [1649661324.748719][8012:8017] CHIP:EM: Sending Standalone Ack for MessageCounter:4617498 on exchange 9590i
+
+          Verify in DUT as client side log:
+          [1657909576.774655][2977:2977] CHIP:IM: Received Read request
+          [1657909576.774796][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909576.774850][2977:2977] CHIP:DMG: {
+          [1657909576.774915][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909576.774968][2977:2977] CHIP:DMG:        [
+          [1657909576.775017][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909576.775094][2977:2977] CHIP:DMG:                {
+          [1657909576.775151][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909576.775237][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909576.775303][2977:2977] CHIP:DMG:                        Attribute = 0x0000_000F,
+          [1657909576.775362][2977:2977] CHIP:DMG:                }
+          [1657909576.775443][2977:2977] CHIP:DMG:
+          [1657909576.775502][2977:2977] CHIP:DMG:        ],
+          [1657909576.775560][2977:2977] CHIP:DMG:
+          [1657909576.775615][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909576.775687][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909576.775735][2977:2977] CHIP:DMG: },
+          [1657909576.775896][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909576.776099][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909576.776178][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute f is dirty
+          [1657909576.776223][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_000F (expanded=0)
+          [1657909576.776273][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909576.776352][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909576.776452][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label:
@@ -140,9 +366,32 @@ tests:
       PICS: CC.C.A4000
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
-          [1649661325.207404][8018:8023] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4000 DataVersion: 4087274515
-          [1649661325.207486][8018:8023] CHIP:TOO:   enhanced current hue: 0
-          [1649661325.207590][8018:8023] CHIP:EM: Sending Standalone Ack for MessageCounter:2630939 on exchange 50255i
+
+          Verify in DUT as client side log:
+          [1657909627.086489][2977:2977] CHIP:IM: Received Read request
+          [1657909627.086602][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909627.086641][2977:2977] CHIP:DMG: {
+          [1657909627.086671][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909627.086706][2977:2977] CHIP:DMG:        [
+          [1657909627.086753][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909627.086800][2977:2977] CHIP:DMG:                {
+          [1657909627.086842][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909627.086898][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909627.086948][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4000,
+          [1657909627.086994][2977:2977] CHIP:DMG:                }
+          [1657909627.087049][2977:2977] CHIP:DMG:
+          [1657909627.087085][2977:2977] CHIP:DMG:        ],
+          [1657909627.087118][2977:2977] CHIP:DMG:
+          [1657909627.087181][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909627.087217][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909627.087248][2977:2977] CHIP:DMG: },
+          [1657909627.087363][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909627.087508][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909627.087569][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4000 is dirty
+          [1657909627.087601][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4000 (expanded=0)
+          [1657909627.087639][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909627.087694][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909627.087768][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -151,9 +400,32 @@ tests:
       PICS: CC.C.A4001
       verification: |
           ./chip-tool colorcontrol read enhanced-color-mode 1 1
-          [1649661325.650176][8024:8029] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4001 DataVersion: 4087274515
-          [1649661325.650248][8024:8029] CHIP:TOO:   enhanced color mode: 2
-          [1649661325.650343][8024:8029] CHIP:EM: Sending Standalone Ack for MessageCounter:11538460 on exchange 62879i
+
+          Verify in DUT as client side log:
+          [1657909652.217887][2977:2977] CHIP:IM: Received Read request
+          [1657909652.218015][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909652.218064][2977:2977] CHIP:DMG: {
+          [1657909652.218104][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909652.218173][2977:2977] CHIP:DMG:        [
+          [1657909652.218219][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909652.218269][2977:2977] CHIP:DMG:                {
+          [1657909652.218320][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909652.218399][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909652.218456][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4001,
+          [1657909652.218509][2977:2977] CHIP:DMG:                }
+          [1657909652.218578][2977:2977] CHIP:DMG:
+          [1657909652.218629][2977:2977] CHIP:DMG:        ],
+          [1657909652.218680][2977:2977] CHIP:DMG:
+          [1657909652.218744][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909652.218791][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909652.218832][2977:2977] CHIP:DMG: },
+          [1657909652.218978][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909652.219145][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909652.219198][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4001 is dirty
+          [1657909652.219254][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4001 (expanded=0)
+          [1657909652.219305][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909652.219360][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909652.219467][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -162,9 +434,32 @@ tests:
       PICS: CC.C.A4002
       verification: |
           ./chip-tool colorcontrol read color-loop-active 1 1
-          [1649661326.093373][8030:8035] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4002 DataVersion: 4087274515
-          [1649661326.093437][8030:8035] CHIP:TOO:   color loop active: 0
-          [1649661326.093510][8030:8035] CHIP:EM: Sending Standalone Ack for MessageCounter:16553834 on exchange 42935i
+
+          Verify in DUT as client side log:
+          [1657909711.352753][2977:2977] CHIP:IM: Received Read request
+          [1657909711.352915][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909711.352973][2977:2977] CHIP:DMG: {
+          [1657909711.353019][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909711.353095][2977:2977] CHIP:DMG:        [
+          [1657909711.353146][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909711.353209][2977:2977] CHIP:DMG:                {
+          [1657909711.353285][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909711.353354][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909711.353419][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4002,
+          [1657909711.353497][2977:2977] CHIP:DMG:                }
+          [1657909711.353558][2977:2977] CHIP:DMG:
+          [1657909711.353616][2977:2977] CHIP:DMG:        ],
+          [1657909711.353692][2977:2977] CHIP:DMG:
+          [1657909711.353749][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909711.353801][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909711.353849][2977:2977] CHIP:DMG: },
+          [1657909711.354014][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909711.354197][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909711.354275][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4002 is dirty
+          [1657909711.354321][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4002 (expanded=0)
+          [1657909711.354371][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909711.354448][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909711.354550][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -173,9 +468,32 @@ tests:
       PICS: CC.C.A4003
       verification: |
           ./chip-tool colorcontrol read color-loop-direction 1 1
-          [1649661326.532413][8036:8041] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4003 DataVersion: 4087274515
-          [1649661326.532493][8036:8041] CHIP:TOO:   color loop direction: 0
-          [1649661326.532584][8036:8041] CHIP:EM: Sending Standalone Ack for MessageCounter:11662576 on exchange 8707i
+
+          Verify in DUT as client side log:
+          [1657909741.232136][2977:2977] CHIP:IM: Received Read request
+          [1657909741.232261][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909741.232310][2977:2977] CHIP:DMG: {
+          [1657909741.232367][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909741.232416][2977:2977] CHIP:DMG:        [
+          [1657909741.232460][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909741.232509][2977:2977] CHIP:DMG:                {
+          [1657909741.232578][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909741.232632][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909741.232705][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4003,
+          [1657909741.232775][2977:2977] CHIP:DMG:                }
+          [1657909741.232827][2977:2977] CHIP:DMG:
+          [1657909741.232878][2977:2977] CHIP:DMG:        ],
+          [1657909741.232947][2977:2977] CHIP:DMG:
+          [1657909741.232995][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909741.233041][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909741.233105][2977:2977] CHIP:DMG: },
+          [1657909741.233240][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909741.233409][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909741.233463][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4003 is dirty
+          [1657909741.233502][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4003 (expanded=0)
+          [1657909741.233552][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909741.233623][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909741.233711][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -184,9 +502,32 @@ tests:
       PICS: CC.C.A4004
       verification: |
           ./chip-tool colorcontrol read color-loop-time 1 1
-          [1649661326.969567][8042:8047] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4004 DataVersion: 4087274515
-          [1649661326.969644][8042:8047] CHIP:TOO:   color loop time: 25
-          [1649661326.969727][8042:8047] CHIP:EM: Sending Standalone Ack for MessageCounter:4589470 on exchange 61174i
+
+          Verify in DUT as client side log:
+          [1657909771.649273][2977:2977] CHIP:IM: Received Read request
+          [1657909771.649413][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909771.649468][2977:2977] CHIP:DMG: {
+          [1657909771.649542][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909771.649600][2977:2977] CHIP:DMG:        [
+          [1657909771.649650][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909771.649725][2977:2977] CHIP:DMG:                {
+          [1657909771.649784][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909771.649853][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909771.649936][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4004,
+          [1657909771.649997][2977:2977] CHIP:DMG:                }
+          [1657909771.650055][2977:2977] CHIP:DMG:
+          [1657909771.650128][2977:2977] CHIP:DMG:        ],
+          [1657909771.650188][2977:2977] CHIP:DMG:
+          [1657909771.650243][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909771.650316][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909771.650365][2977:2977] CHIP:DMG: },
+          [1657909771.650530][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909771.650710][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909771.650770][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4004 is dirty
+          [1657909771.650814][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4004 (expanded=0)
+          [1657909771.650888][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909771.650954][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909771.651052][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -195,9 +536,32 @@ tests:
       PICS: CC.C.A4005
       verification: |
           ./chip-tool colorcontrol read color-loop-start-enhanced-hue 1 1
-          [1649661327.720397][8049:8054] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4005 DataVersion: 4087274515
-          [1649661327.720479][8049:8054] CHIP:TOO:   color loop start enhanced hue: 8960
-          [1649661327.720572][8049:8054] CHIP:EM: Sending Standalone Ack for MessageCounter:14858381 on exchange 47470i
+
+          Verify in DUT as client side log:
+          [1657909997.529812][2977:2977] CHIP:IM: Received Read request
+          [1657909997.530002][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657909997.530053][2977:2977] CHIP:DMG: {
+          [1657909997.530093][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657909997.530145][2977:2977] CHIP:DMG:        [
+          [1657909997.530189][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657909997.530243][2977:2977] CHIP:DMG:                {
+          [1657909997.530298][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657909997.530358][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657909997.530416][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4005,
+          [1657909997.530470][2977:2977] CHIP:DMG:                }
+          [1657909997.530521][2977:2977] CHIP:DMG:
+          [1657909997.530571][2977:2977] CHIP:DMG:        ],
+          [1657909997.530677][2977:2977] CHIP:DMG:
+          [1657909997.530708][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657909997.530737][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657909997.530821][2977:2977] CHIP:DMG: },
+          [1657909997.530943][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657909997.531048][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657909997.531081][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4005 is dirty
+          [1657909997.531105][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4005 (expanded=0)
+          [1657909997.531139][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657909997.531175][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657909997.531238][2977:2977] CHIP:DMG: <RE> Sending report (payload has 39 bytes)...
       disabled: true
 
     - label:
@@ -206,18 +570,64 @@ tests:
       PICS: CC.C.A4006
       verification: |
           ./chip-tool colorcontrol read color-loop-stored-enhanced-hue 1 1
-          [1649661328.161450][8055:8060] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4006 DataVersion: 4087274515
-          [1649661328.161530][8055:8060] CHIP:TOO:   color loop stored enhanced hue: 0
-          [1649661328.161618][8055:8060] CHIP:EM: Sending Standalone Ack for MessageCounter:10650326 on exchange 16955i
+
+          Verify in DUT as client side log:
+          [1657910020.977065][2977:2977] CHIP:IM: Received Read request
+          [1657910020.977155][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910020.977187][2977:2977] CHIP:DMG: {
+          [1657910020.977213][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910020.977249][2977:2977] CHIP:DMG:        [
+          [1657910020.977277][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910020.977313][2977:2977] CHIP:DMG:                {
+          [1657910020.977349][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910020.977390][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910020.977432][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4006,
+          [1657910020.977470][2977:2977] CHIP:DMG:                }
+          [1657910020.977499][2977:2977] CHIP:DMG:
+          [1657910020.977524][2977:2977] CHIP:DMG:        ],
+          [1657910020.977556][2977:2977] CHIP:DMG:
+          [1657910020.977587][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910020.977619][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910020.977646][2977:2977] CHIP:DMG: },
+          [1657910020.977738][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910020.977852][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910020.977889][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4006 is dirty
+          [1657910020.977913][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4006 (expanded=0)
+          [1657910020.977947][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910020.977985][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910020.978052][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x400a) ColorCapabilities attribute"
       PICS: CC.C.A400a
       verification: |
           ./chip-tool colorcontrol read color-capabilities 1 1
-          [1649661328.603843][8061:8066] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400A DataVersion: 4087274515
-          [1649661328.603925][8061:8066] CHIP:TOO:   color capabilities: 0
-          [1649661328.604011][8061:8066] CHIP:EM: Sending Standalone Ack for MessageCounter:9437585 on exchange 42028i
+
+          Verify in DUT as client side log:
+          [1657910072.897195][2977:2977] CHIP:IM: Received Read request
+          [1657910072.897323][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910072.897371][2977:2977] CHIP:DMG: {
+          [1657910072.897411][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910072.897459][2977:2977] CHIP:DMG:        [
+          [1657910072.897502][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910072.897552][2977:2977] CHIP:DMG:                {
+          [1657910072.897604][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910072.897662][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910072.897718][2977:2977] CHIP:DMG:                        Attribute = 0x0000_400A,
+          [1657910072.897766][2977:2977] CHIP:DMG:                }
+          [1657910072.897818][2977:2977] CHIP:DMG:
+          [1657910072.897865][2977:2977] CHIP:DMG:        ],
+          [1657910072.897916][2977:2977] CHIP:DMG:
+          [1657910072.897963][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910072.898010][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910072.898053][2977:2977] CHIP:DMG: },
+          [1657910072.898187][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910072.898330][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910072.898381][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 400a is dirty
+          [1657910072.898420][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_400A (expanded=0)
+          [1657910072.898470][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910072.898525][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910072.898615][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -226,10 +636,32 @@ tests:
       PICS: CC.C.A400b
       verification: |
           ./chip-tool colorcontrol read color-temp-physical-min-mireds  1 1
-          [1649661329.039107][8067:8072] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400B DataVersion: 4087274515
-          [1649661329.039188][8067:8072] CHIP:TOO:  ColorTempPhysicalMinMireds: 0
 
-          [1649661329.039388][8067:8072] CHIP:EM: Sending Standalone Ack for MessageCounter:511360 on exchange 35476i
+          Verify in DUT as client side log:
+          [1657910109.902989][2977:2977] CHIP:IM: Received Read request
+          [1657910109.903095][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910109.903134][2977:2977] CHIP:DMG: {
+          [1657910109.903161][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910109.903199][2977:2977] CHIP:DMG:        [
+          [1657910109.903234][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910109.903274][2977:2977] CHIP:DMG:                {
+          [1657910109.903315][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910109.903367][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910109.903413][2977:2977] CHIP:DMG:                        Attribute = 0x0000_400B,
+          [1657910109.903455][2977:2977] CHIP:DMG:                }
+          [1657910109.903496][2977:2977] CHIP:DMG:
+          [1657910109.903533][2977:2977] CHIP:DMG:        ],
+          [1657910109.903574][2977:2977] CHIP:DMG:
+          [1657910109.903612][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910109.903649][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910109.903683][2977:2977] CHIP:DMG: },
+          [1657910109.903792][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910109.903912][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910109.903956][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 400b is dirty
+          [1657910109.903989][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_400B (expanded=0)
+          [1657910109.904030][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910109.904110][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910109.904190][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -239,11 +671,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-temp-physical-max-mireds 1 1
 
-
-          [1649661329.475308][8073:8078] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400C DataVersion: 4087274515
-          [1649661329.475388][8073:8078] CHIP:TOO: ColorTempPhysicalMaxMireds: 65279
-
-          [1649661329.475476][8073:8078] CHIP:EM: Sending Standalone Ack for MessageCounter:14879622 on exchange 59016i
+          Verify in DUT as client side log:
+          [1657910176.514563][2977:2977] CHIP:IM: Received Read request
+          [1657910176.514690][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910176.514738][2977:2977] CHIP:DMG: {
+          [1657910176.514779][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910176.514826][2977:2977] CHIP:DMG:        [
+          [1657910176.514869][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910176.514919][2977:2977] CHIP:DMG:                {
+          [1657910176.514970][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910176.515028][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910176.515084][2977:2977] CHIP:DMG:                        Attribute = 0x0000_400C,
+          [1657910176.515137][2977:2977] CHIP:DMG:                }
+          [1657910176.515188][2977:2977] CHIP:DMG:
+          [1657910176.515238][2977:2977] CHIP:DMG:        ],
+          [1657910176.515289][2977:2977] CHIP:DMG:
+          [1657910176.515336][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910176.515382][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910176.515418][2977:2977] CHIP:DMG: },
+          [1657910176.515548][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910176.515692][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910176.515743][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 400c is dirty
+          [1657910176.515782][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_400C (expanded=0)
+          [1657910176.515828][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910176.515881][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910176.515971][2977:2977] CHIP:DMG: <RE> Sending report (payload has 39 bytes)...
       disabled: true
 
     - label:
@@ -252,9 +704,32 @@ tests:
       PICS: CC.C.A400d
       verification: |
           ./chip-tool colorcontrol read couple-color-temp-to-level-min-mireds 1 1
-          [1649661329.915861][8079:8084] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_400D DataVersion: 4087274515
-          [1649661329.915947][8079:8084] CHIP:TOO:   couple color temp to level min-mireds: 0
-          [1649661329.916065][8079:8084] CHIP:EM: Sending Standalone Ack for MessageCounter:1722601 on exchange 3570i
+
+          Verify in DUT as client side log:
+          [1657910205.278279][2977:2977] CHIP:IM: Received Read request
+          [1657910205.278421][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910205.278474][2977:2977] CHIP:DMG: {
+          [1657910205.278520][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910205.278578][2977:2977] CHIP:DMG:        [
+          [1657910205.278628][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910205.278684][2977:2977] CHIP:DMG:                {
+          [1657910205.278743][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910205.278809][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910205.278874][2977:2977] CHIP:DMG:                        Attribute = 0x0000_400D,
+          [1657910205.279008][2977:2977] CHIP:DMG:                }
+          [1657910205.279068][2977:2977] CHIP:DMG:
+          [1657910205.279122][2977:2977] CHIP:DMG:        ],
+          [1657910205.279180][2977:2977] CHIP:DMG:
+          [1657910205.279234][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910205.279328][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910205.279380][2977:2977] CHIP:DMG: },
+          [1657910205.279527][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910205.279685][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910205.279920][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 400d is dirty
+          [1657910205.279968][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_400D (expanded=0)
+          [1657910205.280139][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910205.280211][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910205.280314][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label:
@@ -263,18 +738,64 @@ tests:
       PICS: CC.C.A4010
       verification: |
           ./chip-tool colorcontrol read start-up-color-temperature-mireds 1 1
-          [1649661330.348224][8085:8090] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4010 DataVersion: 4087274515
-          [1649661330.348301][8085:8090] CHIP:TOO:   start up color temperature mireds: 0
-          [1649661330.348390][8085:8090] CHIP:EM: Sending Standalone Ack for MessageCounter:15367381 on exchange 8592i
+
+          Verify in DUT as client side log:
+          [1657910246.097315][2977:2977] CHIP:IM: Received Read request
+          [1657910246.097460][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910246.097516][2977:2977] CHIP:DMG: {
+          [1657910246.097562][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910246.097616][2977:2977] CHIP:DMG:        [
+          [1657910246.097666][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910246.097728][2977:2977] CHIP:DMG:                {
+          [1657910246.097790][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910246.097852][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910246.097916][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4010,
+          [1657910246.097982][2977:2977] CHIP:DMG:                }
+          [1657910246.098045][2977:2977] CHIP:DMG:
+          [1657910246.098099][2977:2977] CHIP:DMG:        ],
+          [1657910246.098158][2977:2977] CHIP:DMG:
+          [1657910246.098213][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910246.098266][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910246.098315][2977:2977] CHIP:DMG: },
+          [1657910246.098461][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910246.098624][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910246.098684][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4010 is dirty
+          [1657910246.098728][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4010 (expanded=0)
+          [1657910246.098785][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910246.098846][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910246.098946][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0010) NumberOfPrimaries attribute"
       PICS: CC.C.A0010
       verification: |
           ./chip-tool colorcontrol read number-of-primaries 1 1
-          [1649661330.790716][8091:8096] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0010 DataVersion: 4087274515
-          [1649661330.790792][8091:8096] CHIP:TOO:   number of primaries: 0
-          [1649661330.790894][8091:8096] CHIP:EM: Sending Standalone Ack for MessageCounter:4700740 on exchange 8440i
+
+          Verify in DUT as client side log:
+          [1657910445.890552][2977:2977] CHIP:IM: Received Read request
+          [1657910445.890635][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910445.890664][2977:2977] CHIP:DMG: {
+          [1657910445.890686][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910445.890713][2977:2977] CHIP:DMG:        [
+          [1657910445.890737][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910445.890764][2977:2977] CHIP:DMG:                {
+          [1657910445.890792][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910445.890830][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910445.890867][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0010,
+          [1657910445.890896][2977:2977] CHIP:DMG:                }
+          [1657910445.890924][2977:2977] CHIP:DMG:
+          [1657910445.890950][2977:2977] CHIP:DMG:        ],
+          [1657910445.890978][2977:2977] CHIP:DMG:
+          [1657910445.891006][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910445.891031][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910445.891054][2977:2977] CHIP:DMG: },
+          [1657910445.891135][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910445.891242][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910445.891275][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 10 is dirty
+          [1657910445.891297][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0010 (expanded=0)
+          [1657910445.891327][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910445.891361][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910445.891422][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0011) Primary1X attribute"
@@ -282,10 +803,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read  primary1x 1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0011 DataVersion: 540305990
-          [1651483665.109697][3245:3250] CHIP:TOO:   primary 1 x: 0
-          [1651483665.109797][3245:3250] CHIP:EM: Sending Standalone Ack for MessageCounter:12731123 on exchange 55053i
+          Verify in DUT as client side log:
+          [1657910568.808716][2977:2977] CHIP:IM: Received Read request
+          [1657910568.808876][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910568.809073][2977:2977] CHIP:DMG: {
+          [1657910568.809131][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910568.809193][2977:2977] CHIP:DMG:        [
+          [1657910568.809243][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910568.809308][2977:2977] CHIP:DMG:                {
+          [1657910568.809375][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910568.809461][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910568.809539][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0011,
+          [1657910568.809621][2977:2977] CHIP:DMG:                }
+          [1657910568.809691][2977:2977] CHIP:DMG:
+          [1657910568.809754][2977:2977] CHIP:DMG:        ],
+          [1657910568.809823][2977:2977] CHIP:DMG:
+          [1657910568.809886][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910568.809950][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910568.810007][2977:2977] CHIP:DMG: },
+          [1657910568.810175][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910568.810365][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910568.810433][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 11 is dirty
+          [1657910568.810484][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0011 (expanded=0)
+          [1657910568.810548][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910568.810618][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910568.810719][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0012) Primary1Y attribute"
@@ -293,9 +835,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read  primary1y 1 1
 
-           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0012 DataVersion: 540305990
-          [1651483698.733322][3253:3259] CHIP:TOO:   primary 1 y: 0
-          [1651483698.733420][3253:3259] CHIP:EM: Sending Standalone Ack for MessageCounter:7863787 on exchange 13103i
+          Verify in DUT as client side log:
+          [1657910588.961223][2977:2977] CHIP:IM: Received Read request
+          [1657910588.961366][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910588.961422][2977:2977] CHIP:DMG: {
+          [1657910588.961468][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910588.961522][2977:2977] CHIP:DMG:        [
+          [1657910588.961572][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910588.961633][2977:2977] CHIP:DMG:                {
+          [1657910588.961692][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910588.961757][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910588.961828][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0012,
+          [1657910588.961895][2977:2977] CHIP:DMG:                }
+          [1657910588.961955][2977:2977] CHIP:DMG:
+          [1657910588.962012][2977:2977] CHIP:DMG:        ],
+          [1657910588.962070][2977:2977] CHIP:DMG:
+          [1657910588.962125][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910588.962177][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910588.962226][2977:2977] CHIP:DMG: },
+          [1657910588.962370][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910588.962529][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910588.962715][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 12 is dirty
+          [1657910588.962764][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0012 (expanded=0)
+          [1657910588.962822][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910588.962885][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910588.962985][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0013) Primary1Intensity attribute"
@@ -303,10 +867,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary1intensity 1 1
 
-
-           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0013 DataVersion: 540305990
-          [1651483742.297459][3263:3268] CHIP:TOO:   primary 1 intensity: 0
-          [1651483742.297558][3263:3268] CHIP:EM: Sending Standalone Ack for MessageCounter:10210809 on exchange 7007i
+          Verify in DUT as client side log:
+          [1657910622.925613][2977:2977] CHIP:IM: Received Read request
+          [1657910622.925739][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910622.925788][2977:2977] CHIP:DMG: {
+          [1657910622.925827][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910622.925874][2977:2977] CHIP:DMG:        [
+          [1657910622.925918][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910622.925973][2977:2977] CHIP:DMG:                {
+          [1657910622.926028][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910622.926088][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910622.926144][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0013,
+          [1657910622.926197][2977:2977] CHIP:DMG:                }
+          [1657910622.926249][2977:2977] CHIP:DMG:
+          [1657910622.926359][2977:2977] CHIP:DMG:        ],
+          [1657910622.926413][2977:2977] CHIP:DMG:
+          [1657910622.926572][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910622.926623][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910622.926718][2977:2977] CHIP:DMG: },
+          [1657910622.926850][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910622.926998][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910622.927049][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 13 is dirty
+          [1657910622.927137][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0013 (expanded=0)
+          [1657910622.927192][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910622.927246][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910622.927384][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0015) Primary2X attribute"
@@ -314,9 +899,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2x 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0015 DataVersion: 540305990
-          [1651483777.233498][3270:3275] CHIP:TOO:   primary 2 x: 0
-          [1651483777.233614][3270:3275] CHIP:EM: Sending Standalone Ack for MessageCounter:1684573 on exchange 21377i
+          Verify in DUT as client side log:
+          [1657910659.885682][2977:2977] CHIP:IM: Received Read request
+          [1657910659.885821][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910659.885876][2977:2977] CHIP:DMG: {
+          [1657910659.885922][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910659.885976][2977:2977] CHIP:DMG:        [
+          [1657910659.886027][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910659.886089][2977:2977] CHIP:DMG:                {
+          [1657910659.886151][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910659.886215][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910659.886287][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0015,
+          [1657910659.886354][2977:2977] CHIP:DMG:                }
+          [1657910659.886414][2977:2977] CHIP:DMG:
+          [1657910659.886467][2977:2977] CHIP:DMG:        ],
+          [1657910659.886526][2977:2977] CHIP:DMG:
+          [1657910659.886581][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910659.886633][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910659.886803][2977:2977] CHIP:DMG: },
+          [1657910659.886955][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910659.887119][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910659.887178][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 15 is dirty
+          [1657910659.887222][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0015 (expanded=0)
+          [1657910659.887278][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910659.887339][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910659.887439][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0016) Primary2Y attribute"
@@ -324,10 +931,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2y 1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0016 DataVersion: 540305990
-          [1651483805.650796][3279:3284] CHIP:TOO:   primary 2 y: 0
-          [1651483805.650942][3279:3284] CHIP:EM: Sending Standalone Ack for MessageCounter:16277541 on exchange 10435i
+          Verify in DUT as client side log:
+          [1657910687.168648][2977:2977] CHIP:IM: Received Read request
+          [1657910687.168754][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910687.168793][2977:2977] CHIP:DMG: {
+          [1657910687.168825][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910687.168863][2977:2977] CHIP:DMG:        [
+          [1657910687.168898][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910687.168937][2977:2977] CHIP:DMG:                {
+          [1657910687.168979][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910687.169032][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910687.169078][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0016,
+          [1657910687.169114][2977:2977] CHIP:DMG:                }
+          [1657910687.169157][2977:2977] CHIP:DMG:
+          [1657910687.169196][2977:2977] CHIP:DMG:        ],
+          [1657910687.169237][2977:2977] CHIP:DMG:
+          [1657910687.169275][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910687.169312][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910687.169346][2977:2977] CHIP:DMG: },
+          [1657910687.169453][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910687.169572][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910687.169613][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 16 is dirty
+          [1657910687.169645][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0016 (expanded=0)
+          [1657910687.169685][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910687.169731][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910687.169804][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0017) Primary2Intensity attribute"
@@ -335,10 +963,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary2intensity 1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0017 DataVersion: 540305990
-          [1651483834.596380][3285:3290] CHIP:TOO:   primary 2 intensity: 0
-          [1651483834.596470][3285:3290] CHIP:EM: Sending Standalone Ack for MessageCounter:5986355 on exchange 855i
+          Verify in DUT as client side log:
+          [1657910837.125032][2977:2977] CHIP:IM: Received Read request
+          [1657910837.125157][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657910837.125206][2977:2977] CHIP:DMG: {
+          [1657910837.125246][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657910837.125293][2977:2977] CHIP:DMG:        [
+          [1657910837.125337][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657910837.125387][2977:2977] CHIP:DMG:                {
+          [1657910837.125438][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657910837.125502][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657910837.125559][2977:2977] CHIP:DMG:                        Attribute = 0x0000_0017,
+          [1657910837.125613][2977:2977] CHIP:DMG:                }
+          [1657910837.125664][2977:2977] CHIP:DMG:
+          [1657910837.125711][2977:2977] CHIP:DMG:        ],
+          [1657910837.125762][2977:2977] CHIP:DMG:
+          [1657910837.125810][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657910837.125856][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657910837.125898][2977:2977] CHIP:DMG: },
+          [1657910837.126026][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657910837.126169][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657910837.126221][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 17 is dirty
+          [1657910837.126259][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_0017 (expanded=0)
+          [1657910837.126309][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657910837.126365][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657910837.126452][2977:2977] CHIP:DMG: <RE> Sending report (payload has 37 bytes)...
       disabled: true
 
     - label: "DUT reads from the TH the (0x0019) Primary3X attribute"
@@ -346,10 +995,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3x 1 1
 
-
-           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0019 DataVersion: 540305990
-          [1651483937.072323][3298:3303] CHIP:TOO:   primary 3 x: 0
-          [1651483937.072405][3298:3303] CHIP:EM: Sending Standalone Ack for MessageCounter:6092298 on exchange 12519i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0019,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x001a) Primary3Y attribute"
@@ -357,9 +1020,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3y 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001A DataVersion: 540305990
-          [1651483967.386334][3305:3310] CHIP:TOO:   primary 3 y: 0
-          [1651483967.386427][3305:3310] CHIP:EM: Sending Standalone Ack for MessageCounter:3329418 on exchange 11657i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300
+          CHIP:DMG:                        Attribute = 0x0000_001A,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x001b) Primary3Intensity attribute"
@@ -367,9 +1045,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary3intensity 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_001B DataVersion: 540305990
-          [1651484113.812178][3316:3321] CHIP:TOO:   primary 3 intensity: 0
-          [1651484113.812270][3316:3321] CHIP:EM: Sending Standalone Ack for MessageCounter:41658 on exchange 9618i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_001B,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0020) Primary4X attribute"
@@ -377,9 +1070,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4x 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0020 DataVersion: 540305990
-          [1651484143.778301][3324:3329] CHIP:TOO:   primary 4 x: 0
-          [1651484143.778392][3324:3329] CHIP:EM: Sending Standalone Ack for MessageCounter:2094184 on exchange 50270i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0020,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0021) Primary4Y attribute"
@@ -387,9 +1095,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4y 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0021 DataVersion: 540305990
-          [1651484171.921901][3334:3339] CHIP:TOO:   primary 4 y: 0
-          [1651484171.921984][3334:3339] CHIP:EM: Sending Standalone Ack for MessageCounter:3701827 on exchange 16726i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0021,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0022) Primary4Intensity attribute"
@@ -397,9 +1120,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary4intensity 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0022 DataVersion: 540305990
-          [1651484198.443415][3341:3346] CHIP:TOO:   primary 4 intensity: 0
-          [1651484198.443528][3341:3346] CHIP:EM: Sending Standalone Ack for MessageCounter:1740063 on exchange 36245i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0022,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0024) Primary5X attribute"
@@ -407,9 +1145,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5x 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0024 DataVersion: 540305990
-          [1651484241.467661][3350:3355] CHIP:TOO:   primary 5 x: 0
-          [1651484241.467788][3350:3355] CHIP:EM: Sending Standalone Ack for MessageCounter:5350139 on exchange 63040i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0024,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0025) Primary5Y attribute"
@@ -417,10 +1170,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5y 1 1
 
-
-           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0025 DataVersion: 540305990
-          [1651484286.709863][3358:3363] CHIP:TOO:   primary 5 y: 0
-          [1651484286.709964][3358:3363] CHIP:EM: Sending Standalone Ack for MessageCounter:7199124 on exchange 47604i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0025,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0026) Primary5Intensity attribute"
@@ -428,10 +1195,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary5intensity 1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0026 DataVersion: 540305990
-          [1651484304.715731][3365:3370] CHIP:TOO:   primary 5 intensity: 0
-          [1651484304.715829][3365:3370] CHIP:EM: Sending Standalone Ack for MessageCounter:8654922 on exchange 29272i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0026,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0028) Primary6X attribute"
@@ -439,10 +1220,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6x 1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
-          [1651484349.601181][3372:3377] CHIP:TOO:   primary 6 x: 0
-          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0028,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x0029) Primary6Y attribute"
@@ -450,9 +1245,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6y 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0028 DataVersion: 540305990
-          [1651484349.601181][3372:3377] CHIP:TOO:   primary 6 x: 0
-          [1651484349.601269][3372:3377] CHIP:EM: Sending Standalone Ack for MessageCounter:13704291 on exchange 30507i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0029,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the (0x002a) Primary6Intensity attribute"
@@ -460,9 +1270,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read primary6intensity 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_002A DataVersion: 540305990
-          [1651484392.490974][3378:3383] CHIP:TOO:   primary 6 intensity: 0
-          [1651484392.491074][3378:3383] CHIP:EM: Sending Standalone Ack for MessageCounter:2427165 on exchange 17769i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_002a,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the Optional (0x0030) WhitePointX attribute"
@@ -470,10 +1295,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read white-point-x   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0030 DataVersion: 540305990
-          [1651484447.853097][3389:3394] CHIP:TOO:   white point x: 0
-          [1651484447.853201][3389:3394] CHIP:EM: Sending Standalone Ack for MessageCounter:2187963 on exchange 39418i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0030,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label: "DUT reads from the TH the Optional (0x0031) WhitePointY attribute"
@@ -481,9 +1320,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read white-point-y 1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0031 DataVersion: 540305990
-          [1651484493.098722][3397:3402] CHIP:TOO:   white point y: 0
-          [1651484493.098838][3397:3402] CHIP:EM: Sending Standalone Ack for MessageCounter:13416692 on exchange 58975i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0031,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -492,10 +1346,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-rx   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0032 DataVersion: 540305990
-          [1651484549.019811][3407:3412] CHIP:TOO:   color point r x: 0
-          [1651484549.019946][3407:3412] CHIP:EM: Sending Standalone Ack for MessageCounter:3393967 on exchange 29393i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0032,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -504,10 +1372,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-ry   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0033 DataVersion: 540305990
-          [1651484569.809289][3413:3418] CHIP:TOO:   color point r y: 0
-          [1651484569.809368][3413:3418] CHIP:EM: Sending Standalone Ack for MessageCounter:5190611 on exchange 55680i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0033,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -517,10 +1399,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-rintensity   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0034 DataVersion: 540305990
-          [1651484618.450366][3424:3429] CHIP:TOO:   color point r intensity: 0
-          [1651484618.450496][3424:3429] CHIP:EM: Sending Standalone Ack for MessageCounter:7795217 on exchange 46127i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0034,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -529,10 +1425,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-gx   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0036 DataVersion: 540305990
-          [1651484661.163449][3438:3443] CHIP:TOO:   color point g x: 0
-          [1651484661.163534][3438:3443] CHIP:EM: Sending Standalone Ack for MessageCounter:8020365 on exchange 14427i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0036,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -541,10 +1451,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-gy   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0037 DataVersion: 540305990
-          [1651484675.995507][3444:3449] CHIP:TOO:   color point g y: 0
-          [1651484675.995585][3444:3449] CHIP:EM: Sending Standalone Ack for MessageCounter:5358119 on exchange 45686i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0037,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -554,10 +1478,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-gintensity   1 1
 
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0038 DataVersion: 540305990
-          [1651484700.811165][3451:3456] CHIP:TOO:   color point g intensity: 0
-          [1651484700.811283][3451:3456] CHIP:EM: Sending Standalone Ack for MessageCounter:3831934 on exchange 46053i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_0038,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -566,9 +1504,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-bx   1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_003A DataVersion: 540305990
-          [1651484728.014850][3459:3464] CHIP:TOO:   color point b x: 0
-          [1651484728.014978][3459:3464] CHIP:EM: Sending Standalone Ack for MessageCounter:16345213 on exchange 13i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_003a,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -577,9 +1530,24 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-by   1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_003B DataVersion: 540305990
-          [1651484766.975812][3469:3474] CHIP:TOO:   color point b y: 0
-          [1651484766.975908][3469:3474] CHIP:EM: Sending Standalone Ack for MessageCounter:13904476 on exchange 17909i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_003b,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true
 
     - label:
@@ -589,7 +1557,22 @@ tests:
       verification: |
           ./chip-tool colorcontrol read color-point-bintensity   1 1
 
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_003B DataVersion: 540305990
-          [1651484766.975812][3469:3474] CHIP:TOO:   color point b y: 0
-          [1651484766.975908][3469:3474] CHIP:EM: Sending Standalone Ack for MessageCounter:13904476 on exchange 17909i
+          Verify in DUT as client side log:
+          CHIP:IM: Received Read request
+          CHIP:DMG: ReadRequestMessage =
+          CHIP:DMG: {
+          CHIP:DMG:        AttributePathIBs =
+          CHIP:DMG:        [
+          CHIP:DMG:                AttributePathIB =
+          CHIP:DMG:                {
+          CHIP:DMG:                        Endpoint = 0x1,
+          CHIP:DMG:                        Cluster = 0x300,
+          CHIP:DMG:                        Attribute = 0x0000_003c,
+          CHIP:DMG:                }
+          CHIP:DMG:
+          CHIP:DMG:        ],
+          CHIP:DMG:
+          CHIP:DMG:        isFabricFiltered = true,
+          CHIP:DMG:        InteractionModelRevision = 1
+          CHIP:DMG: },
       disabled: true

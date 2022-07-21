@@ -27,7 +27,7 @@ tests:
           "Commissioner has regulatory and fabric information available and has
           accurate date, time and timezone"
       verification: |
-
+          1. Manually verify that the time, date and timezone is accurate for the DUT Commissioner
       disabled: true
 
     - label:
@@ -39,7 +39,6 @@ tests:
           On DUT: start commissioning process(need to obtain the Thread dataset first)
 
           ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd27e57b1b1e22d9051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f01021234041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
-          ,,
       disabled: true
 
     - label:
@@ -63,8 +62,14 @@ tests:
           Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
-          On DUT:
-          CHIP:CTL: Setting Regulatory Config
+          Verify on DUT Log:
+
+          Performing next commissioning step 'ConfigRegulatory'
+          [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
+          [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
+
+          Verify on TH:
+           NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
     - label:
@@ -380,7 +385,14 @@ tests:
           Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
-          Need test step review, potentially not a hard requirement so would not be required in test case
+          Verify on DUT Log:
+
+          Performing next commissioning step 'ConfigRegulatory'
+          [1653471968.202645][30157:30162] CHIP:CTL: Setting Regulatory Config
+          [1653471968.202666][30157:30162] CHIP:CTL: No regulatory config supplied by controller, leaving as device default (0)
+
+          Verify on TH:
+           NVS set: chip-config/regulatory-location = 0 (0x0)
       disabled: true
 
     - label:
