@@ -358,7 +358,7 @@ chip_python_wheel_action("chip-clusters") {
   py_package_name = "chip-clusters"
   py_platform_tag = "any"
 
-  output_name = "chip_clusters-${chip_python_version}-py3-any.whl"
+  output_name = "chip_clusters-${chip_python_version}-py3-none-any.whl"
 }
 
 chip_python_wheel_action("chip-repl") {
@@ -406,5 +406,5 @@ chip_python_wheel_action("chip-repl") {
     ":chip-core",
   ]
 
-  output_name = "chip_repl-${chip_python_version}-py3-any.whl"
+  output_name = "chip_repl-${chip_python_version}-py3-none-any.whl"
 }
