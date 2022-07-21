@@ -134,7 +134,6 @@ private:
     bool StartScanWiFiNetworks(ByteSpan ssid);
     static void OnScanWiFiNetworkDone(wfx_wifi_scan_result_t * aScanResult);
 
-    WiFiNetworkIterator mWiFiIterator = WiFiNetworkIterator(this);
     WiFiNetwork mSavedNetwork         = {};
     WiFiNetwork mStagingNetwork       = {};
     ScanCallback * mpScanCallback;
