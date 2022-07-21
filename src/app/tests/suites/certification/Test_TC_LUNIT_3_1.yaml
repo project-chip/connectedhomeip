@@ -39,56 +39,50 @@ tests:
           constraints:
               type: uint8
 
-    - label: "TH writes 0 to TemperatureUnit attribute"
+    - label: "TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Fahrenheit
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
       arguments:
-          value: 0 # Fahrenheit
+          value: 0
 
     - label: "TH reads TemperatureUnit attribute"
       PICS: LUNIT.C.A0000
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
-          constraints:
-              value: 0
-              type: uint8
+          value: 0
 
-    - label: "TH writes 1 to TemperatureUnit attribute"
+    - label: "TH writes 1 (Celsius) to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Celsius
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
       arguments:
-          value: 1 # Celsius
+          value: 1
 
     - label: "TH reads TemperatureUnit attribute"
       PICS: LUNIT.C.A0000
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
-          constraints:
-              value: 1
-              type: uint8
+          value: 1
 
-    - label: "TH writes 2 to TemperatureUnit attribute"
+    - label: "TH writes 2 (Kelvin) to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000.Kelvin
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
       arguments:
-          value: 2 # Kelvin
+          value: 2
 
     - label: "TH reads TemperatureUnit attribute"
       PICS: LUNIT.C.A0000
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
-          constraints:
-              value: 2
-              type: uint8
+          value: 2
 
     - label: "TH writes 5 to TemperatureUnit attribute"
       PICS: LUNIT.C.A0000

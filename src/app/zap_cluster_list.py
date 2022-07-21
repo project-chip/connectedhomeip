@@ -83,7 +83,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TIME_CLUSTER': [],
     'TIME_FORMAT_LOCALIZATION_CLUSTER': ['time-format-localization-server'],
     'TIME_SYNCHRONIZATION_CLUSTER': [],
-    'UNIT_LOCALIZATION_CLUSTER': ['unit-localization'],
+    'UNIT_LOCALIZATION_CLUSTER': [],
     'USER_LABEL_CLUSTER': ['user-label-server'],
     'WAKE_ON_LAN_CLUSTER': ['wake-on-lan-server'],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': ['wifi-network-diagnostics-server'],
