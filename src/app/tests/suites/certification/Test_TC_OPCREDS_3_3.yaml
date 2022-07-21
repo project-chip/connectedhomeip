@@ -24,6 +24,7 @@ tests:
     - label:
           "Factory Reset DUT (to ensure NOC list is empty at the beginning of
           the following steps)"
+      PICS: MCORE.FACTORY_RESET
       verification: |
           On both DUT and TH side
           sudo rm -rf /tmp/chip_*

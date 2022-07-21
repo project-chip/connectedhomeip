@@ -41,12 +41,12 @@ tests:
           [1653306603.740798][13293:13293] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1653306603.740846][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
           [1653306603.740877][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653306603.740898][13293:13293] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          [1653306603.740898][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
           [1653306603.740929][13293:13293] CHIP:SVR: Manual pairing code: [34970112332]
           [1653306603.740951][13293:13293] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1653306603.741000][13293:13293] CHIP:SVR: SetupQRCode: [MT:-24J0YXE00KA0648G00]
           [1653306603.741028][13293:13293] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653306603.741049][13293:13293] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
+          [1653306603.741049][13293:13293] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0YXE00KA0648G00
           [1653306603.741081][13293:13293] CHIP:SVR: Manual pairing code: [749701123365521327694]
 
           CHIP:DL:   Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3841 (0xF01)
@@ -54,17 +54,18 @@ tests:
           CHIP:DL:   Device Type: 65535 (0xFFFF)
           CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
           CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
           CHIP:SVR: Manual pairing code: [34970112332]
           CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
            CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-           CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+           CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
 
 
 
           2. Parse the DUT's QR Code using the TH commissioner: chip-tool
           ubuntu@matter-7:~/Apr18_cntrl/connectedhomeip/examples/chip-tool/out/debug$ ./chip-tool payload parse-setup-payload MT:-24J048N01KA0648G00
 
+          Verify in DUT as client side:
           [1650266365.939678][10146:10146] CHIP:SPL: CommissioningFlow: 2
           [1650266365.939704][10146:10146] CHIP:SPL: VendorID: 65521
           [1650266365.939724][10146:10146] CHIP:SPL: Version: 0
@@ -80,6 +81,7 @@ tests:
       verification: |
           ./chip-tool pairing code 1 MT:-24J042C00KA0648G00
 
+          Verify in DUT as client side:
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
           CHIP:CTL: Received CommissioningComplete response, errorCode=0
           CHIP:CTL: Successfully finished commissioning step 'SendComplete'
@@ -88,4 +90,37 @@ tests:
           CHIP:CTL: Successfully finished commissioning step 'Cleanup'
           CHIP:TOO: Device commissioning completed with success
           CHIP:DMG: ICR moving to [AwaitingDe]
+      disabled: true
+
+    - label:
+          'Scan the TH Devices QR code (that includes the additional TLV data)
+          using DUT. Using the example provided above, the payload would be
+          "MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40".'
+      PICS: MCORE.DD.SCAN_QR_CODE
+      verification: |
+          1. Get QR code from TH as server side:
+          $ ./out/all-clusters-app/chip-all-clusters-app
+          ...
+          [1657211128.302755][365927:365927] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
+          [1657211128.302783][365927:365927] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
+          [1657211128.302804][365927:365927] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
+
+          2. Build TLV Data into TH's QR code
+          $ ./chip-tool payload generate-qrcode --existing-payload MT:-24J029Q00KA0648G00 --tlvBytes hex:152C000A3132333435363738393018
+          [1657211213125] [28612:16578643] CHIP: [TOO] QR Code: MT:-24J029Q00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40
+      disabled: true
+
+    - label:
+          "Using the DUT, parse the THs QR code to onboard the TH Device onto
+          the Matter network."
+      verification: |
+          ./chip-tool pairing code 1 MT:-24J0AFN00KA064IJ3P0IXZB0DK5N1K8SQ1RYCU1-A40
+
+          Verify in DUT as client side:
+          [1657210956708] [28601:16575811] CHIP: [CTL] Received CommissioningComplete response, errorCode=0
+          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
+          [1657210956708] [28601:16575811] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1657210956708] [28601:16575811] CHIP: [CTL] Performing next commissioning step 'Cleanup'
+          [1657210956708] [28601:16575811] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657210956709] [28601:16575811] CHIP: [TOO] Device commissioning completed with success
       disabled: true

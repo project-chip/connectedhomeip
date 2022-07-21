@@ -27,39 +27,39 @@ tests:
       PICS: CC.C.C40.Rsp
       verification: |
           ./chip-tool colorcontrol enhanced-move-to-hue 1000 3 200 0 0 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100403.798306][4293:4298] CHIP:DMG: InvokeResponseMessage =
-          [1657100403.798342][4293:4298] CHIP:DMG: {
-          [1657100403.798398][4293:4298] CHIP:DMG:         suppressResponse = false,
-          [1657100403.798437][4293:4298] CHIP:DMG:         InvokeResponseIBs =
-          [1657100403.798482][4293:4298] CHIP:DMG:         [
-          [1657100403.798518][4293:4298] CHIP:DMG:                 InvokeResponseIB =
-          [1657100403.798574][4293:4298] CHIP:DMG:                 {
-          [1657100403.798613][4293:4298] CHIP:DMG:                         CommandStatusIB =
-          [1657100403.798739][4293:4298] CHIP:DMG:                         {
-          [1657100403.798783][4293:4298] CHIP:DMG:                                 CommandPathIB =
-          [1657100403.798834][4293:4298] CHIP:DMG:                                 {
-          [1657100403.798880][4293:4298] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657100403.798931][4293:4298] CHIP:DMG:                                         ClusterId = 0x300,
-          [1657100403.798977][4293:4298] CHIP:DMG:                                         CommandId = 0x40,
-          [1657100403.799025][4293:4298] CHIP:DMG:                                 },
-          [1657100403.799073][4293:4298] CHIP:DMG:
-          [1657100403.799117][4293:4298] CHIP:DMG:                                 StatusIB =
-          [1657100403.799165][4293:4298] CHIP:DMG:                                 {
-          [1657100403.799214][4293:4298] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657100403.799267][4293:4298] CHIP:DMG:                                 },
-          [1657100403.799315][4293:4298] CHIP:DMG:
-          [1657100403.799357][4293:4298] CHIP:DMG:                         },
-          [1657100403.799411][4293:4298] CHIP:DMG:
-          [1657100403.799451][4293:4298] CHIP:DMG:                 },
-          [1657100403.799495][4293:4298] CHIP:DMG:
-          [1657100403.799530][4293:4298] CHIP:DMG:         ],
-          [1657100403.799573][4293:4298] CHIP:DMG:
-          [1657100403.799608][4293:4298] CHIP:DMG:         InteractionModelRevision = 1
-          [1657100403.799643][4293:4298] CHIP:DMG: },
-          [1657100403.799724][4293:4298] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0040 Status=0x0
-          [1657100403.799782][4293:4298] CHIP:DMG: ICR moving to [AwaitingDe]
+          Verify in DUT as client side log:
+          [1657912045.703432][2977:2977] CHIP:DMG: InvokeRequestMessage =
+          [1657912045.703462][2977:2977] CHIP:DMG: {
+          [1657912045.703485][2977:2977] CHIP:DMG:        suppressResponse = false,
+          [1657912045.703511][2977:2977] CHIP:DMG:        timedRequest = false,
+          [1657912045.703548][2977:2977] CHIP:DMG:        InvokeRequests =
+          [1657912045.703583][2977:2977] CHIP:DMG:        [
+          [1657912045.703608][2977:2977] CHIP:DMG:                CommandDataIB =
+          [1657912045.703635][2977:2977] CHIP:DMG:                {
+          [1657912045.703670][2977:2977] CHIP:DMG:                        CommandPathIB =
+          [1657912045.703709][2977:2977] CHIP:DMG:                        {
+          [1657912045.703737][2977:2977] CHIP:DMG:                                EndpointId = 0x1,
+          [1657912045.703791][2977:2977] CHIP:DMG:                                ClusterId = 0x300,
+          [1657912045.703830][2977:2977] CHIP:DMG:                                CommandId = 0x40,
+          [1657912045.703864][2977:2977] CHIP:DMG:                        },
+          [1657912045.703908][2977:2977] CHIP:DMG:
+          [1657912045.703936][2977:2977] CHIP:DMG:                        CommandFields =
+          [1657912045.703967][2977:2977] CHIP:DMG:                        {
+          [1657912045.704009][2977:2977] CHIP:DMG:                                0x0 = 1000,
+          [1657912045.704048][2977:2977] CHIP:DMG:                                0x1 = 3,
+          [1657912045.704121][2977:2977] CHIP:DMG:                                0x2 = 200,
+          [1657912045.704164][2977:2977] CHIP:DMG:                                0x3 = 0,
+          [1657912045.704202][2977:2977] CHIP:DMG:                                0x4 = 0,
+          [1657912045.704238][2977:2977] CHIP:DMG:                        },
+          [1657912045.704277][2977:2977] CHIP:DMG:                },
+          [1657912045.704309][2977:2977] CHIP:DMG:
+          [1657912045.704333][2977:2977] CHIP:DMG:        ],
+          [1657912045.704374][2977:2977] CHIP:DMG:
+          [1657912045.704399][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912045.704423][2977:2977] CHIP:DMG: },
+          [1657912045.704511][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1657912045.704551][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912045.704580][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0040
       disabled: true
 
     - label:
@@ -69,10 +69,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100425.785217][4301:4306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4000 DataVersion: 1806824664
-          [1657100425.785286][4301:4306] CHIP:TOO:   EnhancedCurrentHue: 1000
+          Verify in DUT as client side log:
+          [1657912064.296156][2977:2977] CHIP:IM: Received Read request
+          [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657912064.296295][2977:2977] CHIP:DMG: {
+          [1657912064.296322][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657912064.296378][2977:2977] CHIP:DMG:        [
+          [1657912064.296409][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657912064.296448][2977:2977] CHIP:DMG:                {
+          [1657912064.296497][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657912064.296538][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657912064.296578][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4000,
+          [1657912064.296621][2977:2977] CHIP:DMG:                }
+          [1657912064.296660][2977:2977] CHIP:DMG:
+          [1657912064.296694][2977:2977] CHIP:DMG:        ],
+          [1657912064.296729][2977:2977] CHIP:DMG:
+          [1657912064.296774][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657912064.296808][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912064.296837][2977:2977] CHIP:DMG: },
+          [1657912064.296942][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657912064.297059][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657912064.297109][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4000 is dirty
+          [1657912064.297136][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4000 (expanded=0)
+          [1657912064.297171][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657912064.297210][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912064.297288][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label: "DUT sends MoveEnhanced Hue command to TH"
@@ -80,39 +101,39 @@ tests:
       verification: |
           ./chip-tool colorcontrol enhanced-move-hue 0 100 0 0 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
+          Verify in DUT as client side log:
 
-          [1657100446.581854][4307:4312] CHIP:DMG: InvokeResponseMessage =
-          [1657100446.581878][4307:4312] CHIP:DMG: {
-          [1657100446.581902][4307:4312] CHIP:DMG:         suppressResponse = false,
-          [1657100446.581927][4307:4312] CHIP:DMG:         InvokeResponseIBs =
-          [1657100446.581957][4307:4312] CHIP:DMG:         [
-          [1657100446.581981][4307:4312] CHIP:DMG:                 InvokeResponseIB =
-          [1657100446.582013][4307:4312] CHIP:DMG:                 {
-          [1657100446.582038][4307:4312] CHIP:DMG:                         CommandStatusIB =
-          [1657100446.582069][4307:4312] CHIP:DMG:                         {
-          [1657100446.582097][4307:4312] CHIP:DMG:                                 CommandPathIB =
-          [1657100446.582133][4307:4312] CHIP:DMG:                                 {
-          [1657100446.582166][4307:4312] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657100446.582201][4307:4312] CHIP:DMG:                                         ClusterId = 0x300,
-          [1657100446.582235][4307:4312] CHIP:DMG:                                         CommandId = 0x41,
-          [1657100446.582267][4307:4312] CHIP:DMG:                                 },
-          [1657100446.582302][4307:4312] CHIP:DMG:
-          [1657100446.582331][4307:4312] CHIP:DMG:                                 StatusIB =
-          [1657100446.582364][4307:4312] CHIP:DMG:                                 {
-          [1657100446.582434][4307:4312] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657100446.582466][4307:4312] CHIP:DMG:                                 },
-          [1657100446.582498][4307:4312] CHIP:DMG:
-          [1657100446.582527][4307:4312] CHIP:DMG:                         },
-          [1657100446.582559][4307:4312] CHIP:DMG:
-          [1657100446.582584][4307:4312] CHIP:DMG:                 },
-          [1657100446.582613][4307:4312] CHIP:DMG:
-          [1657100446.582636][4307:4312] CHIP:DMG:         ],
-          [1657100446.582664][4307:4312] CHIP:DMG:
-          [1657100446.582687][4307:4312] CHIP:DMG:         InteractionModelRevision = 1
-          [1657100446.582710][4307:4312] CHIP:DMG: },
-          [1657100446.582768][4307:4312] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0041 Status=0x0
-          [1657100446.582808][4307:4312] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657912085.345044][2977:2977] CHIP:DMG: InvokeRequestMessage =
+          [1657912085.345072][2977:2977] CHIP:DMG: {
+          [1657912085.345094][2977:2977] CHIP:DMG:        suppressResponse = false,
+          [1657912085.345120][2977:2977] CHIP:DMG:        timedRequest = false,
+          [1657912085.345144][2977:2977] CHIP:DMG:        InvokeRequests =
+          [1657912085.345175][2977:2977] CHIP:DMG:        [
+          [1657912085.345199][2977:2977] CHIP:DMG:                CommandDataIB =
+          [1657912085.345228][2977:2977] CHIP:DMG:                {
+          [1657912085.345256][2977:2977] CHIP:DMG:                        CommandPathIB =
+          [1657912085.345290][2977:2977] CHIP:DMG:                        {
+          [1657912085.345320][2977:2977] CHIP:DMG:                                EndpointId = 0x1,
+          [1657912085.345355][2977:2977] CHIP:DMG:                                ClusterId = 0x300,
+          [1657912085.345388][2977:2977] CHIP:DMG:                                CommandId = 0x41,
+          [1657912085.345418][2977:2977] CHIP:DMG:                        },
+          [1657912085.345451][2977:2977] CHIP:DMG:
+          [1657912085.345479][2977:2977] CHIP:DMG:                        CommandFields =
+          [1657912085.345510][2977:2977] CHIP:DMG:                        {
+          [1657912085.345542][2977:2977] CHIP:DMG:                                0x0 = 0,
+          [1657912085.345574][2977:2977] CHIP:DMG:                                0x1 = 100,
+          [1657912085.345607][2977:2977] CHIP:DMG:                                0x2 = 0,
+          [1657912085.345639][2977:2977] CHIP:DMG:                                0x3 = 0,
+          [1657912085.345671][2977:2977] CHIP:DMG:                        },
+          [1657912085.345698][2977:2977] CHIP:DMG:                },
+          [1657912085.345730][2977:2977] CHIP:DMG:
+          [1657912085.345753][2977:2977] CHIP:DMG:        ],
+          [1657912085.345784][2977:2977] CHIP:DMG:
+          [1657912085.345807][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912085.345829][2977:2977] CHIP:DMG: },
+          [1657912085.345899][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1657912085.345935][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912085.345962][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0041
       disabled: true
 
     - label: "DUT reads CurrentEnhanced Hue attribute from TH several Times."
@@ -120,10 +141,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100425.785217][4301:4306] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4000 DataVersion: 1806824664
-          [1657100425.785286][4301:4306] CHIP:TOO:   EnhancedCurrentHue: 1000
+          Verify in DUT as client side log:
+          [1657912064.296156][2977:2977] CHIP:IM: Received Read request
+          [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657912064.296295][2977:2977] CHIP:DMG: {
+          [1657912064.296322][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657912064.296378][2977:2977] CHIP:DMG:        [
+          [1657912064.296409][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657912064.296448][2977:2977] CHIP:DMG:                {
+          [1657912064.296497][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657912064.296538][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657912064.296578][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4000,
+          [1657912064.296621][2977:2977] CHIP:DMG:                }
+          [1657912064.296660][2977:2977] CHIP:DMG:
+          [1657912064.296694][2977:2977] CHIP:DMG:        ],
+          [1657912064.296729][2977:2977] CHIP:DMG:
+          [1657912064.296774][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657912064.296808][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912064.296837][2977:2977] CHIP:DMG: },
+          [1657912064.296942][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657912064.297059][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657912064.297109][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4000 is dirty
+          [1657912064.297136][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4000 (expanded=0)
+          [1657912064.297171][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657912064.297210][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912064.297288][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label: "DUT sends StepEnhanced Hue command to TH"
@@ -131,39 +173,39 @@ tests:
       verification: |
           ./chip-tool colorcontrol enhanced-step-hue 1 1000 200 0 0 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100579.604087][4383:4388] CHIP:DMG: InvokeResponseMessage =
-          [1657100579.604116][4383:4388] CHIP:DMG: {
-          [1657100579.604145][4383:4388] CHIP:DMG:         suppressResponse = false,
-          [1657100579.604173][4383:4388] CHIP:DMG:         InvokeResponseIBs =
-          [1657100579.604209][4383:4388] CHIP:DMG:         [
-          [1657100579.604237][4383:4388] CHIP:DMG:                 InvokeResponseIB =
-          [1657100579.604274][4383:4388] CHIP:DMG:                 {
-          [1657100579.604303][4383:4388] CHIP:DMG:                         CommandStatusIB =
-          [1657100579.604356][4383:4388] CHIP:DMG:                         {
-          [1657100579.604396][4383:4388] CHIP:DMG:                                 CommandPathIB =
-          [1657100579.604437][4383:4388] CHIP:DMG:                                 {
-          [1657100579.604477][4383:4388] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657100579.604517][4383:4388] CHIP:DMG:                                         ClusterId = 0x300,
-          [1657100579.604556][4383:4388] CHIP:DMG:                                         CommandId = 0x42,
-          [1657100579.604593][4383:4388] CHIP:DMG:                                 },
-          [1657100579.604635][4383:4388] CHIP:DMG:
-          [1657100579.604669][4383:4388] CHIP:DMG:                                 StatusIB =
-          [1657100579.604708][4383:4388] CHIP:DMG:                                 {
-          [1657100579.604749][4383:4388] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657100579.604787][4383:4388] CHIP:DMG:                                 },
-          [1657100579.604824][4383:4388] CHIP:DMG:
-          [1657100579.604858][4383:4388] CHIP:DMG:                         },
-          [1657100579.604896][4383:4388] CHIP:DMG:
-          [1657100579.604924][4383:4388] CHIP:DMG:                 },
-          [1657100579.604958][4383:4388] CHIP:DMG:
-          [1657100579.604985][4383:4388] CHIP:DMG:         ],
-          [1657100579.605018][4383:4388] CHIP:DMG:
-          [1657100579.605045][4383:4388] CHIP:DMG:         InteractionModelRevision = 1
-          [1657100579.605071][4383:4388] CHIP:DMG: },
-          [1657100579.605137][4383:4388] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0042 Status=0x0
-          [1657100579.605184][4383:4388] CHIP:DMG: ICR moving to [AwaitingDe]
+          Verify in DUT as client side log:
+          [1657912123.677693][2977:2977] CHIP:DMG: InvokeRequestMessage =
+          [1657912123.677720][2977:2977] CHIP:DMG: {
+          [1657912123.677742][2977:2977] CHIP:DMG:        suppressResponse = false,
+          [1657912123.677769][2977:2977] CHIP:DMG:        timedRequest = false,
+          [1657912123.677802][2977:2977] CHIP:DMG:        InvokeRequests =
+          [1657912123.677836][2977:2977] CHIP:DMG:        [
+          [1657912123.677860][2977:2977] CHIP:DMG:                CommandDataIB =
+          [1657912123.677901][2977:2977] CHIP:DMG:                {
+          [1657912123.677926][2977:2977] CHIP:DMG:                        CommandPathIB =
+          [1657912123.677957][2977:2977] CHIP:DMG:                        {
+          [1657912123.677996][2977:2977] CHIP:DMG:                                EndpointId = 0x1,
+          [1657912123.678030][2977:2977] CHIP:DMG:                                ClusterId = 0x300,
+          [1657912123.678061][2977:2977] CHIP:DMG:                                CommandId = 0x42,
+          [1657912123.678097][2977:2977] CHIP:DMG:                        },
+          [1657912123.678130][2977:2977] CHIP:DMG:
+          [1657912123.678158][2977:2977] CHIP:DMG:                        CommandFields =
+          [1657912123.678188][2977:2977] CHIP:DMG:                        {
+          [1657912123.678229][2977:2977] CHIP:DMG:                                0x0 = 1,
+          [1657912123.678304][2977:2977] CHIP:DMG:                                0x1 = 1000,
+          [1657912123.678339][2977:2977] CHIP:DMG:                                0x2 = 200,
+          [1657912123.678372][2977:2977] CHIP:DMG:                                0x3 = 0,
+          [1657912123.678413][2977:2977] CHIP:DMG:                                0x4 = 0,
+          [1657912123.678443][2977:2977] CHIP:DMG:                        },
+          [1657912123.678484][2977:2977] CHIP:DMG:                },
+          [1657912123.678515][2977:2977] CHIP:DMG:
+          [1657912123.678538][2977:2977] CHIP:DMG:        ],
+          [1657912123.678578][2977:2977] CHIP:DMG:
+          [1657912123.678602][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912123.678625][2977:2977] CHIP:DMG: },
+          [1657912123.678704][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1657912123.678741][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912123.678778][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0042
       disabled: true
 
     - label:
@@ -172,22 +214,70 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100597.877581][4390:4396] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4000 DataVersion: 1806826991
-          [1657100597.877653][4390:4396] CHIP:TOO:   EnhancedCurrentHue: 1905
+          Verify in DUT as client side log:
+          [1657912064.296156][2977:2977] CHIP:IM: Received Read request
+          [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657912064.296295][2977:2977] CHIP:DMG: {
+          [1657912064.296322][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657912064.296378][2977:2977] CHIP:DMG:        [
+          [1657912064.296409][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657912064.296448][2977:2977] CHIP:DMG:                {
+          [1657912064.296497][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657912064.296538][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657912064.296578][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4000,
+          [1657912064.296621][2977:2977] CHIP:DMG:                }
+          [1657912064.296660][2977:2977] CHIP:DMG:
+          [1657912064.296694][2977:2977] CHIP:DMG:        ],
+          [1657912064.296729][2977:2977] CHIP:DMG:
+          [1657912064.296774][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657912064.296808][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912064.296837][2977:2977] CHIP:DMG: },
+          [1657912064.296942][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657912064.297059][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657912064.297109][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4000 is dirty
+          [1657912064.297136][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4000 (expanded=0)
+          [1657912064.297171][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657912064.297210][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912064.297288][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label: "DUT sends EnhancedMoveToHueAndSaturation command to TH."
       PICS: CC.C.C43.Rsp
       verification: |
           ./chip-tool colorcontrol enhanced-move-to-hue-and-saturation 2500 100 200 0 0 1 1
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1649667723.974929][9413:9418] CHIP:DMG:                                StatusIB =
-          [1649667723.974986][9413:9418] CHIP:DMG:                                {
-          [1649667723.975047][9413:9418] CHIP:DMG:                                        status = 0x00 (SUCCESS),
-          [1649667723.975096][9413:9418] CHIP:DMG:                                },
+          Verify in DUT as client side log:
+          [1657912153.500024][2977:2977] CHIP:DMG: InvokeRequestMessage =
+          [1657912153.500080][2977:2977] CHIP:DMG: {
+          [1657912153.500108][2977:2977] CHIP:DMG:        suppressResponse = false,
+          [1657912153.500139][2977:2977] CHIP:DMG:        timedRequest = false,
+          [1657912153.500180][2977:2977] CHIP:DMG:        InvokeRequests =
+          [1657912153.500217][2977:2977] CHIP:DMG:        [
+          [1657912153.500244][2977:2977] CHIP:DMG:                CommandDataIB =
+          [1657912153.500288][2977:2977] CHIP:DMG:                {
+          [1657912153.500317][2977:2977] CHIP:DMG:                        CommandPathIB =
+          [1657912153.500352][2977:2977] CHIP:DMG:                        {
+          [1657912153.500398][2977:2977] CHIP:DMG:                                EndpointId = 0x1,
+          [1657912153.500437][2977:2977] CHIP:DMG:                                ClusterId = 0x300,
+          [1657912153.500472][2977:2977] CHIP:DMG:                                CommandId = 0x43,
+          [1657912153.500512][2977:2977] CHIP:DMG:                        },
+          [1657912153.500550][2977:2977] CHIP:DMG:
+          [1657912153.500579][2977:2977] CHIP:DMG:                        CommandFields =
+          [1657912153.500610][2977:2977] CHIP:DMG:                        {
+          [1657912153.500656][2977:2977] CHIP:DMG:                                0x0 = 2500,
+          [1657912153.500694][2977:2977] CHIP:DMG:                                0x1 = 100,
+          [1657912153.500731][2977:2977] CHIP:DMG:                                0x2 = 200,
+          [1657912153.500779][2977:2977] CHIP:DMG:                                0x3 = 0,
+          [1657912153.500815][2977:2977] CHIP:DMG:                                0x4 = 0,
+          [1657912153.500861][2977:2977] CHIP:DMG:                        },
+          [1657912153.500893][2977:2977] CHIP:DMG:                },
+          [1657912153.500928][2977:2977] CHIP:DMG:
+          [1657912153.500964][2977:2977] CHIP:DMG:        ],
+          [1657912153.501001][2977:2977] CHIP:DMG:
+          [1657912153.501028][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912153.501054][2977:2977] CHIP:DMG: },
+          [1657912153.501143][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1657912153.501195][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912153.501227][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0043
       disabled: true
 
     - label:
@@ -196,10 +286,31 @@ tests:
       verification: |
           ./chip-tool colorcontrol read enhanced-current-hue 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100626.671635][4405:4410] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_4000 DataVersion: 1806827373
-          [1657100626.671707][4405:4410] CHIP:TOO:   EnhancedCurrentHue: 2153
+          Verify in DUT as client side log:
+          [1657912064.296156][2977:2977] CHIP:IM: Received Read request
+          [1657912064.296261][2977:2977] CHIP:DMG: ReadRequestMessage =
+          [1657912064.296295][2977:2977] CHIP:DMG: {
+          [1657912064.296322][2977:2977] CHIP:DMG:        AttributePathIBs =
+          [1657912064.296378][2977:2977] CHIP:DMG:        [
+          [1657912064.296409][2977:2977] CHIP:DMG:                AttributePathIB =
+          [1657912064.296448][2977:2977] CHIP:DMG:                {
+          [1657912064.296497][2977:2977] CHIP:DMG:                        Endpoint = 0x1,
+          [1657912064.296538][2977:2977] CHIP:DMG:                        Cluster = 0x300,
+          [1657912064.296578][2977:2977] CHIP:DMG:                        Attribute = 0x0000_4000,
+          [1657912064.296621][2977:2977] CHIP:DMG:                }
+          [1657912064.296660][2977:2977] CHIP:DMG:
+          [1657912064.296694][2977:2977] CHIP:DMG:        ],
+          [1657912064.296729][2977:2977] CHIP:DMG:
+          [1657912064.296774][2977:2977] CHIP:DMG:        isFabricFiltered = true,
+          [1657912064.296808][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912064.296837][2977:2977] CHIP:DMG: },
+          [1657912064.296942][2977:2977] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657912064.297059][2977:2977] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1657912064.297109][2977:2977] CHIP:DMG: <RE:Run> Cluster 300, Attribute 4000 is dirty
+          [1657912064.297136][2977:2977] CHIP:DMG: Reading attribute: Cluster=0x0000_0300 Endpoint=1 AttributeId=0x0000_4000 (expanded=0)
+          [1657912064.297171][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=v
+          [1657912064.297210][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912064.297288][2977:2977] CHIP:DMG: <RE> Sending report (payload has 38 bytes)...
       disabled: true
 
     - label: "DUT sends StopMoveStep command to TH."
@@ -207,37 +318,34 @@ tests:
       verification: |
           ./chip-tool colorcontrol stop-move-step 0 0 1 1
 
-          verify on Reference app receives the right response for the data sent in the above commands
-
-          [1657100646.786860][4412:4417] CHIP:DMG: InvokeResponseMessage =
-          [1657100646.786904][4412:4417] CHIP:DMG: {
-          [1657100646.786948][4412:4417] CHIP:DMG:         suppressResponse = false,
-          [1657100646.786993][4412:4417] CHIP:DMG:         InvokeResponseIBs =
-          [1657100646.787048][4412:4417] CHIP:DMG:         [
-          [1657100646.787092][4412:4417] CHIP:DMG:                 InvokeResponseIB =
-          [1657100646.787150][4412:4417] CHIP:DMG:                 {
-          [1657100646.787197][4412:4417] CHIP:DMG:                         CommandStatusIB =
-          [1657100646.787261][4412:4417] CHIP:DMG:                         {
-          [1657100646.787315][4412:4417] CHIP:DMG:                                 CommandPathIB =
-          [1657100646.787376][4412:4417] CHIP:DMG:                                 {
-          [1657100646.787438][4412:4417] CHIP:DMG:                                         EndpointId = 0x1,
-          [1657100646.787502][4412:4417] CHIP:DMG:                                         ClusterId = 0x300,
-          [1657100646.787565][4412:4417] CHIP:DMG:                                         CommandId = 0x47,
-          [1657100646.787625][4412:4417] CHIP:DMG:                                 },
-          [1657100646.787691][4412:4417] CHIP:DMG:
-          [1657100646.787744][4412:4417] CHIP:DMG:                                 StatusIB =
-          [1657100646.787804][4412:4417] CHIP:DMG:                                 {
-          [1657100646.787854][4412:4417] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1657100646.787894][4412:4417] CHIP:DMG:                                 },
-          [1657100646.787934][4412:4417] CHIP:DMG:
-          [1657100646.787974][4412:4417] CHIP:DMG:                         },
-          [1657100646.788021][4412:4417] CHIP:DMG:
-          [1657100646.788056][4412:4417] CHIP:DMG:                 },
-          [1657100646.788093][4412:4417] CHIP:DMG:
-          [1657100646.788121][4412:4417] CHIP:DMG:         ],
-          [1657100646.788157][4412:4417] CHIP:DMG:
-          [1657100646.788186][4412:4417] CHIP:DMG:         InteractionModelRevision = 1
-          [1657100646.788214][4412:4417] CHIP:DMG: },
-          [1657100646.788283][4412:4417] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0047 Status=0x0
-          [1657100646.788331][4412:4417] CHIP:DMG: ICR moving to [AwaitingDe]
+          Verify in DUT as client side log:
+          [1657912172.988756][2977:2977] CHIP:DMG: InvokeRequestMessage =
+          [1657912172.988782][2977:2977] CHIP:DMG: {
+          [1657912172.988805][2977:2977] CHIP:DMG:        suppressResponse = false,
+          [1657912172.988840][2977:2977] CHIP:DMG:        timedRequest = false,
+          [1657912172.988864][2977:2977] CHIP:DMG:        InvokeRequests =
+          [1657912172.988895][2977:2977] CHIP:DMG:        [
+          [1657912172.988919][2977:2977] CHIP:DMG:                CommandDataIB =
+          [1657912172.988957][2977:2977] CHIP:DMG:                {
+          [1657912172.988982][2977:2977] CHIP:DMG:                        CommandPathIB =
+          [1657912172.989014][2977:2977] CHIP:DMG:                        {
+          [1657912172.989054][2977:2977] CHIP:DMG:                                EndpointId = 0x1,
+          [1657912172.989088][2977:2977] CHIP:DMG:                                ClusterId = 0x300,
+          [1657912172.989120][2977:2977] CHIP:DMG:                                CommandId = 0x47,
+          [1657912172.989161][2977:2977] CHIP:DMG:                        },
+          [1657912172.989193][2977:2977] CHIP:DMG:
+          [1657912172.989221][2977:2977] CHIP:DMG:                        CommandFields =
+          [1657912172.989250][2977:2977] CHIP:DMG:                        {
+          [1657912172.989290][2977:2977] CHIP:DMG:                                0x0 = 0,
+          [1657912172.989323][2977:2977] CHIP:DMG:                                0x1 = 0,
+          [1657912172.989354][2977:2977] CHIP:DMG:                        },
+          [1657912172.989390][2977:2977] CHIP:DMG:                },
+          [1657912172.989420][2977:2977] CHIP:DMG:
+          [1657912172.989443][2977:2977] CHIP:DMG:        ],
+          [1657912172.989483][2977:2977] CHIP:DMG:
+          [1657912172.989508][2977:2977] CHIP:DMG:        InteractionModelRevision = 1
+          [1657912172.989530][2977:2977] CHIP:DMG: },
+          [1657912172.989608][2977:2977] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0300 e=1 p=o
+          [1657912172.989646][2977:2977] CHIP:DMG: AccessControl: allowed
+          [1657912172.989682][2977:2977] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_0300 Command=0x0000_0047
       disabled: true

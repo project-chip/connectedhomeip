@@ -41,12 +41,12 @@ tests:
           [1653471956.972509][10713:10713] CHIP:-: ==== Onboarding payload for Standard Commissioning Flow ====
           [1653471956.972546][10713:10713] CHIP:SVR: SetupQRCode: [MT:-24J0CEK01KA0648G00]
           [1653471956.972579][10713:10713] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653471956.972600][10713:10713] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
+          [1653471956.972600][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J0CEK01KA0648G00
           [1653471956.972632][10713:10713] CHIP:SVR: Manual pairing code: [34970112332]
           [1653471956.972654][10713:10713] CHIP:-: ==== Onboarding payload for Custom Commissioning Flows ====
           [1653471956.972715][10713:10713] CHIP:SVR: SetupQRCode: [MT:-24J048N01KA0648G00]
           [1653471956.972748][10713:10713] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1653471956.972769][10713:10713] CHIP:SVR: https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
+          [1653471956.972769][10713:10713] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J048N01KA0648G00
           [1653471956.972803][10713:10713] CHIP:SVR: Manual pairing code: [749701123365521327694]
 
 
@@ -244,8 +244,8 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
-          regulatory information in the Commissionee."
+          "Commissioner SHALL configure regulatory information in the
+          Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
           Verify on TH Log:
