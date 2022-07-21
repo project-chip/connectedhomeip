@@ -668,9 +668,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
 
-    // TODO: Add support for calling AddNOC without a prior AddTrustedRootCertificate if
-    //       the root properly matches an existing one.
-
     // We can't possibly have a matching root based on the fact that we don't have
     // a shared root store. Therefore we would later fail path validation due to
     // missing root. Let's early-bail with InvalidNOC.
@@ -1196,8 +1193,6 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
-
-    // TODO(#17208): Handle checking for byte-to-byte match with existing fabrics before allowing the add
 
     err = ValidateChipRCAC(rootCertificate);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::InvalidCommand);
