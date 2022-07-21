@@ -254,7 +254,7 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 9
- 
+
     - label: "Read ThermostatRunningMode attribute from the DUT"
       PICS: TSTAT.S.A001e
       command: "readAttribute"
