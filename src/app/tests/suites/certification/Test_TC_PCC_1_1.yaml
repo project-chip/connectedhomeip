@@ -53,6 +53,182 @@ tests:
               contains:
                   [0, 1, 2, 17, 18, 19, 32, 65528, 65529, 65531, 65532, 65533]
 
+    - label:
+          "TH reads optional attribute(MinConstPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "TH reads optional attribute(MaxConstPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label:
+          "TH reads optional attribute(MinCompPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label:
+          "TH reads optional attribute(MaxCompPressure) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0006
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label:
+          "TH reads optional attribute(MinConstSpeed) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "TH reads optional attribute(MaxConstSpeed) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A0008
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "TH reads optional attribute(MinConstFlow) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label:
+          "TH reads optional attribute(MaxConstFlow) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A000a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "TH reads optional attribute(MinConstTemp) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A000b
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [11]
+
+    - label:
+          "TH reads optional attribute(MaxConstTemp) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A000c
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [12]
+
+    - label:
+          "TH reads optional attribute(PumpStatus) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
+
+    - label:
+          "TH reads optional attribute(Speed) attribute in AttributeList from
+          the DUT"
+      PICS: PCC.S.A0014
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [20]
+
+    - label:
+          "TH reads optional attribute(LifetimeRunningHours) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0015
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [21]
+
+    - label:
+          "TH reads optional attribute(Power) attribute in AttributeList from
+          the DUT"
+      PICS: PCC.S.A0016
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [22]
+
+    - label:
+          "TH reads optional attribute(LifetimeEnergyConsumed) attribute in
+          AttributeList from the DUT"
+      PICS: PCC.S.A0017
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [23]
+
+    - label:
+          "TH reads optional attribute(ControlMode) attribute in AttributeList
+          from the DUT"
+      PICS: PCC.S.A0021
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [33]
+
     - label: "TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"

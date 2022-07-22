@@ -62,7 +62,7 @@ tests:
                 value: targetvalue1
 
     - label: "Reads the CurrentTarget attribute"
-      PICS: TGTNAV.S.A0001
+      PICS: TGTNAV.S.A0001 && TGTNAV.S.C0000
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:

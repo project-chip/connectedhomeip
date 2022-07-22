@@ -58,11 +58,11 @@ tests:
       command: "writeAttribute"
       attribute: "label list"
       arguments:
-          value: []
+          value: [{ "label": "", "value": "" }]
 
     - label: "TH reads LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "readAttribute"
       attribute: "label list"
       response:
-          value: []
+          value: [{ "label": "", "value": "" }]

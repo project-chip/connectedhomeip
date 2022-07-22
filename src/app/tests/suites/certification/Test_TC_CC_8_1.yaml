@@ -40,7 +40,7 @@ tests:
           value: 1
 
     - label: "TH sends MoveHue command to DUT"
-      PICS: CC.S.C01.Rsp
+      PICS: CC.S.C01.Rsp && CC.S.F00
       command: "MoveHue"
       arguments:
           values:
@@ -54,7 +54,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+      PICS: CC.S.A0000 && CC.S.C01.Rsp && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -64,7 +64,7 @@ tests:
               maxValue: 254
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp
+      PICS: CC.S.C47.Rsp && CC.S.F00
       command: "StopMoveStep"
       arguments:
           values:
@@ -74,7 +74,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+      PICS: CC.S.A0000 && CC.S.C47.Rsp && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -93,7 +93,7 @@ tests:
                 value: 100
 
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.A0000
+      PICS: CC.S.A0000 && CC.S.C47.Rsp && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -104,7 +104,7 @@ tests:
               maxValue: 254
 
     - label: "TH sends MoveSaturation command to DUT"
-      PICS: CC.S.C04.Rsp
+      PICS: CC.S.C04.Rsp && CC.S.F00
       command: "MoveSaturation"
       arguments:
           values:
@@ -118,7 +118,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001
+      PICS: CC.S.A0001 && CC.S.C04.Rsp && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -128,7 +128,7 @@ tests:
               maxValue: 254
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp
+      PICS: CC.S.C47.Rsp && CC.S.F00
       command: "StopMoveStep"
       arguments:
           values:
@@ -139,7 +139,7 @@ tests:
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.A0001
+      PICS: CC.S.A0001 && CC.S.C47.Rsp && CC.S.F00
       attribute: "CurrentSaturation"
       response:
           saveAs: CurrentSaturationValue
@@ -157,7 +157,7 @@ tests:
                 value: 100
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.A0001
+      PICS: CC.S.A0001 && CC.S.C47.Rsp && CC.S.F00
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -168,7 +168,7 @@ tests:
               maxValue: 254
 
     - label: "TH sends MoveColor command to DUT"
-      PICS: CC.S.C08.Rsp
+      PICS: CC.S.C08.Rsp && CC.S.F03
       command: "MoveColor"
       arguments:
           values:
@@ -182,7 +182,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.A0003
+      PICS: CC.S.A0003 && CC.S.C08.Rsp && CC.S.F03
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -192,7 +192,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0004
+      PICS: CC.S.A0004 && CC.S.C08.Rsp && CC.S.F03
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -202,7 +202,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp
+      PICS: CC.S.C47.Rsp && CC.S.F03
       command: "StopMoveStep"
       arguments:
           values:
@@ -212,7 +212,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.A0003
+      PICS: CC.S.A0003 && CC.S.C47.Rsp && CC.S.F03
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -223,7 +223,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0004
+      PICS: CC.S.A0004 && CC.S.C47.Rsp && CC.S.F03
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -242,7 +242,7 @@ tests:
                 value: 100
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0003
+      PICS: CC.S.A0003 && CC.S.C47.Rsp && CC.S.F03
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -253,7 +253,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.A0004
+      PICS: CC.S.A0004 && CC.S.C47.Rsp && CC.S.F03
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -264,7 +264,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends MoveColorTemperature command to DUT"
-      PICS: CC.S.C4B.Rsp
+      PICS: CC.S.C4B.Rsp && CC.S.F04
       command: "MoveColorTemperature"
       arguments:
           values:
@@ -282,7 +282,7 @@ tests:
                 value: 0
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT"
-      PICS: CC.S.A0007
+      PICS: CC.S.A0007 && CC.S.C4B.Rsp && CC.S.F04
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -292,7 +292,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp
+      PICS: CC.S.C47.Rsp && CC.S.F04
       command: "StopMoveStep"
       arguments:
           values:
@@ -302,7 +302,7 @@ tests:
                 value: 0
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT"
-      PICS: CC.S.A0007
+      PICS: CC.S.A0007 && CC.S.C47.Rsp && CC.S.F04
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -323,7 +323,7 @@ tests:
     - label:
           "Reads current color attribute value matched the value sent by the
           last attribute"
-      PICS: CC.S.A0007
+      PICS: CC.S.A0007 && CC.S.C47.Rsp && CC.S.F04
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -334,7 +334,7 @@ tests:
               maxValue: 65279
 
     - label: "TH sends EnhancedMoveHue command to DUT."
-      PICS: CC.S.C41.Rsp
+      PICS: CC.S.C41.Rsp && CC.S.F01
       command: "EnhancedMoveHue"
       arguments:
           values:
@@ -348,7 +348,7 @@ tests:
                 value: 0
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.A4000
+      PICS: CC.S.A4000 && CC.S.C41.Rsp && CC.S.F01
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -358,7 +358,7 @@ tests:
               maxValue: 65535
 
     - label: "TH sends StopMoveStep command to DUT"
-      PICS: CC.S.C47.Rsp
+      PICS: CC.S.C47.Rsp && CC.S.F01
       command: "StopMoveStep"
       arguments:
           values:
@@ -368,7 +368,7 @@ tests:
                 value: 0
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.A4000
+      PICS: CC.S.A4000 && CC.S.C47.Rsp && CC.S.F01
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -387,7 +387,7 @@ tests:
                 value: 100
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.A4000
+      PICS: CC.S.A4000 && CC.S.C47.Rsp && CC.S.F01
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:

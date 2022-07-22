@@ -39,16 +39,15 @@ tests:
               type: uint16
 
     - label: "Read the global attribute: FeatureMap"
-      PICS: MEDIAINPUT.S.NU
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: map32
+              minValue: 0
+              maxValue: 1
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MEDIAINPUT.S.A0000 && MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
