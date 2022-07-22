@@ -7,7 +7,7 @@ ARG NCS_REVISION=fd5905aa6b04febd99d00dba6c482ac25eb15222
 RUN set -x \
     && apt-get update \
     && apt-get install --no-install-recommends -fy \
-    curl=7.68.0-1ubuntu2.11 \
+    curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

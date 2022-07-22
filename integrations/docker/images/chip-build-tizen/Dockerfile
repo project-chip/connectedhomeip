@@ -18,8 +18,8 @@ RUN set -x \
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    cpio=2.13+dfsg-2 \
-    obs-build=20180831-3ubuntu1 \
+    cpio \
+    obs-build \
     openjdk-8-jre-headless \
     zip \
     # Cleanup
