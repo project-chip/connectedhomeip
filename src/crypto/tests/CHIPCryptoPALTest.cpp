@@ -1644,69 +1644,55 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
     using namespace TestCerts;
 
     HeapChecker heapChecker(inSuite);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err;
 
-    ByteSpan root_cert;
-    err = GetTestCert(TestCert::kRoot01, TestCertLoadFlags::kDERForm, root_cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    struct ValidationTestCase
+    {
+        ByteSpan root;
+        ByteSpan ica;
+        ByteSpan leaf;
+        CHIP_ERROR expectedError;
+        CertificateChainValidationResult expectedValResult;
+    };
 
-    ByteSpan ica_cert;
-    err = GetTestCert(TestCert::kICA01, TestCertLoadFlags::kDERForm, ica_cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    // clang-format off
+    static ValidationTestCase sValidationTestCases[] = {
+        // root                                 ica                                       leaf                                           Expected Error              Expected Validation Result
+        // ===================================================================================================================================================================================================================
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_NoPID_Cert,            sTestCert_DAC_FFF2_8002_0017_Cert,             CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_NoPID_FB_Cert,         sTestCert_DAC_FFF2_8003_0018_FB_Cert,          CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,          sTestCert_DAC_FFF2_8004_001C_FB_Cert,          CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        // Valid cases with PAA, PAI, DAC time validity in the past or future:
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,          sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8004_FB_Cert,          sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert, CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInPast_Cert,   sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF2_8005_ValInFuture_Cert, sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert, CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,   sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert, sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
+        // Error cases with invalid (empty Span) inputs:
+        {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
+        {  sTestCert_PAA_FFF1_Cert,             ByteSpan(),                               sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kICAArgumentInvalid  },
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,             ByteSpan(),                                    CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },
+        // Error cases with wrong certificate chaining:
+        {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF2_NoPID_Cert,            sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAI_FFF1_8000_Cert,             sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        {  sTestCert_PAA_NoVID_Cert,            sTestCert_PAA_FFF1_Cert,                  sTestCert_DAC_FFF1_8000_0000_Cert,             CHIP_ERROR_CERT_NOT_TRUSTED, CertificateChainValidationResult::kChainInvalid        },
+        // Error cases with PAA, PAI, DAC time validity in the past or future.
+        // In all cases either PAA or PAI was invalid with respect to DAC's notBefore time:
 
-    ByteSpan leaf_cert;
-    err = GetTestCert(TestCert::kNode01_01, TestCertLoadFlags::kDERForm, leaf_cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    };
+    // clang-format on
 
-    CertificateChainValidationResult chainValidationResult;
-    err = ValidateCertificateChain(root_cert.data(), root_cert.size(), ica_cert.data(), ica_cert.size(), leaf_cert.data(),
-                                   leaf_cert.size(), chainValidationResult);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kSuccess);
-
-    // Now test for invalid arguments.
-    err = ValidateCertificateChain(nullptr, 0, ica_cert.data(), ica_cert.size(), leaf_cert.data(), leaf_cert.size(),
-                                   chainValidationResult);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kRootArgumentInvalid);
-
-    err = ValidateCertificateChain(root_cert.data(), root_cert.size(), nullptr, 0, leaf_cert.data(), leaf_cert.size(),
-                                   chainValidationResult);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kICAArgumentInvalid);
-
-    err = ValidateCertificateChain(root_cert.data(), root_cert.size(), ica_cert.data(), ica_cert.size(), nullptr, 0,
-                                   chainValidationResult);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kLeafArgumentInvalid);
-
-    // Now test with an ICA certificate that does not correspond to the chain
-    ByteSpan wrong_ica_cert;
-    err = GetTestCert(TestCert::kICA02, TestCertLoadFlags::kDERForm, wrong_ica_cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ValidateCertificateChain(root_cert.data(), root_cert.size(), wrong_ica_cert.data(), wrong_ica_cert.size(),
-                                   leaf_cert.data(), leaf_cert.size(), chainValidationResult);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
-
-    // Now test with a Root certificate that does not correspond to the chain
-    ByteSpan wrong_root_cert;
-    err = GetTestCert(TestCert::kRoot02, TestCertLoadFlags::kDERForm, wrong_root_cert);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ValidateCertificateChain(wrong_root_cert.data(), wrong_root_cert.size(), ica_cert.data(), ica_cert.size(),
-                                   leaf_cert.data(), leaf_cert.size(), chainValidationResult);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
-
-    // Now test with a Root certificate that does not correspond to the chain.
-    // Trying to validate ICA (as a leaf) which chains to Root - should fail bacause Root is loaded as untrusted intermediate cert.
-    err = ValidateCertificateChain(wrong_root_cert.data(), wrong_root_cert.size(), root_cert.data(), root_cert.size(),
-                                   ica_cert.data(), ica_cert.size(), chainValidationResult);
-
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_TRUSTED);
-    NL_TEST_ASSERT(inSuite, chainValidationResult == CertificateChainValidationResult::kChainInvalid);
+    for (auto & testCase : sValidationTestCases)
+    {
+        CertificateChainValidationResult chainValidationResult;
+        err = ValidateCertificateChain(testCase.root.data(), testCase.root.size(), testCase.ica.data(), testCase.ica.size(),
+                                       testCase.leaf.data(), testCase.leaf.size(), chainValidationResult);
+        NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+        NL_TEST_ASSERT(inSuite, chainValidationResult == testCase.expectedValResult);
+    }
 }
 
 static void TestX509_IssuingTimestampValidation(nlTestSuite * inSuite, void * inContext)

@@ -123,6 +123,11 @@ struct ASN1UniversalTime
      *          YYYYMMDDHHMMSSZ - other years
      **/
     CHIP_ERROR ExportTo_ASN1_TIME_string(MutableCharSpan & asn1_time) const;
+
+    /**
+     * @brief Encode time as Unix epoch time.
+     **/
+    bool ExportTo_UnixTime(uint32_t & unixEpoch);
 };
 
 class DLL_EXPORT ASN1Reader
