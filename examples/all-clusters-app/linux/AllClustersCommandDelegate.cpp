@@ -32,82 +32,102 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-void AllClustersCommandDelegate::OnEventCommandReceived(const char * command)
+void AllClustersCommandDelegate::OnEventCommandReceived(const char * json)
 {
-    mCurrentCommand.assign(command);
+    Json::Reader reader;
 
-    DeviceLayer::PlatformMgr().ScheduleWork(HandleEventCommand, reinterpret_cast<intptr_t>(this));
+    if (!reader.parse(json, mJsonValue))
+    {
+        ChipLogError(NotSpecified, "Error parsing JSON with error %s:", reader.getFormattedErrorMessages().c_str());
+    }
+    else
+    {
+        DeviceLayer::PlatformMgr().ScheduleWork(HandleEventCommand, reinterpret_cast<intptr_t>(this));
+    }
 }
 
 void AllClustersCommandDelegate::HandleEventCommand(intptr_t context)
 {
     auto * self = reinterpret_cast<AllClustersCommandDelegate *>(context);
 
-    if (self->mCurrentCommand == "SoftwareFault")
+    VerifyOrReturn(!self->mJsonValue.empty(), ChipLogError(NotSpecified, "Invalid JSON event command received"));
+
+    std::string name = self->mJsonValue["Name"].asString();
+
+    if (name == "SoftwareFault")
     {
         self->OnSoftwareFaultEventHandler(Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id);
     }
-    else if (self->mCurrentCommand == "HardwareFaultChange")
+    else if (name == "HardwareFaultChange")
     {
         self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id);
     }
-    else if (self->mCurrentCommand == "RadioFaultChange")
+    else if (name == "RadioFaultChange")
     {
         self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id);
     }
-    else if (self->mCurrentCommand == "NetworkFaultChange")
+    else if (name == "NetworkFaultChange")
     {
         self->OnGeneralFaultEventHandler(Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id);
     }
-    else if (self->mCurrentCommand == "SwitchLatched")
+    else if (name == "SwitchLatched")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::SwitchLatched::Id);
+        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
+        self->OnSwitchLatchedHandler(newPosition);
     }
-    else if (self->mCurrentCommand == "InitialPress")
+    else if (name == "InitialPress")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::InitialPress::Id);
+        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
+        self->OnSwitchInitialPressedHandler(newPosition);
     }
-    else if (self->mCurrentCommand == "LongPress")
+    else if (name == "LongPress")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::LongPress::Id);
+        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
+        self->OnSwitchLongPressedHandler(newPosition);
     }
-    else if (self->mCurrentCommand == "ShortRelease")
+    else if (name == "ShortRelease")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::ShortRelease::Id);
+        uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
+        self->OnSwitchShortReleasedHandler(previousPosition);
     }
-    else if (self->mCurrentCommand == "LongRelease")
+    else if (name == "LongRelease")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::LongRelease::Id);
+        uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
+        self->OnSwitchLongReleasedHandler(previousPosition);
     }
-    else if (self->mCurrentCommand == "MultiPressOngoing")
+    else if (name == "MultiPressOngoing")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::MultiPressOngoing::Id);
+        uint8_t newPosition = static_cast<uint8_t>(self->mJsonValue["NewPosition"].asUInt());
+        uint8_t count       = static_cast<uint8_t>(self->mJsonValue["CurrentNumberOfPressesCounted"].asUInt());
+        self->OnSwitchMultiPressOngoingHandler(newPosition, count);
     }
-    else if (self->mCurrentCommand == "MultiPressComplete")
+    else if (name == "MultiPressComplete")
     {
-        self->OnSwitchEventHandler(Clusters::Switch::Events::MultiPressComplete::Id);
+        uint8_t previousPosition = static_cast<uint8_t>(self->mJsonValue["PreviousPosition"].asUInt());
+        uint8_t count            = static_cast<uint8_t>(self->mJsonValue["TotalNumberOfPressesCounted"].asUInt());
+        self->OnSwitchMultiPressOngoingHandler(previousPosition, count);
     }
-    else if (self->mCurrentCommand == "PowerOnReboot")
+    else if (name == "PowerOnReboot")
     {
         self->OnRebootSignalHandler(BootReasonType::kPowerOnReboot);
     }
-    else if (self->mCurrentCommand == "BrownOutReset")
+    else if (name == "BrownOutReset")
     {
         self->OnRebootSignalHandler(BootReasonType::kBrownOutReset);
     }
-    else if (self->mCurrentCommand == "SoftwareWatchdogReset")
+    else if (name == "SoftwareWatchdogReset")
     {
         self->OnRebootSignalHandler(BootReasonType::kSoftwareWatchdogReset);
     }
-    else if (self->mCurrentCommand == "HardwareWatchdogReset")
+    else if (name == "HardwareWatchdogReset")
     {
         self->OnRebootSignalHandler(BootReasonType::kHardwareWatchdogReset);
     }
-    else if (self->mCurrentCommand == "SoftwareUpdateCompleted")
+    else if (name == "SoftwareUpdateCompleted")
     {
         self->OnRebootSignalHandler(BootReasonType::kSoftwareUpdateCompleted);
     }
-    else if (self->mCurrentCommand == "SoftwareReset")
+    else if (name == "SoftwareReset")
     {
         self->OnRebootSignalHandler(BootReasonType::kSoftwareReset);
     }
@@ -115,6 +135,8 @@ void AllClustersCommandDelegate::HandleEventCommand(intptr_t context)
     {
         ChipLogError(NotSpecified, "Unhandled command: Should never happens");
     }
+
+    self->mJsonValue.clear();
 }
 
 bool AllClustersCommandDelegate::IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
@@ -220,57 +242,87 @@ void AllClustersCommandDelegate::OnSoftwareFaultEventHandler(uint32_t eventId)
     Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
 }
 
-void AllClustersCommandDelegate::OnSwitchEventHandler(uint32_t eventId)
+void AllClustersCommandDelegate::OnSwitchLatchedHandler(uint8_t newPosition)
 {
-    EndpointId endpoint      = 1;
-    uint8_t newPosition      = 20;
-    uint8_t previousPosition = 10;
-    uint8_t count            = 3;
+    EndpointId endpoint = 1;
 
-    if (eventId == Clusters::Switch::Events::SwitchLatched::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::InitialPress::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::LongPress::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::ShortRelease::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::LongRelease::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::MultiPressOngoing::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
-    }
-    else if (eventId == Clusters::Switch::Events::MultiPressComplete::Id)
-    {
-        EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-        Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, newPosition, count);
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Unknow event ID:%d", eventId);
-    }
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
+
+    Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
+}
+
+void AllClustersCommandDelegate::OnSwitchInitialPressedHandler(uint8_t newPosition)
+{
+    EndpointId endpoint = 1;
+
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
+
+    Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
+}
+
+void AllClustersCommandDelegate::OnSwitchLongPressedHandler(uint8_t newPosition)
+{
+    EndpointId endpoint = 1;
+
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
+
+    Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+}
+
+void AllClustersCommandDelegate::OnSwitchShortReleasedHandler(uint8_t previousPosition)
+{
+    EndpointId endpoint = 1;
+
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The the previous value of the CurrentPosition when the momentary switch has been released:%d",
+                  previousPosition);
+
+    Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
+}
+
+void AllClustersCommandDelegate::OnSwitchLongReleasedHandler(uint8_t previousPosition)
+{
+    EndpointId endpoint = 1;
+
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified,
+                  "The the previous value of the CurrentPosition when the momentary switch has been released after having been "
+                  "pressed for a long time:%d",
+                  previousPosition);
+
+    Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
+}
+
+void AllClustersCommandDelegate::OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count)
+{
+    EndpointId endpoint = 1;
+
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed in a multi-press sequence:%d",
+                  newPosition);
+    ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
+
+    Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
+}
+
+void AllClustersCommandDelegate::OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count)
+{
+    EndpointId endpoint = 1;
+
+    EmberAfStatus status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "The previous position when the momentary switch has been pressed in a multi-press sequence:%d",
+                  previousPosition);
+    ChipLogDetail(NotSpecified, "%d times the momentary switch has been pressed", count);
+
+    Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
 }
