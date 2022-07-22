@@ -18,6 +18,7 @@
 #include <platform_stdlib.h>
 
 #include "CHIPDeviceManager.h"
+#include "BindingHandler.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
@@ -41,7 +42,11 @@
 #include <support/CHIPMem.h>
 
 #if CONFIG_ENABLE_PW_RPC
-#include "Rpc.h"
+#include <Rpc.h>
+#endif
+
+#if CONFIG_ENABLE_CHIP_SHELL
+#include <shell/launch_shell.h>
 #endif
 
 using namespace ::chip;
@@ -110,6 +115,8 @@ static void InitServer(intptr_t context)
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
+
+    InitBindingHandler();
 }
 
 extern "C" void ChipTest(void)
@@ -138,6 +145,10 @@ extern "C" void ChipTest(void)
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
+
+#if CONFIG_ENABLE_CHIP_SHELL
+    chip::LaunchShell();
+#endif
 }
 
 bool lowPowerClusterSleep()
