@@ -20,7 +20,6 @@
 #include "BindingHandler.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
-#include <DeviceInfoProviderImpl.h>
 
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
@@ -38,7 +37,6 @@ namespace {
 
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 } // namespace
 
@@ -64,8 +62,8 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AppButton.Init();
+
     AppButton.SetButtonPressCallback(ButtonPressCallback);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     return err;
 }
