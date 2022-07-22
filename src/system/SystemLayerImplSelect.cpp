@@ -249,14 +249,17 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t dispatchQueue = GetDispatchQueue();
-    if (watch->mWrSource) {
+    if (watch->mWrSource)
+    {
         dispatch_resume(watch->mRdSource);
     }
-    else {
-        if (dispatchQueue) {
+    else
+    {
+        if (dispatchQueue)
+        {
             watch->mRdSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, watch->mFD, 0, dispatchQueue);
             ReturnErrorCodeIf(watch->mRdSource == nullptr, CHIP_ERROR_NO_MEMORY);
-            dispatch_source_set_event_handler(watch->mRdSource, ^ {
+            dispatch_source_set_event_handler(watch->mRdSource, ^{
                 SocketEvents events;
                 events.Set(SocketEventFlags::kRead);
                 watch->mCallback(events, watch->mCallbackData);
@@ -277,15 +280,18 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
     watch->mPendingIO.Set(SocketEventFlags::kWrite);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (watch->mWrSource) {
+    if (watch->mWrSource)
+    {
         dispatch_resume(watch->mWrSource);
     }
-    else {
+    else
+    {
         dispatch_queue_t dispatchQueue = GetDispatchQueue();
-        if (dispatchQueue) {
+        if (dispatchQueue)
+        {
             watch->mWrSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, watch->mFD, 0, dispatchQueue);
             ReturnErrorCodeIf(watch->mWrSource == nullptr, CHIP_ERROR_NO_MEMORY);
-            dispatch_source_set_event_handler(watch->mWrSource, ^ {
+            dispatch_source_set_event_handler(watch->mWrSource, ^{
                 SocketEvents events;
                 events.Set(SocketEventFlags::kWrite);
                 watch->mCallback(events, watch->mCallbackData);
@@ -333,11 +339,13 @@ CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
     VerifyOrReturnError(watch->mFD >= 0, CHIP_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (watch->mRdSource) {
+    if (watch->mRdSource)
+    {
         dispatch_cancel(watch->mRdSource);
         dispatch_release(watch->mRdSource);
     }
-    if (watch->mWrSource) {
+    if (watch->mWrSource)
+    {
         dispatch_cancel(watch->mWrSource);
         dispatch_release(watch->mWrSource);
     }
