@@ -263,7 +263,7 @@ private:
         //
         // We're not expecting responses to any messages we send out on this EC.
         //
-        VerifyOrDie(true);
+        VerifyOrDie(false);
     }
 
     enum class State
