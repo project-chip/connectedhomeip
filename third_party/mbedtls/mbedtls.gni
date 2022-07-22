@@ -17,7 +17,7 @@ import("//build_overrides/mbedtls.gni")
 template("mbedtls_target") {
   mbedtls_target_name = target_name
 
-  _mbedtls_root = "${mbedtls_root}/repo"
+  _mbedtls_root = "${mbedtls_repo}/repo"
 
   config("${mbedtls_target_name}_warnings") {
     cflags = [
@@ -57,6 +57,7 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/cipher.c",
       "${_mbedtls_root}/library/cipher_wrap.c",
       "${_mbedtls_root}/library/cmac.c",
+      "${_mbedtls_root}/library/constant_time.c",
       "${_mbedtls_root}/library/ctr_drbg.c",
       "${_mbedtls_root}/library/debug.c",
       "${_mbedtls_root}/library/des.c",

@@ -307,24 +307,14 @@ public:
 
     /**
      * @brief   Initiate TCP half close, in other words, finished with sending.
-     *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
-     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
-     *
-     * @retval  other                   another system or platform error
      */
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     /**
      * @brief   Initiate TCP full close, in other words, finished with both send and
      *  receive.
-     *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
-     * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
-     *
-     * @retval  other                   another system or platform error
      */
-    CHIP_ERROR Close();
+    void Close();
 
     /**
      * @brief   Abortively close the endpoint, in other words, send RST packets.
@@ -609,7 +599,7 @@ protected:
     void DriveReceiving();
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
-    CHIP_ERROR DoClose(CHIP_ERROR err, bool suppressCallback);
+    void DoClose(CHIP_ERROR err, bool suppressCallback);
     static bool IsConnected(State state);
 
     static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);

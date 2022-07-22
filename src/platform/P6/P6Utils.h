@@ -23,6 +23,7 @@
 #include "whd_wlioctl.h"
 #include <cy_wcm.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <whd_events_int.h>
 
 typedef struct
 {
@@ -166,6 +167,7 @@ typedef struct xtlv
 #define XTLV_OPTION_LENU8 0x0004   /* shorted length */
 #define OFFSETOF(type, member) ((uintptr_t) & ((type *) 0)->member)
 #define _LTOH16_UA(cp) ((cp)[0] | ((cp)[1] << 8))
+#define P6_ALIGN_SIZE(value, align_to) (((value) + (align_to) -1) & ~((align_to) -1))
 
 #define CHK_CNTBUF_DATALEN(cntbuf, ioctl_buflen)                                                                                   \
     do                                                                                                                             \
@@ -189,6 +191,7 @@ class P6Utils
 {
 public:
     static CHIP_ERROR IsAPEnabled(bool & apEnabled);
+    static CHIP_ERROR IsStationEnabled(bool & staEnabled);
     static bool IsStationProvisioned(void);
     static CHIP_ERROR IsStationConnected(bool & connected);
     static CHIP_ERROR StartWiFiLayer(void);
@@ -219,9 +222,9 @@ public:
     static void unpack_xtlv_buf(const uint8_t * tlv_buf, uint16_t buflen, wl_cnt_ver_30_t * cnt, wl_cnt_ge40mcst_v1_t * cnt_ge40);
     static void heap_usage(heap_info_t * heap);
     static CHIP_ERROR GetWiFiSSID(char * buf, size_t bufSize);
-    static CHIP_ERROR StoreWiFiSSID(char * buf);
+    static CHIP_ERROR StoreWiFiSSID(char * buf, size_t size);
     static CHIP_ERROR GetWiFiPassword(char * buf, size_t bufSize);
-    static CHIP_ERROR StoreWiFiPassword(char * buf);
+    static CHIP_ERROR StoreWiFiPassword(char * buf, size_t size);
     static CHIP_ERROR GetWiFiSecurityCode(uint32_t & security);
     static CHIP_ERROR StoreWiFiSecurityCode(uint32_t security);
     static CHIP_ERROR wifi_get_mode(uint32_t & security);

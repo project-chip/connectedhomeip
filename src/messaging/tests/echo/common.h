@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <credentials/FabricTable.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
@@ -32,9 +34,11 @@ constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
 
+extern chip::FabricTable gFabricTable;
 extern chip::SessionManager gSessionManager;
 extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
+extern chip::TestPersistentStorageDelegate gStorage;
 
 void InitializeChip(void);
 void ShutdownChip(void);

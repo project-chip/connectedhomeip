@@ -21,7 +21,6 @@ chip_build_tests = false
 chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
-chip_config_network_layer_ble = false
 
 custom_toolchain = "${chip_root}/config/telink/chip-gn/toolchain:zephyr"
 

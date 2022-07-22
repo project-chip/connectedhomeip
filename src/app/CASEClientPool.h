@@ -36,14 +36,14 @@ template <size_t N>
 class CASEClientPool : public CASEClientPoolDelegate
 {
 public:
-    ~CASEClientPool() { mClientPool.ReleaseAll(); }
+    ~CASEClientPool() override { mClientPool.ReleaseAll(); }
 
     CASEClient * Allocate(CASEClientInitParams params) override { return mClientPool.CreateObject(params); }
 
     void Release(CASEClient * client) override { mClientPool.ReleaseObject(client); }
 
 private:
-    BitMapObjectPool<CASEClient, N> mClientPool;
+    ObjectPool<CASEClient, N> mClientPool;
 };
 
 }; // namespace chip

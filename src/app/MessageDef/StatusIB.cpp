@@ -31,7 +31,6 @@
 
 #include <app/AppBuildConfig.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
 
 using namespace chip;
 using namespace chip::TLV;
@@ -45,7 +44,10 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
     reader.Init(mReader);
     while (CHIP_NO_ERROR == reader.Next())
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
         case to_underlying(Tag::kStatus):
@@ -65,7 +67,7 @@ CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
 CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("StatusIB =");
@@ -75,28 +77,31 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
     reader.Init(mReader);
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        if (!(TagPresenceMask & (1 << to_underlying(Tag::kStatus))))
+        if (!TLV::IsContextTag(reader.GetTag()))
         {
-            TagPresenceMask |= (1 << to_underlying(Tag::kStatus));
+            continue;
+        }
+        if (!(tagPresenceMask & (1 << to_underlying(Tag::kStatus))))
+        {
+            tagPresenceMask |= (1 << to_underlying(Tag::kStatus));
 
 #if CHIP_DETAIL_LOGGING
             {
-                uint16_t status;
+                uint8_t status;
                 ReturnErrorOnFailure(reader.Get(status));
-                PRETTY_PRINT("\tstatus = 0x%" PRIx16 ",", status);
+                PRETTY_PRINT("\tstatus = " ChipLogFormatIMStatus ",", ChipLogValueIMStatus(static_cast<Status>(status)));
             }
 #endif // CHIP_DETAIL_LOGGING
         }
-        else if (!(TagPresenceMask & (1 << to_underlying(Tag::kClusterStatus))))
+        else if (!(tagPresenceMask & (1 << to_underlying(Tag::kClusterStatus))))
         {
-            TagPresenceMask |= (1 << to_underlying(Tag::kClusterStatus));
+            tagPresenceMask |= (1 << to_underlying(Tag::kClusterStatus));
 
 #if CHIP_DETAIL_LOGGING
             {
                 ClusterStatus clusterStatus;
                 ReturnErrorOnFailure(reader.Get(clusterStatus));
-                PRETTY_PRINT("\tstatus = 0x%" PRIx8 ",", clusterStatus);
+                PRETTY_PRINT("\tcluster-status = 0x%x,", clusterStatus);
             }
 #endif // CHIP_DETAIL_LOGGING
         }
@@ -107,25 +112,16 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const int RequiredFields = (1 << to_underlying(Tag::kStatus));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_STATUS_CODE;
-        }
+        const int requiredFields = (1 << to_underlying(Tag::kStatus));
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_STATUS_IB;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -195,13 +191,24 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
     const char * desc = nullptr;
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    constexpr char generalFormat[] = "General error: 0x%02" PRIx8;
-    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02" PRIx8;
+    constexpr char generalFormat[] = "General error: " ChipLogFormatIMStatus;
+    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02x";
 
-    // Formatting an 8-bit int will take at most 2 chars, and replace the '%'
-    // and the format letter(s) for PRIx8, so a buffer big enough to hold our
-    // format string will also hold our formatted string.
-    constexpr size_t formattedSize = max(sizeof(generalFormat), sizeof(clusterFormat));
+    // Formatting an 8-bit int will take at most 2 chars, and replace the '%02x'
+    // so a buffer big enough to hold our format string will also hold our
+    // formatted string, as long as we account for the possible string formats.
+    constexpr size_t statusNameMaxLength =
+#define CHIP_IM_STATUS_CODE(name, spec_name, value)                                                                                \
+        max(sizeof(#spec_name),
+#include <protocols/interaction_model/StatusCodeList.h>
+#undef CHIP_IM_STATUS_CODE
+        static_cast<size_t>(0)
+#define CHIP_IM_STATUS_CODE(name, spec_name, value)                                                                                \
+        )
+#include <protocols/interaction_model/StatusCodeList.h>
+#undef CHIP_IM_STATUS_CODE
+        ;
+    constexpr size_t formattedSize = max(sizeof(generalFormat) + statusNameMaxLength, sizeof(clusterFormat));
     char formattedString[formattedSize];
 
     StatusIB status;
@@ -212,7 +219,7 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     }
     else
     {
-        snprintf(formattedString, formattedSize, generalFormat, to_underlying(status.mStatus));
+        snprintf(formattedString, formattedSize, generalFormat, ChipLogValueIMStatus(status.mStatus));
     }
     desc = formattedString;
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

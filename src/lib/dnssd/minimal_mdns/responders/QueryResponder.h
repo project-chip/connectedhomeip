@@ -239,7 +239,7 @@ class QueryResponderBase : public Responder // "_services._dns-sd._udp.local"
 public:
     /// Builds a new responder with the given storage for the response infos
     QueryResponderBase(Internal::QueryResponderInfo * infos, size_t infoSizes);
-    virtual ~QueryResponderBase() {}
+    ~QueryResponderBase() override {}
 
     /// Setup initial settings (clears all infos and sets up dns-sd query replies)
     void Init();
@@ -252,7 +252,8 @@ public:
     /// Implementation of the responder delegate.
     ///
     /// Adds responses for all known _dns-sd services.
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override;
 
     QueryResponderIterator begin(QueryResponderRecordFilter * filter)
     {

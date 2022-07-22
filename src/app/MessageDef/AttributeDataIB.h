@@ -90,10 +90,6 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
-
-protected:
-    // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
 };
 
 class Builder : public StructBuilder

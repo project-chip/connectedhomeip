@@ -46,6 +46,12 @@ CHIP_ERROR AndroidClusterExceptions::CreateChipClusterException(JNIEnv * env, ji
 CHIP_ERROR AndroidClusterExceptions::CreateIllegalStateException(JNIEnv * env, const char message[], ChipError errorCode,
                                                                  jthrowable & outEx)
 {
+    return CreateIllegalStateException(env, message, errorCode.AsInteger(), outEx);
+}
+
+CHIP_ERROR AndroidClusterExceptions::CreateIllegalStateException(JNIEnv * env, const char message[],
+                                                                 ChipError::StorageType errorCode, jthrowable & outEx)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID exceptionConstructor;
     jclass exceptionClass;
@@ -59,20 +65,24 @@ CHIP_ERROR AndroidClusterExceptions::CreateIllegalStateException(JNIEnv * env, c
     VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     char buf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-    snprintf(buf, sizeof(buf), "%s: %d", message, errorCode.AsInteger());
+    snprintf(buf, sizeof(buf), "%s: %d", message, errorCode);
     errStr = env->NewStringUTF(buf);
 
-    outEx = (jthrowable) env->NewObject(exceptionClass, exceptionConstructor, errStr);
+    outEx = static_cast<jthrowable>(env->NewObject(exceptionClass, exceptionConstructor, errStr));
     VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     return err;
 }
 
+void AndroidClusterExceptions::ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], ChipError error)
+{
+    ReturnIllegalStateException(env, callback, message, error.AsInteger());
+}
+
 void AndroidClusterExceptions::ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[],
-                                                           ChipError errorCode)
+                                                           ChipError::StorageType errorCode)
 {
     VerifyOrReturn(callback != nullptr, ChipLogDetail(Zcl, "Callback is null in ReturnIllegalStateException(), exiting early"));
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID method;
     err = JniReferences::GetInstance().FindMethod(env, callback, "onError", "(Ljava/lang/Exception;)V", &method);
@@ -91,4 +101,5 @@ void AndroidClusterExceptions::ReturnIllegalStateException(JNIEnv * env, jobject
     }
     env->CallVoidMethod(callback, method, exception);
 }
+
 } // namespace chip

@@ -2,7 +2,7 @@
 
 ### Directory Structure
 
-The CHIP src directory is structured as follows:
+The CHIP `src` directory is structured as follows:
 
 | File / Folder | Contents                                           |
 | ------------- | -------------------------------------------------- |

@@ -22,6 +22,7 @@ class InfineonApp(Enum):
     LOCK = auto()
     LIGHT = auto()
     ALL_CLUSTERS = auto()
+    ALL_CLUSTERS_MINIMAL = auto()
 
     def ExampleName(self):
         if self == InfineonApp.LOCK:
@@ -30,6 +31,8 @@ class InfineonApp(Enum):
             return 'lighting-app'
         elif self == InfineonApp.ALL_CLUSTERS:
             return 'all-clusters-app'
+        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+            return 'all-clusters-minimal-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -40,6 +43,8 @@ class InfineonApp(Enum):
             return 'chip-p6-lighting-example'
         elif self == InfineonApp.ALL_CLUSTERS:
             return 'chip-p6-clusters-example'
+        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+            return 'chip-p6-clusters-minimal-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -48,6 +53,8 @@ class InfineonApp(Enum):
             return 'lock_app.flashbundle.txt'
         elif self == InfineonApp.ALL_CLUSTERS:
             return 'clusters_app.flashbundle.txt'
+        elif self == InfineonApp.ALL_CLUSTERS_MINIMAL:
+            return 'clusters_minimal_app.flashbundle.txt'
         elif self == InfineonApp.LIGHT:
             return 'lighting_app.flashbundle.txt'
         else:

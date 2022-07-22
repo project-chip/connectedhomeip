@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "PDM.h"
 #include "PWR_Interface.h"
 #include "TimersManager.h"
 #include "board.h"
@@ -51,6 +52,8 @@
 #else
 #define APP_DBG_LOG(...)
 #endif
+
+#define PDM_MAX_WRITES_INFINITE 0xFF
 
 static inline void mutex_init(mbedtls_threading_mutex_t * p_mutex)
 {
@@ -217,6 +220,7 @@ void vPortSuppressTicksAndSleep(TickType_t xExpectedIdleTime)
 
     OSA_InterruptEnable();
 }
+#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */
 
 static void BOARD_ActionOnIdle(void)
 {
@@ -228,9 +232,18 @@ static void BOARD_ActionOnIdle(void)
 #endif
 }
 
+extern void OTAIdleActivities(void);
+
 void vApplicationIdleHook(void)
 {
+    // Data queued by PDM will be written to external flash
+    // when PDM_vIdleTask is called. Interrupts are disabled
+    // to ensure there is no context switch during the actual
+    // writing, thus avoiding race conditions.
+    OSA_InterruptDisable();
+    PDM_vIdleTask(PDM_MAX_WRITES_INFINITE);
+    OSA_InterruptEnable();
+
+    OTAIdleActivities();
     BOARD_ActionOnIdle();
 }
-
-#endif /*  (cPWR_UsePowerDownMode) && (configUSE_TICKLESS_IDLE != 0) */

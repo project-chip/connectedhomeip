@@ -18,50 +18,18 @@
 #
 
 import IPython
-import chip
-import chip.logging
-import coloredlogs
-import logging
 from traitlets.config import Config
-from rich import print
-from rich import pretty
-from rich import inspect
 import builtins
-import argparse
 import sys
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-n", "--noautoinit", help="Disable the default auto-initialization of the controller", action="store_true")
-    args = parser.parse_args()
-
     c = Config()
     c.InteractiveShellApp.exec_lines = [
-        "from rich import print",
-        "from rich.pretty import pprint",
-        "from rich import pretty",
-        "from rich import inspect",
-        "from rich.console import Console",
-        "import logging",
-        "from chip import ChipDeviceCtrl",
-        "import chip.clusters as Clusters",
-        "import coloredlogs",
-        "import chip.logging",
-        "import argparse",
-        "from chip.ChipReplStartup import *",
-        "ReplInit()",
+        "import pkgutil",
+        "module = pkgutil.get_loader('chip.ChipReplStartup')",
+        "%run {module.path} " + " ".join(sys.argv[1:])
     ]
-
-    if (not(args.noautoinit)):
-        c.InteractiveShellApp.exec_lines.extend([
-            "import builtins",
-            "devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=12344321)",
-            "builtins.devCtrl = devCtrl",
-            "console = Console()",
-            "console.print('\\n\\n[blue]CHIP Device Controller has been initialized, and is available as [bold red]devCtrl')"
-        ])
 
     sys.argv = [sys.argv[0]]
 

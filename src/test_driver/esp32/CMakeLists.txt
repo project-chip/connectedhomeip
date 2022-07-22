@@ -40,12 +40,12 @@ idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 # which have the same issue.
 #
 # libAppTests.a -lMessagingTestHelpers -lNetworkTestHelpers
-# 
+#
 # TODO: ble tests do not compile using CMake (library is not auto-built)
 # libBleLayerTests.a
 
 esp32_unit_test(NAME testASN1 LIBRARY ASN1Tests)
-esp32_unit_test(NAME testChipCrypto LIBRARY ChipCryptoTests EXTRA_LIBRARIES -lChipCertTestVectors)
+esp32_unit_test(NAME testChipCrypto LIBRARY ChipCryptoTests EXTRA_LIBRARIES -lCertTestVectors)
 esp32_unit_test(NAME testCore LIBRARY CoreTests)
 esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
 esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)

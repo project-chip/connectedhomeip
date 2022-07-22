@@ -46,21 +46,22 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
                                           .SetHostName(host)
                                           .AddSubtype("_IBEEFBEEFF00DF00D");
-OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
-                                                          .SetPeerId(kPeerId2)
-                                                          .SetMac(ByteSpan(kMac))
-                                                          .SetPort(CHIP_PORT)
-                                                          .EnableIpV4(true)
-                                                          .SetMRPConfig({ 32_ms32, 33_ms32 })
-                                                          .SetTcpSupported(Optional<bool>(true));
+OperationalAdvertisingParameters operationalParams2 =
+    OperationalAdvertisingParameters()
+        .SetPeerId(kPeerId2)
+        .SetMac(ByteSpan(kMac))
+        .SetPort(CHIP_PORT)
+        .EnableIpV4(true)
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(32_ms32, 30_ms32)) // SII and SAI to match below
+        .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("5555666677778888-1212343456567878")
                                           .SetHostName(host)
                                           .AddSubtype("_I5555666677778888")
-                                          .AddTxt("CRI", "32")
-                                          .AddTxt("CRA", "33")
+                                          .AddTxt("SII", "32")
+                                          .AddTxt("SAI", "30")
                                           .AddTxt("T", "1");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
@@ -86,7 +87,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetDeviceType(chip::Optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
@@ -95,7 +96,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetMRPConfig({ 3600000_ms32, 3600005_ms32 });
+        .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32));
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -104,18 +105,18 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("D", "22")
                                                   .AddTxt("VP", "555+897")
                                                   .AddTxt("CM", "1")
-                                                  .AddTxt("DT", "25")
+                                                  .AddTxt("DT", "70000")
                                                   .AddTxt("DN", "testy-test")
                                                   .AddTxt("RI", "id_that_spins")
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
                                                   .AddTxt("T", "1")
-                                                  .AddTxt("CRI", "3600000")
-                                                  .AddTxt("CRA", "3600000")
+                                                  .AddTxt("SII", "3600000")
+                                                  .AddTxt("SAI", "3600000")
                                                   .AddSubtype("_S2")
                                                   .AddSubtype("_L22")
                                                   .AddSubtype("_V555")
-                                                  .AddSubtype("_T25")
+                                                  .AddSubtype("_T70000")
                                                   .AddSubtype("_CM");
 CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
     CommissionAdvertisingParameters()
@@ -124,7 +125,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetLongDiscriminator(22)
         .SetShortDiscriminator(2)
         .SetVendorId(chip::Optional<uint16_t>(555))
-        .SetDeviceType(chip::Optional<uint16_t>(25))
+        .SetDeviceType(chip::Optional<uint32_t>(70000))
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
@@ -139,7 +140,7 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .AddTxt("D", "22")
                                                      .AddTxt("VP", "555+897")
                                                      .AddTxt("CM", "2")
-                                                     .AddTxt("DT", "25")
+                                                     .AddTxt("DT", "70000")
                                                      .AddTxt("DN", "testy-test")
                                                      .AddTxt("RI", "id_that_spins")
                                                      .AddTxt("PI", "Pair me")
@@ -147,7 +148,7 @@ test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .AddSubtype("_S2")
                                                      .AddSubtype("_L22")
                                                      .AddSubtype("_V555")
-                                                     .AddSubtype("_T25")
+                                                     .AddSubtype("_T70000")
                                                      .AddSubtype("_CM");
 void TestStub(nlTestSuite * inSuite, void * inContext)
 {
@@ -219,6 +220,18 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mdnsPlatform.FinalizeServiceUpdate() == CHIP_NO_ERROR);
 }
 
+int TestSetup(void * inContext)
+{
+    return chip::Platform::MemoryInit() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
+}
+
+int TestTeardown(void * inContext)
+{
+    DiscoveryImplPlatform::GetInstance().Shutdown();
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestStub", TestStub),                             //
     NL_TEST_DEF("TestOperational", TestOperational),               //
@@ -230,7 +243,7 @@ const nlTest sTests[] = {
 
 int TestDnssdPlatform(void)
 {
-    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "DnssdPlatform", &sTests[0], &TestSetup, &TestTeardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

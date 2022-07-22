@@ -102,7 +102,7 @@ static CHIP_ERROR WiFiModeHandler(int argc, char ** argv)
     {
         return PrintWiFiMode();
     }
-    else if (argc != 1)
+    if (argc != 1)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

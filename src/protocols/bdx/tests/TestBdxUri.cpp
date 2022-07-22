@@ -27,7 +27,7 @@ namespace {
 
 CharSpan ToSpan(const char * str)
 {
-    return CharSpan(str, strlen(str));
+    return CharSpan::fromCharString(str);
 }
 
 void TestParseURI(nlTestSuite * inSuite, void * inContext)

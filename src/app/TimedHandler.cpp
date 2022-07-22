@@ -17,7 +17,6 @@
  */
 
 #include "TimedHandler.h"
-#include <app/InteractionModelDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>
@@ -112,9 +111,6 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
 
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-
-    reader.Next();
-
     TimedRequestMessage::Parser parser;
     ReturnErrorOnFailure(parser.Init(reader));
 
@@ -124,16 +120,18 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
 
     uint16_t timeoutMs;
     ReturnErrorOnFailure(parser.GetTimeoutMs(&timeoutMs));
+    ReturnErrorOnFailure(parser.ExitContainer());
 
-    ChipLogDetail(DataManagement, "Got Timed Request with timeout %" PRIu16 ": handler %p exchange " ChipLogFormatExchange,
-                  timeoutMs, this, ChipLogValueExchange(aExchangeContext));
+    ChipLogDetail(DataManagement, "Got Timed Request with timeout %u: handler %p exchange " ChipLogFormatExchange, timeoutMs, this,
+                  ChipLogValueExchange(aExchangeContext));
     // Use at least our default IM timeout, because if we close our exchange as
     // soon as we know the delay has passed we won't be able to send the
     // UNSUPPORTED_ACCESS status code the spec tells us to send (and in fact
     // will send nothing and the other side will have to time out to realize
     // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
-    aExchangeContext->SetResponseTimeout(std::max(delay, kImMessageTimeout));
+    aExchangeContext->SetResponseTimeout(
+        std::max(delay, aExchangeContext->GetSessionHandle()->ComputeRoundTripTimeout(app::kExpectedIMProcessingTime)));
     ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.

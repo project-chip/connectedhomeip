@@ -25,6 +25,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -47,7 +48,6 @@ constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
-TestContext sContext;
 
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
@@ -205,16 +205,13 @@ static int Initialize(void * aContext)
  */
 static int Finalize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    return SUCCESS;
 }
 
 int TestUDP()
 {
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestUDP);

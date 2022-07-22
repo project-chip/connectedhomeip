@@ -397,6 +397,12 @@ CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
+    if (GetLength() == 0)
+    {
+        data = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
     err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
     if (err != CHIP_NO_ERROR)
         return err;
@@ -725,6 +731,7 @@ CHIP_ERROR TLVReader::ReadElement()
         break;
     case kTLVFieldSize_8Byte:
         mElemLenOrVal = LittleEndian::Read64(p);
+        VerifyOrReturnError(!TLVTypeHasLength(elemType) || (mElemLenOrVal <= UINT32_MAX), CHIP_ERROR_NOT_IMPLEMENTED);
         break;
     }
 
@@ -784,7 +791,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     return CHIP_NO_ERROR;
 }
 
-Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
+Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p) const
 {
     uint16_t vendorId;
     uint16_t profileNum;

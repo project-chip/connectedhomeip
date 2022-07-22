@@ -28,6 +28,7 @@
 #include <nlunit-test.h>
 
 #include <lib/support/Span.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 using namespace chip;
@@ -91,15 +92,14 @@ void TestMaximumValues(nlTestSuite * inSuite, void * inContext)
     inPayload.discriminator = static_cast<uint16_t>((1 << kPayloadDiscriminatorFieldLengthInBits) - 1);
     inPayload.setUpPINCode  = static_cast<uint32_t>((1 << kSetupPINCodeFieldLengthInBits) - 1);
 
-    NL_TEST_ASSERT(inSuite, inPayload.isValidQRCodePayload());
-    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload, /* allowInvalidPayload */ true));
 }
 
 void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
-    string expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 101";
+    string expected = " 0000 000000000000000100000000000 000010000000 00000001 00 0000000000000001 0000000000001100 000";
     NL_TEST_ASSERT(inSuite, CompareBinary(payload, expected));
 }
 
@@ -119,21 +119,25 @@ void TestPayloadBase38Rep(nlTestSuite * inSuite, void * inContext)
 void TestBase38(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t input[3] = { 10, 10, 10 };
-    char encodedBuf[32];
+    char encodedBuf[64];
     MutableByteSpan inputSpan(input);
     MutableCharSpan encodedSpan(encodedBuf);
 
     // basic stuff
     base38Encode(inputSpan.SubSpan(0, 0), encodedSpan);
     NL_TEST_ASSERT(inSuite, strlen(encodedBuf) == 0);
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "A0") == 0);
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "OT10") == 0);
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "-N.B0") == 0);
 
     // test null termination of output buffer
+    encodedSpan             = MutableCharSpan(encodedBuf);
     MutableCharSpan subSpan = encodedSpan.SubSpan(0, 2);
     NL_TEST_ASSERT(inSuite, base38Encode(inputSpan.SubSpan(0, 1), subSpan) == CHIP_ERROR_BUFFER_TOO_SMALL);
     // Force no nulls in output buffer
@@ -146,60 +150,72 @@ void TestBase38(nlTestSuite * inSuite, void * inContext)
 
     // passing empty parameters
     MutableCharSpan emptySpan;
+    encodedSpan = MutableCharSpan(encodedBuf);
     NL_TEST_ASSERT(inSuite, base38Encode(inputSpan, emptySpan) == CHIP_ERROR_BUFFER_TOO_SMALL);
     base38Encode(MutableByteSpan(), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "") == 0);
     NL_TEST_ASSERT(inSuite, base38Encode(MutableByteSpan(), emptySpan) == CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // test single odd byte corner conditions
-    input[2] = 0;
+    encodedSpan = MutableCharSpan(encodedBuf);
+    input[2]    = 0;
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "OT100") == 0);
-    input[2] = 40;
+    input[2]    = 40;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Y6V91") == 0);
-    input[2] = 41;
+    input[2]    = 41;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "KL0B1") == 0);
-    input[2] = 255;
+    input[2]    = 255;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Q-M08") == 0);
 
     // verify chunks of 1,2 and 3 bytes result in fixed-length strings padded with '0'
     // for 1 byte we need always 2 characters
-    input[0] = 35;
+    input[0]    = 35;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "Z0") == 0);
     // for 2 bytes we need always 4 characters
-    input[0] = 255;
-    input[1] = 0;
+    input[0]    = 255;
+    input[1]    = 0;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "R600") == 0);
     // for 3 bytes we need always 5 characters
-    input[0] = 46;
-    input[1] = 0;
-    input[2] = 0;
+    input[0]    = 46;
+    input[1]    = 0;
+    input[2]    = 0;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "81000") == 0);
 
     // verify maximum available values for each chunk size to check selecting proper characters number
     // for 1 byte we need 2 characters
-    input[0] = 255;
+    input[0]    = 255;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan.SubSpan(0, 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "R6") == 0);
     // for 2 bytes we need 4 characters
-    input[0] = 255;
-    input[1] = 255;
+    input[0]    = 255;
+    input[1]    = 255;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan.SubSpan(0, 2), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "NE71") == 0);
     // for 3 bytes we need 5 characters
-    input[0] = 255;
-    input[1] = 255;
-    input[2] = 255;
+    input[0]    = 255;
+    input[1]    = 255;
+    input[2]    = 255;
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(inputSpan, encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "PLS18") == 0);
 
     // fun with strings
+    encodedSpan = MutableCharSpan(encodedBuf);
     base38Encode(ByteSpan((uint8_t *) "Hello World!", sizeof("Hello World!") - 1), encodedSpan);
     NL_TEST_ASSERT(inSuite, strcmp(encodedBuf, "KKHF3W2S013OPM3EJX11") == 0);
 
@@ -419,11 +435,6 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-struct TestContext
-{
-    nlTestSuite * mSuite;
-};
-
 } // namespace
 
 /**
@@ -440,17 +451,11 @@ int TestQuickResponseCode()
         nullptr
     };
     // clang-format on
-    TestContext context;
-
-    context.mSuite = &theSuite;
 
     // Generate machine-readable, comma-separated value (CSV) output.
     nl_test_set_output_style(OUTPUT_CSV);
 
-    // Run test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return nlTestRunnerStats(&theSuite);
+    return chip::ExecuteTestsWithoutContext(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestQuickResponseCode);

@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Matter Arm Mbed OS Lighting Example Application </h1>
 
@@ -87,12 +85,26 @@ the network.
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
+    ```
     $ git submodule update --init
+    ```
 
 Building the example application requires the use of **ARM Mbed-OS** sources and
-the **arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
-purpose. <br> Some additional packages may be needed, depending on selected
-build target and its requirements.
+the **arm-none-gnu-eabi** toolchain.
+
+The Cypress OpenOCD package is required for flashing purpose. Install the
+Cypress OpenOCD and set env var `OPENOCD_PATH` before calling the flashing
+script.
+
+```
+cd ~
+wget https://github.com/Infineon/openocd/releases/download/release-v4.3.0/openocd-4.3.0.1746-linux.tar.gz
+tar xzvf openocd-4.3.0.1746-linux.tar.gz
+export OPENOCD_PATH=$HOME/openocd
+```
+
+Some additional packages may be needed, depending on selected build target and
+its requirements.
 
 > **The VSCode devcontainer has these components pre-installed. Using the VSCode
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the
@@ -124,13 +136,13 @@ example ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile)
+Command Palette (F1) => Run Task... => Run Mbed Application => build => lighting-app => (board name) => (build profile) => (build type)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=lighting-app -b=<board name> -p=<build profile>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=lighting-app -b=<board name> -p=<build profile> -T=<build type>
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
@@ -139,6 +151,16 @@ Both approaches are limited to supported evaluation boards which are listed in
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit
 [ARM Mbed OS build profiles](https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html).
+
+There are also three types of built application: _simple, boot_ and _upgrade_:
+
+-   **simple** - standalone application, mainly for developing and testing
+    purpose (all building profiles are supported)
+-   **boot** - signed application + bootloader, it supports booting process and
+    can be use for firmware update (only _release_ building profiles is
+    supported)
+-   **update** - signed application, application image can be used for firmware
+    update (only _release_ building profiles is supported)
 
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.
@@ -201,13 +223,17 @@ open a terminal session and connect to the serial port of the device. You can
 use **mbed-tools** for this purpose
 ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
 
+    ```
     mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+    ```
 
 After device reset these lines should be visible:
 
+    ```
     [INFO][CHIP]: [-]Mbed lighting-app example application start
     ...
     [INFO][CHIP]: [-]Mbed lighting-app example application run
+    ```
 
 The lighting-app application launched correctly and you can follow traces in the
 terminal.
@@ -244,24 +270,34 @@ parameters as arguments:
 
 Example:
 
-    python -m chip_rpc.console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+    ```
+    chip-console -d /dev/ttyUSB0 -b 115200 -o /tmp/pw_rpc.out
+    ```
 
 To control the lighting type the following command, where you define if 'on'
 state is true or false:
 
+    ```
     In [1]: rpcs.chip.rpc.Lighting.Set(on=True)
+    ```
 
 The response from the device should be:
 
+    ```
     Out[1]: (Status.OK, pw.protobuf.Empty())
+    ```
 
 To check the lighting state type the following command:
 
+    ```
     In [1]: rpcs.chip.rpc.Lighting.Get()
+    ```
 
 The response from the device should contain the current lighting state:
 
+    ```
     Out[1]: Status.OK, chip.rpc.LightingState(on=True))
+    ```
 
 For more details about RPC console and supported services visit
 [CHIP RPC console](../../common/pigweed/rpc_console/README.md).
@@ -324,8 +360,8 @@ The following states are possible:
     procedure. **LEDs 1-4** blink in unison when the factory reset procedure is
     initiated.
 
--   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    process. This feature is not currently supported.
+-   _Pressed for less than 3 s_ &mdash; Delete all fabric IDs and start BLE
+    advertising.
 
 **Button 1** &mdash; Pressing the button once changes the lighting state to the
 opposite one.

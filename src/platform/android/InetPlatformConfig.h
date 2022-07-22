@@ -25,8 +25,9 @@
 #pragma once
 
 // ==================== Platform Adaptations ====================
-
+#ifndef INET_CONFIG_ENABLE_IPV4
 #define INET_CONFIG_ENABLE_IPV4 1
+#endif // INET_CONFIG_ENABLE_IPV4
 
 // ========== Platform-specific Configuration Overrides =========
 

@@ -29,6 +29,7 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/NodeId.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -94,7 +95,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventFilterIB::Builder & Node(const NodeId aNode);
+    EventFilterIB::Builder & Node(const NodeId aNodeId);
 
     /**
      *  @brief Inject EventId into the TLV stream.

@@ -276,7 +276,7 @@ public:
             mConnectionsBuffer[i].Init(nullptr);
         }
     }
-    ~TCP() { mPendingPackets.ReleaseAll(); }
+    ~TCP() override { mPendingPackets.ReleaseAll(); }
 
 private:
     friend class TCPTest;

@@ -38,15 +38,15 @@
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
-#include <app/server/Server.h>
 #include <transport/raw/PeerAddress.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#error "When using OpenThread Endpoints, one should also use GenericThreadStackManagerImpl_OpenThread"
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -134,7 +134,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
     LOCK_TCPIP_CORE();
     Impl()->LockThreadStack();
 
-    // Determine whether the device is attached to a Thread network.
+    // Determine whether the device Thread interface is up..
     isInterfaceUp = GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoLock();
 
     // If needed, adjust the link state of the LwIP netif to reflect the state of the OpenThread stack.
@@ -150,19 +150,6 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
         else
         {
             netif_set_link_down(mNetIf);
-        }
-
-        // Post an event signaling the change in Thread interface connectivity state.
-        {
-            ChipDeviceEvent event;
-            event.Clear();
-            event.Type                            = DeviceEventType::kThreadConnectivityChange;
-            event.ThreadConnectivityChange.Result = (isInterfaceUp) ? kConnectivity_Established : kConnectivity_Lost;
-            CHIP_ERROR status                     = PlatformMgr().PostEvent(&event);
-            if (status != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
-            }
         }
 
         // Presume the interface addresses are also changing.
@@ -230,39 +217,6 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                     addrAssigned[addrIdx] = true;
                 }
             }
-
-// Multicast won't work with LWIP on top of OT
-// Duplication of listeners, unecessary timers, buffer duplication, hardfault etc...
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
-            // Refresh Multicast listening
-            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
-            {
-                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-
-                Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
-                TransportMgrBase * transportMgr           = &(chip::Server::GetInstance().GetTransportManager());
-                Credentials::GroupDataProvider::GroupInfo group;
-                CHIP_ERROR err = CHIP_NO_ERROR;
-                for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
-                {
-                    auto it = provider->IterateGroupInfo(fabricInfo.GetFabricIndex());
-                    if (it)
-                    {
-                        while (it->Next(group))
-                        {
-                            err = transportMgr->MulticastGroupJoinLeave(
-                                Transport::PeerAddress::Multicast(fabricInfo.GetFabricIndex(), group.group_id), true);
-                            if (err != CHIP_NO_ERROR)
-                            {
-                                ChipLogError(DeviceLayer, "Failed to Join Multicast Group: %s", err.AsString());
-                                break;
-                            }
-                        }
-                        it->Release();
-                    }
-                }
-            }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
         }
 
         ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");
@@ -451,6 +405,10 @@ exit:
         // TODO: deliver CHIP platform event signaling loss of inbound packet.
     }
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

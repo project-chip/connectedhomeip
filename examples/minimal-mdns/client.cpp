@@ -48,7 +48,7 @@ struct Options
     mdns::Minimal::QType type = mdns::Minimal::QType::ANY;
 } gOptions;
 
-constexpr uint32_t kTestMessageId   = 0x1234;
+constexpr uint32_t kTestMessageId   = 0;
 constexpr size_t kMdnsMaxPacketSize = 1'024;
 
 using namespace chip::ArgParser;

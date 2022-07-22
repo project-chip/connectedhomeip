@@ -25,7 +25,7 @@
 
 #include <platform/CYW30739/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <hal/wiced_memory.h>
@@ -42,14 +42,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     wiced_result_t result;
 
     // Initialize the configuration system.
-    err = Internal::CYW30739Config::Init();
+    err = PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
-    /* Initialize LwIP. */
-    lwip_init();
 
     /* Create the thread object. */
     mThread = wiced_rtos_create_thread();
@@ -127,6 +123,11 @@ exit:
     return err;
 }
 
+CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
+{
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::_LockChipStack(void)
 {
     const wiced_result_t result = wiced_rtos_lock_mutex(mMutex);
@@ -171,10 +172,7 @@ CHIP_ERROR PlatformManagerImpl::_StartChipTimer(System::Clock::Timeout durationM
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void PlatformManagerImpl::_Shutdown() {}
 
 void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 {
@@ -188,7 +186,7 @@ void PlatformManagerImpl::SetEventFlags(uint32_t flags)
 
 void PlatformManagerImpl::HandleTimerEvent(void)
 {
-    const CHIP_ERROR err = static_cast<System::LayerImplLwIP &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+    const CHIP_ERROR err = static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandlePlatformTimer %ld", err.AsInteger());

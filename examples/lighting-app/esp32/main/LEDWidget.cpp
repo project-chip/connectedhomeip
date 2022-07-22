@@ -16,7 +16,9 @@
  */
 
 #include "LEDWidget.h"
-#include "color_format.h"
+#include "ColorFormat.h"
+
+static const char * TAG = "LEDWidget";
 
 void LEDWidget::Init(void)
 {
@@ -59,6 +61,7 @@ void LEDWidget::Init(void)
 
 void LEDWidget::Set(bool state)
 {
+    ESP_LOGI(TAG, "Setting state to %d", state ? 1 : 0);
     if (state == mState)
         return;
 
@@ -67,14 +70,33 @@ void LEDWidget::Set(bool state)
     DoSet();
 }
 
+void LEDWidget::Toggle()
+{
+    ESP_LOGI(TAG, "Toggling state to %d", !mState);
+    mState = !mState;
+
+    DoSet();
+}
+
 void LEDWidget::SetBrightness(uint8_t brightness)
 {
+    ESP_LOGI(TAG, "Setting brightness to %d", brightness);
     if (brightness == mBrightness)
         return;
 
     mBrightness = brightness;
 
     DoSet();
+}
+
+uint8_t LEDWidget::GetLevel()
+{
+    return this->mBrightness;
+}
+
+bool LEDWidget::IsTurnedOn()
+{
+    return this->mState;
 }
 
 #if CONFIG_LED_TYPE_RMT
@@ -104,6 +126,7 @@ void LEDWidget::DoSet(void)
         mStrip->refresh(mStrip, 100);
     }
 #else
+    ESP_LOGE(TAG, "DoSet to GPIO number %d", mGPIONum);
     if (mGPIONum < GPIO_NUM_MAX)
     {
         ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, brightness);

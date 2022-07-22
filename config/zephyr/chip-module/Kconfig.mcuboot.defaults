@@ -1,0 +1,89 @@
+#
+#   Copyright (c) 2022 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+# The purpose of this file is to define new default values of settings used when building mcuboot child image for Matter samples.
+
+config MAIN_STACK_SIZE
+	int
+	default 10240
+
+config BOOT_SWAP_SAVE_ENCTLV
+	bool
+	default n
+
+config BOOT_ENCRYPT_RSA
+	bool
+	default n
+
+config BOOT_ENCRYPT_EC256
+	bool
+	default n
+
+config BOOT_ENCRYPT_X25519
+	bool
+	default n
+
+config BOOT_BOOTSTRAP
+	bool
+	default n
+
+config PM
+	bool
+	default n
+
+config FLASH
+	bool
+	default y
+
+config FPROTECT
+	bool
+	default y
+
+config BOOT_MAX_IMG_SECTORS
+	int
+	default 256
+
+config LOG
+	bool
+	default n
+
+config CONSOLE_HANDLER
+	bool
+	default n
+
+config BOOT_BANNER
+	bool
+	default n
+
+config TIMESLICING
+	bool
+	default n
+
+config RESET_ON_FATAL_ERROR
+	bool
+	default n
+
+config MULTITHREADING
+	bool
+	default n
+
+config TICKLESS_KERNEL
+	bool
+	default n
+
+config TIMEOUT_64BIT
+	bool
+	default n

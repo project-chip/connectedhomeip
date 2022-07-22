@@ -32,7 +32,7 @@ class StatusResponse
 public:
     static CHIP_ERROR Send(Protocols::InteractionModel::Status aStatus, Messaging::ExchangeContext * apExchangeContext,
                            bool aExpectResponse);
-    static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus);
+    static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload);
 };
 } // namespace app
 } // namespace chip

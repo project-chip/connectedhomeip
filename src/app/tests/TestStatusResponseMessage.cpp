@@ -85,8 +85,6 @@ void StatusResponseMessagePositiveTest(nlTestSuite * apSuite, void * apContext)
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseStatusResponseMessage(apSuite, reader, true /*aTestPositiveCase*/);
 }
 
@@ -101,8 +99,6 @@ void StatusResponseMessageNegativeTest(nlTestSuite * apSuite, void * apContext)
     err = writer.Finalize(&buf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     reader.Init(std::move(buf));
-    err = reader.Next();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseStatusResponseMessage(apSuite, reader, false /*aTestPositiveCase*/);
 }
 

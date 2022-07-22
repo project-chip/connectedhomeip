@@ -41,16 +41,21 @@ namespace NetworkCommissioning {
 // TODO: The otbr-posix does not actually maintains its own networking states, it will always persist the last network connected.
 // This should not be an issue for most cases, but we should implement the code for maintaining the states by ourselves.
 
-CHIP_ERROR LinuxThreadDriver::Init()
+CHIP_ERROR LinuxThreadDriver::Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback)
 {
-    ByteSpan currentProvision;
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), CHIP_NO_ERROR);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    mSavedNetwork.Init(currentProvision);
-    mStagingNetwork.Init(currentProvision);
+    mSavedNetwork.Init(mStagingNetwork.AsByteSpan());
+
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(networkStatusChangeCallback);
 
     return CHIP_NO_ERROR;
+}
+
+void LinuxThreadDriver::Shutdown()
+{
+    ThreadStackMgrImpl().SetNetworkStatusChangeCallback(nullptr);
 }
 
 CHIP_ERROR LinuxThreadDriver::CommitConfiguration()
@@ -67,12 +72,13 @@ CHIP_ERROR LinuxThreadDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
+Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
     uint8_t extpanid[kSizeExtendedPanId];
     uint8_t newExtpanid[kSizeExtendedPanId];
     Thread::OperationalDataset newDataset;
-
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     newDataset.Init(operationalDataset);
     VerifyOrReturnError(newDataset.IsCommissioned(), Status::kOutOfRange);
 
@@ -83,14 +89,16 @@ Status LinuxThreadDriver::AddOrUpdateNetwork(ByteSpan operationalDataset)
     return Status::kSuccess;
 }
 
-Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId)
+Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex)
 {
+    outDebugText.reduce_size(0);
+    outNetworkIndex = 0;
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -101,14 +109,15 @@ Status LinuxThreadDriver::RemoveNetwork(ByteSpan networkId)
     return Status::kSuccess;
 }
 
-Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
+Status LinuxThreadDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
+    outDebugText.reduce_size(0);
     uint8_t extpanid[kSizeExtendedPanId];
     if (!mStagingNetwork.IsCommissioned())
     {
         return Status::kNetworkNotFound;
     }
-    else if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
+    if (mStagingNetwork.GetExtendedPanId(extpanid) != CHIP_NO_ERROR)
     {
         return Status::kUnknownError;
     }
@@ -135,7 +144,7 @@ void LinuxThreadDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * cal
     VerifyOrExit((networkId.size() == kSizeExtendedPanId && memcmp(networkId.data(), extpanid, kSizeExtendedPanId) == 0),
                  status = Status::kNetworkNotFound);
 
-    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork.AsByteSpan(), callback) == CHIP_NO_ERROR,
+    VerifyOrExit(DeviceLayer::ThreadStackMgrImpl().AttachToThreadNetwork(mStagingNetwork, callback) == CHIP_NO_ERROR,
                  status = Status::kUnknownError);
 
 exit:
@@ -148,6 +157,7 @@ exit:
 void LinuxThreadDriver::ScanNetworks(ThreadDriver::ScanCallback * callback)
 {
     CHIP_ERROR err = DeviceLayer::ThreadStackMgrImpl().StartThreadScan(callback);
+    // The ThreadScan callback will always be invoked in CHIP mainloop, which is strictly after this function
     if (err != CHIP_NO_ERROR)
     {
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
@@ -172,14 +182,12 @@ bool LinuxThreadDriver::ThreadNetworkIterator::Next(Network & item)
     item.connected    = false;
     exhausted         = true;
 
-    ByteSpan currentProvision;
     Thread::OperationalDataset currentDataset;
     uint8_t enabledExtPanId[Thread::kSizeExtendedPanId];
 
     // The Thread network is not actually enabled.
     VerifyOrReturnError(ConnectivityMgrImpl().IsThreadAttached(), true);
-    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentProvision) == CHIP_NO_ERROR, true);
-    VerifyOrReturnError(currentDataset.Init(currentProvision) == CHIP_NO_ERROR, true);
+    VerifyOrReturnError(ThreadStackMgrImpl().GetThreadProvision(currentDataset) == CHIP_NO_ERROR, true);
     // The Thread network is not enabled, but has a different extended pan id.
     VerifyOrReturnError(currentDataset.GetExtendedPanId(enabledExtPanId) == CHIP_NO_ERROR, true);
     VerifyOrReturnError(memcmp(extpanid, enabledExtPanId, kSizeExtendedPanId) == 0, true);

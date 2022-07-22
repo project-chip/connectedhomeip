@@ -30,139 +30,121 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT AccountLoginCluster : public ClusterBase
+class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
-    ~AccountLoginCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR GetSetupPINRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::CharSpan tempAccountIdentifier);
-    CHIP_ERROR LoginRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
-    CHIP_ERROR LogoutRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint)
+    {}
+    ~OnOffCluster() {}
 };
 
-class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
-    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
-    ~ApplicationBasicCluster() {}
+    LevelControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::LevelControl::Id, endpoint)
+    {}
+    ~LevelControlCluster() {}
 };
 
-class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
+class DLL_EXPORT DescriptorCluster : public ClusterBase
 {
 public:
-    ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
-    ~ApplicationLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint16_t catalogVendorId, chip::CharSpan applicationId);
-    CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
-    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint16_t catalogVendorId, chip::CharSpan applicationId);
-};
-
-class DLL_EXPORT AudioOutputCluster : public ClusterBase
-{
-public:
-    AudioOutputCluster() : ClusterBase(app::Clusters::AudioOutput::Id) {}
-    ~AudioOutputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR RenameOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t index, chip::CharSpan name);
-    CHIP_ERROR SelectOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t index);
+    DescriptorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Descriptor::Id, endpoint)
+    {}
+    ~DescriptorCluster() {}
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
 {
 public:
-    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
+    ChannelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Channel::Id, endpoint)
+    {}
     ~ChannelCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t majorNumber, uint16_t minorNumber);
-    CHIP_ERROR ChangeChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    chip::CharSpan match);
-    CHIP_ERROR SkipChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint16_t count);
-};
-
-class DLL_EXPORT ContentLauncherCluster : public ClusterBase
-{
-public:
-    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
-    ~ContentLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    bool autoPlay, chip::CharSpan data);
-    CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
-};
-
-class DLL_EXPORT KeypadInputCluster : public ClusterBase
-{
-public:
-    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
-    ~KeypadInputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t keyCode);
-};
-
-class DLL_EXPORT MediaInputCluster : public ClusterBase
-{
-public:
-    MediaInputCluster() : ClusterBase(app::Clusters::MediaInput::Id) {}
-    ~MediaInputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR HideInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
-                                  chip::CharSpan name);
-    CHIP_ERROR SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t index);
-    CHIP_ERROR ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
-{
-public:
-    MediaPlaybackCluster() : ClusterBase(app::Clusters::MediaPlayback::Id) {}
-    ~MediaPlaybackCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR FastForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
-    CHIP_ERROR SkipBackwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR SkipForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR StartOverRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 {
 public:
-    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
+    TargetNavigatorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::TargetNavigator::Id, endpoint)
+    {}
     ~TargetNavigatorCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR NavigateTargetRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t target, chip::CharSpan data);
+class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
+{
+public:
+    MediaPlaybackCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::MediaPlayback::Id, endpoint)
+    {}
+    ~MediaPlaybackCluster() {}
+};
+
+class DLL_EXPORT MediaInputCluster : public ClusterBase
+{
+public:
+    MediaInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::MediaInput::Id, endpoint)
+    {}
+    ~MediaInputCluster() {}
+};
+
+class DLL_EXPORT KeypadInputCluster : public ClusterBase
+{
+public:
+    KeypadInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::KeypadInput::Id, endpoint)
+    {}
+    ~KeypadInputCluster() {}
+};
+
+class DLL_EXPORT ContentLauncherCluster : public ClusterBase
+{
+public:
+    ContentLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ContentLauncher::Id, endpoint)
+    {}
+    ~ContentLauncherCluster() {}
+};
+
+class DLL_EXPORT AudioOutputCluster : public ClusterBase
+{
+public:
+    AudioOutputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::AudioOutput::Id, endpoint)
+    {}
+    ~AudioOutputCluster() {}
+};
+
+class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
+{
+public:
+    ApplicationLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ApplicationLauncher::Id, endpoint)
+    {}
+    ~ApplicationLauncherCluster() {}
+};
+
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ApplicationBasic::Id, endpoint)
+    {}
+    ~ApplicationBasicCluster() {}
+};
+
+class DLL_EXPORT AccountLoginCluster : public ClusterBase
+{
+public:
+    AccountLoginCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::AccountLogin::Id, endpoint)
+    {}
+    ~AccountLoginCluster() {}
 };
 
 } // namespace Controller

@@ -41,56 +41,6 @@ namespace Messaging {
 
 ReliableMessageContext::ReliableMessageContext() : mNextAckTime(0), mPendingPeerAckMessageCounter(0) {}
 
-bool ReliableMessageContext::AutoRequestAck() const
-{
-    return mFlags.Has(Flags::kFlagAutoRequestAck);
-}
-
-bool ReliableMessageContext::IsAckPending() const
-{
-    return mFlags.Has(Flags::kFlagAckPending);
-}
-
-bool ReliableMessageContext::HasRcvdMsgFromPeer() const
-{
-    return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
-}
-
-void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
-{
-    mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
-}
-
-void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
-{
-    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
-}
-
-void ReliableMessageContext::SetAckPending(bool inAckPending)
-{
-    mFlags.Set(Flags::kFlagAckPending, inAckPending);
-}
-
-void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
-{
-    mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
-}
-
-bool ReliableMessageContext::IsMessageNotAcked() const
-{
-    return mFlags.Has(Flags::kFlagMesageNotAcked);
-}
-
-void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
-{
-    mFlags.Set(Flags::kFlagMesageNotAcked, messageNotAcked);
-}
-
-bool ReliableMessageContext::ShouldDropAckDebug() const
-{
-    return mFlags.Has(Flags::kFlagDropAckDebug);
-}
-
 ExchangeContext * ReliableMessageContext::GetExchangeContext()
 {
     return static_cast<ExchangeContext *>(this);
@@ -119,11 +69,6 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     }
 
     return err;
-}
-
-bool ReliableMessageContext::HasPiggybackAckPending() const
-{
-    return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
 
 /**
@@ -158,10 +103,6 @@ void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags)
 
 {
-    // Skip processing ack if drop ack debug is enabled.
-    if (ShouldDropAckDebug())
-        return CHIP_NO_ERROR;
-
     CHIP_ERROR err = HandleNeedsAckInner(messageCounter, messageFlags);
 
     // Schedule next physical wakeup on function exit
@@ -211,24 +152,22 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
         return err;
     }
     // Otherwise, the message IS NOT a duplicate.
-    else
-    {
-        if (IsAckPending())
-        {
-            ChipLogDetail(ExchangeManager,
-                          "Pending ack queue full; forcing tx of solitary ack for MessageCounter:" ChipLogFormatMessageCounter
-                          " on exchange " ChipLogFormatExchange,
-                          mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-            // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
-            ReturnErrorOnFailure(SendStandaloneAckMessage());
-        }
 
-        // Replace the Pending ack message counter.
-        SetPendingPeerAckMessageCounter(messageCounter);
-        using namespace System::Clock::Literals;
-        mNextAckTime = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT;
-        return CHIP_NO_ERROR;
+    if (IsAckPending())
+    {
+        ChipLogDetail(ExchangeManager,
+                      "Pending ack queue full; forcing tx of solitary ack for MessageCounter:" ChipLogFormatMessageCounter
+                      " on exchange " ChipLogFormatExchange,
+                      mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
+        // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
+        ReturnErrorOnFailure(SendStandaloneAckMessage());
     }
+
+    // Replace the Pending ack message counter.
+    SetPendingPeerAckMessageCounter(messageCounter);
+    using namespace System::Clock::Literals;
+    mNextAckTime = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()

@@ -43,7 +43,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    return Internal::AppPreference::SaveData(key, reinterpret_cast<const uint8_t *>(value), value_size);
+    return Internal::AppPreference::SaveData(key, value, value_size);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)

@@ -1,0 +1,61 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.4.6. [TC-SC-4.6] Commissioner Discovery - Commissioner [DUT -
+    Commissioner]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "DUT is instructed to start advertising its presence as a commissioner
+          in the network"
+      verification: |
+
+      disabled: true
+
+    - label: "Check DNS-SD subtypes used by DUT"
+      verification: |
+          avahi-publish-service --subtype=_V123._sub._matterd._udp DD200C20D25AE5F7 _matterd._udp 33333 VP=123+456 DT=35 DN="Living Room TV"
+
+          ubuntu@ubuntu:~$ avahi-browse _matterd._udp -r
+
+          +   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+          +   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+          =   eth0 IPv6 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [ubuntu-4.local]
+             address = [fd00::9e]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+          =   eth0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
+             hostname = [ubuntu-4.local]
+             address = [192.168.1.47]
+             port = [33333]
+             txt = ["DN=Living Room TV" "DT=35" "VP=123+456"]
+
+
+
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp
+          | grep _matterc
+
+          +;eth0;IPv6;_CM;_sub._matterc._udp;local
+          +;eth0;IPv6;_L3840;_sub._matterc._udp;local
+          +;eth0;IPv6;_S0;_sub._matterc._udp;local
+          +;eth0;IPv6;_V9050;_sub._matterc._udp;local
+      disabled: true

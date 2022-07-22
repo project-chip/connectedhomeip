@@ -42,6 +42,7 @@
 #define MBEDTLS_ECP_C
 #define MBEDTLS_ECDH_C
 #define MBEDTLS_ENTROPY_C
+#define MBEDTLS_SHA224_C
 #define MBEDTLS_SHA256_C
 #define MBEDTLS_TRNG_C
 

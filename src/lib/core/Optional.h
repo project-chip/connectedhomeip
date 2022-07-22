@@ -50,6 +50,7 @@ public:
 
     ~Optional()
     {
+        // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.Branch): mData is set when mHasValue
         if (mHasValue)
         {
             mValue.mData.~T();

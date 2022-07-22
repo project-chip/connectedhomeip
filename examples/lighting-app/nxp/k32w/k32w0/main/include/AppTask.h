@@ -47,6 +47,7 @@ public:
     void PostEvent(const AppEvent * event);
 
     void UpdateClusterState(void);
+    void UpdateDeviceState(void);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -66,6 +67,7 @@ private:
     static void OTAHandler(AppEvent * aEvent);
     static void BleHandler(AppEvent * aEvent);
     static void LightActionEventHandler(AppEvent * aEvent);
+    static void OTAResumeEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);
 
@@ -74,6 +76,16 @@ private:
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void StartTimer(uint32_t aTimeoutInMs);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    static void InitOTA(intptr_t arg);
+    static void StartOTAQuery(intptr_t arg);
+    static void PostOTAResume();
+#endif
+
+    static void UpdateClusterStateInternal(intptr_t arg);
+    static void UpdateDeviceStateInternal(intptr_t arg);
+    static void InitServer(intptr_t arg);
 
     enum Function_t
     {

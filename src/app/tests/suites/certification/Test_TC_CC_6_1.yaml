@@ -17,6 +17,7 @@ name:
     DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -24,6 +25,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
@@ -36,32 +41,70 @@ tests:
       response:
           value: 1
 
-    - label: "Read current color temprature"
-      disabled: true
+    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTempPhysicalMinMireds"
       response:
-          value: 100
+          saveAs: ColorTempPhysicalMinMiredsValue
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          saveAs: ColorTempPhysicalMaxMiredsValue
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Move To Color Temperature command"
+      PICS: CC.S.F04 && CC.S.C0A.Rsp
       command: "MoveToColorTemperature"
       arguments:
           values:
               - name: "colorTemperature"
                 value: 100
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
+    - label: "Wait 1500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1500
+
     - label: "Read current color temprature"
-      disabled: true
+      PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
-      attribute: "color temperature"
+      attribute: "ColorTemperature"
       response:
           value: 100
+          constraints:
+              type: uint16
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

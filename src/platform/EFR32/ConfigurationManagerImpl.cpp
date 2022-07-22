@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -50,7 +50,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<EFR32Config>::Init();
@@ -64,12 +63,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     rebootCause = RMU_ResetCauseGet();
     RMU_ResetCauseClear();
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
     err = CHIP_NO_ERROR;
 
 exit:
@@ -107,57 +100,57 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
 uint32_t ConfigurationManagerImpl::GetBootReason(void)
 {
     // rebootCause is obtained at bootup.
-    uint32_t matterBootCause;
+    BootReasonType matterBootCause;
 #if defined(_SILICON_LABS_32B_SERIES_1)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & RMU_RSTCAUSE_AVDDBOD || rebootCause & RMU_RSTCAUSE_DVDDBOD || rebootCause & RMU_RSTCAUSE_DECBOD)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        matterBootCause = BootReasonType::kBrownOutReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_SYSREQRST)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        matterBootCause = BootReasonType::kSoftwareReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_WDOGRST)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        matterBootCause = BootReasonType::kSoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+        matterBootCause = BootReasonType::kUnspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #elif defined(_SILICON_LABS_32B_SERIES_2)
     if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+        matterBootCause = BootReasonType::kPowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
              rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+        matterBootCause = BootReasonType::kBrownOutReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_SYSREQ)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+        matterBootCause = BootReasonType::kSoftwareReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_WDOG0 || rebootCause & EMU_RSTCAUSE_WDOG1)
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+        matterBootCause = BootReasonType::kSoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+        matterBootCause = BootReasonType::kUnspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #else
-    matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+    matterBootCause = BootReasonType::kUnspecified;
 #endif
 
-    return matterBootCause;
+    return to_underlying(matterBootCause);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
@@ -291,9 +284,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CHIP_KVS_AVAILABLE
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
-#endif // CHIP_KVS_AVAILABLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");

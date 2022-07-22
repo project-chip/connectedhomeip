@@ -31,21 +31,19 @@
         {
             "name": "decode_value",
             "path": "partials/decode_value.zapt"
-        },
-        {
-            "name": "list_attribute_callback_type",
-            "path": "partials/list_attribute_callback_type.zapt"
-        },
-        {
-            "name": "command_callback_responses",
-            "path": "partials/command_callback_responses.zapt"
-        },
-        {
-            "name": "java_type_for_argument",
-            "path": "partials/java_type_for_argument.zapt"
         }
     ],
     "templates": [
+        {
+            "path": "ChipStructs-java.zapt",
+            "name": "CHIP structs for Java",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipStructs.java"
+        },
+        {
+            "path": "ChipEventStructs-java.zapt",
+            "name": "CHIP Event structs for Java",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipEventStructs.java"
+        },
         {
             "path": "CHIPInvokeCallbacks.zapt",
             "name": "CHIP cluster invoke callbacks for Java (native code)",
@@ -60,16 +58,6 @@
             "path": "CHIPCallbackTypes.zapt",
             "name": "CHIP cluster callback types",
             "output": "src/controller/java/zap-generated/CHIPCallbackTypes.h"
-        },
-        {
-            "path": "CHIPClusters-JNI.zapt",
-            "name": "CHIP ZCL API for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPClusters-JNI.cpp"
-        },
-        {
-            "path": "CHIPClustersRead-JNI.zapt",
-            "name": "CHIP ZCL API for Java (native code for reads)",
-            "output": "src/controller/java/zap-generated/CHIPClustersRead-JNI.cpp"
         },
         {
             "path": "CHIPClustersWrite-JNI.zapt",
@@ -87,9 +75,24 @@
             "output": "src/controller/java/zap-generated/CHIPReadCallbacks.cpp"
         },
         {
+            "path": "CHIPAttributeTLVValueDecoder-src.zapt",
+            "name": "CHIP cluster attribute decoder for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPAttributeTLVValueDecoder.cpp"
+        },
+        {
+            "path": "CHIPEventTLVValueDecoder-src.zapt",
+            "name": "CHIP cluster event decoder for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPEventTLVValueDecoder.cpp"
+        },
+        {
             "path": "ChipClusters-java.zapt",
             "name": "CHIP ZCL API for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"
+        },
+        {
+            "path": "ChipIdLookup-java.zapt",
+            "name": "Generate utilities for looking up cluster/attribute IDs",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipIdLookup.java"
         },
         {
             "path": "ClusterInfo-java.zapt",

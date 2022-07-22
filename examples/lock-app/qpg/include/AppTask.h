@@ -52,6 +52,7 @@ private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
+    static void InitServer(intptr_t arg);
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(BoltLockManager::Action_t aAction);
@@ -71,9 +72,8 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 1,
-        kFunction_Joiner         = 2,
-        kFunction_FactoryReset   = 3,
-        kFunction_StartBleAdv    = 4,
+        kFunction_FactoryReset   = 2,
+        kFunction_StartBleAdv    = 3,
 
         kFunction_Invalid
     } Function;
@@ -81,7 +81,6 @@ private:
     Function_t mFunction;
     bool mFunctionTimerActive;
     bool mSyncClusterToButtonAction;
-    chip::Ble::BLEEndPoint * mBLEEndPoint;
 
     static AppTask sAppTask;
 };

@@ -1,0 +1,25 @@
+{{#first}}
+
+{{/first}}
+  {{~indent 1~}}
+  {{#if isFabricScoped~}} fabric {{/if~}}
+  {{#if mustUseTimedInvoke~}} timed {{/if~}}
+  command {{!ensure space}}
+  {{~#chip_access_elements entity="command"~}}
+    {{~#first~}} access( {{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+      {{operation}}: {{role}} 
+    {{~#last}}) {{/last~}}
+  {{~/chip_access_elements~}}
+  {{asUpperCamelCase commandName}}(
+    {{~#zcl_command_arguments~}}
+     {{~#first~}}
+       {{asUpperCamelCase parent.commandName}}Request
+     {{~/first~}}
+    {{~/zcl_command_arguments~}}
+  ): {{#if responseName~}}
+    {{responseName}}
+{{~else~}}
+    DefaultSuccess
+{{~/if~}}
+{{~indent 0}} = {{code}};

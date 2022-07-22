@@ -27,7 +27,6 @@
 #include <type_traits>
 
 #include <app/CommandPathParams.h>
-#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
 #include <app/MessageDef/StatusIB.h>
@@ -60,7 +59,7 @@ public:
      *
      * See Abort() for details on when that might occur.
      */
-    virtual ~CommandSender() { Abort(); }
+    ~CommandSender() override { Abort(); }
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -102,19 +101,18 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR_IM_STATUS_CODE_RECEIVED: An invoke response containing a status code denoting an error was received.
-         *                  When the protocol ID in the received status is IM, aInteractionModelStatus will contain the IM status
-         *                  code. Otherwise, aInteractionModelStatus will always be set to IM::Status::Failure.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aStatusIB       The status code including IM status code and optional cluster status code
          * @param[in] aError          A system error code that conveys the overall error code.
          */
-        virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
+        virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
@@ -137,6 +135,8 @@ public:
      * Constructor.
      *
      * The callback passed in has to outlive this CommandSender object.
+     * If used in a groups setting, callbacks do not need to be passed.
+     * If callbacks are passed the only one that will be called in a group sesttings is the onDone
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
@@ -173,7 +173,7 @@ public:
 
     CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
-#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
      * guaranteed to fail due to requiring a timed invoke but not providing a
@@ -181,11 +181,12 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs, bool aSuppressResponse = false)
     {
+        mSuppressResponse = aSuppressResponse;
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
-#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
     template <typename CommandDataT>
@@ -195,7 +196,7 @@ private:
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
+        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), aData));
         return FinishCommand(aTimedInvokeTimeoutMs);
     }
 
@@ -279,10 +280,9 @@ private:
     // Timed Request.  The caller is assumed to have already checked that our
     // exchange context member is the one the message came in on.
     //
-    // aStatusIB will be populated with the returned status if we can parse it
-    // successfully.
-    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
-                                 StatusIB & aStatusIB);
+    // If the server returned an error status, that will be returned as an error
+    // value of CHIP_ERROR.
+    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.

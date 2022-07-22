@@ -1,0 +1,90 @@
+-   RootNode/22:
+        client_clusters:
+            OtaSoftwareUpdateProvider/41:
+                attributes:
+                    FeatureMap/65532: '0'
+        server_clusters:
+            AccessControl/31:
+                attributes:
+                    FeatureMap/65532: '0'
+            AdministratorCommissioning/60:
+                attributes:
+                    FeatureMap/65532: '0'
+            Basic/40:
+                attributes:
+                    FeatureMap/65532: '0'
+            Descriptor/29:
+                attributes:
+                    FeatureMap/65532: '0'
+            DiagnosticLogs/50:
+                attributes:
+                    FeatureMap/65532: '0'
+            EthernetNetworkDiagnostics/55:
+                attributes:
+                    FeatureMap/65532: '3'
+            FixedLabel/64:
+                attributes:
+                    FeatureMap/65532: '0'
+            GeneralCommissioning/48:
+                attributes:
+                    FeatureMap/65532: '6'
+            GeneralDiagnostics/51:
+                attributes:
+                    FeatureMap/65532: '0'
+            GroupKeyManagement/63:
+                attributes:
+                    FeatureMap/65532: '0'
+            Groups/4:
+                attributes:
+                    FeatureMap/65532: '0'
+            LocalizationConfiguration/43:
+                attributes:
+                    FeatureMap/65532: '0'
+            OperationalCredentials/62:
+                attributes:
+                    FeatureMap/65532: '0'
+            OtaSoftwareUpdateRequestor/42:
+                attributes:
+                    FeatureMap/65532: '0'
+            SoftwareDiagnostics/52:
+                attributes:
+                    FeatureMap/65532: '1'
+            Switch/59:
+                attributes:
+                    FeatureMap/65532: '0'
+            ThreadNetworkDiagnostics/53:
+                attributes:
+                    FeatureMap/65532: '15'
+            TimeFormatLocalization/44:
+                attributes:
+                    FeatureMap/65532: '0'
+            UserLabel/65:
+                attributes:
+                    FeatureMap/65532: '0'
+            WiFiNetworkDiagnostics/54:
+                attributes:
+                    FeatureMap/65532: '3'
+-   DimmableLight/257:
+        client_clusters: {}
+        server_clusters:
+            ColorControl/768:
+                attributes:
+                    FeatureMap/65532: '0'
+            Descriptor/29:
+                attributes:
+                    FeatureMap/65532: '0'
+            Groups/4:
+                attributes:
+                    FeatureMap/65532: '0'
+            Identify/3:
+                attributes:
+                    FeatureMap/65532: '0'
+            LevelControl/8:
+                attributes:
+                    FeatureMap/65532: '3'
+            OccupancySensing/1030:
+                attributes:
+                    FeatureMap/65532: '0'
+            OnOff/6:
+                attributes:
+                    FeatureMap/65532: '1'

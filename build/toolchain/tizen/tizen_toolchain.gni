@@ -14,7 +14,7 @@
 
 import("//build_overrides/build.gni")
 
-import("${build_root}/config/sysroot.gni")
+import("${build_root}/config/tizen/config.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
 
 template("tizen_toolchain") {
@@ -22,15 +22,18 @@ template("tizen_toolchain") {
 
   _tizen_toolchain_args = {
     current_os = "tizen"
-    is_clang = true
+    is_clang = false
 
     forward_variables_from(_invoker_toolchain_args, "*")
   }
 
+  _tizen_toolchain_prefix =
+      "${tizen_sdk_root}/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-"
+
   gcc_toolchain(target_name) {
     toolchain_args = _tizen_toolchain_args
-    ar = "$sysroot/bin/arm-linux-gnueabi-ar"
-    cc = "$sysroot/bin/arm-linux-gnueabi-gcc"
-    cxx = "$sysroot/bin/arm-linux-gnueabi-g++"
+    ar = _tizen_toolchain_prefix + "ar"
+    cc = _tizen_toolchain_prefix + "gcc"
+    cxx = _tizen_toolchain_prefix + "g++"
   }
 }

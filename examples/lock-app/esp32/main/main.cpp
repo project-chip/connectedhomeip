@@ -16,7 +16,6 @@
  */
 
 #include "AppTask.h"
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -28,8 +27,8 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
-#include <app/server/Server.h>
-
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -45,21 +44,27 @@
 #include "Rpc.h"
 #endif
 
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+} // namespace
+
 using namespace ::chip;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
-using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials;
 
 static const char * TAG = "lock-app";
 
-static DeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacks EchoCallbacks;
 
 static void InitServer(intptr_t context)
 {
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     CHIP_ERROR error = GetAppTask().StartAppTask();
@@ -99,6 +104,16 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "device.Init() failed: %s", ErrorStr(error));
         return;
     }
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

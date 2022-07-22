@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Matter Arm Mbed OS Shell Example Application </h1>
 
@@ -48,9 +46,21 @@ using the following command:
     $ git submodule update --init
 
 Building the example application requires the use of **ARM Mbed-OS** sources and
-the **arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
-purpose. <br> Some additional packages may be needed, depending on selected
-build target and its requirements.
+the **arm-none-gnu-eabi** toolchain.
+
+The Cypress OpenOCD package is required for flashing purpose. Install the
+Cypress OpenOCD and set env var `OPENOCD_PATH` before calling the flashing
+script.
+
+```
+cd ~
+wget https://github.com/Infineon/openocd/releases/download/release-v4.3.0/openocd-4.3.0.1746-linux.tar.gz
+tar xzvf openocd-4.3.0.1746-linux.tar.gz
+export OPENOCD_PATH=$HOME/openocd
+```
+
+Some additional packages may be needed, depending on selected build target and
+its requirements.
 
 > **The VSCode devcontainer has these components pre-installed. Using the VSCode
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the
@@ -82,13 +92,13 @@ ported to the mbed-os platform.
 -   **by using generic vscode task**:
 
 ```
-Command Palette (F1) => Run Task... => Run Mbed Application => build => shell => (board name) => (build profile)`
+Command Palette (F1) => Run Task... => Run Mbed Application => build => shell => (board name) => (build profile) => (build type)
 ```
 
 -   **by calling explicitly building script:**
 
 ```
-${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=shell -b=<board name> -p=<build profile>
+${MATTER_ROOT}/scripts/examples/mbed_example.sh -c=build -a=shell -b=<board name> -p=<build profile> -T=<build type>
 ```
 
 Both approaches are limited to supported evaluation boards which are listed in
@@ -97,6 +107,16 @@ Both approaches are limited to supported evaluation boards which are listed in
 Mbed OS defines three building profiles: _develop, debug_ and _release_. For
 more details please visit
 [ARM Mbed OS build profiles](https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html).
+
+There are also three types of built application: _simple, boot_ and _upgrade_:
+
+-   **simple** - standalone application, mainly for developing and testing
+    purpose (all building profiles are supported)
+-   **boot** - signed application + bootloader, it supports booting process and
+    can be use for firmware update (only _release_ building profiles is
+    supported)
+-   **update** - signed application, application image can be used for firmware
+    update (only _release_ building profiles is supported)
 
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.

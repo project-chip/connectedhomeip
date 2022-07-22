@@ -42,6 +42,10 @@
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+#include "pigweed/rpc_services/Descriptor.h"
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 #include "pigweed/rpc_services/Device.h"
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -104,6 +108,10 @@ Attributes attributes_service;
 AmebaButton button_service;
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+Descriptor descriptor_service;
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 AmebaDevice device_service;
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
@@ -125,6 +133,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
     server.RegisterService(button_service);
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
+
+#if defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
+    server.RegisterService(descriptor_service);
+#endif // defined(PW_RPC_DESCRIPTOR_SERVICE) && PW_RPC_DESCRIPTOR_SERVICE
 
 #if defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
     server.RegisterService(device_service);

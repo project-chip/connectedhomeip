@@ -1,0 +1,15 @@
+tests:
+    - label: "Examples Test Step 1"
+      cluster: "ExampleCluster"
+      command: "writeAttribute"
+      PICS: WILL_NOT_RUN
+
+    - label: "Examples Test Step 2"
+      cluster: "ExampleCluster"
+      command: "readAttribute"
+      PICS: WILL_RUN
+
+    - label: "Examples Test Step 3"
+      cluster: "ExampleCluster"
+      command: "ExamplesCommand"
+      PICS: WILL_NOT_RUN || WILL_RUN # Conditional will run

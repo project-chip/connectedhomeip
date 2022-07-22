@@ -28,10 +28,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
+#include <inet/EndPointStateOpenThread.h>
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
-#include "TimersManager.h"
 #include "app_config.h"
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
@@ -70,20 +71,35 @@ CHIP_ERROR AppTask::StartAppTask()
     return err;
 }
 
+void LockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().LockThreadStack();
+}
+
+void UnlockOpenThreadTask(void)
+{
+    chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack();
+}
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = LockOpenThreadTask;
+    nativeParams.unlockCb              = UnlockOpenThreadTask;
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-
-    TMR_Init();
 
     /* HW init leds */
     LED_Init();
@@ -110,7 +126,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Print the current software version
-    char softwareVersionString[ConfigurationManager::kMaxSoftwareVersionLength + 1] = { 0 };
+    char softwareVersionString[ConfigurationManager::kMaxSoftwareVersionStringLength + 1] = { 0 };
     err = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
     if (err != CHIP_NO_ERROR)
     {
@@ -286,7 +302,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     K32W_LOG("Device will factory reset...");
 
     // Actually trigger Factory Reset
-    ConfigurationMgr().InitiateFactoryReset();
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void AppTask::ResetActionEventHandler(AppEvent * aEvent)
@@ -435,3 +451,5 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         K32W_LOG("Event received with no handler. Dropping event.");
     }
 }
+
+extern "C" void OTAIdleActivities(void) {}

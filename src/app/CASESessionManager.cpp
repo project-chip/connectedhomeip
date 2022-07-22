@@ -17,49 +17,51 @@
  */
 
 #include <app/CASESessionManager.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/address_resolve/AddressResolve.h>
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+CHIP_ERROR CASESessionManager::Init(chip::System::Layer * systemLayer, const CASESessionManagerConfig & params)
 {
-    Dnssd::ResolvedNodeData resolutionData;
+    ReturnErrorOnFailure(params.sessionInitParams.Validate());
+    mConfig = params;
+    return AddressResolve::Resolver::Instance().Init(systemLayer);
+}
 
-    bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
+void CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+{
+    ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = " ChipLogFormatX64 ":" ChipLogFormatX64,
+                  ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     if (session == nullptr)
     {
-        // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
-        if (nodeIDWasResolved)
-        {
-            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId, resolutionData);
-        }
-        else
-        {
-            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
-        }
+        ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalDeviceProxy instance found");
+
+        session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
 
         if (session == nullptr)
         {
-            onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
-            return CHIP_ERROR_NO_MEMORY;
+            if (onFailure != nullptr)
+            {
+                onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
+            }
+            return;
         }
     }
-    else if (nodeIDWasResolved)
-    {
-        session->OnNodeIdResolved(resolutionData);
-    }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
-    if (err != CHIP_NO_ERROR)
+    session->Connect(onConnection, onFailure);
+    if (!session->IsConnected() && !session->IsConnecting() && !session->IsResolvingAddress())
     {
-        // Release the peer rather than the pointer in case the failure handler has already released the session.
+        // This session is not making progress toward anything.  It will have
+        // notified the consumer about the failure already via the provided
+        // callbacks, if any.
+        //
+        // Release the peer rather than the pointer in case the failure handler
+        // has already released the session.
         ReleaseSession(peerId);
     }
-
-    return err;
 }
 
 void CASESessionManager::ReleaseSession(PeerId peerId)
@@ -67,60 +69,30 @@ void CASESessionManager::ReleaseSession(PeerId peerId)
     ReleaseSession(FindExistingSession(peerId));
 }
 
-CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
+void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                              Dnssd::Resolver::CacheBypass::On);
+    mConfig.devicePool->ReleaseDevicesForFabric(fabricIndex);
 }
 
-void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
+void CASESessionManager::ReleaseAllSessions()
 {
-    ChipLogProgress(Controller, "Address resolved for node: 0x" ChipLogFormatX64, ChipLogValueX64(nodeData.mPeerId.GetNodeId()));
-
-    if (mConfig.dnsCache != nullptr)
-    {
-        LogErrorOnFailure(mConfig.dnsCache->Insert(nodeData));
-    }
-
-    OperationalDeviceProxy * session = FindExistingSession(nodeData.mPeerId);
-    VerifyOrReturn(session != nullptr,
-                   ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
-
-    LogErrorOnFailure(session->UpdateDeviceData(session->ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
-}
-
-void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
+    mConfig.devicePool->ReleaseAllDevices();
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr)
 {
-    if (mConfig.dnsCache != nullptr)
-    {
-        Dnssd::ResolvedNodeData resolutionData;
-        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(peerId, resolutionData));
-        addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
-        return CHIP_NO_ERROR;
-    }
-
     OperationalDeviceProxy * session = FindExistingSession(peerId);
     VerifyOrReturnError(session != nullptr, CHIP_ERROR_NOT_CONNECTED);
     addr = session->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
 
-OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session)
-{
-    return mConfig.devicePool->FindDevice(session);
-}
-
-OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId)
+OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId) const
 {
     return mConfig.devicePool->FindDevice(peerId);
 }
 
-void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)
+void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session) const
 {
     if (session != nullptr)
     {

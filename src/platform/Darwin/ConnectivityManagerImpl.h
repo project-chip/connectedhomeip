@@ -20,6 +20,11 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
@@ -30,7 +35,11 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
+#else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
+#endif
 
 namespace chip {
 namespace Inet {
@@ -40,6 +49,8 @@ class IPAddress;
 
 namespace chip {
 namespace DeviceLayer {
+
+struct WiFiNetworkInfos;
 
 /**
  * Concrete implementation of the ConnectivityManager singleton object for Darwin platforms.
@@ -55,18 +66,47 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+                                      public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
+#else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
+#endif
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
+    CHIP_ERROR GetInterfaceStatus(const char * interfaceName, bool * status);
+    CHIP_ERROR GetEthernetInterfaceName(char * outName, size_t maxLen);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR GetWiFiInterfaceName(char * outName, size_t maxLen);
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR ConnectWiFiNetwork(WiFiNetworkInfos & network);
+#endif
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    WiFiStationMode _GetWiFiStationMode();
+    CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
+    bool _IsWiFiStationApplicationControlled();
+    bool _IsWiFiStationConnected();
+    bool _IsWiFiStationProvisioned();
+    void _ClearWiFiStationProvision();
+    bool _CanStartWiFiScan();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     // ===== Members for internal use by the following friends.
 

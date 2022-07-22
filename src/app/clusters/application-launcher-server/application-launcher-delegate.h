@@ -20,6 +20,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandResponseHelper.h>
 #include <app/util/af.h>
 #include <list>
 
@@ -28,24 +30,42 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
+using Application          = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type;
+using ApplicationEPType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
+using LauncherResponseType = chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type;
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the Application Launcher Cluster.
  */
 class Delegate
 {
 public:
-    virtual chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() = 0;
-    virtual std::list<uint16_t> HandleGetCatalogList()                                                   = 0;
+    Delegate() : Delegate(false){};
+    Delegate(bool featureMapContentPlatform) { mFeatureMapContentPlatform = featureMapContentPlatform; };
 
-    virtual Commands::LauncherResponse::Type HandleLaunchApp(
-        const chip::CharSpan & data,
-        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
-    virtual Commands::LauncherResponse::Type
-    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
-    virtual Commands::LauncherResponse::Type
-    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
+    inline bool HasFeature(ApplicationLauncherFeature feature)
+    {
+        if (feature == ApplicationLauncherFeature::kApplicationPlatform)
+        {
+            return mFeatureMapContentPlatform;
+        }
+        return false;
+    }
+
+    // this attribute should only be enabled for app platform instance (endpoint 1)
+    CHIP_ERROR HandleGetCurrentApp(app::AttributeValueEncoder & aEncoder);
+
+    virtual CHIP_ERROR HandleGetCatalogList(app::AttributeValueEncoder & aEncoder) = 0;
+
+    virtual void HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                                 const Application & application)                                                     = 0;
+    virtual void HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) = 0;
+    virtual void HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper, const Application & application) = 0;
 
     virtual ~Delegate() = default;
+
+protected:
+    bool mFeatureMapContentPlatform = false;
 };
 
 } // namespace ApplicationLauncher

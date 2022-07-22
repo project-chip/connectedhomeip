@@ -113,7 +113,7 @@
 #define PBUF_LINK_HLEN (0)
 
 #define TCPIP_THREAD_STACKSIZE (2048)
-#define TCPIP_THREAD_PRIO (2)
+#define TCPIP_THREAD_PRIO (3)
 
 #define NETIF_MAX_HWADDR_LEN 8U
 
@@ -131,7 +131,10 @@
 
 // TODO: make LWIP_DEBUG conditional on build type
 
+#ifndef LWIP_DEBUG
 #define LWIP_DEBUG 0
+#endif
+
 #define MEMP_OVERFLOW_CHECK (0)
 #define MEMP_SANITY_CHECK (0)
 #define MEM_DEBUG (LWIP_DBG_OFF)

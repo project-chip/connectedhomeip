@@ -62,9 +62,9 @@ CHIP_ERROR LayerImplSelect::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LayerImplSelect::Shutdown()
+void LayerImplSelect::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturn(mLayerState.SetShuttingDown());
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     TimerList::Node * timer;
@@ -75,9 +75,8 @@ CHIP_ERROR LayerImplSelect::Shutdown()
             dispatch_source_cancel(timer->mTimerSource);
             dispatch_release(timer->mTimerSource);
         }
-
-        mTimerPool.Release(timer);
     }
+    mTimerPool.ReleaseAll();
 #else  // CHIP_SYSTEM_CONFIG_USE_DISPATCH
     mTimerList.Clear();
     mTimerPool.ReleaseAll();
@@ -86,7 +85,6 @@ CHIP_ERROR LayerImplSelect::Shutdown()
     mWakeEvent.Close(*this);
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
-    return CHIP_NO_ERROR;
 }
 
 void LayerImplSelect::Signal()
@@ -140,8 +138,8 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 
         timer->mTimerSource = timerSource;
         dispatch_source_set_timer(
-            timerSource, dispatch_walltime(NULL, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)), 0,
-            2 * NSEC_PER_MSEC);
+            timerSource, dispatch_walltime(nullptr, static_cast<int64_t>(Clock::Milliseconds64(delay).count() * NSEC_PER_MSEC)),
+            DISPATCH_TIME_FOREVER, 2 * NSEC_PER_MSEC);
         dispatch_source_set_event_handler(timerSource, ^{
             dispatch_source_cancel(timerSource);
             dispatch_release(timerSource);
@@ -184,22 +182,21 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CancelTimer(onComplete, appState);
-
-    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
-    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
-
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t dispatchQueue = GetDispatchQueue();
     if (dispatchQueue)
     {
-        (void) mTimerList.Add(timer);
         dispatch_async(dispatchQueue, ^{
-            this->HandleTimerComplete(timer);
+            onComplete(this, appState);
         });
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+    CancelTimer(onComplete, appState);
+
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
+    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
     {
@@ -220,7 +217,7 @@ CHIP_ERROR LayerImplSelect::StartWatchingSocket(int fd, SocketWatchToken * token
             // Duplicate registration is an error.
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        else if ((w.mFD == kInvalidFd) && (watch == nullptr))
+        if ((w.mFD == kInvalidFd) && (watch == nullptr))
         {
             watch = &w;
         }
@@ -341,9 +338,15 @@ void LayerImplSelect::PrepareEvents()
     Clock::ToTimeval(sleepTime, mNextTimeout);
 
     mMaxFd = -1;
+
+    // NOLINTBEGIN(clang-analyzer-security.insecureAPI.bzero)
+    //
+    // NOTE: darwin uses bzero to clear out FD sets. This is not a security concern.
     FD_ZERO(&mSelected.mReadSet);
     FD_ZERO(&mSelected.mWriteSet);
     FD_ZERO(&mSelected.mErrorSet);
+    // NOLINTEND(clang-analyzer-security.insecureAPI.bzero)
+
     for (auto & w : mSocketWatchPool)
     {
         if (w.mFD != kInvalidFd)
@@ -375,7 +378,7 @@ void LayerImplSelect::HandleEvents()
 
     if (!IsSelectResultValid())
     {
-        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(CHIP_ERROR_POSIX(errno)));
+        ChipLogError(DeviceLayer, "Select failed: %" CHIP_ERROR_FORMAT, CHIP_ERROR_POSIX(errno).Format());
         return;
     }
 

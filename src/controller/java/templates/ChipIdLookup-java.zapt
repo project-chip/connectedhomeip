@@ -1,0 +1,56 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+
+package chip.devicecontroller;
+
+public final class ChipIdLookup {
+  /**
+   * Translates cluster ID to a cluster name in upper camel case. If no matching
+   * ID is found, returns an empty string.
+   */
+  public static String clusterIdToName(long clusterId) {
+    {{#chip_client_clusters}}
+    if (clusterId == {{code}}L) {
+      return "{{asUpperCamelCase name}}";
+    }
+    {{/chip_client_clusters}}
+    return "";
+  }
+
+  /**
+   * Translates cluster ID and attribute ID to an attribute name in upper camel case.
+   * If no matching IDs are found, returns an empty string.
+   */
+  public static String attributeIdToName(long clusterId, long attributeId) {
+    {{#chip_client_clusters}}
+    if (clusterId == {{code}}L) {
+      {{#chip_server_cluster_attributes}}
+      if (attributeId == {{code}}L) {
+        return "{{asUpperCamelCase name}}";
+      }
+      {{/chip_server_cluster_attributes}}
+      return "";
+    }
+    {{/chip_client_clusters}}
+    return "";
+  }
+
+  /**
+   * Translates cluster ID and event ID to an attribute name in upper camel case.
+   * If no matching IDs are found, returns an empty string.
+   */
+  public static String eventIdToName(long clusterId, long eventId) {
+    {{#chip_client_clusters}}
+    if (clusterId == {{code}}L) {
+      {{#chip_server_cluster_events}}
+      if (eventId == {{code}}L) {
+        return "{{asUpperCamelCase name}}";
+      }
+      {{/chip_server_cluster_events}}
+      return "";
+    }
+    {{/chip_client_clusters}}
+    return "";
+  }
+}
+{{/if}}

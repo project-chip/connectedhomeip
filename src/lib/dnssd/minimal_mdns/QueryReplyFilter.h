@@ -81,7 +81,7 @@ private:
 
     bool AcceptablePath(FullQName qname)
     {
-        if (mIgnoreNameMatch || mQueryData.IsBootAdvertising())
+        if (mIgnoreNameMatch || mQueryData.IsInternalBroadcast())
         {
             return true;
         }

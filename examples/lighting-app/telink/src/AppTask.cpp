@@ -63,6 +63,7 @@ LEDWidget sStatusLED;
 Button sFactoryResetButton;
 Button sLightingButton;
 Button sThreadStartButton;
+Button sBleAdvStartButton;
 
 bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
@@ -73,6 +74,7 @@ bool sHaveBLEConnections  = false;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 AppTask AppTask::sAppTask;
 
@@ -83,6 +85,8 @@ CHIP_ERROR AppTask::Init()
     // Initialize status LED
     LEDWidget::InitGpio(SYSTEM_STATE_LED_PORT);
     sStatusLED.Init(SYSTEM_STATE_LED_PIN);
+
+    UpdateStatusLED();
 
     InitButtons();
 
@@ -97,7 +101,9 @@ CHIP_ERROR AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -105,10 +111,15 @@ CHIP_ERROR AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
-    ret = chip::Server::GetInstance().AddTestCommissioning();
+    // Add CHIP event handler and start CHIP thread.
+    // Note that all the initialization code should happen prior to this point to avoid data races
+    // between the main and the CHIP threads.
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+
+    ret = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
     if (ret != CHIP_NO_ERROR)
     {
-        LOG_ERR("Failed to add test pairing");
+        LOG_ERR("Fail to set BLE device name");
         return ret;
     }
 
@@ -135,37 +146,6 @@ CHIP_ERROR AppTask::StartApp()
         {
             DispatchEvent(&event);
             ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
-        }
-
-        // Collect connectivity and configuration state from the CHIP stack.  Because the
-        // CHIP event loop is being run in a separate task, the stack must be locked
-        // while these values are queried.  However we use a non-blocking lock request
-        // (TryLockChipStack()) to avoid blocking other UI activities when the CHIP
-        // task is busy (e.g. with a long crypto operation).
-
-        if (PlatformMgr().TryLockChipStack())
-        {
-            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
-            PlatformMgr().UnlockChipStack();
-        }
-
-        if (sIsThreadProvisioned && sIsThreadEnabled)
-        {
-            if (sIsThreadAttached)
-            {
-                sStatusLED.Blink(950, 50);
-            }
-            else
-            {
-                sStatusLED.Blink(100, 100);
-            }
-        }
-        else
-        {
-            sStatusLED.Blink(50, 950);
         }
 
         sStatusLED.Animate();
@@ -215,7 +195,7 @@ void AppTask::FactoryResetButtonEventHandler(void)
 void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
     LOG_INF("Factory Reset triggered.");
-    ConfigurationMgr().InitiateFactoryReset();
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void AppTask::StartThreadButtonEventHandler(void)
@@ -230,14 +210,97 @@ void AppTask::StartThreadButtonEventHandler(void)
 
 void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
+
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
+        // Switch context from BLE to Thread
+        BLEManagerImpl sInstance;
+        sInstance.SwitchToIeee802154();
         StartDefaultThreadNetwork();
         LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
     }
     else
     {
         LOG_INF("Device is commissioned to a Thread network.");
+    }
+}
+
+void AppTask::StartBleAdvButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = StartBleAdvHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::StartBleAdvHandler(AppEvent * aEvent)
+{
+    LOG_INF("BLE advertising start button pressed");
+
+    // Don't allow on starting Matter service BLE advertising after Thread provisioning.
+    if (ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("Matter service BLE advertising not started - device is commissioned to a Thread network.");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        LOG_INF("BLE advertising is already enabled");
+        return;
+    }
+
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    {
+        LOG_ERR("OpenBasicCommissioningWindow() failed");
+    }
+}
+
+void AppTask::UpdateStatusLED()
+{
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        if (sIsThreadAttached)
+        {
+            sStatusLED.Blink(950, 50);
+        }
+        else
+        {
+            sStatusLED.Blink(100, 100);
+        }
+    }
+    else
+    {
+        sStatusLED.Blink(50, 950);
+    }
+}
+
+void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
+{
+    switch (event->Type)
+    {
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+        sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+        sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadConnectivityChange:
+#if CONFIG_CHIP_OTA_REQUESTOR
+        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        {
+            InitBasicOTARequestor();
+        }
+#endif
+        break;
+    default:
+        break;
     }
 }
 
@@ -312,8 +375,8 @@ void AppTask::UpdateClusterState()
     uint8_t onoff = LightingMgr().IsTurnedOn();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &onoff,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status =
+        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Updating on/off cluster failed: %x", status);
@@ -321,8 +384,8 @@ void AppTask::UpdateClusterState()
 
     uint8_t level = LightingMgr().GetLevel();
 
-    status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                                   ZCL_INT8U_ATTRIBUTE_TYPE);
+    status =
+        emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &level, ZCL_INT8U_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -335,8 +398,10 @@ void AppTask::InitButtons(void)
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sLightingButton);
     ButtonManagerInst().AddButton(sThreadStartButton);
+    ButtonManagerInst().AddButton(sBleAdvStartButton);
 }

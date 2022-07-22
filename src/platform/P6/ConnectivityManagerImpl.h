@@ -21,6 +21,10 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
@@ -46,6 +50,10 @@ class PlatformManagerImpl;
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
                                       public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,

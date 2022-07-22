@@ -40,10 +40,10 @@ public:
     }
 
     ApplicationExchangeDispatch() {}
-    virtual ~ApplicationExchangeDispatch() {}
+    ~ApplicationExchangeDispatch() override {}
 
 protected:
-    bool MessagePermitted(uint16_t protocol, uint8_t type) override;
+    bool MessagePermitted(Protocols::Id protocol, uint8_t type) override;
 };
 
 } // namespace Messaging

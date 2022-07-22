@@ -13,7 +13,7 @@
 {{#if (isWeaklyTypedEnum label)}}
 
 // Enum for {{label}}
-enum EmberAf{{asType label}} : {{asUnderlyingZclType type}} {
+enum EmberAf{{asType label}} : {{asUnderlyingZclType name}} {
 {{#zcl_enum_items}}
 {{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
 {{/zcl_enum_items}}

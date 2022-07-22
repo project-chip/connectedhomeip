@@ -22,25 +22,22 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
-    MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
-    MatterBasicPluginServerInitCallback();                                                                                         \
-    MatterDescriptorPluginServerInitCallback();                                                                                    \
-    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
-    MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
-    MatterFixedLabelPluginServerInitCallback();                                                                                    \
-    MatterFlowMeasurementPluginClientInitCallback();                                                                               \
-    MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
-    MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
-    MatterLevelControlPluginClientInitCallback();                                                                                  \
-    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
-    MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterOnOffPluginClientInitCallback();                                                                                         \
-    MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
-    MatterPressureMeasurementPluginClientInitCallback();                                                                           \
-    MatterPumpConfigurationAndControlPluginClientInitCallback();                                                                   \
-    MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
-    MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
+    MatterDescriptorPluginServerInitCallback();                                                                                    \
+    MatterBindingPluginServerInitCallback();                                                                                       \
+    MatterAccessControlPluginServerInitCallback();                                                                                 \
+    MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
+    MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
+    MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
+    MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
-    MatterTimeFormatLocalizationPluginServerInitCallback();                                                                        \
-    MatterUserLabelPluginServerInitCallback();                                                                                     \
-    MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+    MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
+    MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
+    MatterPumpConfigurationAndControlPluginClientInitCallback();                                                                   \
+    MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
+    MatterPressureMeasurementPluginClientInitCallback();                                                                           \
+    MatterFlowMeasurementPluginClientInitCallback();

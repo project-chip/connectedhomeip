@@ -34,6 +34,9 @@
 #endif
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
+// define Device type based on the application
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 10 // 0x00A Door lock
+
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //
@@ -41,7 +44,6 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION

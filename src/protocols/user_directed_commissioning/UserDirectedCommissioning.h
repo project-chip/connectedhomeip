@@ -115,7 +115,7 @@ public:
      *
      */
 
-    CHIP_ERROR EncodeUDCMessage(System::PacketBufferHandle && payload);
+    CHIP_ERROR EncodeUDCMessage(const System::PacketBufferHandle & payload);
 };
 
 class DLL_EXPORT UserDirectedCommissioningServer : public TransportMgrDelegate

@@ -21,6 +21,10 @@
         {
             "name": "cluster_objects_field_init",
             "path": "../../zap-templates/partials/cluster-objects-field-init.zapt"
+        },
+        {
+            "name": "cluster_objects_attribute_typeinfo",
+            "path": "../../zap-templates/partials/cluster-objects-attribute-typeinfo.zapt"
         }
     ],
     "templates": [
@@ -116,8 +120,18 @@
         },
         {
             "path": "../../zap-templates/templates/app/cluster-objects-src.zapt",
-            "name": "Cluster objects header for Interaction Model",
+            "name": "Cluster objects source for Interaction Model",
             "output": "cluster-objects.cpp"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums.zapt",
+            "name": "Enum and bitmap header for clusters",
+            "output": "cluster-enums.h"
+        },
+        {
+            "path": "../../zap-templates/templates/app/cluster-enums-check.zapt",
+            "name": "Enum and bitmap method check header for clusters",
+            "output": "cluster-enums-check.h"
         }
     ]
 }

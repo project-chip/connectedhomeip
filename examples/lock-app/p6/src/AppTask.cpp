@@ -22,9 +22,15 @@
 #include "ButtonHandler.h"
 #include "LEDWidget.h"
 #include "qrcodegen.h"
+#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
@@ -37,12 +43,49 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
+
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/identify-server/identify-server.h>
+
+/* OTA related includes */
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <platform/P6/OTAImageProcessorImpl.h>
+extern "C" {
+#include "cy_smif_psoc6.h"
+}
+using chip::BDXDownloader;
+using chip::CharSpan;
+using chip::DefaultOTARequestor;
+using chip::FabricIndex;
+using chip::GetRequestorInstance;
+using chip::NodeId;
+using chip::OTADownloader;
+using chip::DeviceLayer::OTAImageProcessorImpl;
+using chip::System::Layer;
+
+using namespace ::chip;
+using namespace chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
+
+#endif
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
+using chip::app::Clusters::DoorLock::DlLockState;
+using chip::app::Clusters::DoorLock::DlOperationError;
+using chip::app::Clusters::DoorLock::DlOperationSource;
 namespace {
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
@@ -60,13 +103,49 @@ bool sHaveBLEConnections       = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DefaultOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
+#endif
+
 } // namespace
 
+using namespace ::chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
+using namespace P6DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    GetAppTask().InitOTARequestor();
+#endif
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -85,7 +164,14 @@ CHIP_ERROR AppTask::StartAppTask()
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    int rc = boot_set_confirmed();
+    if (rc != 0)
+    {
+        P6_LOG("boot_set_confirmed failed");
+        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+    }
+#endif
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
@@ -100,11 +186,8 @@ CHIP_ERROR AppTask::Init()
             }
         },
         0);
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
@@ -121,22 +204,92 @@ CHIP_ERROR AppTask::Init()
         P6_LOG("funct timer create failed");
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
-
+    NetWorkCommissioningInstInit();
     P6_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
-    err = BoltLockMgr().Init();
-    if (err != CHIP_NO_ERROR)
+    // Initial lock state
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+    chip::EndpointId endpointId{ 1 };
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
+
+    uint8_t numberOfCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
     {
-        P6_LOG("BoltLockMgr().Init() failed");
-        appError(err);
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to 5 "
+                     "[endpointId=%d]",
+                     endpointId);
+        numberOfCredentialsPerUser = 5;
     }
 
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    uint16_t numberOfUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+                     endpointId);
+        numberOfUsers = 10;
+    }
+
+    uint8_t numberOfWeekdaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfWeekdaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfYeardaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfYeardaySchedulesPerUser = 10;
+    }
+
+    uint8_t numberOfHolidaySchedules = 0;
+    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to 10 [endpointId=%d]",
+            endpointId);
+        numberOfHolidaySchedules = 10;
+    }
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    // err = LockMgr().Init(state, maxCredentialsPerUser, numberOfSupportedUsers);
+    err = LockMgr().Init(state,
+                         ParamBuilder()
+                             .SetNumberOfUsers(numberOfUsers)
+                             .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                             .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                             .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                             .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                             .GetLockParam());
+    if (err != CHIP_NO_ERROR)
+    {
+        P6_LOG("LockMgr().Init() failed");
+        appError(err);
+    }
+    LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLockLED.Init(LOCK_STATE_LED);
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
-    UpdateClusterState();
+    if (state.Value() == DlLockState::kUnlocked)
+    {
+        sLockLED.Set(true);
+    }
+    else
+    {
+        sLockLED.Set(false);
+    }
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -214,25 +367,25 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::LockActionEventHandler(AppEvent * event)
 {
-    bool initiated                 = false;
-    BoltLockManager::Action action = BoltLockManager::Action::KInvalid;
-    int32_t actor                  = 0;
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    bool initiated = false;
+    LockManager::Action_t action;
+    int32_t actor;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (event->Type == AppEvent::kEventType_Lock)
     {
-        action = static_cast<BoltLockManager::Action>(event->LockEvent.Action);
+        action = static_cast<LockManager::Action_t>(event->LockEvent.Action);
         actor  = event->LockEvent.Actor;
     }
     else if (event->Type == AppEvent::kEventType_Button)
     {
-        if (BoltLockMgr().IsUnlocked())
+        if (LockMgr().NextState() == true)
         {
-            action = BoltLockManager::Action::kLock;
+            action = LockManager::LOCK_ACTION;
         }
         else
         {
-            action = BoltLockManager::Action::kUnlock;
+            action = LockManager::UNLOCK_ACTION;
         }
         actor = AppEvent::kEventType_Button;
     }
@@ -243,7 +396,7 @@ void AppTask::LockActionEventHandler(AppEvent * event)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = BoltLockMgr().InitiateAction(actor, action);
+        initiated = LockMgr().InitiateAction(actor, action);
 
         if (!initiated)
         {
@@ -316,7 +469,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * event)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = Function::kNoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -352,7 +505,7 @@ void AppTask::FunctionHandler(AppEvent * event)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
         {
             // Set lock status LED back to show state of lock.
-            sLockLED.Set(!BoltLockMgr().IsUnlocked());
+            sLockLED.Set(!LockMgr().NextState());
 
             sAppTask.CancelTimer();
 
@@ -396,20 +549,20 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     mFunctionTimerActive = true;
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action action, int32_t actor)
+void AppTask::ActionInitiated(LockManager::Action_t aAction, int32_t aActor)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
+    // If the action has been initiated by the lock, update the  lock trait
     // and start flashing the LEDs rapidly to indicate action initiation.
-    if (action == BoltLockManager::Action::kLock)
+    if (aAction == LockManager::LOCK_ACTION)
     {
         P6_LOG("Lock Action has been initiated");
     }
-    else if (action == BoltLockManager::Action::kUnlock)
+    else if (aAction == LockManager::UNLOCK_ACTION)
     {
         P6_LOG("Unlock Action has been initiated");
     }
 
-    if (actor == AppEvent::kEventType_Button)
+    if (aActor == AppEvent::kEventType_Button)
     {
         sAppTask.mSyncClusterToButtonAction = true;
     }
@@ -417,18 +570,18 @@ void AppTask::ActionInitiated(BoltLockManager::Action action, int32_t actor)
     sLockLED.Blink(50, 50);
 }
 
-void AppTask::ActionCompleted(BoltLockManager::Action action)
+void AppTask::ActionCompleted(LockManager::Action_t aAction)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
+    // if the action has been completed by the lock, update the  lock trait.
     // Turn on the lock LED if in a LOCKED state OR
     // Turn off the lock LED if in an UNLOCKED state.
-    if (action == BoltLockManager::Action::kLock)
+    if (aAction == LockManager::LOCK_ACTION)
     {
         P6_LOG("Lock Action has been completed");
 
         sLockLED.Set(true);
     }
-    else if (action == BoltLockManager::Action::kUnlock)
+    else if (aAction == LockManager::UNLOCK_ACTION)
     {
         P6_LOG("Unlock Action has been completed");
 
@@ -442,12 +595,12 @@ void AppTask::ActionCompleted(BoltLockManager::Action action)
     }
 }
 
-void AppTask::PostLockActionRequest(int32_t actor, BoltLockManager::Action action)
+void AppTask::ActionRequest(int32_t aActor, LockManager::Action_t aAction)
 {
     AppEvent event;
     event.Type             = AppEvent::kEventType_Lock;
-    event.LockEvent.Actor  = actor;
-    event.LockEvent.Action = static_cast<uint8_t>(action);
+    event.LockEvent.Actor  = aActor;
+    event.LockEvent.Action = aAction;
     event.Handler          = LockActionEventHandler;
     PostEvent(&event);
 }
@@ -475,18 +628,27 @@ void AppTask::DispatchEvent(AppEvent * event)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateCluster(intptr_t context)
 {
-    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+    bool unlocked        = LockMgr().NextState();
+    DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
-    // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    DlOperationSource source = DlOperationSource::kUnspecified;
+
+    // write the new lock value
+    EmberAfStatus status =
+        DoorLockServer::Instance().SetLockState(1, newState, source) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        P6_LOG("ERR: updating on/off %x", status);
+        P6_LOG("ERR: updating lock state %x", status);
     }
 }
+
+void AppTask::UpdateClusterState(void)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
+}
+
 void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
 {
     (void) pxTask;
@@ -496,3 +658,19 @@ void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTaskName)
     function is called if a stack overflow is detected. */
     printf("ERROR: stack overflow with task %s\r\n", pcTaskName);
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void AppTask::InitOTARequestor()
+{
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    P6_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+}
+#endif

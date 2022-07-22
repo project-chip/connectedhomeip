@@ -15,26 +15,40 @@
  *    limitations under the License.
  */
 
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
+#include "NetworkCommissioningDriver.h"
+
+using namespace ::chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace DeviceLayer {
 
 CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    ChipLogProgress(NetworkProvisioning, "MbedNetworkProvisioningDelegate: SSID: %s", ssid);
-    err = ConnectivityMgrImpl().ProvisionWiFiNetwork(ssid, key);
-    if (err != CHIP_NO_ERROR)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    MutableCharSpan emptyBufferForDebugText;
+    uint8_t outNetworkIndex;
+    auto err = WiFiDriverImpl::GetInstance().AddOrUpdateNetwork(ByteSpan(Uint8::from_const_char(ssid), strlen(ssid)),
+                                                                ByteSpan(Uint8::from_const_char(key), strlen(key)),
+                                                                emptyBufferForDebugText, outNetworkIndex);
+    if (err != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to add WiFi network: 0x%x", int(err));
+        return CHIP_ERROR_INTERNAL;
     }
+    NetworkCommissioning::WiFiDriverImpl::GetInstance().ConnectNetwork(ByteSpan(Uint8::from_const_char(ssid), strlen(ssid)),
+                                                                       nullptr);
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
 
-    return err;
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(ByteSpan threadData)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace DeviceLayer

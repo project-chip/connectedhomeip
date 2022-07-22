@@ -37,7 +37,7 @@ public:
      *        to match the data size. If no Certification Declaration is available, sets
      *        `out_cd_buffer` to empty.
      *
-     * @param[inout] out_cd_buffer Buffer to receive the Certification Declaration body.
+     * @param[in,out] out_cd_buffer Buffer to receive the Certification Declaration body.
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if `out_cd_buffer`
      *          is too small, or another CHIP_ERROR from the underlying implementation
      *          if access fails.
@@ -49,7 +49,7 @@ public:
      *        on success to match the data size. If no Firmware Information is available,
      *        sets `out_firmware_info_buffer` to empty.
      *
-     * @param[inout] out_firmware_info_buffer Buffer to receive the Firmware Information body.
+     * @param[in,out] out_firmware_info_buffer Buffer to receive the Firmware Information body.
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if `out_firmware_info_buffer`
      *          is too small, or another CHIP_ERROR from the underlying implementation if access fails.
      */
@@ -60,7 +60,7 @@ public:
      *        size on success to match the data size. If no Device Attestation Certificate
      *        is available, sets `out_dac_buffer` to empty.
      *
-     * @param[inout] out_dac_buffer Buffer to receive the Device Attestation Certificate.
+     * @param[in,out] out_dac_buffer Buffer to receive the Device Attestation Certificate.
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if `out_dac_buffer`
      *          is too small, or another CHIP_ERROR from the underlying implementation if
      *          access fails.
@@ -72,7 +72,7 @@ public:
      *        size on success to match the data size. If no PAI certificate
      *        is available, sets `out_pai_buffer` to empty.
      *
-     * @param[inout] out_pai_buffer Buffer to receive the PAI certificate.
+     * @param[in,out] out_pai_buffer Buffer to receive the PAI certificate.
      * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if `out_pai_buffer`
      *          is too small, or another CHIP_ERROR from the underlying implementation if
      *          access fails.
@@ -80,16 +80,14 @@ public:
     virtual CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer) = 0;
 
     /**
-     * @brief Signs a SHA256 digest using the device attestation private key
+     * @brief Signs a message using the device attestation private key
      *
-     * @param[in] digest_to_sign The SHA256 digest to sign using the attestation private key. Must
-     *                           be exactly chip::Crypto::kSHA256_Hash_Length.
-     * @param[inout] out_signature_buffer Buffer to receive the signature in raw <r,s> format.
-     * @returns CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if `digest_to_sign` is wrong size,
-     *          CHIP_ERROR_BUFFER_TOO_SMALL if `out_signature_buffer` is too small,
+     * @param[in] message_to_sign The message to sign using the attestation private key.
+     * @param[in,out] out_signature_buffer Buffer to receive the signature in raw <r,s> format.
+     * @returns CHIP_NO_ERROR on success, CHIP_ERROR_BUFFER_TOO_SMALL if `out_signature_buffer` is too small,
      *          or another CHIP_ERROR from the underlying implementation if signature fails.
      */
-    virtual CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & digest_to_sign, MutableByteSpan & out_signature_buffer) = 0;
+    virtual CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_signature_buffer) = 0;
 };
 
 /**
@@ -111,6 +109,11 @@ DeviceAttestationCredentialsProvider * GetDeviceAttestationCredentialsProvider()
  * @param[in] provider the DeviceAttestationCredentialsProvider to start returning with the getter
  */
 void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider);
+
+/**
+ * Check if Instance is prepared
+ */
+bool IsDeviceAttestationCredentialsProviderSet();
 
 } // namespace Credentials
 } // namespace chip

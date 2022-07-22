@@ -97,10 +97,10 @@ CHIP_ERROR HeapTraceTaskHandler(int argc, char ** argv)
 
     for (int i = 0; i < *heap_info.num_totals; i++)
     {
-        streamer_printf(streamer_get(), "Task: %s -> CAP_8BIT: %zu CAP_32BIT: %zu\n",
+        streamer_printf(streamer_get(), "Task: %s -> CAP_8BIT: %u CAP_32BIT: %u\n",
                         heap_info.totals[i].task ? pcTaskGetTaskName(heap_info.totals[i].task) : "Pre-Scheduler allocs",
-                        heap_info.totals[i].size[0],  // Heap size with CAP_8BIT capabilities
-                        heap_info.totals[i].size[1]); // Heap size with CAP32_BIT capabilities
+                        static_cast<unsigned int>(heap_info.totals[i].size[0]),  // Heap size with CAP_8BIT capabilities
+                        static_cast<unsigned int>(heap_info.totals[i].size[1])); // Heap size with CAP32_BIT capabilities
     }
     streamer_printf(streamer_get(), "Free heap %d/%d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT),
                     heap_caps_get_total_size(MALLOC_CAP_8BIT));

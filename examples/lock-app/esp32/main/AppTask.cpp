@@ -103,7 +103,7 @@ CHIP_ERROR AppTask::Init()
 
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
-    UpdateClusterState();
+    chip::DeviceLayer::SystemLayer().ScheduleWork(UpdateClusterState, nullptr);
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -298,7 +298,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -462,13 +462,13 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 }
 
 /* if unlocked then it locked it first*/
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(chip::System::Layer *, void * context)
 {
     uint8_t newValue = !BoltLockMgr().IsUnlocked();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status =
+        emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ESP_LOGI(TAG, "ERR: updating on/off %x", status);

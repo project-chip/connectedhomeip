@@ -42,10 +42,9 @@ const AESECB2     = AESECB.addInstance();
 const ECDH        = scripting.addModule("/ti/drivers/ECDH");
 const ECDH1       = ECDH.addInstance();
 const ECDH2       = ECDH.addInstance();
-const ECJPAKE     = scripting.addModule("/ti/drivers/ECJPAKE");
-const ECJPAKE1    = ECJPAKE.addInstance();
 const NVS         = scripting.addModule("/ti/drivers/NVS");
 const NVS1        = NVS.addInstance();
+const NVS2        = NVS.addInstance();
 const RF          = scripting.addModule("/ti/drivers/RF");
 const RTOS        = scripting.addModule("/ti/drivers/RTOS");
 const SHA2        = scripting.addModule("/ti/drivers/SHA2");
@@ -141,12 +140,14 @@ ECDH1.$name = "CONFIG_ECDH0";
 
 ECDH2.$name = "CONFIG_ECDH_1";
 
-ECJPAKE1.$name = "CONFIG_ECJPAKE_0";
-
 NVS1.$name                    = "CONFIG_NVSINTERNAL";
 NVS1.internalFlash.$name      = "ti_drivers_nvs_NVSCC26XX0";
 NVS1.internalFlash.regionBase = 0xAA000;
 NVS1.internalFlash.regionSize = 0x4000;
+
+NVS2.$name                                 = "CONFIG_NVSEXTERNAL";
+NVS2.nvsType                               = "External"; // NVS Region Type
+NVS2.$hardware                             = system.deviceData.board.components.MX25R8035F;
 
 RTOS.name = "FreeRTOS";
 

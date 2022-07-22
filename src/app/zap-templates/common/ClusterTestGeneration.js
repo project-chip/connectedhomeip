@@ -31,22 +31,24 @@ const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
 const { asBlocks, ensureClusters } = require('./ClustersHelper.js');
 const { Variables }                = require('./variables/Variables.js');
 
-const kIdentityName           = 'identity';
-const kClusterName            = 'cluster';
-const kEndpointName           = 'endpoint';
-const kGroupId                = 'groupId';
-const kCommandName            = 'command';
-const kWaitCommandName        = 'wait';
-const kIndexName              = 'index';
-const kValuesName             = 'values';
-const kConstraintsName        = 'constraints';
-const kArgumentsName          = 'arguments';
-const kResponseName           = 'response';
-const kDisabledName           = 'disabled';
-const kResponseErrorName      = 'error';
-const kResponseWrongErrorName = 'errorWrongValue';
-const kPICSName               = 'PICS';
-const kSaveAsName             = 'saveAs';
+const kIdentityName      = 'identity';
+const kClusterName       = 'cluster';
+const kEndpointName      = 'endpoint';
+const kGroupId           = 'groupId';
+const kCommandName       = 'command';
+const kWaitCommandName   = 'wait';
+const kIndexName         = 'index';
+const kValuesName        = 'values';
+const kConstraintsName   = 'constraints';
+const kArgumentsName     = 'arguments';
+const kResponseName      = 'response';
+const kDisabledName      = 'disabled';
+const kResponseErrorName = 'error';
+const kPICSName          = 'PICS';
+const kSaveAsName        = 'saveAs';
+const kFabricFiltered    = 'fabricFiltered';
+
+const kHexPrefix = 'hex:';
 
 class NullObject {
   toString()
@@ -88,30 +90,36 @@ function setDefaultTypeForWaitCommand(test)
   const type = test[kWaitCommandName];
   switch (type) {
   case 'readEvent':
+    test.commandName = 'WaitEvent';
     test.isEvent     = true;
     test.isReadEvent = true;
     break;
   case 'subscribeEvent':
+    test.commandName      = 'WaitEvent';
     test.isEvent          = true;
     test.isSubscribe      = true;
     test.isSubscribeEvent = true;
     break;
   case 'readAttribute':
+    test.commandName     = 'WaitAttribute';
     test.isAttribute     = true;
     test.isReadAttribute = true;
     break;
   case 'writeAttribute':
+    test.commandName      = 'WaitAttribute';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     break;
   case 'subscribeAttribute':
+    test.commandName          = 'WaitAttribute';
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
     break;
   default:
-    test.isCommand = true;
-    test.command   = test.wait
+    test.commandName = 'WaitCommand';
+    test.isCommand   = true;
+    test.command     = test.wait
     break;
   }
 
@@ -123,55 +131,75 @@ function setDefaultTypeForCommand(test)
   const type = test[kCommandName];
   switch (type) {
   case 'readEvent':
-    test.commandName = 'Read';
+    test.commandName = 'ReadEvent';
     test.isEvent     = true;
     test.isReadEvent = true;
     break;
 
   case 'subscribeEvent':
-    test.commandName      = 'Subscribe';
+    test.commandName      = 'SubscribeEvent';
     test.isEvent          = true;
     test.isSubscribe      = true;
     test.isSubscribeEvent = true;
     break;
 
   case 'readAttribute':
-    test.commandName     = 'Read';
+    test.commandName     = 'ReadAttribute';
     test.isAttribute     = true;
     test.isReadAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'writeAttribute':
-    test.commandName      = 'Write';
+    test.commandName      = 'WriteAttribute';
     test.isAttribute      = true;
     test.isWriteAttribute = true;
     if ((kGroupId in test)) {
-      test.isGroupCommand = true;
-      test.groupId        = parseInt(test[kGroupId], 10);
+      test.isGroupCommand        = true;
+      test.isWriteGroupAttribute = true;
+      test.commandName           = 'WriteGroupAttribute';
+      test.groupId               = parseInt(test[kGroupId], 10);
     }
     break;
 
   case 'subscribeAttribute':
-    test.commandName          = 'Subscribe';
+    test.commandName          = 'SubscribeAttribute';
     test.isAttribute          = true;
     test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
+    if (!(kFabricFiltered in test)) {
+      test[kFabricFiltered] = true;
+    }
     break;
 
   case 'waitForReport':
-    test.commandName     = 'Report';
-    test.isAttribute     = true;
+    test.commandName = 'WaitForReport';
+    if ('attribute' in test) {
+      test.isAttribute = true;
+    } else if ('event' in test) {
+      test.isEvent = true;
+    }
     test.isWaitForReport = true;
     break;
 
   default:
-    test.commandName = test.command;
+    test.commandName = isTestOnlyCluster(test.cluster) ? test.command : 'SendCommand';
     test.isCommand   = true;
     if ((kGroupId in test)) {
       test.isGroupCommand = true;
+      test.commandName    = 'SendGroupCommand';
       test.groupId        = parseInt(test[kGroupId], 10);
     }
     break;
+  }
+
+  // Sanity Check for GroupId usage
+  // Only two types of actions can be send to Group : Write attribute, and Commands
+  // Spec : Action 8.2.4
+  if ((kGroupId in test) && !test.isGroupCommand) {
+    printErrorAndExit(this, 'Wrong Yaml configuration. Action : ' + test.commandName + " can't be sent to group " + test[kGroupId]);
   }
 
   test.isWait = false;
@@ -223,101 +251,150 @@ function ensureValidError(response, errorName)
   }
 }
 
-function setDefaultResponse(test)
+function setDefaultResponse(test, useSynthesizeWaitForReport)
 {
-  const defaultResponse = {};
+  // Some of the tests does not have any command defined.
+  if (!test.command || test.isWait) {
+    setDefault(test, kResponseName, []);
+    return;
+  }
+
+  test.expectMultipleResponses = test.isEvent;
+
+  const defaultResponse = test.expectMultipleResponses ? [] : {};
   setDefault(test, kResponseName, defaultResponse);
 
-  const hasResponseError = (kResponseErrorName in test[kResponseName]) || (kResponseWrongErrorName in test[kResponseName]);
+  // There is different syntax for expressing the expected response, but in the
+  // end it needs to be converted to an array of responses.
+  if (kResponseName in test && !Array.isArray(test[kResponseName])) {
+    let testValues = {};
 
-  const defaultResponseError = 0;
-  setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
-  setDefault(test[kResponseName], kResponseWrongErrorName, defaultResponseError);
+    const response = test[kResponseName];
 
-  const defaultResponseValues = [];
-  setDefault(test[kResponseName], kValuesName, defaultResponseValues);
+    if (kValuesName in response) {
+      testValues[kValuesName] = response[kValuesName];
+    } else if ('value' in response || kConstraintsName in response || kSaveAsName in response) {
+      let obj = {};
+      if ('value' in response) {
+        obj['value'] = response['value'];
+      }
 
-  const defaultResponseConstraints = {};
-  setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
+      if (kConstraintsName in response) {
+        obj[kConstraintsName] = response[kConstraintsName];
+      }
 
-  const defaultResponseSaveAs = '';
-  setDefault(test[kResponseName], kSaveAsName, defaultResponseSaveAs);
+      if (kSaveAsName in response) {
+        obj[kSaveAsName] = response[kSaveAsName];
+      }
 
-  const hasResponseValue              = 'value' in test[kResponseName];
-  const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
-  const hasResponseValueOrConstraints = hasResponseValue || hasResponseConstraints;
-
-  if (test.isCommand && hasResponseValueOrConstraints) {
-    const errorStr = 'Test has a "value" or a "constraints" defined.\n' +
-        '\n' +
-        'Command should explicitly use the response argument name. Example: \n' +
-        '- label: "Send Test Specific Command"\n' +
-        '  command: "testSpecific"\n' +
-        '  response: \n' +
-        '    values: \n' +
-        '      - name: "returnValue"\n' +
-        '      - value: 7\n';
-    throwError(test, errorStr);
-  }
-
-  ensureValidError(test[kResponseName], kResponseErrorName);
-  ensureValidError(test[kResponseName], kResponseWrongErrorName);
-
-  // Step that waits for a particular event does not requires constraints nor expected values.
-  if (test.isWait) {
-    return;
-  }
-
-  if (!test.isAttribute && !test.isEvent) {
-    return;
-  }
-
-  if (test.isWriteAttribute || test.isSubscribe) {
-    if (hasResponseValueOrConstraints) {
-      const errorStr = 'Test has a "value" or a "constraints" defined.';
-      throwError(test, errorStr);
+      testValues[kValuesName] = [ obj ];
+    } else {
+      testValues[kValuesName] = [];
     }
 
-    return;
+    if (kResponseErrorName in response) {
+      testValues[kResponseErrorName] = response[kResponseErrorName];
+    }
+
+    if ('clusterError' in response) {
+      testValues['clusterError'] = response['clusterError'];
+    }
+
+    test[kResponseName] = [ testValues ];
   }
 
-  if (!hasResponseValueOrConstraints && !hasResponseError) {
-    console.log(test);
-    console.log(test[kResponseName]);
-    const errorStr = 'Test does not have a "value" or a "constraints" defined and is not expecting an error.';
-    throwError(test, errorStr);
+  // Ensure only valid keywords are used for response values.
+  test[kResponseName].forEach(response => {
+    const values = response[kValuesName];
+    for (let i = 0; i < values.length; i++) {
+      for (let key in values[i]) {
+        if (key == "name" || key == "value" || key == kConstraintsName || key == kSaveAsName) {
+          continue;
+        }
+
+        const errorStr = `Unknown key "${key}" in "${JSON.stringify(values)}"`;
+        throwError(test, errorStr);
+      }
+    }
+  });
+
+  let responseType = '';
+  if (test.isCommand) {
+    responseType = 'command';
+  } else if (test.isAttribute) {
+    responseType = 'attribute';
+  } else if (test.isEvent) {
+    responseType = 'event';
+  } else {
+    const errorStr = 'Unknown response type';
+    throwError(response, errorStr);
   }
 
-  if (hasResponseValueOrConstraints) {
-    const name             = test.isAttribute ? test.attribute : test.event;
-    const response         = test[kResponseName];
-    const responseValue    = hasResponseValue ? { value : response.value } : null;
-    const constraintsValue = hasResponseConstraints ? { constraints : response.constraints } : null;
+  const defaultName = test[responseType];
 
-    response.values.push({ name, saveAs : response.saveAs, ...responseValue, ...constraintsValue });
-  }
+  test[kResponseName].forEach(response => {
+    const hasResponseError = (kResponseErrorName in response);
 
-  delete test[kResponseName].value;
+    const defaultResponseError = 0;
+    setDefault(response, kResponseErrorName, defaultResponseError);
+    ensureValidError(response, kResponseErrorName);
+
+    const values = response[kValuesName];
+    values.forEach(expectedValue => {
+      const hasResponseValue       = 'value' in expectedValue;
+      const hasResponseConstraints = (kConstraintsName in expectedValue) && !!Object.keys(expectedValue.constraints).length;
+      const hasResponseSaveAs      = (kSaveAsName in expectedValue);
+
+      if (test.isWriteAttribute || (useSynthesizeWaitForReport && test.isSubscribe)) {
+        if (hasResponseValue || hasResponseConstraints) {
+          const errorStr = 'Test has a "value" or a "constraints" defined.';
+          throwError(test, errorStr);
+        }
+      }
+
+      if (test.isCommand && !('name' in expectedValue)) {
+        const errorStr = 'Test value does not have a named argument.\n' +
+            '\n' +
+            'Command should explicitly use the response argument name. Example: \n' +
+            '- label: "Send Test Specific Command"\n' +
+            '  command: "testSpecific"\n' +
+            '  response: \n' +
+            '    values: \n' +
+            '      - name: "returnValue"\n' +
+            '      - value: 7\n';
+        throwError(test, errorStr);
+      }
+
+      setDefault(expectedValue, 'name', defaultName);
+    });
+
+    setDefault(response, kCommandName, test.command);
+    setDefault(response, responseType, test[responseType]);
+    setDefault(response, kClusterName, test.cluster);
+    setDefault(response, 'optional', test.optional || false);
+    setDefault(response, 'async', test.async || false);
+    setDefaultType(response);
+  });
 }
 
-function setDefaults(test, defaultConfig)
+function setDefaults(test, defaultConfig, useSynthesizeWaitForReport)
 {
   const defaultIdentityName = kIdentityName in defaultConfig ? defaultConfig[kIdentityName] : "alpha";
   const defaultClusterName  = defaultConfig[kClusterName] || null;
   const defaultEndpointId   = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
   const defaultDisabled     = false;
 
-  setDefaultType(test);
   setDefault(test, kIdentityName, defaultIdentityName);
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
   setDefault(test, kDisabledName, defaultDisabled);
+  setDefaultType(test);
   setDefaultPICS(test);
   setDefaultArguments(test);
-  setDefaultResponse(test);
+  setDefaultResponse(test, useSynthesizeWaitForReport);
 }
 
-function parse(filename)
+function parse(filename, useSynthesizeWaitForReport)
 {
   let filepath;
   const isCertificationTest = filename.startsWith('Test_TC_');
@@ -330,41 +407,43 @@ function parse(filename)
   const data = fs.readFileSync(filepath, { encoding : 'utf8', flag : 'r' });
   const yaml = YAML.parse(data);
 
-  // "subscribeAttribute" command expects a report to be acked before
-  // it got a success response.
-  // In order to validate that the report has been received with the proper value
-  // a "subscribeAttribute" command can have a response configured into the test step
-  // definition. In this case, a new async "waitForReport" test step will be synthesized
-  // and added to the list of tests.
-  yaml.tests.forEach((test, index) => {
-    if (test.command == "subscribeAttribute" && test.response) {
-      // Create a new report test where the expected response is the response argument
-      // for the "subscribeAttributeTest"
-      const reportTest = {
-        label : "Report: " + test.label,
-        command : "waitForReport",
-        attribute : test.attribute,
-        response : test.response,
-        async : true,
-        allocateSubscribeDataCallback : true,
-      };
-      delete test.response;
+  if (useSynthesizeWaitForReport) {
+    // "subscribeAttribute" command expects a report to be acked before
+    // it got a success response.
+    // In order to validate that the report has been received with the proper value
+    // a "subscribeAttribute" command can have a response configured into the test step
+    // definition. In this case, a new async "waitForReport" test step will be synthesized
+    // and added to the list of tests.
+    yaml.tests.forEach((test, index) => {
+      if (test.command == "subscribeAttribute" && test.response) {
+        // Create a new report test where the expected response is the response argument
+        // for the "subscribeAttributeTest"
+        const reportTest = {
+          label : "Report: " + test.label,
+          command : "waitForReport",
+          attribute : test.attribute,
+          response : test.response,
+          async : true,
+          allocateSubscribeDataCallback : true,
+        };
+        delete test.response;
 
-      // insert the new report test into the tests list
-      yaml.tests.splice(index, 0, reportTest);
+        // insert the new report test into the tests list
+        yaml.tests.splice(index, 0, reportTest);
 
-      // Associate the "subscribeAttribute" test with the synthesized report test
-      test.hasWaitForReport              = true;
-      test.waitForReport                 = reportTest;
-      test.allocateSubscribeDataCallback = !test.hasWaitForReport;
-    }
-  });
+        // Associate the "subscribeAttribute" test with the synthesized report test
+        test.hasWaitForReport              = true;
+        test.waitForReport                 = reportTest;
+        test.allocateSubscribeDataCallback = !test.hasWaitForReport;
+      }
+    });
+  }
 
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
     test.filename = filename;
     test.testName = yaml.name;
-    setDefaults(test, defaultConfig);
+    setDefaults(test, defaultConfig, useSynthesizeWaitForReport);
   });
 
   // Filter disabled tests
@@ -375,7 +454,6 @@ function parse(filename)
   });
 
   yaml.filename   = filename;
-  yaml.timeout    = yaml.config.timeout;
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
@@ -383,7 +461,7 @@ function parse(filename)
 
 function printErrorAndExit(context, msg)
 {
-  console.log(context.testName, ': ', context.label);
+  console.log("\nERROR:\n", context.testName, ': ', context.label);
   console.log(msg);
   process.exit(1);
 }
@@ -462,28 +540,44 @@ function chip_tests_pics(options)
   return templateUtil.collectBlocks(PICS.getAll(), options, this);
 }
 
+async function configureTestItem(item)
+{
+  if (item.isCommand) {
+    let command               = await assertCommandOrAttributeOrEvent(item);
+    item.commandObject        = command;
+    item.hasSpecificArguments = true;
+    item.hasSpecificResponse  = command.hasSpecificResponse || false;
+  } else if (item.isAttribute) {
+    let attr                  = await assertCommandOrAttributeOrEvent(item);
+    item.attributeObject      = attr;
+    item.hasSpecificArguments = item.isWriteAttribute || false;
+    item.hasSpecificResponse  = item.isReadAttribute || item.isSubscribeAttribute || item.isWaitForReport || false;
+  } else if (item.isEvent) {
+    let evt                   = await assertCommandOrAttributeOrEvent(item);
+    item.eventObject          = evt;
+    item.hasSpecificArguments = false;
+    item.hasSpecificResponse  = true;
+  }
+}
+
 async function chip_tests(list, options)
 {
   // Set a global on our items so assertCommandOrAttributeOrEvent can work.
   let global  = this.global;
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
-  let tests   = names.map(item => parse(item));
+  let tests   = names.map(item => parse(item, options.hash.useSynthesizeWaitForReport));
 
   const context = this;
   tests         = await Promise.all(tests.map(async function(test) {
     test.tests = await Promise.all(test.tests.map(async function(item) {
       item.global = global;
-      if (item.isCommand) {
-        let command        = await assertCommandOrAttributeOrEvent(item);
-        item.commandObject = command;
-      } else if (item.isAttribute) {
-        let attr             = await assertCommandOrAttributeOrEvent(item);
-        item.attributeObject = attr;
-      } else if (item.isEvent) {
-        let evt          = await assertCommandOrAttributeOrEvent(item);
-        item.eventObject = evt;
+      await configureTestItem(item);
+
+      if (kResponseName in item) {
+        await Promise.all(item[kResponseName].map(response => configureTestItem(response)));
       }
+
       return item;
     }));
 
@@ -504,6 +598,12 @@ function chip_tests_items(options)
 
 function getVariable(context, key, name)
 {
+  if (!(typeof name == "string" || (typeof name == "object" && (name instanceof String)))) {
+    // Non-string key; don't try to look it up.  Could end up looking like a
+    // variable name by accident when stringified.
+    return null;
+  }
+
   while (!('variables' in context) && context.parent) {
     context = context.parent;
   }
@@ -541,6 +641,12 @@ function chip_tests_variables_get_type(name, options)
   return variable.type;
 }
 
+function chip_tests_variables_is_nullable(name, options)
+{
+  const variable = getVariableOrThrow(this, 'tests', name);
+  return variable.isNullable;
+}
+
 function chip_tests_config(options)
 {
   return templateUtil.collectBlocks(this.variables.config, options, this);
@@ -567,22 +673,26 @@ function chip_tests_config_get_type(name, options)
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
 // context is lost and it fails. Make sure to attach the global context as a property of the | value |
 // that is evaluated.
-function attachGlobal(global, value)
+//
+// errorContext should have "thisVal" and "name" properties that will be used
+// for error reporting via printErrorAndExit.
+function attachGlobal(global, value, errorContext)
 {
   if (Array.isArray(value)) {
-    value = value.map(v => attachGlobal(global, v));
+    value = value.map(v => attachGlobal(global, v, errorContext));
   } else if (value instanceof Object) {
     for (key in value) {
       if (key == "global") {
         continue;
       }
-      value[key] = attachGlobal(global, value[key]);
+      value[key] = attachGlobal(global, value[key], errorContext);
     }
   } else if (value === null) {
     value = new NullObject();
   } else {
     switch (typeof value) {
     case 'number':
+      checkNumberSanity(value, errorContext);
       value = new Number(value);
       break;
     case 'string':
@@ -600,8 +710,27 @@ function attachGlobal(global, value)
   return value;
 }
 
+/**
+ * Ensure the given value is not a possibly-corrupted-by-going-through-double
+ * integer.  If it is, tell the user (using that errorContext.name to describe
+ * it) and die.
+ */
+function checkNumberSanity(value, errorContext)
+{
+  // Number.isInteger is false for non-Numbers.
+  if (Number.isInteger(value) && !Number.isSafeInteger(value)) {
+    printErrorAndExit(errorContext.thisVal,
+        `${errorContext.name} value ${
+            value} is too large to represent exactly as an integer in YAML.  Put quotes around it to treat it as a string.\n\n`);
+  }
+}
+
 function chip_tests_item_parameters(options)
 {
+  if (this.isWait) {
+    return asBlocks.call(this, Promise.resolve([]), options);
+  }
+
   const commandValues = this.arguments.values;
 
   const promise = assertCommandOrAttributeOrEvent(this).then(item => {
@@ -627,7 +756,8 @@ function chip_tests_item_parameters(options)
             'Missing "' + commandArg.name + '" in arguments list: \n\t* '
                 + commandValues.map(command => command.name).join('\n\t* '));
       }
-      commandArg.definedValue = attachGlobal(this.global, expected.value);
+
+      commandArg.definedValue = attachGlobal(this.global, expected.value, { thisVal : this, name : commandArg.name });
 
       return commandArg;
     });
@@ -638,9 +768,14 @@ function chip_tests_item_parameters(options)
   return asBlocks.call(this, promise, options);
 }
 
+function chip_tests_item_responses(options)
+{
+  return templateUtil.collectBlocks(this[kResponseName], options, this);
+}
+
 function chip_tests_item_response_parameters(options)
 {
-  const responseValues = this.response.values.slice();
+  const responseValues = this.values.slice();
 
   const promise = assertCommandOrAttributeOrEvent(this).then(item => {
     if (this.isWriteAttribute) {
@@ -656,12 +791,13 @@ function chip_tests_item_response_parameters(options)
         const expected = responseValues.splice(expectedIndex, 1)[0];
         if ('value' in expected) {
           responseArg.hasExpectedValue = true;
-          responseArg.expectedValue    = attachGlobal(this.global, expected.value);
+          responseArg.expectedValue    = attachGlobal(this.global, expected.value, { thisVal : this, name : responseArg.name });
         }
 
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
-          responseArg.expectedConstraints    = expected.constraints;
+          responseArg.expectedConstraints
+              = attachGlobal(this.global, expected.constraints, { thisVal : this, name : responseArg.name });
         }
 
         if ('saveAs' in expected) {
@@ -692,17 +828,41 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
+function isHexString(value)
+{
+  return value && value.startsWith(kHexPrefix);
+}
+
+function octetStringFromHexString(value)
+{
+  const hexString = value.substring(kHexPrefix.length);
+
+  if (hexString.length % 2) {
+    throw new Error("The provided hexadecimal string contains an even number of characters");
+  }
+
+  if (!(/^[0-9a-fA-F]+$/.test(hexString))) {
+    throw new Error("The provided hexadecimal string contains invalid hexadecimal character.");
+  }
+
+  const bytes = hexString.match(/(..)/g);
+  return bytes.map(byte => '\\x' + byte).join('');
+}
+
+function octetStringLengthFromHexString(value)
+{
+  const hexString = value.substring(kHexPrefix.length);
+  return (hexString.length / 2);
+}
+
 function octetStringEscapedForCLiteral(value)
 {
   // Escape control characters, things outside the ASCII range, and single
   // quotes (because that's our string terminator).
   return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
-    let code = ch.charCodeAt(0);
-    code     = code.toString(16);
-    if (code.length == 1) {
-      code = "0" + code;
-    }
-    return "\\x" + code;
+    var code = ch.charCodeAt(0).toString(8)
+    return "\\" +
+        "0".repeat(3 - code.length) + code;
   });
 }
 
@@ -715,28 +875,185 @@ function if_include_struct_item_value(structValue, name, options)
   }
 
   if (!this.isOptional) {
-    throw new Error(`Value not provided for ${name} where one is expected`);
+    throw new Error(`Value not provided for ${name} where one is expected in ` + JSON.stringify(structValue));
   }
 
   return options.inverse(this);
 }
 
+// To be used to verify that things are actually arrays before trying to use
+// #each with them, since that silently treats non-arrays as empty arrays.
+function ensureIsArray(value, options)
+{
+  if (!(value instanceof Array)) {
+    printErrorAndExit(this, `Expected array but instead got ${typeof value}: ${JSON.stringify(value)}\n`);
+  }
+}
+
+function checkIsInsideTestOnlyClusterBlock(conditions, name)
+{
+  conditions.forEach(condition => {
+    if (condition == undefined) {
+      const errorStr = `Not inside a ({#${name}}} block.`;
+      console.error(errorStr);
+      throw new Error(errorStr);
+    }
+  });
+}
+
+/**
+ * Creates block iterator over the simulated clusters.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_clusters(options)
+{
+  const clusters         = await getClusters(this);
+  const testOnlyClusters = clusters.filter(cluster => isTestOnlyCluster(cluster.name));
+  return asBlocks.call(this, Promise.resolve(testOnlyClusters), options);
+}
+
+/**
+ * Creates block iterator over the cluster commands for a given simulated cluster.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_commands(options)
+{
+  const conditions = [ isTestOnlyCluster(this.name) ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_clusters');
+
+  const commands = await getCommands(this, this.name);
+  return asBlocks.call(this, Promise.resolve(commands), options);
+}
+
+/**
+ * Creates block iterator over the command arguments for a given simulated cluster command.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_cluster_commands}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_command_parameters(options)
+{
+  const conditions = [ isTestOnlyCluster(this.parent.name), this.arguments, this.response ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_cluster_commands');
+
+  return asBlocks.call(this, Promise.resolve(this.arguments), options);
+}
+
+/**
+ * Creates block iterator over the cluster responses for a given simulated cluster.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_responses(options)
+{
+  const conditions = [ isTestOnlyCluster(this.name) ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_clusters');
+
+  const commands  = await getCommands(this, this.name);
+  const responses = [];
+  commands.forEach(command => {
+    if (!command.response.arguments) {
+      return;
+    }
+
+    if (!('responseName' in command)) {
+      return;
+    }
+
+    const alreadyExists = responses.some(item => item.responseName == command.responseName);
+    if (alreadyExists) {
+      return;
+    }
+
+    command.response.responseName = command.responseName;
+    responses.push(command.response);
+  });
+
+  return asBlocks.call(this, Promise.resolve(responses), options);
+}
+
+/**
+ * Creates block iterator over the response arguments for a given simulated cluster response.
+ *
+ * This function is meant to be used inside a {{#chip_tests_only_cluster_responses}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+async function chip_tests_only_cluster_response_parameters(options)
+{
+  const conditions = [ isTestOnlyCluster(this.parent.name), this.arguments, this.responseName ];
+  checkIsInsideTestOnlyClusterBlock(conditions, 'chip_tests_only_cluster_responses');
+
+  return asBlocks.call(this, Promise.resolve(this.arguments), options);
+}
+
+function chip_tests_iterate_expected_list(values, options)
+{
+  let context = options.hash.context || this;
+  values      = values.map(value => {
+    return {
+      global: context.global, parent: context.parent, name: context.name, type: context.type, isArray: false, isNullable: false,
+          value: value,
+    }
+  });
+
+  return asBlocks.call(this, Promise.resolve(values), options);
+}
+
+function chip_tests_iterate_constraints(constraints, options)
+{
+  let values = [];
+  for (let key of Object.keys(constraints)) {
+    // Skip "global", because that's not an actual constraint.
+    if (key == "global") {
+      continue;
+    }
+    values.push({ global : this.global, constraint : key, value : constraints[key] })
+  }
+
+  return asBlocks.call(this, Promise.resolve(values), options)
+}
+
 //
 // Module exports
 //
-exports.chip_tests                          = chip_tests;
-exports.chip_tests_items                    = chip_tests_items;
-exports.chip_tests_item_parameters          = chip_tests_item_parameters;
-exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
-exports.chip_tests_pics                     = chip_tests_pics;
-exports.chip_tests_config                   = chip_tests_config;
-exports.chip_tests_config_has               = chip_tests_config_has;
-exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
-exports.chip_tests_config_get_type          = chip_tests_config_get_type;
-exports.chip_tests_variables                = chip_tests_variables;
-exports.chip_tests_variables_has            = chip_tests_variables_has;
-exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
-exports.isTestOnlyCluster                   = isTestOnlyCluster;
-exports.isLiteralNull                       = isLiteralNull;
-exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
-exports.if_include_struct_item_value        = if_include_struct_item_value;
+exports.chip_tests                                  = chip_tests;
+exports.chip_tests_items                            = chip_tests_items;
+exports.chip_tests_item_parameters                  = chip_tests_item_parameters;
+exports.chip_tests_item_responses                   = chip_tests_item_responses;
+exports.chip_tests_item_response_parameters         = chip_tests_item_response_parameters;
+exports.chip_tests_pics                             = chip_tests_pics;
+exports.chip_tests_config                           = chip_tests_config;
+exports.chip_tests_config_has                       = chip_tests_config_has;
+exports.chip_tests_config_get_default_value         = chip_tests_config_get_default_value;
+exports.chip_tests_config_get_type                  = chip_tests_config_get_type;
+exports.chip_tests_variables                        = chip_tests_variables;
+exports.chip_tests_variables_has                    = chip_tests_variables_has;
+exports.chip_tests_variables_get_type               = chip_tests_variables_get_type;
+exports.chip_tests_variables_is_nullable            = chip_tests_variables_is_nullable;
+exports.isTestOnlyCluster                           = isTestOnlyCluster;
+exports.isLiteralNull                               = isLiteralNull;
+exports.octetStringEscapedForCLiteral               = octetStringEscapedForCLiteral;
+exports.if_include_struct_item_value                = if_include_struct_item_value;
+exports.ensureIsArray                               = ensureIsArray;
+exports.chip_tests_only_clusters                    = chip_tests_only_clusters;
+exports.chip_tests_only_cluster_commands            = chip_tests_only_cluster_commands;
+exports.chip_tests_only_cluster_command_parameters  = chip_tests_only_cluster_command_parameters;
+exports.chip_tests_only_cluster_responses           = chip_tests_only_cluster_responses;
+exports.chip_tests_only_cluster_response_parameters = chip_tests_only_cluster_response_parameters;
+exports.isHexString                                 = isHexString;
+exports.octetStringLengthFromHexString              = octetStringLengthFromHexString;
+exports.octetStringFromHexString                    = octetStringFromHexString;
+exports.chip_tests_iterate_expected_list            = chip_tests_iterate_expected_list;
+exports.chip_tests_iterate_constraints              = chip_tests_iterate_constraints;

@@ -32,7 +32,7 @@ using namespace chip::TLV;
 
 namespace chip {
 namespace app {
-Builder::Builder() : mError(CHIP_ERROR_INCORRECT_STATE), mpWriter(NULL), mOuterContainerType(chip::TLV::kTLVType_NotSpecified) {}
+Builder::Builder() : mError(CHIP_ERROR_INCORRECT_STATE), mpWriter(nullptr), mOuterContainerType(chip::TLV::kTLVType_NotSpecified) {}
 
 void Builder::Init(chip::TLV::TLVWriter * const apWriter, chip::TLV::TLVType aOuterContainerType)
 {

@@ -79,7 +79,7 @@ extern uint32_t SystemCoreClock;
 #define configCHECK_FOR_STACK_OVERFLOW 2
 
 #define configUSE_MALLOC_FAILED_HOOK 1
-#define configUSE_DAEMON_TASK_STARTUP_HOOK 0
+#define configUSE_DAEMON_TASK_STARTUP_HOOK 1
 #define configUSE_APPLICATION_TASK_TAG 0
 
 /* Run time and task stats gathering related definitions. */
@@ -155,6 +155,7 @@ to exclude the API function. */
 #define INCLUDE_vTaskDelay 1
 #define INCLUDE_xTaskIsTaskFinished 1
 #define INCLUDE_xTimerPendFunctionCall 1
+#define INCLUDE_xSemaphoreGetMutexHolder 1
 
 /* Normal assert() semantics without relying on the provision of an assert.h
 header file. */

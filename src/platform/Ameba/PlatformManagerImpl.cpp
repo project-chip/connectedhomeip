@@ -26,8 +26,9 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
+#include <platform/Ameba/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 namespace chip {
 namespace DeviceLayer {
@@ -59,7 +60,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
@@ -76,13 +76,18 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+
+    SuccessOrExit(err);
+
+    err = System::Clock::InitClock_RealTime();
+
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
@@ -104,7 +109,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

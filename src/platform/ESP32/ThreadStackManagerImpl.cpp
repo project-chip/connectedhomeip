@@ -26,7 +26,7 @@
 
 #include <platform/ThreadStackManager.h>
 
-#include <platform/ESP32/ESPThreadConfig.h>
+#include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
@@ -52,6 +52,7 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
+    openthread_launch_task();
     return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
 }
 
@@ -88,14 +89,6 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart()
 void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop()
 {
     // Intentionally empty.
-}
-
-void ThreadStackManagerImpl::ESPThreadTask(void * arg)
-{
-    esp_openthread_launch_mainloop();
-    esp_openthread_netif_glue_deinit();
-    esp_vfs_eventfd_unregister();
-    vTaskDelete(NULL);
 }
 
 } // namespace DeviceLayer

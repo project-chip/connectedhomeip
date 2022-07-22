@@ -21,14 +21,36 @@ import("common_flags.gni")
 declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
-      is_debug && (current_os == "linux" || current_os == "mac")
+      is_debug &&
+      (current_os == "linux" || current_os == "mac" || current_os == "android")
+
+  # Logging verbosity control for Access Control implementation
+  #
+  # If set to > 0, it is desired to get additional logging on all
+  # access control checks for better debugging ability.
+  #
+  # If set to > 1, it is desired to log every single check
+  chip_access_control_policy_logging_verbosity = 0
+  if (is_debug && (current_os == "linux" || current_os == "mac")) {
+    chip_access_control_policy_logging_verbosity = 2
+  }
+
+  chip_enable_session_resumption = true
+
+  # By default, the resources used by each fabric is unlimited if they are allocated on heap. This flag is for checking the resource usage even when they are allocated on heap to increase code coverage in integration tests.
+  chip_im_force_fabric_quota_check = false
 }
 
 buildconfig_header("app_buildconfig") {
   header = "AppBuildConfig.h"
   header_dir = "app"
 
-  defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}" ]
+  defines = [
+    "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=${chip_enable_schema_check}",
+    "CHIP_CONFIG_IM_FORCE_FABRIC_QUOTA_CHECK=${chip_im_force_fabric_quota_check}",
+    "CHIP_CONFIG_ENABLE_SESSION_RESUMPTION=${chip_enable_session_resumption}",
+    "CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY=${chip_access_control_policy_logging_verbosity}",
+  ]
 }
 
 static_library("app") {
@@ -36,8 +58,6 @@ static_library("app") {
 
   sources = [
     "AttributeAccessInterface.cpp",
-    "AttributeCache.cpp",
-    "AttributeCache.h",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
@@ -48,6 +68,10 @@ static_library("app") {
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
+    "ChunkedWriteCallback.cpp",
+    "ChunkedWriteCallback.h",
+    "ClusterStateCache.cpp",
+    "ClusterStateCache.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",
@@ -56,7 +80,12 @@ static_library("app") {
     "DeviceProxy.h",
     "EventManagement.cpp",
     "EventPathParams.h",
+    "FailSafeContext.cpp",
+    "FailSafeContext.h",
+    "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
+    "InteractionModelRevision.h",
+    "InteractionModelTimeout.h",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
     "MessageDef/AttributeDataIB.cpp",
@@ -107,8 +136,12 @@ static_library("app") {
     "MessageDef/InvokeResponseMessage.cpp",
     "MessageDef/ListBuilder.cpp",
     "MessageDef/ListParser.cpp",
+    "MessageDef/MessageBuilder.cpp",
+    "MessageDef/MessageBuilder.h",
     "MessageDef/MessageDefHelper.cpp",
     "MessageDef/MessageDefHelper.h",
+    "MessageDef/MessageParser.cpp",
+    "MessageDef/MessageParser.h",
     "MessageDef/Parser.cpp",
     "MessageDef/Parser.h",
     "MessageDef/ReadRequestMessage.cpp",
@@ -125,11 +158,14 @@ static_library("app") {
     "MessageDef/TimedRequestMessage.cpp",
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
+    "OTAUserConsentCommon.h",
     "OperationalDeviceProxy.cpp",
     "OperationalDeviceProxy.h",
     "OperationalDeviceProxyPool.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "RequiredPrivilege.cpp",
+    "RequiredPrivilege.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "TimedHandler.cpp",
@@ -138,7 +174,6 @@ static_library("app") {
     "TimedRequest.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
-    "encoder-common.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
@@ -146,7 +181,7 @@ static_library("app") {
   public_deps = [
     ":app_buildconfig",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/util:device_callbacks_manager",
+    "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/secure_channel",

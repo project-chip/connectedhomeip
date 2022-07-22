@@ -28,9 +28,12 @@ class TxtResponder : public RecordResponder
 public:
     TxtResponder(const TxtResourceRecord & record) : RecordResponder(QType::TXT, record.GetName()), mRecord(record) {}
 
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override
     {
-        delegate->AddResponse(mRecord);
+        TxtResourceRecord record = mRecord;
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
 
 private:

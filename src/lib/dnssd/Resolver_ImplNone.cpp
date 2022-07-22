@@ -29,15 +29,19 @@ class NoneResolver : public Resolver
 public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *) override { return CHIP_NO_ERROR; }
     void Shutdown() override {}
-    void SetResolverDelegate(ResolverDelegate *) override {}
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}
 
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override
     {
         ChipLogError(Discovery, "Failed to resolve node ID: dnssd resolving not available");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
-    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 NoneResolver gResolver;
@@ -49,17 +53,22 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return gResolver;
 }
 
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+ResolverProxy::~ResolverProxy()
+{
+    Shutdown();
+}
+
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

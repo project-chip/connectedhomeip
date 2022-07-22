@@ -15,4 +15,5 @@
 declare_args() {
   # Root directory for mbedTLS.
   mbedtls_root = "//third_party/connectedhomeip/third_party/mbedtls"
+  mbedtls_repo = "//third_party/connectedhomeip/third_party/mbedtls"
 }

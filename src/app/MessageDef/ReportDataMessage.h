@@ -32,22 +32,22 @@
 
 #include "AttributeReportIBs.h"
 #include "EventReportIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 
 namespace chip {
 namespace app {
 namespace ReportDataMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_SubscriptionId      = 0,
-    kCsTag_AttributeReportIBs  = 1,
-    kCsTag_EventReports        = 2,
-    kCsTag_MoreChunkedMessages = 3,
-    kCsTag_SuppressResponse    = 4,
+    kSubscriptionId      = 0,
+    kAttributeReportIBs  = 1,
+    kEventReports        = 2,
+    kMoreChunkedMessages = 3,
+    kSuppressResponse    = 4,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -86,7 +86,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
+    CHIP_ERROR GetSubscriptionId(SubscriptionId * const apSubscriptionId) const;
 
     /**
      *  @brief Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
@@ -121,7 +121,7 @@ public:
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**
@@ -145,7 +145,7 @@ public:
      *
      *  @return A reference to *this
      */
-    ReportDataMessage::Builder & SubscriptionId(const uint64_t aSubscriptionId);
+    ReportDataMessage::Builder & SubscriptionId(const chip::SubscriptionId aSubscriptionId);
 
     /**
      *  @brief Initialize a AttributeReportIBs::Builder for writing into the TLV stream
@@ -179,7 +179,6 @@ private:
     AttributeReportIBs::Builder mAttributeReportIBsBuilder;
     EventReportIBs::Builder mEventReportsBuilder;
 };
-}; // namespace ReportDataMessage
-
-}; // namespace app
-}; // namespace chip
+} // namespace ReportDataMessage
+} // namespace app
+} // namespace chip

@@ -16,16 +16,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <platform/CHIPDeviceLayer.h>
+
 #include <AppShellCommands.h>
 #include <ButtonHandler.h>
 #include <ChipShellCollection.h>
+#include <DeviceInfoProviderImpl.h>
 #include <LightingManager.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <OTAConfig.h>
+#endif
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/EndPointStateOpenThread.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <mbedtls/platform.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <sparcommon.h>
 #include <stdio.h>
@@ -37,6 +44,8 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+static void InitApp(intptr_t args);
 static void EventHandler(const ChipDeviceEvent * event, intptr_t arg);
 static void HandleThreadStateChangeEvent(const ChipDeviceEvent * event);
 static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t value);
@@ -44,6 +53,13 @@ static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager
 static wiced_led_config_t chip_lighting_led_config = {
     .led    = PLATFORM_LED_1,
     .bright = 50,
+};
+
+static Identify gIdentify = {
+    chip::EndpointId{ 1 },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
 };
 
 APPLICATION_START()
@@ -114,28 +130,46 @@ APPLICATION_START()
     }
 #endif
 
-    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
-
-    LightMgr().Init();
-    LightMgr().SetCallbacks(LightManagerCallback, NULL);
-
-    /* Start CHIP datamodel server */
-    chip::Server::GetInstance().Init();
-
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-    ConfigurationMgr().LogDeviceConfig();
+    PlatformMgr().ScheduleWork(InitApp, 0);
 
     const int ret = Engine::Root().Init();
     if (!chip::ChipError::IsSuccess(ret))
     {
         printf("ERROR Shell Init %d\n", ret);
     }
-    cmd_ping_init();
     RegisterAppShellCommands();
     Engine::Root().RunMainLoop();
 
     assert(!wiced_rtos_check_for_stack_overflow());
+}
+
+void InitApp(intptr_t args)
+{
+    ConfigurationMgr().LogDeviceConfig();
+
+    PlatformMgrImpl().AddEventHandler(EventHandler, 0);
+
+    /* Start CHIP datamodel server */
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+    chip::Server::GetInstance().Init(initParams);
+
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    LightMgr().Init();
+    LightMgr().SetCallbacks(LightManagerCallback, nullptr);
+    LightMgr().WriteClusterLevel(254);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    OTAConfig::Init();
+#endif
 }
 
 void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
@@ -150,15 +184,7 @@ void EventHandler(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-void HandleThreadStateChangeEvent(const ChipDeviceEvent * event)
-{
-#if CHIP_BYPASS_RENDEZVOUS
-    if (event->ThreadStateChange.NetDataChanged && !ConnectivityMgr().IsThreadProvisioned())
-    {
-        ThreadStackMgr().JoinerStart();
-    }
-#endif /* CHIP_BYPASS_RENDEZVOUS */
-}
+void HandleThreadStateChangeEvent(const ChipDeviceEvent * event) {}
 
 void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t level)
 {

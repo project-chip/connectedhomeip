@@ -26,8 +26,8 @@ class AppDelegate
 {
 public:
     virtual ~AppDelegate() {}
-    virtual void OnRendezvousStarted() {}
-    virtual void OnRendezvousStopped() {}
-    virtual void OnPairingWindowOpened() {}
-    virtual void OnPairingWindowClosed() {}
+    virtual void OnCommissioningSessionStarted() {}
+    virtual void OnCommissioningSessionStopped() {}
+    virtual void OnCommissioningWindowOpened() {}
+    virtual void OnCommissioningWindowClosed() {}
 };

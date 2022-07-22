@@ -42,17 +42,15 @@ chip_test_suite("tests") {
   test_sources = [
     "TestMessageHeader.cpp",
     "TestPeerAddress.cpp",
+    "TestTCP.cpp",
   ]
-
-  if (current_os != "mac") {
-    test_sources += [ "TestTCP.cpp" ]
-  }
 
   public_deps = [
     ":helpers",
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",

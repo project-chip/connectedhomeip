@@ -58,9 +58,16 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  *
  * The abstract class hierarchy is:
  * - Layer: Core timer methods.
- *   - LayerLwIP: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP.
+ *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
  *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
+ *
+ * Threading notes:
+ *
+ * The SDK is not generally thread safe. System::Layer methods should only be called from
+ * a single context, or otherwise externally synchronized. For platforms that use a CHIP
+ * event loop thread, timer callbacks are invoked on that thread; for platforms that use
+ * a CHIP lock, the lock is held.
  */
 class DLL_EXPORT Layer
 {
@@ -79,7 +86,7 @@ public:
      * Some other layers hold pointers to System::Layer, so care must be taken
      * to ensure that they are not used after calling Shutdown().
      */
-    virtual CHIP_ERROR Shutdown() = 0;
+    virtual void Shutdown() = 0;
 
     /**
      * True if this Layer is initialized. No method on Layer or its abstract descendants, other than this and `Init()`,
@@ -112,8 +119,11 @@ public:
      *
      *   @note
      *       The cancellation could fail silently in two different ways. If the timer specified by the combination of the callback
-     *       function and application state object couldn't be found, cancellation could fail. If the timer has fired, but not yet
-     *       removed from memory, cancellation could also fail.
+     *       function and application state object couldn't be found, cancellation could fail. If the timer has fired, then
+     *       an event is queued and will be processed later.
+     *
+     *   WARNING: Timer handlers MUST assume that they may be hit even after CancelTimer due to cancelling an
+     *            already fired timer that is queued in the event loop already.
      *
      *   @param[in]  aOnComplete   A pointer to the callback function used in calling @p StartTimer().
      *   @param[in]  aAppState     A pointer to the application state object used in calling @p StartTimer().
@@ -124,14 +134,6 @@ public:
     /**
      * @brief
      *   Schedules a function with a signature identical to `OnCompleteFunct` to be run as soon as possible in the CHIP context.
-     *
-     * @note
-     *   This function could, in principle, be implemented as `StartTimer`. The specification for `SystemTimer` however
-     *   permits certain optimizations that might make that implementation impossible. Specifically, `SystemTimer`
-     *   API may only be called from the thread owning the particular `System::Layer`, whereas the `ScheduleWork` may be
-     *   called from any thread. Additionally, whereas the `SystemTimer` API permits the invocation of the already
-     *   expired handler in line, `ScheduleWork` guarantees that the handler function will be called only after the
-     *   current CHIP event completes.
      *
      * @param[in] aComplete     A pointer to a callback function to be called when this timer fires.
      * @param[in] aAppState     A pointer to an application state object to be passed to the callback function as argument.
@@ -173,9 +175,9 @@ private:
     Layer & operator=(const Layer &) = delete;
 };
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
-class LayerLwIP : public Layer
+class LayerFreeRTOS : public Layer
 {
 };
 

@@ -68,13 +68,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Shutdown()
+    void Shutdown()
     {
         // Return to uninitialized state to permit re-initialization.
-        VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        mLayerState.ResetFromInitialized();
         mSystemLayer = nullptr;
-        return CHIP_NO_ERROR;
     }
 
     System::Layer & SystemLayer() const { return *mSystemLayer; }
@@ -117,8 +115,8 @@ public:
     using Manager  = EndPointManager<typename EndPointImpl::EndPoint>;
     using EndPoint = typename EndPointImpl::EndPoint;
 
-    EndPointManagerImplPool() = default;
-    ~EndPointManagerImplPool() { VerifyOrDie(sEndPointPool.Allocated() == 0); }
+    EndPointManagerImplPool()           = default;
+    ~EndPointManagerImplPool() override = default;
 
     EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
     void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }

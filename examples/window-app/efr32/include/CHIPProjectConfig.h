@@ -30,7 +30,7 @@
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #endif
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
@@ -41,21 +41,20 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x534C: EFR32 window-app
+ * 0x8009: example window app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x0000
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8010
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -77,6 +76,17 @@
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+ *
+ * A uint32_t identifying the software version running on the device.
+ */
+/* The SoftwareVersion attribute of the Basic cluster. */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
+#endif
+
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
@@ -145,17 +155,7 @@
 #define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
 
 /**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of slow advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
-
-/**
- *  @def CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+ *  @def CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
  *
  *  @brief
  *    Active retransmit interval, or time to wait before retransmission after
@@ -165,4 +165,6 @@
  *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
  *
  */
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (2000_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

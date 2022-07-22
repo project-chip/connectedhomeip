@@ -16,8 +16,10 @@ include(${pigweed_dir}/pw_protobuf_compiler/proto.cmake)
 
 set(dir_pw_third_party_nanopb "${chip_dir}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
+pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
-pw_set_backend(pw_assert pw_assert_log)
+pw_set_backend(pw_assert.check pw_assert_log.check_backend)
+pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.ameba)
 
 add_subdirectory(${chip_dir}/third_party/pigweed/repo ${chip_dir}/examples/pigweed-app/ameba/out/pigweed)
@@ -72,14 +74,23 @@ link_directories(
 list(
     APPEND chip_main_flags
 
-    -DINET_CONFIG_ENABLE_IPV4=1
+    -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCONFIG_ENABLE_PW_RPC=1
+    -DMATTER_PIGWEED_APP=1
 )
+
+if (matter_enable_persistentstorage_audit)
+list(
+    APPEND chip_main_flags
+
+    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
+)
+endif (matter_enable_persistentstorage_audit)
 
 list(
     APPEND chip_main_cpp_flags
@@ -98,4 +109,3 @@ add_custom_command(
     POST_BUILD
     COMMAND cp lib${chip_main}.a ${CMAKE_CURRENT_SOURCE_DIR}/lib/application
 )
-

@@ -21,11 +21,12 @@
  *
  */
 /* this file behaves like a config.h, comes first */
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
-#include <lwip/ip.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <openthread-system.h>
 #include <wiced_platform.h>
 
@@ -51,7 +52,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     VerifyOrExit(result == WICED_SUCCESS, err = CHIP_ERROR_INTERNAL);
     otSysInit(0, NULL);
 
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(NULL);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(NULL);
 
 exit:
     return err;
@@ -101,8 +102,12 @@ void ThreadStackManagerImpl::ThreadTaskMain(uint32_t arg)
 } // namespace DeviceLayer
 } // namespace chip
 
-/* A wrapper for the GenericThreadStackManagerImpl_OpenThread_LwIP implementation. */
-err_t tcpip_input(struct pbuf * p, struct netif * inp)
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
-    return ip_input(p, inp);
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    CHIPPlatformMemoryFree(aPtr);
 }

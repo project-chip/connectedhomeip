@@ -114,28 +114,28 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     cyhal_reset_reason_t reset_reason = cyhal_system_get_reset_reason();
     if (reset_reason == CYHAL_SYSTEM_RESET_NONE)
     {
-        bootReason = BootReasonType::PowerOnReboot;
+        bootReason = BootReasonType::kPowerOnReboot;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_WDT)
     {
-        bootReason = BootReasonType::SoftwareWatchdogReset;
+        bootReason = BootReasonType::kSoftwareWatchdogReset;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_SOFT)
     {
-        bootReason = BootReasonType::SoftwareReset;
+        bootReason = BootReasonType::kSoftwareReset;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_HIB_WAKEUP)
     {
-        bootReason = BootReasonType::HardwareWatchdogReset;
+        bootReason = BootReasonType::kHardwareWatchdogReset;
     }
     else
     {
-        bootReason = BootReasonType::Unspecified;
+        bootReason = BootReasonType::kUnspecified;
     }
     return CHIP_NO_ERROR;
 }
@@ -143,10 +143,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
 void DiagnosticDataProviderImpl::UpdateoffPremiseService(bool ipv4service, bool ipv6service)
 {
     /* Enable/Disable IPv4 Off Premise Services */
-    mipv4_offpremise = ipv4service;
+    mipv4_offpremise.SetNonNull(ipv4service);
 
     /* Enable/Disable IPv6 Off Premise Services */
-    mipv6_offpremise = ipv6service;
+    mipv6_offpremise.SetNonNull(ipv6service);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
@@ -158,8 +158,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     if (net_interface)
     {
         /* Update Network Interface list */
-        ifp->name                            = CharSpan(net_interface->name, strlen(net_interface->name));
-        ifp->fabricConnected                 = net_interface->flags & NETIF_FLAG_LINK_UP;
+        ifp->name                            = CharSpan::fromCharString(net_interface->name);
+        ifp->isOperational                   = net_interface->flags & NETIF_FLAG_LINK_UP;
         ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
         ifp->offPremiseServicesReachableIPv4 = mipv4_offpremise;
         ifp->offPremiseServicesReachableIPv6 = mipv6_offpremise;
@@ -255,7 +255,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
         SuccessOrExit(CHIP_ERROR_INTERNAL);
     }
     /* VHT Capable bit variable is not defined in whd and has to use the reserved bit */
-    if (bss_info.reserved[0])
+    if (bss_info.vht_cap)
     {
         wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC;
     }
@@ -541,6 +541,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::WiFiCounters(WiFiStatsCountType type, uin
         free(cntdata);
     }
     return err;
+}
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

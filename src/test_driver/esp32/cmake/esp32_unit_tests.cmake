@@ -36,6 +36,7 @@ macro(esp32_unit_test)
         idf::main 
         -Wl,--whole-archive ${UNIT_TEST_LIBRARY} -Wl,--no-whole-archive
         ${UNIT_TEST_EXTRA_LIBRARIES}
+        -lSupportTesting
         nlunit-test
         nlfaultinjection
     )
@@ -60,10 +61,10 @@ macro(esp32_unit_test)
       COMMAND ${CMAKE_COMMAND} -E echo "Generated ${UNIT_TEST_NAME}.bin"
       COMMAND ${CMAKE_COMMAND} -E md5sum "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}" > "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.bin_timestamp"
       DEPENDS ${UNIT_TEST_NAME}
-      VERBATIM                                                                                                                                                  
+      VERBATIM
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating binary image from ${UNIT_TEST_NAME}"
-    )                                                                                                                                                         
+    )
     add_custom_target(gen_binary_${UNIT_TEST_NAME} ALL DEPENDS "${build_dir}/${UNIT_TEST_NAME}.bin_timestamp")
 
 
@@ -86,10 +87,10 @@ macro(esp32_unit_test)
       COMMAND ${CMAKE_COMMAND} -E md5sum "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img" > "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img_timestamp"
 
       DEPENDS gen_binary_${UNIT_TEST_NAME}
-      VERBATIM                                                                                                                                                  
+      VERBATIM
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating binary image from ${UNIT_TEST_NAME}"
-    )                                                                                                                                                         
+    )
     add_custom_target(gen_image_${UNIT_TEST_NAME} ALL DEPENDS "${build_dir}/${UNIT_TEST_NAME}.img_timestamp")
 
     LIST(APPEND ESP32_TEST_IMAGES ${UNIT_TEST_NAME}.img)

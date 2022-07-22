@@ -18,6 +18,7 @@
 #pragma once
 
 #include "driver/gpio.h"
+#include "esp_log.h"
 
 #if CONFIG_LED_TYPE_RMT
 #include "driver/rmt.h"
@@ -31,14 +32,16 @@ class LEDWidget
 {
 public:
     void Init(void);
-
     void Set(bool state);
+    void Toggle(void);
 
     void SetBrightness(uint8_t brightness);
-
+    void UpdateState();
 #if CONFIG_LED_TYPE_RMT
     void SetColor(uint8_t Hue, uint8_t Saturation);
 #endif
+    uint8_t GetLevel(void);
+    bool IsTurnedOn(void);
 
 private:
     bool mState;

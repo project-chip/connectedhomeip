@@ -96,7 +96,7 @@ typedef struct
     /**
      * Pointer to attribute metadata array for this cluster.
      */
-    EmberAfAttributeMetadata * attributes;
+    const EmberAfAttributeMetadata * attributes;
     /**
      * Total number of attributes
      */
@@ -117,7 +117,29 @@ typedef struct
      * if this cluster has no functions.
      */
     const EmberAfGenericClusterFunction * functions;
+
+    /**
+     * A list of client generated commands. A client generated command
+     * is a client to server command. Can be nullptr or terminated by 0xFFFF_FFFF.
+     */
+    const chip::CommandId * acceptedCommandList;
+
+    /**
+     * A list of server generated commands. A server generated command
+     * is a response to client command request. Can be nullptr or terminated by 0xFFFF_FFFF.
+     */
+    const chip::CommandId * generatedCommandList;
 } EmberAfCluster;
+
+/**
+ * @brief Struct that represents a logical device type consisting
+ * of a DeviceID and its version.
+ */
+typedef struct
+{
+    uint16_t deviceId;
+    uint8_t deviceVersion;
+} EmberAfDeviceType;
 
 /**
  * @brief Struct used to find an attribute in storage. Together the elements
@@ -135,13 +157,6 @@ typedef struct
      * Cluster that the attribute is located on.
      */
     chip::ClusterId clusterId;
-
-    /**
-     * Cluster mask for the cluster, used to determine if it is
-     * the server or client version of the cluster. See CLUSTER_MASK_
-     * macros defined in att-storage.h
-     */
-    EmberAfClusterMask clusterMask;
 
     /**
      * The identifier for the attribute.
@@ -328,7 +343,7 @@ typedef struct
      * Pointer to the cluster structs, describing clusters on this
      * endpoint type.
      */
-    EmberAfCluster * cluster;
+    const EmberAfCluster * cluster;
     /**
      * Number of clusters in this endpoint type.
      */
@@ -368,33 +383,37 @@ enum
 /**
  * @brief Struct that maps actual endpoint type, onto a specific endpoint.
  */
-typedef struct
+struct EmberAfDefinedEndpoint
 {
     /**
      * Actual zigbee endpoint number.
      */
-    chip::EndpointId endpoint;
+    chip::EndpointId endpoint = chip::kInvalidEndpointId;
+
     /**
-     * Device ID of the device on this endpoint.
+     * Span pointing to a list of supported device types
      */
-    uint16_t deviceId;
-    /**
-     * Version of the device.
-     */
-    uint8_t deviceVersion;
-    /**
-     * Endpoint type for this endpoint.
-     */
-    EmberAfEndpointType * endpointType;
-    /**
-     * Network index for this endpoint.
-     */
-    uint8_t networkIndex;
+    chip::Span<const EmberAfDeviceType> deviceTypeList;
+
     /**
      * Meta-data about the endpoint
      */
-    EmberAfEndpointBitmask bitmask;
-} EmberAfDefinedEndpoint;
+    EmberAfEndpointBitmask bitmask = EMBER_AF_ENDPOINT_DISABLED;
+    /**
+     * Endpoint type for this endpoint.
+     */
+    const EmberAfEndpointType * endpointType = nullptr;
+    /**
+     * Pointer to the DataVersion storage for the server clusters on this
+     * endpoint
+     */
+    chip::DataVersion * dataVersions = nullptr;
+
+    /**
+     * Root endpoint id for composed device type.
+     */
+    chip::EndpointId parentEndpointId = chip::kInvalidEndpointId;
+};
 
 // Cluster specific types
 
@@ -728,7 +747,7 @@ typedef struct
     chip::EndpointId endpoint; // 0x00 when this record is not in use
     chip::GroupId groupId;     // 0x0000 if not associated with a group
     uint8_t sceneId;
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
     uint8_t name[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
 #endif
     uint16_t transitionTime;     // in seconds
@@ -1554,12 +1573,6 @@ typedef struct
     EmberNodeId emberNodeId;
     uint32_t timeStamp;
 } EmberAfJoiningDevice;
-
-#define EMBER_AF_INVALID_CLUSTER_ID 0xFFFF
-
-#define EMBER_AF_INVALID_ENDPOINT 0xFF
-
-#define EMBER_AF_INVALID_PAN_ID 0xFFFF
 
 /**
  * @brief Permit join times

@@ -45,6 +45,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
@@ -135,15 +137,15 @@ class ClusterDetailFragment : Fragment() {
       )
       parameterList.forEach {
         val parameterName = it.clusterParameterNameTv.text.toString()
-        val castType =
-          selectedInteractionInfo.commandParameters[parameterName]!!.type
-        val data = castStringToType(it.clusterParameterData.text.toString(), castType)!!
+        val parameterType = selectedInteractionInfo.commandParameters[parameterName]!!.type
+        val parameterUnderlyingType = selectedInteractionInfo.commandParameters[parameterName]!!.underlyingType
+        val data = castStringToType(it.clusterParameterData.text.toString(), parameterType, parameterUnderlyingType)!!
         commandArguments[it.clusterParameterNameTv.text.toString()] = data
         clusterInteractionHistoryList[0].parameterList.add(
           HistoryParameterInfo(
             parameterName,
             data.toString(),
-            castType
+            parameterUnderlyingType
           )
         )
       }
@@ -185,12 +187,13 @@ class ClusterDetailFragment : Fragment() {
     }
   }
 
-  private fun castStringToType(data: String, type: Class<*>): Any? {
+  private fun castStringToType(data: String, type: Class<*>, underlyingType: Class<*>): Any? {
     return when (type) {
       Int::class.java -> data.toInt()
       Boolean::class.java -> data.toBoolean()
       ByteArray::class.java -> data.encodeToByteArray()
       Long::class.java -> data.toLong()
+      Optional::class.java -> if (data.isEmpty()) Optional.empty() else Optional.of(castStringToType(data, underlyingType, underlyingType)!!)
       else -> data
     }
   }

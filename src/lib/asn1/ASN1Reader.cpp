@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -30,10 +30,13 @@
 #include <stdlib.h>
 
 #include <lib/asn1/ASN1.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace ASN1 {
+
+using namespace chip::Encoding;
 
 void ASN1Reader::Init(const uint8_t * buf, size_t len)
 {
@@ -50,7 +53,9 @@ CHIP_ERROR ASN1Reader::Next()
     ReturnErrorCodeIf(EndOfContents, ASN1_END);
     ReturnErrorCodeIf(IndefiniteLen, ASN1_ERROR_UNSUPPORTED_ENCODING);
 
-    mElemStart += (mHeadLen + ValueLen);
+    // Note: avoid using addition assignment operator (+=), which may result in integer overflow
+    // in the right hand side of an assignment (mHeadLen + ValueLen).
+    mElemStart = mElemStart + mHeadLen + ValueLen;
 
     ResetElementState();
 
@@ -110,6 +115,8 @@ CHIP_ERROR ASN1Reader::EnterContainer(uint32_t offset)
     mElemStart = Value + offset;
     if (!IndefiniteLen)
     {
+        VerifyOrReturnError(CanCastTo<uint32_t>(mBufEnd - Value), ASN1_ERROR_VALUE_OVERFLOW);
+        VerifyOrReturnError(static_cast<uint32_t>(mBufEnd - Value) >= ValueLen, ASN1_ERROR_VALUE_OVERFLOW);
         mContainerEnd = Value + ValueLen;
     }
 
@@ -142,17 +149,24 @@ bool ASN1Reader::IsContained() const
 
 CHIP_ERROR ASN1Reader::GetInteger(int64_t & val)
 {
+    uint8_t encodedVal[sizeof(int64_t)] = { 0 };
+    size_t valPaddingLen                = sizeof(int64_t) - ValueLen;
+
     ReturnErrorCodeIf(Value == nullptr, ASN1_ERROR_INVALID_STATE);
     ReturnErrorCodeIf(ValueLen < 1, ASN1_ERROR_INVALID_ENCODING);
     ReturnErrorCodeIf(ValueLen > sizeof(int64_t), ASN1_ERROR_VALUE_OVERFLOW);
     ReturnErrorCodeIf(mElemStart + mHeadLen + ValueLen > mContainerEnd, ASN1_ERROR_UNDERRUN);
 
-    const uint8_t * p = Value;
-    val               = ((*p & 0x80) == 0) ? 0 : -1;
-    for (uint32_t i = ValueLen; i > 0; i--, p++)
+    if ((*Value & 0x80) == 0x80)
     {
-        val = (val << 8) | *p;
+        for (size_t i = 0; i < valPaddingLen; i++)
+        {
+            encodedVal[i] = 0xFF;
+        }
     }
+    memcpy(&encodedVal[valPaddingLen], Value, ValueLen);
+
+    val = static_cast<int64_t>(BigEndian::Get64(encodedVal));
 
     return CHIP_NO_ERROR;
 }
@@ -293,11 +307,12 @@ CHIP_ERROR ASN1Reader::DecodeHead()
         IndefiniteLen = false;
     }
 
+    VerifyOrReturnError(CanCastTo<uint32_t>(mBufEnd - p), ASN1_ERROR_VALUE_OVERFLOW);
+    VerifyOrReturnError(static_cast<uint32_t>(mBufEnd - p) >= ValueLen, ASN1_ERROR_VALUE_OVERFLOW);
     VerifyOrReturnError(CanCastTo<uint32_t>(p - mElemStart), ASN1_ERROR_VALUE_OVERFLOW);
-
     mHeadLen = static_cast<uint32_t>(p - mElemStart);
 
-    EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && Constructed == false && ValueLen == 0);
+    EndOfContents = (Class == kASN1TagClass_Universal && Tag == 0 && !Constructed && ValueLen == 0);
 
     Value = p;
 
@@ -342,8 +357,7 @@ CHIP_ERROR DumpASN1(ASN1Reader & asn1Parser, const char * prefix, const char * i
                     nestLevel--;
                     continue;
                 }
-                else
-                    break;
+                break;
             }
             printf("ASN1Reader::Next() failed: %" CHIP_ERROR_FORMAT "\n", err.Format());
             return err;

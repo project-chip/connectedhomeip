@@ -29,7 +29,12 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
 
     ChipLogProgress(NetworkProvisioning, "TizenNetworkProvisioningDelegate: SSID: %s", ssid);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     err = ConnectivityMgrImpl().ProvisionWiFiNetwork(ssid, key);
+#else
+    err = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));

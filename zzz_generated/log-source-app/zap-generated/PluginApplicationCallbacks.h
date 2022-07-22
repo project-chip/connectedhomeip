@@ -22,8 +22,9 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
-    MatterDiagnosticLogsPluginClientInitCallback();                                                                                \
-    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
+    MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterDiagnosticLogsPluginClientInitCallback();                                                                                \
+    MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterOperationalCredentialsPluginServerInitCallback();

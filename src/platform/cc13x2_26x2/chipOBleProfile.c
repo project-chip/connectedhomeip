@@ -63,7 +63,7 @@ const uint8 chipOBleProfileRxCharUUID[ATT_UUID_SIZE] = {
 static const gattAttrType_t chipoBleProfile = { ATT_BT_UUID_SIZE, chipOBleServUUID };
 
 // CHIPoBLE Tx Characteristic Properties
-static uint8_t chipOBleProfileTxCharProps = GATT_PROP_READ | GATT_PROP_NOTIFY;
+static uint8_t chipOBleProfileTxCharProps = GATT_PROP_READ | GATT_PROP_INDICATE;
 
 // CHIPoBLE Tx Characteristic Value
 static uint8_t chipOBleProfileTxCharVal[CHIPOBLEPROFILE_CHAR_LEN] = { 0x00 };
@@ -362,7 +362,7 @@ static bStatus_t CHIPoBLEProfile_WriteAttrCB(uint16_t connHandle, gattAttribute_
 
         notifyApp = CHIPOBLEPROFILE_CCCWrite;
 
-        status = GATTServApp_ProcessCCCWriteReq(connHandle, pAttr, pValue, len, offset, GATT_CLIENT_CFG_NOTIFY);
+        status = GATTServApp_ProcessCCCWriteReq(connHandle, pAttr, pValue, len, offset, GATT_CLIENT_CFG_INDICATE);
     }
     else
     {

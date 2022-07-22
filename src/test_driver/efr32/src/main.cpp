@@ -186,7 +186,6 @@ int main(void)
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     chip::Platform::MemoryInit();
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
     chip::DeviceLayer::PlatformMgr().InitChipStack();
 

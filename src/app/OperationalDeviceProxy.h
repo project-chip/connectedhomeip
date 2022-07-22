@@ -29,42 +29,41 @@
 #include <app/CASEClient.h>
 #include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
-#include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
+#include <credentials/GroupDataProvider.h>
+#include <lib/address_resolve/AddressResolve.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
-#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#include <lib/dnssd/ResolverProxy.h>
-
 namespace chip {
 
 struct DeviceProxyInitParams
 {
-    SessionManager * sessionManager          = nullptr;
-    Messaging::ExchangeManager * exchangeMgr = nullptr;
-    SessionIDAllocator * idAllocator         = nullptr;
-    FabricTable * fabricTable                = nullptr;
-    CASEClientPoolDelegate * clientPool      = nullptr;
-
-    Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+    SessionManager * sessionManager                                    = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
+    Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                           = nullptr;
+    FabricTable * fabricTable                                          = nullptr;
+    CASEClientPoolDelegate * clientPool                                = nullptr;
+    Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
 
     Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        // sessionResumptionStorage can be nullptr when resumption is disabled
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(groupDataProvider == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -76,29 +75,49 @@ class OperationalDeviceProxy;
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
 typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
 
-class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
+/**
+ * Represents a connection path to a device that is in an operational state.
+ *
+ * Handles the lifetime of communicating with such a device:
+ *    - Discover the device using DNSSD (find out what IP address to use and what
+ *      communication parameters are appropriate for it)
+ *    - Establish a secure channel to it via CASE
+ *    - Expose to consumers the secure session for talking to the device.
+ */
+class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
+                                          public SessionDelegate,
+                                          public SessionEstablishmentDelegate,
+                                          public AddressResolve::NodeListener
 {
 public:
-    virtual ~OperationalDeviceProxy();
+    ~OperationalDeviceProxy() override;
+
+    //
+    // TODO: Should not be PeerId, but rather, ScopedNodeId
+    //
     OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
-        VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
+        mInitParams = params;
+        if (params.Validate() != CHIP_NO_ERROR)
+        {
+            mState = State::Uninitialized;
+            return;
+        }
 
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
-        mInitParams  = params;
         mPeerId      = peerId;
-        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
-
+        mFabricTable = params.fabricTable;
+        if (mFabricTable != nullptr)
+        {
+            auto fabricInfo = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
+            if (fabricInfo != nullptr)
+            {
+                mFabricIndex = fabricInfo->GetFabricIndex();
+            }
+        }
         mState = State::NeedsAddress;
+        mAddressLookupHandle.SetListener(this);
     }
-
-    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId, const Dnssd::ResolvedNodeData & nodeResolutionData) :
-        OperationalDeviceProxy(params, peerId)
-    {
-        OnNodeIdResolved(nodeResolutionData);
-    }
-
-    void Clear();
 
     /*
      * This function can be called to establish a secure session with the device.
@@ -109,74 +128,56 @@ public:
      * On establishing the session, the callback function `onConnection` will be called. If the
      * session setup fails, `onFailure` will be called.
      *
-     * If the session already exists, `onConnection` will be called immediately.
-     * If the resolver is null and the device state is State::NeedsAddress, CHIP_ERROR_INVALID_ARGUMENT will be
-     * returned.
+     * If the session already exists, `onConnection` will be called immediately,
+     * before the Connect call returns.
+     *
+     * `onFailure` may be called before the Connect call returns, for error
+     * cases that are detected synchronously (e.g. inability to start an address
+     * lookup).
      */
-    CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 
     bool IsConnecting() const { return mState == State::Connecting; }
 
     /**
-     *   Called when a connection is closing.
-     *   The object releases all resources associated with the connection.
+     * IsResolvingAddress returns true if we are doing an address resolution
+     * that needs to happen before we can establish CASE.  We can be in the
+     * middle of doing address updates at other times too (e.g. when we are
+     * IsConnected()), but those will not cause a true return from
+     * IsResolvingAddress().
      */
+    bool IsResolvingAddress() const { return mState == State::ResolvingAddress; }
+
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablished(const SessionHandle & session) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+
+    //////////// SessionDelegate Implementation ///////////////
+
+    // Called when a connection is closing. The object releases all resources associated with the connection.
     void OnSessionReleased() override;
-
-    void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
-    {
-        mDeviceAddress = ToPeerAddress(nodeResolutionData);
-
-        mMRPConfig = nodeResolutionData.GetMRPConfig();
-
-        if (mState == State::NeedsAddress)
-        {
-            mState = State::Initialized;
-        }
-    }
+    // Called when a message is not acked within first retrans timer, try to refresh the peer address
+    void OnFirstMessageDeliveryFailed() override;
+    // Called when a connection is hanging. Try to re-establish another session, and shift to the new session when done, the
+    // original session won't be touched during the period.
+    void OnSessionHang() override;
 
     /**
      *  Mark any open session with the device as expired.
      */
-    CHIP_ERROR Disconnect() override;
-
-    /**
-     * Use SetConnectedSession if 'this' object is a newly allocated device proxy.
-     * It will take an existing session, such as the one established
-     * during commissioning, and use it for this device proxy.
-     *
-     * Note: Avoid using this function generally as it is Deprecated
-     */
-    void SetConnectedSession(const SessionHandle & handle);
+    void Disconnect() override;
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
-    /**
-     *   Update data of the device.
-     *   This function will set new IP address, port and MRP retransmission intervals of the device.
-     *   Since the device settings might have been moved from RAM to the persistent storage, the function
-     *   will load the device settings first, before making the changes.
-     */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
-
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
-
-    uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
-
-    CHIP_ERROR ShutdownSubscriptions() override;
-
-    Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
+    void ShutdownSubscriptions() override;
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
-
-    bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
 
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
@@ -189,59 +190,96 @@ public:
         // For all other addresses, we should rely on the device's routing table to route messages sent.
         // Forcing messages down an InterfaceId might fail. For example, in bridged networks like Thread,
         // mDNS advertisements are not usually received on the same interface the peer is reachable on.
-        if (nodeData.mAddress[0].IsIPv6LinkLocal())
+        if (nodeData.resolutionData.ipAddress[0].IsIPv6LinkLocal())
         {
-            interfaceId = nodeData.mInterfaceId;
+            interfaceId = nodeData.resolutionData.interfaceId;
         }
 
-        return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
+        return Transport::PeerAddress::UDP(nodeData.resolutionData.ipAddress[0], nodeData.resolutionData.port, interfaceId);
     }
+
+    /**
+     * @brief Get the fabricIndex
+     */
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    /**
+     * Triggers a DNSSD lookup to find a usable peer address for this operational device.
+     */
+    CHIP_ERROR LookupPeerAddress();
+
+    // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
+    void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
+    void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override;
 
 private:
     enum class State
     {
-        Uninitialized,
-        NeedsAddress,
-        Initialized,
-        Connecting,
-        SecureConnected,
+        Uninitialized,    // Error state: OperationalDeviceProxy is useless
+        NeedsAddress,     // No address known, lookup not started yet.
+        ResolvingAddress, // Address lookup in progress.
+        HasAddress,       // Have an address, CASE handshake not started yet.
+        Connecting,       // CASE handshake in progress.
+        SecureConnected,  // CASE session established.
     };
 
     DeviceProxyInitParams mInitParams;
-    FabricInfo * mFabricInfo;
+    FabricTable * mFabricTable = nullptr;
+    FabricIndex mFabricIndex   = kUndefinedFabricIndex;
     System::Layer * mSystemLayer;
 
+    // mCASEClient is only non-null if we are in State::Connecting or just
+    // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
+    void MoveToState(State aTargetState);
+
     State mState = State::Uninitialized;
 
     SessionHolderWithDelegate mSecureSession;
 
-    uint8_t mSequenceNumber = 0;
-
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
 
+    /// This is used when a node address is required.
+    chip::AddressResolve::NodeLookupHandle mAddressLookupHandle;
+
     CHIP_ERROR EstablishConnection();
+
+    /*
+     * This checks to see if an existing CASE session exists to the peer within the SessionManager
+     * and if one exists, to load that into mSecureSession.
+     *
+     * Returns true if a valid session was found, false otherwise.
+     *
+     */
+    bool AttachToExistingSecureSession();
 
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
 
-    static void HandleCASEConnected(void * context, CASEClient * client);
-    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
-
-    static void CloseCASESessionTask(System::Layer * layer, void * context);
-
-    void CloseCASESession();
+    void CleanupCASEClient();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    void DequeueConnectionSuccessCallbacks(bool executeCallback);
-    void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);
+    /*
+     * This dequeues all failure and success callbacks and appropriately
+     * invokes either set depending on the value of error.
+     *
+     * If error == CHIP_NO_ERROR, only success callbacks are invoked.
+     * Otherwise, only failure callbacks are invoked.
+     *
+     */
+    void DequeueConnectionCallbacks(CHIP_ERROR error);
+
+    /**
+     * This function will set new IP address, port and MRP retransmission intervals of the device.
+     */
+    void UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
 };
 
 } // namespace chip

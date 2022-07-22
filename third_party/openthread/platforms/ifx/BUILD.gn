@@ -20,7 +20,10 @@ openthread_ifx_root = "${chip_root}/third_party/openthread/ot-ifx"
 openthread_ifx_mcu = "cyw30739"
 
 config("openthread_ifx_config") {
-  include_dirs = [ "${openthread_ifx_root}/src/${openthread_ifx_mcu}" ]
+  include_dirs = [
+    "${openthread_ifx_root}/src/${openthread_ifx_mcu}",
+    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/mbedtls/include",
+  ]
 }
 
 source_set("openthread_core_config_ifx") {
@@ -38,6 +41,7 @@ source_set("libopenthread-ifx") {
     "${openthread_ifx_root}/src/${openthread_ifx_mcu}/logging.c",
     "${openthread_ifx_root}/src/${openthread_ifx_mcu}/misc.c",
     "${openthread_ifx_root}/src/${openthread_ifx_mcu}/radio.c",
+    "${openthread_ifx_root}/src/${openthread_ifx_mcu}/radio_wrapper.cpp",
     "${openthread_ifx_root}/src/${openthread_ifx_mcu}/settings.c",
     "${openthread_ifx_root}/src/${openthread_ifx_mcu}/system.c",
   ]

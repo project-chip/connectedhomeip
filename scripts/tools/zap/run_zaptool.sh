@@ -45,9 +45,16 @@ CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
         npm install
     fi
 
+    echo "ARGS: ${ZAP_ARGS[@]}"
+
+    if [[ "${ZAP_ARGS[@]}" == *"/all-clusters-app.zap"* ]]; then
+        ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl-with-test-extensions.json"
+    else
+        ZCL_FILE="$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json"
+    fi
+
     node src-script/zap-start.js --logToStdout \
         --gen "$CHIP_ROOT/src/app/zap-templates/app-templates.json" \
-        --zcl "$CHIP_ROOT/src/app/zap-templates/zcl/zcl.json" \
+        --zcl "$ZCL_FILE" \
         "${ZAP_ARGS[@]}"
-
 )

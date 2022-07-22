@@ -1,0 +1,116 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 123.3.1. [TC-S-3.1] Functionality with client as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "read mandatory attributes"
+      verification: |
+          read mandatory attributes
+      disabled: true
+
+    - label:
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          - TH receives the read command and knows this attribute for this cluster and provides a plausible value. - DUT processes the values and operates normally (does not crash, continues with next steps)
+      disabled: true
+
+    - label:
+          "read optional attributes (TH simulates a server cluster which
+          supports all optional attributes)"
+      verification: |
+          read optional attributes (TH simulates a server cluster which supports all optional attributes)
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          - TH receives the read command and provides a plausible value - DUT processes the values and operates normally (does not crash, continues with next steps)
+      disabled: true
+
+    - label: "write mandatory attributes"
+      verification: |
+          write mandatory attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          TH receives the write command, checks whether the value is valid. If value invalid, provide appropriate feedback to DUT and flag test as FAIL - DUT operates normally (does not crash, continues with next steps)
+      disabled: true
+
+    - label:
+          "write optional attributes (TH simulates a server cluster which
+          supports all optional attributes)"
+      verification: |
+          write optional attributes (TH simulates a server cluster which supports all optional attributes)
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          - TH receives the write command, checks whether the value is valid. If value invalid, provide appropriate feedback to DUT and flag test as FAIL - DUT operates normally (does not crash, continues with next steps)
+      disabled: true
+
+    - label: "Change configuration - TH does not support optional attributes"
+      verification: |
+          Change configuration - TH does not support optional attributes
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again"
+      verification: |
+          DUT is aware of the new configuration.
+      disabled: true
+
+    - label:
+          "read optional attributes (TH simulates a server cluster which does
+          not support any optional attributes)"
+      verification: |
+          read optional attributes (TH simulates a server cluster which does not support any optional attributes)
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order"
+      verification: |
+          - TH receives the read command, and responds that this attribute is not available - DUT processes the error response and operates normally (does not crash, continues with next steps) Alternative allowed DUT behavior: - DUT is aware (from the global attributes it may have read in step 5) that the optional attributes are not available, and does not issue read requests for the attributes which it did read in step 2
+      disabled: true
+
+    - label:
+          "write optional attributes (TH simulates a server cluster which does
+          not support any optional attributes)"
+      verification: |
+          write optional attributes (TH simulates a server cluster which does not support any optional attributes)
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order"
+      verification: |
+          - TH receives the write command and responds that this attribute is not available - DUT processes the error response and operates normally (does not crash, continues with next steps if any) Alternative allowed DUT behavior: - DUT is aware (from the global attributes it may have read in step 5) that the optional attributes are not available, and does not issue write requests for the attributes which it did write in step 4
+      disabled: true

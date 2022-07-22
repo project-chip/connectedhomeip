@@ -125,19 +125,6 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
     return err;
 }
 
-BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(BLEManager::CHIPoBLEServiceMode val)
-{
-    mServiceMode = val;
-
-    /* Trigger state update */
-    return DriveBLEState();
-}
-
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
@@ -838,14 +825,16 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 // Enable legacy advertising for set #1
                 status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
 
-                assert(status == SUCCESS);
+                // If adverisement fails, keep flags set
+                if (status == SUCCESS)
+                {
 
-                // Start advertisement timeout timer
-                Util_startClock(&sInstance.clkAdvTimeout);
+                    // Start advertisement timeout timer
+                    Util_startClock(&sInstance.clkAdvTimeout);
 
-                sInstance.mFlags.Set(Flags::kAdvertising);
+                    sInstance.mFlags.Set(Flags::kAdvertising);
+                }
             }
-
             // Advertising should be disabled
             if ((!sInstance.mFlags.Has(Flags::kAdvertisingEnabled)) && sInstance.mFlags.Has(Flags::kAdvertising))
             {
@@ -871,10 +860,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
     case BLEManagerIMPL_CHIPOBLE_TX_IND_EVT: {
         uint8_t dataLen = ((CHIPoBLEIndEvt_t *) (pMsg->pData))->len;
-        uint16_t i      = 0;
-        void * connHandle;
-        ConnRec_t * activeConnObj = NULL;
-        ChipDeviceEvent event;
 
         CHIPoBLEProfile_SetParameter(CHIPOBLEPROFILE_TX_CHAR, dataLen, (void *) (((CHIPoBLEIndEvt_t *) (pMsg->pData))->pData),
                                      BLEManagerImpl::sSelfEntity);
@@ -882,21 +867,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
         BLEMGR_LOG("BLEMGR: BLE Process Application Message: BLEManagerIMPL_CHIPOBLE_TX_IND_EVT: Length: %d", dataLen);
 
         ICall_free((void *) (((CHIPoBLEIndEvt_t *) (pMsg->pData))->pData));
-
-        // Find active connection
-        for (i = 0; i < MAX_NUM_BLE_CONNS; i++)
-        {
-            if (sInstance.connList[i].connHandle != 0xffff)
-            {
-                activeConnObj = &sInstance.connList[i];
-            }
-        }
-
-        connHandle = (void *) &activeConnObj->connHandle;
-
-        event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
-        event.CHIPoBLEIndicateConfirm.ConId = connHandle;
-        PlatformMgr().PostEventOrDie(&event);
 
         dealloc = TRUE;
     }
@@ -965,7 +935,7 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
             CHIPoBLEProfile_GetParameter(CHIPOBLEPROFILE_CCCWrite, &cccValue, 1);
 
             // Check whether it is a sub/unsub event. 0x1 = Notifications enabled, 0x2 = Indications enabled
-            if (cccValue & 1)
+            if (cccValue & 0x2)
             {
                 // Post event to CHIP
                 BLEMGR_LOG("BLEMGR: BLE Process Application Message: CHIPOBLE_CHAR_CHANGE_EVT, Subscrbe");

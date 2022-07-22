@@ -23,18 +23,17 @@
  *
  **/
 
+#include "AppTask.h"
+
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
 
-#include "esp_err.h"
-#include "esp_heap_caps.h"
-#include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/server/Dnssd.h>
 #include <app/util/util.h>
-#include <lib/support/CodeUtils.h>
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/ConcreteAttributePath.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 static const char * TAG = "light-app-callbacks";
 
@@ -43,55 +42,10 @@ extern LEDWidget AppLED;
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::System;
-using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters;
 
-void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
-{
-    switch (event->Type)
-    {
-    case DeviceEventType::kInternetConnectivityChange:
-        OnInternetConnectivityChange(event);
-        break;
-
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
-
-    case DeviceEventType::kCHIPoBLEConnectionEstablished:
-        ESP_LOGI(TAG, "CHIPoBLE connection established");
-        break;
-
-    case DeviceEventType::kCHIPoBLEConnectionClosed:
-        ESP_LOGI(TAG, "CHIPoBLE disconnected");
-        break;
-
-    case DeviceEventType::kCommissioningComplete:
-        ESP_LOGI(TAG, "Commissioning complete");
-        break;
-
-    case DeviceEventType::kInterfaceIpAddressChanged:
-        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
-            chip::app::DnssdServer::Instance().StartServer();
-        }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-        }
-        break;
-    }
-
-    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
-
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                                                     uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -117,40 +71,10 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
         break;
     }
 
-    ESP_LOGI(TAG, "Current free heap: %zu\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI(TAG, "Current free heap: %u\n", static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT)));
 }
 
-void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
-{
-    if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
-    {
-        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
-        chip::app::DnssdServer::Instance().StartServer();
-    }
-    else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
-    {
-        ESP_LOGE(TAG, "Lost IPv4 connectivity...");
-    }
-    if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-    {
-        ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::DnssdServer::Instance().StartServer();
-    }
-    else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
-    {
-        ESP_LOGE(TAG, "Lost IPv6 connectivity...");
-    }
-}
-
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
-{
-    if (event->SessionEstablished.IsCommissioner)
-    {
-        ESP_LOGI(TAG, "Commissioner detected!");
-    }
-}
-
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+void AppDeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == OnOff::Attributes::OnOff::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -161,7 +85,7 @@ exit:
     return;
 }
 
-void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+void AppDeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id,
                  ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
@@ -175,7 +99,7 @@ exit:
 
 // Currently ColorControl cluster is supported for ESP32C3_DEVKITM and ESP32S3_DEVKITM which have an on-board RGB-LED
 #if CONFIG_LED_TYPE_RMT
-void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+void AppDeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     uint8_t hue, saturation;
 
@@ -201,3 +125,23 @@ exit:
     return;
 }
 #endif // CONFIG_LED_TYPE_RMT
+
+/** @brief OnOff Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
+ * attributes to the default value.
+ * The logic here expects something similar to the deprecated Plugins callback
+ * emberAfPluginOnOffClusterServerPostInitCallback.
+ *
+ */
+void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+{
+    ESP_LOGI(TAG, "emberAfOnOffClusterInitCallback");
+    GetAppTask().UpdateClusterState();
+}

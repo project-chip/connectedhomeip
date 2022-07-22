@@ -24,7 +24,7 @@
 class DiscoverCommissionersCommand : public CHIPCommand
 {
 public:
-    DiscoverCommissionersCommand() : CHIPCommand("commissioners") {}
+    DiscoverCommissionersCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("commissioners", credsIssuerConfig) {}
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;

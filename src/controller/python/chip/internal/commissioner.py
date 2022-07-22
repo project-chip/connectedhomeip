@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2021-2022 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 #    limitations under the License.
 #
 from chip.configuration import GetLocalNodeId
+from chip.configuration import GetCommissionerCAT
 from chip.native import NativeLibraryHandleMethodArguments, GetLibraryHandle
 from enum import Enum
 from typing import Optional
@@ -103,7 +104,7 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     setter = NativeLibraryHandleMethodArguments(handle)
 
     setter.Set('pychip_internal_Commissioner_New',
-               Commissioner_p, [ctypes.c_uint64])
+               Commissioner_p, [ctypes.c_uint64, ctypes.c_uint32])
     setter.Set('pychip_internal_Commissioner_Unpair',
                ctypes.c_uint32, [Commissioner_p, ctypes.c_uint64])
     setter.Set('pychip_internal_Commissioner_BleConnectForPairing',
@@ -119,7 +120,7 @@ commissionerSingleton: Optional[Commissioner] = None
 def GetCommissioner() -> Commissioner:
     """Gets a reference to the global commissioner singleton.
 
-    Uses the configuration GetLocalNodeId().
+    Uses the configuration GetLocalNodeId() and GetCommissionerCAT().
     """
 
     global commissionerSingleton
@@ -128,7 +129,8 @@ def GetCommissioner() -> Commissioner:
         handle = GetLibraryHandle()
         _SetNativeCallSignatues(handle)
 
-        native = handle.pychip_internal_Commissioner_New(GetLocalNodeId())
+        native = handle.pychip_internal_Commissioner_New(
+            GetLocalNodeId(), GetCommissionerCAT())
         if not native:
             raise Exception('Failed to create commissioner object.')
 

@@ -199,26 +199,26 @@ template <class ImplClass>
 inline const char *
 GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode)
 {
-    return NULL;
+    return nullptr;
 }
 
 template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
 {
-    return NULL;
+    return nullptr;
 }
 
 template <class ImplClass>
 inline const char *
 GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiStationStateToStr(ConnectivityManager::WiFiStationState state)
 {
-    return NULL;
+    return nullptr;
 }
 
 template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPStateToStr(ConnectivityManager::WiFiAPState state)
 {
-    return NULL;
+    return nullptr;
 }
 
 } // namespace Internal

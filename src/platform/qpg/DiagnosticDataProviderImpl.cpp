@@ -27,8 +27,6 @@
 #include <platform/PlatformManager.h>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
-#include <lwip/tcpip.h>
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -69,6 +67,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     qvCHIP_GetHeapStats(&freeHeapSize, &usedHeapSize, &highWatermarkHeapSize);
     currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    qvCHIP_ResetHeapStats();
+    return CHIP_NO_ERROR;
+}
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

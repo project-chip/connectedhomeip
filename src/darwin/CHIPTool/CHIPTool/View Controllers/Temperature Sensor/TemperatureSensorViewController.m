@@ -18,12 +18,15 @@
 @property (nonatomic, strong) UIButton * sendReportingSetup;
 @end
 
+static TemperatureSensorViewController * _Nullable sCurrentController = nil;
+
 @implementation TemperatureSensorViewController
 
 // MARK: UIViewController methods
 
 - (void)viewDidLoad
 {
+    sCurrentController = self;
     [super viewDidLoad];
     [self setupUI];
 
@@ -31,6 +34,23 @@
     [self.view addGestureRecognizer:tap];
 
     [self readCurrentTemperature];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    sCurrentController = nil;
+    [super viewWillDisappear:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    sCurrentController = self;
+    [super viewDidAppear:animated];
+}
+
++ (nullable TemperatureSensorViewController *)currentController
+{
+    return sCurrentController;
 }
 
 - (IBAction)sendReportingSetup:(id)sender
@@ -164,14 +184,16 @@
     NSLog(@"Status: Updated temp in UI to %@", _temperatureLabel.text);
 }
 
-// MARK: CHIPTemperatureMeasurement
+// MARK: MTRBaseClusterTemperatureMeasurement
 
 - (void)readCurrentTemperature
 {
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPTemperatureMeasurement * cluster =
-                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
+                MTRBaseClusterTemperatureMeasurement * cluster =
+                    [[MTRBaseClusterTemperatureMeasurement alloc] initWithDevice:chipDevice
+                                                                        endpoint:1
+                                                                           queue:dispatch_get_main_queue()];
 
                 [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                     if (error != nil)
@@ -197,29 +219,39 @@
     NSLog(
         @"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds), @(deltaInCelsius));
 
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+    if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
-                CHIPTemperatureMeasurement * cluster =
-                    [[CHIPTemperatureMeasurement alloc] initWithDevice:chipDevice endpoint:1 queue:dispatch_get_main_queue()];
-                // TODO - Fix temperature reporting in iOS CHIPTool
-                /*
-                [cluster
-                    subscribeAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                       maxInterval:maxIntervalSeconds
-                                                   responseHandler:^(NSError * error, NSDictionary * values) {
-                                                       if (error == nil)
-                                                           return;
-                                                       NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                           [error description]);
-                                                   }];
-
-                [cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
-                    if (error != nil)
-                        return;
-                    NSNumber * value = values[@"value"];
-                    [self updateTempInUI:value.shortValue];
-                }];
-                 */
+                // Use a wildcard subscription
+                [chipDevice subscribeWithQueue:dispatch_get_main_queue()
+                    minInterval:minIntervalSeconds
+                    maxInterval:maxIntervalSeconds
+                    params:nil
+                    cacheContainer:nil
+                    attributeReportHandler:^(NSArray * _Nullable reports) {
+                        if (!reports)
+                            return;
+                        for (MTRAttributeReport * report in reports) {
+                            // These should be exposed by the SDK
+                            if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
+                                [report.path.attribute
+                                    isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                if (report.error != nil) {
+                                    NSLog(@"Error reading temperature: %@", report.error);
+                                } else {
+                                    __auto_type controller = [TemperatureSensorViewController currentController];
+                                    if (controller != nil) {
+                                        [controller updateTempInUI:((NSNumber *) report.value).shortValue];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    eventReportHandler:nil
+                    errorHandler:^(NSError * error) {
+                        NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+                    }
+                    subscriptionEstablished:^ {
+                    }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

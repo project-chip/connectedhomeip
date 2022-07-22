@@ -28,14 +28,13 @@ class OperationalDeviceProxyPoolDelegate
 public:
     virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) = 0;
 
-    virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId,
-                                              const Dnssd::ResolvedNodeData & nodeResolutionData) = 0;
-
     virtual void Release(OperationalDeviceProxy * device) = 0;
 
-    virtual OperationalDeviceProxy * FindDevice(const SessionHandle & session) = 0;
-
     virtual OperationalDeviceProxy * FindDevice(PeerId peerId) = 0;
+
+    virtual void ReleaseDevicesForFabric(FabricIndex fabricIndex) = 0;
+
+    virtual void ReleaseAllDevices() = 0;
 
     virtual ~OperationalDeviceProxyPoolDelegate() {}
 };
@@ -44,35 +43,14 @@ template <size_t N>
 class OperationalDeviceProxyPool : public OperationalDeviceProxyPoolDelegate
 {
 public:
-    ~OperationalDeviceProxyPool() { mDevicePool.ReleaseAll(); }
+    ~OperationalDeviceProxyPool() override { mDevicePool.ReleaseAll(); }
 
     OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) override
     {
         return mDevicePool.CreateObject(params, peerId);
     }
 
-    OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId,
-                                      const Dnssd::ResolvedNodeData & nodeResolutionData) override
-    {
-        return mDevicePool.CreateObject(params, peerId, nodeResolutionData);
-    }
-
     void Release(OperationalDeviceProxy * device) override { mDevicePool.ReleaseObject(device); }
-
-    OperationalDeviceProxy * FindDevice(const SessionHandle & session) override
-    {
-        OperationalDeviceProxy * foundDevice = nullptr;
-        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
-            if (activeDevice->MatchesSession(session))
-            {
-                foundDevice = activeDevice;
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-
-        return foundDevice;
-    }
 
     OperationalDeviceProxy * FindDevice(PeerId peerId) override
     {
@@ -89,8 +67,27 @@ public:
         return foundDevice;
     }
 
+    void ReleaseDevicesForFabric(FabricIndex fabricIndex) override
+    {
+        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+            if (activeDevice->GetFabricIndex() == fabricIndex)
+            {
+                Release(activeDevice);
+            }
+            return Loop::Continue;
+        });
+    }
+
+    void ReleaseAllDevices() override
+    {
+        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+            Release(activeDevice);
+            return Loop::Continue;
+        });
+    }
+
 private:
-    BitMapObjectPool<OperationalDeviceProxy, N> mDevicePool;
+    ObjectPool<OperationalDeviceProxy, N> mDevicePool;
 };
 
 }; // namespace chip

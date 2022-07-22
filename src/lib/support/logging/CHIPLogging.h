@@ -46,6 +46,10 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+#if CHIP_PW_TOKENIZER_LOGGING
+#include "pw_tokenizer/tokenize_to_global_handler_with_payload.h"
+#endif
+
 /**
  *   @namespace chip::Logging
  *
@@ -106,8 +110,14 @@ void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogError
+#if CHIP_PW_TOKENIZER_LOGGING
+#define ChipLogError(MOD, MSG, ...)                                                                                                \
+    PW_TOKENIZE_TO_GLOBAL_HANDLER_WITH_PAYLOAD(                                                                                    \
+        (pw_tokenizer_Payload)((chip::Logging::kLogCategory_Error << 8) | chip::Logging::kLogModule_##MOD), MSG, __VA_ARGS__)
+#else
 #define ChipLogError(MOD, MSG, ...)                                                                                                \
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Error, MSG, ##__VA_ARGS__)
+#endif
 #endif
 #else
 #define ChipLogError(MOD, MSG, ...) ((void) 0)
@@ -127,8 +137,14 @@ void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogProgress
+#if CHIP_PW_TOKENIZER_LOGGING
+#define ChipLogProgress(MOD, MSG, ...)                                                                                             \
+    PW_TOKENIZE_TO_GLOBAL_HANDLER_WITH_PAYLOAD(                                                                                    \
+        (pw_tokenizer_Payload)((chip::Logging::kLogCategory_Progress << 8) | chip::Logging::kLogModule_##MOD), MSG, __VA_ARGS__)
+#else
 #define ChipLogProgress(MOD, MSG, ...)                                                                                             \
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Progress, MSG, ##__VA_ARGS__)
+#endif
 #endif
 #else
 #define ChipLogProgress(MOD, MSG, ...) ((void) 0)
@@ -148,8 +164,14 @@ void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogDetail
+#if CHIP_PW_TOKENIZER_LOGGING
+#define ChipLogDetail(MOD, MSG, ...)                                                                                               \
+    PW_TOKENIZE_TO_GLOBAL_HANDLER_WITH_PAYLOAD(                                                                                    \
+        (pw_tokenizer_Payload)((chip::Logging::kLogCategory_Detail << 8) | chip::Logging::kLogModule_##MOD), MSG, __VA_ARGS__)
+#else
 #define ChipLogDetail(MOD, MSG, ...)                                                                                               \
     chip::Logging::Log(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, MSG, ##__VA_ARGS__)
+#endif
 #endif
 #else
 #define ChipLogDetail(MOD, MSG, ...) ((void) 0)
@@ -178,8 +200,15 @@ void SetLogFilter(uint8_t category);
  *
  */
 #ifndef ChipLogAutomation
+#if CHIP_PW_TOKENIZER_LOGGING
+#define ChipLogAutomation(MSG, ...)                                                                                                \
+    PW_TOKENIZE_TO_GLOBAL_HANDLER_WITH_PAYLOAD(                                                                                    \
+        (pw_tokenizer_Payload)((chip::Logging::kLogModule_Automation << 8) | chip::Logging::kLogModule_Automation), MSG,           \
+        __VA_ARGS__)
+#else
 #define ChipLogAutomation(MSG, ...)                                                                                                \
     chip::Logging::Log(chip::Logging::kLogModule_Automation, chip::Logging::kLogCategory_Automation, MSG, ##__VA_ARGS__)
+#endif
 #endif
 #else
 #define ChipLogAutomation(MOD, MSG, ...) ((void) 0)
@@ -204,16 +233,10 @@ static constexpr uint16_t kMaxMessagePadding = (chip::Logging::kMaxPrefixLen + c
                                                 chip::Logging::kMaxSeparatorLen + chip::Logging::kMaxTrailerLen);
 
 void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg);
-void GetModuleName(char * buf, uint8_t bufSize, uint8_t module);
 
 #else
 
 static inline void GetMessageWithPrefix(char * buf, uint8_t bufSize, uint8_t module, const char * msg)
-{
-    return;
-}
-
-static inline void GetModuleName(char * buf, uint8_t bufSize, uint8_t module)
 {
     return;
 }
@@ -330,7 +353,7 @@ bool IsCategoryEnabled(uint8_t category);
  *  @endcode
  *
  */
-#define ChipLogFormatMEI "0x%04" PRIX16 "_%04" PRIX16
+#define ChipLogFormatMEI "0x%04X_%04X"
 
 /*
  *  @brief
@@ -357,7 +380,7 @@ bool IsCategoryEnabled(uint8_t category);
  * have the exchange id and initiator/responder boolean, not an actual exchange,
  * so we want to have a helper for that case too.
  */
-#define ChipLogFormatExchangeId "%" PRIu16 "%c"
+#define ChipLogFormatExchangeId "%u%c"
 #define ChipLogValueExchangeId(id, isInitiator) id, ((isInitiator) ? 'i' : 'r')
 #define ChipLogFormatExchange ChipLogFormatExchangeId
 #define ChipLogValueExchange(ec) ChipLogValueExchangeId((ec)->GetExchangeId(), (ec)->IsInitiator())
@@ -371,7 +394,7 @@ bool IsCategoryEnabled(uint8_t category);
  * Logging helpers for protocol ids.  A protocol id is a (vendor-id,
  * protocol-id) pair.
  */
-#define ChipLogFormatProtocolId "(%" PRIu16 ", %" PRIu16 ")"
+#define ChipLogFormatProtocolId "(%u, %u)"
 #define ChipLogValueProtocolId(id) (id).GetVendorId(), (id).GetProtocolId()
 
 /**
@@ -382,7 +405,11 @@ bool IsCategoryEnabled(uint8_t category);
 /**
  * Logging helpers for message types, so we format them consistently.
  */
-#define ChipLogFormatMessageType "0x%" PRIx8
+#define ChipLogFormatMessageType "0x%x"
+
+/** Logging helpers for scoped node ids, which is a tuple of <NodeId, FabricIndex> */
+#define ChipLogFormatScopedNodeId "<" ChipLogFormatX64 ", %d>"
+#define ChipLogValueScopedNodeId(id) ChipLogValueX64((id).GetNodeId()), (id).GetFabricIndex()
 
 } // namespace Logging
 } // namespace chip

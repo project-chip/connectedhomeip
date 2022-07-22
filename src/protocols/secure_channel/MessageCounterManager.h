@@ -31,7 +31,9 @@ namespace secure_channel {
 
 class ExchangeManager;
 
-class MessageCounterManager : public Messaging::ExchangeDelegate, public Transport::MessageCounterManagerInterface
+class MessageCounterManager : public Messaging::UnsolicitedMessageHandler,
+                              public Messaging::ExchangeDelegate,
+                              public Transport::MessageCounterManagerInterface
 {
 public:
     static constexpr uint16_t kChallengeSize             = Transport::PeerMessageCounter::kChallengeSize;
@@ -104,6 +106,8 @@ private:
     CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
     CHIP_ERROR HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, System::PacketBufferHandle && msgBuf);
     CHIP_ERROR HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, System::PacketBufferHandle && msgBuf);
+
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
 

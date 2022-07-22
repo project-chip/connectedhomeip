@@ -25,10 +25,14 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/EFR32/DiagnosticDataProviderImpl.h>
+#include <platform/FreeRTOS/SystemTimeSupport.h>
+#include <platform/KeyValueStoreManager.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
@@ -43,13 +47,17 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     // Initialize the configuration system.
-    err = Internal::EFR32Config::Init();
+    err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -60,7 +68,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
@@ -82,7 +90,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wfx_generic_message_t * eventData)

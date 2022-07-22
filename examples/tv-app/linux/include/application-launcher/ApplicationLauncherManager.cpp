@@ -19,49 +19,58 @@
 #include "ApplicationLauncherManager.h"
 
 using namespace std;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
+using namespace chip::Uint8;
 
-Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp()
+CHIP_ERROR ApplicationLauncherManager::HandleGetCatalogList(AttributeValueEncoder & aEncoder)
 {
-    Structs::ApplicationEP::Type currentApp;
-    currentApp.application.catalogVendorId = 123;
-    currentApp.application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
-    currentApp.endpoint                    = chip::CharSpan("endpointId", strlen("endpointId"));
-    return currentApp;
+    std::list<uint16_t> catalogList = { 123, 456 };
+    return aEncoder.EncodeList([catalogList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & catalog : catalogList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(catalog));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
-std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
+void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & helper, const ByteSpan & data,
+                                                 const ApplicationType & application)
 {
-    return { 123, 456 };
-}
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
-    const chip::CharSpan & data,
-    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
-{
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
-    response.status = StatusEnum::kSuccess;
-    return response;
+    LauncherResponseType response;
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+    response.status  = ApplicationLauncherStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(
-    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationType & application)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleStopApp");
+
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
-    response.status = StatusEnum::kSuccess;
-    return response;
+    LauncherResponseType response;
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+    response.status  = ApplicationLauncherStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(
-    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
+void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
+                                               const ApplicationType & application)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::HandleHideApp");
+
     // TODO: Insert code here
-    Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
-    response.status = StatusEnum::kSuccess;
-    return response;
+    LauncherResponseType response;
+    const char * buf = "data";
+    response.data    = ByteSpan(from_const_char(buf), strlen(buf));
+    response.status  = ApplicationLauncherStatusEnum::kSuccess;
+    helper.Success(response);
 }

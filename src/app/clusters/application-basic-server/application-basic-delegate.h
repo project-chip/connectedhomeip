@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
 #include <list>
 
@@ -28,22 +30,67 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 
+using ApplicationBasicApplicationType = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
+
+class DLL_EXPORT CatalogVendorApp
+{
+public:
+    CatalogVendorApp(){};
+    CatalogVendorApp(CatalogVendorApp * app)
+    {
+        catalogVendorId = app->catalogVendorId;
+        Platform::CopyString(applicationId, sizeof(applicationId), app->applicationId);
+    };
+    CatalogVendorApp(uint16_t vendorId, const char * appId) { Set(vendorId, appId); };
+
+    bool Matches(const CatalogVendorApp & app)
+    {
+        std::string appId1(applicationId);
+        std::string appId2(app.applicationId);
+
+        return catalogVendorId == app.catalogVendorId && appId1 == appId2;
+    }
+
+    void Set(uint16_t vendorId, const char * appId)
+    {
+        catalogVendorId = vendorId;
+        Platform::CopyString(applicationId, sizeof(applicationId), appId);
+    }
+
+    static const int kApplicationIdSize = 32;
+    char applicationId[kApplicationIdSize];
+    uint16_t catalogVendorId;
+};
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the Application Basic Cluster.
  */
 class Delegate
 {
 public:
-    virtual chip::CharSpan HandleGetVendorName()                                                                     = 0;
-    virtual uint16_t HandleGetVendorId()                                                                             = 0;
-    virtual chip::CharSpan HandleGetApplicationName()                                                                = 0;
-    virtual uint16_t HandleGetProductId()                                                                            = 0;
-    virtual chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication() = 0;
-    virtual ApplicationStatusEnum HandleGetStatus()                                                                  = 0;
-    virtual chip::CharSpan HandleGetApplicationVersion()                                                             = 0;
-    virtual std::list<uint16_t> HandleGetAllowedVendorList()                                                         = 0;
+    Delegate() : Delegate(123, "applicationId"){};
+    Delegate(uint16_t szCatalogVendorId, const char * szApplicationId) : mCatalogVendorApp(szCatalogVendorId, szApplicationId){};
+
+    virtual CHIP_ERROR HandleGetVendorName(app::AttributeValueEncoder & aEncoder)      = 0;
+    virtual uint16_t HandleGetVendorId()                                               = 0;
+    virtual CHIP_ERROR HandleGetApplicationName(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual uint16_t HandleGetProductId()                                              = 0;
+    CHIP_ERROR HandleGetApplication(app::AttributeValueEncoder & aEncoder);
+    inline ApplicationStatusEnum HandleGetStatus() { return mApplicationStatus; }
+    virtual CHIP_ERROR HandleGetApplicationVersion(app::AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR HandleGetAllowedVendorList(app::AttributeValueEncoder & aEncoder)  = 0;
+
+    inline void SetApplicationStatus(ApplicationStatusEnum status) { mApplicationStatus = status; }
+    bool Matches(ApplicationBasicApplication match);
+
+    inline CatalogVendorApp * GetCatalogVendorApp() { return &mCatalogVendorApp; }
+    virtual std::list<uint16_t> GetAllowedVendorList() = 0;
 
     virtual ~Delegate() = default;
+
+protected:
+    CatalogVendorApp mCatalogVendorApp;
+    ApplicationStatusEnum mApplicationStatus = ApplicationStatusEnum::kStopped;
 };
 
 } // namespace ApplicationBasic

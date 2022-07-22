@@ -15,6 +15,7 @@
 name: 27.2.11. [TC-CC-5.3] Color Step functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
@@ -34,56 +39,69 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "TH reads CurrentX attribute from DUT"
       command: "readAttribute"
-      attribute: "current x"
+      PICS: CC.S.F03 && CC.S.A0003
+      attribute: "CurrentX"
       response:
-          value: 200
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "TH reads CurrentY attribute from DUT"
       command: "readAttribute"
-      attribute: "current y"
+      PICS: CC.S.F03 && CC.S.A0004
+      attribute: "CurrentY"
       response:
-          value: 300
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
-    - label: "Step Color command"
+    - label: "TH sends StepColor command to DUT"
       command: "StepColor"
+      PICS: CC.S.F03 && CC.S.C09.Rsp
       arguments:
           values:
               - name: "stepX"
                 value: 15
               - name: "stepY"
                 value: 20
-              - name: "transitionTime"
-                value: 50
-              - name: "optionsMask"
+              - name: "TransitionTime"
+                value: 10
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check current x attribute value matched the value sent by the last
-          command"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current x"
-      response:
-          value: -1
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
 
-    - label:
-          "Check current y attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0003
       command: "readAttribute"
-      attribute: "current y"
+      attribute: "CurrentX"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
+      PICS: CC.S.F03 && CC.S.A0004
+      command: "readAttribute"
+      attribute: "CurrentY"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

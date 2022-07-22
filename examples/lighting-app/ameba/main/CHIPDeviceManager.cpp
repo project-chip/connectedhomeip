@@ -63,6 +63,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     CHIP_ERROR err;
     mCB = cb;
 
+    err = Platform::MemoryInit();
+    SuccessOrExit(err);
+
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
@@ -71,21 +74,11 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
-
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("StartEventLoopTask() - ERROR!\r\n");
-    }
-    else
-    {
-        printf("StartEventLoopTask() - OK\r\n");
-    }
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -93,8 +86,8 @@ exit:
 } // namespace DeviceManager
 } // namespace chip
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
         chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
@@ -160,7 +153,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         {
             if (cb != nullptr)
             {
-                cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, type, size, value);
+                cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, type, size, value);
             }
             ChipLogProgress(Zcl, "ZCL_IDENTIFY_TIME_ATTRIBUTE_ID value: %u ", *value);
         }

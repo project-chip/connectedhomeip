@@ -59,7 +59,7 @@ private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
-    CHIP_ERROR _Shutdown(void);
+    void _Shutdown(void);
 
     // ===== Members for internal use by the following friends.
 

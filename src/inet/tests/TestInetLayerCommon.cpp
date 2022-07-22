@@ -356,8 +356,8 @@ void HandleRawMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferH
     aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer);
     aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer);
 
-    printf("Raw message received from %s to %s (%zu bytes)\n", lSourceAddressBuffer, lDestinationAddressBuffer,
-           static_cast<size_t>(aBuffer->DataLength()));
+    printf("Raw message received from %s to %s (%u bytes)\n", lSourceAddressBuffer, lDestinationAddressBuffer,
+           static_cast<unsigned int>(aBuffer->DataLength()));
 }
 
 void HandleRawReceiveError(const UDPEndPoint * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)
@@ -386,8 +386,8 @@ void HandleUDPMessageReceived(const UDPEndPoint * aEndPoint, const PacketBufferH
     aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer);
     aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer);
 
-    printf("UDP packet received from %s:%u to %s:%u (%zu bytes)\n", lSourceAddressBuffer, aPacketInfo->SrcPort,
-           lDestinationAddressBuffer, aPacketInfo->DestPort, static_cast<size_t>(aBuffer->DataLength()));
+    printf("UDP packet received from %s:%u to %s:%u (%u bytes)\n", lSourceAddressBuffer, aPacketInfo->SrcPort,
+           lDestinationAddressBuffer, aPacketInfo->DestPort, static_cast<unsigned int>(aBuffer->DataLength()));
 }
 
 void HandleUDPReceiveError(const UDPEndPoint * aEndPoint, const CHIP_ERROR & aError, const IPPacketInfo * aPacketInfo)

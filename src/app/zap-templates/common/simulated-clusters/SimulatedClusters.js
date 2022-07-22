@@ -24,7 +24,32 @@ let SimulatedClusters = [];
 (async () => {
   const simulatedClustersPath  = path.join(__dirname, 'clusters');
   const simulatedClustersFiles = await fs.promises.readdir(simulatedClustersPath);
-  SimulatedClusters = simulatedClustersFiles.map(filename => (require(path.join(simulatedClustersPath, filename))).cluster);
+  SimulatedClusters            = simulatedClustersFiles.map(filename => {
+    let cluster = (require(path.join(simulatedClustersPath, filename))).cluster;
+    cluster.commands.forEach(command => {
+      if (!('name' in command)) {
+        console.error('Error in: ' + filename + '. Missing command name.');
+        throw new Error();
+      }
+
+      if (!('arguments' in command)) {
+        command.arguments = [];
+      }
+
+      if (!('response' in command)) {
+        command.response = { arguments : [] };
+      }
+
+      if (command.arguments.length) {
+        command.hasSpecificArguments = true;
+      }
+
+      if (command.response.arguments.length) {
+        command.hasSpecificResponse = true;
+      }
+    });
+    return cluster;
+  });
   return SimulatedClusters;
 })();
 
@@ -35,7 +60,7 @@ function getSimulatedCluster(clusterName)
 
 function getClusters(context)
 {
-  return ensureClusters(context).getClusters().then(clusters => clusters.concat(SimulatedClusters).flat(1));
+  return ensureClusters(context, true).getClusters().then(clusters => clusters.concat(SimulatedClusters).flat(1));
 }
 
 function getCommands(context, clusterName)

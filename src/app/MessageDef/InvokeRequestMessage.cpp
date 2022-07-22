@@ -29,7 +29,7 @@ namespace app {
 CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    int TagPresenceMask = 0;
+    int tagPresenceMask = 0;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("InvokeRequestMessage =");
@@ -40,14 +40,17 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        if (!TLV::IsContextTag(reader.GetTag()))
+        {
+            continue;
+        }
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
         case to_underlying(Tag::kSuppressResponse):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
 #if CHIP_DETAIL_LOGGING
             {
                 bool suppressResponse;
@@ -59,8 +62,8 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 
         case to_underlying(Tag::kTimedRequest):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kTimedRequest))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kTimedRequest));
 #if CHIP_DETAIL_LOGGING
             {
                 bool timedRequest;
@@ -71,8 +74,8 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
             break;
         case to_underlying(Tag::kInvokeRequests):
             // check if this tag has appeared before
-            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kInvokeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << to_underlying(Tag::kInvokeRequests));
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kInvokeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kInvokeRequests));
             {
                 InvokeRequests::Parser invokeRequests;
                 ReturnErrorOnFailure(invokeRequests.Init(reader));
@@ -82,6 +85,9 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
+        case kInteractionModelRevisionTag:
+            ReturnErrorOnFailure(MessageParser::CheckInteractionModelRevision(reader));
+            break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -89,26 +95,17 @@ CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("},");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kTimedRequest)) |
+        const int requiredFields = (1 << to_underlying(Tag::kSuppressResponse)) | (1 << to_underlying(Tag::kTimedRequest)) |
             (1 << to_underlying(Tag::kInvokeRequests));
-
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            err = CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE;
-        }
+        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_INVOKE_REQUEST_MESSAGE;
     }
 
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -126,8 +123,7 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parse
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kInvokeRequests)), reader));
-    ReturnErrorOnFailure(apInvokeRequests->Init(reader));
-    return CHIP_NO_ERROR;
+    return apInvokeRequests->Init(reader);
 }
 
 InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::SuppressResponse(const bool aSuppressResponse)
@@ -159,7 +155,14 @@ InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests()
 
 InvokeRequestMessage::Builder & InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 {
-    EndOfContainer();
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = MessageBuilder::EncodeInteractionModelRevision();
+    }
+    if (mError == CHIP_NO_ERROR)
+    {
+        EndOfContainer();
+    }
     return *this;
 }
 }; // namespace app

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -25,6 +25,7 @@
  */
 
 #include "chip-cert.h"
+#include <credentials/CHIPCertificateSet.h>
 
 #include "vector"
 
@@ -38,7 +39,7 @@ using namespace chip::ASN1;
 #define CMD_NAME "chip-cert validate-cert"
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg);
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[]);
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[]);
 
 // clang-format off
 OptionDef gCmdOptionDefs[] =
@@ -96,10 +97,10 @@ enum
     kMaxCerts = 16,
 };
 
-const char * gTargetCertFileName = nullptr;
-const char * gCACertFileNames[kMaxCerts - 1];
-bool gCACertIsTrusted[kMaxCerts - 1];
-size_t gNumCertFileNames = 0;
+const char * gTargetCertFileName         = nullptr;
+const char * gCACertFileNames[kMaxCerts] = { nullptr };
+bool gCACertIsTrusted[kMaxCerts]         = { false };
+size_t gNumCertFileNames                 = 0;
 
 bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg)
 {
@@ -107,6 +108,11 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     {
     case 'c':
     case 't':
+        if (gNumCertFileNames >= kMaxCerts)
+        {
+            PrintArgError("%s: Too many certificate files\n", progName);
+            return false;
+        }
         gCACertFileNames[gNumCertFileNames]   = arg;
         gCACertIsTrusted[gNumCertFileNames++] = (id == 't');
         break;
@@ -118,7 +124,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
     return true;
 }
 
-bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
+bool HandleNonOptionArgs(const char * progName, int argc, char * const argv[])
 {
     if (argc == 0)
     {
@@ -182,7 +188,9 @@ bool Cmd_ValidateCert(int argc, char * argv[])
     certToBeValidated = certSet.GetLastCert();
 
     context.Reset();
-    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), context.mEffectiveTime);
+    uint32_t currentTime;
+    res = chip::UnixEpochToChipEpochTime(static_cast<uint32_t>(time(nullptr)), currentTime);
+    context.mEffectiveTime.Set<CurrentChipEpochTime>(currentTime);
     VerifyTrueOrExit(res);
 
     err = certSet.FindValidCert(certToBeValidated->mSubjectDN, certToBeValidated->mSubjectKeyId, context, &validatedCert);

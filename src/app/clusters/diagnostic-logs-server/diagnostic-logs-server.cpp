@@ -38,6 +38,13 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
 {
     HandleCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType>(
         handlerContext, [&](auto & _u, auto & payload) {
+            if (payload.requestedProtocol == chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol::kUnknownEnumValue)
+            {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         chip::Protocols::InteractionModel::Status::InvalidCommand);
+                return;
+            }
+
             switch (payload.intent)
             {
             case chip::app::Clusters::DiagnosticLogs::LogsIntent::kEndUserSupport: {
@@ -45,7 +52,7 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 if (mBuffer.IsEmpty())
                 {
                     response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
-                    handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                    handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
                     break;
                 }
 
@@ -58,7 +65,7 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 if (!buf)
                 {
                     response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kBusy;
-                    handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                    handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
                     break;
                 }
 
@@ -71,21 +78,26 @@ void DiagnosticLogsCommandHandler::InvokeCommand(HandlerContext & handlerContext
                 response.status    = chip::app::Clusters::DiagnosticLogs::LogsStatus::kSuccess;
                 response.content   = chip::ByteSpan(buf.get() + sizeof(timeMs), logSize - sizeof(timeMs));
                 response.timeStamp = timeMs;
-                handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
             case chip::app::Clusters::DiagnosticLogs::LogsIntent::kNetworkDiag: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
                 response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
-                handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
             case chip::app::Clusters::DiagnosticLogs::LogsIntent::kCrashLogs: {
                 chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::Type response;
                 response.status = chip::app::Clusters::DiagnosticLogs::LogsStatus::kNoLogs;
-                handlerContext.mCommandHandler.AddResponseData(handlerContext.mRequestPath, response);
+                handlerContext.mCommandHandler.AddResponse(handlerContext.mRequestPath, response);
             }
             break;
+            case chip::app::Clusters::DiagnosticLogs::LogsIntent::kUnknownEnumValue: {
+                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
+                                                         chip::Protocols::InteractionModel::Status::InvalidCommand);
+                break;
+            }
             }
         });
 }
@@ -94,6 +106,7 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::DecodableType & commandData)
 {
+    // TODO: Shouldn't the default "no-op" impl return some sort of error?
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;

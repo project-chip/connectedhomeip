@@ -27,16 +27,22 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
 using namespace ::chip;

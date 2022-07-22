@@ -1,0 +1,71 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.3. [TC-SC-4.3] Operational Discovery - Node
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH is instructed to start advertising a service using DNS-SD"
+      verification: |
+
+      disabled: true
+
+    - label: "Scan for DNS-SD advertising"
+      verification: |
+          ubuntu@ubuntu:~$ avahi-browse -rt _matter._tcp
+
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true
+
+    - label:
+          "TH is instructed to start advertising a service using DNS-SD and
+          using only the TXT records defined in section of the matter spec"
+      verification: |
+          ubuntu@ubuntu:~$ avahi-browse -rt _matter._tcp
+
+          ++ veth34b1077 IPv6 4B475AAEB62F42A1-0000000000000001             _matter._tcp         local
+          = veth34b1077 IPv6 4B475AAEB62F42A1-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::14ad:64ff:fe95:d164]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true
+
+    - label:
+          "TH is instructed to start advertising a service using DNS-SD with
+          non-standard TXT record keys"
+      verification: |
+          avahi-publish-service --subtype=_S3._sub._matterc._tcp --subtype=_L840._sub._matterc._tcp DD200C20D25AE5F7 --subtype=_CM._sub._matterc._tcp _matterc._tcp 11111 D=840 CM=2  INVALID_TEST=40
+
+
+          ubuntu@ubuntu:~$ avahi-browse -rt _matter._tcp
+
+
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true

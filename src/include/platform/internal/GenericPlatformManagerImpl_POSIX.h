@@ -77,7 +77,6 @@ protected:
     struct sched_param mChipTaskSchedParam;
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
-    bool mMainLoopStarted   = false;
     bool mChipStackIsLocked = false;
     pthread_t mChipStackLockOwnerThread;
 #endif
@@ -94,7 +93,7 @@ protected:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StopEventLoopTask();
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration);
-    CHIP_ERROR _Shutdown();
+    void _Shutdown();
 
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const;

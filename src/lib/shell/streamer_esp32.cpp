@@ -82,6 +82,7 @@ int streamer_esp32_init(streamer_t * streamer)
 
     esp_console_cmd_t command = { .command = "matter", .help = "Matter utilities", .func = chip_command_handler };
     ESP_ERROR_CHECK(esp_console_cmd_register(&command));
+    ESP_ERROR_CHECK(esp_console_register_help_command());
     return 0;
 }
 

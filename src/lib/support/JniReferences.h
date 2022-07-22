@@ -112,6 +112,20 @@ public:
      */
     jdouble DoubleToPrimitive(jobject boxedObject);
 
+    CHIP_ERROR CreateArrayList(jobject & outList);
+
+    CHIP_ERROR AddToList(jobject list, jobject objectToAdd);
+
+    CHIP_ERROR GetListSize(jobject list, jint & size);
+
+    CHIP_ERROR GetListItem(jobject list, jint index, jobject & outItem);
+
+    CHIP_ERROR CreateHashMap(jobject & outMap);
+
+    CHIP_ERROR PutInMap(jobject map, jobject key, jobject value);
+
+    CHIP_ERROR GetObjectField(jobject objectToRead, const char * name, const char * signature, jobject & outObject);
+
     /**
      * Call a void method with no arguments named "OnSubscriptionEstablished" on the provided jobject.
      */
@@ -152,5 +166,9 @@ private:
     JavaVM * mJvm              = nullptr;
     jobject mClassLoader       = nullptr;
     jmethodID mFindClassMethod = nullptr;
+
+    jclass mHashMapClass   = nullptr;
+    jclass mListClass      = nullptr;
+    jclass mArrayListClass = nullptr;
 };
 } // namespace chip

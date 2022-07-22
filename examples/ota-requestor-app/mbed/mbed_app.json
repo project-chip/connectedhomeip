@@ -1,0 +1,87 @@
+{
+    "macros": ["MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""],
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "lwip.ipv6-enabled": true,
+            "lwip.raw-socket-enabled": true,
+            "lwip.netbuf-recvinfo-enabled": true,
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
+            "nsapi.default-wifi-password": "\"YOUR_PASSWORD\"",
+            "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
+            "mbed-trace.enable": true,
+            "target.printf_lib": "std",
+            "mcuboot.bootloader-build": false,
+            "mcuboot.log-enable": true,
+            "mcuboot.log-level": "MCUBOOT_LOG_LEVEL_ERROR"
+        },
+        "CY8CPROTO_062_4343W": {
+            "target.network-default-interface-type": "WIFI",
+            "target.macros_add": [
+                "MXCRYPTO_DISABLED",
+                "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
+                "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
+                "WHD_PRINT_DISABLE"
+            ],
+            "target.components_add": ["capsense"],
+            "function-button2": "USER_BUTTON",
+            "mcuboot.primary-slot-address": "0x10022000",
+            "mcuboot.slot-size": "0x180000",
+            "mcuboot.scratch-address": "0x101A2000",
+            "mcuboot.scratch-size": "0x40000",
+            "mcuboot.max-img-sectors": "0xC00",
+            "mcuboot.header-size": "0x400"
+        }
+    },
+    "config": {
+        "led-active-state": {
+            "help": "GPIO output to turn the LED on.",
+            "value": 0
+        },
+        "system-state-led": {
+            "help": "System status LED.",
+            "value": "LED1"
+        },
+        "function-button1": {
+            "help": "Function button 1 pin.",
+            "value": "BUTTON1"
+        },
+        "function-button2": {
+            "help": "Function button 2 pin.",
+            "value": "BUTTON2"
+        },
+        "factory-reset-trigger-timeout": {
+            "help": "'function-button1' press timeout to trigger a factory reset (in milliseconds).",
+            "value": 3000
+        },
+        "commissioning-reset-trigger-timeout": {
+            "help": "'function-button2' press timeout to trigger a commissioning reset (in milliseconds).",
+            "value": 3000
+        },
+        "reset-cancel-window-timeout": {
+            "help": "'function-buttonX' press timeout to cancel a reset task (in milliseconds). The total 'function-buttonX' press time to have the specific reset actually initiated is equal to '<type>-reset-trigger-timeout' + 'reset-cancel-window-timeout'.",
+            "value": 3000
+        },
+        "user-response-timeout": {
+            "help": "Amount of time (in milliseconds) to wait for a response from the user. Value equal 0 means waiting forever",
+            "value": 0
+        },
+        "ble-device-name": {
+            "help": "Name used for BLE advertising.",
+            "value": "\"MBED-ota-req\""
+        },
+        "version-number": {
+            "value": "0"
+        },
+        "version-number-str": {
+            "value": "\"0.1.0\""
+        },
+        "vendor-id": {
+            "value": "0xFFF1"
+        },
+        "product-id": {
+            "value": "0x8008"
+        }
+    }
+}

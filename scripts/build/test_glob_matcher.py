@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from glob_matcher import GlobMatcher
-
 import unittest
+
+from glob_matcher import GlobMatcher
 
 
 class TestGlobMatcher(unittest.TestCase):

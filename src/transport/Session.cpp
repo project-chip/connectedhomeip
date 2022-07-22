@@ -34,10 +34,25 @@ UnauthenticatedSession * Session::AsUnauthenticatedSession()
     return static_cast<UnauthenticatedSession *>(this);
 }
 
-GroupSession * Session::AsGroupSession()
+IncomingGroupSession * Session::AsIncomingGroupSession()
 {
-    VerifyOrDie(GetSessionType() == SessionType::kGroup);
-    return static_cast<GroupSession *>(this);
+    VerifyOrDie(GetSessionType() == SessionType::kGroupIncoming);
+    return static_cast<IncomingGroupSession *>(this);
+}
+
+OutgoingGroupSession * Session::AsOutgoingGroupSession()
+{
+    VerifyOrDie(GetSessionType() == SessionType::kGroupOutgoing);
+    return static_cast<OutgoingGroupSession *>(this);
+}
+
+System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout upperlayerProcessingTimeout)
+{
+    if (IsGroupSession())
+    {
+        return System::Clock::kZero;
+    }
+    return GetAckTimeout() + upperlayerProcessingTimeout;
 }
 
 } // namespace Transport

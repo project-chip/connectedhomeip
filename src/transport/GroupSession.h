@@ -18,38 +18,58 @@
 
 #include <app/util/basic-types.h>
 #include <lib/core/GroupId.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/Pool.h>
 #include <transport/Session.h>
 
 namespace chip {
 namespace Transport {
 
-class GroupSession : public Session
+class IncomingGroupSession : public Session, public ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>
 {
 public:
-    GroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group), mFabricIndex(fabricIndex) {}
-    ~GroupSession() { NotifySessionReleased(); }
+    IncomingGroupSession(GroupId group, FabricIndex fabricIndex, NodeId peerNodeId) : mGroupId(group), mPeerNodeId(peerNodeId)
+    {
+        SetFabricIndex(fabricIndex);
+    }
+    ~IncomingGroupSession() override
+    {
+        NotifySessionReleased();
+        VerifyOrDie(GetReferenceCount() == 0);
+    }
 
-    Session::SessionType GetSessionType() const override { return Session::SessionType::kGroup; }
+    void Retain() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<IncomingGroupSession, NoopDeletor<IncomingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
+
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupIncoming; }
 #if CHIP_PROGRESS_LOGGING
-    const char * GetSessionTypeString() const override { return "secure"; };
+    const char * GetSessionTypeString() const override { return "incoming group"; };
 #endif
+
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(mPeerNodeId, GetFabricIndex()); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(kUndefinedNodeId, GetFabricIndex()); }
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
-        Access::SubjectDescriptor isd;
-        isd.authMode = Access::AuthMode::kGroup;
-        // TODO: fill other group subjects fields
-        return isd; // return an empty ISD for unauthenticated session.
+        Access::SubjectDescriptor subjectDescriptor;
+        subjectDescriptor.authMode    = Access::AuthMode::kGroup;
+        subjectDescriptor.subject     = NodeIdFromGroupId(mGroupId);
+        subjectDescriptor.fabricIndex = GetFabricIndex();
+        return subjectDescriptor;
     }
 
     bool RequireMRP() const override { return false; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const override
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override
     {
+        static const ReliableMessageProtocolConfig cfg(GetDefaultMRPConfig());
         VerifyOrDie(false);
-        return gDefaultMRPConfig;
+        return cfg;
     }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
@@ -58,76 +78,63 @@ public:
     }
 
     GroupId GetGroupId() const { return mGroupId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
 private:
     const GroupId mGroupId;
-    const FabricIndex mFabricIndex;
+    const NodeId mPeerNodeId;
 };
 
-/*
- * @brief
- *   An table which manages GroupSessions
- */
-template <size_t kMaxSessionCount>
-class GroupSessionTable
+class OutgoingGroupSession : public Session, public ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>
 {
 public:
-    ~GroupSessionTable() { mEntries.ReleaseAll(); }
-
-    /**
-     * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
-     *
-     * @return the session found or allocated, nullptr if not found and allocation failed.
-     */
-    CHECK_RETURN_VALUE
-    Optional<SessionHandle> AllocEntry(GroupId group, FabricIndex fabricIndex)
+    OutgoingGroupSession(GroupId group, FabricIndex fabricIndex) : mGroupId(group) { SetFabricIndex(fabricIndex); }
+    ~OutgoingGroupSession() override
     {
-        GroupSession * entry = mEntries.CreateObject(group, fabricIndex);
-        if (entry != nullptr)
-        {
-            return MakeOptional<SessionHandle>(*entry);
-        }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+        NotifySessionReleased();
+        VerifyOrDie(GetReferenceCount() == 0);
     }
 
-    /**
-     * Get a session using given GroupId
-     */
-    CHECK_RETURN_VALUE
-    Optional<SessionHandle> FindEntry(GroupId group, FabricIndex fabricIndex)
+    void Retain() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Retain(); }
+    void Release() override { ReferenceCounted<OutgoingGroupSession, NoopDeletor<OutgoingGroupSession>, 0>::Release(); }
+
+    bool IsActiveSession() const override { return true; }
+
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kGroupOutgoing; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "outgoing group"; };
+#endif
+
+    // Peer node ID is unused: users care about the group, not the node
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    // Local node ID is unused: users care about the group, not the node
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override
     {
-        GroupSession * result = nullptr;
-        mEntries.ForEachActiveObject([&](GroupSession * entry) {
-            if (entry->GetGroupId() == group && entry->GetFabricIndex() == fabricIndex)
-            {
-                result = entry;
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-        if (result != nullptr)
-        {
-            return MakeOptional<SessionHandle>(*result);
-        }
-        else
-        {
-            return Optional<SessionHandle>::Missing();
-        }
+        return Access::SubjectDescriptor(); // no subject exists for outgoing group session.
     }
 
-    /**
-     * @brief Deletes an entry from the object pool
-     *
-     * @param entry
-     */
-    void DeleteEntry(GroupSession * entry) { mEntries.ReleaseObject(entry); }
+    bool RequireMRP() const override { return false; }
+
+    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override
+    {
+        static const ReliableMessageProtocolConfig cfg(GetDefaultMRPConfig());
+        VerifyOrDie(false);
+        return cfg;
+    }
+
+    System::Clock::Timestamp GetMRPBaseTimeout() override { return System::Clock::kZero; }
+
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        VerifyOrDie(false);
+        return System::Clock::Timeout();
+    }
+
+    GroupId GetGroupId() const { return mGroupId; }
 
 private:
-    BitMapObjectPool<GroupSession, kMaxSessionCount> mEntries;
+    const GroupId mGroupId;
 };
 
 } // namespace Transport

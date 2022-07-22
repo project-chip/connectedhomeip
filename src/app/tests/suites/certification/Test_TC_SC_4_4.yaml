@@ -1,0 +1,92 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 3.4.4. [TC-SC-4.4] Operational Discovery - Controller [DUT - Controller]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH is instructed to start advertising a service using DNS-SD"
+      verification: |
+
+      disabled: true
+
+    - label: "Scan for DNS-SD advertising"
+      verification: |
+          ubuntu@ubuntu:~$ avahi-browse _matter._tcp -r
+
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          +   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true
+
+    - label: "DUT is instructed to advertise its service"
+      verification: |
+
+      disabled: true
+
+    - label: "Scan for DNS-SD advertising"
+      verification: |
+          avahi-browse _matter._tcp -r
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          +   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+          =   eth0 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::e65f:1ff:fe49:ae29]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true
+
+    - label: "DUT is instructed to query the TH for its services"
+      verification: |
+
+      disabled: true
+
+    - label: "Change its IP address by any means"
+      verification: |
+          change the IP address
+          1.we have to take two routers
+          2.execute the above steps using the 1st router
+          3.switch the connection to 2nd router and execute the below steps and check the ipaddress of the routers.
+      disabled: true
+
+    - label: "DUT is instructed to query the TH for its services"
+      verification: |
+          ubuntu@ubuntu:~$ avahi-browse _matter._tcp -r
+
+          + veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+          = veth721e1d9 IPv6 433B62F8F07F4327-0000000000000001             _matter._tcp         local
+             hostname = [E45F0149AE290000.local]
+             address = [fe80::28e0:95ff:fed9:3085]
+             port = [5540]
+             txt = ["T=1" "SAI=300" "SII=5000"]
+      disabled: true

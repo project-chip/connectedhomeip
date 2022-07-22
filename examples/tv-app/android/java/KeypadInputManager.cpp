@@ -18,6 +18,7 @@
 
 #include "KeypadInputManager.h"
 #include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -39,7 +40,7 @@ void KeypadInputManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::KeypadInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keyCode)
+void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType> & helper, const CecKeyCode & keyCode)
 {
     Commands::SendKeyResponse::Type response;
 
@@ -59,13 +60,13 @@ Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCo
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kInvalidKeyInCurrentState;
+        response.status = chip::app::Clusters::KeypadInput::KeypadInputStatusEnum::kInvalidKeyInCurrentState;
     }
     else
     {
-        response.status = static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
+        response.status = static_cast<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum>(ret);
     }
-    return response;
+    helper.Success(response);
 }
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)
@@ -85,4 +86,16 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(Zcl, "Failed to access KeypadInputManager 'sendKey' method");
         env->ExceptionClear();
     }
+}
+
+uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

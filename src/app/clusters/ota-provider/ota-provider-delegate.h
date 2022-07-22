@@ -34,17 +34,29 @@ namespace Clusters {
 /** @brief
  *    Defines methods for implementing application-specific logic for the OTA Provider Cluster.
  */
-class OTAProviderDelegate
+class DLL_EXPORT OTAProviderDelegate
 {
 public:
-    virtual EmberAfStatus HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                           const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) = 0;
+    /**
+     * Called to handle a QueryImage command and is responsible for sending the response (if success) or status (if error). The
+     * caller is responsible for validating fields in the command.
+     */
+    virtual void HandleQueryImage(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                  const OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) = 0;
 
-    virtual EmberAfStatus
+    /**
+     * Called to handle an ApplyUpdateRequest command and is responsible for sending the response (if success) or status (if error).
+     * The caller is responsible for validating fields in the command.
+     */
+    virtual void
     HandleApplyUpdateRequest(CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              const OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) = 0;
 
-    virtual EmberAfStatus
+    /**
+     * Called to handle a NotifyUpdateApplied command and is responsible for sending the status. The caller is responsible for
+     * validating fields in the command.
+     */
+    virtual void
     HandleNotifyUpdateApplied(CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) = 0;
 

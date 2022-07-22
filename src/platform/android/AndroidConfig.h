@@ -1,8 +1,6 @@
-
-
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,7 +27,7 @@
 #include <inttypes.h>
 #include <jni.h>
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -64,33 +62,26 @@ public:
     static const Key kConfigKey_HardwareVersionString;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
-    static const Key kConfigKey_FabricId;
     static const Key kConfigKey_ServiceConfig;
     static const Key kConfigKey_PairedAccountId;
     static const Key kConfigKey_ServiceId;
-    static const Key kConfigKey_FabricSecret;
-    static const Key kConfigKey_GroupKeyIndex;
     static const Key kConfigKey_LastUsedEpochKeyId;
     static const Key kConfigKey_FailSafeArmed;
     static const Key kConfigKey_WiFiStationSecType;
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
-    static const Key kConfigKey_ActiveLocale;
-    static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_ProductId;
     static const Key kConfigKey_ProductName;
     static const Key kConfigKey_SoftwareVersion;
     static const Key kConfigKey_SoftwareVersionString;
-    static const Key kConfigKey_NodeLabel;
     static const Key kConfigKey_PartNumber;
     static const Key kConfigKey_ProductURL;
     static const Key kConfigKey_ProductLabel;
-    static const Key kConfigKey_LocalConfigDisabled;
-    static const Key kConfigKey_Reachable;
     static const Key kConfigKey_UniqueId;
-
-    static const char kGroupKeyNamePrefix[];
+    static const Key kConfigKey_Spake2pIterationCount;
+    static const Key kConfigKey_Spake2pSalt;
+    static const Key kConfigKey_Spake2pVerifier;
 
     static CHIP_ERROR Init();
 

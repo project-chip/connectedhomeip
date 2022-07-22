@@ -9,7 +9,7 @@
 
 {{#zcl_clusters}}
 #if defined(ZCL_USING_{{asDelimitedMacro this.define}}_SERVER) || defined(ZCL_USING_{{asDelimitedMacro this.define}}_CLIENT)
-    #define CHIP_PRINTCLUSTER_{{asDelimitedMacro this.define}} {ZCL_{{asDelimitedMacro this.define}}_ID, {{this.code}}, "{{this.label}}" },
+    #define CHIP_PRINTCLUSTER_{{asDelimitedMacro this.define}} {ZCL_{{asDelimitedMacro this.define}}_ID, "{{this.label}}" },
 #else
     #define CHIP_PRINTCLUSTER_{{asDelimitedMacro this.define}}
 #endif

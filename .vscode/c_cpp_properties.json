@@ -82,6 +82,18 @@
                 "path": ["${workspaceFolder}/out/debug/"],
                 "limitSymbolsToIncludedHeaders": true
             }
+        },
+        {
+            "name": "Tizen examples debug (GN)",
+            "cStandard": "c11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "/opt/tizen-sdk/tools/arm-linux-gnueabi-gcc-9.2/bin/arm-linux-gnueabi-gcc",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.tizen_arm.json",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4

@@ -22,8 +22,8 @@ ti_simplelink_sysconfig_target =
 ti_simplelink_board = "LP_CC2652R7"
 
 # use -Os instead of -Og
-#is_debug = false
+#optimize_debug_level = "s"
+#lwip_debug = false
 
 # BLE options
 chip_config_network_layer_ble = true
-chip_bypass_rendezvous = false

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.matter.tv.server">
+
+    <!-- Permission to bind to Matter Agent service from Matter content apps-->
+    <permission android:name="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION"
+        android:protectionLevel="normal" />
+
+    <!-- Permission for Matter Agent to send Matter commands -->
+    <permission
+        android:name="com.matter.tv.app.api.permission.SEND_DATA"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.matter.tv.app.api.permission.SEND_DATA" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <application
+        android:allowBackup="true"
+        android:extractNativeLibs="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:name="com.matter.tv.server.MatterTvServerApplication"
+        android:theme="@style/Theme.MatterTVSlave">
+
+        <activity android:name="com.matter.tv.server.MainActivity"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service android:name="com.matter.tv.server.service.MatterServantService" />
+        <service
+            android:name="com.matter.tv.server.service.ContentAppAgentService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.matter.tv.app.api.permission.BIND_SERVICE_PERMISSION">
+
+            <intent-filter>
+                <action android:name="com.matter.tv.app.api.action.MatterAppAgent" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+
+
+</manifest>

@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Mbed-OS add new hardware target </h1>
 

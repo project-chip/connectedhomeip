@@ -30,13 +30,7 @@ project_dir = "${chip_root}/examples/pump-controller-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
-
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
+  public_configs = [ ":pump_controller_app_config" ]
 }
 
 ti_sysconfig("sysconfig") {
@@ -109,17 +103,6 @@ ti_simplelink_executable("pump_controller_app") {
     "-Wno-implicit-fallthrough",
     "-Wno-sign-compare",
     "-Wconversion",
-  ]
-
-  ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
-
-  inputs = [ ldscript ]
-
-  ldflags = [
-    "-L${ti_simplelink_sdk_root}/source",
-    rebase_path("${target_gen_dir}/sysconfig/ti_utils_build_linker.cmd.genlibs",
-                root_build_dir),
-    "-T" + rebase_path(ldscript, root_build_dir),
   ]
 
   output_dir = root_out_dir

@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Matter Arm Mbed OS Unit Tests Application </h1>
 
@@ -42,10 +40,22 @@ submodules using the following command:
 
     $ git submodule update --init
 
-Building the application requires the use of **ARM Mbed-OS** sources and the
-**arm-none-gnu-eabi** toolchain. The OpenOCD package is used for flashing
-purpose. <br> Some additional packages may be needed, depending on selected
-build target and its requirements.
+Building the example application requires the use of **ARM Mbed-OS** sources and
+the **arm-none-gnu-eabi** toolchain.
+
+The Cypress OpenOCD package is required for flashing purpose. Install the
+Cypress OpenOCD and set env var `OPENOCD_PATH` before calling the flashing
+script.
+
+```
+cd ~
+wget https://github.com/Infineon/openocd/releases/download/release-v4.3.0/openocd-4.3.0.1746-linux.tar.gz
+tar xzvf openocd-4.3.0.1746-linux.tar.gz
+export OPENOCD_PATH=$HOME/openocd
+```
+
+Some additional packages may be needed, depending on selected build target and
+its requirements.
 
 > **The VSCode devcontainer has these components pre-installed. Using the VSCode
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the
@@ -156,28 +166,34 @@ terminal session and connect to the serial port of the device. You can use
 **mbed-tools** for this purpose
 ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
 
+    ```
     mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+    ```
 
 After device reset these lines should be visible:
 
+    ```
     [INFO][CHIP]: [-]Mbed unit-tests application start
     ...
     [INFO][CHIP]: [-]Mbed unit-tests application run
+    ```
 
 The unit tests application launched correctly and registered tests are executed.
 
 The final result is the number of tests that failed:
 
+    ```
     [INFO][CHIP]: [-]CHIP test status: 0
+    ```
 
 ## Supported devices
 
 The application supports building and running on the following mbed-enabled
 devices:
 
-| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                                                                                                 |       Status       | Platform components                                                                                                                                                                                                                                                                |
-| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | <details><summary>CY8CPROTO-062-4343W</summary><img src="https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg" alt="CY8CPROTO-062-4343W"/></details> | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
+| Manufacturer                                          | Hardware platform                                                         | Build target          | Platform image                                                                                         |       Status       | Platform components                                                                                                                                                                                                                                                                |
+| ----------------------------------------------------- | ------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------ | :----------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Cypress<br> Semiconductor](https://www.cypress.com/) | [CY8CPROTO-062-4343W](https://os.mbed.com/platforms/CY8CPROTO-062-4343W/) | `CY8CPROTO_062_4343W` | ![CY8CPROTO-062-4343W](https://os.mbed.com/media/cache/platforms/p6_wifi-bt_proto.png.250x250_q85.jpg) | :heavy_check_mark: | <details><summary>LEDs</summary><ul><li>Board has only one usable LED (LED4) which corresponds to USER LED from UI.</li></ul></details> <details><summary>Buttons</summary><ul><li>Unused</li></ul></details> <details><summary>Slider</summary><ul><li>Unused</li></ul></details> |
 
 #### Notes
 

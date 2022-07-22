@@ -28,49 +28,69 @@ namespace chip {
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
  */
-class SessionHolder : public SessionReleaseDelegate, public IntrusiveListNodeBase
+class SessionHolder : public IntrusiveListNodeBase<>
 {
 public:
     SessionHolder() {}
-    ~SessionHolder();
+    SessionHolder(const SessionHandle & handle) { Grab(handle); }
+    virtual ~SessionHolder();
 
     SessionHolder(const SessionHolder &);
     SessionHolder(SessionHolder && that);
     SessionHolder & operator=(const SessionHolder &);
     SessionHolder & operator=(SessionHolder && that);
 
-    // Implement SessionReleaseDelegate
-    void OnSessionReleased() override { Release(); }
+    virtual void SessionReleased() { Release(); }
+    virtual void ShiftToSession(const SessionHandle & session)
+    {
+        Release();
+        Grab(session);
+    }
 
     bool Contains(const SessionHandle & session) const
     {
         return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
     }
 
-    void Grab(const SessionHandle & session);
+    bool GrabPairingSession(const SessionHandle & session); // Should be only used inside CASE/PASE pairing.
+    bool Grab(const SessionHandle & session);
     void Release();
 
-    operator bool() const { return mSession.HasValue(); }
-    SessionHandle Get() const { return SessionHandle{ mSession.Value().Get() }; }
-    Optional<SessionHandle> ToOptional() const
+    explicit operator bool() const { return mSession.HasValue(); }
+    Optional<SessionHandle> Get() const
     {
-        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(Get()) : chip::Optional<SessionHandle>::Missing();
+        //
+        // We cannot return mSession directly even if Optional<SessionHandle> is internally composed of the same bits,
+        // since they are not actually equivalent type-wise, and SessionHandle does not permit copy-construction.
+        //
+        // So, construct a new Optional<SessionHandle> from the underlying Transport::Session reference.
+        //
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(mSession.Value().Get())
+                                   : chip::Optional<SessionHandle>::Missing();
     }
 
     Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
-private:
+    // There is not delegate, nothing to do here
+    virtual void DispatchSessionEvent(SessionDelegate::Event event) {}
+
+protected:
+    // Helper for use by the Grab methods.
+    void GrabUnchecked(const SessionHandle & session);
+
     Optional<ReferenceCountedHandle<Transport::Session>> mSession;
 };
 
-// @brief Extends SessionHolder to allow propagate OnSessionReleased event to an extra given destination
+/// @brief Extends SessionHolder to allow propagate SessionDelegate::* events to a given destination
 class SessionHolderWithDelegate : public SessionHolder
 {
 public:
-    SessionHolderWithDelegate(SessionReleaseDelegate & delegate) : mDelegate(delegate) {}
+    SessionHolderWithDelegate(SessionDelegate & delegate) : mDelegate(delegate) {}
+    SessionHolderWithDelegate(const SessionHandle & handle, SessionDelegate & delegate) : SessionHolder(handle), mDelegate(delegate)
+    {}
     operator bool() const { return SessionHolder::operator bool(); }
 
-    void OnSessionReleased() override
+    void SessionReleased() override
     {
         Release();
 
@@ -78,8 +98,16 @@ public:
         mDelegate.OnSessionReleased();
     }
 
+    void ShiftToSession(const SessionHandle & session) override
+    {
+        if (mDelegate.GetNewSessionHandlingPolicy() == SessionDelegate::NewSessionHandlingPolicy::kShiftToNewSession)
+            SessionHolder::ShiftToSession(session);
+    }
+
+    void DispatchSessionEvent(SessionDelegate::Event event) override { (mDelegate.*event)(); }
+
 private:
-    SessionReleaseDelegate & mDelegate;
+    SessionDelegate & mDelegate;
 };
 
 } // namespace chip

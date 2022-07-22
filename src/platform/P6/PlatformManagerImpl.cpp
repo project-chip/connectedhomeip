@@ -28,7 +28,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/P6/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,7 +44,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     CHIP_ERROR err;
 
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
@@ -66,7 +65,7 @@ CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
     return Internal::InitLwIPCoreLock();
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     uint64_t upTime = 0;
 
@@ -88,7 +87,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
-    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
+    Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

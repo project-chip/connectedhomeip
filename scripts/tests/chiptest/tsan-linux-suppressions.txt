@@ -1,0 +1,10 @@
+# The Linux server app ends up with a data race in libglib.  A race_top
+# suppression does not work, since the actual race is inside a memset, so the
+# thing on top of the stack is memset.  called_from_lib is a narrower
+# suppression than a "race" suppression (which would be "libglib anywhere on the
+# stack", as opposed to "inside a function TSan intercepts, which was called
+# from libglib).
+#
+# See https://github.com/project-chip/connectedhomeip/issues/14710 for
+# addressing this.
+called_from_lib:libglib

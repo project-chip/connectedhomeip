@@ -87,7 +87,7 @@ AttributePersistenceProvider * GetAttributePersistenceProvider();
  *
  * If the `provider` is nullptr, the value is not changed.
  *
- * @param[in] provider the AttributePersistenceProvider implementation to use.
+ * @param[in] aProvider the AttributePersistenceProvider implementation to use.
  */
 void SetAttributePersistenceProvider(AttributePersistenceProvider * aProvider);
 

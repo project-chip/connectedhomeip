@@ -29,10 +29,6 @@
 #endif
 #include <lib/support/logging/CHIPLogging.h>
 
-#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
-void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
-#endif
-
 using namespace ::chip;
 
 void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
@@ -41,13 +37,5 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
     ChipLogProgress(Zcl, "Using ZAP configuration...");
     emberAfEndpointConfigure();
     emberAfInit(exchangeManager);
-
-#if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
-    EmberStatus status = EMBER_NETWORK_UP;
-#endif
-
-#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
-    emberAfPluginIasZoneServerStackStatusCallback(status);
-#endif
 #endif
 }

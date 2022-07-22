@@ -26,6 +26,7 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/link.h>
 #include <openthread/netdata.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -39,6 +40,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -68,6 +70,11 @@ public:
     otInstance * OTInstance() const;
     static void OnOpenThreadStateChange(uint32_t flags, void * context);
     inline void OverrunErrorTally(void);
+    void
+    SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
+    {
+        mpStatusChangeCallback = statusChangeCallback;
+    }
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -80,16 +87,23 @@ protected:
 
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
+    CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    void _OnThreadAttachFinished(void);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
+    CHIP_ERROR _StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+    static void _OnNetworkScanFinished(otActiveScanResult * aResult, void * aContext);
+    void _OnNetworkScanFinished(otActiveScanResult * aResult);
+    void _UpdateNetworkStatus();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
-    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
 #endif
 
     bool _HaveMeshConnectivity(void);
@@ -137,11 +151,16 @@ private:
 
     otInstance * mOTInst;
     uint64_t mOverrunCount = 0;
+    bool mIsAttached       = false;
+
+    NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
+    NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
+    NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    ConnectivityManager::SEDPollingConfig mPollingConfig;
-    ConnectivityManager::SEDPollingMode mPollingMode = ConnectivityManager::SEDPollingMode::Idle;
-    uint32_t mFastPollingConsumers                   = 0;
+    ConnectivityManager::SEDIntervalsConfig mIntervalsConfig;
+    ConnectivityManager::SEDIntervalMode mIntervalsMode = ConnectivityManager::SEDIntervalMode::Idle;
+    uint32_t mActiveModeConsumers                       = 0;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -153,21 +172,13 @@ private:
         static constexpr uint8_t kDefaultDomainNameSize  = 20;
         static constexpr uint8_t kMaxDomainNameSize      = 32;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        // Thread supports both operational and commissionable discovery, so buffers sizes must be worst case.
+        // SRP is used for both operational and commissionable services, so buffers sizes must be worst case.
         static constexpr size_t kSubTypeMaxNumber   = Dnssd::Common::kSubTypeMaxNumber;
         static constexpr size_t kSubTypeTotalLength = Dnssd::Common::kSubTypeTotalLength;
         static constexpr size_t kTxtMaxNumber =
             std::max(Dnssd::CommissionAdvertisingParameters::kTxtMaxNumber, Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber);
         static constexpr size_t kTxtTotalValueLength = std::max(Dnssd::CommissionAdvertisingParameters::kTxtTotalValueSize,
                                                                 Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize);
-#else
-        // Thread only supports operational discovery.
-        static constexpr size_t kSubTypeMaxNumber    = Dnssd::Operational::kSubTypeMaxNumber;
-        static constexpr size_t kSubTypeTotalLength  = Dnssd::Operational::kSubTypeTotalLength;
-        static constexpr size_t kTxtMaxNumber        = Dnssd::OperationalAdvertisingParameters::kTxtMaxNumber;
-        static constexpr size_t kTxtTotalValueLength = Dnssd::OperationalAdvertisingParameters::kTxtTotalValueSize;
-#endif
 
         static constexpr size_t kServiceBufferSize = Dnssd::Common::kInstanceNameMaxLength + 1 + // add null-terminator
             Dnssd::kDnssdTypeAndProtocolMaxSize + 1 +                                            // add null-terminator
@@ -183,7 +194,9 @@ private:
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
-            bool Matches(const char * aInstanceName, const char * aName) const;
+            bool Matches(const char * instanceName, const char * name) const;
+            bool Matches(const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
+                         const Span<const Dnssd::TextEntry> & txtEntries) const;
         };
 
         char mHostName[Dnssd::kHostNameMaxLength + 1];
@@ -253,7 +266,7 @@ private:
     void OnJoinerComplete(otError aError);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR SetSEDPollingMode(ConnectivityManager::SEDPollingMode pollingType);
+    CHIP_ERROR SetSEDIntervalMode(ConnectivityManager::SEDIntervalMode intervalType);
 #endif
 
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }

@@ -10,10 +10,12 @@ To access the CLI console, use a serial terminal emulator of your choice, like
 Minicom or GNU Screen. Use the baud rate set to `115200`.
 
 For example, to start using the CLI console with Minicom, run the following
-command with _/dev/ttyACM0_ replaced with the device node name of your
+command with `/dev/ttyACM0` replaced with the device node name of your
 development kit:
 
-    $ minicom -D /dev/ttyACM0 -b 115200
+    ```
+    minicom -D /dev/ttyACM0 -b 115200
+    ```
 
 When you reboot the kit, you will see the boot logs in the console, similar to
 the following messages:
@@ -125,7 +127,7 @@ To print all the onboardingcodes:
 ```shell
 uart:~$ matter onboardingcodes none
 QRCode:             MT:W0GU2OTB00KA0648G00
-QRCodeUrl:          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+QRCodeUrl:          https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ManualPairingCode:  34970112332
 ```
 
@@ -150,7 +152,7 @@ in a web browser. Takes no arguments.
 
 ```shell
 uart:~$ matter onboardingcodes none qrcodeurl
-https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ```
 
 #### manualpairingcode
@@ -170,8 +172,8 @@ information. You can use this command without any subcommand to print all
 available configuration data or to add a specific subcommand.
 
 ```shell
-VendorId:        9050 (0x235A)
-ProductId:       20043 (0x4E4B)
+VendorId:        65521 (0xFFF1)
+ProductId:       32768 (0x8000)
 HardwareVersion: 1 (0x1)
 FabricId:
 PinCode:         020202021
@@ -205,7 +207,7 @@ Prints the vendor ID of the device. Takes no arguments.
 
 ```shell
 uart:~$ matter config vendorid
-9050 (0x235A)
+65521 (0xFFFF1)
 ```
 
 #### productid
@@ -214,7 +216,7 @@ Prints the product ID of the device. Takes no arguments.
 
 ```shell
 uart:~$ matter config productid
-20043 (0x4E4B)
+32768 (0x8000)
 ```
 
 #### hardwarever

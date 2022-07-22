@@ -1,0 +1,82 @@
+#
+#    Copyright (c) 2022 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Configuration options CHIP ESP32 demo application.
+#
+
+menu "Demo"
+
+    choice
+        prompt "Device Type"
+        default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
+        default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
+        default DEVICE_TYPE_ESP32_S3_DEVKITM if IDF_TARGET_ESP32S3
+        help
+            Specifies the type of ESP32 device.
+
+            Note that the "ESP32-DevKitC" choice is compatible with a number of clone devices
+            available from third-party manufacturers.
+
+        config DEVICE_TYPE_ESP32_DEVKITC
+            bool "ESP32-DevKitC"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_ESP32_WROVER_KIT
+            bool "ESP32-WROVER-KIT_V4.1"
+            depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_ESP32_C3_DEVKITM
+            bool "ESP32C3-DevKitM"
+            depends on IDF_TARGET_ESP32C3
+        config DEVICE_TYPE_ESP32_S3_DEVKITM
+            bool "ESP32S3-DevKitM"
+            depends on IDF_TARGET_ESP32S3
+        config DEVICE_TYPE_ESP32H2_DEVKITC
+            bool "ESP32H2-DevKitC"
+            depends on IDF_TARGET_ESP32H2
+    endchoice
+
+    choice
+      prompt "Rendezvous Mode"
+      default RENDEZVOUS_MODE_BLE
+      help
+          Specifies the Rendezvous mode of the peripheral.
+
+      config RENDEZVOUS_MODE_WIFI
+          bool "Wi-Fi"
+      config RENDEZVOUS_MODE_BLE
+          bool "BLE"
+      config RENDEZVOUS_MODE_THREAD
+          bool "Thread"
+      config RENDEZVOUS_MODE_ETHERNET
+          bool "Ethernet"
+    endchoice
+
+    config RENDEZVOUS_MODE
+       int
+       range 0 8
+       default 1 if RENDEZVOUS_MODE_WIFI
+       default 2 if RENDEZVOUS_MODE_BLE
+       default 4 if RENDEZVOUS_MODE_THREAD
+       default 8 if RENDEZVOUS_MODE_ETHERNET
+    
+    config EXAMPLE_BOARD_BUTTON_GPIO
+        int "Boot Button GPIO"
+        default 0 if !IDF_TARGET_ESP32C3
+        default 9 if IDF_TARGET_ESP32C3
+        help
+            GPIO number on which the "Boot" button is connected. This is generally used
+            by the application for custom operations like toggling states.
+endmenu

@@ -1,0 +1,130 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 123.2.3. [TC-S-2.3] Secondary functionality with server as DUT
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "preparation step for using commands from Groups cluster: TH generates
+          fabric-unique GroupID, GroupName, random key, EpochKey0 and
+          GroupKeySetID. TH sets GroupKeySecurityPolicy = TrustFirst (1)
+          GroupKeyMulticastPolicy = PerGroupID (0) EpochStartTime0 = 0"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH sends a AddGroup command to DUT with the GroupID field set to G1."
+      PICS: G.S.C00.Rsp
+      verification: |
+          DUT sends a AddGroupResponse command to TH with the Status field set to 0x00 (SUCCESS) or 0x8a (DUPLICATE_EXISTS) and the GroupID field set to G1.
+      disabled: true
+
+    - label:
+          "TH sends a RemoveAllScenes command to DUT with the GroupID field set
+          to G1."
+      PICS: S.S.C03.Rsp
+      verification: |
+          DUT sends a RemoveAllScenesResponse command to TH with the Status field set to 0x00 (SUCCESS) and GroupID field set to G1.
+      disabled: true
+
+    - label:
+          "TH sends a GetSceneMembership command to DUT with the GroupID field
+          set to G1."
+      PICS: S.S.C06.Rsp
+      verification: |
+          DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to the value SC0, the GroupID field set to G1 and the SceneCount field set to 0x00.
+      disabled: true
+
+    - label:
+          "TH sends a EnhancedAddScene command to DUT with the GroupID field set
+          to G1, the SceneID field set to 0x01, the TransitionTime field set to
+          0x000a (1s) and a set of extension fields appropriate to AC1."
+      PICS: S.S.C40.Rsp
+      verification: |
+          DUT sends a EnhancedAddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01.
+      disabled: true
+
+    - label:
+          "TH sends a AddScene command to DUT with the GroupID field set to G1,
+          the SceneID field set to 0x01, the TransitionTime field set to 0x0001
+          (1s) and a set of extension fields appropriate to AC1."
+      PICS: S.S.C40.Rsp
+      verification: |
+          DUT sends a AddSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01.
+      disabled: true
+
+    - label:
+          "TH sends a EnhancedViewScene command to DUT with the GroupID field
+          set to G1 and the SceneID field set to 0x01."
+      PICS: S.S.C41.Rsp
+      verification: |
+          DUT sends a EnhancedViewSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1, the SceneID field set to 0x01, the TransitionTime field set to 0x000a (1s) and a set of extension fields appropriate to AC1.
+      disabled: true
+
+    - label:
+          "TH sends a ViewScene command to DUT with the GroupID field set to G1
+          and the SceneID field set to 0x01."
+      PICS: "!S.S.C41.Rsp"
+      verification: |
+          DUT sends a ViewSceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the GroupID field set to G1 and the SceneID field set to 0x01, the TransitionTime field set to 0x0001 (1s) and a set of extension fields appropriate to AC1.
+      disabled: true
+
+    - label:
+          "TH sends a GetSceneMembership command to DUT with the GroupID field
+          set to G1."
+      PICS: S.S.C06.Rsp
+      verification: |
+          DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values (SC0 - 1), 0xfe or null, the GroupID field set to G1, the SceneCount field set to 0x01 and the SceneList field containing only the scene ID 0x01.
+      disabled: true
+
+    - label:
+          "TH configures AC2 on DUT for all implemented application clusters
+          supporting scenes."
+      PICS: S.S.C04.Rsp
+      verification: |
+          DUT is configured with AC2 which is different from AC1.
+      disabled: true
+
+    - label:
+          "TH sends a RecallScene command to group G1 with the GroupID field set
+          to G1 and the scene ID field set to 0x01."
+      PICS: S.S.C05.Rsp
+      verification: |
+          (There is no Status response since this was a groupcast) DUT returns to AC1.
+      disabled: true
+
+    - label:
+          "TH sends a CopyScene command to DUT with the mode field set to 0x00,
+          the group identifier from field set to G1, the scene identifier from
+          field set to 0x01, the group identifier to field set to G1 and the
+          scene identifier to field set to 0x02."
+      PICS: S.S.C42.Rsp
+      verification: |
+          DUT sends a CopySceneResponse command to TH with the Status field set to 0x00 (SUCCESS), the group identifier from field set to G1 and the scene identifier from field set to 0x01.
+      disabled: true
+
+    - label:
+          "TH sends a GetSceneMembership command to DUT with the GroupID field
+          set to G1."
+      PICS: S.S.C06.Rsp
+      verification: |
+          DUT sends a GetSceneMembershipResponse command to TH with the Status field set to 0x00 (SUCCESS), the Capacity field set to one of the values (SC0 - 2), 0xfe or null, the GroupID field set to G1, the SceneCount field set to 0x02 and the SceneList field containing the scene IDs 0x01 and 0x02.
+      disabled: true

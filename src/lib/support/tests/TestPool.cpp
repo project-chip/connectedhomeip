@@ -187,12 +187,12 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, objs1.size() == kSize);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == kSize);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == kSize);
-    printf("allocated = %zu\n", pool.Allocated());
-    printf("highwater = %zu\n", pool.HighWaterMark());
+    printf("allocated = %u\n", static_cast<unsigned int>(pool.Allocated()));
+    printf("highwater = %u\n", static_cast<unsigned int>(pool.HighWaterMark()));
 
     pool.ReleaseAll();
-    printf("allocated = %zu\n", pool.Allocated());
-    printf("highwater = %zu\n", pool.HighWaterMark());
+    printf("allocated = %u\n", static_cast<unsigned int>(pool.Allocated()));
+    printf("highwater = %u\n", static_cast<unsigned int>(pool.HighWaterMark()));
     NL_TEST_ASSERT(inSuite, objs1.size() == 0);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == 0);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == 0);

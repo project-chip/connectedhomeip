@@ -22,7 +22,7 @@
 
 """Provides Python APIs for CHIP."""
 import enum
-from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct
+from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct, DataVersionFilterIBstruct
 
 from chip.exceptions import ChipStackException
 
@@ -53,7 +53,7 @@ class Status(enum.IntEnum):
     UnsupportedRead = 0x8f
     Deprecated90 = 0x90
     Deprecated91 = 0x91
-    Reserved92 = 0x92
+    DataVersionMismatch = 0x92
     Deprecated93 = 0x93
     Timeout = 0x94
     Reserved95 = 0x95
@@ -74,12 +74,12 @@ class Status(enum.IntEnum):
 
 
 class InteractionModelError(ChipStackException):
-    def __init__(self, state: Status):
-        self._state = state
+    def __init__(self, status: Status):
+        self._status = status
 
     def __str__(self):
-        return f"InteractionModelError: {self._state.name} (0x{self._state.value:x})"
+        return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
 
     @property
-    def state(self) -> Status:
-        return self._state
+    def status(self) -> Status:
+        return self._status

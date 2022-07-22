@@ -29,20 +29,20 @@
 namespace chip {
 namespace app {
 
-void BufferedReadCallback::OnReportBegin(const ReadClient * apReadClient)
+void BufferedReadCallback::OnReportBegin()
 {
-    mCallback.OnReportBegin(apReadClient);
+    mCallback.OnReportBegin();
 }
 
-void BufferedReadCallback::OnReportEnd(const ReadClient * apReadClient)
+void BufferedReadCallback::OnReportEnd()
 {
-    CHIP_ERROR err = DispatchBufferedData(apReadClient, mBufferedPath, StatusIB(), true);
+    CHIP_ERROR err = DispatchBufferedData(mBufferedPath, StatusIB(), true);
     if (err != CHIP_NO_ERROR)
     {
-        mCallback.OnError(apReadClient, err);
+        mCallback.OnError(err);
     }
 
-    mCallback.OnReportEnd(apReadClient);
+    mCallback.OnReportEnd();
 }
 
 CHIP_ERROR BufferedReadCallback::GenerateListTLV(TLV::ScopedBufferTLVReader & aReader)
@@ -168,8 +168,8 @@ CHIP_ERROR BufferedReadCallback::BufferData(const ConcreteDataAttributePath & aP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath,
-                                                      const StatusIB & aStatusIB, bool aEndOfReport)
+CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatusIB,
+                                                      bool aEndOfReport)
 {
     if (aPath == mBufferedPath)
     {
@@ -215,26 +215,25 @@ CHIP_ERROR BufferedReadCallback::DispatchBufferedData(const ReadClient * apReadC
     //
     ReturnErrorOnFailure(reader.Next());
 
-    mCallback.OnAttributeData(apReadClient, mBufferedPath, &reader, statusIB);
+    mCallback.OnAttributeData(mBufferedPath, &reader, statusIB);
 
     //
     // Clear out our buffered contents to free up allocated buffers, and reset the buffered path.
     //
     mBufferedList.clear();
     mBufferedPath = ConcreteDataAttributePath();
-
     return CHIP_NO_ERROR;
 }
 
-void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
-                                           TLV::TLVReader * apData, const StatusIB & aStatus)
+void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                           const StatusIB & aStatus)
 {
     CHIP_ERROR err;
 
     //
     // First, let's dispatch to our registered callback any buffered up list data from previous calls.
     //
-    err = DispatchBufferedData(apReadClient, aPath, aStatus);
+    err = DispatchBufferedData(aPath, aStatus);
     SuccessOrExit(err);
 
     //
@@ -247,7 +246,7 @@ void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, cons
     }
     else
     {
-        mCallback.OnAttributeData(apReadClient, aPath, apData, aStatus);
+        mCallback.OnAttributeData(aPath, apData, aStatus);
     }
 
     //
@@ -258,7 +257,7 @@ void BufferedReadCallback::OnAttributeData(const ReadClient * apReadClient, cons
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        mCallback.OnError(apReadClient, err);
+        mCallback.OnError(err);
     }
 }
 

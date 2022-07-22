@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import enum
 import logging
 
 from lark import Lark
@@ -15,12 +16,75 @@ except:
     from matter_idl_types import *
 
 
-class MatterIdlTransformer(Transformer):
-    """A transformer capable to transform data
-       parsed by Lark according to matter_grammar.lark
+class SharedTag(enum.Enum):
+    FABRIC_SCOPED = enum.auto()
+
+
+class AddServerClusterToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a server cluster to the given endpoint.
     """
 
-    def number(self, tokens):
+    def __init__(self, cluster: ServerClusterInstantiation):
+        self.cluster = cluster
+
+    def apply(self, endpoint):
+        endpoint.server_clusters.append(self.cluster)
+
+
+class AddBindingToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a cluster binding to the given endpoint.
+    """
+
+    def __init__(self, name):
+        self.name = name
+
+    def apply(self, endpoint):
+        endpoint.client_bindings.append(self.name)
+
+
+class AddDeviceTypeToEndpointTransform:
+    """Provides an 'apply' method that can be run on endpoints
+       to add a device type to it
+    """
+
+    def __init__(self, device_type: DeviceType):
+        self.device_type = device_type
+
+    def apply(self, endpoint):
+        endpoint.device_types.append(self.device_type)
+
+
+class MatterIdlTransformer(Transformer):
+    """
+    A transformer capable to transform data parsed by Lark according to 
+    matter_grammar.lark.
+
+    Generally transforms a ".matter" file into an Abstract Syntax Tree (AST).
+    End result will be a `matter_idl_types.Idl` value that represents the
+    entire parsed .matter file.
+
+    The content of this file closely resembles the .lark input file and its
+    purpose is to convert LARK tokens (that ar generally inputted by name)
+    into underlying python types.
+
+    Some documentation to get started is available at 
+    https://lark-parser.readthedocs.io/en/latest/visitors.html#transformer
+
+    TLDR would be:
+      When the ".lark" defines a token like `foo: number`, the transformer
+      has the option to define a method called `foo` which will take the
+      parsed input (as strings unless transformed) and interpret them.
+
+      Actual parametes to the methods depend on the rules multiplicity and/or
+      optionality.
+    """
+
+    def __init__(self, skip_meta):
+        self.skip_meta = skip_meta
+
+    def positive_integer(self, tokens):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
@@ -31,6 +95,20 @@ class MatterIdlTransformer(Transformer):
             return int(n[2:], 16)
         else:
             return int(n)
+
+    @v_args(inline=True)
+    def negative_integer(self, value):
+        return -value
+
+    @v_args(inline=True)
+    def integer(self, value):
+        return value
+
+    def bool_default_true(self, _):
+        return True
+
+    def bool_default_false(self, _):
+        return False
 
     def id(self, tokens):
         """An id is a string containing an identifier
@@ -55,13 +133,23 @@ class MatterIdlTransformer(Transformer):
         else:
             raise Error("Unexpected size for data type")
 
+    def shared_tag_fabric(self, _):
+        return SharedTag.FABRIC_SCOPED
+
+    def shared_tags(self, entries):
+        return entries
+
     @v_args(inline=True)
-    def enum_entry(self, id, number):
-        return EnumEntry(name=id, code=number)
+    def constant_entry(self, id, number):
+        return ConstantEntry(name=id, code=number)
 
     @v_args(inline=True)
     def enum(self, id, type, *entries):
         return Enum(name=id, base_type=type, entries=list(entries))
+
+    @v_args(inline=True)
+    def bitmap(self, id, type, *entries):
+        return Bitmap(name=id, base_type=type, entries=list(entries))
 
     def field(self, args):
         data_type, name = args[0], args[1]
@@ -79,8 +167,11 @@ class MatterIdlTransformer(Transformer):
     def attr_readonly(self, _):
         return AttributeTag.READABLE
 
-    def attr_global(self, _):
-        return AttributeTag.GLOBAL
+    def attr_nosubscribe(self, _):
+        return AttributeTag.NOSUBSCRIBE
+
+    def attribute_tags(self, tags):
+        return tags
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL
@@ -91,11 +182,12 @@ class MatterIdlTransformer(Transformer):
     def debug_priority(self, _):
         return EventPriority.DEBUG
 
-    def endpoint_server_cluster(self, _):
-        return EndpointContentType.SERVER_CLUSTER
+    def timed_command(self, _):
+        return CommandAttribute.TIMED_INVOKE
 
-    def endpoint_binding_to_cluster(self, _):
-        return EndpointContentType.CLIENT_BINDING
+    def command_attributes(self, attrs):
+        # List because attrs is a tuple
+        return set(list(attrs))
 
     def struct_field(self, args):
         # Last argument is the named_member, the rest
@@ -110,19 +202,130 @@ class MatterIdlTransformer(Transformer):
     def client_cluster(self, _):
         return ClusterSide.CLIENT
 
+    def command_access(self, privilege):
+        return privilege[0]
+
+    def command_with_access(self, args):
+        # Arguments
+        #   - optional access for invoke
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["invokeacl"] = args[0]
+
+        return init_args
+
     def command(self, args):
-        # A command has 3 arguments if no input or
-        # 4 arguments if input parameter is available
-        param_in = None
-        if len(args) > 3:
-            param_in = args[1]
-        return Command(name=args[0], input_param=param_in, output_param=args[-2], code=args[-1])
+        # The command takes 5 arguments if no input argument, 6 if input
+        # argument is provided
+        if len(args) != 6:
+            args.insert(3, None)
+
+        attr = args[1]  # direct command attributes
+        for shared_attr in args[0]:
+            if shared_attr == SharedTag.FABRIC_SCOPED:
+                attr.add(CommandAttribute.FABRIC_SCOPED)
+            else:
+                raise Exception("Unknown shared tag: %r" % shared_attr)
+
+        return Command(
+            attributes=attr,
+            input_param=args[3], output_param=args[4], code=args[5],
+            **args[2]
+        )
+
+    def event_access(self, privilege):
+        return privilege[0]
+
+    def event_with_access(self, args):
+        # Arguments
+        #   - optional access for read
+        #   - event identifier (name)
+        init_args = {
+            "name": args[-1]
+        }
+        if len(args) > 1:
+            init_args["readacl"] = args[0]
+
+        return init_args
 
     def event(self, args):
-        return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
+        return Event(priority=args[0], code=args[2], fields=args[3:], **args[1])
 
-    def attribute(self, args):
-        tags = set(args[:-1])
+    def view_privilege(self, args):
+        return AccessPrivilege.VIEW
+
+    def operate_privilege(self, args):
+        return AccessPrivilege.OPERATE
+
+    def manage_privilege(self, args):
+        return AccessPrivilege.MANAGE
+
+    def administer_privilege(self, args):
+        return AccessPrivilege.ADMINISTER
+
+    def read_access(self, args):
+        return AttributeOperation.READ
+
+    def write_access(self, args):
+        return AttributeOperation.WRITE
+
+    @v_args(inline=True)
+    def attribute_access_entry(self, operation, access):
+        return (operation, access)
+
+    def attribute_access(self, value):
+        # return value as-is to not need to deal with trees in `attribute_with_access`
+        return value
+
+    def attribute_with_access(self, args):
+        # Input arguments are:
+        #   - acl (optional list of pairs operation + access)
+        #   - field definition
+        acl = {}
+        if len(args) > 1:
+            for operation, access in args[0]:
+                if operation == AttributeOperation.READ:
+                    acl['readacl'] = access
+                elif operation == AttributeOperation.WRITE:
+                    acl['writeacl'] = access
+                else:
+                    raise Exception("Unknown attribute operation: %r" % operation)
+
+        return (args[-1], acl)
+
+    def ram_attribute(self, _):
+        return AttributeStorage.RAM
+
+    def persist_attribute(self, _):
+        return AttributeStorage.PERSIST
+
+    def callback_attribute(self, _):
+        return AttributeStorage.CALLBACK
+
+    @v_args(meta=True, inline=True)
+    def endpoint_attribute_instantiation(self, meta, storage, id, default=None):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return AttributeInstantiation(parse_meta=meta, name=id, storage=storage, default=default)
+
+    def ESCAPED_STRING(self, s):
+        # handle escapes, skip the start and end quotes
+        return s.value[1:-1].encode('utf-8').decode('unicode-escape')
+
+    @v_args(inline=True)
+    def attribute(self, shared_tags, tags, definition_tuple):
+
+        tags = set(tags)
+        (definition, acl) = definition_tuple
+
+        for shared_attr in shared_tags:
+            if shared_attr == SharedTag.FABRIC_SCOPED:
+                tags.add(AttributeTag.FABRIC_SCOPED)
+            else:
+                raise Exception("Unknown shared tag: %r" % shared_attr)
+
         # until we support write only (and need a bit of a reshuffle)
         # if the 'attr_readonly == READABLE' is not in the list, we make things
         # read/write
@@ -130,7 +333,7 @@ class MatterIdlTransformer(Transformer):
             tags.add(AttributeTag.READABLE)
             tags.add(AttributeTag.WRITABLE)
 
-        return Attribute(definition=args[-1], tags=tags)
+        return Attribute(definition=definition, tags=tags, **acl)
 
     @v_args(inline=True)
     def struct(self, id, *fields):
@@ -142,35 +345,42 @@ class MatterIdlTransformer(Transformer):
         return value
 
     @v_args(inline=True)
-    def response_struct(self, value):
-        value.tag = StructTag.RESPONSE
-        return value
+    def response_struct(self, id, code, *fields):
+        return Struct(name=id, tag=StructTag.RESPONSE, code=code, fields=list(fields))
 
     @v_args(inline=True)
-    def endpoint(self, number, *clusters):
+    def endpoint(self, number, *transforms):
         endpoint = Endpoint(number=number)
 
-        for t, name in clusters:
-            if t == EndpointContentType.CLIENT_BINDING:
-                endpoint.client_bindings.append(name)
-            elif t == EndpointContentType.SERVER_CLUSTER:
-                endpoint.server_clusters.append(name)
-            else:
-                raise Error("Unknown endpoint content: %r" % t)
+        for t in transforms:
+            t.apply(endpoint)
 
         return endpoint
 
     @v_args(inline=True)
-    def endpoint_cluster(self, t, id):
-        return (t, id)
+    def endpoint_device_type(self, name, code):
+        return AddDeviceTypeToEndpointTransform(DeviceType(name=name, code=code))
 
     @v_args(inline=True)
-    def cluster(self, side, name, code, *content):
-        result = Cluster(side=side, name=name, code=code)
+    def endpoint_cluster_binding(self, id):
+        return AddBindingToEndpointTransform(id)
+
+    @v_args(meta=True, inline=True)
+    def endpoint_server_cluster(self, meta, id, *attributes):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return AddServerClusterToEndpointTransform(ServerClusterInstantiation(parse_meta=meta, name=id, attributes=list(attributes)))
+
+    @v_args(inline=True, meta=True)
+    def cluster(self, meta, side, name, code, *content):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+
+        result = Cluster(parse_meta=meta, side=side, name=name, code=code)
 
         for item in content:
             if type(item) == Enum:
                 result.enums.append(item)
+            elif type(item) == Bitmap:
+                result.bitmaps.append(item)
             elif type(item) == Event:
                 result.events.append(item)
             elif type(item) == Attribute:
@@ -180,7 +390,7 @@ class MatterIdlTransformer(Transformer):
             elif type(item) == Command:
                 result.commands.append(item)
             else:
-                raise Error("UNKNOWN cluster content item: %r" % item)
+                raise Exception("UNKNOWN cluster content item: %r" % item)
 
         return result
 
@@ -197,18 +407,41 @@ class MatterIdlTransformer(Transformer):
             elif type(item) == Endpoint:
                 idl.endpoints.append(item)
             else:
-                raise Error("UNKNOWN idl content item: %r" % item)
+                raise Exception("UNKNOWN idl content item: %r" % item)
 
         return idl
 
 
-def CreateParser():
-    return Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', transformer=MatterIdlTransformer())
+class ParserWithLines:
+    def __init__(self, parser, skip_meta: bool):
+        self.parser = parser
+        self.skip_meta = skip_meta
+
+    def parse(self, file, file_name: str = None):
+        idl = MatterIdlTransformer(self.skip_meta).transform(self.parser.parse(file))
+        idl.parse_file_name = file_name
+        return idl
+
+
+def CreateParser(skip_meta: bool = False):
+    """
+    Generates a parser that will process a ".matter" file into a IDL
+    """
+
+    # NOTE: LALR parser is fast. While Earley could parse more ambigous grammars,
+    #       earley is much slower:
+    #    - 0.39s LALR parsing of all-clusters-app.matter
+    #    - 2.26s Earley parsing of the same thing.
+    # For this reason, every attempt should be made to make the grammar context free
+    return ParserWithLines(Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True), skip_meta)
 
 
 if __name__ == '__main__':
+    # This Parser is generally not intended to be run as a stand-alone binary.
+    # The ability to run is for debug and to print out the parsed AST.
     import click
     import coloredlogs
+    import pprint
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -231,10 +464,10 @@ if __name__ == '__main__':
                             log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
 
         logging.info("Starting to parse ...")
-        data = CreateParser().parse(open(filename).read())
+        data = CreateParser().parse(open(filename).read(), file_name=filename)
         logging.info("Parse completed")
 
         logging.info("Data:")
-        print(data)
+        pprint.pp(data)
 
     main()

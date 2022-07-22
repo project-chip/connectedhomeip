@@ -28,15 +28,7 @@ platforms.
 
 ## EFR32
 
-The EFR32 platform KVS is fully implemented, the KVS is enabled and configured
-using these defines:
-
-```
-defines = [
-  "CHIP_KVS_SECTOR_COUNT=4",
-  "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
-]
-```
+The EFR32 platform KVS is fully implemented
 
 <a name="building"></a>
 

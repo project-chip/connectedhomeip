@@ -51,7 +51,7 @@ class TimedHandler : public Messaging::ExchangeDelegate
 {
 public:
     TimedHandler() {}
-    virtual ~TimedHandler() {}
+    ~TimedHandler() override {}
 
     // ExchangeDelegate implementation.
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * aExchangeContext, const PayloadHeader & aPayloadHeader,

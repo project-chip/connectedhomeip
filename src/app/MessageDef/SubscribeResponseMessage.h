@@ -17,8 +17,8 @@
 
 #pragma once
 #include "EventPathIBs.h"
-#include "StructBuilder.h"
-#include "StructParser.h"
+#include "MessageBuilder.h"
+#include "MessageParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -29,14 +29,13 @@
 namespace chip {
 namespace app {
 namespace SubscribeResponseMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_SubscriptionId            = 0,
-    kCsTag_MinIntervalFloorSeconds   = 1,
-    kCsTag_MaxIntervalCeilingSeconds = 2,
+    kSubscriptionId = 0,
+    kMaxInterval    = 2,
 };
 
-class Parser : public StructParser
+class Parser : public MessageParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -60,15 +59,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
-
-    /**
-     *  @brief Get Final MinIntervalFloorSeconds. Next() must be called before accessing them.
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const;
+    CHIP_ERROR GetSubscriptionId(SubscriptionId * const apSubscriptionId) const;
 
     /**
      *  @brief Get Final MaxIntervalCeilingSeconds. Next() must be called before accessing them.
@@ -76,26 +67,21 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const;
+    CHIP_ERROR GetMaxInterval(uint16_t * const apMaxInterval) const;
 };
 
-class Builder : public StructBuilder
+class Builder : public MessageBuilder
 {
 public:
     /**
      *  @brief final subscription Id for the subscription back to the client.s.
      */
-    SubscribeResponseMessage::Builder & SubscriptionId(const uint64_t SubscriptionId);
-
-    /**
-     *  @brief Final Min Interval for the subscription back to the clients.
-     */
-    SubscribeResponseMessage::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
+    SubscribeResponseMessage::Builder & SubscriptionId(const chip::SubscriptionId SubscriptionId);
 
     /**
      *  @brief Final Max Interval for the subscription back to the clients.
      */
-    SubscribeResponseMessage::Builder & MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds);
+    SubscribeResponseMessage::Builder & MaxInterval(const uint16_t aMaxInterval);
 
     /**
      *  @brief Mark the end of this SubscribeResponseMessage

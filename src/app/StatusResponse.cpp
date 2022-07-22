@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/InteractionModelTimeout.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/StatusResponse.h>
 
@@ -36,39 +37,34 @@ CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Mes
     response.Status(aStatus);
     ReturnErrorOnFailure(response.GetError());
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
+    apExchangeContext->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     ReturnErrorOnFailure(apExchangeContext->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
                                                         aExpectResponse ? Messaging::SendMessageFlags::kExpectResponse
                                                                         : Messaging::SendMessageFlags::kNone));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus)
+CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     StatusResponseMessage::Parser response;
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
-    ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(response.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     ReturnErrorOnFailure(response.CheckSchemaValidity());
 #endif
-    ReturnErrorOnFailure(response.GetStatus(aStatus.mStatus));
-    ChipLogProgress(InteractionModel, "Received status response, status is %" PRIu8, to_underlying(aStatus.mStatus));
+    StatusIB status;
+    ReturnErrorOnFailure(response.GetStatus(status.mStatus));
+    ChipLogProgress(InteractionModel, "Received status response, status is " ChipLogFormatIMStatus,
+                    ChipLogValueIMStatus(status.mStatus));
+    ReturnErrorOnFailure(response.ExitContainer());
 
-    if (aStatus.mStatus == Protocols::InteractionModel::Status::Success)
+    if (status.mStatus == Protocols::InteractionModel::Status::Success)
     {
-        err = CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
-    else if (aStatus.mStatus == Protocols::InteractionModel::Status::ResourceExhausted)
-    {
-        err = CHIP_ERROR_NO_MEMORY;
-    }
-    else
-    {
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-    return err;
+
+    return status.ToChipError();
 }
 } // namespace app
 } // namespace chip

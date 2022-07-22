@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2020-2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,9 @@ import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.ChipEventPath;
+import java.util.List;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -37,8 +40,14 @@ public class ChipDeviceController {
     return;
   }
 
+  /** Returns a new {@link ChipDeviceController} with default parameters. */
   public ChipDeviceController() {
-    deviceControllerPtr = newDeviceController();
+    this(ControllerParams.newBuilder().build());
+  }
+
+  /** Returns a new {@link ChipDeviceController} with the specified parameters. */
+  public ChipDeviceController(ControllerParams params) {
+    deviceControllerPtr = newDeviceController(params);
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -174,6 +183,9 @@ public class ChipDeviceController {
   /**
    * Through GetConnectedDeviceCallback, returns a pointer to a connected device or an error.
    *
+   * <p>The native code invoked by this method creates a strong reference to the provided callback,
+   * which is released only when GetConnectedDeviceCallback has returned success or failure.
+   *
    * <p>TODO(#8443): This method could benefit from a ChipDevice abstraction to hide the pointer
    * passing.
    */
@@ -259,12 +271,44 @@ public class ChipDeviceController {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
+  /**
+   * Returns the {@link NetworkLocation} at which the given {@code deviceId} has been found.
+   *
+   * @param deviceId the 64-bit node ID of the device
+   * @throws ChipDeviceControllerException if the device location could not be resolved
+   */
+  public NetworkLocation getNetworkLocation(long deviceId) {
+    return getNetworkLocation(deviceControllerPtr, deviceId);
+  }
+
   public long getCompressedFabricId() {
     return getCompressedFabricId(deviceControllerPtr);
   }
 
+  /**
+   * Returns the compressed fabric ID based on the given root certificate and node operational
+   * credentials.
+   *
+   * @param rcac the root certificate (in Matter cert form)
+   * @param noc the NOC (in Matter cert form)
+   * @see #convertX509CertToMatterCert(byte[])
+   */
+  public native long generateCompressedFabricId(byte[] rcac, byte[] noc);
+
   public void updateDevice(long fabricId, long deviceId) {
     updateDevice(deviceControllerPtr, fabricId, deviceId);
+  }
+
+  /**
+   * Get commmissionible Node. Commmissionible Node results are able to get using {@link
+   * ChipDeviceController.getDiscoveredDevice}.
+   */
+  public void discoverCommissionableNodes() {
+    discoverCommissionableNodes(deviceControllerPtr);
+  }
+
+  public DiscoveredDevice getDiscoveredDevice(int idx) {
+    return getDiscoveredDevice(deviceControllerPtr, idx);
   }
 
   public boolean openPairingWindow(long devicePtr, int duration) {
@@ -272,13 +316,25 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, int iteration, int discriminator, long setupPinCode) {
+      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
 
-  public boolean isActive(long deviceId) {
-    return isActive(deviceControllerPtr, deviceId);
+  public boolean openPairingWindowCallback(
+      long devicePtr, int duration, OpenCommissioningCallback callback) {
+    return openPairingWindowCallback(deviceControllerPtr, devicePtr, duration, callback);
+  }
+
+  public boolean openPairingWindowWithPINCallback(
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback) {
+    return openPairingWindowWithPINCallback(
+        deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
   /* Shutdown all cluster attribute subscriptions for a given device */
@@ -287,7 +343,104 @@ public class ChipDeviceController {
   }
 
   /**
-   * Generates a new PASE verifier and passcode ID for the given setup PIN code.
+   * Returns an attestation challenge for the given device, for which there must be an existing
+   * secure session.
+   *
+   * @param devicePtr a pointer to the device from which to retrieve the challenge
+   * @throws ChipDeviceControllerException if there is no secure session for the given device
+   */
+  public byte[] getAttestationChallenge(long devicePtr) {
+    return getAttestationChallenge(deviceControllerPtr, devicePtr);
+  }
+
+  /** Subscribe to the given attribute path. */
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int minInterval,
+      int maxInterval) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    subscribeToPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        minInterval,
+        maxInterval);
+  }
+
+  /** Read the given attribute path. */
+  public void readPath(
+      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePaths);
+  }
+
+  /** Subscribe to the given event path. */
+  public void subscribeToEventPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
+      ReportEventCallback reportCallback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval) {
+    subscribeToEventPath(
+        subscriptionEstablishedCallback,
+        resubscriptionAttemptCallback,
+        reportCallback,
+        devicePtr,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        false,
+        true);
+  }
+
+  public void subscribeToEventPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
+      ReportEventCallback reportCallback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered) {
+    ReportEventCallbackJni jniCallback =
+        new ReportEventCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+    subscribeToEventPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        keepSubscriptions,
+        isFabricFiltered);
+  }
+
+  /** Read the given event path. */
+  public void readEventPath(
+      ReportEventCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+    ReportEventCallbackJni jniCallback = new ReportEventCallbackJni(null, callback, null);
+    readEventPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, eventPaths);
+  }
+
+  /**
+   * Converts a given X.509v3 certificate into a Matter certificate.
+   *
+   * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
+   *     memory, invalid certificate format)
+   */
+  public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
    * @param setupPincode the PIN code to use
@@ -295,14 +448,48 @@ public class ChipDeviceController {
    * @param salt the 16-byte salt
    */
   public PaseVerifierParams computePaseVerifier(
-      long devicePtr, long setupPincode, int iterations, byte[] salt) {
+      long devicePtr, long setupPincode, long iterations, byte[] salt) {
     return computePaseVerifier(deviceControllerPtr, devicePtr, setupPincode, iterations, salt);
   }
 
-  private native PaseVerifierParams computePaseVerifier(
-      long deviceControllerPtr, long devicePtr, long setupPincode, int iterations, byte[] salt);
+  public void shutdownCommissioning() {
+    shutdownCommissioning(deviceControllerPtr);
+  }
 
-  private native long newDeviceController();
+  private native PaseVerifierParams computePaseVerifier(
+      long deviceControllerPtr, long devicePtr, long setupPincode, long iterations, byte[] salt);
+
+  private native void subscribeToPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int minInterval,
+      int maxInterval);
+
+  public native void readPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths);
+
+  private native void subscribeToEventPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered);
+
+  public native void readEventPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<ChipEventPath> eventPaths);
+
+  private native long newDeviceController(ControllerParams params);
 
   private native void pairDevice(
       long deviceControllerPtr,
@@ -346,9 +533,15 @@ public class ChipDeviceController {
 
   private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
+  private native NetworkLocation getNetworkLocation(long deviceControllerPtr, long deviceId);
+
   private native long getCompressedFabricId(long deviceControllerPtr);
 
   private native void updateDevice(long deviceControllerPtr, long fabricId, long deviceId);
+
+  private native void discoverCommissionableNodes(long deviceControllerPtr);
+
+  private native DiscoveredDevice getDiscoveredDevice(long deviceControllerPtr, int idx);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long devicePtr, int duration);
 
@@ -356,13 +549,27 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long devicePtr,
       int duration,
-      int iteration,
+      long iteration,
       int discriminator,
       long setupPinCode);
 
-  private native boolean isActive(long deviceControllerPtr, long deviceId);
+  private native boolean openPairingWindowCallback(
+      long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
+
+  private native boolean openPairingWindowWithPINCallback(
+      long deviceControllerPtr,
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      long setupPinCode,
+      OpenCommissioningCallback callback);
+
+  private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
 
   private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+
+  private native void shutdownCommissioning(long deviceControllerPtr);
 
   static {
     System.loadLibrary("CHIPController");

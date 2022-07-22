@@ -15,4 +15,5 @@
 declare_args() {
   # Root directory for openthread.
   openthread_root = "//third_party/connectedhomeip/third_party/openthread/repo"
+  openthread_device_type = "ftd"
 }

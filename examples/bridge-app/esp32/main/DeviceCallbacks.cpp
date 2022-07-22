@@ -16,86 +16,102 @@
  *    limitations under the License.
  */
 
-#include "DeviceCallbacks.h"
-#include "esp_check.h"
-#include "esp_err.h"
-#include "esp_heap_caps.h"
-#include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/server/Dnssd.h>
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#include "DeviceCallbacks.h"
 
 static const char * TAG = "bridge-devicecallbacks";
 
 using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::app::Clusters;
+using namespace ::chip::app::Clusters::BridgedActions::Attributes;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-using namespace ::chip::DeviceLayer;
 
-void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
-{
-    switch (event->Type)
-    {
-    case DeviceEventType::kInternetConnectivityChange:
-        OnInternetConnectivityChange(event);
-        break;
-
-    case DeviceEventType::kSessionEstablished:
-        OnSessionEstablished(event);
-        break;
-
-    case DeviceEventType::kInterfaceIpAddressChanged:
-        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
-            chip::app::DnssdServer::Instance().StartServer();
-        }
-        break;
-    }
-
-    ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
-}
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
+                                                     uint8_t type, uint16_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
+namespace {
+
+class BridgedActionsAttrAccess : public AttributeAccessInterface
 {
-    if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
-    {
-        ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
-        chip::app::DnssdServer::Instance().StartServer();
-    }
-    else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
-    {
-        ESP_LOGE(TAG, "Lost IPv4 connectivity...");
-    }
-    if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-    {
-        ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::app::DnssdServer::Instance().StartServer();
-        ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-    }
-    else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
-    {
-        ESP_LOGE(TAG, "Lost IPv6 connectivity...");
-    }
+public:
+    // Register for the Bridged Actions cluster on all endpoints.
+    BridgedActionsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BridgedActions::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    static constexpr uint16_t ClusterRevision = 1;
+
+    CHIP_ERROR ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+};
+
+constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
+
+CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    // Just return an empty list
+    return aEncoder.EncodeEmptyList();
 }
 
-void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
+CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    if (event->SessionEstablished.IsCommissioner)
+    // Just return an empty list
+    return aEncoder.EncodeEmptyList();
+}
+
+CHIP_ERROR BridgedActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    const char SetupUrl[] = "https://example.com";
+    return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
+}
+
+CHIP_ERROR BridgedActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(ClusterRevision);
+}
+
+BridgedActionsAttrAccess gAttrAccess;
+
+CHIP_ERROR BridgedActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == BridgedActions::Id);
+
+    switch (aPath.mAttributeId)
     {
-        ESP_LOGI(TAG, "Commissioner detected!");
+    case ActionList::Id:
+        return ReadActionListAttribute(aPath.mEndpointId, aEncoder);
+    case EndpointList::Id:
+        return ReadEndpointListAttribute(aPath.mEndpointId, aEncoder);
+    case SetupUrl::Id:
+        return ReadSetupUrlAttribute(aPath.mEndpointId, aEncoder);
+    case ClusterRevision::Id:
+        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+    default:
+        break;
     }
+    return CHIP_NO_ERROR;
+}
+} // anonymous namespace
+
+void MatterBridgedActionsPluginServerInitCallback(void)
+{
+    registerAttributeAccessOverride(&gAttrAccess);
 }

@@ -81,7 +81,7 @@ void TestIPv4(nlTestSuite * inSuite, void * inContext)
     packetInfo.DestPort    = kMdnsPort;
     packetInfo.Interface   = FindValidInterfaceId();
 
-    responder.AddAllResponses(&packetInfo, &acc);
+    responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration());
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -105,7 +105,7 @@ void TestIPv6(nlTestSuite * inSuite, void * inContext)
     packetInfo.DestPort    = kMdnsPort;
     packetInfo.Interface   = FindValidInterfaceId();
 
-    responder.AddAllResponses(&packetInfo, &acc);
+    responder.AddAllResponses(&packetInfo, &acc, ResponseConfiguration());
 }
 
 const nlTest sTests[] = {

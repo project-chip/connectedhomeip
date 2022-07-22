@@ -27,8 +27,8 @@ addresses for communication to nodes on the same network (wifi or thread). When
 there is more than one netif in the system (ex. loopback, softAP, STA), the link
 local address needs more information to determine which link the address is
 local to. This is normally added as the link local scope and can be seen on
-addresses ex. FE80::xxxx:xxxx:xxxx:xxxx%<scope>, where the <scope> identifies
-the netif (something like %wlan0 or %eno1 etc.).
+addresses ex. `FE80::xxxx:xxxx:xxxx:xxxx%<scope>`, where the <scope> identifies
+the netif (something like `%wlan0` or `%eno1` etc.).
 
 Without this indicator, the link local address can only be resolved if there is
 one netif. LwIP will also allow a direct address match to the netif source
@@ -122,7 +122,7 @@ Instead, it might be better to build this into the ICMP layer itself.
 LwIP's DNS handling isn’t great and breaks down when the router supports
 IPv4/IPv6. There is a single list of DNS servers, DHCP, SLAAC and DHCPv6 all
 update the list without locks. Basically, whatever wrote to the list last gets
-to set the list. Although there is handling for IP type (requesting A or AAAA
+to set the list. Although there is handling for IP type (requesting A or `AAAA`
 records), there isn’t handling to specify an IPv6 or IPv4 server specifically,
 which can be challenging since not all servers serve all record types.
 

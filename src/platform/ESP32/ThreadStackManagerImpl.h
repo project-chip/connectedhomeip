@@ -73,7 +73,6 @@ private:
     friend ThreadStackManagerImpl & ::chip::DeviceLayer::ThreadStackMgrImpl(void);
     static ThreadStackManagerImpl sInstance;
     ThreadStackManagerImpl() = default;
-    static void ESPThreadTask(void * arg);
 };
 
 /**

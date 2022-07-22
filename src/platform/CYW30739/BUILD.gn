@@ -52,9 +52,14 @@ static_library("CYW30739") {
     "cycfg_gatt_db.c",
     "cycfg_gatt_db.h",
     "cyw30739-chip-mbedtls-config.h",
-    "wiced_button_manager.c",
-    "wiced_led_manager.c",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
 
   deps = [ "${chip_root}/src/crypto" ]
 
@@ -66,11 +71,18 @@ static_library("CYW30739") {
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    public_configs = [
+      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
+    ]
 
     deps += [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${openthread_root}/src/core:libopenthread_core_headers",
     ]
+    if (chip_openthread_ftd) {
+      deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+    } else {
+      deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+    }
 
     if (chip_mdns == "platform") {
       sources += [ "../OpenThread/DnssdImpl.cpp" ]

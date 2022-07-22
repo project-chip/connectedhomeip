@@ -41,7 +41,6 @@
 #include <vector>
 
 #include <inttypes.h>
-#include <signal.h>
 #include <stdint.h>
 #include <string.h>
 #include <sys/types.h>
@@ -154,6 +153,11 @@ void InitTestInetCommon()
     UseStdoutLineBuffering();
 }
 
+void ShutdownTestInetCommon()
+{
+    chip::Platform::MemoryShutdown();
+}
+
 void InitSystemLayer()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -232,7 +236,7 @@ void InitNetwork()
             uint64_t iid    = gNetworkOptions.LocalIPv6Addr[j].InterfaceId();
             char * tap_name = (char *) chip::Platform::MemoryAlloc(sizeof(gDefaultTapDeviceName));
             assert(tap_name);
-            snprintf(tap_name, sizeof(gDefaultTapDeviceName), "chip-dev-%" PRIx16, static_cast<uint16_t>(iid));
+            snprintf(tap_name, sizeof(gDefaultTapDeviceName), "chip-dev-%x", static_cast<uint16_t>(iid));
             gNetworkOptions.TapDeviceName.push_back(tap_name);
         }
     }
@@ -499,7 +503,16 @@ static void OnLwIPInitComplete(void * arg)
 
 void ShutdownNetwork()
 {
+    gTCP.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
+        gTCP.ReleaseEndPoint(lEndPoint);
+        return Loop::Continue;
+    });
     gTCP.Shutdown();
+
+    gUDP.ForEachEndPoint([](UDPEndPoint * lEndPoint) -> Loop {
+        gUDP.ReleaseEndPoint(lEndPoint);
+        return Loop::Continue;
+    });
     gUDP.Shutdown();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReleaseLwIP();

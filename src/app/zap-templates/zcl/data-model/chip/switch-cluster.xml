@@ -32,7 +32,7 @@ Interactions with the switch device are exposed as attributes (for the latching 
 
     <attribute side="server" code="0x0000" define="NUMBER_OF_POSITIONS" type="INT8U" writable="false" optional="false" default="2" min="2">number of positions</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_POSITION" type="INT8U" writable="false" reportable="true" optional="false">current position</attribute>
-    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="INT8U" writable="false" optional="false" default="2" min="2">multi press max</attribute>
+    <attribute side="server" code="0x0002" define="MULTI_PRESS_MAX" type="INT8U" writable="false" optional="true" default="2" min="2">multi press max</attribute>
     <event side="server" code="0x00" priority="info" name="SwitchLatched" optional="true">
       <description>Switch Latched</description>
       <field id="0" name="NewPosition" type="INT8U" />

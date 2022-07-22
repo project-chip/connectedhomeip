@@ -234,7 +234,7 @@ class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, chip::Ob
 {
 public:
     Server() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)) {}
-    ~Server() {}
+    ~Server() override {}
 };
 
 } // namespace Minimal

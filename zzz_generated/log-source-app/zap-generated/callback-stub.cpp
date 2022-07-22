@@ -29,6 +29,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
+    case ZCL_ACCESS_CONTROL_CLUSTER_ID:
+        emberAfAccessControlClusterInitCallback(endpoint);
+        break;
     case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
@@ -47,6 +50,11 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     }
 }
 
+void __attribute__((weak)) emberAfAccessControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -77,8 +85,8 @@ void __attribute__((weak)) emberAfAddToCurrentAppTasksCallback(EmberAfApplicatio
 void __attribute__((weak)) emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 EmberAfAttributeWritePermission __attribute__((weak))
-emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                          uint8_t * value, uint8_t type)
+emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
+                                          uint8_t type)
 {
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
 }
@@ -110,14 +118,14 @@ bool __attribute__((weak)) emberAfMessageSentCallback(const MessageSendDestinati
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength)
 {
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus __attribute__((weak))
-emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * attributeMetadata,
+emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                       uint8_t * buffer)
 {
     return EMBER_ZCL_STATUS_FAILURE;
@@ -148,12 +156,12 @@ bool __attribute__((weak)) emberAfStartMoveCallback()
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
-MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
+MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                  uint8_t * value)
 {
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask,
-                                                             uint8_t type, uint16_t size, uint8_t * value)
+void __attribute__((weak)) MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type,
+                                                             uint16_t size, uint8_t * value)
 {}

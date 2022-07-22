@@ -16,25 +16,88 @@
  *    limitations under the License.
  */
 
+#include "main-common.h"
+#include "AllClustersCommandDelegate.h"
 #include "include/tv-callbacks.h"
+#include <app-common/zap-generated/att-storage.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
-#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <new>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+#include <signal.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/PeerAddress.h>
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <platform/Darwin/NetworkCommissioningDriver.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#include <Options.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 namespace {
-static LowPowerManager lowPowerManager;
+
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_cluster_fifo_";
+LowPowerManager sLowPowerManager;
+NamedPipeCommands sChipNamedPipeCommands;
+AllClustersCommandDelegate sAllClustersCommandDelegate;
+
+// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
+
+// when the shell is enabled, don't intercept signals since it prevents the user from
+// using expected commands like CTRL-C to quit the application. (see issue #17845)
+// We should stop using signals for those faults, and move to a different notification
+// means, like a pipe. (see issue #19114)
+#if !defined(ENABLE_CHIP_SHELL)
+void OnRebootSignalHandler(int signum)
+{
+    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
+
+    // The BootReason attribute SHALL indicate the reason for the Node’s most recent boot, the real usecase
+    // for this attribute is embedded system. In Linux simulation, we use different signals to tell the current
+    // running process to terminate with different reasons.
+    BootReasonType bootReason = BootReasonType::kUnspecified;
+    switch (signum)
+    {
+    case SIGINT:
+        bootReason = BootReasonType::kSoftwareReset;
+        break;
+    default:
+        IgnoreUnusedVariable(bootReason);
+        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
+        chipDie();
+        break;
+    }
+
+    Server::GetInstance().DispatchShutDownAndStopEventLoop();
+}
+
+void SetupSignalHandlers()
+{
+    // sigaction is not used here because Tsan interceptors seems to
+    // never dispatch the signals on darwin.
+    signal(SIGINT, OnRebootSignalHandler);
+}
+#endif // !defined(ENABLE_CHIP_SHELL)
+
 } // namespace
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
@@ -87,32 +150,117 @@ static Identify gIdentify1 = {
 namespace {
 // This file is being used by platforms other than Linux, so we need this check to disable related features since we only
 // implemented them on linux.
+constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sLinuxThreadDriver);
+NetworkCommissioning::LinuxThreadDriver sThreadDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sThreadDriver);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary, &sWiFiDriver);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(1 /* Endpoint Id */, &sLinuxWiFiDriver);
-#endif
-#endif
+
+Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
 } // namespace
 
 void ApplicationInit()
 {
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER)
+#if !defined(ENABLE_CHIP_SHELL)
+    SetupSignalHandlers();
+#endif // !defined(ENABLE_CHIP_SHELL)
+
+    (void) kNetworkCommissioningEndpointMain;
+    // Enable secondary endpoint only when we need it, this should be applied to all platforms.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
+    const bool kThreadEnabled = {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    sThreadNetworkCommissioningInstance.Init();
+        LinuxDeviceOptions::GetInstance().mThread
+#else
+        false
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    sWiFiNetworkCommissioningInstance.Init();
+    };
+
+    const bool kWiFiEnabled = {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        LinuxDeviceOptions::GetInstance().mWiFi
+#else
+        false
 #endif
+    };
+
+    if (kThreadEnabled && kWiFiEnabled)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        sThreadNetworkCommissioningInstance.Init();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        sWiFiNetworkCommissioningInstance.Init();
+#endif
+        // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
+        emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
+    }
+    else if (kThreadEnabled)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        sThreadNetworkCommissioningInstance.Init();
+#endif
+    }
+    else if (kWiFiEnabled)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+        // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
+        sWiFiNetworkCommissioningInstance.~Instance();
+        new (&sWiFiNetworkCommissioningInstance)
+            Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sWiFiDriver);
+        sWiFiNetworkCommissioningInstance.Init();
+#endif
+    }
+    else
+    {
+        sEthernetNetworkCommissioningInstance.Init();
+    }
+
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+
+    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+}
+
+void ApplicationExit()
+{
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    ChipLogProgress(NotSpecified, "TV Linux App: LowPower::SetDefaultDelegate");
+    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }

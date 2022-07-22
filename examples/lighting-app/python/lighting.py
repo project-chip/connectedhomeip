@@ -177,7 +177,6 @@ def attributeChangeCallback(
     endpoint: int,
     clusterId: int,
     attributeId: int,
-    mask: int,
     manufacturerCode: int,
     xx_type: int,
     size: int,

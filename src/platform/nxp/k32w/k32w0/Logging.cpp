@@ -2,6 +2,7 @@
 
 #include <platform/logging/LogV.h>
 
+#include <inttypes.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
@@ -27,7 +28,6 @@ static constexpr uint8_t category_max_len_bytes = 3;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 static bool isLogInitialized;
-extern uint8_t gOtLogUartInstance;
 extern "C" uint32_t otPlatAlarmMilliGetNow(void);
 
 namespace chip {
@@ -45,7 +45,7 @@ void GetMessageString(char * buf, uint8_t bufLen, const char * module, uint8_t c
      */
     assert(bufLen >= (timestamp_max_len_bytes + category_max_len_bytes + (strlen(module) + 2) + 1));
 
-    writtenLen = snprintf(buf, bufLen, "[%lu]", otPlatAlarmMilliGetNow());
+    writtenLen = snprintf(buf, bufLen, "[%" PRIu32, otPlatAlarmMilliGetNow());
     bufLen -= writtenLen;
     buf += writtenLen;
 
@@ -107,8 +107,7 @@ void ENFORCE_FORMAT(1, 0) GenericLog(const char * format, va_list arg, const cha
 
     if (!isLogInitialized)
     {
-        isLogInitialized   = true;
-        gOtLogUartInstance = 0;
+        isLogInitialized = true;
         otPlatUartEnable();
     }
 
@@ -156,10 +155,11 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME lwip
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * LwIP log output function.
  */
-extern "C" void LwIPLog(const char * msg, ...)
+extern "C" void ENFORCE_FORMAT(1, 2) LwIPLog(const char * msg, ...)
 {
     va_list v;
     const char * module = "LWIP";
@@ -168,13 +168,14 @@ extern "C" void LwIPLog(const char * msg, ...)
     GenericLog(msg, v, module, chip::Logging::kLogCategory_None);
     va_end(v);
 }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #undef K32W_LOG_MODULE_NAME
 #define K32W_LOG_MODULE_NAME thread
 
-extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
+extern "C" void ENFORCE_FORMAT(3, 4) otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list v;
     const char * module = "OT";

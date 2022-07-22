@@ -135,6 +135,16 @@
             }
         },
         {
+            "label": "Build i.MX Linux examples",
+            "type": "shell",
+            "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": ["relative", "${workspaceFolder}/out/aarch64/"]
+            }
+        },
+        {
             "label": "Run Mbed Application",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
@@ -142,7 +152,8 @@
                 "-c=${input:mbedCommand}",
                 "-a=${input:mbedApp}",
                 "-b=${input:mbedTarget}",
-                "-p=${input:mbedProfile}"
+                "-p=${input:mbedProfile}",
+                "-T=${input:mbedAppType}"
             ],
             "group": "build",
             "problemMatcher": {
@@ -181,6 +192,68 @@
             "problemMatcher": {
                 "base": "$gcc"
             }
+        },
+        {
+            "label": "Build LightingApp (Tizen)",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "${workspaceFolder}/scripts/build/build_examples.py --target tizen-arm-light --enable-flashbundle build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Connect to device (Tizen)",
+            "type": "shell",
+            "command": "sdb",
+            "args": ["connect", "${input:tizenTargetDeviceAddress}"],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Install LightingApp (Tizen)",
+            "type": "shell",
+            "command": "sdb",
+            "args": [
+                "-s",
+                "${input:tizenTargetDeviceAddressSdb}",
+                "install",
+                "${workspaceFolder}/out/tizen-arm-light/package/out/org.tizen.matter.example.lighting-1.0.0.tpk"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            }
+        },
+        {
+            "label": "Launch LightingApp with gdbserver attached (Tizen)",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "${workspaceFolder}/scripts/helpers/tizen_gdbserver_run.sh",
+                "--app-name",
+                "org.tizen.matter.example.lighting",
+                "--target",
+                "${input:tizenTargetDeviceAddressSdb}"
+            ],
+            "problemMatcher": [],
+            "runOptions": {
+                "reevaluateOnRerun": false
+            },
+            "isBackground": false,
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": true,
+                "clear": true
+            }
         }
     ],
     "inputs": [
@@ -200,7 +273,8 @@
                 "lighting-app",
                 "pigweed-app",
                 "all-clusters-app",
-                "shell"
+                "shell",
+                "ota-requestor-app"
             ],
             "default": "lock-app"
         },
@@ -215,13 +289,31 @@
             "type": "pickString",
             "id": "mbedProfile",
             "description": "What mbed profile do you want to use?",
-            "options": ["develop", "release", "debug"],
-            "default": "develop"
+            "options": ["release", "develop", "debug"],
+            "default": "release"
+        },
+        {
+            "type": "pickString",
+            "id": "mbedAppType",
+            "description": "What mbed application type do you want to use?",
+            "options": ["simple", "boot", "upgrade"],
+            "default": "simple"
         },
         {
             "type": "promptString",
             "id": "exampleGlob",
             "description": "What applications to build (e.g. '*m5stack*' or 'esp32-*')"
+        },
+        {
+            "type": "pickString",
+            "id": "imxExampleTarget",
+            "description": "What example application type do you want to build?",
+            "options": [
+                "examples/chip-tool",
+                "examples/lighting-app/linux",
+                "examples/thermostat/linux"
+            ],
+            "default": "examples/chip-tool"
         },
         {
             "type": "pickString",
@@ -271,6 +363,14 @@
                 "efr32-brd4186a-unit-test",
                 "efr32-brd4187a-unit-test",
                 "efr32-brd4304a-unit-test",
+                "efr32-brd4161a-switch",
+                "efr32-brd4163a-switch",
+                "efr32-brd4164a-switch",
+                "efr32-brd4166a-switch",
+                "efr32-brd4170a-switch",
+                "efr32-brd4186a-switch",
+                "efr32-brd4187a-switch",
+                "efr32-brd4304a-switch",
                 "efr32-brd4161a-window-covering",
                 "efr32-brd4163a-window-covering",
                 "efr32-brd4164a-window-covering",
@@ -336,8 +436,24 @@
                 "nrf-nrf5340-shell",
                 "qpg-qpg6100-lock",
                 "telink-tlsr9518adk80d-light",
+                "telink-tlsr9518adk80d-light-switch",
                 "tizen-arm-light"
             ]
+        },
+        {
+            "type": "promptString",
+            "id": "tizenTargetDeviceAddress",
+            "description": "Enter the target device address and port in format <address>:<port>"
+        },
+        {
+            "id": "tizenTargetDeviceAddressSdb",
+            "type": "command",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "sdb devices | grep -v 'List of devices attached' |awk '{print $1 \"|\" $1, $3, \"(\" $2 \")\"}'",
+                "fieldSeparator": "|",
+                "description": "Select target device"
+            }
         }
     ]
 }

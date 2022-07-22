@@ -15,6 +15,7 @@
 name: Test Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Test Cluster"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Test Command"
       command: "test"
@@ -606,13 +611,13 @@ tests:
       command: "writeAttribute"
       attribute: "float_double"
       arguments:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Read attribute DOUBLE large Value"
       command: "readAttribute"
       attribute: "float_double"
       response:
-          value: 1.7e200
+          value: "1.7e+200"
 
     - label: "Write attribute DOUBLE small Value"
       command: "writeAttribute"
@@ -721,6 +726,18 @@ tests:
       attribute: "octet_string"
       response:
           value: "Tes\x00ti\x00ng"
+
+    - label: "Write attribute OCTET_STRING with hex: format"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "hex:000102030405"
+
+    - label: "Read attribute OCTET_STRING with hex: format"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "hex:000102030405"
 
     - label: "Write attribute OCTET_STRING with weird chars"
       command: "writeAttribute"
@@ -858,12 +875,38 @@ tests:
       arguments:
           value: ""
 
-    - label: "Read attribute LIST_LONG_OCTET_STRING"
+    - label: "Read attribute LIST_LONG_OCTET_STRING (for chunked read)"
       command: "readAttribute"
       attribute: "list_long_octet_string"
       response:
           value:
               [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              ]
+
+    - label: "Write attribute LIST_LONG_OCTET_STRING (for chunked write)"
+      command: "writeAttribute"
+      attribute: "list_long_octet_string"
+      arguments:
+          value:
+              [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              ]
+
+    - label: "Read attribute LIST_LONG_OCTET_STRING (for chunked read)"
+      command: "readAttribute"
+      attribute: "list_long_octet_string"
+      response:
+          value:
+              [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
@@ -954,17 +997,13 @@ tests:
       command: "test"
       endpoint: 200
       response:
-          # No such endpoint, so expect an error.
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_ENDPOINT
+          error: UNSUPPORTED_ENDPOINT
 
     - label: "Send Test Command to unsupported cluster"
       command: "test"
       endpoint: 0
       response:
-          # No TestCluster on that, so expect an error.
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_CLUSTER
+          error: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -999,13 +1038,28 @@ tests:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
+                value: 1
+      response:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
+                value: 1
+
+    - label: "Send a command with a vendor_id and invalid enum"
+      command: "TestEnumsRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 20003
+              - name: "arg2"
                 value: 101
       response:
           values:
               - name: "arg1"
                 value: 20003
               - name: "arg2"
-                value: 101
+                value: 4
 
     # Tests for Struct
 
@@ -1523,10 +1577,10 @@ tests:
       arguments:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  { member1: 0, member2: "Test0" },
+                  { member1: 1, member2: "Test1" },
+                  { member1: 2, member2: "Test2" },
+                  { member1: 3, member2: "Test3" },
               ]
 
     - label: "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"
@@ -1535,10 +1589,10 @@ tests:
       response:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  { member1: 0, member2: "Test0" },
+                  { member1: 1, member2: "Test1" },
+                  { member1: 2, member2: "Test2" },
+                  { member1: 3, member2: "Test3" },
               ]
 
     # Tests for Nullables and Optionals
@@ -1625,6 +1679,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_boolean"
       response:
+          saveAs: booValueNull
           value: null
 
     - label: "Write attribute NULLABLE_BOOLEAN True"
@@ -1638,6 +1693,13 @@ tests:
       attribute: "nullable_boolean"
       response:
           value: true
+
+    - label: "Read attribute NULLABLE_BOOLEAN not null"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          constraints:
+              notValue: booValueNull
 
     # Tests for nullable Bitmap8 attribute
 
@@ -1665,6 +1727,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_bitmap8"
       response:
+          saveAs: nullableValue254
           value: 254
 
     - label: "Write attribute NULLABLE_BITMAP8 null Value"
@@ -1678,6 +1741,13 @@ tests:
       attribute: "nullable_bitmap8"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_BITMAP8 not 254 Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap8"
+      response:
+          constraints:
+              notValue: nullableValue254
 
     # Tests for nullable Bitmap16 attribute
 
@@ -2711,13 +2781,13 @@ tests:
       command: "writeAttribute"
       attribute: "nullable_enum_attr"
       arguments:
-          value: 254
+          value: 3
 
     - label: "Read attribute NULLABLE_SIMPLE_ENUM Max Value"
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
-          value: 254
+          value: 3
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"
       command: "writeAttribute"
@@ -2731,7 +2801,8 @@ tests:
       command: "readAttribute"
       attribute: "nullable_enum_attr"
       response:
-          value: 254
+          saveAs: nullableEnumAttr3
+          value: 3
 
     - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
       command: "writeAttribute"
@@ -2744,6 +2815,13 @@ tests:
       attribute: "nullable_enum_attr"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM not 3 Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          constraints:
+              notValue: nullableEnumAttr3
 
     # Tests for Octet String attribute
 
@@ -2763,6 +2841,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_octet_string"
       response:
+          saveAs: nullableOctetStrTestValue
           value: "TestValue"
 
     - label: "Write attribute NULLABLE_OCTET_STRING"
@@ -2789,6 +2868,13 @@ tests:
       response:
           value: ""
 
+    - label: "Read attribute NULLABLE_OCTET_STRING not TestValue"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              notValue: nullableOctetStrTestValue
+
     # Tests for Char String attribute
 
     - label: "Read attribute NULLABLE_CHAR_STRING Default Value"
@@ -2807,7 +2893,14 @@ tests:
       command: "readAttribute"
       attribute: "nullable_char_string"
       response:
+          saveAs: nullableCharStringSave
           value: "☉T☉"
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: nullableCharStringSave
 
     - label: "Write attribute NULLABLE_CHAR_STRING - Value too long"
       command: "writeAttribute"
@@ -2833,21 +2926,26 @@ tests:
       response:
           value: ""
 
+    - label: "Read attribute NULLABLE_CHAR_STRING not ☉T☉"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          constraints:
+              notValue: nullableCharStringSave
+
     - label: "Read attribute from nonexistent endpoint."
       endpoint: 200
       command: "readAttribute"
       attribute: "list_int8u"
       response:
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_ENDPOINT
+          error: UNSUPPORTED_ENDPOINT
 
     - label: "Read attribute from nonexistent cluster."
       endpoint: 0
       command: "readAttribute"
       attribute: "list_int8u"
       response:
-          # SDK returning wrong error code here so far.
-          errorWrongValue: UNSUPPORTED_CLUSTER
+          error: UNSUPPORTED_CLUSTER
 
     # Tests for command with optional arguments
     - label:
@@ -2869,7 +2967,7 @@ tests:
       command: "subscribeAttribute"
       attribute: "list_int8u"
       minInterval: 2
-      maxInterval: 10
+      maxInterval: 5
       response:
           value: [1, 2, 3, 4]
 
@@ -3709,3 +3807,81 @@ tests:
       attribute: "nullable_range_restricted_int16s"
       response:
           value: null
+
+    - label: "Write attribute that returns general status on write"
+      command: "writeAttribute"
+      attribute: "general_error_boolean"
+      arguments:
+          value: false
+      response:
+          error: INVALID_DATA_TYPE
+
+    - label: "Write attribute that returns cluster-specific status on write"
+      command: "writeAttribute"
+      attribute: "cluster_error_boolean"
+      arguments:
+          value: false
+      response:
+          # TODO: We don't have a way to represent cluster-specific status
+          # here yet.
+          error: FAILURE
+
+    - label: "Read attribute that returns general status on read"
+      command: "readAttribute"
+      attribute: "general_error_boolean"
+      response:
+          error: INVALID_DATA_TYPE
+
+    - label: "read attribute that returns cluster-specific status on read"
+      command: "readAttribute"
+      attribute: "cluster_error_boolean"
+      response:
+          # TODO: We don't have a way to represent cluster-specific status
+          # here yet.
+          error: FAILURE
+
+    - label: "read AcceptedCommandList attribute"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value:
+              [0, 1, 2, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 18, 19, 20, 21]
+
+    - label: "read GeneratedCommandList attribute"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: [0, 1, 4, 5, 6, 8, 9, 10, 11]
+
+    # Struct-typed attribute
+    - label: "Write struct-typed attribute"
+      command: "writeAttribute"
+      attribute: "struct_attr"
+      arguments:
+          value:
+              {
+                  a: 5,
+                  b: true,
+                  c: 2,
+                  d: "abc",
+                  e: "",
+                  f: 17,
+                  g: 1.5,
+                  h: 3.14159265358979,
+              }
+
+    - label: "Read struct-typed attribute"
+      command: "readAttribute"
+      attribute: "struct_attr"
+      response:
+          value:
+              {
+                  a: 5,
+                  b: true,
+                  c: 2,
+                  d: "abc",
+                  e: "",
+                  f: 17,
+                  g: 1.5,
+                  h: 3.14159265358979,
+              }

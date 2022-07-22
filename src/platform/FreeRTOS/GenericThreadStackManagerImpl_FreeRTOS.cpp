@@ -37,9 +37,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
-
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
 {
@@ -143,6 +140,10 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
 }
+
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// NB: This must come after all templated class members are defined.
+template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 
 } // namespace Internal
 } // namespace DeviceLayer

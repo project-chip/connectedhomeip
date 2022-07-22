@@ -27,7 +27,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
@@ -63,15 +63,9 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
-    bool failSafeArmed;
 
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
-    }
-    err = CHIP_NO_ERROR;
+    // Initialize the generic implementation base class.
+    err = Internal::GenericConfigurationManagerImpl<CC13X2_26X2Config>::Init();
 
     return err;
 }

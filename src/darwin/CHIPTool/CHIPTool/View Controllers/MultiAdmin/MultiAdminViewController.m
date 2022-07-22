@@ -199,9 +199,9 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
 - (IBAction)openPairingWindow:(id)sender
 {
-    uint32_t setupPIN = arc4random();
+    NSUInteger setupPIN = [MTRSetupPayload generateRandomPIN];
     [_deviceSelector forSelectedDevices:^(uint64_t deviceId) {
-        if (CHIPGetConnectedDeviceWithID(deviceId, ^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
+        if (MTRGetConnectedDeviceWithID(deviceId, ^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
                 if (chipDevice) {
                     NSString * timeoutStr = [self.timeoutField text];
                     if (timeoutStr.length == 0) {
@@ -211,7 +211,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
                     NSString * output;
                     NSError * error;
-                    CHIPDeviceController * controller = InitializeCHIP();
+                    MTRDeviceController * controller = InitializeMTR();
                     if ([self.useOnboardingTokenSwitch isOn]) {
                         NSString * discriminatorStr = [self.discriminatorField text];
                         if (discriminatorStr.length == 0) {

@@ -26,7 +26,7 @@
 
 #include <platform/internal/GenericConfigurationManagerImpl.h>
 
-#include "EFR32Config.h"
+#include <platform/EFR32/EFR32Config.h>
 
 namespace chip {
 namespace DeviceLayer {

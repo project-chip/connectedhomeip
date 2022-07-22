@@ -20,13 +20,17 @@ import("$dir_pw_build/python_dist.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 pw_python_package("nl_test_runner") {
-  generate_setup = {
-    metadata = {
-      name = "nl_test_runner"
-      version = "0.0.1"
-    }
-  }
-  sources = [ "nl_test_runner/nl_test_runner.py" ]
+  setup = [
+    "pyproject.toml",
+    "setup.cfg",
+    "setup.py",
+  ]
+
+  sources = [
+    "nl_test_runner/__init__.py",
+    "nl_test_runner/nl_test_runner.py",
+  ]
+
   python_deps = [
     "$dir_pw_hdlc/py",
     "$dir_pw_protobuf_compiler/py",

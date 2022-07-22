@@ -23,7 +23,10 @@ config("config") {
 }
 
 source_set("trace") {
-  sources = [ "trace.h" ]
+  sources = [
+    "trace.cpp",
+    "trace.h",
+  ]
   if (chip_build_pw_trace_lib) {
     public_configs = [ ":config" ]
     public_deps = [ "${dir_pigweed}/pw_trace" ]

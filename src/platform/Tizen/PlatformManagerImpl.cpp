@@ -25,9 +25,11 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
+#include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 #include <platform/Tizen/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 namespace chip {
 namespace DeviceLayer {
@@ -38,7 +40,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
 }

@@ -121,13 +121,57 @@ static void TestMemAlloc_UniquePtr(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, destructorCalled == 1);
 }
 
+static void TestMemAlloc_SharedPtr(nlTestSuite * inSuite, void * inContext)
+{
+    // SharedPtr is a wrapper of std::shared_ptr for platform allocators.
+    int instanceConstructorCalled      = 0;
+    int instanceDestructorCalled       = 0;
+    int otherInstanceConstructorCalled = 0;
+    int otherInstanceDestructorCalled  = 0;
+
+    class Cls
+    {
+    public:
+        Cls(int * constructCtr, int * desctructorCtr) : mpDestructorCtr(desctructorCtr) { (*constructCtr)++; }
+        ~Cls() { (*mpDestructorCtr)++; }
+
+    private:
+        int * mpDestructorCtr;
+    };
+
+    // Check constructor call for a block-scoped variable and share our
+    // reference to a function-scoped variable.
+    SharedPtr<Cls> otherReference;
+    {
+        auto ptr = MakeShared<Cls>(&instanceConstructorCalled, &instanceDestructorCalled);
+        NL_TEST_ASSERT(inSuite, instanceConstructorCalled == 1);
+        // Capture a shared reference so we aren't destructed when we leave this scope.
+        otherReference = ptr;
+    }
+
+    // Verify that by sharing to otherReference, we weren't destructed.
+    NL_TEST_ASSERT(inSuite, instanceDestructorCalled == 0);
+
+    // Now drop our reference.
+    otherReference = MakeShared<Cls>(&otherInstanceConstructorCalled, &otherInstanceDestructorCalled);
+
+    // Verify that the new instance was constructed and the first instance was
+    // destructed, and that we retain a reference to the new instance.
+    NL_TEST_ASSERT(inSuite, instanceConstructorCalled == 1);
+    NL_TEST_ASSERT(inSuite, instanceDestructorCalled == 1);
+    NL_TEST_ASSERT(inSuite, otherInstanceConstructorCalled == 1);
+    NL_TEST_ASSERT(inSuite, otherInstanceDestructorCalled == 0);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("Test MemAlloc::Malloc", TestMemAlloc_Malloc),
                                  NL_TEST_DEF("Test MemAlloc::Calloc", TestMemAlloc_Calloc),
                                  NL_TEST_DEF("Test MemAlloc::Realloc", TestMemAlloc_Realloc),
-                                 NL_TEST_DEF("Test MemAlloc::UniquePtr", TestMemAlloc_UniquePtr), NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF("Test MemAlloc::UniquePtr", TestMemAlloc_UniquePtr),
+                                 NL_TEST_DEF("Test MemAlloc::SharedPtr", TestMemAlloc_SharedPtr),
+                                 NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.

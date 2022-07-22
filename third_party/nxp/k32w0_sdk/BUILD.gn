@@ -29,6 +29,13 @@ group("k32w0_sdk") {
   public_deps = [ k32w0_sdk_target ]
 }
 
+if (chip_crypto == "tinycrypt") {
+  assert(
+      mbedtls_repo ==
+          "//third_party/connectedhomeip/third_party/nxp/libs/mbedtls",
+      "mbedtls_repo must be set to nxp mbedtls-tinycrypt library when chip_crypto == \"tinycrypt\"")
+}
+
 config("mbedtls_k32w0_config") {
   defines = [
     "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
@@ -42,7 +49,6 @@ config("mbedtls_k32w0_config") {
     "MBEDTLS_X509_CREATE_C",
     "MBEDTLS_PEM_WRITE_C",
     "MBEDTLS_HKDF_C",
-    "MBEDTLS_ERROR_C",
     "MBEDTLS_PKCS5_C",
   ]
 
@@ -54,7 +60,18 @@ config("mbedtls_k32w0_config") {
     ]
   }
 
+  if (chip_crypto == "tinycrypt") {
+    defines += [
+      "MBEDTLS_USE_TINYCRYPT",
+      "MBEDTLS_OPTIMIZE_TINYCRYPT_ASM",
+    ]
+  }
+
   include_dirs = [ chip_root ]
+
+  if (chip_crypto == "tinycrypt") {
+    include_dirs += [ "${mbedtls_repo}/repo/include/tinycrypt" ]
+  }
 }
 
 mbedtls_target("mbedtls") {
@@ -62,6 +79,14 @@ mbedtls_target("mbedtls") {
     "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/aes_alt.c",
     "${k32w0_sdk_root}/middleware/mbedtls/port/ksdk/ksdk_mbedtls.c",
   ]
+
+  if (chip_crypto == "tinycrypt") {
+    sources += [
+      "${mbedtls_repo}/repo/tinycrypt/ecc.c",
+      "${mbedtls_repo}/repo/tinycrypt/ecc_dh.c",
+      "${mbedtls_repo}/repo/tinycrypt/ecc_dsa.c",
+    ]
+  }
 
   public_configs = [ ":mbedtls_k32w0_config" ]
 

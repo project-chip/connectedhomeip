@@ -110,9 +110,9 @@ limitations under the License.
     </enum>
     <struct name="ProviderLocation">
         <cluster code="0x002a"/>
-        <item fieldId="0" name="FabricIndex" type="fabric_idx"/>
         <item fieldId="1" name="ProviderNodeID" type="node_id"/>
         <item fieldId="2" name="Endpoint" type="endpoint_no"/>
+        <item fieldId="0xFE" name="FabricIndex" type="fabric_idx"/>
     </struct>
     <cluster>
         <name>OTA Software Update Requestor</name>
@@ -136,7 +136,7 @@ limitations under the License.
         </command>
         <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
           <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>
-          <field id="0" name="PreviousState" type="OTAUpdateStateEnum" isNullable="true"/>
+          <field id="0" name="PreviousState" type="OTAUpdateStateEnum"/>
           <field id="1" name="NewState" type="OTAUpdateStateEnum"/>
           <field id="2" name="Reason" type="OTAChangeReasonEnum"/>
           <field id="3" name="TargetSoftwareVersion" type="INT32U" isNullable="true"/>

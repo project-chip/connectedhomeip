@@ -15,9 +15,11 @@
  *    limitations under the License.
  */
 
-#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
-#include "LEDWidget.h"
+
+#include "AppTask.h"
+#include <common/CHIPDeviceManager.h>
+#include <common/Esp32AppServer.h>
 
 #include "esp_log.h"
 #include "esp_spi_flash.h"
@@ -26,53 +28,36 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/ESP32/OTAImageProcessorImpl.h>
-#include <platform/GenericOTARequestorDriver.h>
+
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#include <platform/ESP32/ESP32FactoryDataProvider.h>
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-#if CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestor gRequestorCore;
-GenericOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
-#endif
-
-LEDWidget AppLED;
-
 static const char * TAG = "light-app";
 
-static DeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacks EchoCallbacks;
 
-static void InitOTARequestor(void)
-{
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-#endif
-}
+namespace {
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+} // namespace
 
 static void InitServer(intptr_t context)
 {
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
 extern "C" void app_main()
@@ -92,7 +77,6 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
-
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
@@ -102,9 +86,34 @@ extern "C" void app_main()
         return;
     }
 
-    AppLED.Init();
+#if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    SetCommissionableDataProvider(&sFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+#if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
+    SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-    InitOTARequestor();
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize Thread stack");
+        return;
+    }
+    if (ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to launch Thread task");
+        return;
+    }
+#endif
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+    }
 }

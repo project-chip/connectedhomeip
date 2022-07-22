@@ -42,6 +42,8 @@ extern "C" {
 void * pvPortCalloc(size_t num, size_t size);
 void * pvPortRealloc(void * pv, size_t size);
 
+void xPortResetHeapMinimumEverFreeHeapSize(void);
+
 #ifdef __cplusplus
 }
 #endif

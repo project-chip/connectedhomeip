@@ -7,7 +7,7 @@ that generates inputs to [ninja](https://ninja-build.org/).
 Tested on:
 
 -   macOS 10.15
--   Debian 10
+-   Debian 11
 -   Ubuntu 20.04 LTS
 
 Build system features:
@@ -43,9 +43,9 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev \
+sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
-     python3-pip unzip libgirepository1.0-dev libcairo2-dev
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
 ### Installing prerequisites on macOS
@@ -86,7 +86,8 @@ architectures on a micro SD card. This release will have bluez 5.55 or newer
 which is required for BLE functionality.
 
 Boot the SD card, login with the default user account "ubuntu" and password
-"ubuntu", then proceed with "How to install prerequisites on Linux".
+"ubuntu", then proceed with
+[Installing prerequisites on Linux](#installing-prerequisites-on-linux).
 
 Finally, install some Raspberry Pi specific dependencies:
 
@@ -182,7 +183,7 @@ To run all tests, run:
 ninja -C out/host check
 ```
 
-To run only the tests in src/inet/tests, you can run:
+To run only the tests in `src/inet/tests`, you can run:
 
 ```
 ninja -C out/host src/inet/tests:tests_run
@@ -281,13 +282,14 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
 Note: Some platforms that can be built as part of the unified build require
-downloading additional SDKs. To add these to the build, the location of the SDK
-installation must be provided as a build argument. For example, to add the
-Simplelink cc13x2_26x2 examples to the unified build, install the
-[SDK](https://ti.com/chip_sdk) and add the following build arguments:
+downloading additional tools. To add these to the build, the location must be
+provided as a build argument. For example, to add the Simplelink cc13x2_26x2
+examples to the unified build, install
+[SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
+arguments:
 
 ```
-gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_simplelink_sdk_root=\"/path/to/sdk\" ti_sysconfig_root=\"/path/to/sysconfig\""
+gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_sysconfig_root=\"/path/to/sysconfig\""
 ```
 
 ## Getting help

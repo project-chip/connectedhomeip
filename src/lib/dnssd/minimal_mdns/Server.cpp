@@ -240,8 +240,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
             interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
-            ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
-                         AddressTypeStr(addressType), chip::ErrorStr(err));
+            ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %" CHIP_ERROR_FORMAT,
+                         interfaceName, AddressTypeStr(addressType), err.Format());
 
             endPointHolder.reset();
         }
@@ -345,8 +345,9 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
     //   - if at least one broadcast succeeds, assume success overall
     //   + some internal consistency validations for state error.
 
-    bool hadSuccesfulSend = false;
-    CHIP_ERROR lastError  = CHIP_ERROR_NO_ENDPOINT;
+    unsigned successes   = 0;
+    unsigned failures    = 0;
+    CHIP_ERROR lastError = CHIP_ERROR_NO_ENDPOINT;
 
     if (chip::Loop::Break == mEndpoints.ForEachActiveObject([&](auto * info) {
             chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
@@ -356,7 +357,7 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
                 return chip::Loop::Continue;
             }
 
-            CHIP_ERROR err;
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
             /// The same packet needs to be sent over potentially multiple interfaces.
             /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
@@ -382,12 +383,19 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
 
             if (err == CHIP_NO_ERROR)
             {
-                hadSuccesfulSend = true;
+                successes++;
             }
             else
             {
-                ChipLogError(Discovery, "Attempt to mDNS broadcast failed:  %s", chip::ErrorStr(err));
+                failures++;
                 lastError = err;
+#if CHIP_DETAIL_LOGGING
+                char ifaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
+                err = info->mInterfaceId.GetInterfaceName(ifaceName, sizeof(ifaceName));
+                if (err != CHIP_NO_ERROR)
+                    strcpy(ifaceName, "???");
+                ChipLogDetail(Discovery, "Warning: Attempt to mDNS broadcast failed on %s:  %s", ifaceName, lastError.AsString());
+#endif
             }
             return chip::Loop::Continue;
         }))
@@ -395,7 +403,21 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
         return lastError;
     }
 
-    if (!hadSuccesfulSend)
+    if (failures != 0)
+    {
+        // if we had failures, log if the final status was success or failure, to make log reading
+        // easier. Some mDNS failures may be expected (e.g. for interfaces unavailable)
+        if (successes != 0)
+        {
+            ChipLogDetail(Discovery, "mDNS broadcast had only partial success: %u successes and %u failures.", successes, failures);
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "mDNS broadcast full failed in %u separate send attempts.", failures);
+        }
+    }
+
+    if (!successes)
     {
         return lastError;
     }

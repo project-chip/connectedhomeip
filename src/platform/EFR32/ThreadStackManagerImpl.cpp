@@ -27,8 +27,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
-
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
@@ -55,7 +54,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
@@ -126,6 +125,8 @@ extern "C" otError otPlatUartEnable(void)
 #endif
 }
 
+#if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+
 extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
 #ifdef PW_RPC_ENABLED
@@ -163,3 +164,5 @@ extern "C" __WEAK otError otPlatUartDisable(void)
 {
     return OT_ERROR_NOT_IMPLEMENTED;
 }
+
+#endif // CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI

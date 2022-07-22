@@ -71,7 +71,7 @@ public:
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
-    CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
@@ -109,9 +109,17 @@ public:
     uint32_t mPacketUnicastTxCount   = 0;
     uint64_t mOverrunCount           = 0;
     uint8_t mWiFiMacAddress[CY_WCM_MAC_ADDR_LEN];
-    bool mipv4_offpremise = false;
-    bool mipv6_offpremise = false;
+    app::DataModel::Nullable<bool> mipv4_offpremise;
+    app::DataModel::Nullable<bool> mipv6_offpremise;
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

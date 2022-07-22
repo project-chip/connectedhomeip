@@ -53,6 +53,13 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
 {
     CHIP_ERROR retval = CHIP_NO_ERROR;
 
+    ChipLogDetail(DeviceLayer, "ChipLinuxStorage::Init: Using KVS config file: %s", configFile);
+    if (mInitialized)
+    {
+        ChipLogError(DeviceLayer, "ChipLinuxStorage::Init: Attempt to re-initialize with KVS config file: %s", configFile);
+        return CHIP_NO_ERROR;
+    }
+
     mConfigPath.assign(configFile);
     retval = ChipLinuxStorageIni::Init();
 
@@ -76,6 +83,8 @@ CHIP_ERROR ChipLinuxStorage::Init(const char * configFile)
         retval = ChipLinuxStorageIni::AddConfig(mConfigPath);
     }
 
+    mInitialized = true;
+
     return retval;
 }
 
@@ -88,6 +97,19 @@ CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, bool & val)
 
     retval = ChipLinuxStorageIni::GetUIntValue(key, result);
     val    = (result != 0);
+
+    mLock.unlock();
+
+    return retval;
+}
+
+CHIP_ERROR ChipLinuxStorage::ReadValue(const char * key, uint16_t & val)
+{
+    CHIP_ERROR retval = CHIP_NO_ERROR;
+
+    mLock.lock();
+
+    retval = ChipLinuxStorageIni::GetUInt16Value(key, val);
 
     mLock.unlock();
 
@@ -160,6 +182,15 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, bool val)
     }
 
     return retval;
+}
+
+CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint16_t val)
+{
+    char buf[16];
+
+    snprintf(buf, sizeof(buf), "%u", val);
+
+    return WriteValueStr(key, buf);
 }
 
 CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, uint32_t val)

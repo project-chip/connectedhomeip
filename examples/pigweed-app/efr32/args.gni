@@ -19,3 +19,4 @@ import("${chip_root}/src/platform/EFR32/args.gni")
 efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 cpp_standard = "gnu++17"
+pw_rpc_CONFIG = "$dir_pw_rpc:disable_global_mutex"

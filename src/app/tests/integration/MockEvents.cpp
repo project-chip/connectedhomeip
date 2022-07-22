@@ -201,8 +201,6 @@ bool MockEventGeneratorImpl::IsEventGeneratorStopped()
         gEventIsStopped = false;
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }

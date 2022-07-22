@@ -31,8 +31,7 @@
 #include <utility>
 
 namespace {
-constexpr uint8_t kVersionMask          = 0x0F;
-constexpr uint8_t kMaxFileDesignatorLen = 32;
+constexpr uint8_t kVersionMask = 0x0F;
 } // namespace
 
 using namespace chip;
@@ -186,10 +185,10 @@ void TransferInit::LogMessage(bdx::MessageType messageType) const
 
     ChipLogAutomation("  Proposed Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlOptions.Raw() | Version));
     ChipLogAutomation("  Range Control: 0x%X", static_cast<unsigned>(mRangeCtlFlags.Raw()));
-    ChipLogAutomation("  Proposed Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Proposed Max Block Size: %u", MaxBlockSize);
     ChipLogAutomation("  Start Offset: 0x" ChipLogFormatX64, ChipLogValueX64(StartOffset));
     ChipLogAutomation("  Proposed Max Length: 0x" ChipLogFormatX64, ChipLogValueX64(MaxLength));
-    ChipLogAutomation("  File Designator Length: %" PRIu16, FileDesLength);
+    ChipLogAutomation("  File Designator Length: %u", FileDesLength);
     ChipLogAutomation("  File Designator: %s", fd);
 }
 #endif // CHIP_AUTOMATION_LOGGING
@@ -280,7 +279,7 @@ void SendAccept::LogMessage(bdx::MessageType messageType) const
     (void) messageType;
     ChipLogAutomation("SendAccept");
     ChipLogAutomation("  Transfer Control: 0x%X", static_cast<unsigned>(TransferCtlFlags.Raw() | Version));
-    ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Max Block Size: %u", MaxBlockSize);
 }
 #endif // CHIP_AUTOMATION_LOGGING
 
@@ -424,7 +423,7 @@ void ReceiveAccept::LogMessage(bdx::MessageType messageType) const
     ChipLogAutomation("ReceiveAccept");
     ChipLogAutomation("  Transfer Control: 0x%X", TransferCtlFlags.Raw() | Version);
     ChipLogAutomation("  Range Control: 0x%X", mRangeCtlFlags.Raw());
-    ChipLogAutomation("  Max Block Size: %" PRIu16, MaxBlockSize);
+    ChipLogAutomation("  Max Block Size: %u", MaxBlockSize);
     ChipLogAutomation("  Length: 0x" ChipLogFormatX64, ChipLogValueX64(Length));
 }
 #endif // CHIP_AUTOMATION_LOGGING
@@ -556,7 +555,7 @@ void DataBlock::LogMessage(bdx::MessageType messageType) const
     }
 
     ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
-    ChipLogAutomation("  Data Length: %zu", DataLength);
+    ChipLogAutomation("  Data Length: %u", static_cast<unsigned int>(DataLength));
 }
 #endif // CHIP_AUTOMATION_LOGGING
 

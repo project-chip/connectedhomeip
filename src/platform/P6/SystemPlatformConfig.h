@@ -36,7 +36,6 @@ struct ChipDeviceEvent;
 
 // ==================== Platform Adaptations ====================
 
-#define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME 0
 #define CHIP_SYSTEM_CONFIG_LWIP_EVENT_TYPE int
 #define CHIP_SYSTEM_CONFIG_LWIP_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
@@ -54,5 +53,3 @@ struct ChipDeviceEvent;
 #ifndef CHIP_SYSTEM_CONFIG_NUM_TIMERS
 #define CHIP_SYSTEM_CONFIG_NUM_TIMERS 16
 #endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
-
-#define CHIP_CONFIG_MDNS_CACHE_SIZE 4

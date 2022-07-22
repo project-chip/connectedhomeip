@@ -17,61 +17,167 @@
  */
 
 #include "ContentLauncherManager.h"
-#include <app/util/ContentAppPlatform.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace std;
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
-using namespace chip::AppPlatform;
 
-void ContentLauncherManager::HandleLaunchContent(
-    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
-    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
+{
+    mAcceptHeaderList            = acceptHeaderList;
+    mSupportedStreamingProtocols = supportedStreamingProtocols;
+
+    // Add dummy content for test cases
+    ContentEntry entry1;
+    entry1.mName = "TV Show Example";
+    ParameterType parameter1;
+    parameter1.type  = ParameterEnum::kActor;
+    parameter1.value = chip::CharSpan::fromCharString("Gaby sHoffman");
+    ParameterType parameter2;
+    parameter2.type  = ParameterEnum::kChannel;
+    parameter2.value = chip::CharSpan::fromCharString("PBS");
+    ParameterType parameter3;
+    parameter3.type  = ParameterEnum::kCharacter;
+    parameter3.value = chip::CharSpan::fromCharString("Snow White");
+    ParameterType parameter4;
+    parameter4.type  = ParameterEnum::kDirector;
+    parameter4.value = chip::CharSpan::fromCharString("Spike Lee");
+    ParameterType parameter5;
+    parameter5.type  = ParameterEnum::kFranchise;
+    parameter5.value = chip::CharSpan::fromCharString("Star Wars");
+    ParameterType parameter6;
+    parameter6.type  = ParameterEnum::kGenre;
+    parameter6.value = chip::CharSpan::fromCharString("Horror");
+    ParameterType parameter7;
+    parameter7.type  = ParameterEnum::kPopularity;
+    parameter7.value = chip::CharSpan::fromCharString("Popularity");
+    ParameterType parameter8;
+    parameter8.type  = ParameterEnum::kProvider;
+    parameter8.value = chip::CharSpan::fromCharString("Netflix");
+    entry1.mSearchFields.push_back(parameter1);
+    entry1.mSearchFields.push_back(parameter2);
+    entry1.mSearchFields.push_back(parameter3);
+    entry1.mSearchFields.push_back(parameter4);
+    entry1.mSearchFields.push_back(parameter5);
+    entry1.mSearchFields.push_back(parameter6);
+    entry1.mSearchFields.push_back(parameter7);
+    entry1.mSearchFields.push_back(parameter8);
+    mContentList.push_back(entry1);
+
+    ContentEntry entry2;
+    entry2.mName = "Sports Example";
+    ParameterType parameter21;
+    parameter21.type  = ParameterEnum::kEvent;
+    parameter21.value = chip::CharSpan::fromCharString("Football games");
+    ParameterType parameter22;
+    parameter22.type  = ParameterEnum::kLeague;
+    parameter22.value = chip::CharSpan::fromCharString("NCAA");
+    ParameterType parameter23;
+    parameter23.type  = ParameterEnum::kSport;
+    parameter23.value = chip::CharSpan::fromCharString("football");
+    ParameterType parameter24;
+    parameter24.type  = ParameterEnum::kSportsTeam;
+    parameter24.value = chip::CharSpan::fromCharString("Arsenel");
+    ParameterType parameter25;
+    parameter25.type  = ParameterEnum::kType;
+    parameter25.value = chip::CharSpan::fromCharString("TVSeries");
+    entry2.mSearchFields.push_back(parameter21);
+    entry2.mSearchFields.push_back(parameter22);
+    entry2.mSearchFields.push_back(parameter23);
+    entry2.mSearchFields.push_back(parameter24);
+    entry2.mSearchFields.push_back(parameter25);
+    mContentList.push_back(entry2);
+}
+
+void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
+                                                 const CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
 
-    Commands::LaunchResponse::Type response;
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl TEST CASE autoplay=%d data=%s ", (autoplay ? 1 : 0),
+                    dataString.c_str());
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(mEndpointId);
-    if (app != NULL)
+    bool foundMatch = false;
+    for (auto const & contentEntry : this->mContentList)
     {
-        response = app->GetContentLauncher()->LaunchContent(parameterList, autoplay, dataString);
-        responser.Success(response);
-        return;
+        auto iter = parameterList.begin();
+        while (iter.Next())
+        {
+            auto & parameterType = iter.GetValue();
+            for (auto const & parameter : contentEntry.mSearchFields)
+            {
+                if (parameter.type == parameterType.type)
+                {
+                    string val1(parameter.value.data(), parameter.value.size());
+                    string val2(parameterType.value.data(), parameterType.value.size());
+                    if (strcmp(val1.c_str(), val2.c_str()) == 0)
+                    {
+                        ChipLogProgress(Zcl, " TEST CASE found match=%s type=%d", contentEntry.mName.c_str(),
+                                        static_cast<uint16_t>(parameter.type));
+                        foundMatch = true;
+                    }
+                }
+            }
+        }
     }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
+    if (!foundMatch)
+    {
+        ChipLogProgress(Zcl, " TEST CASE did not find a match");
+    }
+
+    LaunchResponseType response;
     // TODO: Insert code here
-    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
-    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    responser.Success(response);
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-void ContentLauncherManager::HandleLaunchUrl(
-    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-    const std::list<BrandingInformation> & brandingInformation,
-    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
+                                             const CharSpan & displayString, const BrandingInformationType & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
     string contentUrlString(contentUrl.data(), contentUrl.size());
     string displayStringString(displayString.data(), displayString.size());
+    string providerNameString(brandingInformation.providerName.data(), brandingInformation.providerName.size());
+
+    ChipLogProgress(
+        Zcl, "ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=%s DisplayString=%s BrandingInformation.ProviderName=%s",
+        contentUrlString.c_str(), displayStringString.c_str(), providerNameString.c_str());
 
     // TODO: Insert code here
-    Commands::LaunchResponse::Type response;
-    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
-    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    responser.Success(response);
+    LaunchResponseType response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+
+    // Handle test cases
+    if (contentUrlString == "https://badurl")
+    {
+        response.status = ContentLauncher::ContentLaunchStatusEnum::kUrlNotAvailable;
+    }
+    else if (contentUrlString == "https://csa-iot.org/badauth")
+    {
+        response.status = ContentLauncher::ContentLaunchStatusEnum::kAuthFailed;
+    }
+
+    helper.Success(response);
 }
 
-CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        chip::CharSpan data = chip::CharSpan("example", strlen("example"));
-        ReturnErrorOnFailure(encoder.Encode(data));
-        ReturnErrorOnFailure(encoder.Encode(data));
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (std::string & entry : mAcceptHeaderList)
+        {
+            CharSpan data = CharSpan::fromCharString(entry.c_str());
+            ReturnErrorOnFailure(encoder.Encode(data));
+        }
         return CHIP_NO_ERROR;
     });
 }
@@ -79,6 +185,17 @@ CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::Attribut
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
-    uint32_t streamingProtocols = 0;
-    return streamingProtocols;
+    return mSupportedStreamingProtocols;
+}
+
+uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

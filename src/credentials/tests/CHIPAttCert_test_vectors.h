@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -141,6 +141,46 @@ extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_PublicKey;
 extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_PrivateKey;
 
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_Cert;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_SKID;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_PrivateKey;
+
 extern const ByteSpan sTestCert_PAA_FFF1_Cert;
 extern const ByteSpan sTestCert_PAA_FFF1_SKID;
 extern const ByteSpan sTestCert_PAA_FFF1_PublicKey;
@@ -161,10 +201,20 @@ extern const ByteSpan sTestCert_PAI_FFF2_8001_SKID;
 extern const ByteSpan sTestCert_PAI_FFF2_8001_PublicKey;
 extern const ByteSpan sTestCert_PAI_FFF2_8001_PrivateKey;
 
+extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_SKID;
+extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_PublicKey;
+extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_PrivateKey;
+
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Cert;
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_SKID;
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_PublicKey;
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_PrivateKey;
+
+extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_Cert;
+extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_SKID;
+extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PublicKey;
+extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PrivateKey;
 
 } // namespace TestCerts
 } // namespace chip

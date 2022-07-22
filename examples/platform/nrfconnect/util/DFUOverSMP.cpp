@@ -21,16 +21,21 @@
 #error "DFUOverSMP requires MCUMGR module configs enabled"
 #endif
 
-#include <dfu/mcuboot.h>
 #include <img_mgmt/img_mgmt.h>
-#include <mgmt/mcumgr/smp_bt.h>
 #include <os_mgmt/os_mgmt.h>
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/mgmt/mcumgr/smp_bt.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "OTAUtil.h"
+
 using namespace ::chip::DeviceLayer;
+
+constexpr uint16_t kAdvertisingIntervalMinMs = 400;
+constexpr uint16_t kAdvertisingIntervalMaxMs = 500;
 
 DFUOverSMP DFUOverSMP::sDFUOverSMP;
 
@@ -41,9 +46,13 @@ void DFUOverSMP::Init(DFUOverSMPRestartAdvertisingHandler startAdvertisingCb)
     img_mgmt_set_upload_cb(UploadConfirmHandler, NULL);
 
     memset(&mBleConnCallbacks, 0, sizeof(mBleConnCallbacks));
+    mBleConnCallbacks.connected    = OnBleConnect;
     mBleConnCallbacks.disconnected = OnBleDisconnect;
 
     bt_conn_cb_register(&mBleConnCallbacks);
+
+    k_work_init(&mFlashSleepWork, [](k_work *) { GetFlashHandler().DoAction(FlashHandler::Action::SLEEP); });
+    k_work_init(&mFlashWakeUpWork, [](k_work *) { GetFlashHandler().DoAction(FlashHandler::Action::WAKE_UP); });
 
     restartAdvertisingCallback = startAdvertisingCb;
 
@@ -106,8 +115,8 @@ void DFUOverSMP::StartBLEAdvertising()
                      BT_DATA(BT_DATA_NAME_COMPLETE, deviceName, static_cast<uint8_t>(strlen(deviceName))) };
 
     int rc;
-    bt_le_adv_param advParams = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, BT_GAP_ADV_FAST_INT_MIN_2,
-                                                     BT_GAP_ADV_FAST_INT_MAX_2, nullptr);
+    bt_le_adv_param advParams = BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_OPT_ONE_TIME, kAdvertisingIntervalMinMs,
+                                                     kAdvertisingIntervalMaxMs, nullptr);
 
     rc = bt_le_adv_stop();
     if (rc)
@@ -127,8 +136,21 @@ void DFUOverSMP::StartBLEAdvertising()
     }
 }
 
+void DFUOverSMP::OnBleConnect(bt_conn * conn, uint8_t err)
+{
+    if (GetDFUOverSMP().IsEnabled())
+    {
+        (void) k_work_submit(&sDFUOverSMP.mFlashWakeUpWork);
+    }
+}
+
 void DFUOverSMP::OnBleDisconnect(struct bt_conn * conId, uint8_t reason)
 {
+    if (GetDFUOverSMP().IsEnabled())
+    {
+        (void) k_work_submit(&sDFUOverSMP.mFlashSleepWork);
+    }
+
     PlatformMgr().LockChipStack();
 
     // After BLE disconnect SMP advertising needs to be restarted. Before making it ensure that BLE disconnect was not triggered

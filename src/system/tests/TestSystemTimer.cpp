@@ -31,6 +31,7 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/SystemError.h>
@@ -78,13 +79,13 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 template <class LayerImpl>
-class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplLwIP, LayerImpl>::value>::type>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplFreeRTOS, LayerImpl>::value>::type>
 {
 public:
     static bool HasServiceEvents() { return true; }
     static void ServiceEvents(Layer & aLayer)
     {
-        LayerImplLwIP & layer = static_cast<LayerImplLwIP &>(aLayer);
+        LayerImplFreeRTOS & layer = static_cast<LayerImplFreeRTOS &>(aLayer);
         if (layer.IsInitialized())
         {
             layer.HandlePlatformTimer();
@@ -482,12 +483,7 @@ static int TestTeardown(void * aContext)
 
 int TestSystemTimer(void)
 {
-    TestContext context;
-
-    // Run test suit againt one lContext.
-    nlTestRunner(&kTheSuite, &context);
-
-    return nlTestRunnerStats(&kTheSuite);
+    return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSystemTimer)

@@ -27,7 +27,7 @@
       }
       listFreer.add(listHolder_{{depth}});
       for (size_t i_{{depth}} = 0; i_{{depth}} < {{source}}.count; ++i_{{depth}}) {
-        if (![{{source}}[i_{{depth}}] isKindOfClass:[{{asObjectiveCClass type cluster forceNotList=true}} class]]) {
+        if ( ! [{{source}}[i_{{depth}}] isKindOfClass: [{{asObjectiveCClass type cluster forceNotList=true}} class]] ) {
           // Wrong kind of value.
           {{errorCode}}
         }
@@ -49,14 +49,14 @@
      {{>encode_value target=(concat ../target "." (asLowerCamelCase label)) source=(concat ../source "." (asStructPropertyName label)) cluster=../cluster errorCode=../errorCode depth=(incrementDepth ../depth)}}
     {{/zcl_struct_items_by_struct_name}}
   {{else}}
-    {{#if_chip_enum type}}
+    {{#if_is_strongly_typed_chip_enum type}}
       {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
     {{else}}
-      {{#if_is_bitmap type}}
+      {{#if_is_strongly_typed_bitmap type}}
         {{target}} = static_cast<std::remove_reference_t<decltype({{target}})>>({{source}}.{{asObjectiveCNumberType source type true}}Value);
       {{else}}
         {{target}} = {{source}}.{{asObjectiveCNumberType source type true}}Value;
-      {{/if_is_bitmap}}
-    {{/if_chip_enum}}
+      {{/if_is_strongly_typed_bitmap}}
+    {{/if_is_strongly_typed_chip_enum}}
   {{/if_is_struct}}
 {{/if}}

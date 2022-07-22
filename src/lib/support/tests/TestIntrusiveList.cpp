@@ -27,7 +27,7 @@ namespace {
 
 using namespace chip;
 
-class ListNode : public IntrusiveListNodeBase
+class ListNode : public IntrusiveListNodeBase<>
 {
 };
 
@@ -131,6 +131,95 @@ void TestContains(nlTestSuite * inSuite, void * inContext)
     list.Remove(&b);
 }
 
+void TestReplaceNode(nlTestSuite * inSuite, void * inContext)
+{
+    ListNode a, b;
+    IntrusiveList<ListNode> list;
+    list.PushBack(&a);
+
+    list.Replace(&a, &b);
+    NL_TEST_ASSERT(inSuite, !a.IsInList());
+    NL_TEST_ASSERT(inSuite, b.IsInList());
+    NL_TEST_ASSERT(inSuite, !list.Empty());
+    NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, list.Contains(&b));
+    list.Remove(&b);
+}
+
+void TestMoveList(nlTestSuite * inSuite, void * inContext)
+{
+    ListNode a, b;
+
+    {
+        // Test case 1: Move construct an empty list
+        IntrusiveList<ListNode> listA;
+        IntrusiveList<ListNode> listB(std::move(listA));
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
+        NL_TEST_ASSERT(inSuite, listB.Empty());
+    }
+
+    {
+        // Test case 2: Move construct an non-empty list
+        IntrusiveList<ListNode> listA;
+        listA.PushBack(&a);
+
+        IntrusiveList<ListNode> listB(std::move(listA));
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
+        NL_TEST_ASSERT(inSuite, listB.Contains(&a));
+        listB.Remove(&a);
+    }
+
+    {
+        // Test case 3: Move assign an empty list
+        IntrusiveList<ListNode> listA;
+        IntrusiveList<ListNode> listB;
+        listB = std::move(listA);
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
+        NL_TEST_ASSERT(inSuite, listB.Empty());
+    }
+
+    {
+        // Test case 4: Move assign to a non-empty list
+        IntrusiveList<ListNode> listA;
+        listA.PushBack(&a);
+
+        IntrusiveList<ListNode> listB;
+        listB = std::move(listA);
+        NL_TEST_ASSERT(inSuite, listA.Empty()); // NOLINT(bugprone-use-after-move)
+        NL_TEST_ASSERT(inSuite, listB.Contains(&a));
+        listB.Remove(&a);
+    }
+}
+
+class ListNodeAutoUnlink : public IntrusiveListNodeBase<IntrusiveMode::AutoUnlink>
+{
+};
+
+void TestAutoUnlink(nlTestSuite * inSuite, void * inContext)
+{
+    IntrusiveList<ListNodeAutoUnlink, IntrusiveMode::AutoUnlink> list;
+
+    // Test case 1: Test node->Unlink()
+    {
+        ListNodeAutoUnlink a;
+        NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+        list.PushBack(&a);
+        NL_TEST_ASSERT(inSuite, list.Contains(&a));
+        a.Unlink();
+        NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+        NL_TEST_ASSERT(inSuite, list.Empty());
+    }
+
+    // Test case 2: The node is automatically removed when goes out of scope
+    {
+        ListNodeAutoUnlink a;
+        NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+        list.PushBack(&a);
+        NL_TEST_ASSERT(inSuite, list.Contains(&a));
+    }
+    NL_TEST_ASSERT(inSuite, list.Empty());
+}
+
 int Setup(void * inContext)
 {
     return SUCCESS;
@@ -150,6 +239,9 @@ int Teardown(void * inContext)
 static const nlTest sTests[] = {
     NL_TEST_DEF_FN(TestIntrusiveListRandom), //
     NL_TEST_DEF_FN(TestContains),            //
+    NL_TEST_DEF_FN(TestReplaceNode),         //
+    NL_TEST_DEF_FN(TestMoveList),            //
+    NL_TEST_DEF_FN(TestAutoUnlink),          //
     NL_TEST_SENTINEL(),                      //
 };
 

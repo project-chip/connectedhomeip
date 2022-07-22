@@ -48,16 +48,23 @@ CHIP_ERROR ChipAndroidAppInit(void)
     ConfigurationMgr().LogDeviceConfig();
 
     // Init ZCL Data Model and CHIP App Server
-    err = chip::Server::GetInstance().Init(nullptr, CHIP_PORT, CHIP_UDC_PORT);
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.operationalServicePort        = CHIP_PORT;
+    initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
+
+    err = chip::Server::GetInstance().Init(initParams);
     SuccessOrExit(err);
 
-    // TODO: move load DAC to java
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    if (!IsDeviceAttestationCredentialsProviderSet())
+    {
+        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(NotSpecified, "Failed to run ChipAndroidAppInit: %s ", ErrorStr(err));
+        ChipLogProgress(NotSpecified, "Failed to run ChipAndroidAppInit: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     return err;

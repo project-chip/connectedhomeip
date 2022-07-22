@@ -22,8 +22,10 @@ chip_test_suite("tests") {
   output_name = "libMdnsFakePlatformTests"
   if (chip_device_platform == "fake") {
     test_sources = [ "TestPlatform.cpp" ]
+
     public_deps = [
       "${chip_root}/src/lib/dnssd",
+      "${chip_root}/src/lib/support:testing",
       "${nlunit_test_root}:nlunit-test",
     ]
   }

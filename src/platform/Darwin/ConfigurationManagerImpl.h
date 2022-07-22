@@ -27,8 +27,14 @@
 
 #include <platform/Darwin/PosixConfig.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Darwin/WiFi/WiFiNetworkInfos.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 namespace chip {
 namespace DeviceLayer {
+
+static constexpr int kCountryCodeLength = 2;
 
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the Darwin platform.
@@ -36,6 +42,16 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
 public:
+    CHIP_ERROR StoreVendorId(uint16_t vendorId);
+    CHIP_ERROR StoreProductId(uint16_t productId);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    CHIP_ERROR GetWiFiNetworkInformations(WiFiNetworkInfos & infos);
+    CHIP_ERROR StoreWiFiNetworkInformations(WiFiNetworkInfos & infos);
+    CHIP_ERROR ClearWiFiNetworkInformations();
+    bool HasWiFiNetworkInformations();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 
@@ -44,14 +60,22 @@ private:
 
     CHIP_ERROR Init(void) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
-    CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen) override;
-    CHIP_ERROR StoreActiveLocale(const char * code, size_t codeLen) override;
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+    CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
+    CHIP_ERROR GetLocationCapability(uint8_t & location) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
+    CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
+    CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;

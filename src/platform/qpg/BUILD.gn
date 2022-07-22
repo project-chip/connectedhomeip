@@ -70,6 +70,7 @@ static_library("qpg") {
 
     public_configs += [
       "${chip_root}/third_party/openthread/platforms/qpg:openthread_qpg_config",
+      "${chip_root}/src/lib/address_resolve:default_address_resolve_config",
     ]
 
     sources += [

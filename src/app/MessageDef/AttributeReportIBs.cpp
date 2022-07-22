@@ -35,8 +35,7 @@ namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
-    size_t numAttributeReportIBs = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributeReportIBs =");
@@ -55,30 +54,18 @@ CHIP_ERROR AttributeReportIBs::Parser::CheckSchemaValidity() const
             ReturnErrorOnFailure(AttributeReport.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
-
-        ++numAttributeReportIBs;
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one Attribute report
-        if (numAttributeReportIBs > 0)
-        {
-            err = CHIP_NO_ERROR;
-        }
-        else
-        {
-            ChipLogError(DataManagement, "PROTOCOL ERROR: Empty Attribute reports");
-            err = CHIP_NO_ERROR;
-        }
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
@@ -96,5 +83,29 @@ AttributeReportIBs::Builder & AttributeReportIBs::Builder::EndOfAttributeReportI
     EndOfContainer();
     return *this;
 }
+
+CHIP_ERROR AttributeReportIBs::Builder::EncodeAttributeStatus(const ConcreteReadAttributePath & aPath, const StatusIB & aStatus)
+{
+    AttributeReportIB::Builder & attributeReport = CreateAttributeReport();
+    ReturnErrorOnFailure(GetError());
+    AttributeStatusIB::Builder & attributeStatusIBBuilder = attributeReport.CreateAttributeStatus();
+    ReturnErrorOnFailure(attributeReport.GetError());
+    AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+
+    attributePathIBBuilder.Endpoint(aPath.mEndpointId)
+        .Cluster(aPath.mClusterId)
+        .Attribute(aPath.mAttributeId)
+        .EndOfAttributePathIB();
+    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
+    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+    statusIBBuilder.EncodeStatusIB(aStatus);
+    ReturnErrorOnFailure(statusIBBuilder.GetError());
+
+    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
+    return attributeReport.EndOfAttributeReportIB().GetError();
+}
+
 } // namespace app
 } // namespace chip

@@ -31,23 +31,31 @@ To test the DFU over Matter, you need to complete the following steps:
 1.  Navigate to the CHIP root directory.
 2.  Build the OTA Provider application for Linux:
 
-        $ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/provider chip_config_network_layer_ble=false
+        ```
+        scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/provider chip_config_network_layer_ble=false
+        ```
 
 3.  Build chip-tool for Linux:
 
-        $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
+        ```
+        scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
+        ```
 
-4.  Run OTA Provider application with _app_update.bin_ replaced with the path to
-    the new firmware image which you wish to provide to the Matter device:
+4.  Run OTA Provider application with _matter.ota_ replaced with the path to the
+    Matter OTA image which you wish to provide to the Matter device. Note that
+    the Matter OTA image is, by default, generated at _zephyr/matter.ota_ in the
+    example's build directory:
 
-         $ out/provider/chip-ota-provider-app -f app_update.bin
+         $ out/provider/chip-ota-provider-app -f matter.ota
 
     Keep the application running and use another terminal for the remaining
     steps.
 
 5.  Commission the OTA Provider into the Matter network using Node Id 1:
 
-        $ ./out/chiptool/chip-tool pairing onnetwork 1 20202021
+        ```
+        ./out/chiptool/chip-tool pairing onnetwork 1 20202021
+        ```
 
 6.  Use the OTBR web interface to form a new Thread network using the default
     network settings.
@@ -56,29 +64,51 @@ To test the DFU over Matter, you need to complete the following steps:
     Operational Dataset. It can be retrieved from the OTBR in case you have
     changed the default network settings when forming the network.
 
-         $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
+        ```
+        ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
+        ```
 
-8.  Initiate the DFU procedure in one of the following ways:
+8.  Configure the Matter device with the default OTA Provider by running the
+    following command. The last two arguments are Requestor Node Id and
+    Requestor Endpoint Id, respectively:
+
+        ```
+        ./out/chiptool/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"fabricIndex": 1, "providerNodeID": 1, "endpoint": 0}]' 2 0
+        ```
+
+9.  Configure the OTA Provider with the access control list (ACL) that grants
+    _Operate_ privileges to all nodes in the fabric. This is necessary to allow
+    the nodes to send cluster commands to the OTA Provider:
+
+        ```
+        ./out/chiptool/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+        ```
+
+10. Initiate the DFU procedure in one of the following ways:
+
 
     -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
         option, which enables Matter shell commands, run the following command
-        on the device shell. The numeric arguments are Fabric Index, Provider
-        Node Id and Provider Endpoint Id, respectively.
+        on the device shell:
 
-               $ matter ota query 1 1 0
+               ```
+               matter ota query
+               ```
 
     -   Otherwise, use chip-tool to send the Announce OTA Provider command to
         the device. The numeric arguments are Provider Node Id, Provider Vendor
         Id, Announcement Reason, Provider Endpoint Id, Requestor Node Id and
         Requestor Endpoint Id, respectively.
 
-               $ ./out/chiptool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+               ```
+               ./out/chiptool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+               ```
 
         Once the device is made aware of the OTA Provider node, it automatically
         queries the OTA Provider for a new firmware image.
 
-9.  When the firmware image download is complete, reboot the device to apply the
-    update.
+11. When the firmware image download is complete, the device is automatically
+    rebooted to apply the update.
 
 ## Device Firmware Upgrade over Bluetooth LE using smartphone
 
@@ -140,7 +170,9 @@ Complete the following steps to perform DFU using mcumgr:
 4.  Upload the application firmware image to the device by running the following
     command in your example directory:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0 -w 1
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/app_update.bin -n 0 -w 1
+        ```
 
     The operation can take a few minutes. Wait until the progress bar reaches
     100%.
@@ -148,12 +180,15 @@ Complete the following steps to perform DFU using mcumgr:
 5.  Obtain the list of images present in the device memory by running following
     command:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
+        ```
 
     The displayed output contains the old image in slot 0 that is currently
     active and the new image in slot 1, which is not active yet (flags field
     empty):
 
+        ```
         Images:
         image=0 slot=0
             version: 0.0.0
@@ -166,16 +201,20 @@ Complete the following steps to perform DFU using mcumgr:
             flags:
             hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
         Split status: N/A (0)
+        ```
 
 6.  Swap the firmware images by calling the following method with `image-hash`
     replaced by the image present in the slot 1 hash (for example,
     `cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1`):
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
+        ```
 
     You can observe that the `flags:` field in the image for slot 1 changes
     value to `pending`:
 
+        ```
         Images:
         image=0 slot=0
             version: 0.0.0
@@ -188,6 +227,7 @@ Complete the following steps to perform DFU using mcumgr:
             flags: pending
             hash: cbd58fc3821e749d3abfb00b3069f98c078824735f1b2a333e8a1579971e7de1
         Split status: N/A (0)
+        ```
 
 > **_NOTE:_** If you are using the nRF5340DK board, that supports multi-image
 > device firmware upgrade, complete Steps 7-9. If not using one, go straight to
@@ -196,7 +236,9 @@ Complete the following steps to perform DFU using mcumgr:
 7.  Upload the network core firmware image to the device by running the
     following command in your example directory:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1 -w 1
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image upload build/zephyr/net_core_app_update.bin -n 1 -w 1
+        ```
 
     The operation can take a few minutes. Wait until the progress bar reaches
     100%.
@@ -204,13 +246,16 @@ Complete the following steps to perform DFU using mcumgr:
 8.  Obtain the list of images present in the device memory by running following
     command:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image list
+        ```
 
     The displayed output contains the old application image in slot 0 that is
     currently active, the new application image in slot 1 in pending state, and
     the new network image which is in slot 1 and not active yet (flags field
     empty):
 
+        ```
         Images:
         image=0 slot=0
             version: 0.0.0
@@ -228,16 +273,20 @@ Complete the following steps to perform DFU using mcumgr:
             flags:
             hash: d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48
         Split status: N/A (0)
+        ```
 
 9.  Swap the firmware images by calling the following method with `image-hash`
     replaced by the image present in the slot 1 hash (for example,
     `d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48`):
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' image test image-hash
+        ```
 
     You can observe that the `flags:` field in the image for slot 1 changes
     value to `pending`:
 
+        ```
         Images:
         image=0 slot=0
             version: 0.0.0
@@ -255,21 +304,26 @@ Complete the following steps to perform DFU using mcumgr:
             flags: pending
             hash: d9e31e73cb7a959c26411250c2b3028f3510ae88a4549ae3f2f097c3e7530f48
         Split status: N/A (0)
+        ```
 
 10. Reset the device with the following command to let the bootloader swap
     images:
 
-        $ sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' reset
+        ```
+        sudo mcumgr --conntype ble --hci ble-hci-number --connstring peer_name='ble-device-name' reset
+        ```
 
 
     The device is reset and the following notifications appear in its console:
 
+        ```
         *** Booting Zephyr OS build zephyr-v2.5.0-1101-ga9d3aef65424  ***
         I: Starting bootloader
         I: Primary image: magic=good, swap_type=0x2, copy_done=0x1, image_ok=0x1
         I: Secondary image: magic=good, swap_type=0x2, copy_done=0x3, image_ok=0x3
         I: Boot source: none
         I: Swap type: test
+        ```
 
     Swapping operation can take some time, and after it completes, the new
     firmware is booted.

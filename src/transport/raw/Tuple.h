@@ -216,7 +216,7 @@ private:
      * @tparam N the index of the underlying transport to run GroupJoinLeave through.
      *
      * @param address where to send the message
-     * @param msgBuf the message to send.  Includes all CHIP message fields except optional length.
+     * @param join a boolean indicating if the transport should join or leave the group
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
@@ -281,6 +281,8 @@ public:
     {
         return std::get<i>(mTransports);
     }
+
+    std::tuple<TransportTypes...> & GetTransports() { return mTransports; }
 };
 
 } // namespace Transport

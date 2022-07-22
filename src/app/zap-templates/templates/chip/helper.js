@@ -20,6 +20,8 @@ const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const templateUtil = require(zapPath + 'generator/template-util.js');
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
 const iteratorUtil = require(zapPath + 'util/iterator-util.js');
+const queryAccess  = require(zapPath + 'db/query-access')
+const queryZcl     = require(zapPath + 'db/query-zcl');
 
 const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
 const StringHelper                 = require('../../common/StringHelper.js');
@@ -38,10 +40,9 @@ function throwErrorIfUndefined(item, errorMsg, conditions)
 
 function checkIsInsideClusterBlock(context, name)
 {
-  const clusterName = context.name;
-  const clusterSide = context.side;
+  const clusterName = context.name ? context.name : context.clusterName;
+  const clusterSide = context.side ? context.side : context.clusterSide;
   const errorMsg    = name + ': Not inside a ({#chip_server_clusters}} block.';
-
   throwErrorIfUndefined(context, errorMsg, [ clusterName, clusterSide ]);
 
   return { clusterName, clusterSide };
@@ -104,7 +105,7 @@ function getResponses(methodName)
  */
 function chip_server_clusters(options)
 {
-  return asBlocks.call(this, ensureClusters(this).getServerClusters(), options);
+  return asBlocks.call(this, ensureClusters(this, options.hash.includeAll).getServerClusters(), options);
 }
 
 /**
@@ -123,7 +124,7 @@ function chip_has_server_clusters(options)
  */
 function chip_client_clusters(options)
 {
-  return asBlocks.call(this, ensureClusters(this).getClientClusters(), options);
+  return asBlocks.call(this, ensureClusters(this, options.hash.includeAll).getClientClusters(), options);
 }
 
 /**
@@ -142,7 +143,7 @@ function chip_has_client_clusters(options)
  */
 function chip_clusters(options)
 {
-  return asBlocks.call(this, ensureClusters(this).getClusters(), options);
+  return asBlocks.call(this, ensureClusters(this, options.hash.includeAll).getClusters(), options);
 }
 
 /**
@@ -164,21 +165,16 @@ function chip_server_global_responses(options)
   return asBlocks.call(this, getServerGlobalAttributeResponses(this), options);
 }
 
-async function if_in_global_responses(options)
+async function if_basic_global_response(options)
 {
   const attribute          = this.response.arguments[0];
   const globalResponses    = await getServerGlobalAttributeResponses(this);
-  const responseTypeExists = globalResponses.find(
-      // Some fields of item/attribute here may be undefined.
-      item => item.isList == attribute.isList && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
-          && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
+  const complexType        = attribute.isNullable || attribute.isOptional || attribute.isStruct || attribute.isArray;
+  const responseTypeExists = globalResponses.find(item => item.chipType == attribute.chipType);
 
-  if (responseTypeExists)
-  {
+  if (!complexType && responseTypeExists) {
     return options.fn(this);
-  }
-  else
-  {
+  } else {
     return options.inverse(this);
   }
 }
@@ -188,10 +184,10 @@ function getServerGlobalAttributeResponses(context)
   const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
 
   const reducer = (unique, item) => {
-    const { type, size, isList, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
+    const { type, size, isArray, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
 
     // List-typed elements have a dedicated callback
-    if (isList) {
+    if (isArray) {
       return unique;
     }
 
@@ -275,11 +271,14 @@ function chip_cluster_command_arguments(options)
 function chip_cluster_command_arguments_with_structs_expanded(options)
 {
   const commandId = checkIsInsideCommandBlock(this, 'chip_cluster_command_arguments');
-  const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments_with_structs_expanded');
+  const commands  = getCommands.call(this.parent, 'chip_cluster_command_arguments_with_structs_expanded');
 
   const filter = command => command.id == commandId;
   return asBlocks.call(this, commands.then(items => {
     const item = items.find(filter);
+    if (item === undefined) {
+      return [];
+    }
     return item.expandedArguments || item.arguments;
   }),
       options);
@@ -315,7 +314,7 @@ function chip_server_has_list_attributes(options)
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
   const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
-  const filter = attribute => attribute.isList;
+  const filter = attribute => attribute.isArray;
   return attributes.then(items => items.find(filter));
 }
 
@@ -332,7 +331,24 @@ function chip_client_has_list_attributes(options)
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
   const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
-  const filter = attribute => attribute.isList;
+  const filter = attribute => attribute.isArray;
+  return attributes.then(items => items.find(filter));
+}
+
+/**
+ * Returns if a given server cluster has any reportable attribute
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_has_reportable_attributes(options)
+{
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_reportable_attributes');
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
+
+  const filter = attribute => attribute.isReportableAttribute;
   return attributes.then(items => items.find(filter));
 }
 
@@ -431,6 +447,87 @@ async function chip_endpoint_clusters(options)
 }
 
 /**
+ * Helper checks if the type for the bitmap is BitFlags. This generally includes
+ * all bitmaps apart from
+ * bitmap8/16/32 (generally defined in types.xml)
+ * example:
+ * {{#if_is_strongly_typed_bitmap type}}
+ * strongly typed bitmap
+ * {{else}}
+ * not a strongly typed bitmap
+ * {{/if_is_strongly_typed_bitmap}}
+ *
+ * @param {*} type
+ * @returns Promise of content.
+ */
+async function if_is_strongly_typed_bitmap(type, options)
+{
+  let packageId = await templateUtil.ensureZclPackageId(this);
+  let bitmap;
+  if (type && typeof type === 'string') {
+    bitmap = await queryZcl.selectBitmapByName(this.global.db, packageId, type);
+  } else {
+    bitmap = await queryZcl.selectBitmapById(this.global.db, type);
+  }
+
+  if (bitmap) {
+    let a = await queryZcl.selectAtomicType(this.global.db, packageId, bitmap.name);
+    if (a) {
+      // If this is an atomic type, it's a generic, weakly typed, bitmap.
+      return options.inverse(this);
+    } else {
+      return options.fn(this);
+    }
+  }
+  return options.inverse(this);
+}
+
+/**
+ * Handlebar helper function which checks if an enum is a strongly typed enum or
+ * not. This generally includes all enums apart from
+ * enum8/16/32 (generally defined in types.xml)
+ * example for if_is_strongly_typed_chip_enum:
+ * {{#if_is_strongly_typed_chip_enum type}}
+ * strongly typed enum
+ * {{else}}
+ * not a strongly typed enum
+ * {{/if_is_strongly_typed_chip_enum}}
+ *
+ * @param {*} type
+ * @param {*} options
+ * @returns Promise of content.
+ */
+async function if_is_strongly_typed_chip_enum(type, options)
+{
+  // There are certain exceptions.
+  if (type.toLowerCase() == 'vendor_id') {
+    return options.fn(this);
+  } else {
+    let packageId = await templateUtil.ensureZclPackageId(this);
+    let enumRes;
+    // Retrieving the enum from the enum table
+    if (type && typeof type === 'string') {
+      enumRes = await queryZcl.selectEnumByName(this.global.db, type, packageId);
+    } else {
+      enumRes = await queryZcl.selectEnumById(this.global.db, type);
+    }
+
+    // Checking if an enum is atomic. If an enum is not atomic then the enum
+    // is a strongly typed enum
+    if (enumRes) {
+      let a = await queryZcl.selectAtomicType(this.global.db, packageId, enumRes.name);
+      if (a) {
+        // if an enum has an atomic type that means it's a weakly-typed enum.
+        return options.inverse(this);
+      } else {
+        return options.fn(this);
+      }
+    }
+    return options.inverse(this);
+  }
+}
+
+/**
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
  */
@@ -449,6 +546,100 @@ async function if_chip_enum(type, options)
     result = options.inverse(this);
   }
   return templateUtil.templatePromise(this.global, result);
+}
+
+async function if_chip_complex(options)
+{
+  // `zcl_command_arguments` has an `isArray` property and `type`
+  // contains the array element type.
+  if (this.isArray) {
+    return options.fn(this);
+  }
+
+  // zcl_attributes iterators does not expose an `isArray` property
+  // and `entryType` contains the array element type, while `type`
+  // contains the atomic type, which is array in this case.
+  // https://github.com/project-chip/zap/issues/412
+  if (this.type == 'array') {
+    return options.fn(this);
+  }
+
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isStruct(this.global.db, this.type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
+  } else {
+    result = options.inverse(this);
+  }
+  return templateUtil.templatePromise(this.global, result);
+}
+
+async function chip_access_elements(options)
+{
+
+  // console.log(options);
+  let entityType = options.hash.entity
+
+  if (entityType == null)
+  {
+    throw new Error('Access helper requires entityType, either from context, or from the entity="<entityType>" option.')
+  }
+
+  let accessList = null
+
+  // Exaples of operations:
+  //   { operation: null, role: null, accessModifier: 'fabric-scoped' },
+  //   { operation: 'read', role: 'administer', accessModifier: null },
+  //   { operation: 'write', role: 'administer', accessModifier: null }
+  //
+  // Note the existence of a null operation with a modifier of fabric-scoped
+
+  // accessDefaults contains acceptable operations
+  // together with their default value
+  let accessDefaults = new Map();
+
+  switch (entityType) {
+  case 'attribute':
+    accessList = await queryAccess.selectAttributeAccess(this.global.db, this.id);
+    accessDefaults.set('read', 'view');
+    accessDefaults.set('write', 'operate');
+    break;
+  case 'command':
+    accessList = await queryAccess.selectCommandAccess(this.global.db, this.id);
+    accessDefaults.set('invoke', 'operate');
+    break;
+  case 'event':
+    accessList = await queryAccess.selectEventAccess(this.global.db, this.id);
+    accessDefaults.set('read', 'view');
+    break;
+  default:
+    throw new Error(`Entity type ${entityType} not supported. Requires: attribute/command/event.`)
+  }
+
+  let accessEntries = [];
+
+  for (element of accessList) {
+    if (!element.operation) {
+      continue; // not a valid operation (likely null)
+    }
+
+    const operation = element.operation.toLowerCase();
+    if (!accessDefaults.has(operation)) {
+      continue; // not a valid operation (may be a bug or non-matter operation)
+    }
+
+    const role = element.role.toLowerCase();
+
+    if (role === accessDefaults.get(operation)) {
+      continue; // already set as a default
+    }
+
+    accessEntries.push({ operation, role })
+  }
+
+  let p = templateUtil.collectBlocks(accessEntries, options, this)
+  return templateUtil.templatePromise(this.global, p)
 }
 
 //
@@ -470,10 +661,15 @@ exports.chip_attribute_list_entryTypes                       = chip_attribute_li
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
 exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
+exports.chip_server_has_reportable_attributes                = chip_server_has_reportable_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.chip_endpoints                                       = chip_endpoints;
 exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
 exports.if_chip_enum                                         = if_chip_enum;
-exports.if_in_global_responses                               = if_in_global_responses;
+exports.if_chip_complex                                      = if_chip_complex;
+exports.if_basic_global_response                             = if_basic_global_response;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
+exports.chip_access_elements                                 = chip_access_elements
+exports.if_is_strongly_typed_chip_enum                       = if_is_strongly_typed_chip_enum
+exports.if_is_strongly_typed_bitmap                          = if_is_strongly_typed_bitmap

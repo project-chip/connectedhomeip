@@ -13,17 +13,3 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-source_set("device_callbacks_manager") {
-  sources = [
-    "CHIPDeviceCallbacksMgr.cpp",
-    "CHIPDeviceCallbacksMgr.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
-
-  cflags = [ "-Wconversion" ]
-}

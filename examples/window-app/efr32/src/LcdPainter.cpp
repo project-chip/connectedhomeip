@@ -20,6 +20,8 @@
 #include <LcdPainter.h>
 #include <lcd.h>
 
+using namespace chip::app::Clusters::WindowCovering;
+
 constexpr uint32_t sTiltIcon[] = {
     0xffffffff, 0xffffffff, 0xc0000003, 0xc0000003, 0xc0000003, 0xc0000003, 0xc1ffffc3, 0xc1ffffc3,
     0xc1ffffc3, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003, 0xc003c003,
@@ -48,9 +50,9 @@ constexpr uint32_t sTwoIcon[] = {
     0xc3ffffc3, 0xc3ffffc3, 0xc3ffffc3, 0xc0000003, 0xc0000003, 0xc0000003, 0xffffffff, 0xffffffff,
 };
 
-PixelPainter::PixelPainter(uint8_t lift, uint8_t tilt) : mLift(lift), mTilt(tilt) {}
+PixelPainter::PixelPainter(uint16_t lift, uint16_t tilt) : mLift(lift), mTilt(tilt) {}
 
-CompositePainter::CompositePainter(uint8_t lift, uint8_t tilt, PixelPainter * painter1, PixelPainter * painter2,
+CompositePainter::CompositePainter(uint16_t lift, uint16_t tilt, PixelPainter * painter1, PixelPainter * painter2,
                                    PixelPainter * painter3) :
     PixelPainter(lift, tilt),
     mPainter1(painter1), mPainter2(painter2), mPainter3(painter3)
@@ -103,7 +105,7 @@ uint8_t FramePainter::Color(uint32_t x, uint32_t y)
     return -1;
 }
 
-IconPainter::IconPainter(uint8_t lift, uint8_t tilt, LcdIcon icon) : PixelPainter(lift, tilt), mIcon(icon)
+IconPainter::IconPainter(uint16_t lift, uint16_t tilt, LcdIcon icon) : PixelPainter(lift, tilt), mIcon(icon)
 {
     mIconSize   = sizeof(sTiltIcon) / sizeof(uint32_t);
     mIconOffset = (LCD_SIZE - mIconSize) / 2;
@@ -148,7 +150,7 @@ uint8_t HorizontalShadePainter::Color(uint32_t x, uint32_t y)
     return (x % 2) && x < (uint32_t)(LCD_FRAME_SIZE + mLift);
 }
 
-VerticalBlindPainter::VerticalBlindPainter(uint8_t lift, uint8_t tilt) : PixelPainter(lift, tilt)
+VerticalBlindPainter::VerticalBlindPainter(uint16_t lift, uint16_t tilt) : PixelPainter(lift, tilt)
 {
     mBandSize = (LCD_COVER_SIZE / sBandCount);
 }
@@ -175,33 +177,32 @@ uint8_t VerticalBlindPainter::Color(uint32_t x, uint32_t y)
     }
 }
 
-PixelPainter * LcdPainter::GetCoverPainter(EmberAfWcType type, uint8_t lift, uint8_t tilt)
+PixelPainter * LcdPainter::GetCoverPainter(Type type, uint16_t lift, uint16_t tilt)
 {
     switch (type)
     {
-    case EMBER_ZCL_WC_TYPE_ROLLERSHADE:
-    case EMBER_ZCL_WC_TYPE_ROLLERSHADE2_MOTOR:
-    case EMBER_ZCL_WC_TYPE_ROLLERSHADE_EXTERIOR:
-    case EMBER_ZCL_WC_TYPE_ROLLERSHADE_EXTERIOR2_MOTOR:
+    case Type::kRollerShade:
+    case Type::kRollerShade2Motor:
+    case Type::kRollerShadeExterior:
+    case Type::kRollerShadeExterior2Motor:
         return new VerticalShadePainter(lift, tilt);
-
-    case EMBER_ZCL_WC_TYPE_DRAPERY:
-    case EMBER_ZCL_WC_TYPE_AWNING:
+    case Type::kDrapery:
+    case Type::kAwning:
         return new HorizontalShadePainter(lift, tilt);
-
-    case EMBER_ZCL_WC_TYPE_SHUTTER:
-    case EMBER_ZCL_WC_TYPE_TILT_BLIND_TILT_ONLY:
-    case EMBER_ZCL_WC_TYPE_TILT_BLIND_LIFT_AND_TILT:
+    case Type::kShutter:
+    case Type::kTiltBlindTiltOnly:
+    case Type::kTiltBlindLiftAndTilt:
         return new VerticalBlindPainter(lift, tilt);
-
-    case EMBER_ZCL_WC_TYPE_PROJECTOR_SCREEN:
-    case EMBER_ZCL_WC_TYPE_UNKNOWN:
+    case Type::kProjectorScreen:
+    case Type::kUnknown:
     default:
         return new VerticalShadePainter(lift, tilt);
     }
+
+    return nullptr;
 }
 
-void LcdPainter::Paint(EmberAfWcType type, uint8_t lift, uint8_t tilt, LcdIcon icon)
+void LcdPainter::Paint(Type type, uint16_t lift, uint16_t tilt, LcdIcon icon)
 {
     FramePainter framePaint         = FramePainter(lift, tilt);
     IconPainter iconPaint           = IconPainter(lift, tilt, icon);

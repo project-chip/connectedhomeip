@@ -56,33 +56,57 @@ private:
      *  2. The path provided in aPath is similar to what is buffered but we've hit the end of the report.
      *
      */
-    CHIP_ERROR DispatchBufferedData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, const StatusIB & aStatus,
-                                    bool aEndOfReport = false);
+    CHIP_ERROR DispatchBufferedData(const ConcreteAttributePath & aPath, const StatusIB & aStatus, bool aEndOfReport = false);
 
     /*
      * Buffer up list data as they arrive.
      */
     CHIP_ERROR BufferData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apReader);
 
-private:
     //
     // ReadClient::Callback
     //
-    void OnReportBegin(const ReadClient * apReadClient) override;
-    void OnReportEnd(const ReadClient * apReadClient) override;
-    void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
-                         const StatusIB & aStatus) override;
-    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override { return mCallback.OnError(apReadClient, aError); }
-    void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const StatusIB * apStatus) override
+    void OnReportBegin() override;
+    void OnReportEnd() override;
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnError(CHIP_ERROR aError) override
     {
-        return mCallback.OnEventData(apReadClient, aEventHeader, apData, apStatus);
+        mBufferedList.clear();
+        return mCallback.OnError(aError);
+    }
+
+    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override
+    {
+        return mCallback.OnEventData(aEventHeader, apData, apStatus);
     }
 
     void OnDone(ReadClient * apReadClient) override { return mCallback.OnDone(apReadClient); }
-    void OnSubscriptionEstablished(const ReadClient * apReadClient) override { mCallback.OnSubscriptionEstablished(apReadClient); }
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    {
+        mCallback.OnSubscriptionEstablished(aSubscriptionId);
+    }
 
-private:
+    void OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec) override
+    {
+        mCallback.OnResubscriptionAttempt(aTerminationCause, aNextResubscribeIntervalMsec);
+    }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        return mCallback.OnDeallocatePaths(std::move(aReadPrepareParams));
+    }
+
+    virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
+                                                     const Span<AttributePathParams> & aAttributePaths,
+                                                     bool & aEncodedDataVersionList) override
+    {
+        return mCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList);
+    }
+
+    virtual CHIP_ERROR GetHighestReceivedEventNumber(Optional<EventNumber> & aEventNumber) override
+    {
+        return mCallback.GetHighestReceivedEventNumber(aEventNumber);
+    }
     /*
      * Given a reader positioned at a list element, allocate a packet buffer, copy the list item where
      * the reader is positioned into that buffer and add it to our buffered list for tracking.
@@ -91,7 +115,6 @@ private:
      *
      */
     CHIP_ERROR BufferListItem(TLV::TLVReader & reader);
-
     ConcreteDataAttributePath mBufferedPath;
     std::vector<System::PacketBufferHandle> mBufferedList;
     Callback & mCallback;

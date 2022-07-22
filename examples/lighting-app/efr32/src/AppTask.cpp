@@ -21,8 +21,12 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#ifdef DISPLAY_ENABLED
 #include "lcd.h"
+#ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
+#endif // QR_CODE_ENABLED
+#endif // DISPLAY_ENABLED
 #include "sl_simple_led_instances.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
@@ -34,9 +38,6 @@
 #include <app/util/attribute-storage.h>
 
 #include <assert.h>
-
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -53,6 +54,8 @@
 #endif
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/EFR32/NetworkCommissioningWiFiDriver.h>
 #endif /* SL_WIFI */
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -67,6 +70,9 @@
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_LIGHT_SWITCH &sl_button_btn1
 
+using namespace chip;
+using namespace ::chip::DeviceLayer;
+
 namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -80,6 +86,9 @@ LEDWidget sLightLED;
 bool sIsWiFiProvisioned = false;
 bool sIsWiFiEnabled     = false;
 bool sIsWiFiAttached    = false;
+
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -148,56 +157,9 @@ Identify gIdentify = {
     OnTriggerIdentifyEffect,
 };
 
-/**********************************************************
- * OffWithEffect Callbacks
- *********************************************************/
-
-void OnTriggerOffWithEffect(OnOffEffect * effect)
-{
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant                                      = effect->mEffectVariant;
-
-    // Uses print outs until we can support the effects
-    if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
-    {
-        if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS)
-        {
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS");
-        }
-        else if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE)
-        {
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE");
-        }
-        else if (effectVariant ==
-                 EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS)
-        {
-            ChipLogProgress(Zcl,
-                            "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_"
-                            "IN_12_SECONDS");
-        }
-    }
-    else if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT)
-    {
-        if (effectVariant ==
-            EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND)
-        {
-            ChipLogProgress(
-                Zcl, "EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND");
-        }
-    }
-}
-
-OnOffEffect gEffect = {
-    chip::EndpointId{ 1 },
-    OnTriggerOffWithEffect,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
-    static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
-};
-
 } // namespace
 
 using namespace chip::TLV;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -231,12 +193,9 @@ CHIP_ERROR AppTask::Init()
     }
     EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
-#endif
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
@@ -266,17 +225,18 @@ CHIP_ERROR AppTask::Init()
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLightLED.Init(LIGHT_LED);
     sLightLED.Set(LightMgr().IsLightOn());
-    UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
 
 // Print setup info on LCD if available
-#ifdef DISPLAY_ENABLED
-    std::string QRCode;
+#if QR_CODE_ENABLED
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
 
     if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
     {
-        LCDWriteQRCode((uint8_t *) QRCode.c_str());
+        LCDWriteQRCode((uint8_t *) QRCode.data());
     }
     else
     {
@@ -284,7 +244,7 @@ CHIP_ERROR AppTask::Init()
     }
 #else
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#endif
+#endif // QR_CODE_ENABLED
 
     return err;
 }
@@ -484,7 +444,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     {
         // Actually trigger Factory Reset
         sAppTask.mFunction = kFunction_NoneSelected;
-        ConfigurationMgr().InitiateFactoryReset();
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -606,7 +566,7 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 
     if (sAppTask.mSyncClusterToButtonAction)
     {
-        UpdateClusterState();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
         sAppTask.mSyncClusterToButtonAction = false;
     }
 }
@@ -665,7 +625,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState(void)
+void AppTask::UpdateClusterState(intptr_t context)
 {
     uint8_t newValue = LightMgr().IsLightOn();
 

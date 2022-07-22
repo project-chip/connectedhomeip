@@ -24,11 +24,16 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#if !CHIP_DISABLE_PLATFORM_KVS
+#include <platform/Darwin/DeviceInstanceInfoProviderImpl.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#endif
+
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
-#include <platform/internal/GenericPlatformManagerImpl.cpp>
+#include <platform/internal/GenericPlatformManagerImpl.ipp>
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -42,17 +47,24 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     CHIP_ERROR err;
 
     // Initialize the configuration system.
+#if !CHIP_DISABLE_PLATFORM_KVS
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
+#endif // CHIP_DISABLE_PLATFORM_KVS
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     mRunLoopSem = dispatch_semaphore_create(0);
+
+    // Ensure there is a dispatch queue available
+    GetWorkQueue();
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
+
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
 
@@ -62,9 +74,9 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 {
-    if (mIsWorkQueueRunning == false)
+    if (mIsWorkQueueSuspended)
     {
-        mIsWorkQueueRunning = true;
+        mIsWorkQueueSuspended = false;
         dispatch_resume(mWorkQueue);
     }
 
@@ -73,9 +85,9 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask()
 
 CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
 {
-    if (mIsWorkQueueRunning == true)
+    if (!mIsWorkQueueSuspended && !mIsWorkQueueSuspensionPending)
     {
-        mIsWorkQueueRunning = false;
+        mIsWorkQueueSuspensionPending = true;
         if (dispatch_get_current_queue() != mWorkQueue)
         {
             // dispatch_sync is used in order to guarantee serialization of the caller with
@@ -83,6 +95,9 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
             dispatch_sync(mWorkQueue, ^{
                 dispatch_suspend(mWorkQueue);
             });
+
+            mIsWorkQueueSuspended         = true;
+            mIsWorkQueueSuspensionPending = false;
         }
         else
         {
@@ -92,6 +107,8 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
             // that no more tasks will run on the queue.
             dispatch_async(mWorkQueue, ^{
                 dispatch_suspend(mWorkQueue);
+                mIsWorkQueueSuspended         = true;
+                mIsWorkQueueSuspensionPending = false;
                 dispatch_semaphore_signal(mRunLoopSem);
             });
         }
@@ -111,14 +128,19 @@ void PlatformManagerImpl::_RunEventLoop()
     dispatch_semaphore_wait(mRunLoopSem, DISPATCH_TIME_FOREVER);
 }
 
-CHIP_ERROR PlatformManagerImpl::_Shutdown()
+void PlatformManagerImpl::_Shutdown()
 {
     // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
-    return GenericPlatformManagerImpl<ImplClass>::_Shutdown();
+    GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 }
 
 CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 {
+    if (mWorkQueue == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     const ChipDeviceEvent eventCopy = *event;
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);
@@ -126,50 +148,14 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(
-    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 {
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-{
-    // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
-    supportedLocales.add(CharSpan("Test", strlen("Test")));
-    supportedLocales.add(CharSpan("en-US", strlen("en-US")));
-    supportedLocales.add(CharSpan("de-DE", strlen("de-DE")));
-    supportedLocales.add(CharSpan("fr-FR", strlen("fr-FR")));
-    supportedLocales.add(CharSpan("en-GB", strlen("en-GB")));
-    supportedLocales.add(CharSpan("es-ES", strlen("es-ES")));
-    supportedLocales.add(CharSpan("zh-CN", strlen("zh-CN")));
-    supportedLocales.add(CharSpan("it-IT", strlen("it-IT")));
-    supportedLocales.add(CharSpan("ja-JP", strlen("ja-JP")));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PlatformManagerImpl::_GetSupportedCalendarTypes(
-    AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-{
-    // In Darwin simulation, return following supported Calendar Types
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kBuddhist);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kChinese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kCoptic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kEthiopian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kGregorian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kHebrew);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIndian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kIslamic);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kJapanese);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kKorean);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kPersian);
-    supportedCalendarTypes.add(app::Clusters::TimeFormatLocalization::CalendarType::kTaiwanese);
-
-    return CHIP_NO_ERROR;
-}
+    // If we have no work queue, or it's suspended, then we assume our caller
+    // knows what they are doing in terms of their own concurrency.
+    return !mWorkQueue || mIsWorkQueueSuspended || dispatch_get_current_queue() == mWorkQueue;
+};
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

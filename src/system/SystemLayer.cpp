@@ -26,7 +26,7 @@ CHIP_ERROR Layer::ScheduleLambdaBridge(LambdaBridge && bridge)
     CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, std::move(bridge));
     if (lReturn != CHIP_NO_ERROR)
     {
-        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %s", ErrorStr(lReturn));
+        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %" CHIP_ERROR_FORMAT, lReturn.Format());
     }
     return lReturn;
 }

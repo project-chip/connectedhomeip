@@ -41,6 +41,8 @@ static_library("Tizen") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "DeviceInstanceInfoProviderImpl.cpp",
+    "DeviceInstanceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
@@ -51,6 +53,9 @@ static_library("Tizen") {
     "Logging.cpp",
     "MainLoop.cpp",
     "MainLoop.h",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -74,5 +79,12 @@ static_library("Tizen") {
     sources += [ "DnssdImpl.cpp" ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
   }
 }

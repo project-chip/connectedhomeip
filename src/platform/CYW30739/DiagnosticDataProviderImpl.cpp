@@ -29,6 +29,10 @@
 #include <hal/wiced_memory.h>
 #include <malloc.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/OpenThread/OpenThreadUtils.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -63,6 +67,83 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     currentHeapHighWatermark = mallocInfo.arena;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+    if (err == CHIP_NO_ERROR)
+    {
+        // If the value overflows, return UINT16 max value to provide best-effort number.
+        rebootCount = static_cast<uint16_t>(count <= UINT16_MAX ? count : UINT16_MAX);
+    }
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    uint32_t reason = 0;
+    CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<BootReasonType>(reason);
+    }
+
+    return err;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    auto ifp = Platform::New<NetworkInterface>();
+    VerifyOrReturnError(ifp != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress);
+    ifp->type            = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+
+    static_assert(sizeof(ifp->MacAddress) >= ConfigurationManager::kPrimaryMACAddressLength, "Invalid MacAddress buffer size");
+    ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
+
+    /* Thread only support IPv6 */
+    uint8_t ipv6AddressesCount = 0;
+    for (Inet::InterfaceAddressIterator iterator; iterator.Next() && ipv6AddressesCount < kMaxIPv6AddrCount;)
+    {
+        chip::Inet::IPAddress ipv6Address;
+        if (iterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+            ipv6AddressesCount++;
+        }
+    }
+    ifp->IPv6Addresses = app::DataModel::List<const ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+
+    *netifpp = ifp;
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        Platform::Delete(del);
+    }
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_THREAD */
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

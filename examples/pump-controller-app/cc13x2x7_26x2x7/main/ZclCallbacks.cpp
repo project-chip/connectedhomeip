@@ -29,8 +29,8 @@
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
-                                       uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
 {
     if (attributePath.mClusterId == OnOff::Id && attributePath.mAttributeId == OnOff::Attributes::OnOff::Id)
     {
@@ -39,7 +39,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     else if (attributePath.mClusterId == LevelControl::Id &&
              attributePath.mAttributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
-        ChipLogProgress(Zcl, "[pump-app] Cluster LevelControl: attribute CurrentLevel set to %" PRIu8, *value);
+        ChipLogProgress(Zcl, "[pump-app] Cluster LevelControl: attribute CurrentLevel set to %u", *value);
     }
     else
     {

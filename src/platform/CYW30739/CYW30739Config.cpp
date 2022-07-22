@@ -38,28 +38,27 @@ CHIP_ERROR CYW30739Config::Init()
 template <typename T>
 CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, T & val)
 {
-    wiced_result_t result;
-    uint16_t read_count = wiced_hal_read_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, sizeof(val), (uint8_t *) &val, &result);
-    if (result != WICED_SUCCESS || read_count != sizeof(val))
-    {
-        read_count = wiced_hal_read_nvram_static(PLATFORM_NVRAM_SSID_MATTER_BASE + key, sizeof(val), &val, &result);
-    }
-    if (result == WICED_SUCCESS && read_count == sizeof(val))
-        return CHIP_NO_ERROR;
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    size_t read_count;
+    ReturnErrorOnFailure(ReadConfigValueBin(key, &val, sizeof(val), read_count));
+    VerifyOrReturnError(sizeof(val) == read_count, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CYW30739Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return ReadConfigValueBin(key, reinterpret_cast<uint8_t *>(buf), bufSize, outLen);
+    return ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
+    return ReadConfigValueBin(key, static_cast<void *>(buf), bufSize, outLen);
+}
+
+CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, void * buf, size_t bufSize, size_t & outLen)
+{
     wiced_result_t result;
     uint16_t read_count = wiced_hal_read_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, bufSize, (uint8_t *) buf, &result);
-    if (result != WICED_SUCCESS)
+    if (kMinConfigKey_ChipFactory <= key && key <= kMaxConfigKey_ChipFactory && result != WICED_SUCCESS)
     {
         read_count = wiced_hal_read_nvram_static(PLATFORM_NVRAM_SSID_MATTER_BASE + key, bufSize, buf, &result);
     }
@@ -68,15 +67,16 @@ CHIP_ERROR CYW30739Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t buf
         outLen = read_count;
         return CHIP_NO_ERROR;
     }
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, bool & val);
 template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, uint32_t & val);
 template CHIP_ERROR CYW30739Config::ReadConfigValue(Key key, uint64_t & val);
 
-CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, uint32_t val)
+template <typename T>
+CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, T val)
 {
     wiced_result_t result;
     uint16_t write_count = wiced_hal_write_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, sizeof(val), (uint8_t *) &val, &result);
@@ -86,6 +86,10 @@ CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, uint32_t val)
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
+template CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, bool val);
+template CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, uint32_t val);
+template CHIP_ERROR CYW30739Config::WriteConfigValue(Key key, uint64_t val);
+
 CHIP_ERROR CYW30739Config::WriteConfigValueStr(Key key, const char * str)
 {
     return WriteConfigValueStr(key, str, (str != NULL) ? strlen(str) : 0);
@@ -93,33 +97,51 @@ CHIP_ERROR CYW30739Config::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR CYW30739Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return WriteConfigValueBin(key, reinterpret_cast<const uint8_t *>(str), strLen);
+    return WriteConfigValueBin(key, str, strLen);
 }
 
 CHIP_ERROR CYW30739Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    wiced_result_t result;
-    wiced_hal_write_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, dataLen, (uint8_t *) data, &result);
-    if (result == WICED_SUCCESS)
+    return WriteConfigValueBin(key, static_cast<const void *>(data), dataLen);
+}
+
+CHIP_ERROR CYW30739Config::WriteConfigValueBin(Key key, const void * data, size_t dataLen)
+{
+    /* Skip writing because the write API reports error result for zero length data. */
+    if (dataLen == 0)
         return CHIP_NO_ERROR;
-    else
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+    wiced_result_t result;
+    const uint16_t write_count = wiced_hal_write_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, dataLen, (uint8_t *) data, &result);
+    if (result == WICED_SUCCESS && write_count == dataLen)
+        return CHIP_NO_ERROR;
+
+    ChipLogError(DeviceLayer, "%s wiced_hal_write_nvram %u", __func__, result);
+    return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+}
+
+CHIP_ERROR CYW30739Config::ClearConfigValue(Key key)
+{
+    wiced_result_t result;
+    wiced_hal_delete_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, &result);
+    if (result == WICED_SUCCESS)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 bool CYW30739Config::ConfigValueExists(Key key)
 {
-    wiced_result_t result;
-    wiced_hal_read_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, 0, NULL, &result);
-    if (result != WICED_SUCCESS)
-        wiced_hal_read_nvram_static(PLATFORM_NVRAM_SSID_MATTER_BASE + key, 0, NULL, &result);
-    return result == WICED_SUCCESS;
+    uint8_t val;
+    return ChipError::IsSuccess(ReadConfigValue(key, val));
 }
 
 CHIP_ERROR CYW30739Config::FactoryResetConfig(void)
 {
-    wiced_result_t result;
-    for (Key key = kConfigKey_Base; key <= kConfigKey_Max; key++)
-        wiced_hal_delete_nvram(PLATFORM_NVRAM_VSID_MATTER_BASE + key, &result);
+    for (Key key = kMinConfigKey_ChipConfig; key <= kMaxConfigKey_ChipConfig; key++)
+        ClearConfigValue(key);
     return CHIP_NO_ERROR;
 }
 

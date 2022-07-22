@@ -30,7 +30,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
 
 #include <drivers/entropy.h>
 #include <malloc.h>
@@ -47,7 +47,7 @@ static k_timer sOperationalHoursSavingTimer;
 #if !CONFIG_NORDIC_SECURITY_BACKEND
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
-    const struct device * entropy = device_get_binding(DT_CHOSEN_ZEPHYR_ENTROPY_LABEL);
+    const struct device * entropy = DEVICE_DT_GET(DT_CHOSEN(zephyr_entropy));
     int ret                       = entropy_get_entropy(entropy, output, len);
 
     if (ret == 0)
@@ -107,7 +107,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
 #if !CONFIG_NORDIC_SECURITY_BACKEND
     // Add entropy source based on Zephyr entropy driver
@@ -125,20 +124,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     k_timer_start(&sOperationalHoursSavingTimer, K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL),
                   K_HOURS(CONFIG_CHIP_OPERATIONAL_TIME_SAVE_INTERVAL));
 
-    ScheduleWork(OnDeviceBoot, 0);
-
 exit:
     return err;
-}
-
-void PlatformManagerImpl::OnDeviceBoot(intptr_t arg)
-{
-    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
-
-    if (generalDiagnosticsDelegate)
-    {
-        generalDiagnosticsDelegate->OnDeviceRebooted();
-    }
 }
 
 } // namespace DeviceLayer

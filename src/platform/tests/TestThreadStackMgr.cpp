@@ -46,6 +46,7 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     {
         if (event->ThreadConnectivityChange.Result == chip::DeviceLayer::ConnectivityChange::kConnectivity_Established)
         {
+            chip::Platform::MemoryShutdown();
             exit(0);
         }
     }
@@ -76,6 +77,7 @@ int TestThreadStackManager()
     printf("Start Thread task done\n");
 
     chip::DeviceLayer::PlatformMgrImpl().RunEventLoop();
+    chip::Platform::MemoryShutdown();
 
     return -1;
 }

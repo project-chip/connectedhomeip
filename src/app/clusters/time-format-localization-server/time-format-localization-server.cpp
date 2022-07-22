@@ -29,6 +29,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -57,18 +58,32 @@ TimeFormatLocalizationAttrAccess gAttrAccess;
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::AttributeList<CalendarType, DeviceLayer::kMaxCalendarTypes> supportedCalendarTypes;
 
-    if (DeviceLayer::PlatformMgr().GetSupportedCalendarTypes(supportedCalendarTypes) == CHIP_NO_ERROR)
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+
+    if (provider)
     {
-        err = aEncoder.EncodeList([&supportedCalendarTypes](const auto & encoder) -> CHIP_ERROR {
-            for (auto type : supportedCalendarTypes)
-            {
-                ReturnErrorOnFailure(encoder.Encode(type));
-            }
+        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
 
-            return CHIP_NO_ERROR;
-        });
+        if (it)
+        {
+            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+                CalendarType type;
+
+                while (it->Next(type))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(type));
+                }
+
+                return CHIP_NO_ERROR;
+            });
+
+            it->Release();
+        }
+        else
+        {
+            err = aEncoder.EncodeEmptyList();
+        }
     }
     else
     {
@@ -96,24 +111,32 @@ CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePat
 // if there are any, and to kBuddhist if there are not.
 bool IsSupportedCalendarType(CalendarType newType, CalendarType & validType)
 {
-    DeviceLayer::AttributeList<CalendarType, DeviceLayer::kMaxCalendarTypes> supportedCalendarTypes;
+    // Reset valid type if no supported calendar types found.
+    validType = CalendarType::kBuddhist;
 
-    if (DeviceLayer::PlatformMgr().GetSupportedCalendarTypes(supportedCalendarTypes) == CHIP_NO_ERROR)
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+
+    if (provider)
     {
-        for (auto type : supportedCalendarTypes)
+        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
+
+        if (it)
         {
-            validType = type;
+            CalendarType type;
 
-            if (validType == newType)
+            while (it->Next(type))
             {
-                return true;
+                validType = type;
+
+                if (validType == newType)
+                {
+                    it->Release();
+                    return true;
+                }
             }
+
+            it->Release();
         }
-    }
-    else
-    {
-        // Reset valid type if no supported calendar types found.
-        validType = CalendarType::kBuddhist;
     }
 
     return false;

@@ -16,6 +16,7 @@ name:
     27.2.8. [TC-CC-4.4] MoveToHueAndSaturation functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -23,6 +24,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
@@ -35,53 +40,70 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "TH reads CurrentHue attribute from DUT."
+      PICS: CC.S.F01 && CC.S.A0000
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
-          value: 250
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
-    - label: "Check Saturation attribute value matched before any change"
-      disabled: true
+    - label: "TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
-          value: 90
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
-    - label: "Move To current hue and saturation command"
+    - label: "TH sends MoveToHueAndSaturation command to DUT."
+      PICS: CC.S.F01 && CC.S.C06.Rsp
       command: "MoveToHueAndSaturation"
       arguments:
           values:
               - name: "hue"
                 value: 40
-              - name: "saturation"
+              - name: "Saturation"
                 value: 160
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 10
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0000
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
-          value: 40
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label:
-          "Check Saturation attribute value matched the value sent by the last
-          command"
-      disabled: true
+          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT"
+      PICS: CC.S.F01 && CC.S.A0001
       command: "readAttribute"
-      attribute: "current saturation"
+      attribute: "CurrentSaturation"
       response:
-          value: 160
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

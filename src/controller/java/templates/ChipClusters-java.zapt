@@ -4,6 +4,7 @@
 package chip.devicecontroller;
 
 import androidx.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class ChipClusters {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
     void onError(Exception error);
+    {{! TODO: use SubscriptionEstablishedCallback instead, here and below. }}
     default void onSubscriptionEstablished() {}
   }
 
@@ -95,24 +97,25 @@ public class ChipClusters {
 
     {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, null);
+      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, null);
     }
     {{/unless}}
 
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, int timedInvokeTimeoutMs) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, timedInvokeTimeoutMs);
+      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      , int timedInvokeTimeoutMs) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, timedInvokeTimeoutMs);
     }
   {{/chip_cluster_commands}}
   {{#chip_cluster_commands}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}
+      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
       , @Nullable Integer timedInvokeTimeoutMs);
   {{/chip_cluster_commands}}
   {{#chip_cluster_responses}}
     public interface {{asUpperCamelCase name}}Callback {
-      void onSuccess({{>command_callback_responses parent=..}});
+      void onSuccess({{#chip_cluster_response_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_response_arguments}});
       
       void onError(Exception error);
     }
@@ -120,115 +123,26 @@ public class ChipClusters {
   {{/chip_cluster_responses}}
 
   {{#chip_server_cluster_attributes}}
-  {{! TODO: Add support for struct-typed attributes }}
   {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-  {{#if isList}}
-  {{#if isStruct}}
-    public static class {{asUpperCamelCase name}}Attribute {
-    {{#chip_attribute_list_entryTypes}}
-      {{#if isNullable}}
-      {{! 'unless' blocks are temporary until optional array / struct implemented }}
-      {{#unless isArray}}
-      {{#unless isStruct}}
-      @Nullable
-      {{/unless}}
-      {{/unless}}
-      {{/if}}
-      {{#if isArray}}
-      {{! TODO: Add support for lists here }}
-      {{else if isStruct}}
-      {{! TODO: Add support for structs here }}
-      {{else if (isOctetString type)}}
-      public {{#if isOptional}}Optional<{{/if}}byte[]{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}};
-      {{else if (isCharString type)}}
-      public {{#if isOptional}}Optional<{{/if}}String{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}};
-      {{else}}
-      public {{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType label type}}{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}};
-      {{/if}}
-    {{/chip_attribute_list_entryTypes}}
-
-      public {{asUpperCamelCase name}}Attribute(
-        {{#chip_attribute_list_entryTypes}}
-        {{#if isNullable}}
-        {{#unless isArray}}
-        {{#unless isStruct}}
-        @Nullable
-        {{/unless}}
-        {{/unless}}
-        {{/if}}
-        {{#if isArray}}
-        {{! TODO: Add support for lists here }}
-        {{else if isStruct}}
-        {{! TODO: Add support for structs here }}
-        {{else if (isOctetString type)}}
-        {{#if isOptional}}Optional<{{/if}}byte[]{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}} {{#notLastSupportedEntryTypes ..}},{{/notLastSupportedEntryTypes}}
-        {{else if (isCharString type)}}
-        {{#if isOptional}}Optional<{{/if}}String{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}} {{#notLastSupportedEntryTypes ..}},{{/notLastSupportedEntryTypes}}
-        {{else}}
-        {{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType label type}}{{#if isOptional}}>{{/if}} {{asLowerCamelCase name}} {{#notLastSupportedEntryTypes ..}},{{/notLastSupportedEntryTypes}}
-        {{/if}}
-        {{/chip_attribute_list_entryTypes}}
-      ) {
-        {{#chip_attribute_list_entryTypes}}
-        {{#if isArray}}
-        {{! TODO: Add support for lists here }}
-        {{else if isStruct}}
-        {{! TODO: Add support for structs here }}
-        {{else}}
-        this.{{asLowerCamelCase name}} = {{asLowerCamelCase name}};
-        {{/if}}
-        {{/chip_attribute_list_entryTypes}}
-      }
-
-      @Override
-      public String toString() {
-        StringBuilder output = new StringBuilder("");
-          {{#chip_attribute_list_entryTypes}}
-            {{#if isOptional}}
-            {{! TODO: Add support for optional types here }}
-            {{else if isNullable}}
-            {{! TODO: Add support for nullable types here }}
-            {{else if isArray}}
-            {{! TODO: Add support for lists here }}
-            {{else if isStruct}}
-            {{! TODO: Add support for structs here }}
-            {{else if (isOctetString type)}}
-            output.append("byte[] ");
-            output.append(Arrays.toString({{asLowerCamelCase name}}));
-            output.append("\n");
-            {{else if (isCharString type)}}
-            output.append("String {{asLowerCamelCase name}}: ");
-            output.append(this.{{asLowerCamelCase name}});
-            output.append("\n");
-            {{else}}
-            output.append("{{asJavaBasicType label type}} {{asLowerCamelCase name}}: ");
-            output.append(this.{{asLowerCamelCase name}});
-            output.append("\n");
-            {{/if}}
-
-          {{/chip_attribute_list_entryTypes}}
-        return output.toString();
-      }
-    }
-    {{/if}}
-  {{/if}}
-
-  {{#if_in_global_responses}}
+  {{#if_basic_global_response}}
   {{else}}
-    {{#if isList}}
+    {{! NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to
+          false. }}
+    {{~#*inline "asJavaTypeForEntry"}}{{asJavaType type null parent.name forceNotList=true}}{{/inline~}}
+    {{#if isArray}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
-        void onSuccess(List<{{#>list_attribute_callback_type}}{{/list_attribute_callback_type}}> valueList);
+        void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{>asJavaTypeForEntry isArray=false}}> valueList);
         void onError(Exception ex);
         default void onSubscriptionEstablished() {}
       }
     {{else}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
-        void onSuccess({{#>list_attribute_callback_type}}{{/list_attribute_callback_type}} value);
+        void onSuccess({{#if isNullable}}@Nullable{{/if}} {{>asJavaTypeForEntry isArray=false}} value);
         void onError(Exception ex);
         default void onSubscriptionEstablished() {}
       }
     {{/if}}
-  {{/if_in_global_responses}}
+  {{/if_basic_global_response}}
   {{/unless}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
@@ -236,40 +150,35 @@ public class ChipClusters {
   {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
     public void read{{asUpperCamelCase name}}Attribute(
-    {{#if_in_global_responses}}
+    {{#if_basic_global_response}}
       {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
     {{else}}
       {{asUpperCamelCase name}}AttributeCallback callback
-    {{/if_in_global_responses}}
+    {{/if_basic_global_response}}
     ) {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
   {{#if isWritableAttribute}}
-  {{! TODO: Lists not supported in attribute writes yet. }}
-  {{#unless isList}}
     {{#unless mustUseTimedWrite}}
-    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback{{>java_type_for_argument}} value) {
+    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, null);
     }
     {{/unless}}
 
-    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback{{>java_type_for_argument}} value, int timedWriteTimeoutMs) {
+    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value, int timedWriteTimeoutMs) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
-  {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
-  {{#unless isList}}
     public void subscribe{{asCamelCased name false}}Attribute(
-      {{#if_in_global_responses}}
+      {{#if_basic_global_response}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_in_global_responses}},
+      {{/if_basic_global_response}},
       int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
-  {{/unless}}
   {{/if}}
   {{/unless}}
   {{/chip_server_cluster_attributes}}
@@ -278,28 +187,23 @@ public class ChipClusters {
   {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
-      {{#if_in_global_responses}}
+      {{#if_basic_global_response}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_in_global_responses}}
+      {{/if_basic_global_response}}
     );
   {{#if isWritableAttribute}}
-  {{! TODO: Lists not supported in attribute writes yet. }}
-  {{#unless isList}}
 
-    private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback{{>java_type_for_argument}} value, @Nullable Integer timedWriteTimeoutMs);
-  {{/unless}}
+    private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{asJavaType type chipType parent.name}} value, @Nullable Integer timedWriteTimeoutMs);
   {{/if}}
   {{#if isReportableAttribute}}
-  {{#unless isList}}
     private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
-      {{#if_in_global_responses}}
+      {{#if_basic_global_response}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_in_global_responses}}, int minInterval, int maxInterval);
-  {{/unless}}
+      {{/if_basic_global_response}}, int minInterval, int maxInterval);
   {{/if}}
   {{/unless}}
   {{/chip_server_cluster_attributes}}

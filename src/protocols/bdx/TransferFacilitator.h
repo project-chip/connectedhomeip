@@ -41,13 +41,22 @@ namespace bdx {
  * This class contains a repeating timer which regurlaly polls the TransferSession state machine.
  * A CHIP node may have many TransferFacilitator instances but only one TransferFacilitator should be used for each BDX transfer.
  */
-class TransferFacilitator : public Messaging::ExchangeDelegate
+class TransferFacilitator : public Messaging::ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
 public:
     TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
-    ~TransferFacilitator() = default;
+    ~TransferFacilitator() override = default;
 
 private:
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
+    {
+        // TODO: Implement a bdx manager, which dispatch bdx messages to bdx transections.
+        // directly.
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+
     // Inherited from ExchangeContext
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
                                  chip::System::PacketBufferHandle && payload) override;
@@ -85,6 +94,7 @@ protected:
     System::Clock::Timeout mPollFreq;
     static constexpr System::Clock::Timeout kDefaultPollFreq    = System::Clock::Milliseconds32(500);
     static constexpr System::Clock::Timeout kImmediatePollDelay = System::Clock::Milliseconds32(1);
+    bool mStopPolling                                           = false;
 };
 
 /**

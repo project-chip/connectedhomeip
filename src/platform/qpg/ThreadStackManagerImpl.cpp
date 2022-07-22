@@ -26,7 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -66,7 +66,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:

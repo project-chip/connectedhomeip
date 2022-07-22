@@ -19,38 +19,71 @@
 #include "AudioOutputManager.h"
 
 using namespace std;
+using namespace chip::app;
 using namespace chip::app::Clusters::AudioOutput;
+
+AudioOutputManager::AudioOutputManager()
+{
+    mCurrentOutput = 1;
+
+    for (int i = 1; i < 4; ++i)
+    {
+        OutputInfoType outputInfo;
+        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
+        // note: safe only because of use of string literal
+        outputInfo.name  = chip::CharSpan::fromCharString("HDMI");
+        outputInfo.index = static_cast<uint8_t>(i);
+        mOutputs.push_back(outputInfo);
+    }
+}
 
 uint8_t AudioOutputManager::HandleGetCurrentOutput()
 {
-    return 0;
+    return mCurrentOutput;
 }
 
-std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList()
+CHIP_ERROR AudioOutputManager::HandleGetOutputList(AttributeValueEncoder & aEncoder)
 {
-    std::list<Structs::OutputInfo::Type> list;
     // TODO: Insert code here
-    int maximumVectorSize = 3;
-
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
-        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-        outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
-        outputInfo.index      = static_cast<uint8_t>(1 + i);
-        list.push_back(outputInfo);
-    }
-    return list;
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & outputInfo : this->mOutputs)
+        {
+            ReturnErrorOnFailure(encoder.Encode(outputInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
-    return true;
+    bool audioOutputRenamed = false;
+
+    for (OutputInfoType & output : mOutputs)
+    {
+        if (output.index == index)
+        {
+            audioOutputRenamed = true;
+            memcpy(this->Data(index), name.data(), name.size());
+            output.name = chip::CharSpan(this->Data(index), name.size());
+        }
+    }
+
+    return audioOutputRenamed;
 }
 
 bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
     // TODO: Insert code here
-    return true;
+    bool audioOutputSelected = false;
+    for (OutputInfoType & output : mOutputs)
+    {
+        if (output.index == index)
+        {
+            audioOutputSelected = true;
+            mCurrentOutput      = index;
+        }
+    }
+
+    return audioOutputSelected;
 }

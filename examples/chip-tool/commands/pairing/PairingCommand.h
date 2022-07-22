@@ -20,7 +20,6 @@
 
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
-#include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
@@ -30,8 +29,8 @@
 enum class PairingMode
 {
     None,
-    QRCode,
-    ManualCode,
+    Code,
+    CodePaseOnly,
     Ble,
     SoftAP,
     Ethernet,
@@ -78,8 +77,8 @@ public:
         {
         case PairingMode::None:
             break;
-        case PairingMode::QRCode:
-        case PairingMode::ManualCode:
+        case PairingMode::Code:
+        case PairingMode::CodePaseOnly:
             AddArgument("payload", &mOnboardingPayload);
             break;
         case PairingMode::Ble:
@@ -129,11 +128,13 @@ public:
             AddArgument("name", &mDiscoveryFilterInstanceName);
             break;
         }
+
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(120); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.ValueOr(120)); }
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -148,9 +149,8 @@ private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
     CHIP_ERROR PairWithMdns(NodeId remoteId);
-    CHIP_ERROR PairWithQRCode(NodeId remoteId);
-    CHIP_ERROR PairWithManualCode(NodeId remoteId);
-    CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
+    CHIP_ERROR PairWithCode(NodeId remoteId);
+    CHIP_ERROR PaseWithCode(NodeId remoteId);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
 
@@ -159,6 +159,7 @@ private:
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
     NodeId mNodeId;
+    chip::Optional<uint16_t> mTimeout;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
@@ -168,7 +169,4 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
-
-    chip::CommissioneeDeviceProxy * mDevice;
-    chip::EndpointId mEndpointId = 0;
 };

@@ -20,13 +20,10 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "CHIPDeviceManager.h"
+#include "DeviceCallbacks.h"
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -36,6 +33,15 @@
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#endif
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -60,6 +66,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
+using namespace chip::DeviceManager;
 using namespace chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
@@ -71,6 +78,34 @@ static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
 AppTask AppTask::sAppTask;
+
+static DeviceCallbacks sDeviceCallbacks;
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+static DefaultOTARequestor sRequestorCore;
+static DefaultOTARequestorStorage sRequestorStorage;
+static DefaultOTARequestorDriver sRequestorUser;
+static BDXDownloader sDownloader;
+static OTAImageProcessorImpl sImageProcessor;
+
+void InitializeOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects
+    SetRequestorInstance(&sRequestorCore);
+
+    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(chip::Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sImageProcessor.SetOTADownloader(&sDownloader);
+    sDownloader.SetImageProcessorDelegate(&sImageProcessor);
+    sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
+}
+#endif
+
+static const chip::EndpointId sIdentifyEndpointId = 0;
+static const uint32_t sIdentifyBlinkRateMs        = 500;
+
+::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
+                          EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::TriggerIdentifyEffectHandler };
 
 int AppTask::StartAppTask()
 {
@@ -103,7 +138,7 @@ int AppTask::Init()
     cc13x2_26x2LogInit();
 
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -121,18 +156,16 @@ int AppTask::Init()
             ;
     }
 
+#ifdef CONFIG_OPENTHREAD_MTD_SED
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#elif CONFIG_OPENTHREAD_MTD
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#endif
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while (1)
-            ;
-    }
-
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
         while (1)
             ;
     }
@@ -144,17 +177,6 @@ int AppTask::Init()
         while (1)
             ;
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
-#endif
-
-    // Init ZCL Data Model and start server
-    PLAT_LOG("Initialize Server");
-    chip::Server::GetInstance().Init();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -190,10 +212,35 @@ int AppTask::Init()
 
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+#endif
+
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
     ConfigurationMgr().LogDeviceConfig();
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+    InitializeOTARequestor();
+#endif
+
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
+
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    ret                           = deviceMgr.Init(&sDeviceCallbacks);
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("CHIPDeviceManager::Init() failed: %s", ErrorStr(ret));
+        while (1)
+            ;
+    }
 
     return 0;
 }
@@ -291,6 +338,8 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
         LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
         LED_stopBlinking(sAppRedHandle);
         LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+        // Signal to the PCC cluster, that the pump is running
+        sAppTask.UpdateClusterState();
     }
     else if (aAction == PumpManager::STOP_ACTION)
     {
@@ -299,6 +348,8 @@ void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
         LED_setOff(sAppGreenHandle);
         LED_stopBlinking(sAppRedHandle);
         LED_setOff(sAppRedHandle);
+        // Signal to the PCC cluster, that the pump is NOT running
+        sAppTask.UpdateClusterState();
     }
     if (aActor == AppEvent::kEventType_ButtonLeft)
     {
@@ -328,8 +379,10 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            // Post event for demonstration purposes
-            sAppTask.PostEvents();
+            // Post event for demonstration purposes, we must ensure that the
+            // LogEvent is called in the right context which is the Matter mainloop
+            // thru ScheduleWork()
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(sAppTask.PostEvents, reinterpret_cast<intptr_t>(nullptr));
 
             // Toggle BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
@@ -352,8 +405,28 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         }
         else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
         {
-            ConfigurationMgr().InitiateFactoryReset();
+            chip::Server::GetInstance().ScheduleFactoryReset();
         }
+        break;
+
+    case AppEvent::kEventType_IdentifyStart:
+        LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+        LED_startBlinking(sAppGreenHandle, sIdentifyBlinkRateMs, LED_BLINK_FOREVER);
+        PLAT_LOG("Identify started");
+        break;
+
+    case AppEvent::kEventType_IdentifyStop:
+        LED_stopBlinking(sAppGreenHandle);
+
+        if (!PumpMgr().IsStopped())
+        {
+            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+        }
+        else
+        {
+            LED_setOff(sAppGreenHandle);
+        }
+        PLAT_LOG("Identify stopped");
         break;
 
     case AppEvent::kEventType_AppEvent:
@@ -380,119 +453,164 @@ void AppTask::InitOnOffClusterState()
     status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, false);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Init On/Off state  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Init On/Off state  %x", status);
     }
 }
 
 void AppTask::InitPCCClusterState() {}
 
-void AppTask::UpdateClusterState()
+void AppTask::UpdateClusterState(void)
+{
+    // We must ensure that the Cluster accessors gets called in the right context
+    // which is the Matter mainloop thru ScheduleWork()
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateCluster, reinterpret_cast<intptr_t>(nullptr));
+}
+
+void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
+    BitMask<PumpConfigurationAndControl::PumpStatus> pumpStatus;
 
-    ChipLogProgress(NotSpecified, "UpdateClusterState");
+    ChipLogProgress(NotSpecified, "Update Cluster State");
+
+    // Update the PumpStatus
+    PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
+    if (PumpMgr().IsStopped())
+    {
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+    }
+    else
+    {
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+    }
+    PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
+
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT,
+                                                                       PumpConfigurationAndControl::PumpControlMode::kConstantFlow);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Flow error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantPressure);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Pressure error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Speed error  %x", status);
+    }
+    status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantTemperature);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Constant Temperature error  %x", status);
+    }
 
     // Write the new values
     bool onOffState = !PumpMgr().IsStopped();
     status          = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %x", status);
     }
 
     int16_t maxPressure = PumpMgr().GetMaxPressure();
     status              = PumpConfigurationAndControl::Attributes::MaxPressure::Set(PCC_CLUSTER_ENDPOINT, maxPressure);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %x", status);
     }
 
     uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
     status            = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(PCC_CLUSTER_ENDPOINT, maxSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %x", status);
     }
 
     uint16_t maxFlow = PumpMgr().GetMaxFlow();
     status           = PumpConfigurationAndControl::Attributes::MaxFlow::Set(PCC_CLUSTER_ENDPOINT, maxFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %x", status);
     }
 
     int16_t minConstPress = PumpMgr().GetMinConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MinConstPressure::Set(PCC_CLUSTER_ENDPOINT, minConstPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %x", status);
     }
 
     int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
     status                = PumpConfigurationAndControl::Attributes::MaxConstPressure::Set(PCC_CLUSTER_ENDPOINT, maxConstPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %x", status);
     }
 
     int16_t minCompPress = PumpMgr().GetMinCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MinCompPressure::Set(PCC_CLUSTER_ENDPOINT, minCompPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %x", status);
     }
 
     int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
     status               = PumpConfigurationAndControl::Attributes::MaxCompPressure::Set(PCC_CLUSTER_ENDPOINT, maxCompPress);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %x", status);
     }
 
     uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MinConstSpeed::Set(PCC_CLUSTER_ENDPOINT, minConstSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %x", status);
     }
 
     uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
     status                 = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Set(PCC_CLUSTER_ENDPOINT, maxConstSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %x", status);
     }
 
     uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MinConstFlow::Set(PCC_CLUSTER_ENDPOINT, minConstFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %x", status);
     }
 
     uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
     status                = PumpConfigurationAndControl::Attributes::MaxConstFlow::Set(PCC_CLUSTER_ENDPOINT, maxConstFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %x", status);
     }
 
     int16_t minConstTemp = PumpMgr().GetMinConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MinConstTemp::Set(PCC_CLUSTER_ENDPOINT, minConstTemp);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %x", status);
     }
 
     int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
     status               = PumpConfigurationAndControl::Attributes::MaxConstTemp::Set(PCC_CLUSTER_ENDPOINT, maxConstTemp);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %x", status);
     }
 }
 
-void AppTask::PostEvents()
+void AppTask::PostEvents(intptr_t context)
 {
     // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
     for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
@@ -506,5 +624,48 @@ void AppTask::PostEvents()
         {
             ChipLogError(Zcl, "AppTask: Failed to record GeneralFault event");
         }
+    }
+}
+
+void AppTask::IdentifyStartHandler(::Identify *)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_IdentifyStart;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::IdentifyStopHandler(::Identify *)
+{
+    AppEvent event;
+    event.Type = AppEvent::kEventType_IdentifyStop;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        PLAT_LOG("Starting blink identifier effect");
+        IdentifyStartHandler(identify);
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        PLAT_LOG("Breathe identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        PLAT_LOG("Okay identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        PLAT_LOG("Channel Change identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+        PLAT_LOG("Finish identifier effect not implemented");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+        PLAT_LOG("Stop identifier effect");
+        IdentifyStopHandler(identify);
+        break;
+    default:
+        PLAT_LOG("No identifier effect");
     }
 }

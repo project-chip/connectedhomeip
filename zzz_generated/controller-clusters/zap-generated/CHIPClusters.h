@@ -30,827 +30,605 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT AccessControlCluster : public ClusterBase
+class DLL_EXPORT IdentifyCluster : public ClusterBase
 {
 public:
-    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
-    ~AccessControlCluster() {}
-};
-
-class DLL_EXPORT AccountLoginCluster : public ClusterBase
-{
-public:
-    AccountLoginCluster() : ClusterBase(app::Clusters::AccountLogin::Id) {}
-    ~AccountLoginCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR GetSetupPINRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::CharSpan tempAccountIdentifier);
-    CHIP_ERROR LoginRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
-    CHIP_ERROR LogoutRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT AdministratorCommissioningCluster : public ClusterBase
-{
-public:
-    AdministratorCommissioningCluster() : ClusterBase(app::Clusters::AdministratorCommissioning::Id) {}
-    ~AdministratorCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR OpenBasicCommissioningWindow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t commissioningTimeout);
-    CHIP_ERROR OpenCommissioningWindow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint16_t commissioningTimeout, chip::ByteSpan PAKEVerifier, uint16_t discriminator,
-                                       uint32_t iterations, chip::ByteSpan salt, uint16_t passcodeID);
-    CHIP_ERROR RevokeCommissioning(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
-{
-public:
-    ApplicationBasicCluster() : ClusterBase(app::Clusters::ApplicationBasic::Id) {}
-    ~ApplicationBasicCluster() {}
-};
-
-class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
-{
-public:
-    ApplicationLauncherCluster() : ClusterBase(app::Clusters::ApplicationLauncher::Id) {}
-    ~ApplicationLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint16_t catalogVendorId, chip::CharSpan applicationId);
-    CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
-    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint16_t catalogVendorId, chip::CharSpan applicationId);
-};
-
-class DLL_EXPORT AudioOutputCluster : public ClusterBase
-{
-public:
-    AudioOutputCluster() : ClusterBase(app::Clusters::AudioOutput::Id) {}
-    ~AudioOutputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR RenameOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t index, chip::CharSpan name);
-    CHIP_ERROR SelectOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t index);
-};
-
-class DLL_EXPORT BarrierControlCluster : public ClusterBase
-{
-public:
-    BarrierControlCluster() : ClusterBase(app::Clusters::BarrierControl::Id) {}
-    ~BarrierControlCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR BarrierControlGoToPercent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint8_t percentOpen);
-    CHIP_ERROR BarrierControlStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT BasicCluster : public ClusterBase
-{
-public:
-    BasicCluster() : ClusterBase(app::Clusters::Basic::Id) {}
-    ~BasicCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
-{
-public:
-    BinaryInputBasicCluster() : ClusterBase(app::Clusters::BinaryInputBasic::Id) {}
-    ~BinaryInputBasicCluster() {}
-};
-
-class DLL_EXPORT BindingCluster : public ClusterBase
-{
-public:
-    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
-    ~BindingCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
-                    chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
-    CHIP_ERROR Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
-                      chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
-};
-
-class DLL_EXPORT BooleanStateCluster : public ClusterBase
-{
-public:
-    BooleanStateCluster() : ClusterBase(app::Clusters::BooleanState::Id) {}
-    ~BooleanStateCluster() {}
-};
-
-class DLL_EXPORT BridgedActionsCluster : public ClusterBase
-{
-public:
-    BridgedActionsCluster() : ClusterBase(app::Clusters::BridgedActions::Id) {}
-    ~BridgedActionsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR DisableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                             uint32_t invokeID);
-    CHIP_ERROR DisableActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR EnableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                            uint32_t invokeID);
-    CHIP_ERROR EnableActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR InstantAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                             uint32_t invokeID);
-    CHIP_ERROR InstantActionWithTransition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint16_t actionID, uint32_t invokeID, uint16_t transitionTime);
-    CHIP_ERROR PauseAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                           uint32_t invokeID);
-    CHIP_ERROR PauseActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR ResumeAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                            uint32_t invokeID);
-    CHIP_ERROR StartAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                           uint32_t invokeID);
-    CHIP_ERROR StartActionWithDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint16_t actionID, uint32_t invokeID, uint32_t duration);
-    CHIP_ERROR StopAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t actionID,
-                          uint32_t invokeID);
-};
-
-class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
-{
-public:
-    BridgedDeviceBasicCluster() : ClusterBase(app::Clusters::BridgedDeviceBasic::Id) {}
-    ~BridgedDeviceBasicCluster() {}
-};
-
-class DLL_EXPORT ChannelCluster : public ClusterBase
-{
-public:
-    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
-    ~ChannelCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t majorNumber, uint16_t minorNumber);
-    CHIP_ERROR ChangeChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    chip::CharSpan match);
-    CHIP_ERROR SkipChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint16_t count);
-};
-
-class DLL_EXPORT ColorControlCluster : public ClusterBase
-{
-public:
-    ColorControlCluster() : ClusterBase(app::Clusters::ColorControl::Id) {}
-    ~ColorControlCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ColorLoopSet(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t updateFlags,
-                            uint8_t action, uint8_t direction, uint16_t time, uint16_t startHue, uint8_t optionsMask,
-                            uint8_t optionsOverride);
-    CHIP_ERROR EnhancedMoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                               uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR EnhancedMoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t enhancedHue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
-                                 uint8_t optionsOverride);
-    CHIP_ERROR EnhancedMoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t enhancedHue, uint8_t saturation, uint16_t transitionTime,
-                                              uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR EnhancedStepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                               uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t rateX,
-                         int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum,
-                                    uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                       uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                              uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveToColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t colorX,
-                           uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveToColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask,
-                                      uint8_t optionsOverride);
-    CHIP_ERROR MoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t hue,
-                         uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR MoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                      uint8_t optionsOverride);
-    CHIP_ERROR MoveToSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t stepX,
-                         int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum,
-                                    uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                       uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StepSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                              uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride);
-    CHIP_ERROR StopMoveStep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t optionsMask,
-                            uint8_t optionsOverride);
-};
-
-class DLL_EXPORT ContentLauncherCluster : public ClusterBase
-{
-public:
-    ContentLauncherCluster() : ClusterBase(app::Clusters::ContentLauncher::Id) {}
-    ~ContentLauncherCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    bool autoPlay, chip::CharSpan data);
-    CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
-};
-
-class DLL_EXPORT DescriptorCluster : public ClusterBase
-{
-public:
-    DescriptorCluster() : ClusterBase(app::Clusters::Descriptor::Id) {}
-    ~DescriptorCluster() {}
-};
-
-class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
-{
-public:
-    DiagnosticLogsCluster() : ClusterBase(app::Clusters::DiagnosticLogs::Id) {}
-    ~DiagnosticLogsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR RetrieveLogsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t intent, uint8_t requestedProtocol, chip::ByteSpan transferFileDesignator);
-};
-
-class DLL_EXPORT DoorLockCluster : public ClusterBase
-{
-public:
-    DoorLockCluster() : ClusterBase(app::Clusters::DoorLock::Id) {}
-    ~DoorLockCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                               uint8_t credentialType, uint16_t credentialIndex);
-    CHIP_ERROR ClearUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
-    CHIP_ERROR GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t credentialType, uint16_t credentialIndex);
-    CHIP_ERROR GetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
-    CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
-    CHIP_ERROR SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex, chip::ByteSpan credentialData,
-                             uint16_t userIndex, uint8_t userStatus);
-    CHIP_ERROR SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t operationType,
-                       uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
-                       uint8_t credentialRule);
-    CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                          chip::ByteSpan pinCode);
-};
-
-class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase
-{
-public:
-    ElectricalMeasurementCluster() : ClusterBase(app::Clusters::ElectricalMeasurement::Id) {}
-    ~ElectricalMeasurementCluster() {}
-};
-
-class DLL_EXPORT EthernetNetworkDiagnosticsCluster : public ClusterBase
-{
-public:
-    EthernetNetworkDiagnosticsCluster() : ClusterBase(app::Clusters::EthernetNetworkDiagnostics::Id) {}
-    ~EthernetNetworkDiagnosticsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT FixedLabelCluster : public ClusterBase
-{
-public:
-    FixedLabelCluster() : ClusterBase(app::Clusters::FixedLabel::Id) {}
-    ~FixedLabelCluster() {}
-};
-
-class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
-{
-public:
-    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
-    ~FlowMeasurementCluster() {}
-};
-
-class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
-{
-public:
-    GeneralCommissioningCluster() : ClusterBase(app::Clusters::GeneralCommissioning::Id) {}
-    ~GeneralCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                           uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t location, chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
-};
-
-class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
-{
-public:
-    GeneralDiagnosticsCluster() : ClusterBase(app::Clusters::GeneralDiagnostics::Id) {}
-    ~GeneralDiagnosticsCluster() {}
-};
-
-class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
-{
-public:
-    GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
-    ~GroupKeyManagementCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                          uint16_t groupKeySetID);
-    CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t groupKeySetIDs);
-    CHIP_ERROR KeySetRemove(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            uint16_t groupKeySetID);
-    CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                           uint16_t groupKeySetID, uint8_t securityPolicy, chip::ByteSpan epochKey0, uint64_t epochStartTime0,
-                           chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2, uint64_t epochStartTime2);
+    IdentifyCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Identify::Id, endpoint)
+    {}
+    ~IdentifyCluster() {}
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase
 {
 public:
-    GroupsCluster() : ClusterBase(app::Clusters::Groups::Id) {}
+    GroupsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Groups::Id, endpoint)
+    {}
     ~GroupsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                        chip::CharSpan groupName);
-    CHIP_ERROR AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t groupId, chip::CharSpan groupName);
-    CHIP_ERROR GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint16_t groupList);
-    CHIP_ERROR RemoveAllGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId);
-    CHIP_ERROR ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId);
-};
-
-class DLL_EXPORT IdentifyCluster : public ClusterBase
-{
-public:
-    IdentifyCluster() : ClusterBase(app::Clusters::Identify::Id) {}
-    ~IdentifyCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t identifyTime);
-    CHIP_ERROR IdentifyQuery(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TriggerEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint8_t effectIdentifier, uint8_t effectVariant);
-};
-
-class DLL_EXPORT IlluminanceMeasurementCluster : public ClusterBase
-{
-public:
-    IlluminanceMeasurementCluster() : ClusterBase(app::Clusters::IlluminanceMeasurement::Id) {}
-    ~IlluminanceMeasurementCluster() {}
-};
-
-class DLL_EXPORT KeypadInputCluster : public ClusterBase
-{
-public:
-    KeypadInputCluster() : ClusterBase(app::Clusters::KeypadInput::Id) {}
-    ~KeypadInputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t keyCode);
-};
-
-class DLL_EXPORT LevelControlCluster : public ClusterBase
-{
-public:
-    LevelControlCluster() : ClusterBase(app::Clusters::LevelControl::Id) {}
-    ~LevelControlCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                    uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
-    CHIP_ERROR MoveToLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t level,
-                           uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
-    CHIP_ERROR MoveToLevelWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t level, uint16_t transitionTime);
-    CHIP_ERROR MoveWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode,
-                             uint8_t rate);
-    CHIP_ERROR Step(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                    uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
-    CHIP_ERROR StepWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode,
-                             uint8_t stepSize, uint16_t transitionTime);
-    CHIP_ERROR Stop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t optionMask,
-                    uint8_t optionOverride);
-    CHIP_ERROR StopWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
-{
-public:
-    LocalizationConfigurationCluster() : ClusterBase(app::Clusters::LocalizationConfiguration::Id) {}
-    ~LocalizationConfigurationCluster() {}
-};
-
-class DLL_EXPORT LowPowerCluster : public ClusterBase
-{
-public:
-    LowPowerCluster() : ClusterBase(app::Clusters::LowPower::Id) {}
-    ~LowPowerCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT MediaInputCluster : public ClusterBase
-{
-public:
-    MediaInputCluster() : ClusterBase(app::Clusters::MediaInput::Id) {}
-    ~MediaInputCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR HideInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
-                                  chip::CharSpan name);
-    CHIP_ERROR SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t index);
-    CHIP_ERROR ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
-{
-public:
-    MediaPlaybackCluster() : ClusterBase(app::Clusters::MediaPlayback::Id) {}
-    ~MediaPlaybackCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR FastForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
-    CHIP_ERROR SkipBackwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR SkipForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR StartOverRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT ModeSelectCluster : public ClusterBase
-{
-public:
-    ModeSelectCluster() : ClusterBase(app::Clusters::ModeSelect::Id) {}
-    ~ModeSelectCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ChangeToMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t newMode);
-};
-
-class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
-{
-public:
-    NetworkCommissioningCluster() : ClusterBase(app::Clusters::NetworkCommissioning::Id) {}
-    ~NetworkCommissioningCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddOrUpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        chip::ByteSpan operationalDataset, uint64_t breadcrumb);
-    CHIP_ERROR AddOrUpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb);
-    CHIP_ERROR ConnectNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              chip::ByteSpan networkID, uint64_t breadcrumb);
-    CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan networkID, uint64_t breadcrumb);
-    CHIP_ERROR ReorderNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              chip::ByteSpan networkID, uint8_t networkIndex, uint64_t breadcrumb);
-    CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                            uint64_t breadcrumb);
-};
-
-class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
-{
-public:
-    OtaSoftwareUpdateProviderCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateProvider::Id) {}
-    ~OtaSoftwareUpdateProviderCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::ByteSpan updateToken, uint32_t newVersion);
-    CHIP_ERROR NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::ByteSpan updateToken, uint32_t softwareVersion);
-    CHIP_ERROR QueryImage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                          chip::VendorId vendorId, uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
-                          uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
-                          chip::ByteSpan metadataForProvider);
-};
-
-class DLL_EXPORT OtaSoftwareUpdateRequestorCluster : public ClusterBase
-{
-public:
-    OtaSoftwareUpdateRequestorCluster() : ClusterBase(app::Clusters::OtaSoftwareUpdateRequestor::Id) {}
-    ~OtaSoftwareUpdateRequestorCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::NodeId providerNodeId, chip::VendorId vendorId, uint8_t announcementReason,
-                                   chip::ByteSpan metadataForNode, chip::EndpointId endpoint);
-};
-
-class DLL_EXPORT OccupancySensingCluster : public ClusterBase
-{
-public:
-    OccupancySensingCluster() : ClusterBase(app::Clusters::OccupancySensing::Id) {}
-    ~OccupancySensingCluster() {}
-};
-
-class DLL_EXPORT OnOffCluster : public ClusterBase
-{
-public:
-    OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
-    ~OnOffCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR OffWithEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t effectId,
-                             uint8_t effectVariant);
-    CHIP_ERROR On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR OnWithRecallGlobalScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR OnWithTimedOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime);
-    CHIP_ERROR Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-};
-
-class DLL_EXPORT OnOffSwitchConfigurationCluster : public ClusterBase
-{
-public:
-    OnOffSwitchConfigurationCluster() : ClusterBase(app::Clusters::OnOffSwitchConfiguration::Id) {}
-    ~OnOffSwitchConfigurationCluster() {}
-};
-
-class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
-{
-public:
-    OperationalCredentialsCluster() : ClusterBase(app::Clusters::OperationalCredentials::Id) {}
-    ~OperationalCredentialsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan NOCValue,
-                      chip::ByteSpan ICACValue, chip::ByteSpan IPKValue, chip::NodeId caseAdminNode, uint16_t adminVendorId);
-    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         chip::ByteSpan rootCertificate);
-    CHIP_ERROR AttestationRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::ByteSpan attestationNonce);
-    CHIP_ERROR CertificateChainRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t certificateType);
-    CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            chip::ByteSpan CSRNonce);
-    CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            uint8_t fabricIndex);
-    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::ByteSpan trustedRootIdentifier);
-    CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 chip::CharSpan label);
-    CHIP_ERROR UpdateNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan NOCValue, chip::ByteSpan ICACValue);
-};
-
-class DLL_EXPORT PowerSourceCluster : public ClusterBase
-{
-public:
-    PowerSourceCluster() : ClusterBase(app::Clusters::PowerSource::Id) {}
-    ~PowerSourceCluster() {}
-};
-
-class DLL_EXPORT PowerSourceConfigurationCluster : public ClusterBase
-{
-public:
-    PowerSourceConfigurationCluster() : ClusterBase(app::Clusters::PowerSourceConfiguration::Id) {}
-    ~PowerSourceConfigurationCluster() {}
-};
-
-class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
-{
-public:
-    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
-    ~PressureMeasurementCluster() {}
-};
-
-class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
-{
-public:
-    PumpConfigurationAndControlCluster() : ClusterBase(app::Clusters::PumpConfigurationAndControl::Id) {}
-    ~PumpConfigurationAndControlCluster() {}
-};
-
-class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
-{
-public:
-    RelativeHumidityMeasurementCluster() : ClusterBase(app::Clusters::RelativeHumidityMeasurement::Id) {}
-    ~RelativeHumidityMeasurementCluster() {}
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase
 {
 public:
-    ScenesCluster() : ClusterBase(app::Clusters::Scenes::Id) {}
+    ScenesCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Scenes::Id, endpoint)
+    {}
     ~ScenesCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                        uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName, chip::ClusterId clusterId,
-                        uint8_t length, uint8_t value);
-    CHIP_ERROR GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint16_t groupId);
-    CHIP_ERROR RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                           uint8_t sceneId, uint16_t transitionTime);
-    CHIP_ERROR RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                               uint16_t groupId);
-    CHIP_ERROR RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                           uint8_t sceneId);
-    CHIP_ERROR StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                          uint8_t sceneId);
-    CHIP_ERROR ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId,
-                         uint8_t sceneId);
 };
 
-class DLL_EXPORT SoftwareDiagnosticsCluster : public ClusterBase
+class DLL_EXPORT OnOffCluster : public ClusterBase
 {
 public:
-    SoftwareDiagnosticsCluster() : ClusterBase(app::Clusters::SoftwareDiagnostics::Id) {}
-    ~SoftwareDiagnosticsCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ResetWatermarks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    OnOffCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OnOff::Id, endpoint)
+    {}
+    ~OnOffCluster() {}
 };
 
-class DLL_EXPORT SwitchCluster : public ClusterBase
+class DLL_EXPORT OnOffSwitchConfigurationCluster : public ClusterBase
 {
 public:
-    SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
-    ~SwitchCluster() {}
+    OnOffSwitchConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                    EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OnOffSwitchConfiguration::Id, endpoint)
+    {}
+    ~OnOffSwitchConfigurationCluster() {}
 };
 
-class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+class DLL_EXPORT LevelControlCluster : public ClusterBase
 {
 public:
-    TargetNavigatorCluster() : ClusterBase(app::Clusters::TargetNavigator::Id) {}
-    ~TargetNavigatorCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR NavigateTargetRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t target, chip::CharSpan data);
+    LevelControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::LevelControl::Id, endpoint)
+    {}
+    ~LevelControlCluster() {}
 };
 
-class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+class DLL_EXPORT BinaryInputBasicCluster : public ClusterBase
 {
 public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
-    ~TemperatureMeasurementCluster() {}
+    BinaryInputBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BinaryInputBasic::Id, endpoint)
+    {}
+    ~BinaryInputBasicCluster() {}
 };
 
-class DLL_EXPORT TestClusterCluster : public ClusterBase
+class DLL_EXPORT DescriptorCluster : public ClusterBase
 {
 public:
-    TestClusterCluster() : ClusterBase(app::Clusters::TestCluster::Id) {}
-    ~TestClusterCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
-                                       double h);
-    CHIP_ERROR Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TestAddArguments(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t arg1,
-                                uint8_t arg2);
-    CHIP_ERROR TestEmitTestEventRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint8_t arg1, uint8_t arg2, bool arg3);
-    CHIP_ERROR TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::VendorId arg1, uint8_t arg2);
-    CHIP_ERROR TestListInt8UArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t arg1);
-    CHIP_ERROR TestListInt8UReverseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint8_t arg1);
-    CHIP_ERROR TestListNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint32_t e,
-                                                       chip::ByteSpan f, uint8_t g);
-    CHIP_ERROR TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
-                                             double h);
-    CHIP_ERROR TestNestedStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t a, bool b);
-    CHIP_ERROR TestNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint32_t e,
-                                                   chip::ByteSpan f, uint8_t g);
-    CHIP_ERROR TestNotHandled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TestNullableOptionalRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint8_t arg1);
-    CHIP_ERROR TestSimpleOptionalArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 bool arg1);
-    CHIP_ERROR TestSpecific(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
-                                         double h);
-    CHIP_ERROR TestUnknownCommand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR TimedInvokeRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    DescriptorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Descriptor::Id, endpoint)
+    {}
+    ~DescriptorCluster() {}
 };
 
-class DLL_EXPORT ThermostatCluster : public ClusterBase
+class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:
-    ThermostatCluster() : ClusterBase(app::Clusters::Thermostat::Id) {}
-    ~ThermostatCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR GetRelayStatusLog(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR GetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint8_t daysToReturn, uint8_t modeToReturn);
-    CHIP_ERROR SetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
-                                 uint8_t payload);
-    CHIP_ERROR SetpointRaiseLower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t mode,
-                                  int8_t amount);
+    BindingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Binding::Id, endpoint)
+    {}
+    ~BindingCluster() {}
 };
 
-class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
+class DLL_EXPORT AccessControlCluster : public ClusterBase
 {
 public:
-    ThermostatUserInterfaceConfigurationCluster() : ClusterBase(app::Clusters::ThermostatUserInterfaceConfiguration::Id) {}
-    ~ThermostatUserInterfaceConfigurationCluster() {}
+    AccessControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::AccessControl::Id, endpoint)
+    {}
+    ~AccessControlCluster() {}
 };
 
-class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase
+class DLL_EXPORT BridgedActionsCluster : public ClusterBase
 {
 public:
-    ThreadNetworkDiagnosticsCluster() : ClusterBase(app::Clusters::ThreadNetworkDiagnostics::Id) {}
-    ~ThreadNetworkDiagnosticsCluster() {}
+    BridgedActionsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BridgedActions::Id, endpoint)
+    {}
+    ~BridgedActionsCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+class DLL_EXPORT BasicCluster : public ClusterBase
+{
+public:
+    BasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Basic::Id, endpoint)
+    {}
+    ~BasicCluster() {}
+};
+
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint)
+    {}
+    ~OtaSoftwareUpdateProviderCluster() {}
+};
+
+class DLL_EXPORT OtaSoftwareUpdateRequestorCluster : public ClusterBase
+{
+public:
+    OtaSoftwareUpdateRequestorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                      EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateRequestor::Id, endpoint)
+    {}
+    ~OtaSoftwareUpdateRequestorCluster() {}
+};
+
+class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
+{
+public:
+    LocalizationConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::LocalizationConfiguration::Id, endpoint)
+    {}
+    ~LocalizationConfigurationCluster() {}
 };
 
 class DLL_EXPORT TimeFormatLocalizationCluster : public ClusterBase
 {
 public:
-    TimeFormatLocalizationCluster() : ClusterBase(app::Clusters::TimeFormatLocalization::Id) {}
+    TimeFormatLocalizationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::TimeFormatLocalization::Id, endpoint)
+    {}
     ~TimeFormatLocalizationCluster() {}
 };
 
-class DLL_EXPORT UserLabelCluster : public ClusterBase
+class DLL_EXPORT UnitLocalizationCluster : public ClusterBase
 {
 public:
-    UserLabelCluster() : ClusterBase(app::Clusters::UserLabel::Id) {}
-    ~UserLabelCluster() {}
+    UnitLocalizationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::UnitLocalization::Id, endpoint)
+    {}
+    ~UnitLocalizationCluster() {}
 };
 
-class DLL_EXPORT WakeOnLanCluster : public ClusterBase
+class DLL_EXPORT PowerSourceConfigurationCluster : public ClusterBase
 {
 public:
-    WakeOnLanCluster() : ClusterBase(app::Clusters::WakeOnLan::Id) {}
-    ~WakeOnLanCluster() {}
+    PowerSourceConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                    EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::PowerSourceConfiguration::Id, endpoint)
+    {}
+    ~PowerSourceConfigurationCluster() {}
+};
+
+class DLL_EXPORT PowerSourceCluster : public ClusterBase
+{
+public:
+    PowerSourceCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::PowerSource::Id, endpoint)
+    {}
+    ~PowerSourceCluster() {}
+};
+
+class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
+{
+public:
+    GeneralCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::GeneralCommissioning::Id, endpoint)
+    {}
+    ~GeneralCommissioningCluster() {}
+};
+
+class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
+{
+public:
+    NetworkCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::NetworkCommissioning::Id, endpoint)
+    {}
+    ~NetworkCommissioningCluster() {}
+};
+
+class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
+{
+public:
+    DiagnosticLogsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::DiagnosticLogs::Id, endpoint)
+    {}
+    ~DiagnosticLogsCluster() {}
+};
+
+class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
+{
+public:
+    GeneralDiagnosticsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::GeneralDiagnostics::Id, endpoint)
+    {}
+    ~GeneralDiagnosticsCluster() {}
+};
+
+class DLL_EXPORT SoftwareDiagnosticsCluster : public ClusterBase
+{
+public:
+    SoftwareDiagnosticsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::SoftwareDiagnostics::Id, endpoint)
+    {}
+    ~SoftwareDiagnosticsCluster() {}
+};
+
+class DLL_EXPORT ThreadNetworkDiagnosticsCluster : public ClusterBase
+{
+public:
+    ThreadNetworkDiagnosticsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                    EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ThreadNetworkDiagnostics::Id, endpoint)
+    {}
+    ~ThreadNetworkDiagnosticsCluster() {}
 };
 
 class DLL_EXPORT WiFiNetworkDiagnosticsCluster : public ClusterBase
 {
 public:
-    WiFiNetworkDiagnosticsCluster() : ClusterBase(app::Clusters::WiFiNetworkDiagnostics::Id) {}
+    WiFiNetworkDiagnosticsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::WiFiNetworkDiagnostics::Id, endpoint)
+    {}
     ~WiFiNetworkDiagnosticsCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR ResetCounts(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+class DLL_EXPORT EthernetNetworkDiagnosticsCluster : public ClusterBase
+{
+public:
+    EthernetNetworkDiagnosticsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                      EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::EthernetNetworkDiagnostics::Id, endpoint)
+    {}
+    ~EthernetNetworkDiagnosticsCluster() {}
+};
+
+class DLL_EXPORT BridgedDeviceBasicCluster : public ClusterBase
+{
+public:
+    BridgedDeviceBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BridgedDeviceBasic::Id, endpoint)
+    {}
+    ~BridgedDeviceBasicCluster() {}
+};
+
+class DLL_EXPORT SwitchCluster : public ClusterBase
+{
+public:
+    SwitchCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Switch::Id, endpoint)
+    {}
+    ~SwitchCluster() {}
+};
+
+class DLL_EXPORT AdministratorCommissioningCluster : public ClusterBase
+{
+public:
+    AdministratorCommissioningCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                      EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::AdministratorCommissioning::Id, endpoint)
+    {}
+    ~AdministratorCommissioningCluster() {}
+};
+
+class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
+{
+public:
+    OperationalCredentialsCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OperationalCredentials::Id, endpoint)
+    {}
+    ~OperationalCredentialsCluster() {}
+};
+
+class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
+{
+public:
+    GroupKeyManagementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::GroupKeyManagement::Id, endpoint)
+    {}
+    ~GroupKeyManagementCluster() {}
+};
+
+class DLL_EXPORT FixedLabelCluster : public ClusterBase
+{
+public:
+    FixedLabelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::FixedLabel::Id, endpoint)
+    {}
+    ~FixedLabelCluster() {}
+};
+
+class DLL_EXPORT UserLabelCluster : public ClusterBase
+{
+public:
+    UserLabelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::UserLabel::Id, endpoint)
+    {}
+    ~UserLabelCluster() {}
+};
+
+class DLL_EXPORT BooleanStateCluster : public ClusterBase
+{
+public:
+    BooleanStateCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BooleanState::Id, endpoint)
+    {}
+    ~BooleanStateCluster() {}
+};
+
+class DLL_EXPORT ModeSelectCluster : public ClusterBase
+{
+public:
+    ModeSelectCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ModeSelect::Id, endpoint)
+    {}
+    ~ModeSelectCluster() {}
+};
+
+class DLL_EXPORT DoorLockCluster : public ClusterBase
+{
+public:
+    DoorLockCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::DoorLock::Id, endpoint)
+    {}
+    ~DoorLockCluster() {}
 };
 
 class DLL_EXPORT WindowCoveringCluster : public ClusterBase
 {
 public:
-    WindowCoveringCluster() : ClusterBase(app::Clusters::WindowCovering::Id) {}
+    WindowCoveringCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::WindowCovering::Id, endpoint)
+    {}
     ~WindowCoveringCluster() {}
+};
 
-    // Cluster Commands
-    CHIP_ERROR DownOrClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR GoToLiftPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::Percent liftPercentageValue, chip::Percent100ths liftPercent100thsValue);
-    CHIP_ERROR GoToLiftValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint16_t liftValue);
-    CHIP_ERROR GoToTiltPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::Percent tiltPercentageValue, chip::Percent100ths tiltPercent100thsValue);
-    CHIP_ERROR GoToTiltValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint16_t tiltValue);
-    CHIP_ERROR StopMotion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR UpOrOpen(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+class DLL_EXPORT BarrierControlCluster : public ClusterBase
+{
+public:
+    BarrierControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BarrierControl::Id, endpoint)
+    {}
+    ~BarrierControlCluster() {}
+};
+
+class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
+{
+public:
+    PumpConfigurationAndControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                       EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::PumpConfigurationAndControl::Id, endpoint)
+    {}
+    ~PumpConfigurationAndControlCluster() {}
+};
+
+class DLL_EXPORT ThermostatCluster : public ClusterBase
+{
+public:
+    ThermostatCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Thermostat::Id, endpoint)
+    {}
+    ~ThermostatCluster() {}
+};
+
+class DLL_EXPORT FanControlCluster : public ClusterBase
+{
+public:
+    FanControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::FanControl::Id, endpoint)
+    {}
+    ~FanControlCluster() {}
+};
+
+class DLL_EXPORT ThermostatUserInterfaceConfigurationCluster : public ClusterBase
+{
+public:
+    ThermostatUserInterfaceConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                                EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ThermostatUserInterfaceConfiguration::Id, endpoint)
+    {}
+    ~ThermostatUserInterfaceConfigurationCluster() {}
+};
+
+class DLL_EXPORT ColorControlCluster : public ClusterBase
+{
+public:
+    ColorControlCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ColorControl::Id, endpoint)
+    {}
+    ~ColorControlCluster() {}
+};
+
+class DLL_EXPORT BallastConfigurationCluster : public ClusterBase
+{
+public:
+    BallastConfigurationCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::BallastConfiguration::Id, endpoint)
+    {}
+    ~BallastConfigurationCluster() {}
+};
+
+class DLL_EXPORT IlluminanceMeasurementCluster : public ClusterBase
+{
+public:
+    IlluminanceMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::IlluminanceMeasurement::Id, endpoint)
+    {}
+    ~IlluminanceMeasurementCluster() {}
+};
+
+class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
+{
+public:
+    TemperatureMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                  EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::TemperatureMeasurement::Id, endpoint)
+    {}
+    ~TemperatureMeasurementCluster() {}
+};
+
+class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+{
+public:
+    PressureMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::PressureMeasurement::Id, endpoint)
+    {}
+    ~PressureMeasurementCluster() {}
+};
+
+class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+{
+public:
+    FlowMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::FlowMeasurement::Id, endpoint)
+    {}
+    ~FlowMeasurementCluster() {}
+};
+
+class DLL_EXPORT RelativeHumidityMeasurementCluster : public ClusterBase
+{
+public:
+    RelativeHumidityMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                       EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::RelativeHumidityMeasurement::Id, endpoint)
+    {}
+    ~RelativeHumidityMeasurementCluster() {}
+};
+
+class DLL_EXPORT OccupancySensingCluster : public ClusterBase
+{
+public:
+    OccupancySensingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OccupancySensing::Id, endpoint)
+    {}
+    ~OccupancySensingCluster() {}
+};
+
+class DLL_EXPORT WakeOnLanCluster : public ClusterBase
+{
+public:
+    WakeOnLanCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::WakeOnLan::Id, endpoint)
+    {}
+    ~WakeOnLanCluster() {}
+};
+
+class DLL_EXPORT ChannelCluster : public ClusterBase
+{
+public:
+    ChannelCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::Channel::Id, endpoint)
+    {}
+    ~ChannelCluster() {}
+};
+
+class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
+{
+public:
+    TargetNavigatorCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::TargetNavigator::Id, endpoint)
+    {}
+    ~TargetNavigatorCluster() {}
+};
+
+class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
+{
+public:
+    MediaPlaybackCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::MediaPlayback::Id, endpoint)
+    {}
+    ~MediaPlaybackCluster() {}
+};
+
+class DLL_EXPORT MediaInputCluster : public ClusterBase
+{
+public:
+    MediaInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::MediaInput::Id, endpoint)
+    {}
+    ~MediaInputCluster() {}
+};
+
+class DLL_EXPORT LowPowerCluster : public ClusterBase
+{
+public:
+    LowPowerCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::LowPower::Id, endpoint)
+    {}
+    ~LowPowerCluster() {}
+};
+
+class DLL_EXPORT KeypadInputCluster : public ClusterBase
+{
+public:
+    KeypadInputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::KeypadInput::Id, endpoint)
+    {}
+    ~KeypadInputCluster() {}
+};
+
+class DLL_EXPORT ContentLauncherCluster : public ClusterBase
+{
+public:
+    ContentLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ContentLauncher::Id, endpoint)
+    {}
+    ~ContentLauncherCluster() {}
+};
+
+class DLL_EXPORT AudioOutputCluster : public ClusterBase
+{
+public:
+    AudioOutputCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::AudioOutput::Id, endpoint)
+    {}
+    ~AudioOutputCluster() {}
+};
+
+class DLL_EXPORT ApplicationLauncherCluster : public ClusterBase
+{
+public:
+    ApplicationLauncherCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ApplicationLauncher::Id, endpoint)
+    {}
+    ~ApplicationLauncherCluster() {}
+};
+
+class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
+{
+public:
+    ApplicationBasicCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ApplicationBasic::Id, endpoint)
+    {}
+    ~ApplicationBasicCluster() {}
+};
+
+class DLL_EXPORT AccountLoginCluster : public ClusterBase
+{
+public:
+    AccountLoginCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::AccountLogin::Id, endpoint)
+    {}
+    ~AccountLoginCluster() {}
+};
+
+class DLL_EXPORT ElectricalMeasurementCluster : public ClusterBase
+{
+public:
+    ElectricalMeasurementCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::ElectricalMeasurement::Id, endpoint)
+    {}
+    ~ElectricalMeasurementCluster() {}
+};
+
+class DLL_EXPORT TestClusterCluster : public ClusterBase
+{
+public:
+    TestClusterCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::TestCluster::Id, endpoint)
+    {}
+    ~TestClusterCluster() {}
 };
 
 } // namespace Controller

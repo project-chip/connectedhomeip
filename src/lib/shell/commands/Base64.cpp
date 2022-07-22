@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <cstdint>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -48,6 +49,7 @@ static CHIP_ERROR Base64DecodeHandler(int argc, char ** argv)
 
     VerifyOrReturnError(argc > 0, CHIP_ERROR_INVALID_ARGUMENT);
     binarySize = Base64Decode(argv[0], strlen(argv[0]), binary);
+    VerifyOrReturnError(binarySize != UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
     streamer_print_hex(sout, binary, binarySize);
     streamer_printf(sout, "\r\n");
     return CHIP_NO_ERROR;

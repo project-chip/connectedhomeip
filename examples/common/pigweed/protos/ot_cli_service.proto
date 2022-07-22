@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package chip.rpc;
+
+import 'pw_protobuf_protos/common.proto';
+
+message OtCliResponse {
+  string response = 1;
+}
+
+message OtCliCommand {
+  string command = 1;
+}
+
+service OtCli {
+  // Handle the command using the Open Thread CLI, and stream the reponses back.
+  rpc Command(OtCliCommand) returns (stream OtCliResponse){}
+}

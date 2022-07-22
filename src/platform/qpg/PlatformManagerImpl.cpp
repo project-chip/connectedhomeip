@@ -23,11 +23,14 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/FreeRTOS/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/qpg/DiagnosticDataProviderImpl.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 namespace DeviceLayer {
@@ -42,10 +45,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::QPGConfig::Init();
     SuccessOrExit(err);
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

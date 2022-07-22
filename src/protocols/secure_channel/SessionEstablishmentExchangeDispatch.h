@@ -38,10 +38,10 @@ public:
     }
 
     SessionEstablishmentExchangeDispatch() {}
-    virtual ~SessionEstablishmentExchangeDispatch() {}
+    ~SessionEstablishmentExchangeDispatch() override {}
 
 protected:
-    bool MessagePermitted(uint16_t protocol, uint8_t type) override;
+    bool MessagePermitted(Protocols::Id, uint8_t type) override;
     bool IsEncryptionRequired() const override { return false; }
 };
 

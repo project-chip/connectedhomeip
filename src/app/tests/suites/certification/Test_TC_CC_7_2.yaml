@@ -15,6 +15,7 @@
 name: 27.2.16. [TC-CC-7.2] Enhanced MoveHue functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
@@ -34,80 +39,199 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check EnhancedCurrentHue attribute value matched the value sent by
-          the last command"
-      disabled: true
+    - label: "TH reads EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      PICS: CC.S.F01 && CC.S.A4000
+      attribute: "EnhancedCurrentHue"
       response:
-          value: 1025
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
-    - label: "Enhanced Move Hue Down command "
+    - label: "TH sends EnhancedMoveHue command to DUT with MoveMode Up"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
-                value: 3
-              - name: "rate"
-                value: 5
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Enhanced Move Hue Stop command"
-      command: "EnhancedMoveHue"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 0
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Check EnhancedCurrentHue attribute value changed to a lower Hue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          value: -1
-
-    - label: "Enhanced Move Hue Up command"
-      command: "EnhancedMoveHue"
-      arguments:
-          values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 1
-              - name: "rate"
+              - name: "Rate"
                 value: 50
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label: "Enhanced Move Hue Stop command"
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times."
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times."
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times."
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedMoveHue command to DUT with MoveMode Stop"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
       command: "EnhancedMoveHue"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "MoveMode"
                 value: 0
-              - name: "rate"
+              - name: "Rate"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label: "Check EnhancedCurrentHue attribute value changed to a higher Hue"
-      disabled: true
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times"
+      PICS: CC.S.F01 && CC.S.A4000
       command: "readAttribute"
-      attribute: "enhanced current hue"
+      attribute: "EnhancedCurrentHue"
       response:
-          value: -1
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedMoveHue command to DUT with MoveMode Down"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 3
+              - name: "Rate"
+                value: 15
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "Wait 500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times"
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times"
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "Wait 500ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 500
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times"
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
+
+    - label: "TH sends EnhancedMoveHue command to DUT with MoveMode Stop"
+      PICS: CC.S.F01 && CC.S.C41.Rsp
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "MoveMode"
+                value: 0
+              - name: "Rate"
+                value: 0
+              - name: "OptionsMask"
+                value: 0
+              - name: "OptionsOverride"
+                value: 0
+
+    - label: "TH reads EnhancedCurrentHue attribute from DUT several times."
+      PICS: CC.S.F01 && CC.S.A4000
+      command: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

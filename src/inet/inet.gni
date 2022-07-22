@@ -27,7 +27,9 @@ declare_args() {
   chip_inet_config_enable_tcp_endpoint = true
 
   # Inet implementation type.
-  if (chip_system_config_use_lwip) {
+  if (chip_system_config_use_open_thread_inet_endpoints) {
+    chip_system_config_inet = "OpenThread"
+  } else if (chip_system_config_use_lwip) {
     chip_system_config_inet = "LwIP"
   } else {
     chip_system_config_inet = "Sockets"

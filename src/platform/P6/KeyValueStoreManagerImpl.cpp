@@ -172,6 +172,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::ConvertCyResultToChip(cy_rslt_t err) const
     return CHIP_ERROR_INTERNAL;
 }
 
+CHIP_ERROR KeyValueStoreManagerImpl::Erase(void)
+{
+    if (!init_success)
+    {
+        return CHIP_ERROR_WELL_UNINITIALIZED;
+    }
+
+    cy_rslt_t result = mtb_kvstore_reset(&kvstore_obj);
+    return ConvertCyResultToChip(result);
+}
 } // namespace PersistedStorage
 } // namespace DeviceLayer
 } // namespace chip

@@ -25,11 +25,28 @@ using namespace ::chip;
 
 CHIP_ERROR ModelCommand::RunCommand()
 {
-    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+
+    if (IsGroupId(mDestinationId))
+    {
+        FabricIndex fabricIndex = CurrentCommissioner().GetFabricIndex();
+        ChipLogProgress(chipTool, "Sending command to group 0x%x", GroupIdFromNodeId(mDestinationId));
+
+        return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
+    }
+
+    ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mDestinationId);
+
+    CommissioneeDeviceProxy * commissioneeDeviceProxy = nullptr;
+    if (CHIP_NO_ERROR == CurrentCommissioner().GetDeviceBeingCommissioned(mDestinationId, &commissioneeDeviceProxy))
+    {
+        return SendCommand(commissioneeDeviceProxy, mEndPointId);
+    }
+
+    return CurrentCommissioner().GetConnectedDevice(mDestinationId, &mOnDeviceConnectedCallback,
+                                                    &mOnDeviceConnectionFailureCallback);
 }
 
-void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
+void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
@@ -45,4 +62,12 @@ void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CH
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectionFailureFn: context is null"));
     command->SetCommandExitStatus(err);
+}
+
+void ModelCommand::Shutdown()
+{
+    mOnDeviceConnectedCallback.Cancel();
+    mOnDeviceConnectionFailureCallback.Cancel();
+
+    CHIPCommand::Shutdown();
 }

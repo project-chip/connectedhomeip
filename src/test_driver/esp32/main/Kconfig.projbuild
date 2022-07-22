@@ -37,5 +37,5 @@ menu "Crypto Tests"
 
     config CHIP_PROJECT_CONFIG
         string "CHIP Project Configuration file"
-        default "$(PROJECT_PATH)/main/include/CHIPProjectConfig.h"
+        default "main/include/CHIPProjectConfig.h"
 endmenu

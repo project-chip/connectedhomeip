@@ -52,6 +52,13 @@ if (chip_enable_pw_rpc) {
     prefix = "device_service"
   }
 
+  pw_proto_library("descriptor_service") {
+    sources = [ "protos/descriptor_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "descriptor_service"
+  }
+
   pw_proto_library("button_service") {
     sources = [ "protos/button_service.proto" ]
     deps = [ "$dir_pw_protobuf:common_protos" ]
@@ -71,6 +78,29 @@ if (chip_enable_pw_rpc) {
     deps = [ "$dir_pw_protobuf:common_protos" ]
     strip_prefix = "protos"
     prefix = "locking_service"
+  }
+
+  pw_proto_library("ot_cli_service") {
+    sources = [ "protos/ot_cli_service.proto" ]
+    inputs = [ "protos/ot_cli_service.options" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "ot_cli_service"
+  }
+
+  pw_proto_library("thread_service") {
+    sources = [ "protos/thread_service.proto" ]
+    inputs = [ "protos/thread_service.options" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "thread_service"
+  }
+
+  pw_proto_library("wifi_service") {
+    sources = [ "protos/wifi_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "wifi_service"
   }
 }
 

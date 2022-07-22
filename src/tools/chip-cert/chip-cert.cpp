@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -59,6 +59,8 @@ const char * const sHelp =
     "    print-cert -- Print a CHIP certificate.\n"
     "\n"
     "    gen-att-cert -- Generate a CHIP attestation certificate.\n"
+    "\n"
+    "    validate-att-cert -- Validate a CHIP attestation certificate chain.\n"
     "\n"
     "    gen-cd -- Generate a CHIP certification declaration signed message.\n"
     "\n"
@@ -126,6 +128,10 @@ extern "C" int main(int argc, char * argv[])
     else if (strcasecmp(argv[1], "gen-att-cert") == 0 || strcasecmp(argv[1], "genattcert") == 0)
     {
         res = Cmd_GenAttCert(argc - 1, argv + 1);
+    }
+    else if (strcasecmp(argv[1], "validate-att-cert") == 0 || strcasecmp(argv[1], "validateattcert") == 0)
+    {
+        res = Cmd_ValidateAttCert(argc - 1, argv + 1);
     }
     else if (strcasecmp(argv[1], "gen-cd") == 0 || strcasecmp(argv[1], "gencd") == 0)
     {

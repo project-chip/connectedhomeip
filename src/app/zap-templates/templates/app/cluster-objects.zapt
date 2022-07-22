@@ -7,9 +7,11 @@
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
-#include <lib/support/BitFlags.h>
+#include <lib/core/ClusterEnums.h>
+#include <lib/support/BitMask.h>
 #include <protocols/interaction_model/Constants.h>
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -32,37 +34,21 @@ namespace Structs {
 } // namespace Structs
 } // namespace detail
 
+namespace Globals {
+namespace Attributes {
+{{#zcl_attributes_server}}
+{{#unless clusterRef}}
+namespace {{asUpperCamelCase label}} {
+  {{> cluster_objects_attribute_typeinfo ns=""}}
+} // namespace {{asUpperCamelCase label}}
+
+{{/unless}}
+{{/zcl_attributes_server}}
+} // namespace Attributes
+} // namespace Globals
+
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
-{{#zcl_enums}}
-{{#if (isWeaklyTypedEnum label)}}
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-{{/if}}
-// Enum for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
-{{#zcl_enum_items}}
-k{{asUpperCamelCase label}} = {{asHex value 2}},
-{{/zcl_enum_items}}
-};
-{{#if (isWeaklyTypedEnum label)}}
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using {{asType label}} = EmberAf{{asType label}};
-#endif
-{{/if}}
-{{/zcl_enums}}
-
-{{#zcl_bitmaps}}
-
-// Bitmap for {{label}}
-enum class {{asType label}} : {{asUnderlyingZclType type}} {
-{{#zcl_bitmap_items}}
-k{{asUpperCamelCase label}} = {{asHex mask}},
-{{/zcl_bitmap_items}}
-};
-{{/zcl_bitmaps}}
-
 {{#zcl_structs}}
 {{#first}}
 namespace Structs {
@@ -118,8 +104,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 
     using ResponseType =
-    {{~#if responseRef}}
-      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{getResponseCommandName responseRef}}::DecodableType;
+    {{~#if responseName}}
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{responseName}}::DecodableType;
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
@@ -147,23 +133,13 @@ namespace Attributes {
 
 {{#zcl_attributes_server}}
 namespace {{asUpperCamelCase label}} {
-    struct TypeInfo {
-    {{! forceNotOptional=true because the optionality is on the attribute
-        itself, but we want just the type of the attribute. }}
-    {{#if entryType}}
-        using Type = {{zapTypeToEncodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true isArgument=true}};
+    {{#if clusterRef}}
+      {{> cluster_objects_attribute_typeinfo ns=parent.name}}
     {{else}}
-        using Type = {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true isArgument=true}};
+      struct TypeInfo : public Clusters::Globals::Attributes::{{asUpperCamelCase label}}::TypeInfo {
+          static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+      };
     {{/if}}
-
-        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
-        static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
-        static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
-    };
 } // namespace {{asUpperCamelCase label}}
 {{/zcl_attributes_server}}
 
@@ -201,10 +177,17 @@ public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+    static constexpr bool kIsFabricScoped = {{event_is_fabric_scoped}};
 
     {{#zcl_event_fields}}
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase name}}{{> cluster_objects_field_init}};
     {{/zcl_event_fields}}
+
+    {{#if event_is_fabric_scoped}}
+    auto GetFabricIndex() const {
+        return {{ asLowerCamelCase event_fabric_idx_field }};
+    }
+    {{/if}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
 };
@@ -230,5 +213,9 @@ public:
 {{/zcl_clusters}}
 
 } // namespace Clusters
+
+bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand);
+bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand);
+
 } // namespace app
 } // namespace chip

@@ -19,13 +19,13 @@
 
 #pragma once
 
-// ---- Lock Example App Config ----
+// ---- Door lock Example App Config ----
 
-#define APP_TASK_NAME "Lck"
+#define APP_TASK_NAME "Lock"
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
+#define ACTUATOR_MOVEMENT_PERIOS_MS 10
 
 // EFR Logging
 #ifdef __cplusplus

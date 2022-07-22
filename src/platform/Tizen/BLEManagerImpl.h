@@ -87,9 +87,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -182,7 +180,7 @@ private:
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
     static void HandleConnectionTimeout(chip::System::Layer * layer, void * data);
-    static bool IsDeviceChipPeripheral(void * device);
+    static bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
     void NotifyBLEPeripheralGATTServerRegisterComplete(bool aIsSuccess, void * apAppstate);
@@ -251,11 +249,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode()
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled()

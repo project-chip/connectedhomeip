@@ -74,6 +74,12 @@ public:
      */
     EventFilterIBs::Builder & EndOfEventFilters();
 
+    /**
+     *  @brief Generate single event filter
+     *
+     */
+    CHIP_ERROR GenerateEventFilter(EventNumber aEventNumber);
+
 private:
     EventFilterIB::Builder mEventFilter;
 };

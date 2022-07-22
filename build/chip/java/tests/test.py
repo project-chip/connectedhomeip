@@ -14,8 +14,7 @@
 # limitations under the License.
 
 """
-Test for GN Java build rules. This test should be executed using ninja, and
-generate_jars_for_test.py should have been called before running this test.
+Test for GN Java build rules. This test should be executed using ninja.
 """
 
 import json
@@ -32,8 +31,6 @@ class JavaBuildTest(unittest.TestCase):
 
     jars_dir = 'python/lib' + local_test_dir
     configs_dir = 'python/gen' + local_test_dir
-
-    tmp_dir = '/tmp/chip_java_build_test'
 
     # Target names in the BUILD.gn
     targets_to_check = [

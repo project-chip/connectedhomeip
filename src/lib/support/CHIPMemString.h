@@ -171,7 +171,10 @@ public:
     ScopedMemoryString(const char * string, size_t length)
     {
         size_t lengthWithNull = length + 1;
-        CopyString(Alloc(lengthWithNull).Get(), lengthWithNull, string);
+
+        // We must convert the source string to a CharSpan, so we call the
+        // version of CopyString that handles unterminated strings.
+        CopyString(Alloc(lengthWithNull).Get(), lengthWithNull, CharSpan(string, length));
     }
 };
 

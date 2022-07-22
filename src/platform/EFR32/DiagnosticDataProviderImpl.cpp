@@ -28,10 +28,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
-#include <lwip/tcpip.h>
-
 #include "AppConfig.h"
 #include "FreeRTOS.h"
+#include "heap_4_silabs.h"
+#include <lib/support/CHIPMemString.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -82,6 +82,71 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+
+    xPortResetHeapMinimumEverFreeHeapSize();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    /* Obtain all available task information */
+    TaskStatus_t * taskStatusArray;
+    ThreadMetrics * head = nullptr;
+    uint32_t arraySize, x, dummy;
+
+    arraySize = uxTaskGetNumberOfTasks();
+
+    taskStatusArray = static_cast<TaskStatus_t *>(chip::Platform::MemoryCalloc(arraySize, sizeof(TaskStatus_t)));
+
+    if (taskStatusArray != NULL)
+    {
+        /* Generate raw status information about each task. */
+        arraySize = uxTaskGetSystemState(taskStatusArray, arraySize, &dummy);
+        /* For each populated position in the taskStatusArray array,
+           format the raw data as human readable ASCII data. */
+
+        for (x = 0; x < arraySize; x++)
+        {
+            ThreadMetrics * thread = new ThreadMetrics();
+            if (thread)
+            {
+                Platform::CopyString(thread->NameBuf, taskStatusArray[x].pcTaskName);
+                thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+                thread->id = taskStatusArray[x].xTaskNumber;
+                thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+
+                /* Unsupported metrics */
+                // thread->stackSize
+                // thread->stackFreeCurrent
+
+                thread->Next = head;
+                head         = thread;
+            }
+        }
+
+        *threadMetricsOut = head;
+        /* The array is no longer needed, free the memory it consumes. */
+        chip::Platform::MemoryFree(taskStatusArray);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        delete del;
+    }
+}
+
 // General Diagnostics Getters
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
@@ -98,7 +163,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     uint32_t reason = 0;
     CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
@@ -106,7 +171,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<uint8_t>(reason);
+        bootReason = static_cast<BootReasonType>(reason);
     }
 
     return err;
@@ -182,18 +247,85 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     NetworkInterface * ifp = new NetworkInterface();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    const char * threadNetworkName       = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                            = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->fabricConnected                 = true;
-    ifp->offPremiseServicesReachableIPv4 = false;
-    ifp->offPremiseServicesReachableIPv6 = false;
-    ifp->type                            = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
-#else
-    /* TODO */
-#endif
+    const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->type = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+#else
+    NetworkInterface * head = NULL;
+    for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
+    {
+        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        Inet::InterfaceType interfaceType;
+        if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
+        {
+            switch (interfaceType)
+            {
+            case Inet::InterfaceType::Unknown:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+                break;
+            case Inet::InterfaceType::WiFi:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                break;
+            case Inet::InterfaceType::Ethernet:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                break;
+            case Inet::InterfaceType::Thread:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+                break;
+            case Inet::InterfaceType::Cellular:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                break;
+            }
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get interface type");
+        }
+
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
+
+        uint8_t addressSize;
+        if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
+        }
+        else
+        {
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, addressSize);
+        }
+
+        // Assuming IPv6-only support
+        Inet::InterfaceAddressIterator interfaceAddressIterator;
+        uint8_t ipv6AddressesCount = 0;
+        while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+        {
+            if (interfaceAddressIterator.GetInterfaceId() == interfaceIterator.GetInterfaceId())
+            {
+                chip::Inet::IPAddress ipv6Address;
+                if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+                {
+                    memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+                    ipv6AddressesCount++;
+                }
+            }
+            interfaceAddressIterator.Next();
+        }
+
+        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+        head               = ifp;
+    }
+    *netifpp = head;
+#endif
 
     *netifpp = ifp;
     return CHIP_NO_ERROR;
@@ -207,6 +339,151 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         netifp                 = netifp->Next;
         delete del;
     }
+}
+
+#if SL_WIFI
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+{
+    wfx_wifi_scan_result_t ap;
+    int32_t err = wfx_get_ap_info(&ap);
+    static uint8_t bssid[6];
+    if (err == 0)
+    {
+        memcpy(bssid, ap.bssid, 6);
+        BssId = ByteSpan(bssid, 6);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+{
+    wfx_wifi_scan_result_t ap;
+    int32_t err = wfx_get_ap_info(&ap);
+    if (err == 0)
+    {
+        securityType = ap.security;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+{
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    wfx_wifi_scan_result_t ap;
+    int32_t err = wfx_get_ap_info(&ap);
+    if (err == 0)
+    {
+        channelNumber = ap.chan;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    wfx_wifi_scan_result_t ap;
+    int32_t err = wfx_get_ap_info(&ap);
+    if (err == 0)
+    {
+        rssi = ap.rssi;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        beaconLostCount = extra_info.beacon_lost_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        packetMulticastRxCount = extra_info.mcast_rx_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        packetMulticastTxCount = extra_info.mcast_tx_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        packetUnicastRxCount = extra_info.ucast_rx_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        packetUnicastTxCount = extra_info.ucast_tx_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    wfx_wifi_scan_ext_t extra_info;
+    int32_t err = wfx_get_ap_ext(&extra_info);
+    if (err == 0)
+    {
+        overrunCount = extra_info.overrun_count;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
+    return CHIP_NO_ERROR;
+}
+#endif // SL_WIFI
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer

@@ -45,25 +45,11 @@ namespace AdministratorCommissioning {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::OpenBasicCommissioningWindow::Id: {
-            Commands::OpenBasicCommissioningWindow::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
-                    apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         case Commands::OpenCommissioningWindow::Id: {
             Commands::OpenCommissioningWindow::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -71,6 +57,16 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             {
                 wasHandled = emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(apCommandObj, aCommandPath,
                                                                                                      commandData);
+            }
+            break;
+        }
+        case Commands::OpenBasicCommissioningWindow::Id: {
+            Commands::OpenBasicCommissioningWindow::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallback(
+                    apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -103,66 +99,10 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace AdministratorCommissioning
 
-namespace Basic {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                 ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-}
-
-} // namespace Basic
-
-namespace DiagnosticLogs {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::RetrieveLogsRequest::Id: {
-            Commands::RetrieveLogsRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace DiagnosticLogs
-
 namespace GeneralCommissioning {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
@@ -177,6 +117,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::SetRegulatoryConfig::Id: {
+            Commands::SetRegulatoryConfig::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::CommissioningComplete::Id: {
             Commands::CommissioningComplete::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -184,15 +133,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             {
                 wasHandled =
                     emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::SetRegulatoryConfig::Id: {
-            Commands::SetRegulatoryConfig::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -215,19 +155,162 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace GeneralCommissioning
 
-namespace LevelControl {
+namespace GeneralDiagnostics {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
         switch (aCommandPath.mCommandId)
         {
+        case Commands::TestEventTrigger::Id: {
+            Commands::TestEventTrigger::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace GeneralDiagnostics
+
+namespace GroupKeyManagement {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::KeySetWrite::Id: {
+            Commands::KeySetWrite::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterKeySetWriteCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::KeySetRead::Id: {
+            Commands::KeySetRead::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterKeySetReadCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::KeySetRemove::Id: {
+            Commands::KeySetRemove::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterKeySetRemoveCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::KeySetReadAllIndices::Id: {
+            Commands::KeySetReadAllIndices::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace GroupKeyManagement
+
+namespace Identify {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::Identify::Id: {
+            Commands::Identify::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfIdentifyClusterIdentifyCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace Identify
+
+namespace LevelControl {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::MoveToLevel::Id: {
+            Commands::MoveToLevel::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::Move::Id: {
             Commands::Move::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -237,12 +320,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::MoveToLevel::Id: {
-            Commands::MoveToLevel::DecodableType commandData;
+        case Commands::Step::Id: {
+            Commands::Step::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfLevelControlClusterStepCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::Stop::Id: {
+            Commands::Stop::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfLevelControlClusterStopCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -264,30 +356,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::Step::Id: {
-            Commands::Step::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfLevelControlClusterStepCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         case Commands::StepWithOnOff::Id: {
             Commands::StepWithOnOff::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::Stop::Id: {
-            Commands::Stop::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfLevelControlClusterStopCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -323,15 +397,20 @@ namespace NetworkCommissioning {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
         switch (aCommandPath.mCommandId)
         {
+        case Commands::ScanNetworks::Id: {
+            Commands::ScanNetworks::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::AddOrUpdateThreadNetwork::Id: {
             Commands::AddOrUpdateThreadNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -339,25 +418,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             {
                 wasHandled =
                     emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::AddOrUpdateWiFiNetwork::Id: {
-            Commands::AddOrUpdateWiFiNetwork::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::ConnectNetwork::Id: {
-            Commands::ConnectNetwork::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterConnectNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -370,21 +430,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::ConnectNetwork::Id: {
+            Commands::ConnectNetwork::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfNetworkCommissioningClusterConnectNetworkCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::ReorderNetwork::Id: {
             Commands::ReorderNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfNetworkCommissioningClusterReorderNetworkCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::ScanNetworks::Id: {
-            Commands::ScanNetworks::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -407,14 +467,48 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace NetworkCommissioning
 
+namespace OtaSoftwareUpdateRequestor {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::AnnounceOtaProvider::Id: {
+            Commands::AnnounceOtaProvider::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace OtaSoftwareUpdateRequestor
+
 namespace OnOff {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
@@ -470,34 +564,11 @@ namespace OperationalCredentials {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
 {
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
     CHIP_ERROR TLVError = CHIP_NO_ERROR;
     bool wasHandled     = false;
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::AddNOC::Id: {
-            Commands::AddNOC::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::AddTrustedRootCertificate::Id: {
-            Commands::AddTrustedRootCertificate::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         case Commands::AttestationRequest::Id: {
             Commands::AttestationRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -518,31 +589,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::OpCSRRequest::Id: {
-            Commands::OpCSRRequest::DecodableType commandData;
+        case Commands::CSRRequest::Id: {
+            Commands::CSRRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterCSRRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::RemoveFabric::Id: {
-            Commands::RemoveFabric::DecodableType commandData;
+        case Commands::AddNOC::Id: {
+            Commands::AddNOC::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterAddNOCCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::RemoveTrustedRootCertificate::Id: {
-            Commands::RemoveTrustedRootCertificate::DecodableType commandData;
+        case Commands::UpdateNOC::Id: {
+            Commands::UpdateNOC::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(apCommandObj, aCommandPath,
-                                                                                                      commandData);
+                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -555,12 +625,22 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::UpdateNOC::Id: {
-            Commands::UpdateNOC::DecodableType commandData;
+        case Commands::RemoveFabric::Id: {
+            Commands::RemoveFabric::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfOperationalCredentialsClusterUpdateNOCCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::AddTrustedRootCertificate::Id: {
+            Commands::AddTrustedRootCertificate::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -583,6 +663,43 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace OperationalCredentials
 
+namespace ThreadNetworkDiagnostics {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::ResetCounts::Id: {
+            Commands::ResetCounts::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfThreadNetworkDiagnosticsClusterResetCountsCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace ThreadNetworkDiagnostics
+
 } // namespace Clusters
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
@@ -594,14 +711,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::AdministratorCommissioning::Id:
         Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::Basic::Id:
-        Clusters::Basic::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::DiagnosticLogs::Id:
-        Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
     case Clusters::GeneralCommissioning::Id:
         Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::GeneralDiagnostics::Id:
+        Clusters::GeneralDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::GroupKeyManagement::Id:
+        Clusters::GroupKeyManagement::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::Identify::Id:
+        Clusters::Identify::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::LevelControl::Id:
         Clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
@@ -609,11 +729,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::NetworkCommissioning::Id:
         Clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
+    case Clusters::OtaSoftwareUpdateRequestor::Id:
+        Clusters::OtaSoftwareUpdateRequestor::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
     case Clusters::OnOff::Id:
         Clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OperationalCredentials::Id:
         Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::ThreadNetworkDiagnostics::Id:
+        Clusters::ThreadNetworkDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     default:
         ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
@@ -621,25 +747,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     }
 
-    Compatibility::ResetEmberAfObjects();
-}
-
-void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader,
-                                          CommandSender * apCommandObj)
-{
-    Compatibility::SetupEmberAfCommandSender(apCommandObj, aCommandPath);
-
-    TLV::TLVType dataTlvType;
-    SuccessOrExit(aReader.EnterContainer(dataTlvType));
-    switch (aCommandPath.mClusterId)
-    {
-    default:
-        ChipLogError(Zcl, "Unknown cluster " ChipLogFormatMEI, ChipLogValueMEI(aCommandPath.mClusterId));
-        break;
-    }
-
-exit:
-    aReader.ExitContainer(dataTlvType);
     Compatibility::ResetEmberAfObjects();
 }
 

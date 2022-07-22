@@ -103,12 +103,6 @@ uint32_t emberAfGetUtcFromTimeStruct(EmberAfTimeStruct * time);
  */
 uint8_t emberAfGetWeekdayFromUtc(uint32_t utcTime);
 
-/*
- * @brief Prints out a human readable date form from the given ZCL data type.
- */
-void emberAfPrintDate(const EmberAfDate * date);
-void emberAfPrintDateln(const EmberAfDate * date);
-
 /**
  * @brief Sets current time.
  * Convenience function for setting the time to a value.

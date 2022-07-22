@@ -28,9 +28,14 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::LowPower;
+
+static constexpr size_t kLowPowerDelegateTableSize =
+    EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -39,19 +44,19 @@ using chip::app::Clusters::LowPower::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_LOW_POWER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegateTable[kLowPowerDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::LowPower::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
     if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "LowPower has no delegate set for endpoint:%" PRIu16, endpoint);
+        ChipLogProgress(Zcl, "LowPower has no delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -83,22 +88,23 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 bool emberAfLowPowerClusterSleepCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Sleep::DecodableType & commandData)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    using Protocols::InteractionModel::Status;
+
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
-    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-
-exit:
-    if (err != CHIP_NO_ERROR)
+    Status status;
+    if (isDelegateNull(delegate, endpoint))
     {
-        ChipLogError(Zcl, "emberAfLowPowerClusterSleepCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        ChipLogError(Zcl, "emberAfLowPowerClusterSleepCallback: no delegate");
+        status = Status::Failure;
     }
-
-    bool success         = delegate->HandleSleep();
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        bool success = delegate->HandleSleep();
+        status       = success ? Status::Success : Status::Failure;
+    }
+    command->AddStatus(commandPath, status);
     return true;
 }
 

@@ -43,8 +43,6 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
 
-#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Linux platforms.

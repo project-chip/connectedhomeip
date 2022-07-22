@@ -30,3 +30,19 @@
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+ *
+ * Enable support for Chip-over-BLE (CHIPoBLE).
+ */
+#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+
+/**
+ * CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
+ *
+ * Reduce packet buffer pool size to 8 (default 15) to reduce ram consumption
+ */
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1

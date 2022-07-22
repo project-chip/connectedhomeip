@@ -39,17 +39,14 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturn
     return ThreadStackMgr().ClearSrpHost(hostname);
 }
 
-CHIP_ERROR ChipDnssdShutdown()
-{
-    return CHIP_NO_ERROR;
-}
+void ChipDnssdShutdown() {}
 
 const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
     return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
 }
 
-CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
+CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ReturnErrorCodeIf(service == nullptr, CHIP_ERROR_INVALID_ARGUMENT);

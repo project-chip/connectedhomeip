@@ -23,6 +23,8 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <inet/InetInterface.h>
+#include <lib/core/ClusterEnums.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/GeneralFaults.h>
 
@@ -36,6 +38,13 @@ static constexpr size_t kMaxThreadNameLength = 32;
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
 constexpr size_t kMaxHardwareAddrSize = 8;
 
+constexpr size_t kMaxIPv4AddrSize  = 4;
+constexpr size_t kMaxIPv6AddrSize  = 16;
+constexpr size_t kMaxIPv4AddrCount = 4;
+constexpr size_t kMaxIPv6AddrCount = 8;
+
+using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonType;
+
 struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type
 {
     char NameBuf[kMaxThreadNameLength + 1];
@@ -46,57 +55,14 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 {
     char Name[Inet::InterfaceId::kMaxIfNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];
+    uint8_t Ipv4AddressesBuffer[kMaxIPv4AddrCount][kMaxIPv4AddrSize];
+    uint8_t Ipv6AddressesBuffer[kMaxIPv6AddrCount][kMaxIPv6AddrSize];
+    chip::ByteSpan Ipv4AddressSpans[kMaxIPv4AddrCount];
+    chip::ByteSpan Ipv6AddressSpans[kMaxIPv6AddrCount];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };
 
-/**
- * Defines the General Diagnostics Delegate class to notify platform events.
- */
-class GeneralDiagnosticsDelegate
-{
-public:
-    virtual ~GeneralDiagnosticsDelegate() {}
-
-    /**
-     * @brief
-     *   Called after the current device is rebooted.
-     */
-    virtual void OnDeviceRebooted() {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a hardware fault has been raised.
-     */
-    virtual void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
-    {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a radio fault has been raised.
-     */
-    virtual void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) {}
-
-    /**
-     * @brief
-     *   Called when the Node detects a network fault has been raised.
-     */
-    virtual void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) {}
-};
-
-/**
- * Defines the Software Diagnostics Delegate class to notify software events.
- */
-class SoftwareDiagnosticsDelegate
-{
-public:
-    virtual ~SoftwareDiagnosticsDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a software fault that has taken place on the Node.
-     */
-    virtual void OnSoftwareFaultDetected(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & softwareFault) {}
-};
+class DiagnosticDataProviderImpl;
 
 /**
  * Defines the WiFi Diagnostics Delegate class to notify WiFi network events.
@@ -131,23 +97,6 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    enum BootReasonType : uint8_t
-    {
-        Unspecified             = 0,
-        PowerOnReboot           = 1,
-        BrownOutReset           = 2,
-        SoftwareWatchdogReset   = 3,
-        HardwareWatchdogReset   = 4,
-        SoftwareUpdateCompleted = 5,
-        SoftwareReset           = 6,
-    };
-
-    void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
-    GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
-
-    void SetSoftwareDiagnosticsDelegate(SoftwareDiagnosticsDelegate * delegate) { mSoftwareDiagnosticsDelegate = delegate; }
-    SoftwareDiagnosticsDelegate * GetSoftwareDiagnosticsDelegate() const { return mSoftwareDiagnosticsDelegate; }
-
     void SetWiFiDiagnosticsDelegate(WiFiDiagnosticsDelegate * delegate) { mWiFiDiagnosticsDelegate = delegate; }
     WiFiDiagnosticsDelegate * GetWiFiDiagnosticsDelegate() const { return mWiFiDiagnosticsDelegate; }
 
@@ -157,7 +106,7 @@ public:
     virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
     virtual CHIP_ERROR GetUpTime(uint64_t & upTime);
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    virtual CHIP_ERROR GetBootReason(uint8_t & bootReason);
+    virtual CHIP_ERROR GetBootReason(BootReasonType & bootReason);
     virtual CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
     virtual CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
     virtual CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
@@ -173,9 +122,14 @@ public:
     /**
      * Software Diagnostics methods.
      */
+
+    /// Feature support - this returns support gor GetCurrentHeapHighWatermark and ResetWatermarks()
+    virtual bool SupportsWatermarks() { return false; }
+
     virtual CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
     virtual CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
     virtual CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
+    virtual CHIP_ERROR ResetWatermarks();
 
     /*
      * Get the linked list of thread metrics of the current plaform. After usage, each caller of GetThreadMetrics
@@ -188,7 +142,7 @@ public:
     /**
      * Ethernet network diagnostics methods
      */
-    virtual CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
+    virtual CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate);
     virtual CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
     virtual CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
     virtual CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
@@ -223,9 +177,7 @@ protected:
     virtual ~DiagnosticDataProvider() = default;
 
 private:
-    GeneralDiagnosticsDelegate * mGeneralDiagnosticsDelegate   = nullptr;
-    SoftwareDiagnosticsDelegate * mSoftwareDiagnosticsDelegate = nullptr;
-    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate         = nullptr;
+    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
     DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;
@@ -234,11 +186,20 @@ private:
 };
 
 /**
- * Returns a reference to a DiagnosticDataProvider object.
+ * Returns a reference to the public interface of the DiagnosticDataProvider singleton object.
  *
- * Applications should use this to access the features of the DiagnosticDataProvider.
+ * Applications should use this to access features of the DiagnosticDataProvider object
+ * that are common to all platforms.
  */
 DiagnosticDataProvider & GetDiagnosticDataProvider();
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+extern DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 /**
  * Sets a reference to a DiagnosticDataProvider object.
@@ -259,6 +220,11 @@ inline CHIP_ERROR DiagnosticDataProvider::GetCurrentHeapUsed(uint64_t & currentH
 }
 
 inline CHIP_ERROR DiagnosticDataProvider::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+inline CHIP_ERROR DiagnosticDataProvider::ResetWatermarks()
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -285,7 +251,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetTotalOperationalHours(uint32_t & to
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetBootReason(uint8_t & bootReason)
+inline CHIP_ERROR DiagnosticDataProvider::GetBootReason(BootReasonType & bootReason)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -312,7 +278,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetNetworkInterfaces(NetworkInterface 
 
 inline void DiagnosticDataProvider::ReleaseNetworkInterfaces(NetworkInterface * netifp) {}
 
-inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(uint8_t & pHYRate)
+inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateType & pHYRate)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

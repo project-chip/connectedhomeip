@@ -35,10 +35,9 @@ class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 public:
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                     uint8_t mask, uint8_t type, uint16_t size, uint8_t * value) override;
+                                     uint8_t type, uint16_t size, uint8_t * value) override;
 
 private:
     void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

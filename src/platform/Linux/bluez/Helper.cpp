@@ -67,6 +67,7 @@
 #include <utility>
 
 #include <lib/support/CodeUtils.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/Linux/BLEManagerImpl.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -82,6 +83,8 @@ using chip::Platform::CopyString;
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+constexpr uint16_t kMaxConnectRetries = 4;
 
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint);
 
@@ -1196,22 +1199,23 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     gpointer data;
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle;
-
-    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
-    uint16_t lifetimeCounter = 0;
     BitFlags<AdditionalDataFields> additionalDataFields;
+    AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
 
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
-    SuccessOrExit(err);
-    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
-    SuccessOrExit(err);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    uint8_t rotatingDeviceIdUniqueId[ConfigurationManager::kRotatingDeviceIDUniqueIDLength] = {};
+    MutableByteSpan rotatingDeviceIdUniqueIdSpan(rotatingDeviceIdUniqueId);
 
+    err = GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    SuccessOrExit(err);
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
-#endif
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID) */
 
-    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
-                                                                         bufferHandle, additionalDataFields);
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, bufferHandle,
+                                                                         additionalDataFields);
     SuccessOrExit(err);
 
     data = g_memdup(bufferHandle->Start(), bufferHandle->DataLength());
@@ -1734,25 +1738,48 @@ bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 
 struct ConnectParams
 {
-    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint) {}
+    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint), mNumRetries(0) {}
     BluezDevice1 * mDevice;
     BluezEndpoint * mEndpoint;
+    uint16_t mNumRetries;
 };
 
-static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer)
+static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams)
 {
-    BluezDevice1 * device = BLUEZ_DEVICE1(aObject);
-    GError * error        = nullptr;
-    gboolean success      = bluez_device1_call_connect_finish(device, aResult, &error);
+    BluezDevice1 * device  = BLUEZ_DEVICE1(aObject);
+    GError * error         = nullptr;
+    gboolean success       = bluez_device1_call_connect_finish(device, aResult, &error);
+    ConnectParams * params = static_cast<ConnectParams *>(apParams);
+
+    assert(params != nullptr);
 
     if (!success)
     {
-        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s", error->message);
+        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s (%d)", error->message, error->code);
+
+        // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
+        // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
+        // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
+        // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
+        // D-Bus method, or else `Connect()` returns immediately without any effect.
+        if (g_error_matches(error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && params->mNumRetries++ < kMaxConnectRetries)
+        {
+            // Clear the error before usage in subsequent call.
+            g_clear_error(&error);
+
+            bluez_device1_call_disconnect_sync(device, nullptr, &error);
+            bluez_device1_call_connect(device, params->mEndpoint->mpConnectCancellable, ConnectDeviceDone, params);
+            ExitNow();
+        }
+
         BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
-        ExitNow();
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "ConnectDevice complete");
     }
 
-    ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+    chip::Platform::Delete(params);
 
 exit:
     if (error != nullptr)
@@ -1768,9 +1795,8 @@ static gboolean ConnectDeviceImpl(ConnectParams * apParams)
     assert(endpoint != nullptr);
 
     g_cancellable_reset(endpoint->mpConnectCancellable);
-    bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, nullptr);
+    bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, apParams);
     g_object_unref(device);
-    chip::Platform::Delete(apParams);
 
     return G_SOURCE_REMOVE;
 }

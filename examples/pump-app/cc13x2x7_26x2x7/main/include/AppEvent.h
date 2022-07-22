@@ -30,6 +30,8 @@ struct AppEvent
         kEventType_ButtonLeft,
         kEventType_ButtonRight,
         kEventType_AppEvent,
+        kEventType_IdentifyStart,
+        kEventType_IdentifyStop,
     };
 
     enum AppEventButtonType

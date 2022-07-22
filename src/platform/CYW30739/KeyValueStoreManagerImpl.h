@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,10 @@
 
 #pragma once
 
-#include <inet/InetConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <slist.h>
+
+#include "CYW30739Config.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,6 +39,8 @@ class KeyValueStoreManagerImpl final : public KeyValueStoreManager
     friend class KeyValueStoreManager;
 
 public:
+    CHIP_ERROR Init(void);
+
     // NOTE: Currently this platform does not support partial and offset reads
     //       these will return CHIP_ERROR_NOT_IMPLEMENTED.
     CHIP_ERROR _Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size = nullptr, size_t offset = 0);
@@ -44,40 +49,43 @@ public:
 
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
+    CHIP_ERROR EraseAll(void);
+
 private:
-    static constexpr uint8_t mMaxEntryCount = 1 + /* For the global message counter */
-        1 +                                       /* For the admin key count */
-        CHIP_CONFIG_MAX_DEVICE_ADMINS + 1 +       /* For the session key count */
-        CHIP_CONFIG_MAX_SESSION_KEYS;
+    using Config = Internal::CYW30739Config;
 
-    struct KeyEntry
+    static constexpr uint8_t mMaxEntryCount = 128;
+
+    struct KeyConfigIdEntry : public slist_node_t
     {
-        bool mIsValid;
+        KeyConfigIdEntry(uint8_t configID, const char * key, size_t keyLength);
+
+        bool IsMatchKey(const char * key) const;
+        constexpr Config::Key GetValueConfigKey() const
+        {
+            return Internal::CYW30739ConfigKey(Config::kChipKvsValue_KeyBase, mConfigID);
+        }
+        constexpr Config::Key GetKeyConfigKey() const
+        {
+            return Internal::CYW30739ConfigKey(Config::kChipKvsKey_KeyBase, mConfigID);
+        }
+        constexpr KeyConfigIdEntry * Next() const { return static_cast<KeyConfigIdEntry *>(next); }
+        constexpr uint8_t NextConfigID() const { return mConfigID + 1; }
+
+        uint8_t mConfigID;
         char mKey[CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH];
-
-        bool IsMatchKey(const char * key);
     };
 
-    class KeyEntryStorage
-    {
-    public:
-        KeyEntryStorage(void);
-        ~KeyEntryStorage(void);
-
-        CHIP_ERROR AllocateEntry(uint16_t & nvramID, const char * key, size_t keyLength);
-        void ReleaseEntry(const char * key);
-        CHIP_ERROR FindKeyNvramID(uint16_t & nvramID, const char * key);
-
-    private:
-        KeyEntry mKeyEntries[mMaxEntryCount];
-        bool mIsDirty;
-    };
+    KeyConfigIdEntry * AllocateEntry(const char * key, size_t keyLength);
+    KeyConfigIdEntry * FindEntry(const char * key, Optional<uint8_t> * freeConfigID = nullptr);
 
     // ===== Members for internal use by the following friends.
     friend KeyValueStoreManager & KeyValueStoreMgr();
     friend KeyValueStoreManagerImpl & KeyValueStoreMgrImpl();
 
     static KeyValueStoreManagerImpl sInstance;
+
+    slist_node_t mKeyConfigIdList;
 };
 
 /**

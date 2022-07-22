@@ -26,13 +26,6 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
-// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
-// instead of IM status code.
-// #6308 should handle IM error code on the application side, either modify this function or remove this.
-bool IMDefaultResponseCallback(const chip::app::CommandSender * commandObj, EmberAfStatus status);
-bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status);
-void LogStatus(uint8_t status);
-
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
 typedef void (*DefaultFailureCallback)(void * context, uint8_t status);

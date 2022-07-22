@@ -47,6 +47,7 @@ void BLEBase::ClearState()
     {
         mBleLayer->CancelBleIncompleteConnection();
         mBleLayer->OnChipBleConnectReceived = nullptr;
+        mBleLayer->mBleTransport            = nullptr;
         mBleLayer                           = nullptr;
     }
 
@@ -66,8 +67,16 @@ CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
     VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(bleLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mBleLayer                           = bleLayer;
-    mBleLayer->mBleTransport            = this;
+    mBleLayer = bleLayer;
+    if (mBleLayer->mBleTransport == nullptr || !param.PreserveExistingBleLayerTransport())
+    {
+        mBleLayer->mBleTransport = this;
+        ChipLogDetail(Inet, "BLEBase::Init - setting/overriding transport");
+    }
+    else
+    {
+        ChipLogDetail(Inet, "BLEBase::Init - not overriding transport");
+    }
     mBleLayer->OnChipBleConnectReceived = nullptr;
 
     mState = State::kInitialized;
@@ -141,14 +150,14 @@ exit:
             mBleEndPoint->Close();
             mBleEndPoint = nullptr;
         }
-        ChipLogError(Inet, "Failed to setup BLE endPoint: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to setup BLE endPoint: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
 void BLEBase::OnBleConnectionError(CHIP_ERROR err)
 {
     ClearPendingPackets();
-    ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
+    ChipLogDetail(Inet, "BleConnection Error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle && buffer)
@@ -162,7 +171,7 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Inet, "Failed to establish BLE connection: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to establish BLE connection: %" CHIP_ERROR_FORMAT, err.Format());
         OnEndPointConnectionClosed(endPoint, err);
         return;
     }
@@ -174,7 +183,7 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err)
             err = endPoint->Send(std::move(mPendingPackets[i]));
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Inet, "Deferred sending failed: %s", ErrorStr(err));
+                ChipLogError(Inet, "Deferred sending failed: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
     }

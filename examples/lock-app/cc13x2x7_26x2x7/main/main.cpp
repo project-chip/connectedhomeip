@@ -35,7 +35,6 @@
 #include <ti/drivers/AESECB.h>
 #include <ti/drivers/ECDH.h>
 #include <ti/drivers/ECDSA.h>
-#include <ti/drivers/ECJPAKE.h>
 #include <ti/drivers/SHA2.h>
 
 #include <bget.h>
@@ -76,8 +75,6 @@ int main(void)
     ECDH_init();
 
     ECDSA_init();
-
-    ECJPAKE_init();
 
     AESECB_init();
 

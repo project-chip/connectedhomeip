@@ -33,6 +33,8 @@
 #include <cstdio>
 #endif
 
+#include <src/lib/support/logging/CHIPLogging.h>
+
 #if CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 #include <dmalloc.h>
 #include <lib/support/SafeInt.h>
@@ -123,6 +125,10 @@ void * __wrap_calloc(size_t num, size_t size)
     {
         memset(ptr, 0, total_size);
     }
+    else
+    {
+        ChipLogError(DeviceLayer, "__wrap_calloc: Could not allocate memory!");
+    }
 
     return ptr;
 }
@@ -147,6 +153,7 @@ void * __wrap_realloc(void * ptr, size_t new_size)
 
         if (!new_ptr)
         {
+            ChipLogError(DeviceLayer, "__wrap_realloc: Could not allocate memory!");
             return NULL;
         }
 

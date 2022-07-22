@@ -24,6 +24,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/CommissionableDataProvider.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 
 using chip::DeviceLayer::ConfigurationMgr;
 
@@ -43,12 +45,12 @@ static CHIP_ERROR ConfigGetVendorId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetVendorId(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "VendorId:        ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -62,12 +64,12 @@ static CHIP_ERROR ConfigGetProductId(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductId(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(value16));
     if (printHeader)
     {
         streamer_printf(sout, "ProductId:       ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -81,12 +83,12 @@ static CHIP_ERROR ConfigGetHardwareVersion(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetHardwareVersion(value16));
+    ReturnErrorOnFailure(DeviceLayer::GetDeviceInstanceInfoProvider()->GetHardwareVersion(value16));
     if (printHeader)
     {
         streamer_printf(sout, "HardwareVersion: ");
     }
-    streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
+    streamer_printf(sout, "%u (0x%X)\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
@@ -100,7 +102,7 @@ static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
     streamer_t * sout = streamer_get();
     uint32_t setupPinCode;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupPinCode(setupPinCode));
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->GetSetupPasscode(setupPinCode));
     if (printHeader)
     {
         streamer_printf(sout, "PinCode:         ");
@@ -119,12 +121,12 @@ static CHIP_ERROR ConfigGetSetupDiscriminator(bool printHeader)
     streamer_t * sout = streamer_get();
     uint16_t setupDiscriminator;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetSetupDiscriminator(setupDiscriminator));
+    ReturnErrorOnFailure(DeviceLayer::GetCommissionableDataProvider()->GetSetupDiscriminator(setupDiscriminator));
     if (printHeader)
     {
         streamer_printf(sout, "Discriminator:   ");
     }
-    streamer_printf(sout, "%03x\r\n", setupDiscriminator & 0xFFF);
+    streamer_printf(sout, "%03x\r\n", setupDiscriminator & chip::kMaxDiscriminatorValue);
     return CHIP_NO_ERROR;
 }
 
@@ -132,11 +134,11 @@ static CHIP_ERROR ConfigSetSetupDiscriminator(char * argv)
 {
     CHIP_ERROR error;
     streamer_t * sout           = streamer_get();
-    uint16_t setupDiscriminator = strtoull(argv, NULL, 10);
+    uint16_t setupDiscriminator = strtoull(argv, nullptr, 10);
 
-    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < 0xFFF, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(setupDiscriminator != 0 && setupDiscriminator < chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = ConfigurationMgr().StoreSetupDiscriminator(setupDiscriminator);
+    error = DeviceLayer::GetCommissionableDataProvider()->SetSetupDiscriminator(setupDiscriminator);
 
     if (error == CHIP_NO_ERROR)
     {
@@ -156,10 +158,8 @@ static CHIP_ERROR ConfigDiscriminator(int argc, char ** argv)
     {
         return ConfigGetSetupDiscriminator(false);
     }
-    else
-    {
-        return ConfigSetSetupDiscriminator(argv[0]);
-    }
+
+    return ConfigSetSetupDiscriminator(argv[0]);
 }
 
 static CHIP_ERROR PrintAllConfigs()
@@ -210,7 +210,6 @@ void RegisterConfigCommands()
 
     // Register the root `config` command with the top-level shell.
     Engine::Root().RegisterCommands(&sConfigComand, 1);
-    return;
 }
 
 } // namespace Shell

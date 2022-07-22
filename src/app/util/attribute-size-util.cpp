@@ -75,7 +75,7 @@ uint16_t emberAfAttributeValueSize(ClusterId clusterId, AttributeId attrId, Embe
     uint16_t dataSize = 0;
     if (emberAfIsThisDataTypeAStringType(dataType))
     {
-        if (buffer != 0)
+        if (buffer != nullptr)
         {
             if (emberAfIsStringAttributeType(dataType))
             {

@@ -77,7 +77,7 @@
 #define PBUF_POOL_BUFSIZE 1356
 
 /* Network Interfaces options */
-#define PBUF_POOL_SIZE 8
+#define PBUF_POOL_SIZE 10
 
 /* LOOPIF options */
 

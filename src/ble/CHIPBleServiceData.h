@@ -45,11 +45,16 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
-    constexpr static uint16_t kDiscriminatorMask     = 0xfff;
-    constexpr static uint8_t kAdditionalDataFlagMask = 0x1;
+    constexpr static uint16_t kDiscriminatorMask            = 0xfff;
+    constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
+    constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
+    constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
 
     uint8_t OpCode;
-    uint8_t DeviceDiscriminator[2];
+    // DeviceDiscriminatorAndAdvVersion[0] contains the low 8 bits of the 12-bit discriminator.
+    // DeviceDiscriminatorAndAdvVersion[1] contains the high 8 bits of the 12-bit discriminator in its low 4 bits and
+    // the 4 bits of the advertisement version in its high 4 bits.
+    uint8_t DeviceDiscriminatorAndAdvVersion[2];
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];
     uint8_t AdditionalDataFlag;
@@ -64,17 +69,34 @@ struct ChipBLEDeviceIdentificationInfo
 
     void SetProductId(uint16_t productId) { chip::Encoding::LittleEndian::Put16(DeviceProductId, productId); }
 
+    uint8_t GetAdvertisementVersion() const
+    {
+        uint8_t advertisementVersion = static_cast<uint8_t>((DeviceDiscriminatorAndAdvVersion[1] & kAdvertisementVersionMask) >>
+                                                            kAdvertisementVersionShiftBits);
+        return advertisementVersion;
+    }
+
+    // Use only 4 bits to set advertisement version
+    void SetAdvertisementVersion(uint8_t advertisementVersion)
+    {
+        // Advertisement Version is 4 bit long from 12th to 15th
+        advertisementVersion =
+            static_cast<uint8_t>((advertisementVersion << kAdvertisementVersionShiftBits) & kAdvertisementVersionMask);
+        DeviceDiscriminatorAndAdvVersion[1] =
+            static_cast<uint8_t>((DeviceDiscriminatorAndAdvVersion[1] & ~kAdvertisementVersionMask) | advertisementVersion);
+    }
+
     uint16_t GetDeviceDiscriminator() const
     {
-        return chip::Encoding::LittleEndian::Get16(DeviceDiscriminator) & kDiscriminatorMask;
+        return chip::Encoding::LittleEndian::Get16(DeviceDiscriminatorAndAdvVersion) & kDiscriminatorMask;
     }
 
     void SetDeviceDiscriminator(uint16_t deviceDiscriminator)
     {
         // Discriminator is 12-bit long, so don't overwrite bits 12th through 15th
         deviceDiscriminator &= kDiscriminatorMask;
-        deviceDiscriminator |= static_cast<uint16_t>(DeviceDiscriminator[1] << 8u & ~kDiscriminatorMask);
-        chip::Encoding::LittleEndian::Put16(DeviceDiscriminator, deviceDiscriminator);
+        deviceDiscriminator |= static_cast<uint16_t>(DeviceDiscriminatorAndAdvVersion[1] << 8u & ~kDiscriminatorMask);
+        chip::Encoding::LittleEndian::Put16(DeviceDiscriminatorAndAdvVersion, deviceDiscriminator);
     }
 
     uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }

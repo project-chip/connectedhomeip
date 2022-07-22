@@ -29,9 +29,10 @@ bool emberAfPrintReceivedMessages = true;
 
 using namespace chip::Logging;
 
+#if CHIP_PROGRESS_LOGGING
+
 void emberAfPrint(int category, const char * format, ...)
 {
-#if _CHIP_USE_LOGGING
     if (format != nullptr)
     {
         va_list args;
@@ -39,12 +40,11 @@ void emberAfPrint(int category, const char * format, ...)
         chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Progress, format, args);
         va_end(args);
     }
-#endif
 }
 
+#if !CHIP_PW_TOKENIZER_LOGGING
 void emberAfPrintln(int category, const char * format, ...)
 {
-#if _CHIP_USE_LOGGING
     if (format != nullptr)
     {
         va_list args;
@@ -52,8 +52,8 @@ void emberAfPrintln(int category, const char * format, ...)
         chip::Logging::LogV(chip::Logging::kLogModule_Zcl, chip::Logging::kLogCategory_Progress, format, args);
         va_end(args);
     }
-#endif
 }
+#endif
 
 // TODO: add unit tests.
 
@@ -99,3 +99,5 @@ void emberAfPrintString(int category, const uint8_t * string)
 {
     emberAfPrint(category, "%.*s", emberAfStringLength(string), string + 1);
 }
+
+#endif // CHIP_PROGRESS_LOGGING

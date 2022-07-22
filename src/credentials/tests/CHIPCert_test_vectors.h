@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
+#include <credentials/CHIPCertificateSet.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {

@@ -17,6 +17,13 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
+  <enum name="OnOffStartUpOnOff" type="ENUM8">
+    <cluster code="0x0006"/>
+    <item name="Off" value="0x00"/>
+    <item name="On" value="0x01"/>
+    <item name="TogglePreviousOnOff" value="0x02"/>
+  </enum>
+
   <enum name="OnOffEffectIdentifier" type="enum8">
     <cluster code="0x0006"/>
     <item name="DelayedAllOff" value="0x00"/>
@@ -52,7 +59,11 @@ limitations under the License.
     <attribute side="server" code="0x4000" define="GLOBAL_SCENE_CONTROL" type="boolean" default="1"                 optional="true">GlobalSceneControl</attribute>
     <attribute side="server" code="0x4001" define="ON_TIME"              type="int16u"  default="0" writable="true" optional="true">OnTime</attribute>
     <attribute side="server" code="0x4002" define="OFF_WAIT_TIME"        type="int16u"  default="0" writable="true" optional="true">OffWaitTime</attribute>
-    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="enum8"               writable="true" optional="true">StartUpOnOff</attribute>
+    <attribute side="server" code="0x4003" define="START_UP_ON_OFF"      type="OnOffStartUpOnOff" min="0" max="2" isNullable="true" writable="true" optional="true">
+      <description>StartUpOnOff</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
 
     <command source="client" code="0x00" name="Off" optional="false">
       <description>On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0.</description>
@@ -82,6 +93,10 @@ limitations under the License.
       <arg name="OnTime" type="int16u"/><!-- min:0 max:0xfe -->
       <arg name="OffWaitTime" type="int16u"/><!-- min:0 max:0xfe -->
     </command>
-
   </cluster>
+
+  <bitmap name="OnOffFeature" type="BITMAP32">
+    <cluster code="0x0006" />
+    <field name="Lighting" mask="0x01" />
+  </bitmap>
 </configurator>

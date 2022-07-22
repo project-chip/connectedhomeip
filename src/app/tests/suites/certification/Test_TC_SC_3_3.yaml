@@ -1,0 +1,45 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 14.3.3. [TC-SC-3.3] CASE Session Resumption [DUT - Initiator]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label:
+          "Responder receives the Sigma1 message and extracts the following
+          initiatorRandom initiatorSessionId destinationId resumptionID
+          initiatorResumeMIC initiatorEphPubKey initiatorSEDParams"
+      verification: |
+          Verify that the message is properly formatted: I Flag is set to 1 S flag and DIZ fields of message flags are set to 0 Encryption Type of security flags is set to 0 The Session Key Type field is set to 0 The Protocol ID field is set to 0x0000 and The Protocol Opcode field is set to 0x30 Verify that the initiatorRandom is of Octet String maximum of length 32 bytes Verify that the initiatorSessionId is of uint16 Verify that the destinationId is of Octet string Verify that the resumptionID from the Initiator matches with the precondition Verify that the resumptionID is of Octet String maximum of length 16 bytes Verify that the initiatorEphPubKey is of Octet string Verify that the initiatorResumeMIC is of Octet string Verify that the responderSEDParams is from any one of the following: SLEEPY_IDLE_INTERVAL Verify that it is of uint32 SLEEPY_ACTIVE_INTERVAL Verify that it is of uint32
+      disabled: true
+
+    - label:
+          "Responder sends a TLV-encoded Sigma2_Resume message to Initiator
+          containing resumptionID responderSessionID sigma2ResumeMIC
+          responderMRPParams"
+      verification: |
+          Verify that the Initiator receives the Sigma2_Resume message
+      disabled: true
+
+    - label:
+          "Responder receives the SigmaFinished message and extracts the
+          following ProtcolId ProtocolCode"
+      verification: |
+          Verify that the SigmaFinished Status report with the following GeneralCode as SUCCESS ProtcolId as SECURE_CHANNEL ProtocolCode as SESSION_ESTABLISHMENT_SUCCESS
+      disabled: true

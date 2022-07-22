@@ -21,6 +21,10 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
@@ -69,6 +73,10 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>,
 #endif
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>
 {
     // Allow the ConnectivityManager interface class to delegate method calls to
@@ -76,9 +84,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 public:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     void StartWiFiManagement(void);
     void StopWiFiManagement(void);
 #endif
@@ -124,12 +132,14 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
     ConnectivityManager::WiFiAPMode mWiFiAPMode;
     WiFiAPState mWiFiAPState;
     System::Clock::Timestamp mLastAPDemandTime;
     System::Clock::Timeout mWiFiStationReconnectInterval;
     System::Clock::Timeout mWiFiAPIdleTimeout;
+#endif
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

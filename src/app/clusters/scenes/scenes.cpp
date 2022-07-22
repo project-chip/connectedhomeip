@@ -62,7 +62,7 @@ using namespace chip::app::Clusters::Scenes;
 
 uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 #if !defined(EMBER_AF_PLUGIN_SCENES_USE_TOKENS) || defined(EZSP_HOST)
-EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
+EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[MATTER_SCENES_TABLE_SIZE];
 #endif
 
 static bool readServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
@@ -107,7 +107,7 @@ bool isEndpointInGroup(chip::FabricIndex fabricIndex, EndpointId endpoint, Group
 
 void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 {
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
     {
         // The high bit of Name Support indicates whether scene names are supported.
         uint8_t nameSupport = EMBER_BIT(7);
@@ -118,7 +118,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 #if !defined(EMBER_AF_PLUGIN_SCENES_USE_TOKENS) || defined(EZSP_HOST)
     {
         uint8_t i;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
         {
             EmberAfSceneTableEntry entry;
             emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
@@ -175,8 +175,8 @@ void emAfPluginScenesServerPrintInfo(void)
     uint8_t i;
     EmberAfSceneTableEntry entry;
     emberAfCorePrintln("using 0x%x out of 0x%x table slots", emberAfPluginScenesServerNumSceneEntriesInUse(),
-                       EMBER_AF_PLUGIN_SCENES_TABLE_SIZE);
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+                       MATTER_SCENES_TABLE_SIZE);
+    for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
     {
         emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
         emberAfCorePrint("%x: ", i);
@@ -184,7 +184,7 @@ void emAfPluginScenesServerPrintInfo(void)
         {
             emberAfCorePrint("ep %x grp %2x scene %x tt %d", entry.endpoint, entry.groupId, entry.sceneId, entry.transitionTime);
             emberAfCorePrint(".%d", entry.transitionTime100ms);
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
             emberAfCorePrint(" name(%x)\"", emberAfStringLength(entry.name));
             emberAfCorePrintString(entry.name);
             emberAfCorePrint("\"");
@@ -261,7 +261,7 @@ bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, c
     else
     {
         uint8_t i;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
         {
             EmberAfSceneTableEntry entry;
             emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
@@ -316,7 +316,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandOb
     {
         uint8_t i;
         status = EMBER_ZCL_STATUS_SUCCESS;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
         {
             EmberAfSceneTableEntry entry;
             emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
@@ -436,7 +436,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     uint8_t sceneCount   = 0;
-    uint8_t sceneList[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
+    uint8_t sceneList[MATTER_SCENES_TABLE_SIZE];
 
     emberAfScenesClusterPrintln("RX: GetSceneMembership 0x%2x", groupId);
 
@@ -448,7 +448,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         uint8_t i;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
         {
             EmberAfSceneTableEntry entry;
             emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
@@ -472,9 +472,9 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
         SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1),
-                                        static_cast<uint8_t>(EMBER_AF_PLUGIN_SCENES_TABLE_SIZE -
-                                                             emberAfPluginScenesServerNumSceneEntriesInUse())));
+        SuccessOrExit(
+            err = writer->Put(TLV::ContextTag(1),
+                              static_cast<uint8_t>(MATTER_SCENES_TABLE_SIZE - emberAfPluginScenesServerNumSceneEntriesInUse())));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(2), groupId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(3), sceneCount));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(4), ByteSpan(sceneList, sceneCount)));
@@ -500,7 +500,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
 
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+    for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
     {
         emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
         if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
@@ -508,7 +508,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
             index = i;
             break;
         }
-        else if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
+        if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
         {
             index = i;
         }
@@ -599,7 +599,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fa
         entry.endpoint = endpoint;
         entry.groupId  = groupId;
         entry.sceneId  = sceneId;
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
         entry.name[0] = 0;
 #endif
         entry.transitionTime      = 0;
@@ -622,130 +622,126 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
     {
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
-    else
+
+    uint8_t i;
+    for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
     {
-        uint8_t i;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        EmberAfSceneTableEntry entry;
+        emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
+        if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
         {
-            EmberAfSceneTableEntry entry;
-            emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
-            if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
-            {
 #ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
-                if (entry.hasOnOffValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off",
-                                         (uint8_t *) &entry.onOffValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasOnOffValue)
+            {
+                writeServerAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, "on/off",
+                                     (uint8_t *) &entry.onOffValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
-                if (entry.hasCurrentLevelValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
-                                         (uint8_t *) &entry.currentLevelValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasCurrentLevelValue)
+            {
+                writeServerAttribute(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, "current level",
+                                     (uint8_t *) &entry.currentLevelValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
-                if (entry.hasOccupiedCoolingSetpointValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
-                                         "occupied cooling setpoint", (uint8_t *) &entry.occupiedCoolingSetpointValue,
-                                         ZCL_INT16S_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasOccupiedHeatingSetpointValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
-                                         "occupied heating setpoint", (uint8_t *) &entry.occupiedHeatingSetpointValue,
-                                         ZCL_INT16S_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasSystemModeValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
-                                         (uint8_t *) &entry.systemModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasOccupiedCoolingSetpointValue)
+            {
+                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_COOLING_SETPOINT_ATTRIBUTE_ID,
+                                     "occupied cooling setpoint", (uint8_t *) &entry.occupiedCoolingSetpointValue,
+                                     ZCL_INT16S_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasOccupiedHeatingSetpointValue)
+            {
+                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_OCCUPIED_HEATING_SETPOINT_ATTRIBUTE_ID,
+                                     "occupied heating setpoint", (uint8_t *) &entry.occupiedHeatingSetpointValue,
+                                     ZCL_INT16S_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasSystemModeValue)
+            {
+                writeServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, ZCL_SYSTEM_MODE_ATTRIBUTE_ID, "system mode",
+                                     (uint8_t *) &entry.systemModeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
-                if (entry.hasCurrentXValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                         "current x", (uint8_t *) &entry.currentXValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasCurrentYValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                         "current y", (uint8_t *) &entry.currentYValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasCurrentXValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID, "current x",
+                                     (uint8_t *) &entry.currentXValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasCurrentYValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID, "current y",
+                                     (uint8_t *) &entry.currentYValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
 
-                if (entry.hasEnhancedCurrentHueValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                         ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID, "enhanced current hue",
-                                         (uint8_t *) &entry.enhancedCurrentHueValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasCurrentSaturationValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                         "current saturation", (uint8_t *) &entry.currentSaturationValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorLoopActiveValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
-                                         "color loop active", (uint8_t *) &entry.colorLoopActiveValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorLoopDirectionValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID,
-                                         ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID, "color loop direction",
-                                         (uint8_t *) &entry.colorLoopDirectionValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorLoopTimeValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
-                                         "color loop time", (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasColorTemperatureMiredsValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                         "color temp mireds", (uint8_t *) &entry.colorTemperatureMiredsValue,
-                                         ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasEnhancedCurrentHueValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_CURRENT_HUE_ATTRIBUTE_ID,
+                                     "enhanced current hue", (uint8_t *) &entry.enhancedCurrentHueValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasCurrentSaturationValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                     "current saturation", (uint8_t *) &entry.currentSaturationValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorLoopActiveValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_ACTIVE_ATTRIBUTE_ID,
+                                     "color loop active", (uint8_t *) &entry.colorLoopActiveValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorLoopDirectionValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_DIRECTION_ATTRIBUTE_ID,
+                                     "color loop direction", (uint8_t *) &entry.colorLoopDirectionValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorLoopTimeValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_LOOP_TIME_ATTRIBUTE_ID,
+                                     "color loop time", (uint8_t *) &entry.colorLoopTimeValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasColorTemperatureMiredsValue)
+            {
+                writeServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                                     "color temp mireds", (uint8_t *) &entry.colorTemperatureMiredsValue,
+                                     ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
 #endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
 #ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
-                if (entry.hasLockStateValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
-                                         (uint8_t *) &entry.lockStateValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
+            if (entry.hasLockStateValue)
+            {
+                writeServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, "lock state",
+                                     (uint8_t *) &entry.lockStateValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
 #endif
 #ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
-                if (entry.hasCurrentPositionLiftPercentageValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID, "CurrentPositionLiftPercentage",
-                                         (uint8_t *) &entry.currentPositionLiftPercentageValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasCurrentPositionTiltPercentageValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID, "CurrentPositionTiltPercentage",
-                                         (uint8_t *) &entry.currentPositionTiltPercentageValue, ZCL_INT8U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasTargetPositionLiftPercent100thsValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionLiftPercent100ths",
-                                         (uint8_t *) &entry.targetPositionLiftPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-                if (entry.hasTargetPositionTiltPercent100thsValue)
-                {
-                    writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
-                                         ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionTiltPercent100ths",
-                                         (uint8_t *) &entry.targetPositionTiltPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
-                }
-#endif
-                emberAfScenesMakeValid(endpoint, sceneId, groupId);
-                return EMBER_ZCL_STATUS_SUCCESS;
+            if (entry.hasCurrentPositionLiftPercentageValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_LIFT_PERCENTAGE_ATTRIBUTE_ID,
+                                     "CurrentPositionLiftPercentage", (uint8_t *) &entry.currentPositionLiftPercentageValue,
+                                     ZCL_INT8U_ATTRIBUTE_TYPE);
             }
+            if (entry.hasCurrentPositionTiltPercentageValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID, ZCL_WC_CURRENT_POSITION_TILT_PERCENTAGE_ATTRIBUTE_ID,
+                                     "CurrentPositionTiltPercentage", (uint8_t *) &entry.currentPositionTiltPercentageValue,
+                                     ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasTargetPositionLiftPercent100thsValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
+                                     ZCL_WC_TARGET_POSITION_LIFT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionLiftPercent100ths",
+                                     (uint8_t *) &entry.targetPositionLiftPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+            if (entry.hasTargetPositionTiltPercent100thsValue)
+            {
+                writeServerAttribute(endpoint, ZCL_WINDOW_COVERING_CLUSTER_ID,
+                                     ZCL_WC_TARGET_POSITION_TILT_PERCENT100_THS_ATTRIBUTE_ID, "TargetPositionTiltPercent100ths",
+                                     (uint8_t *) &entry.targetPositionTiltPercent100thsValue, ZCL_INT16U_ATTRIBUTE_TYPE);
+            }
+#endif
+            emberAfScenesMakeValid(endpoint, sceneId, groupId);
+            return EMBER_ZCL_STATUS_SUCCESS;
         }
     }
 
@@ -754,8 +750,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fab
 
 bool emberAfPluginScenesServerParseAddScene(
     app::CommandHandler * commandObj, const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
-    const CharSpan & sceneName,
-    const app::DataModel::DecodableList<Structs::SceneExtensionFieldSet::DecodableType> & extensionFieldSets)
+    const CharSpan & sceneName, const app::DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType> & extensionFieldSets)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfSceneTableEntry entry;
@@ -777,7 +772,7 @@ bool emberAfPluginScenesServerParseAddScene(
         goto kickout;
     }
 
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+    for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
     {
         emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
         if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
@@ -785,7 +780,7 @@ bool emberAfPluginScenesServerParseAddScene(
             index = i;
             break;
         }
-        else if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
+        if (index == EMBER_AF_SCENE_TABLE_NULL_INDEX && entry.endpoint == EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID)
         {
             index = i;
         }
@@ -813,8 +808,8 @@ bool emberAfPluginScenesServerParseAddScene(
         entry.transitionTime100ms = 0;
     }
 
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
-    emberAfCopyString(entry.name, sceneName, ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH);
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
+    emberAfCopyString(entry.name, Uint8::from_const_char(sceneName.data()), ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH);
 #endif
 
     // When adding a new scene, wipe out all of the extensions before parsing the
@@ -1111,7 +1106,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     else
     {
         uint8_t i;
-        for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+        for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
         {
             emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
             if (entry.endpoint == endpoint && entry.groupId == groupId && entry.sceneId == sceneId)
@@ -1139,7 +1134,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     SuccessOrExit(err = writer->Put(TLV::ContextTag(3),
                                     static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms
                                                                    : entry.transitionTime)));
-#ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
     SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.name));
 #else
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(4), ""));
@@ -1155,7 +1150,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
             // command and tenths of a second in the enhanced version.
             emberAfPutInt16uInResp(
                 static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime));
-    #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
+    #if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
             emberAfPutStringInResp(entry.name);
     #else
             emberAfPutInt8uInResp(0); // name length
@@ -1306,7 +1301,7 @@ exit:
 void emberAfScenesClusterRemoveScenesInGroupCallback(EndpointId endpoint, GroupId groupId)
 {
     uint8_t i;
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
+    for (i = 0; i < MATTER_SCENES_TABLE_SIZE; i++)
     {
         EmberAfSceneTableEntry entry;
         emberAfPluginScenesServerRetrieveSceneEntry(entry, i);

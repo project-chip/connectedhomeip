@@ -1,6 +1,4 @@
-<p align="center">
-    <img src="https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png" alt="ARM Mbed-OS logo"/>
-</p>
+![ARM Mbed-OS logo](https://raw.githubusercontent.com/ARMmbed/mbed-os/master/logo.png)
 
 <h1> Matter Arm Mbed OS provisioning guide </h1>
 
@@ -67,7 +65,9 @@ After building, install the application by completing the following steps:
 1.  Install the Android Debug Bridge (adb) package by running the following
     command:
 
+        ```
         $ sudo apt install android-tools-adb
+        ```
 
 2.  Enable **USB debugging** on your smartphone. See the
     [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options)
@@ -94,7 +94,9 @@ complete the following steps:
     accessory device. You can use **mbed-tools** for this purpose
     ([mbed-tools](https://github.com/ARMmbed/mbed-tools)):
 
+        ```
         mbed-tools sterm -p /dev/ttyACM0 -b 115200 -e off
+        ```
 
 To start the rendezvous, CHIPTool must get the commissioning information from
 the Matter device. The data payload is encoded within a QR code and is printed
@@ -104,8 +106,10 @@ to the UART console.
 
 -   Find a message similar to the following one in the application logs:
 
+        ```
         [INFO][CHIP]: [SVR]Copy/paste the below URL in a browser to see the QR Code:
-        [INFO][CHIP]: [SVR]https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00CMVH7SR00
+        [INFO][CHIP]: [SVR]https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AYNJV7VSC00CMVH7SR00
+        ```
 
 -   Open URL from the console to display the QR in a web browser.
 
@@ -168,12 +172,12 @@ In order to send commands to a device, it must be paired with the client and
 connected to the network.
 
 To run the commissioning process via BLE, run the built executable and pass it
-the network ssid and password, fabric id, discriminator and pairing code of the
-remote device.
+the node id to assign to the newly-commissioned node, network ssid and password,
+discriminator and pairing code of the remote device.
 
 Example:
 
-    $ chip-tool pairing ble-wifi network_ssid network_password 0 20202021 3840
+    $ chip-tool pairing ble-wifi node_id_to_assign network_ssid network_password 20202021 3840
 
 ## Sending ZCL commands
 
@@ -209,7 +213,7 @@ To build and install the Python Device Controller application check the guide
 In order to send commands to a device, it must be paired with the client and
 connected to the network.
 
-To run the commissioning process via BLE:
+To run the auto commissioning process via BLE:
 
 -   Run Device Controller:
 
@@ -219,27 +223,14 @@ To run the commissioning process via BLE:
 
         chip-device-ctrl > ble-scan
 
+-   Pass the Wi-Fi credentials to the device:
+
+        chip-device-ctrl > set-pairing-wifi-credential ssid credentials
+
 -   Connect the device via BLE (provide the accessory device discriminator,
     setup pin code and node ID):
 
         chip-device-ctrl > connect -ble 3840 20202021 1234
-
--   Pass the Wi-Fi credentials to the device:
-
-        chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
-
--   Enable the Wi-Fi interface:
-
-        chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
-
--   Close BLE connection:
-
-        chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
-
--   Discover IP address of the device (address is cached in the controller for
-    later usage). You should provide the fabric and node ID:
-
-        chip-device-ctrl > resolve 5544332211 1234
 
 ## Sending ZCL commands
 

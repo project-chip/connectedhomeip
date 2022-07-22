@@ -27,6 +27,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
 #include <lib/support/Span.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 
@@ -34,6 +35,10 @@ namespace Dnssd {
 struct TextEntry;
 struct DnssdService;
 } // namespace Dnssd
+
+namespace Thread {
+class OperationalDataset;
+} // namespace Thread
 
 namespace DeviceLayer {
 
@@ -62,7 +67,8 @@ class GenericThreadStackManagerImpl_FreeRTOS;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 // Declaration of callback types corresponding to DnssdResolveCallback and DnssdBrowseCallback to avoid circular including.
-using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, CHIP_ERROR error);
+using DnsResolveCallback = void (*)(void * context, chip::Dnssd::DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                    CHIP_ERROR error);
 using DnsBrowseCallback  = void (*)(void * context, chip::Dnssd::DnssdService * services, size_t servicesSize, CHIP_ERROR error);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 
@@ -88,7 +94,10 @@ public:
     bool TryLockThreadStack();
     void UnlockThreadStack();
     bool HaveRouteToAddress(const chip::Inet::IPAddress & destAddr);
-    CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
+    bool IsThreadEnabled();
+    bool IsThreadProvisioned();
+    bool IsThreadAttached();
+    CHIP_ERROR GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR GetAndLogThreadStatsCounters();
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
@@ -99,6 +108,10 @@ public:
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
+    CHIP_ERROR AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+    CHIP_ERROR StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback);
+    void OnThreadAttachFinished(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort,
@@ -145,32 +158,29 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_FreeRTOS;
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
-    bool IsThreadEnabled();
-    bool IsThreadProvisioned();
-    bool IsThreadAttached();
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
 
     /**
-     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * Sets Sleepy End Device intervals configuration and posts kSEDIntervalChange event to inform other software
      * modules about the change.
      *
-     * @param[in]  pollingConfig  polling intervals configuration to be set
+     * @param[in]  intervalsConfig  intervals configuration to be set
      */
-    CHIP_ERROR SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
 
     /**
-     * Requests setting Sleepy End Device fast polling interval on or off.
-     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
-     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     * Requests setting Sleepy End Device active interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the active mode
+     * consumers counter. Active mode is set if the consumers counter is bigger than 0.
      *
-     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     * @param[in]  onOff  true if active mode should be enabled and false otherwise.
      */
-    CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
+    CHIP_ERROR RequestSEDActiveMode(bool onOff);
 #endif
 
     bool HaveMeshConnectivity();
@@ -337,14 +347,31 @@ inline bool ThreadStackManager::IsThreadAttached()
     return static_cast<ImplClass *>(this)->_IsThreadAttached();
 }
 
-inline CHIP_ERROR ThreadStackManager::GetThreadProvision(ByteSpan & netInfo)
+inline CHIP_ERROR ThreadStackManager::GetThreadProvision(Thread::OperationalDataset & dataset)
 {
-    return static_cast<ImplClass *>(this)->_GetThreadProvision(netInfo);
+    return static_cast<ImplClass *>(this)->_GetThreadProvision(dataset);
 }
 
 inline CHIP_ERROR ThreadStackManager::SetThreadProvision(ByteSpan netInfo)
 {
     return static_cast<ImplClass *>(this)->_SetThreadProvision(netInfo);
+}
+
+inline CHIP_ERROR
+ThreadStackManager::AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
+                                          NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+{
+    return static_cast<ImplClass *>(this)->_AttachToThreadNetwork(dataset, callback);
+}
+
+inline void ThreadStackManager::OnThreadAttachFinished(void)
+{
+    static_cast<ImplClass *>(this)->_OnThreadAttachFinished();
+}
+
+inline CHIP_ERROR ThreadStackManager::StartThreadScan(NetworkCommissioning::ThreadDriver::ScanCallback * callback)
+{
+    return static_cast<ImplClass *>(this)->_StartThreadScan(callback);
 }
 
 inline void ThreadStackManager::ErasePersistentInfo()
@@ -363,19 +390,19 @@ inline CHIP_ERROR ThreadStackManager::SetThreadDeviceType(ConnectivityManager::T
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-inline CHIP_ERROR ThreadStackManager::GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR ThreadStackManager::GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    return static_cast<ImplClass *>(this)->_GetSEDPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_GetSEDIntervalsConfig(intervalsConfig);
 }
 
-inline CHIP_ERROR ThreadStackManager::SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
+inline CHIP_ERROR ThreadStackManager::SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    return static_cast<ImplClass *>(this)->_SetSEDPollingConfig(pollingConfig);
+    return static_cast<ImplClass *>(this)->_SetSEDIntervalsConfig(intervalsConfig);
 }
 
-inline CHIP_ERROR ThreadStackManager::RequestSEDFastPollingMode(bool onOff)
+inline CHIP_ERROR ThreadStackManager::RequestSEDActiveMode(bool onOff)
 {
-    return static_cast<ImplClass *>(this)->_RequestSEDFastPollingMode(onOff);
+    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff);
 }
 #endif
 

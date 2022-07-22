@@ -34,14 +34,6 @@ namespace Identify {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Identify
 
-namespace IdentifyQueryResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace IdentifyQueryResponse
-
-namespace IdentifyQuery {
-static constexpr CommandId Id = 0x00000001;
-} // namespace IdentifyQuery
-
 namespace TriggerEffect {
 static constexpr CommandId Id = 0x00000040;
 } // namespace TriggerEffect
@@ -242,206 +234,12 @@ namespace StopWithOnOff {
 static constexpr CommandId Id = 0x00000007;
 } // namespace StopWithOnOff
 
+namespace MoveToClosestFrequency {
+static constexpr CommandId Id = 0x00000008;
+} // namespace MoveToClosestFrequency
+
 } // namespace Commands
 } // namespace LevelControl
-
-namespace Alarms {
-namespace Commands {
-
-namespace ResetAlarm {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ResetAlarm
-
-namespace Alarm {
-static constexpr CommandId Id = 0x00000000;
-} // namespace Alarm
-
-namespace ResetAllAlarms {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ResetAllAlarms
-
-namespace GetAlarmResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetAlarmResponse
-
-namespace GetAlarm {
-static constexpr CommandId Id = 0x00000002;
-} // namespace GetAlarm
-
-namespace ResetAlarmLog {
-static constexpr CommandId Id = 0x00000003;
-} // namespace ResetAlarmLog
-
-} // namespace Commands
-} // namespace Alarms
-
-namespace PowerProfile {
-namespace Commands {
-
-namespace PowerProfileRequest {
-static constexpr CommandId Id = 0x00000000;
-} // namespace PowerProfileRequest
-
-namespace PowerProfileNotification {
-static constexpr CommandId Id = 0x00000000;
-} // namespace PowerProfileNotification
-
-namespace PowerProfileStateRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace PowerProfileStateRequest
-
-namespace PowerProfileResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace PowerProfileResponse
-
-namespace GetPowerProfilePriceResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace GetPowerProfilePriceResponse
-
-namespace PowerProfileStateResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace PowerProfileStateResponse
-
-namespace GetOverallSchedulePriceResponse {
-static constexpr CommandId Id = 0x00000003;
-} // namespace GetOverallSchedulePriceResponse
-
-namespace GetPowerProfilePrice {
-static constexpr CommandId Id = 0x00000003;
-} // namespace GetPowerProfilePrice
-
-namespace EnergyPhasesScheduleNotification {
-static constexpr CommandId Id = 0x00000004;
-} // namespace EnergyPhasesScheduleNotification
-
-namespace PowerProfilesStateNotification {
-static constexpr CommandId Id = 0x00000004;
-} // namespace PowerProfilesStateNotification
-
-namespace EnergyPhasesScheduleResponse {
-static constexpr CommandId Id = 0x00000005;
-} // namespace EnergyPhasesScheduleResponse
-
-namespace GetOverallSchedulePrice {
-static constexpr CommandId Id = 0x00000005;
-} // namespace GetOverallSchedulePrice
-
-namespace PowerProfileScheduleConstraintsRequest {
-static constexpr CommandId Id = 0x00000006;
-} // namespace PowerProfileScheduleConstraintsRequest
-
-namespace EnergyPhasesScheduleRequest {
-static constexpr CommandId Id = 0x00000006;
-} // namespace EnergyPhasesScheduleRequest
-
-namespace EnergyPhasesScheduleStateRequest {
-static constexpr CommandId Id = 0x00000007;
-} // namespace EnergyPhasesScheduleStateRequest
-
-namespace EnergyPhasesScheduleStateResponse {
-static constexpr CommandId Id = 0x00000007;
-} // namespace EnergyPhasesScheduleStateResponse
-
-namespace GetPowerProfilePriceExtendedResponse {
-static constexpr CommandId Id = 0x00000008;
-} // namespace GetPowerProfilePriceExtendedResponse
-
-namespace EnergyPhasesScheduleStateNotification {
-static constexpr CommandId Id = 0x00000008;
-} // namespace EnergyPhasesScheduleStateNotification
-
-namespace PowerProfileScheduleConstraintsNotification {
-static constexpr CommandId Id = 0x00000009;
-} // namespace PowerProfileScheduleConstraintsNotification
-
-namespace PowerProfileScheduleConstraintsResponse {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace PowerProfileScheduleConstraintsResponse
-
-namespace GetPowerProfilePriceExtended {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace GetPowerProfilePriceExtended
-
-} // namespace Commands
-} // namespace PowerProfile
-
-namespace ApplianceControl {
-namespace Commands {
-
-namespace ExecutionOfACommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ExecutionOfACommand
-
-namespace SignalStateResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace SignalStateResponse
-
-namespace SignalState {
-static constexpr CommandId Id = 0x00000001;
-} // namespace SignalState
-
-namespace SignalStateNotification {
-static constexpr CommandId Id = 0x00000001;
-} // namespace SignalStateNotification
-
-namespace WriteFunctions {
-static constexpr CommandId Id = 0x00000002;
-} // namespace WriteFunctions
-
-namespace OverloadPauseResume {
-static constexpr CommandId Id = 0x00000003;
-} // namespace OverloadPauseResume
-
-namespace OverloadPause {
-static constexpr CommandId Id = 0x00000004;
-} // namespace OverloadPause
-
-namespace OverloadWarning {
-static constexpr CommandId Id = 0x00000005;
-} // namespace OverloadWarning
-
-} // namespace Commands
-} // namespace ApplianceControl
-
-namespace Binding {
-namespace Commands {
-
-namespace Bind {
-static constexpr CommandId Id = 0x00000000;
-} // namespace Bind
-
-namespace Unbind {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Unbind
-
-} // namespace Commands
-} // namespace Binding
-
-namespace PollControl {
-namespace Commands {
-
-namespace CheckIn {
-static constexpr CommandId Id = 0x00000000;
-} // namespace CheckIn
-
-namespace CheckInResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace CheckInResponse
-
-namespace FastPollStop {
-static constexpr CommandId Id = 0x00000001;
-} // namespace FastPollStop
-
-namespace SetLongPollInterval {
-static constexpr CommandId Id = 0x00000002;
-} // namespace SetLongPollInterval
-
-namespace SetShortPollInterval {
-static constexpr CommandId Id = 0x00000003;
-} // namespace SetShortPollInterval
-
-} // namespace Commands
-} // namespace PollControl
 
 namespace BridgedActions {
 namespace Commands {
@@ -629,6 +427,16 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace DiagnosticLogs
 
+namespace GeneralDiagnostics {
+namespace Commands {
+
+namespace TestEventTrigger {
+static constexpr CommandId Id = 0x00000000;
+} // namespace TestEventTrigger
+
+} // namespace Commands
+} // namespace GeneralDiagnostics
+
 namespace SoftwareDiagnostics {
 namespace Commands {
 
@@ -669,28 +477,6 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace EthernetNetworkDiagnostics
 
-namespace BridgedDeviceBasic {
-namespace Commands {
-
-namespace StartUp {
-static constexpr CommandId Id = 0x00000000;
-} // namespace StartUp
-
-namespace ShutDown {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ShutDown
-
-namespace Leave {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Leave
-
-namespace ReachableChanged {
-static constexpr CommandId Id = 0x00000003;
-} // namespace ReachableChanged
-
-} // namespace Commands
-} // namespace BridgedDeviceBasic
-
 namespace AdministratorCommissioning {
 namespace Commands {
 
@@ -728,13 +514,13 @@ namespace CertificateChainResponse {
 static constexpr CommandId Id = 0x00000003;
 } // namespace CertificateChainResponse
 
-namespace OpCSRRequest {
+namespace CSRRequest {
 static constexpr CommandId Id = 0x00000004;
-} // namespace OpCSRRequest
+} // namespace CSRRequest
 
-namespace OpCSRResponse {
+namespace CSRResponse {
 static constexpr CommandId Id = 0x00000005;
-} // namespace OpCSRResponse
+} // namespace CSRResponse
 
 namespace AddNOC {
 static constexpr CommandId Id = 0x00000006;
@@ -759,10 +545,6 @@ static constexpr CommandId Id = 0x0000000A;
 namespace AddTrustedRootCertificate {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace AddTrustedRootCertificate
-
-namespace RemoveTrustedRootCertificate {
-static constexpr CommandId Id = 0x0000000C;
-} // namespace RemoveTrustedRootCertificate
 
 } // namespace Commands
 } // namespace OperationalCredentials
@@ -822,46 +604,6 @@ namespace UnlockWithTimeout {
 static constexpr CommandId Id = 0x00000003;
 } // namespace UnlockWithTimeout
 
-namespace GetLogRecord {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetLogRecord
-
-namespace GetLogRecordResponse {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetLogRecordResponse
-
-namespace SetPINCode {
-static constexpr CommandId Id = 0x00000005;
-} // namespace SetPINCode
-
-namespace GetPINCode {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetPINCode
-
-namespace GetPINCodeResponse {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetPINCodeResponse
-
-namespace ClearPINCode {
-static constexpr CommandId Id = 0x00000007;
-} // namespace ClearPINCode
-
-namespace ClearAllPINCodes {
-static constexpr CommandId Id = 0x00000008;
-} // namespace ClearAllPINCodes
-
-namespace SetUserStatus {
-static constexpr CommandId Id = 0x00000009;
-} // namespace SetUserStatus
-
-namespace GetUserStatus {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace GetUserStatus
-
-namespace GetUserStatusResponse {
-static constexpr CommandId Id = 0x0000000A;
-} // namespace GetUserStatusResponse
-
 namespace SetWeekDaySchedule {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace SetWeekDaySchedule
@@ -910,38 +652,6 @@ namespace ClearHolidaySchedule {
 static constexpr CommandId Id = 0x00000013;
 } // namespace ClearHolidaySchedule
 
-namespace SetUserType {
-static constexpr CommandId Id = 0x00000014;
-} // namespace SetUserType
-
-namespace GetUserType {
-static constexpr CommandId Id = 0x00000015;
-} // namespace GetUserType
-
-namespace GetUserTypeResponse {
-static constexpr CommandId Id = 0x00000015;
-} // namespace GetUserTypeResponse
-
-namespace SetRFIDCode {
-static constexpr CommandId Id = 0x00000016;
-} // namespace SetRFIDCode
-
-namespace GetRFIDCode {
-static constexpr CommandId Id = 0x00000017;
-} // namespace GetRFIDCode
-
-namespace GetRFIDCodeResponse {
-static constexpr CommandId Id = 0x00000017;
-} // namespace GetRFIDCodeResponse
-
-namespace ClearRFIDCode {
-static constexpr CommandId Id = 0x00000018;
-} // namespace ClearRFIDCode
-
-namespace ClearAllRFIDCodes {
-static constexpr CommandId Id = 0x00000019;
-} // namespace ClearAllRFIDCodes
-
 namespace SetUser {
 static constexpr CommandId Id = 0x0000001A;
 } // namespace SetUser
@@ -957,14 +667,6 @@ static constexpr CommandId Id = 0x0000001C;
 namespace ClearUser {
 static constexpr CommandId Id = 0x0000001D;
 } // namespace ClearUser
-
-namespace OperatingEventNotification {
-static constexpr CommandId Id = 0x00000020;
-} // namespace OperatingEventNotification
-
-namespace ProgrammingEventNotification {
-static constexpr CommandId Id = 0x00000021;
-} // namespace ProgrammingEventNotification
 
 namespace SetCredential {
 static constexpr CommandId Id = 0x00000022;
@@ -1052,10 +754,6 @@ namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
 
-namespace GetRelayStatusLogResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetRelayStatusLogResponse
-
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;
 } // namespace GetWeeklySchedule
@@ -1063,10 +761,6 @@ static constexpr CommandId Id = 0x00000002;
 namespace ClearWeeklySchedule {
 static constexpr CommandId Id = 0x00000003;
 } // namespace ClearWeeklySchedule
-
-namespace GetRelayStatusLog {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetRelayStatusLog
 
 } // namespace Commands
 } // namespace Thermostat
@@ -1153,154 +847,24 @@ static constexpr CommandId Id = 0x0000004C;
 } // namespace Commands
 } // namespace ColorControl
 
-namespace IasZone {
-namespace Commands {
-
-namespace ZoneEnrollResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ZoneEnrollResponse
-
-namespace ZoneStatusChangeNotification {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ZoneStatusChangeNotification
-
-namespace InitiateNormalOperationMode {
-static constexpr CommandId Id = 0x00000001;
-} // namespace InitiateNormalOperationMode
-
-namespace ZoneEnrollRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ZoneEnrollRequest
-
-namespace InitiateTestMode {
-static constexpr CommandId Id = 0x00000002;
-} // namespace InitiateTestMode
-
-namespace InitiateNormalOperationModeResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace InitiateNormalOperationModeResponse
-
-namespace InitiateTestModeResponse {
-static constexpr CommandId Id = 0x00000003;
-} // namespace InitiateTestModeResponse
-
-} // namespace Commands
-} // namespace IasZone
-
-namespace IasAce {
-namespace Commands {
-
-namespace Arm {
-static constexpr CommandId Id = 0x00000000;
-} // namespace Arm
-
-namespace ArmResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ArmResponse
-
-namespace Bypass {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Bypass
-
-namespace GetZoneIdMapResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetZoneIdMapResponse
-
-namespace Emergency {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Emergency
-
-namespace GetZoneInformationResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace GetZoneInformationResponse
-
-namespace Fire {
-static constexpr CommandId Id = 0x00000003;
-} // namespace Fire
-
-namespace ZoneStatusChanged {
-static constexpr CommandId Id = 0x00000003;
-} // namespace ZoneStatusChanged
-
-namespace Panic {
-static constexpr CommandId Id = 0x00000004;
-} // namespace Panic
-
-namespace PanelStatusChanged {
-static constexpr CommandId Id = 0x00000004;
-} // namespace PanelStatusChanged
-
-namespace GetZoneIdMap {
-static constexpr CommandId Id = 0x00000005;
-} // namespace GetZoneIdMap
-
-namespace GetPanelStatusResponse {
-static constexpr CommandId Id = 0x00000005;
-} // namespace GetPanelStatusResponse
-
-namespace GetZoneInformation {
-static constexpr CommandId Id = 0x00000006;
-} // namespace GetZoneInformation
-
-namespace SetBypassedZoneList {
-static constexpr CommandId Id = 0x00000006;
-} // namespace SetBypassedZoneList
-
-namespace GetPanelStatus {
-static constexpr CommandId Id = 0x00000007;
-} // namespace GetPanelStatus
-
-namespace BypassResponse {
-static constexpr CommandId Id = 0x00000007;
-} // namespace BypassResponse
-
-namespace GetBypassedZoneList {
-static constexpr CommandId Id = 0x00000008;
-} // namespace GetBypassedZoneList
-
-namespace GetZoneStatusResponse {
-static constexpr CommandId Id = 0x00000008;
-} // namespace GetZoneStatusResponse
-
-namespace GetZoneStatus {
-static constexpr CommandId Id = 0x00000009;
-} // namespace GetZoneStatus
-
-} // namespace Commands
-} // namespace IasAce
-
-namespace IasWd {
-namespace Commands {
-
-namespace StartWarning {
-static constexpr CommandId Id = 0x00000000;
-} // namespace StartWarning
-
-namespace Squawk {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Squawk
-
-} // namespace Commands
-} // namespace IasWd
-
 namespace Channel {
 namespace Commands {
 
-namespace ChangeChannelRequest {
+namespace ChangeChannel {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeChannelRequest
+} // namespace ChangeChannel
 
 namespace ChangeChannelResponse {
 static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeChannelResponse
 
-namespace ChangeChannelByNumberRequest {
+namespace ChangeChannelByNumber {
 static constexpr CommandId Id = 0x00000002;
-} // namespace ChangeChannelByNumberRequest
+} // namespace ChangeChannelByNumber
 
-namespace SkipChannelRequest {
+namespace SkipChannel {
 static constexpr CommandId Id = 0x00000003;
-} // namespace SkipChannelRequest
+} // namespace SkipChannel
 
 } // namespace Commands
 } // namespace Channel
@@ -1308,9 +872,9 @@ static constexpr CommandId Id = 0x00000003;
 namespace TargetNavigator {
 namespace Commands {
 
-namespace NavigateTargetRequest {
+namespace NavigateTarget {
 static constexpr CommandId Id = 0x00000000;
-} // namespace NavigateTargetRequest
+} // namespace NavigateTarget
 
 namespace NavigateTargetResponse {
 static constexpr CommandId Id = 0x00000001;
@@ -1322,53 +886,53 @@ static constexpr CommandId Id = 0x00000001;
 namespace MediaPlayback {
 namespace Commands {
 
-namespace PlayRequest {
+namespace Play {
 static constexpr CommandId Id = 0x00000000;
-} // namespace PlayRequest
+} // namespace Play
 
-namespace PauseRequest {
+namespace Pause {
 static constexpr CommandId Id = 0x00000001;
-} // namespace PauseRequest
+} // namespace Pause
 
-namespace StopRequest {
+namespace StopPlayback {
 static constexpr CommandId Id = 0x00000002;
-} // namespace StopRequest
+} // namespace StopPlayback
 
-namespace StartOverRequest {
+namespace StartOver {
 static constexpr CommandId Id = 0x00000003;
-} // namespace StartOverRequest
+} // namespace StartOver
 
-namespace PreviousRequest {
+namespace Previous {
 static constexpr CommandId Id = 0x00000004;
-} // namespace PreviousRequest
+} // namespace Previous
 
-namespace NextRequest {
+namespace Next {
 static constexpr CommandId Id = 0x00000005;
-} // namespace NextRequest
+} // namespace Next
 
-namespace RewindRequest {
+namespace Rewind {
 static constexpr CommandId Id = 0x00000006;
-} // namespace RewindRequest
+} // namespace Rewind
 
-namespace FastForwardRequest {
+namespace FastForward {
 static constexpr CommandId Id = 0x00000007;
-} // namespace FastForwardRequest
+} // namespace FastForward
 
-namespace SkipForwardRequest {
+namespace SkipForward {
 static constexpr CommandId Id = 0x00000008;
-} // namespace SkipForwardRequest
+} // namespace SkipForward
 
-namespace SkipBackwardRequest {
+namespace SkipBackward {
 static constexpr CommandId Id = 0x00000009;
-} // namespace SkipBackwardRequest
+} // namespace SkipBackward
 
 namespace PlaybackResponse {
 static constexpr CommandId Id = 0x0000000A;
 } // namespace PlaybackResponse
 
-namespace SeekRequest {
+namespace Seek {
 static constexpr CommandId Id = 0x0000000B;
-} // namespace SeekRequest
+} // namespace Seek
 
 } // namespace Commands
 } // namespace MediaPlayback
@@ -1376,21 +940,21 @@ static constexpr CommandId Id = 0x0000000B;
 namespace MediaInput {
 namespace Commands {
 
-namespace SelectInputRequest {
+namespace SelectInput {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectInputRequest
+} // namespace SelectInput
 
-namespace ShowInputStatusRequest {
+namespace ShowInputStatus {
 static constexpr CommandId Id = 0x00000001;
-} // namespace ShowInputStatusRequest
+} // namespace ShowInputStatus
 
-namespace HideInputStatusRequest {
+namespace HideInputStatus {
 static constexpr CommandId Id = 0x00000002;
-} // namespace HideInputStatusRequest
+} // namespace HideInputStatus
 
-namespace RenameInputRequest {
+namespace RenameInput {
 static constexpr CommandId Id = 0x00000003;
-} // namespace RenameInputRequest
+} // namespace RenameInput
 
 } // namespace Commands
 } // namespace MediaInput
@@ -1408,9 +972,9 @@ static constexpr CommandId Id = 0x00000000;
 namespace KeypadInput {
 namespace Commands {
 
-namespace SendKeyRequest {
+namespace SendKey {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SendKeyRequest
+} // namespace SendKey
 
 namespace SendKeyResponse {
 static constexpr CommandId Id = 0x00000001;
@@ -1422,13 +986,13 @@ static constexpr CommandId Id = 0x00000001;
 namespace ContentLauncher {
 namespace Commands {
 
-namespace LaunchContentRequest {
+namespace LaunchContent {
 static constexpr CommandId Id = 0x00000000;
-} // namespace LaunchContentRequest
+} // namespace LaunchContent
 
-namespace LaunchURLRequest {
+namespace LaunchURL {
 static constexpr CommandId Id = 0x00000001;
-} // namespace LaunchURLRequest
+} // namespace LaunchURL
 
 namespace LaunchResponse {
 static constexpr CommandId Id = 0x00000002;
@@ -1440,13 +1004,13 @@ static constexpr CommandId Id = 0x00000002;
 namespace AudioOutput {
 namespace Commands {
 
-namespace SelectOutputRequest {
+namespace SelectOutput {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectOutputRequest
+} // namespace SelectOutput
 
-namespace RenameOutputRequest {
+namespace RenameOutput {
 static constexpr CommandId Id = 0x00000001;
-} // namespace RenameOutputRequest
+} // namespace RenameOutput
 
 } // namespace Commands
 } // namespace AudioOutput
@@ -1454,17 +1018,17 @@ static constexpr CommandId Id = 0x00000001;
 namespace ApplicationLauncher {
 namespace Commands {
 
-namespace LaunchAppRequest {
+namespace LaunchApp {
 static constexpr CommandId Id = 0x00000000;
-} // namespace LaunchAppRequest
+} // namespace LaunchApp
 
-namespace StopAppRequest {
+namespace StopApp {
 static constexpr CommandId Id = 0x00000001;
-} // namespace StopAppRequest
+} // namespace StopApp
 
-namespace HideAppRequest {
+namespace HideApp {
 static constexpr CommandId Id = 0x00000002;
-} // namespace HideAppRequest
+} // namespace HideApp
 
 namespace LauncherResponse {
 static constexpr CommandId Id = 0x00000003;
@@ -1476,24 +1040,46 @@ static constexpr CommandId Id = 0x00000003;
 namespace AccountLogin {
 namespace Commands {
 
-namespace GetSetupPINRequest {
+namespace GetSetupPIN {
 static constexpr CommandId Id = 0x00000000;
-} // namespace GetSetupPINRequest
+} // namespace GetSetupPIN
 
 namespace GetSetupPINResponse {
 static constexpr CommandId Id = 0x00000001;
 } // namespace GetSetupPINResponse
 
-namespace LoginRequest {
+namespace Login {
 static constexpr CommandId Id = 0x00000002;
-} // namespace LoginRequest
+} // namespace Login
 
-namespace LogoutRequest {
+namespace Logout {
 static constexpr CommandId Id = 0x00000003;
-} // namespace LogoutRequest
+} // namespace Logout
 
 } // namespace Commands
 } // namespace AccountLogin
+
+namespace ElectricalMeasurement {
+namespace Commands {
+
+namespace GetProfileInfoResponseCommand {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetProfileInfoResponseCommand
+
+namespace GetProfileInfoCommand {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetProfileInfoCommand
+
+namespace GetMeasurementProfileResponseCommand {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetMeasurementProfileResponseCommand
+
+namespace GetMeasurementProfileCommand {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetMeasurementProfileCommand
+
+} // namespace Commands
+} // namespace ElectricalMeasurement
 
 namespace TestCluster {
 namespace Commands {
@@ -1590,6 +1176,10 @@ namespace TestNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace TestNestedStructListArgumentRequest
 
+namespace TestEmitTestFabricScopedEventResponse {
+static constexpr CommandId Id = 0x0000000B;
+} // namespace TestEmitTestFabricScopedEventResponse
+
 namespace TestListNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000C;
 } // namespace TestListNestedStructListArgumentRequest
@@ -1626,116 +1216,12 @@ namespace TestEmitTestEventRequest {
 static constexpr CommandId Id = 0x00000014;
 } // namespace TestEmitTestEventRequest
 
+namespace TestEmitTestFabricScopedEventRequest {
+static constexpr CommandId Id = 0x00000015;
+} // namespace TestEmitTestFabricScopedEventRequest
+
 } // namespace Commands
 } // namespace TestCluster
-
-namespace Messaging {
-namespace Commands {
-
-namespace DisplayMessage {
-static constexpr CommandId Id = 0x00000000;
-} // namespace DisplayMessage
-
-namespace GetLastMessage {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetLastMessage
-
-namespace CancelMessage {
-static constexpr CommandId Id = 0x00000001;
-} // namespace CancelMessage
-
-namespace MessageConfirmation {
-static constexpr CommandId Id = 0x00000001;
-} // namespace MessageConfirmation
-
-namespace DisplayProtectedMessage {
-static constexpr CommandId Id = 0x00000002;
-} // namespace DisplayProtectedMessage
-
-namespace GetMessageCancellation {
-static constexpr CommandId Id = 0x00000002;
-} // namespace GetMessageCancellation
-
-namespace CancelAllMessages {
-static constexpr CommandId Id = 0x00000003;
-} // namespace CancelAllMessages
-
-} // namespace Commands
-} // namespace Messaging
-
-namespace ApplianceEventsAndAlert {
-namespace Commands {
-
-namespace GetAlerts {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetAlerts
-
-namespace GetAlertsResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetAlertsResponse
-
-namespace AlertsNotification {
-static constexpr CommandId Id = 0x00000001;
-} // namespace AlertsNotification
-
-namespace EventsNotification {
-static constexpr CommandId Id = 0x00000002;
-} // namespace EventsNotification
-
-} // namespace Commands
-} // namespace ApplianceEventsAndAlert
-
-namespace ApplianceStatistics {
-namespace Commands {
-
-namespace LogNotification {
-static constexpr CommandId Id = 0x00000000;
-} // namespace LogNotification
-
-namespace LogRequest {
-static constexpr CommandId Id = 0x00000000;
-} // namespace LogRequest
-
-namespace LogResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace LogResponse
-
-namespace LogQueueRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace LogQueueRequest
-
-namespace LogQueueResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace LogQueueResponse
-
-namespace StatisticsAvailable {
-static constexpr CommandId Id = 0x00000003;
-} // namespace StatisticsAvailable
-
-} // namespace Commands
-} // namespace ApplianceStatistics
-
-namespace ElectricalMeasurement {
-namespace Commands {
-
-namespace GetProfileInfoResponseCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoResponseCommand
-
-namespace GetProfileInfoCommand {
-static constexpr CommandId Id = 0x00000000;
-} // namespace GetProfileInfoCommand
-
-namespace GetMeasurementProfileResponseCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileResponseCommand
-
-namespace GetMeasurementProfileCommand {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetMeasurementProfileCommand
-
-} // namespace Commands
-} // namespace ElectricalMeasurement
 
 } // namespace Clusters
 } // namespace app

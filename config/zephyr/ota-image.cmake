@@ -54,11 +54,11 @@ function(chip_ota_image TARGET_NAME)
 
     # Pass the argument list via file to avoid hitting Windows command-line length limit
     file(GENERATE
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args-ota-image.tmp
+        OUTPUT ${ARG_OUTPUT_FILE}.args
         CONTENT ${OTA_ARGS}
     )
 
     add_custom_target(${TARGET_NAME} ALL
-        COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/ota_image_tool.py create @${CMAKE_CURRENT_BINARY_DIR}/args-ota-image.tmp
+        COMMAND ${Python3_EXECUTABLE} ${CHIP_ROOT}/src/app/ota_image_tool.py create @${ARG_OUTPUT_FILE}.args
     )
 endfunction()

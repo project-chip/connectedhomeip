@@ -68,6 +68,9 @@ using namespace app::Clusters;
 using namespace app::Clusters::Groups;
 using namespace chip::Credentials;
 
+/**
+ * @brief Checks if group-endpoint association exist for the given fabric
+ */
 static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -76,30 +79,58 @@ static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId 
     return provider->HasEndpoint(fabricIndex, groupId, endpointId);
 }
 
+/**
+ * @brief Checks if there are key set associated with the given GroupId
+ */
+static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
+{
+    GroupDataProvider * provider = GetGroupDataProvider();
+    VerifyOrReturnError(nullptr != provider, false);
+    GroupDataProvider::GroupKey entry;
+
+    auto it    = provider->IterateGroupKeys(fabricIndex);
+    bool found = false;
+    while (it->Next(entry) && !found)
+    {
+        found = (entry.group_id == groupId);
+    }
+    it->Release();
+
+    if (found)
+    {
+        GroupDataProvider::KeySet keys;
+        found = (CHIP_NO_ERROR == provider->GetKeySet(fabricIndex, entry.keyset_id, keys));
+    }
+    return found;
+}
+
 static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
-    VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_INVALID_VALUE);
+    VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
+    VerifyOrReturnError(KeyExists(fabricIndex, groupId), EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
 
-    provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
-    CHIP_ERROR err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
+    // Add a new entry to the GroupTable
+    CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
+    if (CHIP_NO_ERROR == err)
+    {
+        err = provider->AddEndpoint(fabricIndex, groupId, endpointId);
+    }
     if (CHIP_NO_ERROR == err)
     {
         return EMBER_ZCL_STATUS_SUCCESS;
     }
-    else
-    {
-        ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                      err.Format());
-        return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-    }
+
+    ChipLogDetail(Zcl, "ERR: Failed to add mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
+                  err.Format());
+    return EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED;
 }
 
 static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
-    VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_INVALID_VALUE);
+    VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), EMBER_ZCL_STATUS_NOT_FOUND);
 
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -110,22 +141,29 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
     {
         return EMBER_ZCL_STATUS_SUCCESS;
     }
-    else
-    {
-        ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
-                      err.Format());
-        return EMBER_ZCL_STATUS_NOT_FOUND;
-    }
+
+    ChipLogDetail(Zcl, "ERR: Failed to remove mapping (end:%d, group:0x%x), err:%" CHIP_ERROR_FORMAT, endpointId, groupId,
+                  err.Format());
+    return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 {
     // The most significant bit of the NameSupport attribute indicates whether or not group names are supported
-    static constexpr uint8_t nameSupport = 0x80;
-    EmberAfStatus status                 = Attributes::NameSupport::Set(endpointId, nameSupport);
+    //
+    // According to spec, highest bit (Group Names supported) MUST match feature bit 0 (Group Names supported)
+    static constexpr uint8_t kNameSuppportFlagGroupNamesSupported = 0x80;
+
+    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, kNameSuppportFlagGroupNamesSupported);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing name support %x", status);
+    }
+
+    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupClusterFeature::kGroupNames));
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogDetail(Zcl, "ERR: writing group feature map %x", status);
     }
 }
 
@@ -134,23 +172,10 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::AddGroupResponse::Type response;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // For all networks, Add Group commands are only responded to when
-    // they are addressed to a single device.
-    if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return true;
-    }
 
     response.groupId = commandData.groupId;
     response.status  = GroupAdd(fabricIndex, commandPath.mEndpointId, commandData.groupId, commandData.groupName);
-    err              = commandObj->AddResponseData(commandPath, response);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupsCluster: AddGroup failed: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -165,11 +190,6 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
 
-    if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return true;
-    }
-
     VerifyOrExit(IsFabricGroupId(groupId), status = EMBER_ZCL_STATUS_INVALID_VALUE);
     VerifyOrExit(nullptr != provider, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = EMBER_ZCL_STATUS_NOT_FOUND);
@@ -182,19 +202,14 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
 exit:
     response.groupId = groupId;
     response.status  = status;
-    err              = commandObj->AddResponseData(commandPath, response);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupsCluster: ViewGroup failed: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
 struct GroupMembershipResponse
 {
-    // A capacity of 0xFF means that it is unknown if any further groups MAY be added.
-    static constexpr uint8_t kCapacityUnknown = 0xff;
+    // A null capacity means that it is unknown if any further groups MAY be added.
+    const chip::app::DataModel::Nullable<uint8_t> kCapacityUnknown;
 
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
@@ -239,7 +254,7 @@ struct GroupMembershipResponse
                         {
                             ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                             matchCount++;
-                            ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group_id);
+                            ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                         }
                     }
                 }
@@ -254,7 +269,7 @@ struct GroupMembershipResponse
                             {
                                 ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                                 matchCount++;
-                                ChipLogDetail(Zcl, " 0x%02" PRIx16, mapping.group_id);
+                                ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
                                 break;
                             }
                         }
@@ -281,14 +296,13 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * comman
 
     {
         GroupDataProvider::EndpointIterator * iter = nullptr;
-        CHIP_ERROR err                             = CHIP_NO_ERROR;
 
         iter = provider->IterateEndpoints(fabricIndex);
         VerifyOrExit(nullptr != iter, status = EMBER_ZCL_STATUS_FAILURE);
 
-        err = commandObj->AddResponseData(commandPath, GroupMembershipResponse(commandData, commandPath.mEndpointId, iter));
+        commandObj->AddResponse(commandPath, GroupMembershipResponse(commandData, commandPath.mEndpointId, iter));
         iter->Release();
-        status = (CHIP_NO_ERROR == err) ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+        status = EMBER_ZCL_STATUS_SUCCESS;
     }
 
 exit:
@@ -305,14 +319,6 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
 {
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::RemoveGroupResponse::Type response;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // For all networks, Remove Group commands are only responded to when
-    // they are addressed to a single device.
-    if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return true;
-    }
 
 #ifdef EMBER_AF_PLUGIN_SCENES
     // If a group is, removed the scenes associated with that group SHOULD be removed.
@@ -321,12 +327,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     response.groupId = commandData.groupId;
     response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupId);
 
-    err = commandObj->AddResponseData(commandPath, response);
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogDetail(Zcl, "GroupsCluster: RemoveGroup failed: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 

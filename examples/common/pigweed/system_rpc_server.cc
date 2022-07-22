@@ -33,7 +33,7 @@ stream::SysIoWriter writer;
 stream::SysIoReader reader;
 
 // Set up the output channel for the pw_rpc server to use.
-hdlc::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
+hdlc::RpcChannelOutput hdlc_channel_output(writer, pw::hdlc::kDefaultRpcAddress, "HDLC channel");
 Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
 rpc::Server server(channels);
 
@@ -43,7 +43,7 @@ void Init()
 {
     // Send log messages to HDLC address 1. This prevents logs from interfering
     // with pw_rpc communications.
-    pw::log_basic::SetOutput([](std::string_view log) { pw::hdlc::WriteUIFrame(1, std::as_bytes(std::span(log)), writer); });
+    pw::log_basic::SetOutput([](std::string_view log) { pw::hdlc::WriteUIFrame(1, pw::as_bytes(pw::span(log)), writer); });
 }
 
 rpc::Server & Server()

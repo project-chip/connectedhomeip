@@ -19,23 +19,38 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <app/tests/suites/commands/commissioner/CommissionerCommands.h>
+#include <app/tests/suites/commands/delay/DelayCommands.h>
+#include <app/tests/suites/commands/discovery/DiscoveryCommands.h>
+#include <app/tests/suites/commands/interaction_model/InteractionModel.h>
 #include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/commands/system/SystemCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/TestRunner.h>
 #include <app/tests/suites/include/ValueChecker.h>
-#include <lib/support/UnitTestUtils.h>
-#include <zap-generated/tests/CHIPClustersTest.h>
 
 constexpr uint16_t kTimeoutInSeconds = 90;
 
-class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public PICSChecker, public LogCommands
+class TestCommand : public TestRunner,
+                    public CHIPCommand,
+                    public ValueChecker,
+                    public ConstraintsChecker,
+                    public PICSChecker,
+                    public LogCommands,
+                    public CommissionerCommands,
+                    public DiscoveryCommands,
+                    public SystemCommands,
+                    public DelayCommands,
+                    public InteractionModel
 {
 public:
-    TestCommand(const char * commandName) :
-        CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+    TestCommand(const char * commandName, uint16_t testsCount, CredentialIssuerCommands * credsIssuerConfig) :
+        TestRunner(commandName, testsCount), CHIPCommand(commandName, credsIssuerConfig),
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
-        AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
+        AddArgument("continueOnFailure", 0, 1, &mContinueOnFailure,
+                    "Boolean indicating if the test runner should continue execution if a test fails. Default to false.");
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -44,41 +59,51 @@ public:
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(kTimeoutInSeconds); }
-
-    virtual void NextTest() = 0;
-
-    /////////// GlobalCommands Interface /////////
-    CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
-    CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
-    CHIP_ERROR WaitForCommissionee();
 
 protected:
-    std::map<std::string, ChipDevice *> mDevices;
-    chip::NodeId mNodeId;
+    /////////// DelayCommands Interface /////////
+    CHIP_ERROR WaitForCommissionee(const char * identity,
+                                   const chip::app::Clusters::DelayCommands::Commands::WaitForCommissionee::Type & value) override;
+    void OnWaitForMs() override { NextTest(); };
+
+    /////////// Interaction Model Interface /////////
+    chip::DeviceProxy * GetDevice(const char * identity) override { return mDevices[identity]; }
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override{};
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
-    static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
-    CHIP_ERROR ContinueOnChipMainThread() override { return WaitForMs(0); };
+    CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
 
-    void Exit(std::string message) override;
-    void ThrowFailureResponse();
-    void ThrowSuccessResponse();
+    chip::Controller::DeviceCommissioner & GetCommissioner(const char * identity) override
+    {
+        return CHIPCommand::GetCommissioner(identity);
+    };
+
+    static void ExitAsync(intptr_t context);
+    void Exit(std::string message, CHIP_ERROR err = CHIP_ERROR_INTERNAL) override;
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    void Wait()
+    bool IsUnsupported(const chip::app::StatusIB & status)
     {
-        if (mDelayInMs.HasValue())
-        {
-            chip::test_utils::SleepMillis(mDelayInMs.Value());
-        }
-    };
-    chip::Optional<uint64_t> mDelayInMs;
+        return status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedAttribute ||
+            status.mStatus == chip::Protocols::InteractionModel::Status::UnsupportedCommand;
+    }
+
     chip::Optional<char *> mPICSFilePath;
-    chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<uint16_t> mTimeout;
+    std::map<std::string, chip::DeviceProxy *> mDevices;
+
+    // When set to false, prevents interaction model events from affecting the current test status.
+    // This flag exists because if an error happens while processing a response the allocated
+    // command client/sender (ReadClient/WriteClient/CommandSender) can not be deallocated
+    // as it still used by the stack afterward. So a task is scheduled to run to close the
+    // test suite as soon as possible, and pending events are ignored in between.
+    bool mContinueProcessing = true;
+
+    // When set to true, the test runner continue to run after a test failure.
+    chip::Optional<bool> mContinueOnFailure;
+    std::vector<std::string> mErrorMessages;
 };

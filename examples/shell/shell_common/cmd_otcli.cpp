@@ -40,11 +40,13 @@
 #include <openthread/link.h>
 #include <openthread/thread.h>
 #if OPENTHREAD_API_VERSION >= 85
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #ifndef SHELL_OTCLI_TX_BUFFER_SIZE
 #define SHELL_OTCLI_TX_BUFFER_SIZE 1024
 #endif
 static char sTxBuffer[SHELL_OTCLI_TX_BUFFER_SIZE];
 static constexpr uint16_t sTxLength = SHELL_OTCLI_TX_BUFFER_SIZE;
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI)
 #endif
 #else
 #include <sys/types.h>
@@ -163,6 +165,7 @@ static const shell_command_t cmds_otcli_root = { &cmd_otcli_dispatch, "otcli", "
 
 #if CHIP_TARGET_STYLE_EMBEDDED
 #if OPENTHREAD_API_VERSION >= 85
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArguments)
 {
     int rval = vsnprintf(sTxBuffer, sTxLength, aFormat, aArguments);
@@ -171,7 +174,9 @@ static int OnOtCliOutput(void * aContext, const char * aFormat, va_list aArgumen
 exit:
     return rval;
 }
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #else
+
 static int OnOtCliOutput(const char * aBuf, uint16_t aBufLength, void * aContext)
 {
     return streamer_write(streamer_get(), aBuf, aBufLength);
@@ -185,12 +190,14 @@ void cmd_otcli_init()
 {
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_TARGET_STYLE_EMBEDDED
+#if !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
 #if OPENTHREAD_API_VERSION >= 85
     otCliInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
 #else
     otCliConsoleInit(otInstanceInitSingle(), &OnOtCliOutput, NULL);
-#endif
-#endif
+#endif // OPENTHREAD_API_VERSION >= 85
+#endif // !CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#endif // CHIP_TARGET_STYLE_EMBEDDED
 
     // Register the root otcli command with the top-level shell.
     Engine::Root().RegisterCommands(&cmds_otcli_root, 1);

@@ -25,6 +25,7 @@
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
+#include <app/clusters/on-off-server/on-off-server.h>
 
 #include <lib/core/CHIPError.h>
 
@@ -58,6 +59,8 @@ public:
     typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
+    static void OnTriggerOffWithEffect(OnOffEffect * effect);
+
 private:
     friend LightingManager & LightMgr(void);
     State_t mState;
@@ -68,6 +71,7 @@ private:
     bool mAutoTurnOff;
     uint32_t mAutoTurnOffDuration;
     bool mAutoTurnOffTimerArmed;
+    bool mOffEffectArmed;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
@@ -75,6 +79,7 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void AutoTurnOffTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
+    static void OffEffectTimerEventHandler(AppEvent * aEvent);
 
     static LightingManager sLight;
 };

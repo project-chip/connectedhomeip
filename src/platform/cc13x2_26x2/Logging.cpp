@@ -18,6 +18,7 @@
 UART_Handle sDebugUartHandle;
 char sDebugUartBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
+#if MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
 extern "C" int cc13x2_26x2LogInit(void)
 {
     UART_Params uartParams;
@@ -50,6 +51,14 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
     }
 }
 
+#else
+
+/* log functins defined somewhere else */
+extern "C" int cc13x2_26x2LogInit(void);
+extern "C" void cc13x2_26x2VLog(const char * msg, va_list v);
+
+#endif // MATTER_CC13X2_26X2_PLATFORM_LOG_ENABLED
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -81,6 +90,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 } // namespace Logging
 } // namespace chip
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 /**
  * LwIP log output function.
  */
@@ -95,6 +105,7 @@ extern "C" void LwIPLog(const char * msg, ...)
     chip::DeviceLayer::OnLogOutput();
     va_end(v);
 }
+#endif // #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 /**
  * Platform log output function.

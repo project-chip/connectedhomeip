@@ -57,7 +57,7 @@ struct ScanFilterData
     char address[CHIP_TIZEN_BLE_ADDRESS_STRING_LEN];
     char service_uuid[CHIP_TIZEN_BLE_SERVICE_UUID_STRING_LEN];
     char service_data[CHIP_TIZEN_BLE_SERVICE_DATA_MAX_LEN];
-    int service_data_len;
+    unsigned int service_data_len;
 };
 
 // Receives callbacks when chip devices are being scanned

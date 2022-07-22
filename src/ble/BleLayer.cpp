@@ -94,7 +94,7 @@ public:
         return nullptr;
     }
 
-    BLEEndPoint * Find(BLE_CONNECTION_OBJECT c)
+    BLEEndPoint * Find(BLE_CONNECTION_OBJECT c) const
     {
         if (c == BLE_CONNECTION_UNINITIALIZED)
         {
@@ -288,7 +288,6 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = NULL;
 #endif
-    mBleEndPoint = NULL;
 
     return CHIP_NO_ERROR;
 }
@@ -299,13 +298,13 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplication
     return Init(platformDelegate, nullptr, appDelegate, systemLayer);
 }
 
-CHIP_ERROR BleLayer::Shutdown()
+void BleLayer::Shutdown()
 {
     mState = kState_NotInitialized;
-    return CloseAllBleConnections();
+    CloseAllBleConnections();
 }
 
-CHIP_ERROR BleLayer::CloseAllBleConnections()
+void BleLayer::CloseAllBleConnections()
 {
     // Close and free all BLE end points.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
@@ -330,10 +329,9 @@ CHIP_ERROR BleLayer::CloseAllBleConnections()
             }
         }
     }
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
+void BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
 {
     // Close and free all BLE endpoints.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
@@ -358,7 +356,6 @@ CHIP_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
             }
         }
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
@@ -427,7 +424,6 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
 #endif
-    mBleEndPoint = *retEndPoint;
 
     return CHIP_NO_ERROR;
 }

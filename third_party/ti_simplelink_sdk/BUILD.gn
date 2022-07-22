@@ -35,24 +35,34 @@ group("ti_simplelink_sysconfig") {
 }
 
 config("ti_simplelink_mbedtls_config") {
-  defines = [ "MBEDTLS_CONFIG_FILE=\"cc13x2_26x2-mbedtls-config.h\"" ]
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+    defines = [ "MBEDTLS_CONFIG_FILE=\"cc13x2_26x2-mbedtls-config.h\"" ]
 
-  include_dirs = [
-    "${chip_root}/src/platform/cc13x2_26x2",
-    "${chip_root}/src/platform/cc13x2_26x2/crypto",
-    "${ti_simplelink_sdk_root}/source",
-  ]
+    include_dirs = [
+      "${chip_root}/src/platform/cc13x2_26x2",
+      "${chip_root}/src/platform/cc13x2_26x2/crypto",
+      "${ti_simplelink_sdk_root}/source",
+    ]
+  } else if (ti_simplelink_device_family == "cc32xx") {
+    defines = [ "MBEDTLS_CONFIG_FILE=\"cc32xx-mbedtls-config.h\"" ]
+
+    include_dirs = [ "${chip_root}/src/platform/cc32xx" ]
+  }
 }
 
 mbedtls_target("mbedtls") {
   # Hardware acceleration
-  sources = [
-    "${chip_root}/src/platform/cc13x2_26x2/crypto/aes_alt.c",
-    "${chip_root}/src/platform/cc13x2_26x2/crypto/ecdh_alt.c",
-    "${chip_root}/src/platform/cc13x2_26x2/crypto/ecdsa_alt.c",
-    "${chip_root}/src/platform/cc13x2_26x2/crypto/ecjpake_alt.c",
-    "${chip_root}/src/platform/cc13x2_26x2/crypto/sha256_alt.c",
-  ]
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+    sources = [
+      "${chip_root}/src/platform/cc13x2_26x2/crypto/aes_alt.c",
+      "${chip_root}/src/platform/cc13x2_26x2/crypto/ecdh_alt.c",
+      "${chip_root}/src/platform/cc13x2_26x2/crypto/ecdsa_alt.c",
+      "${chip_root}/src/platform/cc13x2_26x2/crypto/ecjpake_alt.c",
+      "${chip_root}/src/platform/cc13x2_26x2/crypto/sha256_alt.c",
+    ]
+  }
 
   public_configs = [ ":ti_simplelink_mbedtls_config" ]
 
@@ -60,22 +70,41 @@ mbedtls_target("mbedtls") {
 }
 
 config("ti_simplelink_freertos_config") {
-  include_dirs = [
-    "${chip_root}/src/platform/cc13x2_26x2",
-    "${freertos_root}/repo/portable/GCC/ARM_CM4F",
-  ]
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+    include_dirs = [
+      "${chip_root}/src/platform/cc13x2_26x2",
+      "${freertos_root}/repo/portable/GCC/ARM_CM4F",
+    ]
+  } else if (ti_simplelink_device_family == "cc32xx") {
+    include_dirs = [
+      "${chip_root}/src/platform/cc32xx",
+      "${freertos_root}/repo/portable/GCC/ARM_CM3",
+    ]
+  }
 }
 
 freertos_target("freertos") {
-  sources = [
-    "${freertos_root}/repo/portable/GCC/ARM_CM4F/port.c",
-    #"${freertos_root}/repo/portable/MemMang/heap_4.c",
-  ]
+  if (ti_simplelink_device_family == "cc13x2_26x2" ||
+      ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+    sources = [
+      "${freertos_root}/repo/portable/GCC/ARM_CM4F/port.c",
+      #"${freertos_root}/repo/portable/MemMang/heap_4.c",
+    ]
+  } else if (ti_simplelink_device_family == "cc32xx") {
+    sources = [
+      "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
+      "${freertos_root}/repo/portable/MemMang/heap_4.c",
+    ]
+  }
 
   public_configs = [ ":ti_simplelink_freertos_config" ]
 
   if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
     # BLE has to have it's own heap config
+    public_deps =
+        [ "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig" ]
+  } else if (ti_simplelink_device_family == "cc32xx") {
     public_deps =
         [ "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig" ]
   }

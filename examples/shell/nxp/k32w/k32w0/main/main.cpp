@@ -20,12 +20,8 @@
 // Main Code
 // ================================================================================
 
-#include "openthread/platform/logging.h"
+#include <AppTask.h>
 #include <mbedtls/platform.h>
-#include <openthread-system.h>
-#include <openthread/cli.h>
-#include <openthread/error.h>
-#include <openthread/heap.h>
 
 #include <ChipShellCollection.h>
 #include <lib/core/CHIPCore.h>
@@ -39,10 +35,6 @@
 
 #include "FreeRtosHooks.h"
 #include "app_config.h"
-
-#include "radio.h"
-
-#include <AppTask.h>
 
 const uint16_t shell_task_size    = 3096;
 const uint8_t shell_task_priority = 0;
@@ -58,7 +50,7 @@ extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
 /* needed for FreeRtos Heap 4 */
-uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
+uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
 extern "C" unsigned int sleep(unsigned int seconds)
 {
@@ -74,8 +66,10 @@ static void shell_task(void * args)
 
 extern "C" void main_task(void const * argument)
 {
-    int status = 0;
+    int status     = 0;
+    char * argv[1] = { 0 };
     BaseType_t shellTaskHandle;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
@@ -84,15 +78,18 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    err = PlatformMgrImpl().InitBoardFwk();
+    if (err != CHIP_NO_ERROR)
+    {
+        return;
+    }
 
-    /* Used for HW initializations */
-    otSysInit(0, NULL);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     K32W_LOG("Welcome to NXP Shell Demo App");
 
     /* Mbedtls Threading support is needed because both
-     * Thread and Weave tasks are using it */
+     * Thread and Matter tasks are using it */
     freertos_mbedtls_mutex_init();
 
     // Init Chip memory management before the stack
@@ -101,7 +98,7 @@ extern "C" void main_task(void const * argument)
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        K32W_LOG("Error during PlatformMgr().InitWeaveStack()");
+        K32W_LOG("Error during PlatformMgr().InitMatterStack()");
         goto exit;
     }
 
@@ -134,8 +131,6 @@ extern "C" void main_task(void const * argument)
     }
 
     // cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
 
     shellTaskHandle = xTaskCreate(shell_task, "shell_task", shell_task_size / sizeof(StackType_t), NULL, shell_task_priority, NULL);
     if (!shellTaskHandle)

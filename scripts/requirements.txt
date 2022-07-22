@@ -23,8 +23,11 @@ portpicker
 mobly
 
 # zephyr
-west>=0.11.0
+west>=0.12.0
 intelhex
+cbor
+cbor2
+jsonschema
 
 # happy tests
 lockfile
@@ -43,9 +46,19 @@ anytree
 cxxfilt
 ghapi
 pandas ; platform_machine != 'aarch64' and platform_machine != 'arm64'
+tabulate
 
 # scripts/build
 click
 
 # scripts/idl
 lark
+stringcase
+
+cryptography
+
+# python unit tests
+colorama
+
+# update tornado for pw_watch
+tornado

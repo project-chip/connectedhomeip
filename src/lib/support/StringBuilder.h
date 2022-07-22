@@ -53,6 +53,9 @@ public:
     /// did all the values fit?
     bool Fit() const { return mWriter.Fit(); }
 
+    /// Was nothing written yet?
+    bool Empty() const { return mWriter.Needed() == 0; }
+
     /// access the underlying value
     const char * c_str() const { return reinterpret_cast<const char *>(mWriter.Buffer()); }
 

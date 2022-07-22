@@ -82,25 +82,22 @@ static void VerifyInitialized(const char * func)
 
 CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
-#ifndef NDEBUG
     if (memoryInitialized++ > 0)
     {
         fprintf(stderr, "ABORT: chip::Platform::MemoryInit() called twice.\n");
         abort();
     }
-#endif
+
     return CHIP_NO_ERROR;
 }
 
 void MemoryAllocatorShutdown()
 {
-#ifndef NDEBUG
     if (--memoryInitialized < 0)
     {
         fprintf(stderr, "ABORT: chip::Platform::MemoryShutdown() called twice.\n");
         abort();
     }
-#endif
 }
 
 void * MemoryAlloc(size_t size)

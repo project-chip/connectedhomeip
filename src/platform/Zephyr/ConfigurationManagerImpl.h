@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -81,7 +81,12 @@ inline bool ConfigurationManagerImpl::CanFactoryReset()
 
 inline CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
 {
-    return Internal::ZephyrConfig::ReadConfigValueCounter(key, value);
+    CHIP_ERROR err = Internal::ZephyrConfig::ReadConfigValueCounter(key, value);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+    return err;
 }
 
 inline CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)

@@ -15,6 +15,7 @@
 name: Descriptor Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Descriptor"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Read attribute Device list"
       command: "readAttribute"
@@ -43,7 +48,9 @@ tests:
                   0x002A, # OTA Software Update Requestor
                   0x002B, # Localization Configuration
                   0x002C, # Time Format Localization
+                  0x002D, # Unit Localization
                   0x002E, # Power Source Configuration
+                  0x002F, # Power Source
                   0x0030, # General Commissioning
                   0x0031, # Network Commissioning
                   0x0032, # Diagnostic Logs

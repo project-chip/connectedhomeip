@@ -31,11 +31,11 @@ following features are available:
 
 -   Pull docker image:
 
-          $ docker pull pankore/chip-build-ameba:latest
+          $ docker pull connectedhomeip/chip-build-ameba:latest
 
 -   Run docker container:
 
-          $ docker run -it -v ${CHIP_DIR}:/root/chip pankore/chip-build-ameba:latest
+          $ docker run -it -v ${CHIP_DIR}:/root/chip connectedhomeip/chip-build-ameba:latest
 
 -   Setup build environment:
 
@@ -72,8 +72,8 @@ Connect a USB-TTL Adapter as shown below
 Build the
 [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
-Input `ATS$` command, then launch the chip-rpc console, where the Echo RPC
-commands can be invoked
+Reset Ameba board, then launch the chip-rpc console, where the Echo RPC commands
+can be invoked
 
         python -m pw_hdlc.rpc_console --device /dev/tty<USB-TTL port> -b 115200
 

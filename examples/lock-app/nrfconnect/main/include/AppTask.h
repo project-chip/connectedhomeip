@@ -25,6 +25,10 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/nrfconnect/FactoryDataProvider.h>
+#endif
+
 #ifdef CONFIG_MCUMGR_SMP_BT
 #include "DFUOverSMP.h"
 #endif
@@ -34,19 +38,17 @@ struct k_timer;
 class AppTask
 {
 public:
-    int StartApp();
+    CHIP_ERROR StartApp();
 
-    void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(AppEvent * event);
-    void UpdateClusterState();
+    void UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source);
 
 private:
     friend AppTask & GetAppTask(void);
 
-    int Init();
+    CHIP_ERROR Init();
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void LockStateChanged(BoltLockManager::State state, BoltLockManager::OperationSource source);
 
     void CancelTimer(void);
 
@@ -84,6 +86,10 @@ private:
     Function_t mFunction      = kFunction_NoneSelected;
     bool mFunctionTimerActive = false;
     static AppTask sAppTask;
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;
+#endif
 };
 
 inline AppTask & GetAppTask(void)

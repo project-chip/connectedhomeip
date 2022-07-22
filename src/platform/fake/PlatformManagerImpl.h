@@ -45,10 +45,12 @@ private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack() { return CHIP_NO_ERROR; }
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
+    void _Shutdown() {}
 
     CHIP_ERROR _AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0) { return CHIP_ERROR_NOT_IMPLEMENTED; }
     void _RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0) {}
+    void _HandleServerStarted() {}
+    void _HandleServerShuttingDown() {}
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0) {}
 
     void _RunEventLoop()
@@ -97,35 +99,6 @@ private:
     }
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint,
-                                  AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
-                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    CHIP_ERROR _GetSupportedCalendarTypes(
-        AttributeList<app::Clusters::TimeFormatLocalization::CalendarType, kMaxCalendarTypes> & supportedCalendarTypes)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
 
     void _LockChipStack() {}
     bool _TryLockChipStack() { return true; }

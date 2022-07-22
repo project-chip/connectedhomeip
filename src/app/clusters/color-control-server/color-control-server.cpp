@@ -60,6 +60,15 @@ ColorControlServer & ColorControlServer::Instance()
     return instance;
 }
 
+bool ColorControlServer::HasFeature(chip::EndpointId endpoint, ColorControlFeature feature)
+{
+    bool success;
+    uint32_t featureMap;
+    success = (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS);
+
+    return success ? ((featureMap & to_underlying(feature)) != 0) : false;
+}
+
 EmberAfStatus ColorControlServer::stopAllColorTransitions(EndpointId endpoint)
 {
     EmberEventControl * event = getEventControl(endpoint);
@@ -98,7 +107,7 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
     }
 
     uint8_t options = 0x00;
-    Attributes::ColorControlOptions::Get(endpoint, &options);
+    Attributes::Options::Get(endpoint, &options);
 
     bool on = true;
     OnOff::Attributes::OnOff::Get(endpoint, &on);
@@ -165,11 +174,9 @@ void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorM
     {
         return;
     }
-    else
-    {
-        Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
-        Attributes::ColorMode::Set(endpoint, newColorMode);
-    }
+
+    Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
+    Attributes::ColorMode::Set(endpoint, newColorMode);
 
     colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
 
@@ -664,63 +671,62 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
             // we are performing a move to and not a move.
             return true;
         }
+
+        // Check if we are in a color loop. If not, we         are in a moveHue
+        uint8_t isColorLoop = 0;
+        Attributes::ColorLoopActive::Get(p->endpoint, &isColorLoop);
+
+        if (isColorLoop)
+        {
+            p->currentEnhancedHue = p->initialEnhancedHue;
+        }
         else
         {
-            // Check if we are in a color loop. If not, we are in a moveHue
-            uint8_t isColorLoop = 0;
-            Attributes::ColorLoopActive::Get(p->endpoint, &isColorLoop);
-
-            if (isColorLoop)
+            // we are performing a Hue         move.  Need to compute the new values for the
+            // next move         period.
+            if (p->up)
             {
-                p->currentEnhancedHue = p->initialEnhancedHue;
-            }
-            else
-            {
-                // we are performing a Hue move.  Need to compute the new values for the
-                // next move period.
-                if (p->up)
+                if (p->isEnhancedHue)
                 {
-                    if (p->isEnhancedHue)
-                    {
-                        newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
-                        newHue = addEnhancedHue(p->finalEnhancedHue, newHue);
+                    newHue = subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue);
+                    newHue = addEnhancedHue(p->finalEnhancedHue, newHue);
 
-                        p->initialEnhancedHue = p->finalEnhancedHue;
-                        p->finalEnhancedHue   = newHue;
-                    }
-                    else
-                    {
-                        newHue = subtractHue(p->finalHue, p->initialHue);
-                        newHue = addHue(p->finalHue, static_cast<uint8_t>(newHue));
-
-                        p->initialHue = p->finalHue;
-                        p->finalHue   = static_cast<uint8_t>(newHue);
-                    }
+                    p->initialEnhancedHue = p->finalEnhancedHue;
+                    p->finalEnhancedHue   = newHue;
                 }
                 else
                 {
-                    if (p->isEnhancedHue)
-                    {
-                        newHue = subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue);
-                        newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
+                    newHue = subtractHue(p->finalHue, p->initialHue);
+                    newHue = addHue(p->finalHue, static_cast<uint8_t>(newHue));
 
-                        p->initialEnhancedHue = p->finalEnhancedHue;
-                        p->finalEnhancedHue   = newHue;
-                    }
-                    else
-                    {
-                        newHue = subtractHue(p->initialHue, p->finalHue);
-                        newHue = subtractHue(p->finalHue, static_cast<uint8_t>(newHue));
-
-                        p->initialHue = p->finalHue;
-                        p->finalHue   = static_cast<uint8_t>(newHue);
-                    }
+                    p->initialHue = p->finalHue;
+                    p->finalHue   = static_cast<uint8_t>(newHue);
                 }
             }
+            else
+            {
+                if (p->isEnhancedHue)
+                {
+                    newHue = subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue);
+                    newHue = subtractEnhancedHue(p->finalEnhancedHue, newHue);
 
-            p->stepsRemaining = p->stepsTotal;
+                    p->initialEnhancedHue = p->finalEnhancedHue;
+                    p->finalEnhancedHue   = newHue;
+                }
+                else
+                {
+                    newHue = subtractHue(p->initialHue, p->finalHue);
+                    newHue = subtractHue(p->finalHue, static_cast<uint8_t>(newHue));
+
+                    p->initialHue = p->finalHue;
+                    p->finalHue   = static_cast<uint8_t>(newHue);
+                }
+            }
         }
+
+        p->stepsRemaining = p->stepsTotal;
     }
+
     return false;
 }
 
@@ -1969,16 +1975,16 @@ ColorControlServer::Color16uTransitionState * ColorControlServer::getTempTransit
  */
 EmberAfStatus ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
-    EndpointId endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = aEndpoint;
 
     Color16uTransitionState * colorTempTransitionState = getTempTransitionState(endpoint);
     VerifyOrReturnError(colorTempTransitionState != nullptr, EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
 
     uint16_t temperatureMin = MIN_TEMPERATURE_VALUE;
-    Attributes::ColorTempPhysicalMin::Get(endpoint, &temperatureMin);
+    Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &temperatureMin);
 
     uint16_t temperatureMax = MAX_TEMPERATURE_VALUE;
-    Attributes::ColorTempPhysicalMax::Get(endpoint, &temperatureMax);
+    Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &temperatureMax);
 
     if (transitionTime == 0)
     {
@@ -2033,7 +2039,7 @@ uint16_t ColorControlServer::getTemperatureCoupleToLevelMin(EndpointId endpoint)
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         // Not less than the physical min.
-        Attributes::ColorTempPhysicalMin::Get(endpoint, &colorTemperatureCoupleToLevelMin);
+        Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &colorTemperatureCoupleToLevelMin);
     }
 
     return colorTemperatureCoupleToLevelMin;
@@ -2079,10 +2085,10 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
             uint16_t tempPhysicalMin = MIN_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMin::Get(endpoint, &tempPhysicalMin);
+            Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
 
             uint16_t tempPhysicalMax = MAX_TEMPERATURE_VALUE;
-            Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysicalMax);
+            Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
             if (tempPhysicalMin <= startUpColorTemp && startUpColorTemp <= tempPhysicalMax)
             {
@@ -2152,8 +2158,8 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
 {
     uint8_t moveMode                 = commandData.moveMode;
     uint16_t rate                    = commandData.rate;
-    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimum;
-    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximum;
+    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     uint8_t optionsMask              = commandData.optionsMask;
     uint8_t optionsOverride          = commandData.optionsOverride;
     EndpointId endpoint              = commandPath.mEndpointId;
@@ -2171,8 +2177,8 @@ bool ColorControlServer::moveColorTempCommand(const app::ConcreteCommandPath & c
         return true;
     }
 
-    Attributes::ColorTempPhysicalMin::Get(endpoint, &tempPhysicalMin);
-    Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysicalMax);
+    Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+    Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
@@ -2272,8 +2278,8 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
     uint8_t stepMode                 = commandData.stepMode;
     uint16_t stepSize                = commandData.stepSize;
     uint16_t transitionTime          = commandData.transitionTime;
-    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimum;
-    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximum;
+    uint16_t colorTemperatureMinimum = commandData.colorTemperatureMinimumMireds;
+    uint16_t colorTemperatureMaximum = commandData.colorTemperatureMaximumMireds;
     uint8_t optionsMask              = commandData.optionsMask;
     uint8_t optionsOverride          = commandData.optionsOverride;
     EndpointId endpoint              = commandPath.mEndpointId;
@@ -2290,9 +2296,8 @@ bool ColorControlServer::stepColorTempCommand(const app::ConcreteCommandPath & c
         return true;
     }
 
-    Attributes::ColorTempPhysicalMin::Get(endpoint, &tempPhysicalMin);
-
-    Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysicalMax);
+    Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
+    Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
     if (transitionTime == 0)
     {
@@ -2414,7 +2419,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         LevelControl::Attributes::CurrentLevel::Get(endpoint, &currentLevel);
 
         uint16_t tempPhysMax = MAX_TEMPERATURE_VALUE;
-        Attributes::ColorTempPhysicalMax::Get(endpoint, &tempPhysMax);
+        Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysMax);
 
         // Scale color temp setting between the coupling min and the physical max.
         // Note that mireds varies inversely with level: low level -> high mireds.
@@ -2445,12 +2450,6 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
-
-void emberAfPluginColorControlServerStopTransition(void)
-{
-    EndpointId endpoint = emberAfCurrentEndpoint();
-    ColorControlServer::Instance().stopAllColorTransitions(endpoint);
-}
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 

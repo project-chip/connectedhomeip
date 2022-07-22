@@ -16,132 +16,236 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace std;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
+using namespace chip::Uint8;
+using chip::CharSpan;
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
-    return PlaybackStateEnum::kPlaying;
+    return mCurrentState;
 }
 
 uint64_t MediaPlaybackManager::HandleGetStartTime()
 {
-    return 0;
+    return mStartTime;
 }
 
 uint64_t MediaPlaybackManager::HandleGetDuration()
 {
-    return 0;
+    return mDuration;
 }
 
-Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
+CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    Structs::PlaybackPosition::Type sampledPosition;
-    sampledPosition.updatedAt = 0;
-    sampledPosition.position  = 0;
-    return sampledPosition;
+    return aEncoder.Encode(mPlaybackPosition);
 }
 
 float MediaPlaybackManager::HandleGetPlaybackSpeed()
 {
-    return 0;
+    return mPlaybackSpeed;
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
 {
-    return 0;
+    return mStartTime;
 }
 
 uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 {
-    return 0;
+    return mDuration;
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
+void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState  = PlaybackStateEnum::kPlaying;
+    mPlaybackSpeed = 1;
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePause()
+void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState  = PlaybackStateEnum::kPaused;
+    mPlaybackSpeed = 0;
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStop()
+void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState     = PlaybackStateEnum::kNotPlaying;
+    mPlaybackSpeed    = 0;
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleFastForward()
+void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
+    {
+        // if already at max speed, return error
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        helper.Success(response);
+        return;
+    }
+
+    mCurrentState  = PlaybackStateEnum::kPlaying;
+    mPlaybackSpeed = (mPlaybackSpeed <= 0 ? 1 : mPlaybackSpeed * 2);
+    if (mPlaybackSpeed > kPlaybackMaxForwardSpeed)
+    {
+        // don't exceed max speed
+        mPlaybackSpeed = kPlaybackMaxForwardSpeed;
+    }
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePrevious()
+void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState     = PlaybackStateEnum::kPlaying;
+    mPlaybackSpeed    = 1;
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleRewind()
+void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
+    {
+        // if already at max speed in reverse, return error
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSpeedOutOfRange;
+        helper.Success(response);
+        return;
+    }
+
+    mCurrentState  = PlaybackStateEnum::kPlaying;
+    mPlaybackSpeed = (mPlaybackSpeed >= 0 ? -1 : mPlaybackSpeed * 2);
+    if (mPlaybackSpeed < kPlaybackMaxRewindSpeed)
+    {
+        // don't exceed max rewind speed
+        mPlaybackSpeed = kPlaybackMaxRewindSpeed;
+    }
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipBackward(const uint64_t & deltaPositionMilliseconds)
+void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                              const uint64_t & deltaPositionMilliseconds)
 {
     // TODO: Insert code here
+    uint64_t newPosition = (mPlaybackPosition.position.Value() > deltaPositionMilliseconds
+                                ? mPlaybackPosition.position.Value() - deltaPositionMilliseconds
+                                : 0);
+    mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipForward(const uint64_t & deltaPositionMilliseconds)
+void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const uint64_t & deltaPositionMilliseconds)
 {
     // TODO: Insert code here
+    uint64_t newPosition = mPlaybackPosition.position.Value() + deltaPositionMilliseconds;
+    newPosition          = newPosition > mDuration ? mDuration : newPosition;
+    mPlaybackPosition    = { 0, chip::app::DataModel::Nullable<uint64_t>(newPosition) };
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSeekRequest(const uint64_t & positionMilliseconds)
+void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                      const uint64_t & positionMilliseconds)
 {
     // TODO: Insert code here
-    Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    if (positionMilliseconds > mDuration)
+    {
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSeekOutOfRange;
+        helper.Success(response);
+    }
+    else
+    {
+        mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(positionMilliseconds) };
+
+        Commands::PlaybackResponse::Type response;
+        response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+        response.status = MediaPlaybackStatusEnum::kSuccess;
+        helper.Success(response);
+    }
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleNext()
+void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mCurrentState     = PlaybackStateEnum::kPlaying;
+    mPlaybackSpeed    = 1;
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStartOverRequest()
+void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
+    mPlaybackPosition = { 0, chip::app::DataModel::Nullable<uint64_t>(0) };
+
     Commands::PlaybackResponse::Type response;
-    response.status = StatusEnum::kSuccess;
-    return response;
+    response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
+    response.status = MediaPlaybackStatusEnum::kSuccess;
+    helper.Success(response);
+}
+
+uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        return mDynamicEndpointFeatureMap;
+    }
+
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }

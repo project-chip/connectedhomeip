@@ -58,8 +58,16 @@ public:
     constexpr VendorId GetVendorId() const { return mVendorId; }
     constexpr uint16_t GetProtocolId() const { return mProtocolId; }
 
+    static constexpr uint32_t kVendorIdShift = 16;
+
+    static Id FromFullyQualifiedSpecForm(uint32_t aSpecForm)
+    {
+        return Id(static_cast<VendorId>(aSpecForm >> kVendorIdShift),
+                  static_cast<uint16_t>(aSpecForm & ((1 << kVendorIdShift) - 1)));
+    }
+
 private:
-    constexpr uint32_t ToUint32() const { return (static_cast<uint32_t>(mVendorId) << 16) | mProtocolId; }
+    constexpr uint32_t ToUint32() const { return (static_cast<uint32_t>(mVendorId) << kVendorIdShift) | mProtocolId; }
 
     chip::VendorId mVendorId;
     uint16_t mProtocolId;
@@ -78,7 +86,6 @@ CHIP_STANDARD_PROTOCOL(InteractionModel, 0x0001)          // Interaction Model P
 CHIP_STANDARD_PROTOCOL(BDX, 0x0002)                       // Bulk Data Exchange Protocol
 CHIP_STANDARD_PROTOCOL(UserDirectedCommissioning, 0x0003) // User Directed Commissioning Protocol
 CHIP_STANDARD_PROTOCOL(Echo, 0x0004)                      // Echo Protocol.  To be removed or standardized.
-CHIP_STANDARD_PROTOCOL(TempZCL, 0x0009) // For carrying ZCL-compatible messages, to be removed when we no longer use them
 
 #undef CHIP_STANDARD_PROTOCOL
 

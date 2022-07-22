@@ -27,6 +27,11 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+/**
+ * NullNullable is an alias for NullOptional, for better readability.
+ */
+constexpr auto NullNullable = NullOptional;
+
 /*
  * Dedicated type for nullable things, to differentiate them from optional
  * things.
@@ -73,6 +78,9 @@ struct Nullable : protected Optional<T>
     {
         return true;
     }
+
+    // The only fabric-scoped objects in the spec are commands, events and structs inside lists, and none of those can be nullable.
+    static constexpr bool kIsFabricScoped = false;
 
     bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }
     bool operator!=(const Nullable & other) const { return !(*this == other); }

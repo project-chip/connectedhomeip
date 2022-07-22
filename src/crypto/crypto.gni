@@ -21,12 +21,14 @@ declare_args() {
 
 if (chip_crypto == "") {
   if (current_os == "android" || current_os == "freertos" ||
-      current_os == "zephyr" || current_os == "mbed") {
+      current_os == "zephyr" || current_os == "mbed" || current_os == "webos") {
     chip_crypto = "mbedtls"
   } else {
     chip_crypto = "openssl"
   }
 }
 
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl",
-       "Please select a valid crypto implementation: mbedtls, openssl")
+assert(
+    chip_crypto == "mbedtls" || chip_crypto == "openssl" ||
+        chip_crypto == "tinycrypt" || chip_crypto == "boringssl",
+    "Please select a valid crypto implementation: mbedtls, openssl, tinycrypt, boringssl")

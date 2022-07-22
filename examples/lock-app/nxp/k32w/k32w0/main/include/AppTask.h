@@ -65,8 +65,9 @@ private:
     static void TimerEventHandler(TimerHandle_t xTimer);
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
+    static void UpdateClusterStateInternal(intptr_t arg);
     static void ThreadStart();
+    static void InitServer(intptr_t arg);
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t

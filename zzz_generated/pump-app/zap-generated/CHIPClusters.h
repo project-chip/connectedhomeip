@@ -30,25 +30,23 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT FlowMeasurementCluster : public ClusterBase
+class DLL_EXPORT OtaSoftwareUpdateProviderCluster : public ClusterBase
 {
 public:
-    FlowMeasurementCluster() : ClusterBase(app::Clusters::FlowMeasurement::Id) {}
-    ~FlowMeasurementCluster() {}
+    OtaSoftwareUpdateProviderCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session,
+                                     EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OtaSoftwareUpdateProvider::Id, endpoint)
+    {}
+    ~OtaSoftwareUpdateProviderCluster() {}
 };
 
-class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
+class DLL_EXPORT OccupancySensingCluster : public ClusterBase
 {
 public:
-    PressureMeasurementCluster() : ClusterBase(app::Clusters::PressureMeasurement::Id) {}
-    ~PressureMeasurementCluster() {}
-};
-
-class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
-{
-public:
-    TemperatureMeasurementCluster() : ClusterBase(app::Clusters::TemperatureMeasurement::Id) {}
-    ~TemperatureMeasurementCluster() {}
+    OccupancySensingCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
+        ClusterBase(exchangeManager, session, app::Clusters::OccupancySensing::Id, endpoint)
+    {}
+    ~OccupancySensingCluster() {}
 };
 
 } // namespace Controller

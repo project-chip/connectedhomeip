@@ -25,6 +25,8 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "FunctionLib.h"
+
 namespace chip {
 namespace DeviceLayer {
 

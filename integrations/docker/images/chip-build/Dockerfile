@@ -60,8 +60,10 @@ RUN set -x \
     udev \
     unzip \
     wget \
+    git-lfs \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/ \
+    && git lfs install \
     && : # last line
 
 # Cmake (Mbed OS requires >=3.19.0-rc3 version which is not available in Ubuntu 20.04 repository)
@@ -114,13 +116,14 @@ RUN set -x \
 
 # NodeJS: install a newer version than what apt-get would read
 # This installs the latest LTS version of nodejs
+ENV CHIP_NODE_VERSION=v16.13.2
 RUN set -x \
     && mkdir node_js \
     && cd node_js \
-    && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
-    && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
-    && mv node-v12.19.0-linux-x64 /opt/ \
-    && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
+    && wget https://nodejs.org/dist/$CHIP_NODE_VERSION/node-$CHIP_NODE_VERSION-linux-x64.tar.xz \
+    && tar xfvJ node-$CHIP_NODE_VERSION-linux-x64.tar.xz \
+    && mv node-$CHIP_NODE_VERSION-linux-x64 /opt/ \
+    && ln -s /opt/node-$CHIP_NODE_VERSION-linux-x64 /opt/node \
     && ln -s /opt/node/bin/* /usr/bin \
     && cd .. \
     && rm -rf node_js \

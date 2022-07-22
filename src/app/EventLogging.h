@@ -22,6 +22,7 @@
 #include <app/EventLoggingDelegate.h>
 #include <app/EventManagement.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h> // So we can encode lists
 
 namespace chip {
@@ -53,23 +54,43 @@ private:
  * context tags to be interpreted within the schema identified by
  * `ClusterID` and `EventId`.
  *
- * @param[in] apDelegate The EventLoggingDelegate to serialize the event data
+ * LogEvent has 2 variant, one for fabric-scoped events and one for non-fabric-scoped events.
+ * @param[in] aEventData  The event cluster object
  * @param[in] aEndpoint    The current cluster's Endpoint Id
- * @param[in] aUrgent    The EventOption Type, kUrgent or kNotUrgent
  * @param[out] aEventNumber The event Number if the event was written to the
  *                         log, 0 otherwise. The Event number is expected to monotonically increase.
  *
  * @return CHIP_ERROR  CHIP Error Code
  */
-template <typename T>
-CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber,
-                    EventOptions::Type aUrgent = EventOptions::Type::kNotUrgent)
+template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber)
 {
     EventLogger<T> eventData(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     EventOptions eventOptions;
-    eventOptions.mUrgent   = aUrgent;
+    eventOptions.mPath        = path;
+    eventOptions.mPriority    = aEventData.GetPriorityLevel();
+    eventOptions.mFabricIndex = aEventData.GetFabricIndex();
+
+    //
+    // Unlike attributes which have a different 'EncodeForRead' for fabric-scoped structs,
+    // fabric-sensitive events don't require that since the actual omission of the event in its entirety
+    // happens within the event management framework itself at the time of access.
+    //
+    // The 'mFabricIndex' field in the event options above is encoded out-of-band alongside the event payload
+    // and used to match against the accessing fabric.
+    //
+    return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
+}
+
+template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
+CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber)
+{
+    EventLogger<T> eventData(aEventData);
+    ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
+    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    EventOptions eventOptions;
     eventOptions.mPath     = path;
     eventOptions.mPriority = aEventData.GetPriorityLevel();
     return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);

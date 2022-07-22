@@ -22,6 +22,7 @@
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <protocols/interaction_model/Constants.h>
@@ -67,8 +68,7 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
         mLastMessageWasStatus = aPayloadHeader.HasMessageType(MsgType::StatusResponse);
         if (mLastMessageWasStatus)
         {
-            mStatus.mStatus = Status::Failure;
-            StatusResponse::ProcessStatusResponse(std::move(aPayload), mStatus);
+            mError = StatusResponse::ProcessStatusResponse(std::move(aPayload));
         }
         if (mKeepExchangeOpen)
         {
@@ -83,7 +83,7 @@ public:
     bool mKeepExchangeOpen     = false;
     bool mNewMessageReceived   = false;
     bool mLastMessageWasStatus = false;
-    StatusIB mStatus;
+    CHIP_ERROR mError          = CHIP_NO_ERROR;
 };
 
 } // anonymous namespace
@@ -112,7 +112,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     TestContext & ctx = *static_cast<TestContext *>(aContext);
 
     System::PacketBufferHandle payload;
-    GenerateTimedRequest(aSuite, 50, payload);
+    GenerateTimedRequest(aSuite, 500, payload);
 
     TestExchangeDelegate delegate;
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&delegate);
@@ -128,7 +128,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
+    NL_TEST_ASSERT(aSuite, delegate.mError == CHIP_NO_ERROR);
 
     // Send an empty payload, which will error out but not with the
     // UNSUPPORTED_ACCESS status we expect if we miss our timeout.
@@ -144,7 +144,7 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus != Status::UnsupportedAccess);
+    NL_TEST_ASSERT(aSuite, StatusIB(delegate.mError).mStatus != Status::UnsupportedAccess);
 }
 
 void TestTimedHandler::TestInvokeFastEnough(nlTestSuite * aSuite, void * aContext)
@@ -178,7 +178,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * 
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
+    NL_TEST_ASSERT(aSuite, delegate.mError == CHIP_NO_ERROR);
 
     // Sleep for > 50ms so we miss our time window.
     chip::test_utils::SleepMillis(75);
@@ -197,7 +197,7 @@ void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * 
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::UnsupportedAccess);
+    NL_TEST_ASSERT(aSuite, StatusIB(delegate.mError).mStatus == Status::UnsupportedAccess);
 }
 
 void TestTimedHandler::TestInvokeTooSlow(nlTestSuite * aSuite, void * aContext)
@@ -229,7 +229,7 @@ void TestTimedHandler::TestInvokeNeverComes(nlTestSuite * aSuite, void * aContex
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
-    NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
+    NL_TEST_ASSERT(aSuite, delegate.mError == CHIP_NO_ERROR);
 
     // Do nothing else; exchange on the server remains open.  We are testing to
     // see whether shutdown cleans it up properly.
@@ -259,7 +259,7 @@ nlTestSuite sSuite =
 {
     "TestTimedHandler",
     &sTests[0],
-    TestContext::InitializeAsync,
+    TestContext::Initialize,
     TestContext::Finalize
 };
 // clang-format on
@@ -268,9 +268,7 @@ nlTestSuite sSuite =
 
 int TestTimedHandler()
 {
-    TestContext gContext;
-    nlTestRunner(&sSuite, &gContext);
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestTimedHandler)

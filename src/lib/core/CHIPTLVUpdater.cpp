@@ -63,7 +63,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     uint32_t readDataLen      = aReader.GetLengthRead();
 
     // TLVUpdater does not support backing stores yet
-    VerifyOrReturnError(aReader.mBackingStore == 0, CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(aReader.mBackingStore == nullptr, CHIP_ERROR_NOT_IMPLEMENTED);
 
     // TLVReader should point to a non-NULL buffer
     VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -84,7 +84,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     memmove(buf + freeLen, buf, remainingDataLen);
 
     // Initialize the internal reader object
-    mUpdaterReader.mBackingStore  = 0;
+    mUpdaterReader.mBackingStore  = nullptr;
     mUpdaterReader.mReadPoint     = buf + freeLen;
     mUpdaterReader.mBufEnd        = buf + freeLen + remainingDataLen;
     mUpdaterReader.mLenRead       = readDataLen;
@@ -99,7 +99,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     mUpdaterReader.AppData           = aReader.AppData;
 
     // Initialize the internal writer object
-    mUpdaterWriter.mBackingStore  = 0;
+    mUpdaterWriter.mBackingStore  = nullptr;
     mUpdaterWriter.mBufStart      = buf - readDataLen;
     mUpdaterWriter.mWritePoint    = buf;
     mUpdaterWriter.mRemainingLen  = freeLen;

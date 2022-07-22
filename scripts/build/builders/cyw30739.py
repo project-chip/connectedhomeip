@@ -20,16 +20,26 @@ from .gn import GnBuilder
 
 class Cyw30739App(Enum):
     LIGHT = auto()
+    LOCK = auto()
+    OTA_REQUESTOR = auto()
 
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
             return "lighting-app"
+        elif self == Cyw30739App.LOCK:
+            return "lock-app"
+        elif self == Cyw30739App.OTA_REQUESTOR:
+            return "ota-requestor-app"
         else:
             raise Exception("Unknown app type: %r" % self)
 
     def AppNamePrefix(self):
         if self == Cyw30739App.LIGHT:
             return "chip-cyw30739-lighting-example"
+        elif self == Cyw30739App.LOCK:
+            return "chip-cyw30739-lock-example"
+        elif self == Cyw30739App.OTA_REQUESTOR:
+            return "chip-cyw30739-ota-requestor-example"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -54,11 +64,26 @@ class Cyw30739Builder(GnBuilder):
         runner,
         app: Cyw30739App = Cyw30739App.LIGHT,
         board: Cyw30739Board = Cyw30739Board.CYW930739M2EVB_01,
+        release: bool = False,
+        progress_logging: bool = True
     ):
         super(Cyw30739Builder, self).__init__(
             root=app.BuildRoot(root), runner=runner)
         self.app = app
         self.board = board
+        self.release = release
+        self.progress_logging = progress_logging
+
+    def GnBuildArgs(self):
+        args = []
+
+        if not self.progress_logging:
+            args.append('chip_progress_logging=false')
+
+        if self.release:
+            args.append('is_debug=false')
+
+        return args
 
     def build_outputs(self):
         items = {}

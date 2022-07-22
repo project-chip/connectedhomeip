@@ -1,0 +1,62 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name:
+    3.3.9. [TC-DD-3.9] Commissioning Flow - Custom Flow = 2 [DUT - Commissionee]
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH receives Onboarding Payload from the DUT"
+      verification: |
+          1. Parse the DUT's QR Code using the TH commissioner: chip-tool
+          $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          [1657230447725] [31078:16782733] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
+          [1657230447725] [31078:16782733] CHIP: [SPL] Version:       0
+          [1657230447725] [31078:16782733] CHIP: [SPL] VendorID:      65521
+          [1657230447725] [31078:16782733] CHIP: [SPL] ProductID:     32769
+          [1657230447725] [31078:16782733] CHIP: [SPL] Custom flow:   2    (CUSTOM)
+          [1657230447725] [31078:16782733] CHIP: [SPL] Capabilities:  0x04 (On IP network)
+          [1657230447725] [31078:16782733] CHIP: [SPL] Discriminator: 3840
+          [1657230447725] [31078:16782733] CHIP: [SPL] Passcode:      20202021
+
+          2. Verify that the CommissioningFlow is set to 2 (Custom Flow)
+      disabled: true
+
+    - label:
+          "TH fetches commissioning data from Distributed Compliance Ledger
+          (DCL)"
+      verification: |
+          1. TH fetches the DCL from DUT's DCL
+          2. Verify that DCL contains the criteria:
+          - CommissioningCustomFlow field = 2
+          - CommissioningModeInitialStepsHint bit 0 (Power Cycle) = 0 and bit 1 (Device Manufacturer URL) = 1
+          - CommissioningCustomFlowURL populated with a URL that uses https schema
+      disabled: true
+
+    - label:
+          "TH uses the provided URL to guide user on how to put DUT in a state
+          that allows commissioning"
+      verification: |
+          1. Follow steps from DCL's URL given
+      disabled: true
+
+    - label: "DUT is commissioned by the TH"
+      verification: |
+          1. Verify that the DUT is commissioned to the TH commissioner successfully
+      disabled: true

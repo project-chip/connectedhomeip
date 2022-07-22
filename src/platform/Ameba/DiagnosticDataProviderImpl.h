@@ -37,14 +37,18 @@ public:
 
     // ===== Methods that implement the PlatformManager abstract interface.
 
+    bool SupportsWatermarks() override { return true; }
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+    CHIP_ERROR ResetWatermarks() override;
+    CHIP_ERROR GetThreadMetrics(ThreadMetrics ** threadMetricsOut) override;
+    void ReleaseThreadMetrics(ThreadMetrics * threadMetrics) override;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
-    CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
 
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
@@ -62,8 +66,17 @@ public:
     CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
     CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate) override;
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
+    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 #endif
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

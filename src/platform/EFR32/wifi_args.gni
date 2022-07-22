@@ -34,6 +34,7 @@ chip_device_platform = "efr32"
 chip_enable_openthread = false
 chip_inet_config_enable_ipv4 = true
 chip_inet_config_enable_dns_resolver = false
+chip_inet_config_enable_tcp_endpoint = true
 
 chip_build_tests = false
 chip_config_memory_management = "platform"

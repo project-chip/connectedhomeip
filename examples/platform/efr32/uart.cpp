@@ -26,23 +26,50 @@ extern "C" {
 #include "em_usart.h"
 #include "sl_board_control.h"
 #include "sl_uartdrv_instances.h"
+#ifdef EFR32MG24
+#include "sl_uartdrv_eusart_vcom_config.h"
+#else
 #include "sl_uartdrv_usart_vcom_config.h"
+#endif // EFR32MG24
 #include "uart.h"
 #include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
+
 #if !defined(MIN)
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
+#ifdef EFR32MG24
+#define HELPER1(x) EUSART##x##_RX_IRQn
+#else
 #define HELPER1(x) USART##x##_RX_IRQn
-#define HELPER2(x) HELPER1(x)
-#define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
+#endif
 
+#define HELPER2(x) HELPER1(x)
+
+#ifdef EFR32MG24
+#define HELPER3(x) EUSART##x##_RX_IRQHandler
+#else
 #define HELPER3(x) USART##x##_RX_IRQHandler
+#endif
+
 #define HELPER4(x) HELPER3(x)
+
+// On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
+#ifdef EFR32MG24
+#define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
+#define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
+#define vcom_handle sl_uartdrv_eusart_vcom_handle
+#else
+#define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
+#define vcom_handle sl_uartdrv_usart_vcom_handle
+#endif // EFR32MG24
 
 typedef struct
 {
@@ -186,13 +213,26 @@ void uartConsoleInit(void)
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
     // Activate 2 dma queues to always have one active
-    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
-    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
-    // Enable USART0 interrupt to wake OT task when data arrives
+    UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
+    UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
+
+    // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
     NVIC_ClearPendingIRQ(USART_IRQ);
     NVIC_EnableIRQ(USART_IRQ);
+
+#ifdef EFR32MG24
+    // Clear previous RX interrupts
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+    // Enable RX interrupts
+    EUSART_IntEnable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
+
+    // Enable EUSART
+    EUSART_Enable(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, eusartEnable);
+#else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
+#endif // EFR32MG24
 }
 
 void USART_IRQHandler(void)
@@ -204,6 +244,10 @@ void USART_IRQHandler(void)
     /* TODO */
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
+#endif
+
+#ifdef EFR32MG24
+    EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
 }
 
@@ -221,7 +265,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
         lastCount = 0;
     }
 
-    UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, data, transferCount, UART_rx_callback);
+    UARTDRV_Receive(vcom_handle, data, transferCount, UART_rx_callback);
 
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
@@ -245,12 +289,23 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
         return UART_CONSOLE_ERR;
     }
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
     // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
     // TODO Use DMA and find/fix what causes the issue with PW
-    if (UARTDRV_ForceTransmit(sl_uartdrv_usart_vcom_handle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
+    if (UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
     {
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
         return BufLength;
     }
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
 
     return UART_CONSOLE_ERR;
 }
@@ -274,11 +329,10 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         // Not enough data available in the fifo for the read size request
         // If there is data available in dma buffer, get it now.
-        CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(sl_uartdrv_usart_vcom_handle, &data, &count, &remaining);
-                            if (count > lastCount) {
-                                WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
-                                lastCount = count;
-                            })
+        CORE_ATOMIC_SECTION(UARTDRV_GetReceiveStatus(vcom_handle, &data, &count, &remaining); if (count > lastCount) {
+            WriteToFifo(&sReceiveFifo, data + lastCount, count - lastCount);
+            lastCount = count;
+        })
     }
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);

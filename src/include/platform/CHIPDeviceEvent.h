@@ -25,6 +25,9 @@
 #pragma once
 #include <stdint.h>
 
+#include <inet/IPAddress.h>
+#include <lib/core/DataModelTypes.h>
+
 namespace chip {
 namespace DeviceLayer {
 namespace DeviceEventType {
@@ -131,25 +134,11 @@ enum PublicEventTypes
     kServiceConnectivityChange,
 
     /**
-     * Fabric Membership Change
-     *
-     * Signals a change in the device's membership in a chip fabric.
-     */
-    kFabricMembershipChange,
-
-    /**
      * Service Provisioning Change
      *
      * Signals a change to the device's service provisioning state.
      */
     kServiceProvisioningChange,
-
-    /**
-     * Account Pairing Change
-     *
-     * Signals a change to the device's state with respect to being paired to a user account.
-     */
-    kAccountPairingChange,
 
     /**
      * Time Sync Change
@@ -159,18 +148,11 @@ enum PublicEventTypes
     kTimeSyncChange,
 
     /**
-     * SED Polling Interval Change
+     * SED Interval Change
      *
-     * Signals a change to the sleepy end device polling interval.
+     * Signals a change to the sleepy end device interval.
      */
-    kSEDPollingIntervalChange,
-
-    /**
-     * Security Session Established
-     *
-     * Signals that an external entity has established a new security session with the device.
-     */
-    kSessionEstablished,
+    kSEDIntervalChange,
 
     /**
      * CHIPoBLE Connection Established
@@ -214,9 +196,15 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
-     * Commissioning has completed either through timer expiry or by a call to the general commissioning cluster command.
+     * Commissioning has completed by a call to the general commissioning cluster command.
      */
     kCommissioningComplete,
+
+    /**
+     * Signals that the fail-safe timer expired before the CommissioningComplete command was
+     * successfully invoked.
+     */
+    kFailSafeTimerExpired,
 
     /**
      *
@@ -227,6 +215,16 @@ enum PublicEventTypes
      * Signals that DNS-SD platform layer was initialized and is ready to operate.
      */
     kDnssdPlatformInitialized,
+
+    /**
+     * Signals that bindings were updated.
+     */
+    kBindingsChangedViaCluster,
+
+    /**
+     * Signals that the state of the OTA engine changed.
+     */
+    kOtaStateChanged,
 };
 
 /**
@@ -284,6 +282,11 @@ enum ActivityChange
     kActivity_NoChange = 0,
     kActivity_Started  = 1,
     kActivity_Stopped  = -1,
+};
+
+enum OtaState
+{
+    kOtaSpaceAvailable = 0,
 };
 
 inline ConnectivityChange GetConnectivityChange(bool prevState, bool newState)
@@ -350,7 +353,14 @@ struct ChipDeviceEvent final
         {
             ConnectivityChange IPv4;
             ConnectivityChange IPv6;
-            char address[INET6_ADDRSTRLEN];
+            // WARNING: There used to be `char address[INET6_ADDRSTRLEN]` here and it is
+            //          deprecated/removed since it was too large and only used for logging.
+            //          Consider not relying on ipAddress field either since the platform
+            //          layer *does not actually validate* that the actual internet is reachable
+            //          before issuing this event *and* there may be multiple addresses
+            //          (especially IPv6) so it's recommended to use `ChipDevicePlatformEvent`
+            //          instead and do something that is better for your platform.
+            chip::Inet::IPAddress ipAddress;
         } InternetConnectivityChange;
         struct
         {
@@ -439,14 +449,27 @@ struct ChipDeviceEvent final
 
         struct
         {
-            CHIP_ERROR status;
+            uint64_t nodeId;
+            FabricIndex fabricIndex;
         } CommissioningComplete;
+
+        struct
+        {
+            FabricIndex fabricIndex;
+            bool addNocCommandHasBeenInvoked;
+            bool updateNocCommandHasBeenInvoked;
+        } FailSafeTimerExpired;
 
         struct
         {
             // TODO(cecille): This should just specify wifi or thread since we assume at most 1.
             int network;
         } OperationalNetwork;
+
+        struct
+        {
+            OtaState newState;
+        } OtaStateChanged;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

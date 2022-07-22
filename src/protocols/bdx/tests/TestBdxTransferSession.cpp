@@ -124,7 +124,7 @@ void VerifyStatusReport(nlTestSuite * inSuite, void * inContext, const System::P
     err = report.Parse(std::move(msgCopy));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, report.GetGeneralCode() == SecureChannel::GeneralStatusCode::kFailure);
-    NL_TEST_ASSERT(inSuite, report.GetProtocolId() == Protocols::BDX::Id.ToFullyQualifiedSpecForm());
+    NL_TEST_ASSERT(inSuite, report.GetProtocolId() == Protocols::BDX::Id);
     NL_TEST_ASSERT(inSuite, report.GetProtocolCode() == static_cast<uint16_t>(expectedCode));
 }
 

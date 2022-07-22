@@ -61,8 +61,14 @@ static CHIP_ERROR PrintAllCommands()
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     streamer_printf(sout, "  sendudc <address> <port>   Send UDC message to address. Usage: commissionee sendudc ::1 5543\r\n");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    // TODO: Figure out whether setdiscoverytimeout is a reasonable thing to do
+    // at all, and if so what semantics it should have.  Presumably it should
+    // affect BLE discovery too, not just DNS-SD.  How should it interact with
+    // explicit timeouts specified in OpenCommissioningWindow?
+#if 0
     streamer_printf(
         sout, "  setdiscoverytimeout <timeout>   Set discovery timeout in seconds. Usage: commissionee setdiscoverytimeout 30\r\n");
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     streamer_printf(sout,
                     "  setextendeddiscoverytimeout <timeout>   Set extendeddiscovery timeout in seconds. Usage: commissionee "
@@ -72,6 +78,7 @@ static CHIP_ERROR PrintAllCommands()
                     "  restartmdns <commissioningMode> (disabled|enabled_basic|enabled_enhanced)   Start Mdns with given "
                     "settings. Usage: commissionee "
                     "restartmdns enabled_basic\r\n");
+    streamer_printf(sout, "  startbcm                   Start basic commissioning mode. Usage: commissionee startbcm\r\n");
     streamer_printf(sout, "\r\n");
 
     return CHIP_NO_ERROR;
@@ -79,31 +86,35 @@ static CHIP_ERROR PrintAllCommands()
 
 static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
     if (argc == 0 || strcmp(argv[0], "help") == 0)
     {
         return PrintAllCommands();
     }
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else if (strcmp(argv[0], "sendudc") == 0)
+    if (strcmp(argv[0], "sendudc") == 0)
     {
         char * eptr;
         chip::Inet::IPAddress commissioner;
         chip::Inet::IPAddress::FromString(argv[1], commissioner);
         uint16_t port = (uint16_t) strtol(argv[2], &eptr, 10);
-        return error  = SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
+        return SendUDC(true, chip::Transport::PeerAddress::UDP(commissioner, port));
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    else if (strcmp(argv[0], "setdiscoverytimeout") == 0)
+    // TODO: Figure out whether setdiscoverytimeout is a reasonable thing to do
+    // at all, and if so what semantics it should have.  Presumably it should
+    // affect BLE discovery too, not just DNS-SD.  How should it interact with
+    // explicit timeouts specified in OpenCommissioningWindow?
+#if 0
+    if (strcmp(argv[0], "setdiscoverytimeout") == 0)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
         chip::app::DnssdServer::Instance().SetDiscoveryTimeoutSecs(timeout);
         return CHIP_NO_ERROR;
     }
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    else if (strcmp(argv[0], "setextendeddiscoverytimeout") == 0)
+    if (strcmp(argv[0], "setextendeddiscoverytimeout") == 0)
     {
         char * eptr;
         int16_t timeout = (int16_t) strtol(argv[1], &eptr, 10);
@@ -111,7 +122,7 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    else if (strcmp(argv[0], "restartmdns") == 0)
+    if (strcmp(argv[0], "restartmdns") == 0)
     {
         if (argc < 2)
         {
@@ -127,18 +138,19 @@ static CHIP_ERROR CommissioneeHandler(int argc, char ** argv)
             chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledBasic);
             return CHIP_NO_ERROR;
         }
-        else if (strcmp(argv[1], "enabled_enhanced") == 0)
+        if (strcmp(argv[1], "enabled_enhanced") == 0)
         {
             chip::app::DnssdServer::Instance().StartServer(chip::Dnssd::CommissioningMode::kEnabledEnhanced);
             return CHIP_NO_ERROR;
         }
         return PrintAllCommands();
     }
-    else
+    if (strcmp(argv[0], "startbcm") == 0)
     {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        return CHIP_NO_ERROR;
     }
-    return error;
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void RegisterCommissioneeCommands()

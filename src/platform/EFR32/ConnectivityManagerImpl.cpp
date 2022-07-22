@@ -23,17 +23,18 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-#include <lwip/dns.h>
-#include <lwip/ip_addr.h>
-#include <lwip/nd6.h>
-#include <lwip/netif.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.ipp>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
 
 using namespace ::chip;

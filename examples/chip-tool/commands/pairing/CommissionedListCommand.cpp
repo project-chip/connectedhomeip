@@ -35,12 +35,8 @@ CHIP_ERROR CommissionedListCommand::PrintInformation()
     uint16_t pairedNodesIdsSize = sizeof(pairedNodesIds);
     memset(pairedNodesIds, 0, pairedNodesIdsSize);
 
-    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), chip::kPairedDeviceListKeyPrefix, key,
-                      ReturnLogErrorOnFailure(mStorage.SyncGetKeyValue(key, pairedNodesIds, pairedNodesIdsSize)));
-
-    chip::SerializableU64Set<chip::Controller::kNumMaxPairedDevices> devices;
-    devices.Deserialize(chip::ByteSpan((uint8_t *) pairedNodesIds, pairedNodesIdsSize));
-
+    // TODO: Get the list of paired node IDs.  chip-tool needs to store that as
+    // devices get paired.
     uint16_t pairedDevicesCount = 0;
     while (pairedNodesIds[pairedDevicesCount] != 0x0 && pairedDevicesCount < chip::Controller::kNumMaxPairedDevices)
     {
@@ -69,12 +65,11 @@ CHIP_ERROR CommissionedListCommand::PrintInformation()
 
 CHIP_ERROR CommissionedListCommand::PrintDeviceInformation(chip::NodeId deviceId)
 {
+    // TODO: Controller::SerializedDevice and Controller::SerializableDevice are
+    // gone.  Need to figure out what chip-tool should actually store/retrieve
+    // here.
     chip::Controller::SerializedDevice deviceInfo;
     uint16_t size = sizeof(deviceInfo.inner);
-
-    PERSISTENT_KEY_OP(deviceId, chip::kPairedDeviceKeyPrefix, key,
-                      ReturnLogErrorOnFailure(mStorage.SyncGetKeyValue(key, deviceInfo.inner, size)));
-    VerifyOrReturnError(size <= sizeof(deviceInfo.inner), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
     chip::Controller::SerializableDevice serializable;
     constexpr size_t maxlen = BASE64_ENCODED_LEN(sizeof(serializable));

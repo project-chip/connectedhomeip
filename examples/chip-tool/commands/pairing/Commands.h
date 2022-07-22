@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "CloseSessionCommand.h"
 #include "CommissionedListCommand.h"
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommand.h"
@@ -34,19 +35,35 @@ public:
     {}
 };
 
-class PairQRCode : public PairingCommand
+class PairCode : public PairingCommand
 {
 public:
-    PairQRCode(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("qrcode", PairingMode::QRCode, PairingNetworkType::None, credsIssuerConfig)
+    PairCode(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code", PairingMode::Code, PairingNetworkType::None, credsIssuerConfig)
     {}
 };
 
-class PairManualCode : public PairingCommand
+class PairCodePase : public PairingCommand
 {
 public:
-    PairManualCode(CredentialIssuerCommands * credsIssuerConfig) :
-        PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None, credsIssuerConfig)
+    PairCodePase(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-paseonly", PairingMode::CodePaseOnly, PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
+class PairCodeWifi : public PairingCommand
+{
+public:
+    PairCodeWifi(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-wifi", PairingMode::Code, PairingNetworkType::WiFi, credsIssuerConfig)
+    {}
+};
+
+class PairCodeThread : public PairingCommand
+{
+public:
+    PairCodeThread(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("code-thread", PairingMode::Code, PairingNetworkType::Thread, credsIssuerConfig)
     {}
 };
 
@@ -165,7 +182,7 @@ public:
 class StartUdcServerCommand : public CHIPCommand
 {
 public:
-    StartUdcServerCommand() : CHIPCommand("start-udc-server") {}
+    StartUdcServerCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("start-udc-server", credsIssuerConfig) {}
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(300); }
 
     CHIP_ERROR RunCommand() override
@@ -181,8 +198,10 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
 
     commands_list clusterCommands = {
         make_unique<Unpair>(credsIssuerConfig),
-        make_unique<PairQRCode>(credsIssuerConfig),
-        make_unique<PairManualCode>(credsIssuerConfig),
+        make_unique<PairCode>(credsIssuerConfig),
+        make_unique<PairCodePase>(credsIssuerConfig),
+        make_unique<PairCodeWifi>(credsIssuerConfig),
+        make_unique<PairCodeThread>(credsIssuerConfig),
         make_unique<PairBleWiFi>(credsIssuerConfig),
         make_unique<PairBleThread>(credsIssuerConfig),
         make_unique<PairSoftAP>(credsIssuerConfig),
@@ -196,10 +215,11 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkDeviceType>(credsIssuerConfig),
         make_unique<PairOnNetworkInstanceName>(credsIssuerConfig),
-        // TODO - enable CommissionedListCommand once DNS Cache is implemented
+        // TODO(#13973) - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
-        make_unique<StartUdcServerCommand>(),
+        make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
+        make_unique<CloseSessionCommand>(credsIssuerConfig),
     };
 
     commands.Register(clusterName, clusterCommands);

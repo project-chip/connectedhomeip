@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
@@ -88,7 +90,7 @@ private:
     std::ofstream mFile;
 };
 
-void SetTraceStream(TraceStream * stream);
+void AddTraceStream(TraceStream * stream);
 void InitTrace();
 void DeInitTrace();
 

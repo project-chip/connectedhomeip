@@ -35,8 +35,8 @@ namespace app {
 namespace CommandDataIB {
 enum class Tag : uint8_t
 {
-    kPath = 0,
-    kData = 1,
+    kPath   = 0,
+    kFields = 1,
 };
 
 class Parser : public StructParser
@@ -71,18 +71,14 @@ public:
     CHIP_ERROR GetPath(CommandPathIB::Parser * const apPath) const;
 
     /**
-     *  @brief Get a TLVReader for the Data. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the Fields. Next() must be called before accessing them.
      *
      *  @param [in] apReader    A pointer to apReader
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetData(TLV::TLVReader * const apReader) const;
-
-protected:
-    // A recursively callable function to parse a data element and pretty-print it.
-    CHIP_ERROR ParseData(TLV::TLVReader & aReader, int aDepth) const;
+    CHIP_ERROR GetFields(TLV::TLVReader * const apReader) const;
 };
 
 class Builder : public StructBuilder

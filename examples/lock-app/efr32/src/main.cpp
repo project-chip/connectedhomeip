@@ -17,96 +17,32 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-
-#include <FreeRTOS.h>
-#include <mbedtls/threading.h>
-
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPPlatformMemory.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/KeyValueStoreManager.h>
-
 #include <AppTask.h>
 
 #include "AppConfig.h"
 #include "init_efrPlatform.h"
 #include "sl_simple_button_instances.h"
 #include "sl_system_kernel.h"
+#include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
-
-#ifdef HEAP_MONITORING
-#include "MemMonitoring.h"
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <matter_config.h>
+#ifdef EFR32_ATTESTATION_CREDENTIALS
+#include <examples/platform/efr32/EFR32DeviceAttestationCreds.h>
+#else
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif
 
-#if DISPLAY_ENABLED
-#include "lcd.h"
-#endif
-
-#if PW_RPC_ENABLED
-#include "Rpc.h"
-#endif
-
-#ifdef ENABLE_CHIP_SHELL
-#include "matter_shell.h"
-#endif
-
-#include <mbedtls/platform.h>
-#if CHIP_ENABLE_OPENTHREAD
-#include <openthread/cli.h>
-#include <openthread/dataset.h>
-#include <openthread/error.h>
-#include <openthread/heap.h>
-#include <openthread/icmp6.h>
-#include <openthread/instance.h>
-#include <openthread/link.h>
-#include <openthread/platform/openthread-system.h>
-#include <openthread/tasklet.h>
-#include <openthread/thread.h>
-#endif // CHIP_ENABLE_OPENTHREAD
-
-#if defined(RS911X_WIFI) || defined(WF200_WIFI)
-#include "wfx_host_events.h"
-#endif /* RS911X_WIFI */
-
+#define BLE_DEV_NAME "SiLabs-Door-Lock"
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Credentials;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
 volatile int apperror_cnt;
-// ================================================================================
-// App Error
-//=================================================================================
-void appError(int err)
-{
-    EFR32_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
-    portDISABLE_INTERRUPTS();
-    while (1)
-        ;
-}
-
-void appError(CHIP_ERROR error)
-{
-    appError(static_cast<int>(error.AsInteger()));
-}
-
-// ================================================================================
-// FreeRTOS Callbacks
-// ================================================================================
-extern "C" void vApplicationIdleHook(void)
-{
-    // FreeRTOS Idle callback
-
-    // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::EFR32Config::RepackNvm3Flash();
-}
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 // ================================================================================
 // Main Code
@@ -114,93 +50,32 @@ extern "C" void vApplicationIdleHook(void)
 int main(void)
 {
     init_efrPlatform();
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+    if (EFR32MatterConfig::InitMatter(BLE_DEV_NAME) != CHIP_NO_ERROR)
+        appError(CHIP_ERROR_INTERNAL);
 
-#if PW_RPC_ENABLED
-    chip::rpc::Init();
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // Initialize device attestation config
+#ifdef EFR32_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-
-    EFR32_LOG("==================================================");
-    EFR32_LOG("chip-efr32-lock-example starting");
-    EFR32_LOG("==================================================");
-
-    EFR32_LOG("Init CHIP Stack");
-
-    // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
-
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("PlatformMgr().InitChipStack() failed");
-        appError(ret);
-    }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LOCK");
-#if CHIP_ENABLE_OPENTHREAD
-    EFR32_LOG("Initializing OpenThread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("ThreadStackMgr().InitThreadStack() failed");
-        appError(ret);
-    }
-
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        appError(ret);
-    }
-#endif // CHIP_ENABLE_OPENTHREAD
-
-    EFR32_LOG("Starting Platform Manager Event Loop");
-    ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
-        appError(ret);
-    }
-
-#if CHIP_ENABLE_OPENTHREAD
-    EFR32_LOG("Starting OpenThread task");
-
-    // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("ThreadStackMgr().StartThreadTask() failed");
-        appError(ret);
-    }
-#endif // CHIP_ENABLE_OPENTHREAD
-#ifdef WF200_WIFI
-    // Start wfx bus communication task.
-    wfx_bus_start();
-#ifdef SL_WFX_USE_SECURE_LINK
-    wfx_securelink_task_start(); // start securelink key renegotiation task
-#endif                           // SL_WFX_USE_SECURE_LINK
-#endif                           /* WF200_WIFI */
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     EFR32_LOG("Starting App Task");
-    ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("GetAppTask().Init() failed");
-        appError(ret);
-    }
-
-#ifdef ENABLE_CHIP_SHELL
-    chip::startShellTask();
-#endif
+    if (GetAppTask().StartAppTask() != CHIP_NO_ERROR)
+        appError(CHIP_ERROR_INTERNAL);
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
 
-    chip::Platform::MemoryShutdown();
-
     // Should never get here.
+    chip::Platform::MemoryShutdown();
     EFR32_LOG("vTaskStartScheduler() failed");
-    appError(ret);
+    appError(CHIP_ERROR_INTERNAL);
 }
 
 void sl_button_on_change(const sl_button_t * handle)

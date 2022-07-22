@@ -28,6 +28,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceInfoProvider.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -53,18 +54,32 @@ private:
 CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxFixedLabels> labelList;
 
-    if (DeviceLayer::PlatformMgr().GetFixedLabelList(endpoint, labelList) == CHIP_NO_ERROR)
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+
+    if (provider)
     {
-        err = aEncoder.EncodeList([&labelList](const auto & encoder) -> CHIP_ERROR {
-            for (auto label : labelList)
-            {
-                ReturnErrorOnFailure(encoder.Encode(label));
-            }
+        DeviceLayer::DeviceInfoProvider::FixedLabelIterator * it = provider->IterateFixedLabel(endpoint);
 
-            return CHIP_NO_ERROR;
-        });
+        if (it)
+        {
+            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+                FixedLabel::Structs::LabelStruct::Type fixedlabel;
+
+                while (it->Next(fixedlabel))
+                {
+                    ReturnErrorOnFailure(encoder.Encode(fixedlabel));
+                }
+
+                return CHIP_NO_ERROR;
+            });
+
+            it->Release();
+        }
+        else
+        {
+            err = aEncoder.EncodeEmptyList();
+        }
     }
     else
     {

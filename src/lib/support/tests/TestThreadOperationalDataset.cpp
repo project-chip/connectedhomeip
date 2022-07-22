@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -290,10 +291,8 @@ const nlTest sTests[] = {
 int TestThreadOperationalDatasetBuilder(void)
 {
     nlTestSuite theSuite = { "ThreadOperationalDataset", sTests, nullptr, nullptr };
-    Thread::OperationalDataset dataset{};
 
-    nlTestRunner(&theSuite, &dataset);
-    return nlTestRunnerStats(&theSuite);
+    return ExecuteTestsWithContext<Thread::OperationalDataset>(&theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestThreadOperationalDatasetBuilder)

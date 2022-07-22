@@ -74,8 +74,7 @@
 // Cluster name structure
 typedef struct
 {
-    uint16_t id;
-    uint16_t mfgCode;
+    chip::ClusterId id;
     const char * name;
 } EmberAfClusterName;
 
@@ -223,8 +222,6 @@ uint16_t emberAfStrnlen(const uint8_t * string, uint16_t maxLength);
 uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
                                 uint8_t appendingCharsLen);
 
-extern uint8_t emAfExtendedPanId[];
-
 EmberStatus emAfValidateChannelPages(uint8_t page, uint8_t channel);
 
 /* @brief A Silicon Labs assert function
@@ -277,9 +274,12 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
 
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer);
-bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                   bool asServer);
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
+
+/* @brief returns true if the attribute is known to be volatile (i.e. RAM
+ * storage).
+ */
+bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 namespace chip {
 chip::Messaging::ExchangeManager * ExchangeManager();

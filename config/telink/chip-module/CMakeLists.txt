@@ -105,8 +105,16 @@ if (CONFIG_POSIX_API)
     )
 endif()
 
-zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/mbedtls/include)
+# Add MbedTLS config file
+list(APPEND CHIP_CFLAGS -DMBEDTLS_CONFIG_FILE=CONFIG_MBEDTLS_CFG_FILE)
+
+# Add hardware cryptography dependencies
+zephyr_include_directories(${ZEPHYR_BASE}/../modules/crypto/mbedtls/include)
+zephyr_include_directories(${ZEPHYR_BASE}/modules/mbedtls/configs)
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
+zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/crypto/)
+zephyr_sources(${ZEPHYR_BASE}/../modules/hal/telink/tlsr9/drivers/B91/aes.c)
+zephyr_sources(${ZEPHYR_BASE}/../modules/hal/telink/tlsr9/drivers/B91/pke.c)
 
 zephyr_get_compile_flags(CHIP_CFLAGS_C C)
 zephyr_get_compile_flags(CHIP_CFLAGS_CC CXX)
@@ -128,6 +136,10 @@ endif()
 
 if (CONFIG_CHIP_PW_RPC)
     list(APPEND CHIP_LIBRARIES -lPwRpc)
+endif()
+
+if (CONFIG_TELINK_BLE_LIB)
+    list(APPEND CHIP_LIBRARIES -lB91_ble_lib)
 endif()
 
 # Set up CHIP project configuration file
@@ -200,10 +212,8 @@ chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
-if (BOARD STREQUAL "native_posix")
-    chip_gn_arg_string("target_cpu" "x86")
-elseif (BOARD STREQUAL "native_posix_64")
-    chip_gn_arg_string("target_cpu" "x64")
+if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
+    chip_gn_arg_string("chip_mdns" "platform")
 endif()
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
@@ -243,12 +253,19 @@ target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
     ${CHIP_ROOT}/third_party/nlassert/repo/include
+    ${CHIP_ROOT}/third_party/telink_sdk
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+
 if (CONFIG_CHIP_LIB_SHELL)
     target_link_options(chip INTERFACE -Wl,--whole-archive -lCHIPShell -Wl,--no-whole-archive)
 endif()
+
+if (CONFIG_TELINK_BLE_LIB)
+    target_link_directories(chip INTERFACE ${CHIP_ROOT}/third_party/telink_sdk/repo/eagle_ble_sdk/proj_lib)
+endif()
+
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)
 add_dependencies(chip chip-gn)
 

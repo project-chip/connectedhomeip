@@ -16,7 +16,8 @@ Semiconductor's nRF Connect SDK, and supports remote access and control of a
 simulated door lock over a low-power, 802.15.4 Thread network.
 
 The example behaves as a Matter accessory, that is a device that can be paired
-into an existing Matter network and can be controlled by this network.
+into an existing Matter network and can be controlled by this network. The
+device works as a Thread Sleepy End Device.
 
 <hr>
 
@@ -36,6 +37,7 @@ into an existing Matter network and can be controlled by this network.
     -   [Building with low-power configuration](#building-with-low-power-configuration)
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
+    -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
     -   [Testing using CHIPTool](#testing-using-chiptool)
@@ -95,28 +97,31 @@ with other Thread devices in the network.
 
 ### Device Firmware Upgrade
 
-The example allows enabling the over-the-air Device Firmware Upgrade feature. In
-this process, the device hosting new firmware image sends the image to the
-Matter device using Bluetooth LE transport and
-[Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
-The
+The example supports over-the-air (OTA) device firmware upgrade (DFU) using one
+of the two available methods:
+
+-   Matter OTA update that is mandatory for Matter-compliant devices and enabled
+    by default
+-   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
+    over Bluetooth LE, an optional proprietary method that can be enabled to
+    work alongside the default Matter OTA update. Note that this protocol is not
+    a part of the Matter specification.
+
+For both methods, the
 [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
-bootloader solution then replaces the old firmware image with the new one.
+bootloader solution is used to replace the old firmware image with the new one.
 
-#### Bootloader
+#### Matter Over-the-Air Update
 
-MCUboot is a secure bootloader used for swapping firmware images of different
-versions and generating proper build output files that can be used in the device
-firmware upgrade process.
+The Matter over-the-air update distinguishes two types of nodes: OTA Provider
+and OTA Requestor.
 
-The bootloader solution requires an area of flash memory to swap application
-images during the firmware upgrade. The Nordic devices use an external memory
-chip for this purpose. The memory chip communicates with the microcontroller
-through the QSPI bus.
+An OTA Provider is a node that hosts a new firmware image and is able to respond
+on an OTA Requestor's queries regarding availability of new firmware images or
+requests to start sending the update packages.
 
-See the
-[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
-section to learn how to change MCUboot and flash configuration in this example.
+An OTA Requestor is a node that wants to download a new firmware image and sends
+requests to an OTA Provider to start the update process.
 
 #### Simple Management Protocol
 
@@ -131,6 +136,21 @@ See the
 [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 section to learn how to enable SMP and use it for the DFU purpose in this
 example.
+
+#### Bootloader
+
+MCUboot is a secure bootloader used for swapping firmware images of different
+versions and generating proper build output files that can be used in the device
+firmware upgrade process.
+
+The bootloader solution requires an area of flash memory to swap application
+images during the firmware upgrade. Nordic Semiconductor devices use an external
+memory chip for this purpose. The memory chip communicates with the
+microcontroller through the QSPI bus.
+
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to change MCUboot and flash configuration in this example.
 
 <hr>
 
@@ -357,34 +377,26 @@ following command:
 To build the example with release configuration that disables the diagnostic
 features like logs and command-line interface, run the following command:
 
-    $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/release.conf
+    $ west build -b build-target -- -DCONF_FILE=prj_release.conf
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
 
-### Building with low-power configuration
-
-You can build the example using the low-power configuration, which enables
-Thread's Sleepy End Device mode and disables debug features, such as the UART
-console or the **LED 1** usage.
-
-To build for the low-power configuration, run the following command with
-_build-target_ replaced with the build target name of the Nordic Semiconductor's
-kit you own (for example `nrf52840dk_nrf52840`):
-
-    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
-For example, use the following command for `nrf52840dk_nrf52840`:
-
-    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
-
 ### Building with Device Firmware Upgrade support
 
-To build the example with configuration that enables DFU, run the following
-command with _build-target_ replaced with the build target name of the Nordic
-Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
+Support for DFU using Matter OTA is enabled by default.
 
-    $ west build -b build-target -- -DBUILD_WITH_DFU=1
+To enable DFU over Bluetooth LE, run the following command with _build-target_
+replaced with the build target name of the Nordic Semiconductor kit you are
+using (for example `nrf52840dk_nrf52840`):
+
+    $ west build -b build-target -- -DCONFIG_CHIP_DFU_OVER_BT_SMP=y
+
+To completely disable support for both DFU methods, run the following command
+with _build-target_ replaced with the build target name of the Nordic
+Semiconductor kit you are using (for example `nrf52840dk_nrf52840`):
+
+    $ west build -b build-target -- -DCONF_FILE=prj_no_dfu.conf
 
 > **Note**:
 >
@@ -395,22 +407,10 @@ Semiconductor's kit you own (for example `nrf52840dk_nrf52840`):
 > upgrading the application core and network core firmware in two-core nRF5340
 > DK devices.
 
-#### Changing Device Firmware Upgrade configuration
-
-To change the default DFU configuration, edit the
-`overlay-single_image_dfu_support.conf` or
-`overlay-multi_image_dfu_support.conf` overlay files depending on whether the
-build target device supports multi-image DFU (nRF5340 DK) or single-image DFU
-(nRF52840 DK). The files are located in the `config/nrfconnect/app` directory.
-You can also define the desired options in your example's `prj.conf` file.
-
 #### Changing bootloader configuration
 
-To change the default MCUboot configuration, edit the
-`mcuboot_single_image_dfu.conf` or `mcuboot_multi_image_dfu.conf` overlay files
-depending on whether the build target device supports multi-image DFU (nRF5340
-DK) or single-image DFU (nRF52840 DK). The files are located in the
-`configuration` directory.
+To change the default MCUboot configuration, edit the `prj.conf` file located in
+the `child_image/mcuboot` directory.
 
 Make sure to keep the configuration consistent with changes made to the
 application configuration. This is necessary for the configuration to work, as
@@ -427,7 +427,7 @@ purposes. You can change these settings by defining
 This example uses this option to define using an external flash.
 
 To modify the flash settings of your board (that is, your _build-target_, for
-example `nrf52840dk_nrf52840`), edit the `pm_static.yml` file located in the
+example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 `configuration/build-target/` directory.
 
 <hr>
@@ -449,6 +449,33 @@ Semiconductor's kit you own.
 
 Changes done with menuconfig will be lost if the `build` directory is deleted.
 To make them persistent, save the configuration options in the `prj.conf` file.
+
+### Example build types
+
+The example uses different configuration files depending on the supported
+features. Configuration files are provided for different build types and they
+are located in the application root directory.
+
+The `prj.conf` file represents a debug build type. Other build types are covered
+by dedicated files with the build type added as a suffix to the prj part, as per
+the following list. For example, the release build type file name is
+`prj_release.conf`. If a board has other configuration files, for example
+associated with partition layout or child image configuration, these follow the
+same pattern.
+
+Before you start testing the application, you can select one of the build types
+supported by the sample. This sample supports the following build types,
+depending on the selected board:
+
+-   debug -- Debug version of the application - can be used to enable additional
+    features for verifying the application behavior, such as logs or
+    command-line shell.
+-   release -- Release version of the application - can be used to enable only
+    the necessary application functionalities to optimize its performance.
+-   no_dfu -- Debug version of the application without Device Firmware Upgrade
+    feature support - can be used only for the nRF52840 DK and nRF5340 DK, as
+    those platforms have DFU enabled by default.
+
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
 page.

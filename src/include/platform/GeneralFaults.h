@@ -49,13 +49,12 @@ public:
         int mIndex = -1;
     };
 
-public:
     GeneralFaults() = default;
     ~GeneralFaults() { mSize = 0; }
 
     CHIP_ERROR add(const uint8_t value);
 
-    uint8_t * data() { return mData; }
+    const uint8_t * data() const { return mData; }
     size_t size() const;
     uint8_t operator[](int index) const;
 

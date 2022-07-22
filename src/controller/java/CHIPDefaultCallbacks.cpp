@@ -70,7 +70,7 @@ exit:
 }
 
 chip::CHIPDefaultFailureCallback::CHIPDefaultFailureCallback(jobject javaCallback) :
-    Callback::Callback<DefaultFailureCallback>(CallbackFn, this)
+    Callback::Callback<CHIPDefaultFailureCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -96,8 +96,9 @@ chip::CHIPDefaultFailureCallback::~CHIPDefaultFailureCallback()
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void chip::CHIPDefaultFailureCallback::CallbackFn(void * context, uint8_t status)
+void chip::CHIPDefaultFailureCallback::CallbackFn(void * context, CHIP_ERROR error)
 {
+    chip::app::StatusIB status(error);
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID javaMethod;
@@ -118,7 +119,10 @@ void chip::CHIPDefaultFailureCallback::CallbackFn(void * context, uint8_t status
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &javaMethod);
     SuccessOrExit(err);
 
-    err = chip::AndroidClusterExceptions::GetInstance().CreateChipClusterException(env, status, exception);
+    // TODO: Figure out what to do with the non-StatusIB cases and the cases
+    // when we have a cluster status?
+    err = chip::AndroidClusterExceptions::GetInstance().CreateChipClusterException(env, chip::to_underlying(status.mStatus),
+                                                                                   exception);
     SuccessOrExit(err);
 
     env->ExceptionClear();

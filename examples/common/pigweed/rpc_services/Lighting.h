@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace rpc {
@@ -37,6 +38,8 @@ public:
 
     virtual pw::Status Set(const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
+        DeviceLayer::StackLock lock;
+
         uint8_t on = request.on;
         RETURN_STATUS_IF_NOT_OK(
             emberAfWriteServerAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &on, ZCL_BOOLEAN_ATTRIBUTE_ID));
@@ -65,6 +68,8 @@ public:
 
     virtual pw::Status Get(const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
     {
+        DeviceLayer::StackLock lock;
+
         uint8_t on;
         uint8_t level;
         uint8_t hue;

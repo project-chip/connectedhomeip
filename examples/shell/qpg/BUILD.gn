@@ -1,0 +1,84 @@
+# Copyright(c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/qpg_sdk.gni")
+
+import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
+import("${qpg_sdk_build_root}/qpg_executable.gni")
+import("${qpg_sdk_build_root}/qpg_sdk.gni")
+
+assert(current_os == "freertos")
+
+qpg_project_dir = "${chip_root}/examples/shell/qpg"
+examples_plat_dir = "${chip_root}/examples/platform/qpg"
+
+qpg_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/qpg",
+    "${qpg_project_dir}/include",
+    "${examples_plat_dir}",
+  ]
+
+  defines = [ "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE" ]
+}
+
+qpg_executable("shell_app") {
+  output_name = "chip-${qpg_target_ic}-shell-example.out"
+
+  sources = [
+    "${examples_plat_dir}/app/main.cpp",
+    "${examples_plat_dir}/ota/ota.cpp",
+    "src/AppTask.cpp",
+  ]
+
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/shell/shell_common:shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${examples_plat_dir}:qpg-matter-shell",
+  ]
+
+  #fixme Added lock-app dependency as linker errors get generated if no
+  #chip datamodel is given [import("${chip_root}/src/app/chip_data_model.gni")]
+  deps += [ "${chip_root}/examples/lock-app/lock-common" ]
+
+  include_dirs = [
+    "include",
+    "${examples_plat_dir}/ota",
+  ]
+
+  defines = []
+
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
+}
+
+group("qpg") {
+  deps = [ ":shell_app" ]
+}
+
+group("default") {
+  deps = [ ":qpg" ]
+}

@@ -40,8 +40,6 @@ static_library("shell_common") {
   sources = [
     "cmd_misc.cpp",
     "cmd_otcli.cpp",
-    "cmd_ping.cpp",
-    "cmd_send.cpp",
     "globals.cpp",
   ]
 

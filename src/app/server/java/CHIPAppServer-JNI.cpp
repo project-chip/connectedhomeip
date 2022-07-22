@@ -22,6 +22,7 @@
  *
  */
 #include "AndroidAppServerWrapper.h"
+#include "ChipFabricProvider-JNI.h"
 #include "ChipThreadWork.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -79,6 +80,8 @@ jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(AppServer, "Java class references loaded.");
 
     err = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
+    SuccessOrExit(err);
+    err = AndroidChipFabricProviderJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 
 exit:

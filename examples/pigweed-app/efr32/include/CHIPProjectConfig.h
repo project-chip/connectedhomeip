@@ -38,21 +38,20 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x5350: EFR32 pigweed-app
+ * 0x8009: example pigweed-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x5350
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x800B
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -74,6 +73,17 @@
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+ *
+ * A uint32_t identifying the software version running on the device.
+ */
+/* The SoftwareVersion attribute of the Basic cluster. */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
+#endif
+
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
@@ -140,13 +150,3 @@
  * 30000 (30 secondes).
  */
 #define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
-
-/**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of slow advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)

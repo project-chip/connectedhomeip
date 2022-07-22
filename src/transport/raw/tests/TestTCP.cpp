@@ -27,7 +27,9 @@
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/UnitTestUtils.h>
 #include <system/SystemLayer.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
@@ -69,7 +71,6 @@ constexpr NodeId kDestinationNodeId = 111222333;
 constexpr uint32_t kMessageCounter  = 18;
 
 using TestContext = chip::Test::IOContext;
-TestContext sContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -107,6 +108,27 @@ public:
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
         CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+
+        // retry a few times in case the port is somehow in use.
+        // this is a WORKAROUND for flaky testing if we run tests very fast after each other.
+        // in that case, a port could be in a WAIT state.
+        //
+        // What may be happening:
+        //   - We call InitializeMessageTest several times in this unit test
+        //   - closing sockets takes a while (FIN-wait or similar)
+        //   - trying InitializeMessageTest to take the same port right after may fail
+        //
+        // The tests may be run with a 0 port (to self select an active port) however I have not
+        // validated that this works and we need a followup for it
+        //
+        // TODO: stop using fixed ports.
+        for (int i = 0; (i < 50) && (err != CHIP_NO_ERROR); i++)
+        {
+            ChipLogProgress(NotSpecified, "RETRYING tcp initialization");
+            chip::test_utils::SleepMillis(100);
+            err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
+        }
+
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSessionManager(this);
@@ -216,7 +238,7 @@ struct TestData
     // `sizes[]` is a zero-terminated sequence of packet buffer sizes.
     // If total length supplied is not large enough for at least the PacketHeader and length field,
     // the last buffer will be made larger.
-    TestData() : mHandle(), mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
+    TestData() : mPayload(nullptr), mTotalLength(0), mMessageLength(0), mMessageOffset(0) {}
     ~TestData() { Free(); }
     bool Init(const uint16_t sizes[]);
     void Free();
@@ -475,16 +497,13 @@ static int Initialize(void * aContext)
  */
 static int Finalize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    reinterpret_cast<TestContext *>(aContext)->Shutdown();
+    return SUCCESS;
 }
 
 int TestTCP()
 {
-    // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
-
-    return (nlTestRunnerStats(&sSuite));
+    return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestTCP);

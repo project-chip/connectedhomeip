@@ -58,9 +58,15 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) override
+    CHIP_ERROR GetCommissionableInstanceName(char * instanceName, size_t maxLength) const override
     {
         ChipLogError(Discovery, "DNS-SD advertising not available. DNS-SD GetCommissionableInstanceName not available.");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR UpdateCommissionableInstanceName() override
+    {
+        ChipLogError(Discovery, "DNS-SD advertising not available. Can't update DNS-SD commissionable instance name.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };

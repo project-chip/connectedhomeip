@@ -39,6 +39,7 @@ public:
     CHIP_ERROR Init();
     CHIP_ERROR AddConfig(const std::string & configFile);
     CHIP_ERROR CommitConfig(const std::string & configFile);
+    CHIP_ERROR GetUInt16Value(const char * key, uint16_t & val);
     CHIP_ERROR GetUIntValue(const char * key, uint32_t & val);
     CHIP_ERROR GetUInt64Value(const char * key, uint64_t & val);
     CHIP_ERROR GetStringValue(const char * key, char * buf, size_t bufSize, size_t & outLen);

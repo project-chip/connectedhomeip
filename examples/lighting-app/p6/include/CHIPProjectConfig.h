@@ -47,6 +47,9 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 #endif
 
+// define Device type based on the application
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 257 // 0x0101  Dimmable Bulb
+
 // For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //
@@ -54,7 +57,6 @@
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION
@@ -67,14 +69,14 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
- * A string identifying the firmware revision running on the device.
- * CHIP service currently expects the firmware version to be in the format
+ * A string identifying the software version running on the device.
+ * CHIP service currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

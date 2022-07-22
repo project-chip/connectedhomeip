@@ -28,26 +28,62 @@ class DeviceCommissioner;
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
-    AutoCommissioner(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
-    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params);
-    void StartCommissioning(CommissioneeDeviceProxy * proxy);
+    AutoCommissioner();
+    ~AutoCommissioner() override;
+    CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params) override;
+    const CommissioningParameters & GetCommissioningParameters() const override;
+    void SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate) override;
 
-    void CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
+    CHIP_ERROR StartCommissioning(DeviceCommissioner * commissioner, CommissioneeDeviceProxy * proxy) override;
+
+    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
+
+protected:
+    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+    DeviceCommissioner * GetCommissioner() { return mCommissioner; }
 
 private:
-    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr);
-    Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
+    void ReleaseDAC();
+    void ReleasePAI();
 
-    DeviceCommissioner * mCommissioner;
-    CommissioneeDeviceProxy * mCommissioneeDeviceProxy = nullptr;
-    OperationalDeviceProxy * mOperationalDeviceProxy   = nullptr;
-    CommissioningParameters mParams                    = CommissioningParameters();
+    CHIP_ERROR SetDAC(const ByteSpan & dac);
+    CHIP_ERROR SetPAI(const ByteSpan & pai);
+
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
+    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, AesCcm128KeySpan ipk, NodeId adminSubject);
+    /**
+     * The device argument to GetCommandTimeout is the device whose session will
+     * be used for sending the relevant command.
+     */
+    Optional<System::Clock::Timeout> GetCommandTimeout(DeviceProxy * device, CommissioningStage stage) const;
+    EndpointId GetEndpoint(const CommissioningStage & stage) const;
+    CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
+
+    DeviceCommissioner * mCommissioner                               = nullptr;
+    CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
+    OperationalDeviceProxy * mOperationalDeviceProxy                 = nullptr;
+    OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
+    CommissioningParameters mParams                                  = CommissioningParameters();
     // Memory space for the commisisoning parameters that come in as ByteSpans - the caller is not guaranteed to retain this memory
-    // TODO(cecille): Include memory from CommissioneeDeviceProxy once BLE is moved over
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
-};
+    char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
+    bool mNeedsNetworkSetup = false;
+    ReadCommissioningInfo mDeviceCommissioningInfo;
+
+    // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
+    uint8_t * mDAC   = nullptr;
+    uint16_t mDACLen = 0;
+    uint8_t * mPAI   = nullptr;
+    uint16_t mPAILen = 0;
+    uint8_t mAttestationNonce[kAttestationNonceLength];
+    uint8_t mCSRNonce[kCSRNonceLength];
+    uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
+    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
+};
 } // namespace Controller
 } // namespace chip

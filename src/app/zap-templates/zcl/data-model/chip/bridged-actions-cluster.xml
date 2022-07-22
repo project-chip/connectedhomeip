@@ -80,7 +80,6 @@ limitations under the License.
     <item name="EndpointListID" type="INT16U"/>
     <item name="Name"           type="CHAR_STRING" length="32"/>
     <item name="Type"           type="EndpointListTypeEnum"/>
-    <!-- TODO: Change Endpoints to INT16U array once it is supported -->
     <item name="Endpoints"      type="ENDPOINT_NO" array="true" length="256"/>
   </struct>
 

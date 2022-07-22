@@ -22,16 +22,16 @@ namespace Platform {
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     timeval time;
-    gettimeofday(&time, NULL);
+    gettimeofday(&time, nullptr);
     long ms = (time.tv_sec * 1000) + (time.tv_usec / 1000);
 
     uint64_t ktid;
-    pthread_threadid_np(NULL, &ktid);
+    pthread_threadid_np(nullptr, &ktid);
 
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     int32_t prefixLen   = snprintf(formattedMsg, sizeof(formattedMsg), "[%ld] [%lld:%lld] CHIP: [%s] ", ms, (long long) getpid(),
                                  (long long) ktid, module);
-    static os_log_t log = os_log_create("com.zigbee.chip", "all");
+    static os_log_t log = os_log_create("com.csa.matter", "all");
     if (prefixLen < 0)
     {
         // This should not happen

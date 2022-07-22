@@ -18,6 +18,6 @@ import("${chip_root}/examples/platform/nxp/k32w/k32w0/args.gni")
 # SDK target. This is overridden to add our SDK app_config.h & defines.
 k32w0_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
-declare_args() {
-  chip_enable_ota_requestor = true
-}
+chip_enable_ota_requestor = true
+chip_stack_lock_tracking = "fatal"
+chip_enable_ble = true

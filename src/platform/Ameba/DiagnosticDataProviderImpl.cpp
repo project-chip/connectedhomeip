@@ -25,7 +25,6 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/Ameba/DiagnosticDataProviderImpl.h>
-#include <platform/DiagnosticDataProvider.h>
 
 #include <lwip_netconf.h>
 
@@ -54,6 +53,69 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 {
     currentHeapHighWatermark = xPortGetTotalHeapSize() - xPortGetMinimumEverFreeHeapSize();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    // If implemented, the server SHALL set the value of the CurrentHeapHighWatermark attribute to the
+    // value of the CurrentHeapUsed.
+
+    xPortResetHeapMinimumEverFreeHeapSize();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
+{
+    /* Obtain all available task information */
+    TaskStatus_t * taskStatusArray;
+    ThreadMetrics * head = nullptr;
+    unsigned long arraySize, x, dummy;
+
+    arraySize = uxTaskGetNumberOfTasks();
+
+    taskStatusArray = (TaskStatus_t *) pvPortMalloc(arraySize * sizeof(TaskStatus_t));
+
+    if (taskStatusArray != NULL)
+    {
+        /* Generate raw status information about each task. */
+        arraySize = uxTaskGetSystemState(taskStatusArray, arraySize, &dummy);
+        /* For each populated position in the taskStatusArray array,
+           format the raw data as human readable ASCII data. */
+
+        for (x = 0; x < arraySize; x++)
+        {
+            ThreadMetrics * thread = (ThreadMetrics *) pvPortMalloc(sizeof(ThreadMetrics));
+
+            strncpy(thread->NameBuf, taskStatusArray[x].pcTaskName, kMaxThreadNameLength - 1);
+            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
+            thread->id = taskStatusArray[x].xTaskNumber;
+
+            thread->stackFreeMinimum.Emplace(taskStatusArray[x].usStackHighWaterMark);
+            thread->stackSize.Emplace(uxTaskGetStackSize(taskStatusArray[x].xHandle));
+            thread->stackFreeCurrent.Emplace(uxTaskGetFreeStackSize(taskStatusArray[x].xHandle));
+
+            thread->Next = head;
+            head         = thread;
+        }
+
+        *threadMetricsOut = head;
+        /* The array is no longer needed, free the memory it consumes. */
+        vPortFree(taskStatusArray);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
+{
+    while (threadMetrics)
+    {
+        ThreadMetrics * del = threadMetrics;
+        threadMetrics       = threadMetrics->Next;
+        vPortFree(del);
+    }
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
@@ -103,7 +165,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     uint32_t reason = 0;
 
@@ -112,7 +174,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<uint8_t>(reason);
+        bootReason = static_cast<BootReasonType>(reason);
     }
 
     return err;
@@ -137,14 +199,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-            ifp->name            = CharSpan(ifp->Name, strlen(ifp->Name));
-            ifp->fabricConnected = true;
+            ifp->name          = CharSpan::fromCharString(ifp->Name);
+            ifp->isOperational = true;
             if ((ifa->flags) & NETIF_FLAG_ETHERNET)
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
             else
                 ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
-            ifp->offPremiseServicesReachableIPv4 = false;
-            ifp->offPremiseServicesReachableIPv6 = false;
+            ifp->offPremiseServicesReachableIPv4.SetNull();
+            ifp->offPremiseServicesReachableIPv6.SetNull();
 
             memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
 
@@ -156,6 +218,20 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 // Set 48-bit IEEE MAC Address
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+            }
+
+            if (ifa->ip_addr.u_addr.ip4.addr != 0)
+            {
+                memcpy(ifp->Ipv4AddressesBuffer[0], &(ifa->ip_addr.u_addr.ip4.addr), kMaxIPv4AddrSize);
+                ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
+                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+            }
+
+            if (ifa->ip6_addr->u_addr.ip6.addr != 0)
+            {
+                memcpy(ifp->Ipv6AddressesBuffer[0], &(ifa->ip6_addr->u_addr.ip6.addr), kMaxIPv6AddrSize);
+                ifp->Ipv6AddressSpans[0] = ByteSpan(ifp->Ipv6AddressesBuffer[0], kMaxIPv6AddrSize);
+                ifp->IPv6Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, 1);
             }
 
             ifp->Next = head;
@@ -340,7 +416,17 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
     overrunCount = 0;
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
+    return CHIP_NO_ERROR;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
+{
+    return DiagnosticDataProviderImpl::GetDefaultInstance();
+}
 
 } // namespace DeviceLayer
 } // namespace chip

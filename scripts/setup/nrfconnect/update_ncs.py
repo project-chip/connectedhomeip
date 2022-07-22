@@ -22,8 +22,8 @@ import subprocess
 import sys
 
 
-def get_repository_commit_sha(repository_location):
-    command = ['git', '-C', repository_location, 'rev-parse', 'HEAD']
+def get_commit_sha(repository_location, rev):
+    command = ['git', '-C', repository_location, 'rev-list', '-n', '1', rev]
     process = subprocess.run(command, check=True, stdout=subprocess.PIPE)
     return process.stdout.decode('ascii').strip()
 
@@ -111,11 +111,12 @@ def main():
             if not args.quiet:
                 print("Checking current nRF Connect SDK revision...")
 
-            current_revision = get_repository_commit_sha(ncs_base)
+            current_sha = get_commit_sha(ncs_base, 'HEAD')
+            recommended_sha = get_commit_sha(ncs_base, recommended_revision)
 
-            if current_revision != recommended_revision:
+            if current_sha != recommended_sha:
                 print_check_revision_warning_message(
-                    current_revision, recommended_revision)
+                    current_sha, recommended_sha)
                 sys.exit(1)
 
             if not args.quiet:

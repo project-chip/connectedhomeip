@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,32 +27,33 @@
 
 #pragma once
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+//  Enable use of test setup parameters for testing purposes only.
+//
+//    WARNING: This option makes it possible to circumvent basic chip security functionality.
+//    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+//
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
 
-// For convenience, Chip Security Test Mode can be enabled and the
 // requirement for authentication in various protocols can be disabled.
 //
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0x235A: Chip's Vendor Id.
+ * 0xFFF1: Test vendor.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0x5350: EFR32 pigweed-app
+ * 0x800B: pigweed-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x5350
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x800B
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
@@ -140,13 +141,3 @@
  * 30000 (30 secondes).
  */
 #define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
-
-/**
- * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
- *
- * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
- * from the moment of slow advertisement commencement.
- *
- * Defaults to 9000000 (15 minutes).
- */
-#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)

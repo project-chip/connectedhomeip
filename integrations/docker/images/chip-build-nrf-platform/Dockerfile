@@ -2,12 +2,12 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION} as build
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=v1.8.0
+ARG NCS_REVISION=fd5905aa6b04febd99d00dba6c482ac25eb15222
 
 RUN set -x \
     && apt-get update \
     && apt-get install --no-install-recommends -fy \
-    curl=7.68.0-1ubuntu2.7 \
+    curl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
@@ -28,7 +28,6 @@ RUN set -x \
 WORKDIR /opt/NordicSemiconductor/nrfconnect
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
-    cmake==3.21.2 \
     west==0.12.0 \
     && west init -m https://github.com/nrfconnect/sdk-nrf \
     && git -C nrf fetch origin "$NCS_REVISION" \
@@ -60,6 +59,7 @@ COPY --from=build /opt/NordicSemiconductor/nrfconnect/ /opt/NordicSemiconductor/
 RUN set -x \
     # python3-yaml package conflicts with nRF Python requirements
     && (apt-get remove -fy python3-yaml && apt-get autoremove || exit 0) \
+    && python3 -m pip install -U --no-cache-dir cmake==3.22.2 \
     && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/zephyr/scripts/requirements.txt \
     && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/nrf/scripts/requirements.txt \
     && python3 -m pip install --no-cache-dir -r /opt/NordicSemiconductor/nrfconnect/bootloader/mcuboot/scripts/requirements.txt \

@@ -31,8 +31,8 @@ namespace Dnssd {
 using namespace System::Clock::Literals;
 
 // Operational node TXT entries
-static constexpr size_t kKeyMrpRetryIntervalIdleMaxLength        = 7; // [CRI] 0-3600000
-static constexpr size_t kKeyMrpRetryIntervalActiveMaxLength      = 7; // [CRA] 0-3600000
+static constexpr size_t kKeySleepyIdleIntervalMaxLength          = 7; // [SII] 0-3600000
+static constexpr size_t kKeySleepyActiveIntervalMaxLength        = 7; // [SAI] 0-3600000
 static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
 static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 
@@ -41,7 +41,7 @@ static constexpr size_t kKeyLongDiscriminatorMaxLength       = 5;
 static constexpr size_t kKeyVendorProductMaxLength           = 11;
 static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
 static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength              = 5;
+static constexpr size_t kKeyDeviceTypeMaxLength              = 10;
 static constexpr size_t kKeyDeviceNameMaxLength              = 32;
 static constexpr size_t kKeyRotatingDeviceIdMaxLength        = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
@@ -66,8 +66,8 @@ enum class TxtFieldKey : uint8_t
     kRotatingDeviceId,
     kPairingInstruction,
     kPairingHint,
-    kMrpRetryIntervalIdle,
-    kMrpRetryIntervalActive,
+    kSleepyIdleInterval,
+    kSleepyActiveInterval,
     kTcpSupported,
     kCount,
 };
@@ -92,8 +92,8 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kRotatingDeviceId, kKeyRotatingDeviceIdMaxLength, "RI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingInstruction, kKeyPairingInstructionMaxLength, "PI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingHint, kKeyPairingHintMaxLength, "PH", TxtKeyUse::kCommission },
-    { TxtFieldKey::kMrpRetryIntervalIdle, kKeyMrpRetryIntervalIdleMaxLength, "CRI", TxtKeyUse::kCommon },
-    { TxtFieldKey::kMrpRetryIntervalActive, kKeyMrpRetryIntervalActiveMaxLength, "CRA", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSleepyIdleInterval, kKeySleepyIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
+    { TxtFieldKey::kSleepyActiveInterval, kKeySleepyActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
     { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
 };
 #ifdef CHIP_CONFIG_TEST
@@ -104,8 +104,7 @@ uint16_t GetProduct(const ByteSpan & value);
 uint16_t GetVendor(const ByteSpan & value);
 uint16_t GetLongDiscriminator(const ByteSpan & value);
 uint8_t GetCommissioningMode(const ByteSpan & value);
-// TODO: possibly 32-bit? see spec issue #3226
-uint16_t GetDeviceType(const ByteSpan & value);
+uint32_t GetDeviceType(const ByteSpan & value);
 void GetDeviceName(const ByteSpan & value, char * name);
 void GetRotatingDeviceId(const ByteSpan & value, uint8_t * rotatingId, size_t * len);
 uint16_t GetPairingHint(const ByteSpan & value);
@@ -185,8 +184,8 @@ constexpr size_t ValSize(TxtFieldKey key)
     return Internal::txtFieldInfo[static_cast<int>(key)].valMaxSize;
 }
 
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, DiscoveredNodeData & nodeData);
-void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedNodeData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonResolutionData & nodeData);
+void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommissionNodeData & nodeData);
 
 } // namespace Dnssd
 } // namespace chip

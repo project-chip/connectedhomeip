@@ -48,12 +48,20 @@ public:
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
     CHIP_ERROR GetUpTime(uint64_t & upTime) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
-    CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
+    CHIP_ERROR GetBootReason(BootReasonType & bootReason) override;
 
     CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults) override;
     CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults) override;
     CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults) override;
 };
+
+/**
+ * Returns the platform-specific implementation of the DiagnosticDataProvider singleton object.
+ *
+ * Applications can use this to gain access to features of the DiagnosticDataProvider
+ * that are specific to the selected platform.
+ */
+DiagnosticDataProvider & GetDiagnosticDataProviderImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

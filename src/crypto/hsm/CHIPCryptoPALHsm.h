@@ -23,6 +23,7 @@
 #pragma once
 
 #include "CHIPCryptoPALHsm_config.h"
+#include <lib/core/DataModelTypes.h>
 
 #if CHIP_CRYPTO_HSM_NXP
 #include <fsl_sss_se05x_apis.h>
@@ -131,8 +132,6 @@ public:
 
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
 
-    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
-
     virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                           P256ECDHDerivedSecret & out_secret) const override;
 
@@ -145,6 +144,8 @@ public:
     void SetKeyId(uint32_t id) { keyid = id; }
 
     uint32_t GetKeyId(void) { return keyid; }
+
+    CHIP_ERROR CreateOperationalKey(FabricIndex fabricIdx);
 
 private:
     uint32_t keyid;

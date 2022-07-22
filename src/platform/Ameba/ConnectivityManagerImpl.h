@@ -20,6 +20,11 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_UDP.h>
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
@@ -55,6 +60,10 @@ class PlatformManagerImpl;
 
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+                                      public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
 #else
@@ -144,8 +153,11 @@ private:
     static ConnectivityManagerImpl sInstance;
     static void RefreshMessageLayer(void);
     static void RtkWiFiStationConnectedHandler(char * buf, int buf_len, int flags, void * userdata);
+    static void RtkWiFiStationDisconnectedHandler(char * buf, int buf_len, int flags, void * userdata);
+    static void RtkWiFiScanCompletedHandler(void);
     void DHCPProcess(void);
     static void DHCPProcessThread(void * param);
+    static int conn_callback_dispatcher(void * object);
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

@@ -36,6 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/Constants.h>
@@ -200,9 +201,11 @@ void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
 
 struct TestTLVContext
 {
-    nlTestSuite * mSuite;
-    int mEvictionCount;
-    uint32_t mEvictedBytes;
+    nlTestSuite * mSuite   = nullptr;
+    int mEvictionCount     = 0;
+    uint32_t mEvictedBytes = 0;
+
+    TestTLVContext(nlTestSuite * suite) : mSuite(suite) {}
 };
 
 void TestNull(nlTestSuite * inSuite, TLVReader & reader, Tag tag)
@@ -237,13 +240,15 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const cha
     size_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    chip::Platform::ScopedMemoryBuffer<char> valBuffer;
-    char * val = valBuffer.Alloc(expectedLen + 1).Get();
-
+    char * val     = nullptr;
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    NL_TEST_ASSERT(inSuite, val != nullptr);
+    if (val != nullptr)
+    {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
+    }
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -253,12 +258,15 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, Tag tag, const uint
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> valBuffer;
-    uint8_t * val  = valBuffer.Alloc(expectedLen).Get();
+    uint8_t * val  = nullptr;
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    NL_TEST_ASSERT(inSuite, val != nullptr);
+    if (val != nullptr)
+    {
+        NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
+    }
+    chip::Platform::MemoryFree(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, const System::PacketBufferHandle & buffer, const uint8_t * expectedVal,
@@ -2569,9 +2577,9 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     writer.Init(backingStore, bufsize);
-    snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
+    snprintf(strBuffer, sizeof(strBuffer), "Sample string %u", static_cast<unsigned int>(num));
 
-    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %zu", num);
+    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %u", static_cast<unsigned int>(num));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
@@ -2581,10 +2589,10 @@ void CheckCHIPTLVPutStringF(nlTestSuite * inSuite, void * inContext)
     err = reader.Next();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = reader.GetString(valStr, 256);
+    err = reader.GetString(valStr, bufsize);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
+    NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
 }
 
 void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
@@ -2629,10 +2637,10 @@ void CheckCHIPTLVPutStringSpan(nlTestSuite * inSuite, void * inContext)
         err = reader.Next();
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = reader.GetString(valStr, 256);
+        err = reader.GetString(valStr, bufsize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, 256) == 0);
+        NL_TEST_ASSERT(inSuite, strncmp(valStr, strBuffer, bufsize) == 0);
     }
 }
 
@@ -2651,7 +2659,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     // Initial test: Verify that a straight printf works as expected into continuous buffer.
 
     writer.Init(buffer);
-    snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
+    snprintf(strBuffer, sizeof(strBuffer), "Sample string %u", static_cast<unsigned int>(num));
 
     err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2659,7 +2667,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %zu", num);
+    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %u", static_cast<unsigned int>(num));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
@@ -2683,9 +2691,9 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     // This print will both stradle the boundary of the buffer and displace the previous two elements.
     num = 2;
 
-    snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
+    snprintf(strBuffer, sizeof(strBuffer), "Sample string %u", static_cast<unsigned int>(num));
 
-    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %zu", num);
+    err = writer.PutStringF(ProfileTag(TestProfile_1, 1), "Sample string %u", static_cast<unsigned int>(num));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.Finalize();
@@ -3101,6 +3109,35 @@ void TestCHIPTLVWriterErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+void TestCHIPTLVEmptyString(nlTestSuite * inSuite)
+{
+    uint8_t buf[2];
+    TLVWriter writer;
+    CHIP_ERROR err;
+    ByteSpan s;
+
+    writer.Init(buf);
+
+    err = writer.PutString(AnonymousTag(), nullptr, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = writer.Finalize();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    TLVReader reader;
+
+    reader.Init(buf);
+
+    err = reader.Next();
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = reader.Get(s);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, s.data() == nullptr);
+    NL_TEST_ASSERT(inSuite, s.size() == 0);
+}
+
 /**
  *  Test CHIP TLV Writer
  */
@@ -3113,6 +3150,8 @@ void CheckCHIPTLVWriter(nlTestSuite * inSuite, void * inContext)
     TestCHIPTLVWriterPreserveSize(inSuite);
 
     TestCHIPTLVWriterErrorHandling(inSuite);
+
+    TestCHIPTLVEmptyString(inSuite);
 }
 
 void SkipNonContainer(nlTestSuite * inSuite)
@@ -4312,7 +4351,7 @@ static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
     {
         ScopedBufferTLVWriter writer(std::move(buf), 64);
 
-        NL_TEST_ASSERT(inSuite, buf.Get() == nullptr);
+        NL_TEST_ASSERT(inSuite, buf.Get() == nullptr); // // NOLINT(bugprone-use-after-move)
 
         err = writer.Put(TLV::AnonymousTag(), (uint8_t) 33);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -4417,14 +4456,8 @@ int TestCHIPTLV(void)
         TestCHIPTLV_Teardown
     };
     // clang-format on
-    TestTLVContext context;
 
-    context.mSuite = &theSuite;
-
-    // Run test suit against one context
-    nlTestRunner(&theSuite, &context);
-
-    return (nlTestRunnerStats(&theSuite));
+    return chip::ExecuteTestsWithContext<TestTLVContext>(&theSuite, &theSuite);
 }
 
 CHIP_REGISTER_TEST_SUITE(TestCHIPTLV)

@@ -25,6 +25,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #define CHIP_SHELL_MAX_BUFFER_SIZE 128
 
@@ -36,21 +37,27 @@ namespace Shell {
 static CHIP_ERROR GetOnboardingQRCode(bool printHeader, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     streamer_t * sout = streamer_get();
-    std::string QRCode;
+
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
 
     if (printHeader)
     {
         streamer_printf(sout, "QRCode:            ");
     }
     ReturnErrorOnFailure(GetQRCode(QRCode, aRendezvousFlags));
-    streamer_printf(sout, "%s\r\n", QRCode.c_str());
+    streamer_printf(sout, "%s\r\n", QRCode.data());
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR GetOnboardingQRCodeUrl(bool printHeader, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     streamer_t * sout = streamer_get();
-    std::string QRCode;
+
+    // Create buffer for QR code that can fit max size and null terminator.
+    char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
+    chip::MutableCharSpan QRCode(qrCodeBuffer);
 
     if (printHeader)
     {
@@ -58,24 +65,27 @@ static CHIP_ERROR GetOnboardingQRCodeUrl(bool printHeader, chip::RendezvousInfor
     }
     ReturnErrorOnFailure(GetQRCode(QRCode, aRendezvousFlags));
 
-    char qrCodeBuffer[CHIP_SHELL_MAX_BUFFER_SIZE];
+    char qrCodeUrlBuffer[CHIP_SHELL_MAX_BUFFER_SIZE];
 
-    ReturnErrorOnFailure(GetQRCodeUrl(qrCodeBuffer, sizeof(qrCodeBuffer), QRCode));
-    streamer_printf(sout, "%s\r\n", qrCodeBuffer);
+    ReturnErrorOnFailure(GetQRCodeUrl(qrCodeUrlBuffer, sizeof(qrCodeUrlBuffer), QRCode));
+    streamer_printf(sout, "%s\r\n", qrCodeUrlBuffer);
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR GetOnboardingManualPairingCode(bool printHeader, chip::RendezvousInformationFlags aRendezvousFlags)
 {
     streamer_t * sout = streamer_get();
-    std::string manualPairingCode;
+
+    // Create buffer for manual pariting code that can fit max size + check digit + null terminator.
+    char manualPairingCodeBuffer[chip::kManualSetupLongCodeCharLength + 1];
+    chip::MutableCharSpan manualPairingCode(manualPairingCodeBuffer);
 
     if (printHeader)
     {
         streamer_printf(sout, "ManualPairingCode: ");
     }
     ReturnErrorOnFailure(GetManualPairingCode(manualPairingCode, aRendezvousFlags));
-    streamer_printf(sout, "%s\r\n", manualPairingCode.c_str());
+    streamer_printf(sout, "%s\r\n", manualPairingCode.data());
     return CHIP_NO_ERROR;
 }
 
@@ -104,17 +114,17 @@ static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformation
         *aRendezvousFlags = chip::RendezvousInformationFlag::kNone;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "softap") == 0)
+    if (strcmp(str, "softap") == 0)
     {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kSoftAP;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "ble") == 0)
+    if (strcmp(str, "ble") == 0)
     {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kBLE;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "onnetwork") == 0)
+    if (strcmp(str, "onnetwork") == 0)
     {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kOnNetwork;
         return CHIP_NO_ERROR;
@@ -146,18 +156,16 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
     {
         return GetOnboardingQRCode(false, aRendezvousFlags);
     }
-    else if (strcmp(argv[1], "qrcodeurl") == 0)
+    if (strcmp(argv[1], "qrcodeurl") == 0)
     {
         return GetOnboardingQRCodeUrl(false, aRendezvousFlags);
     }
-    else if (strcmp(argv[1], "manualpairingcode") == 0)
+    if (strcmp(argv[1], "manualpairingcode") == 0)
     {
         return GetOnboardingManualPairingCode(false, aRendezvousFlags);
     }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 void RegisterOnboardingCodesCommands()
@@ -170,7 +178,6 @@ void RegisterOnboardingCodesCommands()
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
-    return;
 }
 
 } // namespace Shell

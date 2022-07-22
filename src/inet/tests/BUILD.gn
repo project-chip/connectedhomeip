@@ -64,6 +64,7 @@ chip_test_suite("tests") {
     ":helpers",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
 

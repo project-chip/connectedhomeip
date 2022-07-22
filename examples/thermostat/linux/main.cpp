@@ -21,30 +21,25 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af.h>
+#include <platform/Linux/NetworkCommissioningDriver.h>
 
 using namespace chip;
 using namespace chip::app;
 // using namespace chip::app::Clusters;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+namespace {
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sLinuxWiFiDriver);
+} // namespace
+#endif
+
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
-}
-
-// MatterPreAttributeChangeCallback() is called for every cluster.
-// As of 8/17/21 cluster specific PreAttributeChangeCalbacks are not yet implemented.
-
-Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const ConcreteAttributePath & attributePath, uint8_t mask,
-                                                                     uint8_t type, uint16_t size, uint8_t * value)
-{
-    Protocols::InteractionModel::Status status = Protocols::InteractionModel::Status::Success;
-    if (attributePath.mClusterId == chip::app::Clusters::Thermostat::Id)
-    {
-        status = MatterThermostatClusterServerPreAttributeChangedCallback(attributePath, type, size, value);
-    }
-    return status;
 }
 
 void OnIdentifyStart(Identify *)
@@ -87,7 +82,12 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
 };
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+}
 
 int main(int argc, char * argv[])
 {

@@ -37,6 +37,9 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>
 {
 public:
+    CHIP_ERROR StoreVendorId(uint16_t vendorId);
+    CHIP_ERROR StoreProductId(uint16_t productId);
+
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
@@ -63,6 +66,8 @@ private:
 #endif
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
+    CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
+    CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
 
     // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
     CHIP_ERROR ReadConfigValue(Key key, bool & val) override;

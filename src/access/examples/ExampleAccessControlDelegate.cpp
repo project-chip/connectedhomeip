@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <string>
 #include <type_traits>
 
 namespace {
@@ -37,6 +38,8 @@ using chip::kUndefinedNodeId;
 using chip::Access::AccessControl;
 using chip::Access::AuthMode;
 using chip::Access::Privilege;
+using chip::Access::RequestPath;
+using chip::Access::SubjectDescriptor;
 
 using Entry         = chip::Access::AccessControl::Entry;
 using EntryIterator = chip::Access::AccessControl::EntryIterator;
@@ -128,10 +131,8 @@ public:
 private:
     static bool IsValid(NodeId node) { return node != kUndefinedNodeId; }
 
-private:
     static_assert(sizeof(NodeId) == 8, "Expecting 8 byte node ID");
 
-private:
     NodeId mNode;
 };
 
@@ -212,7 +213,6 @@ private:
             !((target.flags & Target::kDeviceType) && !IsValidDeviceType(target.deviceType));
     }
 
-private:
     void Decode(Target & target) const
     {
         auto & flags      = target.flags;
@@ -268,7 +268,6 @@ private:
         }
     }
 
-private:
     static_assert(sizeof(ClusterId) == 4, "Expecting 4 byte cluster ID");
     static_assert(sizeof(EndpointId) == 2, "Expecting 2 byte endpoint ID");
     static_assert(sizeof(DeviceTypeId) == 4, "Expecting 4 byte device type ID");
@@ -317,7 +316,6 @@ private:
     // (mDeviceType >> kEndpointShift) --> extract endpoint from mDeviceType
     static constexpr int kEndpointShift = 16;
 
-private:
     ClusterId mCluster;
     DeviceTypeId mDeviceType;
 };
@@ -326,7 +324,7 @@ class EntryStorage
 {
 public:
     // ACL support
-    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_DEVICE_ADMINS;
+    static constexpr size_t kNumberOfFabrics  = CHIP_CONFIG_MAX_FABRICS;
     static constexpr size_t kEntriesPerFabric = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC;
     static EntryStorage acl[kNumberOfFabrics * kEntriesPerFabric];
 
@@ -361,7 +359,6 @@ public:
         return nullptr;
     }
 
-public:
     // Pool support
     static EntryStorage pool[kEntryStoragePoolSize];
 
@@ -390,7 +387,6 @@ public:
         return pool <= this && this < end;
     }
 
-public:
     EntryStorage() = default;
 
     void Init()
@@ -428,7 +424,6 @@ public:
         }
     }
 
-public:
     enum class ConvertDirection
     {
         kAbsoluteToRelative,
@@ -483,7 +478,6 @@ public:
         index = found ? toIndex : ArraySize(acl);
     }
 
-public:
     static constexpr size_t kMaxSubjects = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY;
     static constexpr size_t kMaxTargets  = CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY;
 
@@ -526,7 +520,6 @@ public:
         return pool <= &delegate && &delegate < end;
     }
 
-public:
     void Release() override
     {
         mStorage->Release();
@@ -718,7 +711,6 @@ public:
         return CHIP_ERROR_SENTINEL;
     }
 
-public:
     void Init(Entry & entry, EntryStorage & storage)
     {
         entry.SetDelegate(*this);
@@ -733,6 +725,20 @@ public:
 
     EntryStorage * GetStorage() { return mStorage; }
 
+    // A storage is about to be deleted. If this delegate was
+    // using it, make a best effort to copy it to the pool.
+    void FixBeforeDelete(EntryStorage & storage)
+    {
+        if (mStorage == &storage)
+        {
+            // Best effort, OK if it fails.
+            EnsureStorageInPool();
+        }
+    }
+
+    // A storage was deleted, and others shuffled into its place.
+    // Fix this delegate (if necessary) to ensure it's using the
+    // correct storage.
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
@@ -755,7 +761,7 @@ public:
         {
             return CHIP_NO_ERROR;
         }
-        else if (auto * storage = EntryStorage::Find(nullptr))
+        if (auto * storage = EntryStorage::Find(nullptr))
         {
             *storage = *mStorage;
             mStorage = storage;
@@ -800,7 +806,6 @@ public:
         return pool <= &delegate && &delegate < end;
     }
 
-public:
     void Release() override { mInUse = false; }
 
     CHIP_ERROR Next(Entry & entry) override
@@ -841,7 +846,6 @@ public:
         return CHIP_ERROR_SENTINEL;
     }
 
-public:
     void Init(EntryIterator & iterator, const FabricIndex * fabricIndex)
     {
         iterator.SetDelegate(*this);
@@ -856,6 +860,9 @@ public:
 
     bool InUse() const { return mInUse; }
 
+    // A storage was deleted, and others shuffled into its place.
+    // Fix this delegate (if necessary) to ensure it's using the
+    // correct storage.
     void FixAfterDelete(EntryStorage & storage)
     {
         constexpr auto & acl = EntryStorage::acl;
@@ -950,27 +957,54 @@ class AccessControlDelegate : public AccessControl::Delegate
 public:
     CHIP_ERROR Init() override
     {
-        ChipLogDetail(DataManagement, "Examples::AccessControlDelegate::Init");
-        CHIP_ERROR err = LoadFromFlash();
-        if (err != CHIP_NO_ERROR)
+        ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Init");
+        for (auto & storage : EntryStorage::acl)
         {
-            for (auto & storage : EntryStorage::acl)
-            {
-                storage.Clear();
-            }
+            storage.Clear();
         }
-        return err;
+        return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Finish() override
+    void Finish() override { ChipLogProgress(DataManagement, "Examples::AccessControlDelegate::Finish"); }
+
+    CHIP_ERROR GetMaxEntriesPerFabric(size_t & value) const override
     {
-        ChipLogDetail(DataManagement, "Examples::AccessControlDelegate::Finish");
-        return SaveToFlash();
+        value = EntryStorage::kEntriesPerFabric;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetMaxSubjectsPerEntry(size_t & value) const override
+    {
+        value = EntryStorage::kMaxSubjects;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetMaxTargetsPerEntry(size_t & value) const override
+    {
+        value = EntryStorage::kMaxTargets;
+        return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR GetMaxEntryCount(size_t & value) const override
     {
         value = ArraySize(EntryStorage::acl);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetEntryCount(FabricIndex fabric, size_t & value) const override
+    {
+        value = 0;
+        for (const auto & storage : EntryStorage::acl)
+        {
+            if (!storage.InUse())
+            {
+                break;
+            }
+            if (storage.mFabricIndex == fabric)
+            {
+                value++;
+            }
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -1053,9 +1087,15 @@ public:
     {
         if (auto * storage = EntryStorage::FindUsedInAcl(index, fabricIndex))
         {
+            // Best effort attempt to preserve any outstanding delegates...
+            for (auto & delegate : EntryDelegate::pool)
+            {
+                delegate.FixBeforeDelete(*storage);
+            }
+
+            // ...then go through the access control list starting at the deleted storage...
             constexpr auto & acl = EntryStorage::acl;
             constexpr auto * end = acl + ArraySize(acl);
-            // Go through the access control list starting at the deleted storage...
             for (auto * next = storage + 1; storage < end; ++storage, ++next)
             {
                 // ...copying over each storage with its next one...
@@ -1070,6 +1110,7 @@ public:
                     break;
                 }
             }
+
             // ...then fix up all the delegates so they still use the proper storage.
             storage = acl + index;
             for (auto & delegate : EntryDelegate::pool)
@@ -1080,8 +1121,10 @@ public:
             {
                 delegate.FixAfterDelete(*storage);
             }
+
             return CHIP_NO_ERROR;
         }
+
         return CHIP_ERROR_SENTINEL;
     }
 
@@ -1095,12 +1138,11 @@ public:
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
-    bool IsTransitional() const override { return false; }
-
-private:
-    CHIP_ERROR LoadFromFlash() { return CHIP_NO_ERROR; }
-
-    CHIP_ERROR SaveToFlash() { return CHIP_NO_ERROR; }
+    CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
+                     Privilege requestPrivilege) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 static_assert(std::is_pod<SubjectStorage>(), "Storage type must be POD");
@@ -1118,10 +1160,10 @@ namespace chip {
 namespace Access {
 namespace Examples {
 
-AccessControl::Delegate & GetAccessControlDelegate()
+AccessControl::Delegate * GetAccessControlDelegate()
 {
     static AccessControlDelegate accessControlDelegate;
-    return accessControlDelegate;
+    return &accessControlDelegate;
 }
 
 } // namespace Examples

@@ -991,8 +991,8 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 {
     if (arg != NULL)
     {
-        TCPEndPointImplLwIP * ep         = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::LayerLwIP & lSystemLayer = static_cast<System::LayerLwIP &>(ep->GetSystemLayer());
+        TCPEndPointImplLwIP * ep             = static_cast<TCPEndPointImplLwIP *>(arg);
+        System::LayerFreeRTOS & lSystemLayer = static_cast<System::LayerFreeRTOS &>(ep->GetSystemLayer());
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
         // try to use the PCB before it receives the TCPError event posted below, we set the PCB to NULL

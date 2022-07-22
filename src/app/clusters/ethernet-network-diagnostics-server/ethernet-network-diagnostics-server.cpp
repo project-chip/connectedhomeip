@@ -47,6 +47,10 @@ public:
 private:
     template <typename T>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR ReadPHYRate(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadFullDuplex(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadCarrierDetect(AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
@@ -67,6 +71,61 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticD
     return aEncoder.Encode(data);
 }
 
+CHIP_ERROR EthernetDiagosticsAttrAccess::ReadPHYRate(AttributeValueEncoder & aEncoder)
+{
+    Attributes::PHYRate::TypeInfo::Type pHYRate;
+    PHYRateType value = EmberAfPHYRateType::EMBER_ZCL_PHY_RATE_TYPE_10_M;
+
+    if (DeviceLayer::GetDiagnosticDataProvider().GetEthPHYRate(value) == CHIP_NO_ERROR)
+    {
+        pHYRate.SetNonNull(value);
+        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d", value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
+    }
+
+    return aEncoder.Encode(pHYRate);
+}
+
+CHIP_ERROR EthernetDiagosticsAttrAccess::ReadFullDuplex(AttributeValueEncoder & aEncoder)
+{
+    Attributes::FullDuplex::TypeInfo::Type fullDuplex;
+    bool value = 0;
+
+    if (DeviceLayer::GetDiagnosticDataProvider().GetEthFullDuplex(value) == CHIP_NO_ERROR)
+    {
+        fullDuplex.SetNonNull(value);
+        ChipLogProgress(Zcl, "The full-duplex operating status of Node: %d", value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
+    }
+
+    return aEncoder.Encode(fullDuplex);
+}
+
+CHIP_ERROR EthernetDiagosticsAttrAccess::ReadCarrierDetect(AttributeValueEncoder & aEncoder)
+{
+    Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
+    bool value = 0;
+
+    if (DeviceLayer::GetDiagnosticDataProvider().GetEthCarrierDetect(value) == CHIP_NO_ERROR)
+    {
+        carrierDetect.SetNonNull(value);
+        ChipLogProgress(Zcl, "The status of the Carrier Detect control signal present on the ethernet network interface: %d",
+                        value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
+    }
+
+    return aEncoder.Encode(carrierDetect);
+}
+
 EthernetDiagosticsAttrAccess gAttrAccess;
 
 CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -80,13 +139,13 @@ CHIP_ERROR EthernetDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
     switch (aPath.mAttributeId)
     {
     case PHYRate::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetEthPHYRate, aEncoder);
+        return ReadPHYRate(aEncoder);
     }
     case FullDuplex::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetEthFullDuplex, aEncoder);
+        return ReadFullDuplex(aEncoder);
     }
     case CarrierDetect::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetEthCarrierDetect, aEncoder);
+        return ReadCarrierDetect(aEncoder);
     }
     case TimeSinceReset::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetEthTimeSinceReset, aEncoder);
@@ -118,29 +177,9 @@ bool emberAfEthernetNetworkDiagnosticsClusterResetCountsCallback(app::CommandHan
                                                                  const app::ConcreteCommandPath & commandPath,
                                                                  const Commands::ResetCounts::DecodableType & commandData)
 {
-    EndpointId endpoint  = commandPath.mEndpointId;
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    DeviceLayer::GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts();
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
 
-    VerifyOrExit(DeviceLayer::GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
-
-    status = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketRxCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset PacketTxCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::TxErrCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset TxErrCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::CollisionCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset CollisionCount attribute"));
-
-    status = EthernetNetworkDiagnostics::Attributes::OverrunCount::Set(endpoint, 0);
-    VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "Failed to reset OverrunCount attribute"));
-
-exit:
-    emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 

@@ -39,6 +39,12 @@ config("mbedtls_cyw30739_config") {
 }
 
 mbedtls_target("mbedtls") {
+  sources = [
+    "${chip_root}/third_party/openthread/ot-ifx/src/cyw30739/mbedtls/library/aes_alt.c",
+    "${chip_root}/third_party/openthread/ot-ifx/src/cyw30739/mbedtls/library/ccm_alt.c",
+    "${chip_root}/third_party/openthread/ot-ifx/src/cyw30739/mbedtls/library/sha256_alt.c",
+  ]
+
   public_configs = [ ":mbedtls_cyw30739_config" ]
 
   public_deps = [ "${openthread_root}/src/core:libopenthread_core_headers" ]

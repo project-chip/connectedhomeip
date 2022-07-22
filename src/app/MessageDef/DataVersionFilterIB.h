@@ -59,7 +59,7 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributePathIB. Next() must be called before accessing them.
      *
-     *  @param [in] apClusterPath    A pointer to apClusterPath
+     *  @param [in] apPath    A pointer to apPath
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path

@@ -54,7 +54,7 @@ CHIP_ERROR InvokeRequests::Parser::CheckSchemaValidity() const
     }
 
     PRETTY_PRINT("],");
-    PRETTY_PRINT("");
+    PRETTY_PRINT_BLANK_LINE();
 
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -66,8 +66,7 @@ CHIP_ERROR InvokeRequests::Parser::CheckSchemaValidity() const
         }
     }
     ReturnErrorOnFailure(err);
-    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
+    return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 

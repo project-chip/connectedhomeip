@@ -34,18 +34,23 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
+#include "cyhal_wdt.h"
 #include "init_p6Platform.h"
 #include <app/server/Server.h>
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
+#define MAIN_TASK_STACK_SIZE (4096)
+#define MAIN_TASK_PRIORITY 2
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
 volatile int apperror_cnt;
+static void main_task(void * pvParameters);
+
 // ================================================================================
 // App Error
 //=================================================================================
@@ -70,24 +75,17 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 }
 
-// ================================================================================
-// Main Code
-// ================================================================================
-int main(void)
+extern "C" void vApplicationDaemonTaskStartupHook()
 {
-    init_p6Platform();
-
-#ifdef HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
-#endif
-
-    P6_LOG("==================================================\r\n");
-    P6_LOG("chip-p6-lighting-example starting\r\n");
-    P6_LOG("==================================================\r\n");
-
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
 
+    /* Create the Main task. */
+    xTaskCreate(main_task, "Main task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, NULL);
+}
+
+static void main_task(void * pvParameters)
+{
     CHIP_ERROR ret = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
     if (ret != CHIP_NO_ERROR)
     {
@@ -101,7 +99,14 @@ int main(void)
         P6_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_LIGHT");
+
+    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_LIGHT");
+    if (ret != CHIP_NO_ERROR)
+    {
+        P6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
+        appError(ret);
+    }
+
     P6_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
@@ -115,6 +120,31 @@ int main(void)
         P6_LOG("GetAppTask().Init() failed");
         appError(ret);
     }
+
+    /* Delete task */
+    vTaskDelete(NULL);
+}
+
+// ================================================================================
+// Main Code
+// ================================================================================
+int main(void)
+{
+    init_p6Platform();
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    // Clear watchdog timer (started by bootloader) so that it doesn't trigger a reset
+    cyhal_wdt_t wdt_obj;
+    cyhal_wdt_init(&wdt_obj, cyhal_wdt_get_max_timeout_ms());
+    cyhal_wdt_free(&wdt_obj);
+#endif
+#ifdef HEAP_MONITORING
+    MemMonitoring::startHeapMonitoring();
+#endif
+
+    P6_LOG("==================================================\r\n");
+    P6_LOG("chip-p6-lighting-example starting\r\n");
+    P6_LOG("==================================================\r\n");
+
     /* Start the FreeRTOS scheduler */
     vTaskStartScheduler();
 
@@ -124,5 +154,4 @@ int main(void)
 
     // Should never get here.
     P6_LOG("vTaskStartScheduler() failed");
-    appError(ret);
 }

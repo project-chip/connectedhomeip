@@ -32,7 +32,7 @@
 #include <platform/ThreadStackManager.h>
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
 
@@ -55,7 +55,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInst);
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
 exit:
@@ -106,4 +106,9 @@ extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 extern "C" void otPlatFree(void * aPtr)
 {
     return CHIPPlatformMemoryFree(aPtr);
+}
+
+extern "C" void * otPlatRealloc(void * p, size_t aSize)
+{
+    return CHIPPlatformMemoryRealloc(p, aSize);
 }

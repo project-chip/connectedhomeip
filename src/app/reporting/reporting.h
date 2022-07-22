@@ -50,7 +50,7 @@
  * notification to inform its reporting decisions.
  */
 void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                            uint8_t mask, EmberAfAttributeType type, uint8_t * data);
+                                            EmberAfAttributeType type, uint8_t * data);
 
 /*
  * Same but with just an attribute path and no data available.
@@ -61,3 +61,8 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
  * Same but with a nicer attribute path.
  */
 void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath);
+
+/*
+ * Same but only with an EndpointId, this is used when adding / enabling an endpoint during runtime.
+ */
+void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint);

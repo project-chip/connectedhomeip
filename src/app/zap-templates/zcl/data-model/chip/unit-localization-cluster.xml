@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP" />
+  <enum name="TempUnit" type="ENUM8">
+    <cluster code="0x002d"/>
+    <item name="Fahrenheit" value="0x00"/>
+    <item name="Celsius" value="0x01"/>
+    <item name="Kelvin" value="0x02"/>
+  </enum>
+  <cluster>
+    <domain>CHIP</domain>
+    <name>Unit Localization</name>
+    <code>0x002d</code>
+    <define>UNIT_LOCALIZATION_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit.</description>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <!-- Base data types -->
+    <attribute side="server" code="0x00" define="TEMPERATURE_UNIT" type="TempUnit" min="0" max="2" writable="true" optional="true">TemperatureUnit</attribute>
+  </cluster>
+  <bitmap name="UnitLocalizationFeature" type="BITMAP32">
+    <cluster code="0x002d"/>
+    <field name="TemperatureUnit" mask="0x1"/>
+  </bitmap>
+</configurator>

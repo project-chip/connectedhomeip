@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,27 +42,45 @@ namespace Internal {
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
 // NVS namespaces used to store device configuration information.
-const char AmebaConfig::kConfigNamespace_ChipFactory[]  = "chip-factory";
-const char AmebaConfig::kConfigNamespace_ChipConfig[]   = "chip-config";
-const char AmebaConfig::kConfigNamespace_ChipCounters[] = "chip-counters";
+const char AmebaConfig::kConfigNamespace_ChipFactory[]              = "chip-factory";
+const char AmebaConfig::kConfigNamespace_ChipConfig[]               = "chip-config";
+const char AmebaConfig::kConfigNamespace_ChipCounters[]             = "chip-counters";
+const char AmebaConfig::kConfigNamespace_ChipFabric1[]              = "chip-fabric-1";
+const char AmebaConfig::kConfigNamespace_ChipFabric2[]              = "chip-fabric-2";
+const char AmebaConfig::kConfigNamespace_ChipFabric3[]              = "chip-fabric-3";
+const char AmebaConfig::kConfigNamespace_ChipFabric4[]              = "chip-fabric-4";
+const char AmebaConfig::kConfigNamespace_ChipFabric5[]              = "chip-fabric-5";
+const char AmebaConfig::kConfigNamespace_ChipACL[]                  = "chip-acl";
+const char AmebaConfig::kConfigNamespace_ChipGroupMessageCounters[] = "chip-groupmsgcounters";
+const char AmebaConfig::kConfigNamespace_ChipAttributes[]           = "chip-attributes";
+const char AmebaConfig::kConfigNamespace_ChipBindingTable[]         = "chip-bindingtable";
+const char AmebaConfig::kConfigNamespace_ChipOTA[]                  = "chip-ota";
+const char AmebaConfig::kConfigNamespace_ChipFailSafe[]             = "chip-failsafe";
+const char AmebaConfig::kConfigNamespace_ChipSessionResumption[]    = "chip-sessionresumption";
+const char AmebaConfig::kConfigNamespace_ChipDeviceInfoProvider[]   = "chip-deviceinfoprovider";
+const char AmebaConfig::kConfigNamespace_ChipGroupDataProvider[]    = "chip-groupdataprovider";
+const char AmebaConfig::kConfigNamespace_ChipOthers[]               = "chip-others";
+const char AmebaConfig::kConfigNamespace_ChipOthers2[]              = "chip-others2";
 
 // Keys stored in the chip-factory namespace
-const AmebaConfig::Key AmebaConfig::kConfigKey_SerialNum           = { kConfigNamespace_ChipFactory, "serial-num" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceId         = { kConfigNamespace_ChipFactory, "device-id" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_SerialNum             = { kConfigNamespace_ChipFactory, "serial-num" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceId           = { kConfigNamespace_ChipFactory, "device-id" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceCert         = { kConfigNamespace_ChipFactory, "device-cert" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceICACerts     = { kConfigNamespace_ChipFactory, "device-ca-certs" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDevicePrivateKey   = { kConfigNamespace_ChipFactory, "device-key" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_HardwareVersion       = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_ManufacturingDate     = { kConfigNamespace_ChipFactory, "mfg-date" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_SetupPinCode          = { kConfigNamespace_ChipFactory, "pin-code" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_SetupDiscriminator    = { kConfigNamespace_ChipFactory, "discriminator" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_Spake2pIterationCount = { kConfigNamespace_ChipFactory, "iteration-count" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_Spake2pSalt           = { kConfigNamespace_ChipFactory, "salt" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_Spake2pVerifier       = { kConfigNamespace_ChipFactory, "verifier" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_UniqueId              = { kConfigNamespace_ChipFactory, "uniqueId" };
 
 // Keys stored in the chip-config namespace
-const AmebaConfig::Key AmebaConfig::kConfigKey_FabricId                    = { kConfigNamespace_ChipConfig, "fabric-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ServiceConfig               = { kConfigNamespace_ChipConfig, "service-config" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_PairedAccountId             = { kConfigNamespace_ChipConfig, "account-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ServiceId                   = { kConfigNamespace_ChipConfig, "service-id" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_GroupKeyIndex               = { kConfigNamespace_ChipConfig, "group-key-index" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_LastUsedEpochKeyId          = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_FailSafeArmed               = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_WiFiStationSecType          = { kConfigNamespace_ChipConfig, "sta-sec-type" };
@@ -72,8 +90,6 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDeviceICACerts   = { k
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_ActiveLocale                = { kConfigNamespace_ChipConfig, "active-locale" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the Chip-counters namespace
 const AmebaConfig::Key AmebaConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -83,16 +99,16 @@ const AmebaConfig::Key AmebaConfig::kCounterKey_BootReason            = { kConfi
 
 CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, bool & val)
 {
-    uint32_t intVal;
+    uint8_t intVal;
     int32_t success = 0;
 
     success = getPref_bool_new(key.Namespace, key.Name, &intVal);
-    if (!success)
-        ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
+    if (success != 0)
+        ChipLogProgress(DeviceLayer, "getPref_bool_new: %s/%s failed\n", key.Namespace, key.Name);
 
     val = (intVal != 0);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -103,10 +119,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint32_t & val)
     int32_t success = 0;
 
     success = getPref_u32_new(key.Namespace, key.Name, &val);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -117,10 +133,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValue(Key key, uint64_t & val)
     int32_t success = 0;
 
     success = getPref_u64_new(key.Namespace, key.Name, &val);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_u32_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
         return CHIP_NO_ERROR;
     else
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
@@ -131,10 +147,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     int32_t success = 0;
 
     success = getPref_str_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_str_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
     {
         return CHIP_NO_ERROR;
     }
@@ -150,10 +166,10 @@ CHIP_ERROR AmebaConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSiz
     int32_t success = 0;
 
     success = getPref_bin_new(key.Namespace, key.Name, buf, bufSize, &outLen);
-    if (!success)
+    if (success != 0)
         ChipLogProgress(DeviceLayer, "getPref_bin_new: %s/%s failed\n", key.Namespace, key.Name);
 
-    if (success == 1)
+    if (success == 0)
     {
         return CHIP_NO_ERROR;
     }
@@ -263,6 +279,19 @@ CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
     if (success != 0)
     {
         ChipLogError(DeviceLayer, "dct_register_module failed\n");
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AmebaConfig::EnsureNamespace2(const char * ns)
+{
+    int32_t success = -1;
+
+    success = registerPref2(ns);
+    if (success != 0)
+    {
+        ChipLogError(DeviceLayer, "dct_register_module2 failed\n");
     }
 
     return CHIP_NO_ERROR;

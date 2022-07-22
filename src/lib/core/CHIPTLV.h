@@ -32,6 +32,7 @@
 #include <lib/core/CHIPTLVTypes.h>
 
 #include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/ScopedBuffer.h>
@@ -55,12 +56,12 @@
 namespace chip {
 namespace TLV {
 
-inline uint8_t operator|(TLVElementType lhs, TLVTagControl rhs)
+constexpr inline uint8_t operator|(TLVElementType lhs, TLVTagControl rhs)
 {
     return static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs);
 }
 
-inline uint8_t operator|(TLVTagControl lhs, TLVElementType rhs)
+constexpr inline uint8_t operator|(TLVTagControl lhs, TLVElementType rhs)
 {
     return static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs);
 }
@@ -532,6 +533,21 @@ public:
     }
 
     /**
+     * Get the value of the current element as a BitMask value, if it's an integer
+     * value that fits in the BitMask type.
+     *
+     * @param[out] v Receives the value associated with current TLV element.
+     */
+    template <typename T>
+    CHIP_ERROR Get(BitMask<T> & v)
+    {
+        std::underlying_type_t<T> val;
+        ReturnErrorOnFailure(Get(val));
+        v.SetRaw(val);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * Get the value of the current byte or UTF8 string element.
      *
      * To determine the required input buffer size, call the GetLength() method before calling GetBytes().
@@ -629,10 +645,12 @@ public:
     /**
      * Get a pointer to the initial encoded byte of a TLV byte or UTF8 string element.
      *
-     * This method returns a direct pointer the encoded string value within the underlying input buffer.
-     * To succeed, the method requires that the entirety of the string value be present in a single buffer.
-     * Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.  This makes the method of limited use when
-     * reading data from multiple discontiguous buffers.
+     * This method returns a direct pointer to the encoded string value within the underlying input buffer
+     * if a non-zero length string payload is present. To succeed, the method requires that the entirety of the
+     * string value be present in a single buffer. Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.
+     * This makes the method of limited use when reading data from multiple discontiguous buffers.
+     *
+     * If no string data is present (i.e the length is zero), data shall be updated to point to null.
      *
      * @param[out] data                     A reference to a const pointer that will receive a pointer to
      *                                      the underlying string data.
@@ -838,6 +856,19 @@ public:
     uint32_t GetRemainingLength() const { return mMaxLen - mLenRead; }
 
     /**
+     * Return the total number of bytes for the TLV data
+     * @return the total number of bytes for the TLV data
+     */
+    uint32_t GetTotalLength() const { return mMaxLen; }
+
+    /**
+     * Returns the stored backing store.
+     *
+     * @return the stored backing store.
+     */
+    TLVBackingStore * GetBackingStore() { return mBackingStore; }
+
+    /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.
      *
      * @note Depending on the type of the current element, GetReadPoint() will return a pointer that
@@ -938,7 +969,7 @@ protected:
     CHIP_ERROR SkipData();
     CHIP_ERROR SkipToEndOfContainer();
     CHIP_ERROR VerifyElement();
-    Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p);
+    Tag ReadTag(TLVTagControl tagControl, const uint8_t *& p) const;
     CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
@@ -1414,6 +1445,16 @@ public:
      */
     template <typename T>
     CHIP_ERROR Put(Tag tag, BitFlags<T> data)
+    {
+        return Put(tag, data.Raw());
+    }
+
+    /**
+     *
+     * Encodes an unsigned integer with bits corresponding to the flags set when data is a BitMask
+     */
+    template <typename T>
+    CHIP_ERROR Put(Tag tag, BitMask<T> data)
     {
         return Put(tag, data.Raw());
     }
@@ -2370,7 +2411,7 @@ public:
      *                          implicit form.
      */
     void SetImplicitProfileId(uint32_t profileId);
-    uint32_t GetImplicitProfileId() { return mUpdaterReader.ImplicitProfileId; }
+    uint32_t GetImplicitProfileId() const { return mUpdaterReader.ImplicitProfileId; }
 
     /**
      * Copies the current element from input TLV to output TLV.
@@ -2610,7 +2651,7 @@ public:
     }
     CHIP_ERROR EndContainer(TLVType outerContainerType) { return mUpdaterWriter.EndContainer(outerContainerType); }
     uint32_t GetLengthWritten() { return mUpdaterWriter.GetLengthWritten(); }
-    uint32_t GetRemainingFreeLength() { return mUpdaterWriter.mRemainingLen; }
+    uint32_t GetRemainingFreeLength() const { return mUpdaterWriter.mRemainingLen; }
 
 private:
     void AdjustInternalWriterFreeSpace();

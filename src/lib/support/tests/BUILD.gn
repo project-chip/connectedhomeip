@@ -22,6 +22,7 @@ chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
+    "TestBitMask.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
     "TestBytesCircularBuffer.cpp",
@@ -33,8 +34,10 @@ chip_test_suite("tests") {
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
     "TestFold.cpp",
+    "TestIniEscaping.cpp",
     "TestIntrusiveList.cpp",
     "TestOwnerOf.cpp",
+    "TestPersistedCounter.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
@@ -44,8 +47,10 @@ chip_test_suite("tests") {
     "TestSpan.cpp",
     "TestStateMachine.cpp",
     "TestStringBuilder.cpp",
+    "TestTestPersistentStorageDelegate.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
+    "TestTlvToJson.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
@@ -55,19 +60,13 @@ chip_test_suite("tests") {
     test_sources += [ "TestCHIPArgParser.cpp" ]
   }
 
-  if (current_os == "linux" || current_os == "mac") {
-    # persisted counter unit test uses file-based persistent storage
-    test_sources += [ "TestPersistedCounter.cpp" ]
-    sources += [
-      "TestPersistedStorageImplementation.cpp",
-      "TestPersistedStorageImplementation.h",
-    ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]

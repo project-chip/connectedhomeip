@@ -35,6 +35,7 @@ qpg_sdk("sdk") {
 static_library("qpg") {
   deps = [
     "//src/app/server",
+    "//src/controller",
     "//src/lib",
   ]
 

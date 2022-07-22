@@ -15,6 +15,7 @@
 name: 24.6.1. [TC-LVL-6.1] Stop Verification (DUT as Server)
 
 config:
+    nodeId: 0x12344321
     cluster: "Level Control"
     endpoint: 1
 
@@ -22,17 +23,42 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "Sending on command"
+    - label: "Precondition Send On Command"
       cluster: "On/Off"
-      command: "on"
+      PICS: OO.S.C01.Rsp
+      command: "On"
 
-    - label: "Precondition: set DUT to lowest point"
-      command: "MoveToLevel"
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Reads Minlevel attribute from DUT"
+      PICS: LVL.S.A0002
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          saveAs: MinlevelValue
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 255
+
+    - label: "Sends MoveToLevelWithOnOff command to DUT"
+      PICS: LVL.S.C04.Rsp
+      command: "MoveToLevelWithOnOff"
       arguments:
           values:
               - name: "level"
-                value: 0
+                value: 1
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
@@ -40,82 +66,130 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    # For lighting Device type current level minimal value is 1
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
+          saveAs: CurrentLevelValue
           constraints:
               minValue: 0
-              maxValue: 1
+              maxValue: 255
 
     - label: "Sends a move up command to DUT"
+      PICS: LVL.S.C01.Rsp
       command: "Move"
       arguments:
           values:
               - name: "moveMode"
                 value: 0
               - name: "rate"
-                value: 1
+                value: 5
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 2000ms"
+    - label: "Wait 5000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: 5000
+
+    - label: "Sends stop command to DUT"
+      PICS: LVL.S.C03.Rsp
+      command: "Stop"
+      arguments:
+          values:
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Physically verify that the device has stopped transitioning"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.C03.Rsp && LVL.S.A0000
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          constraints:
+              minValue: 22
+              maxValue: 28
+              notValue: CurrentLevelValue
+
+    - label: "Sends a move up command to DUT"
+      PICS: LVL.S.C01.Rsp
+      command: "Move"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 5
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 5000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label: "Sends stop command to DUT"
       command: "Stop"
       arguments:
           values:
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
+
+    - label: "Physically verify that the device has stopped transitioning"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Reads CurrentLevel attribute from DUT"
+      PICS: LVL.S.C01.Rsp && LVL.S.C07.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "current level"
       response:
           constraints:
-              minValue: 2
-              maxValue: 3
+              minValue: 45
+              maxValue: 55
+              notValue: CurrentLevelValue
 
-    - label: "Reset level to 254"
-      command: "MoveToLevel"
-      arguments:
-          values:
-              - name: "level"
-                value: 254
-              - name: "transitionTime"
-                value: 0
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 100ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 100
-
-    - label: "Sending off command"
+    - label: "Precondition send Off Command"
       cluster: "On/Off"
-      command: "off"
+      PICS: OO.S.C00.Rsp
+      command: "Off"
+
+    - label: "Check on/off attribute value is false after off command"
+      cluster: "On/Off"
+      PICS: OO.S.A0000
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0

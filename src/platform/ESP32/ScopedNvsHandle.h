@@ -34,9 +34,9 @@ class ScopedNvsHandle
 public:
     ScopedNvsHandle() : mIsOpen(false) {}
     ~ScopedNvsHandle() { Close(); }
-    CHIP_ERROR Open(const char * name, nvs_open_mode_t open_mode)
+    CHIP_ERROR Open(const char * name, nvs_open_mode_t open_mode, const char * partition_label = NVS_DEFAULT_PART_NAME)
     {
-        esp_err_t err = nvs_open(name, open_mode, &mHandle);
+        esp_err_t err = nvs_open_from_partition(partition_label, name, open_mode, &mHandle);
         if (err == ESP_OK)
         {
             mIsOpen = true;

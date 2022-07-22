@@ -73,10 +73,8 @@ struct VariantCurry<Index, T, Ts...>
         {
             return *reinterpret_cast<const T *>(this_v) == *reinterpret_cast<const T *>(that_v);
         }
-        else
-        {
-            return VariantCurry<Index + 1, Ts...>::Equal(type_t, that_v, this_v);
-        }
+
+        return VariantCurry<Index + 1, Ts...>::Equal(type_t, that_v, this_v);
     }
 };
 

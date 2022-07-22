@@ -110,7 +110,7 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
-class DLL_EXPORT EchoServer : public Messaging::ExchangeDelegate
+class DLL_EXPORT EchoServer : public Messaging::UnsolicitedMessageHandler, public Messaging::ExchangeDelegate
 {
 public:
     /**
@@ -147,6 +147,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     EchoFunct OnEchoRequestReceived           = nullptr;
 
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}

@@ -40,6 +40,36 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/P6/NetworkCommissioningDriver.h>
+
+/* OTA related includes */
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <platform/P6/OTAImageProcessorImpl.h>
+extern "C" {
+#include "cy_smif_psoc6.h"
+}
+using chip::BDXDownloader;
+using chip::CharSpan;
+using chip::DefaultOTARequestor;
+using chip::FabricIndex;
+using chip::GetRequestorInstance;
+using chip::NodeId;
+using chip::OTADownloader;
+using chip::OTAImageProcessorImpl;
+using chip::System::Layer;
+
+using namespace ::chip;
+using namespace chip::TLV;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::System;
+
+#endif
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_WAIT_LOOP 1000
@@ -58,14 +88,54 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+DefaultOTARequestor gRequestorCore;
+DefaultOTARequestorStorage gRequestorStorage;
+DefaultOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
+#endif
+
 } // namespace
 
+using namespace ::chip;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
+using namespace ::chip::System;
 
 AppTask AppTask::sAppTask;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::P6WiFiDriver::GetInstance()));
+
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
+
+static void InitServer(intptr_t context)
+{
+    // Init ZCL Data Model
+    static chip::CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    chip::Server::GetInstance().Init(initParams);
+
+    // We only have network commissioning on endpoint 0.
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+
+    // Initialize device attestation config
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    GetAppTask().InitOTARequestor();
+#endif
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -83,7 +153,14 @@ CHIP_ERROR AppTask::StartAppTask()
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    int rc = boot_set_confirmed();
+    if (rc != 0)
+    {
+        P6_LOG("boot_set_confirmed failed");
+        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+    }
+#endif
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
@@ -98,15 +175,13 @@ CHIP_ERROR AppTask::Init()
             }
         },
         0);
-    // Init ZCL Data Model
-    chip::Server::GetInstance().Init();
 
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
 
+    NetWorkCommissioningInstInit();
     P6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize LEDs
@@ -145,13 +220,13 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::LightActionEventHandler(AppEvent * aEvent)
+void AppTask::LightActionEventHandler(AppEvent * event)
 {
     /* ON/OFF Light Led based on Button interrupt */
     sLightLED.Invert();
 
     /* Update OnOff Cluster state */
-    sAppTask.OnOffUpdateClusterState();
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(OnOffUpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
@@ -173,7 +248,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     }
 }
 
-void AppTask::PostEvent(const AppEvent * aEvent)
+void AppTask::PostEvent(const AppEvent * event)
 {
     if (sAppEventQueue != NULL)
     {
@@ -181,7 +256,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         if (xPortIsInsideInterrupt())
         {
             BaseType_t higherPrioTaskWoken = pdFALSE;
-            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+            status                         = xQueueSendFromISR(sAppEventQueue, event, &higherPrioTaskWoken);
 
 #ifdef portYIELD_FROM_ISR
             portYIELD_FROM_ISR(higherPrioTaskWoken);
@@ -193,7 +268,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         }
         else
         {
-            status = xQueueSend(sAppEventQueue, aEvent, 1);
+            status = xQueueSend(sAppEventQueue, event, 1);
         }
 
         if (!status)
@@ -205,11 +280,11 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
 }
 
-void AppTask::DispatchEvent(AppEvent * aEvent)
+void AppTask::DispatchEvent(AppEvent * event)
 {
-    if (aEvent->Handler)
+    if (event->Handler)
     {
-        aEvent->Handler(aEvent);
+        event->Handler(event);
     }
     else
     {
@@ -217,12 +292,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::OnOffUpdateClusterState(void)
+void AppTask::OnOffUpdateClusterState(intptr_t context)
 {
-    uint8_t newValue = sLightLED.Get();
+    uint8_t onoff = sLightLED.Get();
 
     // write the new on/off value
-    EmberAfStatus status = OnOff::Attributes::OnOff::Set(2, newValue);
+    EmberAfStatus status =
+        emberAfWriteServerAttribute(2, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         P6_LOG("ERR: updating on/off %x", status);
@@ -233,3 +310,39 @@ bool lowPowerClusterSleep()
 {
     return true;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+void AppTask::InitOTARequestor()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SetRequestorInstance(&gRequestorCore);
+    gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
+    gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    uint32_t savedSoftwareVersion;
+    err = ConfigurationMgr().GetSoftwareVersion(savedSoftwareVersion);
+    if (err != CHIP_NO_ERROR)
+    {
+        P6_LOG("Can't get saved software version");
+        appError(err);
+    }
+
+    if (savedSoftwareVersion != CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
+    {
+        ConfigurationMgr().StoreSoftwareVersion(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+
+        P6_LOG("Confirming update to version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+        chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
+        if (requestor != nullptr)
+        {
+            requestor->NotifyUpdateApplied();
+        }
+    }
+
+    P6_LOG("Current Software Version: %u", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    P6_LOG("Current Firmware Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+}
+#endif

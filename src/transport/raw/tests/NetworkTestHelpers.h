@@ -36,13 +36,11 @@ namespace Test {
 class IOContext
 {
 public:
-    IOContext() {}
-
     /// Initialize the underlying layers and test suite pointer
     CHIP_ERROR Init();
 
     // Shutdown all layers, finalize operations
-    CHIP_ERROR Shutdown();
+    void Shutdown();
 
     /// Perform a single short IO Loop
     void DriveIO();
@@ -61,25 +59,32 @@ private:
     Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 };
 
+class LoopbackTransportDelegate
+{
+public:
+    virtual ~LoopbackTransportDelegate() {}
+
+    // Called by the loopback transport when it drops a message due to a nonzero mNumMessagesToDrop.
+    virtual void OnMessageDropped() {}
+};
+
 class LoopbackTransport : public Transport::Base
 {
 public:
+    void InitLoopbackTransport(System::Layer * systemLayer) { mSystemLayer = systemLayer; }
+    void ShutdownLoopbackTransport()
+    {
+        // Make sure no one left packets hanging out that they thought got
+        // delivered but actually didn't.
+        VerifyOrDie(mPendingMessageQueue.empty());
+    }
+
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char *) { return CHIP_NO_ERROR; }
 
-    /*
-     * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
-     * this mode better replicates a real-functioning stack that correctly handles the processing
-     * of a transmitted message as an asynchronous, bottom half handler dispatched after the current execution context has
-     * completed. This is achieved using SystemLayer::ScheduleWork.
-     */
-    void EnableAsyncDispatch(System::Layer * aSystemLayer)
-    {
-        mSystemLayer          = aSystemLayer;
-        mAsyncMessageDispatch = true;
-    }
-
     bool HasPendingMessages() { return !mPendingMessageQueue.empty(); }
+
+    void SetLoopbackTransportDelegate(LoopbackTransportDelegate * delegate) { mDelegate = delegate; }
 
     static void OnMessageReceived(System::Layer * aSystemLayer, void * aAppState)
     {
@@ -101,22 +106,15 @@ public:
         if (mNumMessagesToDrop == 0)
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-
-            if (mAsyncMessageDispatch)
-            {
-                mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
-                mSystemLayer->ScheduleWork(OnMessageReceived, this);
-            }
-            else
-            {
-                HandleMessageReceived(address, std::move(receivedMessage));
-            }
+            mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+            mSystemLayer->ScheduleWork(OnMessageReceived, this);
         }
         else
         {
             mNumMessagesToDrop--;
             mDroppedMessageCount++;
-            MessageDropped();
+            if (mDelegate != nullptr)
+                mDelegate->OnMessageDropped();
         }
 
         return CHIP_NO_ERROR;
@@ -142,17 +140,14 @@ public:
         System::PacketBufferHandle mPendingMessage;
     };
 
-    // Hook for subclasses to perform custom logic on message drops.
-    virtual void MessageDropped() {}
-
     System::Layer * mSystemLayer = nullptr;
-    bool mAsyncMessageDispatch   = false;
     std::queue<PendingMessageItem> mPendingMessageQueue;
     Transport::PeerAddress mTxAddress;
-    uint32_t mNumMessagesToDrop   = 0;
-    uint32_t mDroppedMessageCount = 0;
-    uint32_t mSentMessageCount    = 0;
-    CHIP_ERROR mMessageSendError  = CHIP_NO_ERROR;
+    uint32_t mNumMessagesToDrop           = 0;
+    uint32_t mDroppedMessageCount         = 0;
+    uint32_t mSentMessageCount            = 0;
+    CHIP_ERROR mMessageSendError          = CHIP_NO_ERROR;
+    LoopbackTransportDelegate * mDelegate = nullptr;
 };
 
 } // namespace Test

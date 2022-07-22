@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -203,6 +203,13 @@ static void TestCD_EncodeDecode(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, decodedElements.DACOriginVendorId == testCase.cdElements.DACOriginVendorId);
             NL_TEST_ASSERT(inSuite, decodedElements.DACOriginProductId == testCase.cdElements.DACOriginProductId);
         }
+        NL_TEST_ASSERT(inSuite, decodedElements.AuthorizedPAAListCount == testCase.cdElements.AuthorizedPAAListCount);
+        for (uint8_t j = 0; j < decodedElements.AuthorizedPAAListCount; j++)
+        {
+            NL_TEST_ASSERT(
+                inSuite,
+                memcmp(decodedElements.AuthorizedPAAList[j], testCase.cdElements.AuthorizedPAAList[j], kKeyIdentifierLength) == 0);
+        }
     }
 }
 
@@ -347,6 +354,113 @@ static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * in
             NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginVendorId == testCase.cdElements.DACOriginVendorId);
             NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginProductId == testCase.cdElements.DACOriginProductId);
         }
+        if (testCase.cdElements.AuthorizedPAAListCount > 0)
+        {
+            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.authorizedPAAListPresent);
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, !certificationDeclarationContent.authorizedPAAListPresent);
+        }
+    }
+}
+
+static void TestCD_EncodeDecode_Random(nlTestSuite * inSuite, void * inContext)
+{
+    CertificationElements randomElements = { .FormatVersion             = 0x6F,
+                                             .VendorId                  = 0x88EA,
+                                             .ProductIds                = { 0 },
+                                             .ProductIdsCount           = kMaxProductIdsCount,
+                                             .DeviceTypeId              = 0x1234,
+                                             .CertificateId             = "ZIG20141ZB330001-24",
+                                             .SecurityLevel             = 10,
+                                             .SecurityInformation       = 0xFA,
+                                             .VersionNumber             = 0x28CA,
+                                             .CertificationType         = 1,
+                                             .DACOriginVendorId         = 0x01DC,
+                                             .DACOriginProductId        = 0x10EE,
+                                             .DACOriginVIDandPIDPresent = false,
+                                             .AuthorizedPAAList         = { { 0 } },
+                                             .AuthorizedPAAListCount    = kMaxAuthorizedPAAListCount };
+
+    uint16_t pid = 0x8000;
+    for (uint8_t j = 0; j < randomElements.ProductIdsCount; j++, pid++)
+    {
+        randomElements.ProductIds[j] = pid;
+    }
+    uint8_t kid[kKeyIdentifierLength] = { 0xF4, 0x44, 0xCA, 0xBB, 0xC5, 0x01, 0x65, 0x77, 0xAA, 0x8B,
+                                          0x44, 0xFF, 0xB9, 0x0F, 0xCC, 0xA1, 0x40, 0xFE, 0x66, 0x20 };
+    for (uint8_t j = 0; j < randomElements.AuthorizedPAAListCount; j++)
+    {
+        kid[(j % kKeyIdentifierLength)] ^= 0xFF;
+        memcpy(randomElements.AuthorizedPAAList[j], kid, kKeyIdentifierLength);
+    }
+
+    uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
+    MutableByteSpan encodedCDPayload(encodedCertElemBuf);
+    CertificationElements decodedElements;
+
+    NL_TEST_ASSERT(inSuite, EncodeCertificationElements(randomElements, encodedCDPayload) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, decodedElements) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decodedElements.FormatVersion == randomElements.FormatVersion);
+    NL_TEST_ASSERT(inSuite, decodedElements.VendorId == randomElements.VendorId);
+    NL_TEST_ASSERT(inSuite, decodedElements.ProductIdsCount == randomElements.ProductIdsCount);
+    for (uint8_t j = 0; j < decodedElements.ProductIdsCount; j++)
+    {
+        NL_TEST_ASSERT(inSuite, decodedElements.ProductIds[j] == randomElements.ProductIds[j]);
+    }
+    NL_TEST_ASSERT(inSuite, decodedElements.DeviceTypeId == randomElements.DeviceTypeId);
+    NL_TEST_ASSERT(inSuite, memcmp(decodedElements.CertificateId, randomElements.CertificateId, kCertificateIdLength) == 0);
+    NL_TEST_ASSERT(inSuite, decodedElements.SecurityLevel == randomElements.SecurityLevel);
+    NL_TEST_ASSERT(inSuite, decodedElements.SecurityInformation == randomElements.SecurityInformation);
+    NL_TEST_ASSERT(inSuite, decodedElements.VersionNumber == randomElements.VersionNumber);
+    NL_TEST_ASSERT(inSuite, decodedElements.CertificationType == randomElements.CertificationType);
+    NL_TEST_ASSERT(inSuite, decodedElements.DACOriginVIDandPIDPresent == randomElements.DACOriginVIDandPIDPresent);
+    if (decodedElements.DACOriginVIDandPIDPresent)
+    {
+        NL_TEST_ASSERT(inSuite, decodedElements.DACOriginVendorId == randomElements.DACOriginVendorId);
+        NL_TEST_ASSERT(inSuite, decodedElements.DACOriginProductId == randomElements.DACOriginProductId);
+    }
+    NL_TEST_ASSERT(inSuite, decodedElements.AuthorizedPAAListCount == randomElements.AuthorizedPAAListCount);
+    for (uint8_t j = 0; j < decodedElements.AuthorizedPAAListCount; j++)
+    {
+        NL_TEST_ASSERT(
+            inSuite, memcmp(decodedElements.AuthorizedPAAList[j], randomElements.AuthorizedPAAList[j], kKeyIdentifierLength) == 0);
+    }
+
+    CertificationElementsWithoutPIDs decodedElements2;
+    CertificationElementsDecoder cdElementsDecoder;
+    NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, decodedElements2) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, decodedElements2.formatVersion == randomElements.FormatVersion);
+    NL_TEST_ASSERT(inSuite, decodedElements2.vendorId == randomElements.VendorId);
+    for (uint8_t j = 0; j < randomElements.ProductIdsCount; j++)
+    {
+        NL_TEST_ASSERT(inSuite, cdElementsDecoder.IsProductIdIn(encodedCDPayload, randomElements.ProductIds[j]));
+        // now test for an unexistent ProductId
+        NL_TEST_ASSERT(inSuite, cdElementsDecoder.IsProductIdIn(encodedCDPayload, pid++) == false);
+    }
+    NL_TEST_ASSERT(inSuite, decodedElements2.deviceTypeId == randomElements.DeviceTypeId);
+    NL_TEST_ASSERT(inSuite, memcmp(decodedElements2.certificateId, randomElements.CertificateId, kCertificateIdLength) == 0);
+    NL_TEST_ASSERT(inSuite, decodedElements2.securityLevel == randomElements.SecurityLevel);
+    NL_TEST_ASSERT(inSuite, decodedElements2.securityInformation == randomElements.SecurityInformation);
+    NL_TEST_ASSERT(inSuite, decodedElements2.versionNumber == randomElements.VersionNumber);
+    NL_TEST_ASSERT(inSuite, decodedElements2.certificationType == randomElements.CertificationType);
+    NL_TEST_ASSERT(inSuite, decodedElements2.dacOriginVIDandPIDPresent == randomElements.DACOriginVIDandPIDPresent);
+    if (decodedElements2.dacOriginVIDandPIDPresent)
+    {
+        NL_TEST_ASSERT(inSuite, decodedElements2.dacOriginVendorId == randomElements.DACOriginVendorId);
+        NL_TEST_ASSERT(inSuite, decodedElements2.dacOriginProductId == randomElements.DACOriginProductId);
+    }
+    NL_TEST_ASSERT(inSuite, decodedElements2.authorizedPAAListPresent);
+    for (uint8_t j = 0; j < randomElements.AuthorizedPAAListCount; j++)
+    {
+        NL_TEST_ASSERT(inSuite,
+                       cdElementsDecoder.HasAuthorizedPAA(encodedCDPayload, ByteSpan(randomElements.AuthorizedPAAList[j])));
+        // now test for an unexistent PAA
+        kid[(kKeyIdentifierLength - 1 - j) % kKeyIdentifierLength] ^= 0x5A;
+        NL_TEST_ASSERT(inSuite, cdElementsDecoder.HasAuthorizedPAA(encodedCDPayload, ByteSpan(kid)) == false);
     }
 }
 
@@ -359,6 +473,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode),
                                  NL_TEST_DEF_FN(TestCD_CMSSignAndVerify),
                                  NL_TEST_DEF_FN(TestCD_CMSVerifyAndExtract),
                                  NL_TEST_DEF_FN(TestCD_CertificationElementsDecoder),
+                                 NL_TEST_DEF_FN(TestCD_EncodeDecode_Random),
                                  NL_TEST_SENTINEL() };
 
 int TestCertificationDeclaration(void)

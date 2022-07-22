@@ -1,0 +1,132 @@
+{{>header}}
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+
+#pragma once
+
+namespace chip {
+
+{{#chip_tests_only_clusters}}
+{{#chip_tests_only_cluster_commands}}
+
+struct {{name}}Command
+{
+    {{#chip_tests_only_cluster_command_parameters}}
+    {{zapTypeToEncodableClusterObjectType type ns=cluster}} {{name}};
+    {{/chip_tests_only_cluster_command_parameters}}
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        {{#chip_tests_only_cluster_command_parameters}}
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag({{index}}), {{name}}));
+        {{/chip_tests_only_cluster_command_parameters}}
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            {{#chip_tests_only_cluster_command_parameters}}
+            case {{index}}:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, {{name}}));
+                break;
+            {{/chip_tests_only_cluster_command_parameters}}
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+{{/chip_tests_only_cluster_commands}}
+{{#chip_tests_only_cluster_responses}}
+
+struct {{#if responseName}}{{responseName}}{{else}}{{name}}Response{{/if}}
+{
+    {{#chip_tests_only_cluster_response_parameters}}
+    {{zapTypeToEncodableClusterObjectType type}} {{name}};
+    {{/chip_tests_only_cluster_response_parameters}}
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+        chip::TLV::TLVType outer;
+        ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
+        {{#chip_tests_only_cluster_response_parameters}}
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag({{index}}), {{name}}));
+        {{/chip_tests_only_cluster_response_parameters}}
+        ReturnErrorOnFailure(writer.EndContainer(outer));
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        chip::TLV::TLVType outer;
+        VerifyOrReturnError(chip::TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+
+        while ((err = reader.Next()) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+            switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+            {
+            {{#chip_tests_only_cluster_response_parameters}}
+            case {{index}}:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, {{name}}));
+                break;
+            {{/chip_tests_only_cluster_response_parameters}}
+            default:
+                break;
+            }
+        }
+
+        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        return CHIP_NO_ERROR;
+    }
+};
+{{/chip_tests_only_cluster_responses}}
+{{/chip_tests_only_clusters}}
+
+namespace app {
+namespace Clusters {
+{{#chip_tests_only_clusters}}
+
+namespace {{name}} {
+namespace Commands {
+{{#chip_tests_only_cluster_commands}}
+namespace {{name}} {
+using Type = struct {{name}}Command;
+}
+{{/chip_tests_only_cluster_commands}}
+{{#chip_tests_only_cluster_responses}}
+namespace {{#if responseName}}{{responseName}}{{else}}{{name}}Response{{/if}} {
+using DecodableType = struct {{#if responseName}}{{responseName}}{{else}}{{name}}Response{{/if}};
+}
+{{/chip_tests_only_cluster_responses}}
+} // namespace Commands
+} // namespace {{name}}
+
+{{/chip_tests_only_clusters}}
+} // namespace Clusters
+} // namespace app
+
+} // namespace chip

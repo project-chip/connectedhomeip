@@ -22,7 +22,9 @@
  *
  */
 
-#include <app/ClusterInfo.h>
+#include <app/AttributePathParams.h>
+#include <app/DataVersionFilter.h>
+#include <app/EventPathParams.h>
 #include <app/util/mock/Constants.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -31,12 +33,71 @@ using namespace chip::Test;
 
 namespace chip {
 namespace app {
-namespace TestClusterInfo {
+namespace TestPath {
+void TestAttributePathIntersect(nlTestSuite * apSuite, void * apContext)
+{
+    EndpointId endpointIdArray[2]   = { 1, kInvalidEndpointId };
+    ClusterId clusterIdArray[2]     = { 2, kInvalidClusterId };
+    AttributeId attributeIdArray[2] = { 3, kInvalidAttributeId };
+
+    for (auto endpointId1 : endpointIdArray)
+    {
+        for (auto clusterId1 : clusterIdArray)
+        {
+            for (auto attributeId1 : attributeIdArray)
+            {
+                for (auto endpointId2 : endpointIdArray)
+                {
+                    for (auto clusterId2 : clusterIdArray)
+                    {
+                        for (auto attributeId2 : attributeIdArray)
+                        {
+                            AttributePathParams path1;
+                            path1.mEndpointId  = endpointId1;
+                            path1.mClusterId   = clusterId1;
+                            path1.mAttributeId = attributeId1;
+                            AttributePathParams path2;
+                            path2.mEndpointId  = endpointId2;
+                            path2.mClusterId   = clusterId2;
+                            path2.mAttributeId = attributeId2;
+                            NL_TEST_ASSERT(apSuite, path1.Intersects(path2));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    {
+        AttributePathParams path1;
+        path1.mEndpointId = 1;
+        AttributePathParams path2;
+        path2.mEndpointId = 2;
+        NL_TEST_ASSERT(apSuite, !path1.Intersects(path2));
+    }
+
+    {
+        AttributePathParams path1;
+        path1.mClusterId = 1;
+        AttributePathParams path2;
+        path2.mClusterId = 2;
+        NL_TEST_ASSERT(apSuite, !path1.Intersects(path2));
+    }
+
+    {
+        AttributePathParams path1;
+        path1.mAttributeId = 1;
+        AttributePathParams path2;
+        path2.mAttributeId = 2;
+        NL_TEST_ASSERT(apSuite, !path1.Intersects(path2));
+    }
+}
+
 void TestAttributePathIncludedSameFieldId(nlTestSuite * apSuite, void * apContext)
 {
-    ClusterInfo clusterInfo1;
-    ClusterInfo clusterInfo2;
-    ClusterInfo clusterInfo3;
+    AttributePathParams clusterInfo1;
+    AttributePathParams clusterInfo2;
+    AttributePathParams clusterInfo3;
     clusterInfo1.mAttributeId = 1;
     clusterInfo2.mAttributeId = 1;
     clusterInfo3.mAttributeId = 1;
@@ -54,26 +115,26 @@ void TestAttributePathIncludedSameFieldId(nlTestSuite * apSuite, void * apContex
 void TestAttributePathIncludedDifferentFieldId(nlTestSuite * apSuite, void * apContext)
 {
     {
-        ClusterInfo clusterInfo1;
-        ClusterInfo clusterInfo2;
+        AttributePathParams clusterInfo1;
+        AttributePathParams clusterInfo2;
         clusterInfo1.mAttributeId = 1;
         clusterInfo2.mAttributeId = 2;
         NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     }
     {
-        ClusterInfo clusterInfo1;
-        ClusterInfo clusterInfo2;
+        AttributePathParams clusterInfo1;
+        AttributePathParams clusterInfo2;
         clusterInfo2.mAttributeId = 2;
         NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     }
     {
-        ClusterInfo clusterInfo1;
-        ClusterInfo clusterInfo2;
+        AttributePathParams clusterInfo1;
+        AttributePathParams clusterInfo2;
         NL_TEST_ASSERT(apSuite, clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
     }
     {
-        ClusterInfo clusterInfo1;
-        ClusterInfo clusterInfo2;
+        AttributePathParams clusterInfo1;
+        AttributePathParams clusterInfo2;
 
         clusterInfo1.mAttributeId = 1;
         NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
@@ -82,8 +143,8 @@ void TestAttributePathIncludedDifferentFieldId(nlTestSuite * apSuite, void * apC
 
 void TestAttributePathIncludedDifferentEndpointId(nlTestSuite * apSuite, void * apContext)
 {
-    ClusterInfo clusterInfo1;
-    ClusterInfo clusterInfo2;
+    AttributePathParams clusterInfo1;
+    AttributePathParams clusterInfo2;
     clusterInfo1.mEndpointId = 1;
     clusterInfo2.mEndpointId = 2;
     NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
@@ -91,8 +152,8 @@ void TestAttributePathIncludedDifferentEndpointId(nlTestSuite * apSuite, void * 
 
 void TestAttributePathIncludedDifferentClusterId(nlTestSuite * apSuite, void * apContext)
 {
-    ClusterInfo clusterInfo1;
-    ClusterInfo clusterInfo2;
+    AttributePathParams clusterInfo1;
+    AttributePathParams clusterInfo2;
     clusterInfo1.mClusterId = 1;
     clusterInfo2.mClusterId = 2;
     NL_TEST_ASSERT(apSuite, !clusterInfo1.IsAttributePathSupersetOf(clusterInfo2));
@@ -106,7 +167,7 @@ void TestAttributePathIncludedDifferentClusterId(nlTestSuite * apSuite, void * a
 {kMockEndpoint1, MockClusterId(1), kInvalidEventId},
 {kMockEndpoint1, MockClusterId(1), MockEventId(1)},
 */
-chip::app::ClusterInfo validEventpaths[6];
+chip::app::EventPathParams validEventpaths[6];
 void InitEventPaths()
 {
     validEventpaths[1].mClusterId  = MockClusterId(1);
@@ -163,33 +224,32 @@ void TestEventPathDifferentEndpointId(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, !validEventpaths[5].IsEventPathSupersetOf(testPath));
 }
 
-} // namespace TestClusterInfo
+} // namespace TestPath
 } // namespace app
 } // namespace chip
 
 namespace {
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedSameFieldId),
-    NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestClusterInfo::TestAttributePathIncludedDifferentFieldId),
-    NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId",
-                chip::app::TestClusterInfo::TestAttributePathIncludedDifferentEndpointId),
-    NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId",
-                chip::app::TestClusterInfo::TestAttributePathIncludedDifferentClusterId),
-    NL_TEST_DEF("TestEventPathSameEventId", chip::app::TestClusterInfo::TestEventPathSameEventId),
-    NL_TEST_DEF("TestEventPathDifferentEventId", chip::app::TestClusterInfo::TestEventPathDifferentEventId),
-    NL_TEST_DEF("TestEventPathDifferentClusterId", chip::app::TestClusterInfo::TestEventPathDifferentClusterId),
-    NL_TEST_DEF("TestEventPathDifferentEndpointId", chip::app::TestClusterInfo::TestEventPathDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIncludedSameFieldId", chip::app::TestPath::TestAttributePathIncludedSameFieldId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentFieldId", chip::app::TestPath::TestAttributePathIncludedDifferentFieldId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentEndpointId", chip::app::TestPath::TestAttributePathIncludedDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIncludedDifferentClusterId", chip::app::TestPath::TestAttributePathIncludedDifferentClusterId),
+    NL_TEST_DEF("TestEventPathSameEventId", chip::app::TestPath::TestEventPathSameEventId),
+    NL_TEST_DEF("TestEventPathDifferentEventId", chip::app::TestPath::TestEventPathDifferentEventId),
+    NL_TEST_DEF("TestEventPathDifferentClusterId", chip::app::TestPath::TestEventPathDifferentClusterId),
+    NL_TEST_DEF("TestEventPathDifferentEndpointId", chip::app::TestPath::TestEventPathDifferentEndpointId),
+    NL_TEST_DEF("TestAttributePathIntersect", chip::app::TestPath::TestAttributePathIntersect),
     NL_TEST_SENTINEL()
 };
 }
 
-int TestClusterInfo()
+int TestPath()
 {
-    nlTestSuite theSuite = { "ClusterInfo", &sTests[0], nullptr, nullptr };
-    chip::app::TestClusterInfo::InitEventPaths();
+    nlTestSuite theSuite = { "TestPath", &sTests[0], nullptr, nullptr };
+    chip::app::TestPath::InitEventPaths();
     nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestClusterInfo)
+CHIP_REGISTER_TEST_SUITE(TestPath)

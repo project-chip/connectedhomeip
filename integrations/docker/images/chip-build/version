@@ -1,1 +1,1 @@
-0.5.49 Version bump reason: [Ameba] Revise 'otar' to 'ota_requestor'
+0.5.89 Version bump reason: match K32W sdk paths and logic with K32W Dockerfile

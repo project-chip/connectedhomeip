@@ -46,9 +46,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -142,8 +140,14 @@ private:
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
 
+    static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
+    void HandleFastAdvertisementTimer();
+
     void HandleRXCharWrite(uint8_t *, uint16_t, uint8_t);
-    void HandleTXCharRead(struct ble_gatt_char_context * param);
+    void HandleTXCharRead(void * param);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void HandleC3CharRead(TBTCONFIG_CALLBACK_DATA * p_data);
+#endif
     void HandleTXCharCCCDRead(void * param);
     void HandleTXCharCCCDWrite(int, int, int);
     CHIP_ERROR HandleTXComplete(int);
@@ -192,11 +196,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

@@ -42,6 +42,8 @@ public:
 
     CHIP_ERROR _Put(const char * key, const void * value, size_t value_size);
 
+    CHIP_ERROR EraseAll(void);
+
 private:
     const char * kNamespace = "CHIP_KVS";
 

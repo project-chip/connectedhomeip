@@ -15,6 +15,7 @@
 name: Identify Cluster Tests
 
 config:
+    nodeId: 0x12344321
     cluster: "Identify"
     endpoint: 0
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Send Identify command and expect success response"
       command: "identify"

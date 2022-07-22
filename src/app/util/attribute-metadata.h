@@ -100,19 +100,20 @@ typedef struct
 union EmberAfDefaultOrMinMaxAttributeValue
 {
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
-    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(val) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint32_t val) : defaultValue(val) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}
 
     /**
-     * Points to data if size is more than 2 bytes.
-     * If size is more than 2 bytes, and this value is NULL,
+     * Points to data if the attribute type is a string or the size of the data is more than 4 bytes.
+     * If the attribute type is a string or the data size is more than 4 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     const uint8_t * ptrToDefaultValue;
     /**
-     * Actual default value if the attribute size is 2 bytes or less.
+     * Actual default value if the attribute is non string and size
+     * is 4 bytes or less.
      */
-    uint16_t defaultValue;
+    uint32_t defaultValue;
     /**
      * Points to the min max attribute value structure, if min/max is
      * supported for this attribute.
@@ -136,10 +137,8 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define ATTRIBUTE_MASK_EXTERNAL_STORAGE (0x10)
 // Attribute is singleton
 #define ATTRIBUTE_MASK_SINGLETON (0x20)
-// Attribute is a client attribute
-#define ATTRIBUTE_MASK_CLIENT (0x40)
 // Attribute is nullable
-#define ATTRIBUTE_MASK_NULLABLE (0x80)
+#define ATTRIBUTE_MASK_NULLABLE (0x40)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -193,10 +192,17 @@ struct EmberAfAttributeMetadata
     bool IsExternal() const { return mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE; }
 
     /**
+     * Check whether this is a "singleton" attribute, in the sense that it has a
+     * single value across multiple instances of the cluster.  This is not
+     * mutually exclusive with the attribute being external.
+     */
+    bool IsSingleton() const { return mask & ATTRIBUTE_MASK_SINGLETON; }
+
+    /**
      * Check whether this attribute is automatically stored in non-volatile
      * memory.
      */
-    bool IsNonVolatile() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
+    bool IsAutomaticallyPersisted() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
 };
 
 /** @brief Returns true if the given attribute type is a string. */

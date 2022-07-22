@@ -31,6 +31,8 @@
 #include "KeyValueStorageTest.h"
 #include "init_efrPlatform.h"
 #include "sl_system_kernel.h"
+#include <platform/CHIPDeviceLayer.h>
+#include <platform/EFR32/EFR32Config.h>
 #include <platform/KeyValueStoreManager.h>
 
 static TaskHandle_t sTestTaskHandle;

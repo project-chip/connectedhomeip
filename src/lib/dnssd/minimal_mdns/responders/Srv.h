@@ -28,9 +28,12 @@ class SrvResponder : public RecordResponder
 public:
     SrvResponder(const SrvResourceRecord & record) : RecordResponder(QType::SRV, record.GetName()), mRecord(record) {}
 
-    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate,
+                         const ResponseConfiguration & configuration) override
     {
-        delegate->AddResponse(mRecord);
+        SrvResourceRecord record = mRecord;
+        configuration.Adjust(record);
+        delegate->AddResponse(record);
     }
 
 private:

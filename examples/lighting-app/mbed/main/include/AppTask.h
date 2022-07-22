@@ -21,6 +21,7 @@
 
 #include "AppEvent.h"
 #include "LightingManager.h"
+#include <DFUManager.h>
 
 class AppTask
 {
@@ -61,6 +62,7 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
+        kFunction_StartBleAdv    = 1,
         kFunction_FactoryReset,
 
         kFunction_Invalid

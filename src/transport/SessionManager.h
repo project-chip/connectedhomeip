@@ -27,13 +27,17 @@
 
 #include <utility>
 
+#include <credentials/FabricTable.h>
+#include <crypto/RandUtils.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
+#include <transport/GroupPeerMessageCounter.h>
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
@@ -48,8 +52,6 @@
 #include <transport/raw/Tuple.h>
 
 namespace chip {
-
-class PairingSession;
 
 /**
  * @brief
@@ -118,7 +120,7 @@ private:
     EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 };
 
-class DLL_EXPORT SessionManager : public TransportMgrDelegate
+class DLL_EXPORT SessionManager : public TransportMgrDelegate, public FabricTable::Delegate
 {
 public:
     SessionManager();
@@ -148,25 +150,33 @@ public:
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
 
-    void RegisterRecoveryDelegate(SessionRecoveryDelegate & cb);
-    void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
-    void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
+    // Test-only: create a session on the fly.
+    CHIP_ERROR InjectPaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, NodeId peerNodeId,
+                                            uint16_t peerSessionId, FabricIndex fabricIndex,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role);
+    CHIP_ERROR InjectCaseSessionWithTestKey(SessionHolder & sessionHolder, uint16_t localSessionId, uint16_t peerSessionId,
+                                            NodeId localNodeId, NodeId peerNodeId, FabricIndex fabric,
+                                            const Transport::PeerAddress & peerAddress, CryptoContext::SessionRole role,
+                                            const CATValues & cats = CATValues{});
 
     /**
      * @brief
-     *   Establish a new pairing with a peer node
+     *   Allocate a secure session and non-colliding session ID in the secure
+     *   session table.
      *
-     * @details
-     *   This method sets up a new pairing with the peer node. It also
-     *   establishes the security keys for secure communication with the
-     *   peer node.
+     *   If we're either establishing or just finished establishing a session to a peer in either initiator or responder
+     *   roles, the node id of that peer should be provided in sessionEvictionHint. Else, it should be initialized
+     *   to a default-constructed ScopedNodeId().
+     *
+     * @return SessionHandle with a reference to a SecureSession, else NullOptional on failure
      */
-    CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                          PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric);
+    CHECK_RETURN_VALUE
+    Optional<SessionHandle> AllocateSession(Transport::SecureSession::Type secureSessionType,
+                                            const ScopedNodeId & sessionEvictionHint);
 
-    void ExpirePairing(const SessionHandle & session);
-    void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
-    void ExpireAllPairingsForFabric(FabricIndex fabric);
+    void ExpireAllSessions(const ScopedNodeId & node);
+    void ExpireAllSessionsForFabric(FabricIndex fabricIndex);
+    void ExpireAllPASESessions();
 
     /**
      * @brief
@@ -183,7 +193,8 @@ public:
      * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::MessageCounterManagerInterface * messageCounterManager);
+                    Transport::MessageCounterManagerInterface * messageCounterManager,
+                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable);
 
     /**
      * @brief
@@ -192,7 +203,13 @@ public:
      */
     void Shutdown();
 
+    /**
+     * @brief Notification that a fabric was removed.
+     */
+    void FabricRemoved(FabricIndex fabricIndex);
+
     TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
+    Transport::SecureSessionTable & GetSecureSessions() { return mSecureSessions; }
 
     /**
      * @brief
@@ -206,20 +223,35 @@ public:
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
     {
-        return mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
+        // Allocate ephemeralInitiatorNodeID in Operational Node ID range
+        NodeId ephemeralInitiatorNodeID;
+        do
+        {
+            ephemeralInitiatorNodeID = static_cast<NodeId>(Crypto::GetRandU64());
+        } while (!IsOperationalNodeId(ephemeralInitiatorNodeID));
+        return mUnauthenticatedSessions.AllocInitiator(ephemeralInitiatorNodeID, peerAddress, config);
     }
 
-    // TODO: implements group sessions
-    Optional<SessionHandle> CreateGroupSession(GroupId group) { return mGroupSessions.AllocEntry(group, kUndefinedFabricIndex); }
-    Optional<SessionHandle> FindGroupSession(GroupId group) { return mGroupSessions.FindEntry(group, kUndefinedFabricIndex); }
-    void RemoveGroupSession(Transport::GroupSession * session) { mGroupSessions.DeleteEntry(session); }
-
-    // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
-    // and tv-casting-app that uses the TV's node ID to find the associated secure session
-    SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
+    //
+    // Find an existing secure session given a peer's scoped NodeId and a type of session to match against.
+    // If matching against all types of sessions is desired, NullOptional should be passed into type.
+    //
+    // If a valid session is found, an Optional<SessionHandle> with the value set to the SessionHandle of the session
+    // is returned. Otherwise, an Optional<SessionHandle> with no value set is returned.
+    //
+    //
+    Optional<SessionHandle> FindSecureSessionForNode(ScopedNodeId peerNodeId,
+                                                     const Optional<Transport::SecureSession::Type> & type = NullOptional);
 
     using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
     CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
+
+    //// FabricTable::Delegate Implementation ////
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        (void) fabricTable;
+        this->FabricRemoved(fabricIndex);
+    }
 
 private:
     /**
@@ -238,34 +270,18 @@ private:
     };
 
     System::Layer * mSystemLayer = nullptr;
+    FabricTable * mFabricTable   = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
-    Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
+    Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
+    chip::Transport::GroupOutgoingCounters mGroupClientCounter;
 
     SessionMessageDelegate * mCB = nullptr;
-
-    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
-        mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
-    GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
-
-    friend class SessionHandle;
-
-    /** Schedules a new oneshot timer for checking connection expiry. */
-    void ScheduleExpiryTimer();
-
-    /** Cancels any active timers for connection expiry checks. */
-    void CancelExpiryTimer();
-
-    /**
-     * Callback for timer expiry check
-     */
-    static void ExpiryTimerCallback(System::Layer * layer, void * param);
 
     void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBufferHandle && msg);
@@ -273,8 +289,8 @@ private:
     void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle && msg);
+    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                        System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);
 
@@ -282,18 +298,6 @@ private:
     {
         return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
             payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
-    }
-
-    MessageCounter & GetSendCounterForPacket(PayloadHeader & payloadHeader, Transport::SecureSession & state)
-    {
-        if (IsControlMessage(payloadHeader))
-        {
-            return mGlobalEncryptedMessageCounter;
-        }
-        else
-        {
-            return state.GetSessionMessageCounter().GetLocalMessageCounter();
-        }
     }
 };
 

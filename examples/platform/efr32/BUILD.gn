@@ -64,3 +64,26 @@ source_set("efr-matter-shell") {
     ]
   }
 }
+
+config("attestation-credentials-config") {
+  include_dirs = [ "${chip_root}" ]
+
+  defines = [
+    # Set to 1 to enable EFR32 attestation credentials
+    "EFR32_ATTESTATION_CREDENTIALS",
+  ]
+}
+
+source_set("efr32-attestation-credentials") {
+  sources = [
+    "EFR32DeviceAttestationCreds.cpp",
+    "EFR32DeviceAttestationCreds.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/platform:platform_base",
+  ]
+
+  public_configs = [ ":attestation-credentials-config" ]
+}

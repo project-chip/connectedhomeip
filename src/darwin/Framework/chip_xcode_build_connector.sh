@@ -96,6 +96,7 @@ declare -a args=(
     'chip_crypto="mbedtls"'
     'chip_build_tools=false'
     'chip_build_tests=false'
+    'chip_disable_platform_kvs=true'
     'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"
     'target_cflags=['"$target_cflags"']'
@@ -142,7 +143,7 @@ find_in_ancestors() {
     fi
 
     # there are environments where these bits are unwanted, unnecessary, or impossible
-    [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
+    [[ -n $CHIP_NO_SUBMODULES ]] || scripts/checkout_submodules.py --shallow --platform darwin
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
         # first run bootstrap/activate in an external env to build everything
         env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'

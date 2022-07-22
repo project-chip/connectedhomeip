@@ -56,9 +56,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init();
-    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising();

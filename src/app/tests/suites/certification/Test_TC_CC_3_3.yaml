@@ -15,6 +15,7 @@
 name: 27.2.4. [TC-CC-3.3] Hue Step functionality with server as DUT
 
 config:
+    nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
 
@@ -22,6 +23,10 @@ tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
@@ -34,62 +39,84 @@ tests:
       response:
           value: 1
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Reads CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
-          value: 150
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
 
     - label: "Step hue up command"
+      PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 1
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
-                value: 25
-              - name: "optionsMask"
+              - name: "TransitionTime"
+                value: 5
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    #Delay step is necessary to let the attribute value change over time
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 5
+              maxValue: 254
 
     - label: "Step hue down command"
+      PICS: CC.S.F00 && CC.S.C02.Rsp
       command: "StepHue"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "StepMode"
                 value: 3
-              - name: "stepSize"
+              - name: "StepSize"
                 value: 5
-              - name: "transitionTime"
-                value: 25
-              - name: "optionsMask"
+              - name: "TransitionTime"
+                value: 5
+              - name: "OptionsMask"
                 value: 0
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 0
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      disabled: true
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Over TransitionTime,Read CurrentHue attribute from DUT"
+      PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
-      attribute: "current hue"
+      attribute: "CurrentHue"
       response:
-          value: -1
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 249
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

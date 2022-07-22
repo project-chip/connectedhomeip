@@ -18,7 +18,10 @@ import("//build_overrides/k32w0_sdk.gni")
 import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
 config("chip_examples_project_config") {
-  include_dirs = [ "app/project_include" ]
+  include_dirs = [
+    "app/project_include",
+    "${chip_root}",
+  ]
 }
 
 source_set("openthread_core_config_k32w0_chip_examples") {

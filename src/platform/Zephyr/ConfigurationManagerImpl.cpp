@@ -24,19 +24,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/Zephyr/ZephyrConfig.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.cpp>
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include <power/reboot.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,24 +47,10 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount;
-    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<ZephyrConfig>::Init();
     SuccessOrExit(err);
-
-    // TODO: Initialize the global GroupKeyStore object here
-#if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-    {
-        FactoryProvisioning factoryProv;
-        uint8_t * const kDeviceRAMStart = (uint8_t *) CONFIG_SRAM_BASE_ADDRESS;
-        uint8_t * const kDeviceRAMEnd   = kDeviceRAMStart + CONFIG_SRAM_SIZE * 1024 - 1;
-
-        // Scan device RAM for injected provisioning data and save to persistent storage if found.
-        err = factoryProv.ProvisionDeviceFromRAM(kDeviceRAMStart, kDeviceRAMEnd);
-        SuccessOrExit(err);
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
     if (ZephyrConfig::ConfigValueExists(ZephyrConfig::kCounterKey_RebootCount))
     {
@@ -86,13 +66,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         // The first boot after factory reset of the Node.
         err = StoreRebootCount(1);
         SuccessOrExit(err);
-    }
-
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
     }
 
     err = CHIP_NO_ERROR;
@@ -198,15 +171,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     const CHIP_ERROR err = PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
 
     if (err != CHIP_NO_ERROR)
-        ChipLogError(DeviceLayer, "Factory reset failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Factory reset failed: %" CHIP_ERROR_FORMAT, err.Format());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CONFIG_REBOOT
-    sys_reboot(SYS_REBOOT_WARM);
-#endif
+    PlatformMgr().Shutdown();
 }
 
 } // namespace DeviceLayer

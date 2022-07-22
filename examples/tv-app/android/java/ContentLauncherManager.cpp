@@ -18,6 +18,7 @@
 
 #include "ContentLauncherManager.h"
 #include "TvApp-JNI.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -27,6 +28,7 @@
 
 using namespace std;
 using namespace chip;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
 
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
@@ -40,12 +42,12 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
     ChipLogProgress(Zcl, "TV Android App: ContentLauncher::SetDefaultDelegate");
     ContentLauncherManager * mgr = new ContentLauncherManager();
     mgr->InitializeWithObjects(manager);
-    chip::app::Clusters::ContentLauncher::SetDelegate(static_cast<EndpointId>(endpoint), mgr);
+    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-void ContentLauncherManager::HandleLaunchContent(
-    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
-    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
+                                                 const DecodableList<ParameterType> & parameterList, bool autoplay,
+                                                 const chip::CharSpan & data)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -84,10 +86,10 @@ void ContentLauncherManager::HandleLaunchContent(
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data   = dataStr.charSpan();
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
+        response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
-        err = responser.Success(response);
+        err = helper.Success(response);
     }
 
 exit:
@@ -97,16 +99,15 @@ exit:
     }
 }
 
-void ContentLauncherManager::HandleLaunchUrl(
-    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-    const std::list<BrandingInformation> & brandingInformation,
-    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const chip::CharSpan & contentUrl,
+                                             const chip::CharSpan & displayString,
+                                             const BrandingInformationType & brandingInformation)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContentUrl");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mLaunchUrlMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
@@ -140,10 +141,10 @@ void ContentLauncherManager::HandleLaunchUrl(
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data   = dataStr.charSpan();
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
+        response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
-        err = responser.Success(response);
+        err = helper.Success(response);
     }
 
 exit:
@@ -153,7 +154,7 @@ exit:
     }
 }
 
-CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -254,9 +255,9 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mLaunchContentMethod = env->GetMethodID(
-        ContentLauncherClass, "launchContent",
-        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+    mLaunchContentMethod = env->GetMethodID(ContentLauncherClass, "launchContent",
+                                            "([Lcom/matter/tv/server/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/"
+                                            "matter/tv/server/tvapp/ContentLaunchResponse;");
     if (mLaunchContentMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ContentLauncherManager 'launchContent' method");
@@ -264,11 +265,18 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
     }
 
     mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
-                                        "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
-                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+                                        "(Ljava/lang/String;Ljava/lang/String;Lcom/matter/tv/server/tvapp/"
+                                        "ContentLaunchBrandingInformation;)Lcom/matter/tv/server/tvapp/ContentLaunchResponse;");
     if (mLaunchUrlMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");
         env->ExceptionClear();
     }
+}
+
+uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
+{
+    uint32_t featureMap = 0;
+    Attributes::FeatureMap::Get(endpoint, &featureMap);
+    return featureMap;
 }
