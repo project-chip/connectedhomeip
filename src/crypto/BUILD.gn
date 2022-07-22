@@ -57,6 +57,8 @@ if (chip_crypto == "openssl") {
   import("//build_overrides/boringssl.gni")
 } else if (chip_crypto == "mbedtls") {
   import("//build_overrides/mbedtls.gni")
+} else if (chip_crypto == "tinycrypt") {
+  import("//build_overrides/mbedtls.gni")
 }
 
 static_library("crypto") {
@@ -99,6 +101,9 @@ static_library("crypto") {
     # BoringSSL is close enough to OpenSSL that isd uses same PAL, with minor #ifdef differences
     sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
     public_deps += [ "${boringssl_root}:boringssl" ]
+  } else if (chip_crypto == "tinycrypt") {
+    sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    public_deps += [ "${mbedtls_root}:mbedtls" ]
   } else {
     assert(false, "Invalid CHIP crypto")
   }

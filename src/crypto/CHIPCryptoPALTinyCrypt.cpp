@@ -44,6 +44,11 @@
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
+#include <mbedtls/pk.h>
+#include <tinycrypt/ecc.h>
+#include <tinycrypt/ecc_dh.h>
+#include <tinycrypt/ecc_dsa.h>
+
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
@@ -86,7 +91,7 @@ static EntropyContext gsEntropyContext;
 
 static void _log_mbedTLS_error(int error_code)
 {
-    if (error_code != 0)
+    if (error_code != 0 && error_code != UECC_SUCCESS)
     {
 #if defined(MBEDTLS_ERROR_C)
         char error_str[MAX_ERROR_STR_LEN];
@@ -496,14 +501,14 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
     }
 }
 
-static inline mbedtls_ecp_keypair * to_keypair(P256KeypairContext * context)
+static inline mbedtls_uecc_keypair * to_keypair(P256KeypairContext * context)
 {
-    return SafePointerCast<mbedtls_ecp_keypair *>(context);
+    return SafePointerCast<mbedtls_uecc_keypair *>(context);
 }
 
-static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairContext * context)
+static inline const mbedtls_uecc_keypair * to_const_keypair(const P256KeypairContext * context)
 {
-    return SafePointerCast<const mbedtls_ecp_keypair *>(context);
+    return SafePointerCast<const mbedtls_uecc_keypair *>(context);
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
@@ -515,48 +520,20 @@ CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_len
     memset(&digest[0], 0, sizeof(digest));
     ReturnErrorOnFailure(Hash_SHA256(msg, msg_length, &digest[0]));
 
-#if defined(MBEDTLS_ECDSA_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    mbedtls_mpi r, s;
-    mbedtls_mpi_init(&r);
-    mbedtls_mpi_init(&s);
+    int result       = UECC_FAILURE;
 
-    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
+    const mbedtls_uecc_keypair * keypair = to_const_keypair(&mKeypair);
 
-    mbedtls_ecdsa_context ecdsa_ctxt;
-    mbedtls_ecdsa_init(&ecdsa_ctxt);
+    result = uECC_sign(keypair->private_key, digest, sizeof(digest), out_signature.Bytes());
 
-    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, keypair);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_ecdsa_sign(&ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(grp), &r, &s, &ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(d),
-                                Uint8::to_const_uchar(digest), sizeof(digest), CryptoRNG, nullptr);
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    VerifyOrExit((mbedtls_mpi_size(&r) <= kP256_FE_Length) && (mbedtls_mpi_size(&s) <= kP256_FE_Length),
-                 error = CHIP_ERROR_INTERNAL);
-
-    // Concatenate r and s to output. Sizes were checked above.
-    result = mbedtls_mpi_write_binary(&r, out_signature.Bytes() + 0u, kP256_FE_Length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_write_binary(&s, out_signature.Bytes() + kP256_FE_Length, kP256_FE_Length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
+    VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(out_signature.SetLength(kP256_ECDSA_Signature_Length_Raw) == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-exit:
     keypair = nullptr;
-    mbedtls_ecdsa_free(&ecdsa_ctxt);
-    mbedtls_mpi_free(&s);
-    mbedtls_mpi_free(&r);
-    _log_mbedTLS_error(result);
+
+exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
@@ -578,104 +555,44 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
 CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
                                                         const P256ECDSASignature & signature) const
 {
-#if defined(MBEDTLS_ECDSA_C)
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(hash_length == kSHA256_Hash_Length, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(signature.Length() == kP256_ECDSA_Signature_Length_Raw, CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    mbedtls_mpi r, s;
+    int result       = UECC_FAILURE;
 
-    mbedtls_mpi_init(&r);
-    mbedtls_mpi_init(&s);
+    const uint8_t * public_key = *this;
 
-    mbedtls_ecp_keypair keypair;
-    mbedtls_ecp_keypair_init(&keypair);
-
-    mbedtls_ecdsa_context ecdsa_ctxt;
-    mbedtls_ecdsa_init(&ecdsa_ctxt);
-
-    result = mbedtls_ecp_group_load(&keypair.CHIP_CRYPTO_PAL_PRIVATE(grp), MapECPGroupId(Type()));
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result = mbedtls_ecp_point_read_binary(&keypair.CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair.CHIP_CRYPTO_PAL_PRIVATE(Q),
-                                           Uint8::to_const_uchar(*this), Length());
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    // Read the <r, s> big nums from the signature
-    result = mbedtls_mpi_read_binary(&r, Uint8::to_const_uchar(signature.ConstBytes()) + 0u, kP256_FE_Length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_read_binary(&s, Uint8::to_const_uchar(signature.ConstBytes()) + kP256_FE_Length, kP256_FE_Length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_ecdsa_verify(&ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(grp), Uint8::to_const_uchar(hash), hash_length,
-                                  &ecdsa_ctxt.CHIP_CRYPTO_PAL_PRIVATE(Q), &r, &s);
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_SIGNATURE);
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    result = uECC_verify(public_key + 1, hash, hash_length, Uint8::to_const_uchar(signature.ConstBytes()));
+    VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INVALID_SIGNATURE);
 
 exit:
-    mbedtls_ecdsa_free(&ecdsa_ctxt);
-    mbedtls_ecp_keypair_free(&keypair);
-    mbedtls_mpi_free(&s);
-    mbedtls_mpi_free(&r);
-    _log_mbedTLS_error(result);
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
 #if defined(MBEDTLS_ECDH_C)
-
     CHIP_ERROR error     = CHIP_NO_ERROR;
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
 
-    mbedtls_ecp_group ecp_grp;
-    mbedtls_ecp_group_init(&ecp_grp);
-
-    mbedtls_mpi mpi_secret;
-    mbedtls_mpi_init(&mpi_secret);
-
-    mbedtls_ecp_point ecp_pubkey;
-    mbedtls_ecp_point_init(&ecp_pubkey);
-
-    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
+    const mbedtls_uecc_keypair * keypair = to_const_keypair(&mKeypair);
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
 
-    result = mbedtls_ecp_group_load(&ecp_grp, MapECPGroupId(remote_public_key.Type()));
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    result = uECC_shared_secret(remote_public_key.ConstBytes() + 1, keypair->private_key, Uint8::to_uchar(out_secret));
+    VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    result =
-        mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length());
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    result =
-        mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->CHIP_CRYPTO_PAL_PRIVATE(d), CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), secret_length);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     SuccessOrExit(out_secret.SetLength(secret_length));
 
 exit:
     keypair = nullptr;
-    mbedtls_ecp_group_free(&ecp_grp);
-    mbedtls_mpi_free(&mpi_secret);
-    mbedtls_ecp_point_free(&ecp_pubkey);
     _log_mbedTLS_error(result);
     return error;
-
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
@@ -715,44 +632,31 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
 CHIP_ERROR P256Keypair::Initialize()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-
-    size_t pubkey_size = 0;
+    int result       = UECC_FAILURE;
 
     Clear();
 
-    mbedtls_ecp_group_id group = MapECPGroupId(mPublicKey.Type());
+    mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
 
-    mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
-    mbedtls_ecp_keypair_init(keypair);
+    result = uECC_make_key(keypair->public_key, keypair->private_key);
+    VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_ecp_gen_key(group, keypair, CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result =
-        mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
-                                       MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(mPublicKey), mPublicKey.Length());
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(pubkey_size == mPublicKey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    Uint8::to_uchar(mPublicKey)[0] = 0x04;
+    memcpy(Uint8::to_uchar(mPublicKey) + 1, keypair->public_key, 2 * NUM_ECC_BYTES);
 
     keypair      = nullptr;
     mInitialized = true;
 
 exit:
-    if (keypair != nullptr)
-    {
-        mbedtls_ecp_keypair_free(keypair);
-        keypair = nullptr;
-    }
-
     _log_mbedTLS_error(result);
     return error;
 }
 
 CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
-    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
-    size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
+    const mbedtls_uecc_keypair * keypair = to_const_keypair(&mKeypair);
+    size_t len                           = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -761,11 +665,9 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     bbuf.Put(mPublicKey, mPublicKey.Length());
 
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sizeof(keypair->private_key) <= bbuf.Available(), error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(mbedtls_mpi_size(&keypair->CHIP_CRYPTO_PAL_PRIVATE(d)) <= bbuf.Available(), error = CHIP_ERROR_INTERNAL);
-    result = mbedtls_mpi_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(d), Uint8::to_uchar(privkey), sizeof(privkey));
-
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    memcpy(privkey, keypair->private_key, sizeof(privkey));
 
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -773,45 +675,36 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     output.SetLength(bbuf.Needed());
 
 exit:
-    ClearSecretData(privkey, sizeof(privkey));
+    memset(privkey, 0, sizeof(privkey));
     _log_mbedTLS_error(result);
     return error;
 }
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
-
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
+    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     Clear();
 
-    mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
-    mbedtls_ecp_keypair_init(keypair);
+    mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
 
-    result = mbedtls_ecp_group_load(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), MapECPGroupId(mPublicKey.Type()));
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    memcpy(keypair->public_key, Uint8::to_uchar(input) + 1, 2 * NUM_ECC_BYTES);
+    memcpy(keypair->private_key, Uint8::to_uchar(input) + mPublicKey.Length(), NUM_ECC_BYTES);
 
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    keypair = nullptr;
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     bbuf.Put((const uint8_t *) input, mPublicKey.Length());
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
 
-    result = mbedtls_ecp_point_read_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
-                                           Uint8::to_const_uchar(mPublicKey), mPublicKey.Length());
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    {
-        const uint8_t * privkey = Uint8::to_const_uchar(input) + mPublicKey.Length();
-
-        result = mbedtls_mpi_read_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(d), privkey, kP256_PrivateKey_Length);
-        VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
     mInitialized = true;
 
-exit:
     _log_mbedTLS_error(result);
+
+exit:
     return error;
 }
 
@@ -819,8 +712,8 @@ void P256Keypair::Clear()
 {
     if (mInitialized)
     {
-        mbedtls_ecp_keypair * keypair = to_keypair(&mKeypair);
-        mbedtls_ecp_keypair_free(keypair);
+        mbedtls_uecc_keypair * keypair = to_keypair(&mKeypair);
+        memset(keypair, 0, sizeof(mbedtls_uecc_keypair));
         mInitialized = false;
     }
 }
@@ -832,7 +725,6 @@ P256Keypair::~P256Keypair()
 
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-#if defined(MBEDTLS_X509_CSR_WRITE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     size_t out_length;
@@ -880,10 +772,6 @@ exit:
 
     _log_mbedTLS_error(result);
     return error;
-#else
-    ChipLogError(Crypto, "MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created");
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif
 }
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
@@ -947,20 +835,19 @@ exit:
 
 typedef struct Spake2p_Context
 {
-    mbedtls_ecp_group curve;
     const mbedtls_md_info_t * md_info;
-    mbedtls_ecp_point M;
-    mbedtls_ecp_point N;
-    mbedtls_ecp_point X;
-    mbedtls_ecp_point Y;
-    mbedtls_ecp_point L;
-    mbedtls_ecp_point Z;
-    mbedtls_ecp_point V;
+    uECC_word_t M[2 * NUM_ECC_WORDS];
+    uECC_word_t N[2 * NUM_ECC_WORDS];
+    uECC_word_t X[2 * NUM_ECC_WORDS];
+    uECC_word_t Y[2 * NUM_ECC_WORDS];
+    uECC_word_t L[2 * NUM_ECC_WORDS];
+    uECC_word_t Z[2 * NUM_ECC_WORDS];
+    uECC_word_t V[2 * NUM_ECC_WORDS];
 
-    mbedtls_mpi w0;
-    mbedtls_mpi w1;
-    mbedtls_mpi xy;
-    mbedtls_mpi tempbn;
+    uECC_word_t w0[NUM_ECC_WORDS];
+    uECC_word_t w1[NUM_ECC_WORDS];
+    uECC_word_t xy[NUM_ECC_WORDS];
+    uECC_word_t tempbn[NUM_ECC_WORDS];
 } Spake2p_Context;
 
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
@@ -977,39 +864,20 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
 
     memset(context, 0, sizeof(Spake2p_Context));
 
-    mbedtls_ecp_group_init(&context->curve);
-    result = mbedtls_ecp_group_load(&context->curve, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    M = context->M;
+    N = context->N;
+    X = context->X;
+    Y = context->Y;
+    L = context->L;
+    V = context->V;
+    Z = context->Z;
 
-    context->md_info = mbedtls_md_info_from_type(MBEDTLS_MD_SHA256);
-    VerifyOrExit(context->md_info != nullptr, error = CHIP_ERROR_INTERNAL);
+    w0     = context->w0;
+    w1     = context->w1;
+    xy     = context->xy;
+    tempbn = context->tempbn;
 
-    mbedtls_ecp_point_init(&context->M);
-    mbedtls_ecp_point_init(&context->N);
-    mbedtls_ecp_point_init(&context->X);
-    mbedtls_ecp_point_init(&context->Y);
-    mbedtls_ecp_point_init(&context->L);
-    mbedtls_ecp_point_init(&context->V);
-    mbedtls_ecp_point_init(&context->Z);
-    M = &context->M;
-    N = &context->N;
-    X = &context->X;
-    Y = &context->Y;
-    L = &context->L;
-    V = &context->V;
-    Z = &context->Z;
-
-    mbedtls_mpi_init(&context->w0);
-    mbedtls_mpi_init(&context->w1);
-    mbedtls_mpi_init(&context->xy);
-    mbedtls_mpi_init(&context->tempbn);
-    w0     = &context->w0;
-    w1     = &context->w1;
-    xy     = &context->xy;
-    tempbn = &context->tempbn;
-
-    G     = &context->curve.G;
-    order = &context->curve.N;
+    G = curve_G;
 
     return error;
 
@@ -1024,20 +892,20 @@ void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
     VerifyOrReturn(state != CHIP_SPAKE2P_STATE::PREINIT);
 
     Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-    mbedtls_ecp_point_free(&context->M);
-    mbedtls_ecp_point_free(&context->N);
-    mbedtls_ecp_point_free(&context->X);
-    mbedtls_ecp_point_free(&context->Y);
-    mbedtls_ecp_point_free(&context->L);
-    mbedtls_ecp_point_free(&context->Z);
-    mbedtls_ecp_point_free(&context->V);
+    memset(&context->M, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->N, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->X, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->Y, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->L, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->Z, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->V, 0, 2 * NUM_ECC_WORDS * sizeof(uECC_word_t));
 
-    mbedtls_mpi_free(&context->w0);
-    mbedtls_mpi_free(&context->w1);
-    mbedtls_mpi_free(&context->xy);
-    mbedtls_mpi_free(&context->tempbn);
+    memset(&context->w0, 0, NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->w1, 0, NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->xy, 0, NUM_ECC_WORDS * sizeof(uECC_word_t));
+    memset(&context->tempbn, 0, NUM_ECC_WORDS * sizeof(uECC_word_t));
 
-    mbedtls_ecp_group_free(&context->curve);
+    G     = NULL;
     state = CHIP_SPAKE2P_STATE::PREINIT;
 }
 
@@ -1076,11 +944,10 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_mpi_read_binary((mbedtls_mpi *) fe, Uint8::to_const_uchar(in), in_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    uECC_word_t tmp[2 * NUM_ECC_WORDS] = { 0 };
+    uECC_vli_bytesToNative(tmp, in, NUM_ECC_BYTES);
 
-    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fe, (mbedtls_mpi *) fe, (const mbedtls_mpi *) order);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    uECC_vli_mmod((uECC_word_t *) fe, tmp, curve_n);
 
 exit:
     _log_mbedTLS_error(result);
@@ -1089,10 +956,8 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
-    if (mbedtls_mpi_write_binary((const mbedtls_mpi *) fe, Uint8::to_uchar(out), out_len) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    uECC_vli_nativeToBytes(out, NUM_ECC_BYTES, (const unsigned int *) fe);
+
     return CHIP_NO_ERROR;
 }
 
@@ -1101,10 +966,14 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEGenerate(void * fe)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    mbedtls_uecc_keypair keypair;
 
-    result = mbedtls_ecp_gen_privkey(&context->curve, (mbedtls_mpi *) fe, CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    result = UECC_FAILURE;
+
+    result = uECC_make_key(keypair.public_key, keypair.private_key);
+    VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    uECC_vli_bytesToNative((uECC_word_t *) fe, keypair.private_key, NUM_ECC_BYTES);
 
 exit:
     _log_mbedTLS_error(result);
@@ -1116,11 +985,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, co
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    result = mbedtls_mpi_mul_mpi((mbedtls_mpi *) fer, (const mbedtls_mpi *) fe1, (const mbedtls_mpi *) fe2);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_mpi_mod_mpi((mbedtls_mpi *) fer, (mbedtls_mpi *) fer, (const mbedtls_mpi *) order);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    uECC_vli_modMult((uECC_word_t *) fer, (const uECC_word_t *) fe1, (const uECC_word_t *) fe2, (const uECC_word_t *) curve_n);
 
 exit:
     _log_mbedTLS_error(result);
@@ -1129,12 +994,13 @@ exit:
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointLoad(const uint8_t * in, size_t in_len, void * R)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    uint8_t tmp[2 * NUM_ECC_BYTES];
 
-    if (mbedtls_ecp_point_read_binary(&context->curve, (mbedtls_ecp_point *) R, Uint8::to_const_uchar(in), in_len) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    memcpy(tmp, in + 1, 2 * NUM_ECC_BYTES);
+
+    uECC_vli_bytesToNative((uECC_word_t *) R, tmp, NUM_ECC_BYTES);
+    uECC_vli_bytesToNative((uECC_word_t *) R + NUM_ECC_WORDS, tmp + NUM_ECC_BYTES, NUM_ECC_BYTES);
 
     return CHIP_NO_ERROR;
 }
@@ -1143,25 +1009,18 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointWrite(const void * R, uint8_t * o
 {
     memset(out, 0, out_len);
 
-    size_t mbedtls_out_len = out_len;
-
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    if (mbedtls_ecp_point_write_binary(&context->curve, (const mbedtls_ecp_point *) R, MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                       &mbedtls_out_len, Uint8::to_uchar(out), out_len) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    out[0] = 0x04;
+    uECC_vli_nativeToBytes(out + 1, NUM_ECC_BYTES, (uECC_word_t *) R);
+    uECC_vli_nativeToBytes(out + NUM_ECC_BYTES + 1, NUM_ECC_BYTES, (uECC_word_t *) R + NUM_ECC_WORDS);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, const void * fe1)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
 
-    if (mbedtls_ecp_mul(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
-                        CryptoRNG, nullptr) != 0)
+    if (EccPoint_mult_safer((uECC_word_t *) R, (const uECC_word_t *) P1, (const uECC_word_t *) fe1) != UECC_SUCCESS)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -1172,26 +1031,37 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointAddMul(void * R, const void * P1, const void * fe1, const void * P2,
                                                       const void * fe2)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    uECC_word_t R1[2 * NUM_ECC_WORDS];
+    uECC_word_t R2[2 * NUM_ECC_WORDS];
+    uECC_word_t z[NUM_ECC_WORDS];
+    uint8_t ret = UECC_SUCCESS;
 
-    if (mbedtls_ecp_muladd(&context->curve, (mbedtls_ecp_point *) R, (const mbedtls_mpi *) fe1, (const mbedtls_ecp_point *) P1,
-                           (const mbedtls_mpi *) fe2, (const mbedtls_ecp_point *) P2) != 0)
+    if (EccPoint_mult_safer(R1, (const uECC_word_t *) P1, (const uECC_word_t *) fe1) != UECC_SUCCESS)
     {
         return CHIP_ERROR_INTERNAL;
     }
+
+    if (EccPoint_mult_safer(R2, (const uECC_word_t *) P2, (const uECC_word_t *) fe2) != UECC_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uECC_vli_modSub(z, R2, R1, curve_p);
+    XYcZ_add(R1, R1 + NUM_ECC_WORDS, R2, R2 + NUM_ECC_WORDS);
+    uECC_vli_modInv(z, z, curve_p);
+    apply_z(R2, R2 + NUM_ECC_WORDS, z);
+
+    memcpy((uECC_word_t *) R, R2, 2 * NUM_ECC_BYTES);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointInvert(void * R)
 {
-    mbedtls_ecp_point * Rp    = (mbedtls_ecp_point *) R;
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
+    uECC_word_t tmp[NUM_ECC_WORDS] = { 0 };
 
-    if (mbedtls_mpi_sub_mpi(&Rp->CHIP_CRYPTO_PAL_PRIVATE(Y), &context->curve.P, &Rp->CHIP_CRYPTO_PAL_PRIVATE(Y)) != 0)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    uECC_vli_sub(tmp, curve_p, (uECC_word_t *) R + NUM_ECC_WORDS);
+    memcpy((uECC_word_t *) R + NUM_ECC_WORDS, tmp, NUM_ECC_BYTES);
 
     return CHIP_NO_ERROR;
 }
@@ -1206,45 +1076,32 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::ComputeL(uint8_t * Lout, size_t * L_le
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
-    mbedtls_ecp_group curve;
-    mbedtls_mpi w1_bn;
-    mbedtls_ecp_point Ltemp;
+    result = UECC_SUCCESS;
+    uECC_word_t tmp[2 * NUM_ECC_WORDS];
+    uECC_word_t w1_bn[NUM_ECC_WORDS];
+    uECC_word_t L_tmp[2 * NUM_ECC_WORDS];
 
-    mbedtls_ecp_group_init(&curve);
-    mbedtls_mpi_init(&w1_bn);
-    mbedtls_ecp_point_init(&Ltemp);
+    uECC_vli_bytesToNative(tmp, w1in, NUM_ECC_BYTES);
 
-    result = mbedtls_ecp_group_load(&curve, MBEDTLS_ECP_DP_SECP256R1);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    uECC_vli_mmod(w1_bn, tmp, curve_n);
 
-    result = mbedtls_mpi_read_binary(&w1_bn, Uint8::to_const_uchar(w1in), w1in_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    result = EccPoint_mult_safer(L_tmp, curve_G, w1_bn);
+    VerifyOrExit(result == UECC_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
-    result = mbedtls_mpi_mod_mpi(&w1_bn, &w1_bn, &curve.N);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    result = mbedtls_ecp_mul(&curve, &Ltemp, &w1_bn, &curve.G, CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-
-    memset(Lout, 0, *L_len);
-
-    result = mbedtls_ecp_point_write_binary(&curve, &Ltemp, MBEDTLS_ECP_PF_UNCOMPRESSED, L_len, Uint8::to_uchar(Lout), *L_len);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    // Fully padded raw uncompressed points expected, first byte is always 0x04 i.e uncompressed
+    Lout[0] = 0x04;
+    uECC_vli_nativeToBytes(Lout + 1, NUM_ECC_BYTES, L_tmp);
+    uECC_vli_nativeToBytes(Lout + NUM_ECC_BYTES + 1, NUM_ECC_BYTES, L_tmp + NUM_ECC_WORDS);
 
 exit:
     _log_mbedTLS_error(result);
-    mbedtls_ecp_point_free(&Ltemp);
-    mbedtls_mpi_free(&w1_bn);
-    mbedtls_ecp_group_free(&curve);
 
     return error;
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
 {
-    Spake2p_Context * context = to_inner_spake2p_context(&mSpake2pContext);
-
-    if (mbedtls_ecp_check_pubkey(&context->curve, (mbedtls_ecp_point *) R) != 0)
+    if (uECC_valid_point((const uECC_word_t *) R) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -1261,7 +1118,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     mbedtls_x509_crt certChain;
     mbedtls_x509_crt rootCert;
     int mbedResult;
-    uint32_t flags = 0;
+    uint32_t flags;
 
     result = CertificateChainValidationResult::kInternalFrameworkError;
 
@@ -1288,7 +1145,7 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
     /* Verify the chain against the root */
-    mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, nullptr, nullptr, &flags, nullptr, nullptr);
+    mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, NULL, NULL, &flags, NULL, NULL);
 
     switch (mbedResult)
     {
