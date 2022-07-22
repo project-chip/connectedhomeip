@@ -41,8 +41,6 @@ COPY --from=crosscompile /opt/ubuntu-21.04-aarch64-sysroot /opt/ubuntu-21.04-aar
 
 COPY --from=ameba /opt/ameba /opt/ameba
 
-COPY --from=k32w /opt/sdk/sdks /opt/sdk/sdks
-
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
 COPY --from=ti /opt/ti/sysconfig_1.11.0 /opt/ti/sysconfig_1.11.0
