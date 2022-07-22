@@ -20711,18 +20711,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::Groups::Id: {
         switch (aCommand)
         {
-        case Clusters::Groups::Commands::AddGroup::Id:
-            return true;
-        case Clusters::Groups::Commands::ViewGroup::Id:
-            return true;
-        case Clusters::Groups::Commands::GetGroupMembership::Id:
-            return true;
-        case Clusters::Groups::Commands::RemoveGroup::Id:
-            return true;
-        case Clusters::Groups::Commands::RemoveAllGroups::Id:
-            return true;
-        case Clusters::Groups::Commands::AddGroupIfIdentifying::Id:
-            return true;
         default:
             return false;
         }
@@ -20730,26 +20718,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::Scenes::Id: {
         switch (aCommand)
         {
-        case Clusters::Scenes::Commands::AddScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::ViewScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::RemoveScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::RemoveAllScenes::Id:
-            return true;
-        case Clusters::Scenes::Commands::StoreScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::RecallScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::GetSceneMembership::Id:
-            return true;
-        case Clusters::Scenes::Commands::EnhancedAddScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::EnhancedViewScene::Id:
-            return true;
-        case Clusters::Scenes::Commands::CopyScene::Id:
-            return true;
         default:
             return false;
         }
@@ -20799,8 +20767,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::GeneralCommissioning::Id: {
         switch (aCommand)
         {
-        case Clusters::GeneralCommissioning::Commands::CommissioningComplete::Id:
-            return true;
         default:
             return false;
         }
@@ -20864,10 +20830,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::OperationalCredentials::Id: {
         switch (aCommand)
         {
-        case Clusters::OperationalCredentials::Commands::UpdateNOC::Id:
-            return true;
-        case Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Id:
-            return true;
         default:
             return false;
         }
@@ -20875,14 +20837,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::GroupKeyManagement::Id: {
         switch (aCommand)
         {
-        case Clusters::GroupKeyManagement::Commands::KeySetWrite::Id:
-            return true;
-        case Clusters::GroupKeyManagement::Commands::KeySetRead::Id:
-            return true;
-        case Clusters::GroupKeyManagement::Commands::KeySetRemove::Id:
-            return true;
-        case Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Id:
-            return true;
         default:
             return false;
         }
