@@ -20,7 +20,6 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
-#include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -46,8 +45,6 @@ namespace {
 constexpr EndpointId kLightEndpointId = 1;
 QueueHandle_t sAppEventQueue;
 TaskHandle_t sAppTaskHandle;
-
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 } // namespace
 
@@ -76,8 +73,6 @@ CHIP_ERROR AppTask::Init()
     AppButton.Init();
 
     AppButton.SetButtonPressCallback(ButtonPressCallback);
-
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     return err;
 }
