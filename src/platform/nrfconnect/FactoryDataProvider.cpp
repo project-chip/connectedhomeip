@@ -35,7 +35,7 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P
     ReturnErrorOnFailure(serializedKeypair.SetLength(privateKey.size() + publicKey.size()));
     memcpy(serializedKeypair.Bytes(), publicKey.data(), publicKey.size());
     memcpy(serializedKeypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-    return keypair.Deserialize(serializedKeypair);
+    return keypair.Initialize(serializedKeypair);
 }
 } // namespace
 

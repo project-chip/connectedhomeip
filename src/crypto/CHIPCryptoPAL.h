@@ -75,9 +75,15 @@ constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 
 constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
 constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+constexpr size_t kMax_SerializeKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
+constexpr size_t kMax_PlaintextKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
 
 constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+
+// TODO: Remove AES-256 from CryptoPAL since not required by V1 spec
+constexpr size_t kAES_CCM256_Key_Length   = 256u / 8u;
+constexpr size_t kAES_CCM256_Block_Length = kAES_CCM256_Key_Length;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
@@ -163,7 +169,7 @@ enum class CHIP_SPAKE2P_ROLE : uint8_t
     PROVER   = 1, // Commissioner
 };
 
-enum class SupportedECPKeyTypes : uint8_t
+enum class SupportedECKeyTypes : uint8_t
 {
     ECP256R1 = 0,
 };
@@ -197,11 +203,11 @@ void ClearSecretData(uint8_t (&buf)[N])
 bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n);
 
 template <typename Sig>
-class ECPKey
+class ECPublicKey
 {
 public:
-    virtual ~ECPKey() {}
-    virtual SupportedECPKeyTypes Type() const  = 0;
+    virtual ~ECPublicKey() {}
+    virtual SupportedECKeyTypes Type() const   = 0;
     virtual size_t Length() const              = 0;
     virtual bool IsUncompressed() const        = 0;
     virtual operator const uint8_t *() const   = 0;
@@ -209,7 +215,7 @@ public:
     virtual const uint8_t * ConstBytes() const = 0;
     virtual uint8_t * Bytes()                  = 0;
 
-    virtual bool Matches(const ECPKey<Sig> & other) const
+    virtual bool Matches(const ECPublicKey<Sig> & other) const
     {
         return (this->Length() == other.Length()) &&
             IsBufferContentEqualConstantTime(this->ConstBytes(), other.ConstBytes(), this->Length());
@@ -283,7 +289,11 @@ typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
 
 typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
 
-class P256PublicKey : public ECPKey<P256ECDSASignature>
+typedef CapacityBoundBuffer<kMax_SerializeKey_Length> P256SerializedKeypair;
+
+typedef CapacityBoundBuffer<kMax_PlaintextKey_Length> P256PlaintextKeypair;
+
+class P256PublicKey : public ECPublicKey<P256ECDSASignature>
 {
 public:
     P256PublicKey() {}
@@ -310,7 +320,7 @@ public:
         return *this;
     }
 
-    SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
+    SupportedECKeyTypes Type() const override { return SupportedECKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() override { return bytes; }
     operator const uint8_t *() const override { return bytes; }
@@ -333,11 +343,48 @@ private:
     uint8_t bytes[kP256_PublicKey_Length];
 };
 
-template <typename PK, typename Secret, typename Sig>
-class ECPKeypair
+template <typename PK, typename Plaintext, typename Serialized, typename Sig, typename Secret>
+class ECKeypair
 {
 public:
-    virtual ~ECPKeypair() {}
+    virtual ~ECKeypair() {}
+
+    /**
+     * @brief Initialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Initialize() = 0;
+
+    /**
+     * @brief Initialize the keypair by importing a plaintext key.
+     *
+     * This function takes a key in plaintext format to initialize
+     * the keypair object. Multiple keys can be instantiated from the
+     * same plaintext bytes.
+     *
+     * The plaintext format is defined as the binary concatenation of
+     * the public key and the private key, both in uncompressed form.
+     * For a key on the P256 curve, this means the plaintext key starts
+     * with a byte set to 0x04, followed by 32 bytes of public key X-coordinate,
+     * followed by 32 bytes of public key Y-coordinate, followed by
+     * 32 bytes of private key (all MSB first and zero-extended to
+     * the left if necessary).
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Initialize(Plaintext & input) = 0;
+
+    /**
+     * @brief Serialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Serialize(Serialized & output) const = 0;
+
+    /**
+     * @brief Deserialize the keypair.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR Deserialize(Serialized & input) = 0;
 
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
@@ -367,6 +414,13 @@ public:
     virtual CHIP_ERROR ECDH_derive_secret(const PK & remote_public_key, Secret & out_secret) const = 0;
 
     virtual const PK & Pubkey() const = 0;
+
+    /** Release resources associated with this key pair */
+    virtual void Clear() = 0;
+
+protected:
+    bool mInitialized = false;
+    PK mPublicKey;
 };
 
 struct alignas(size_t) P256KeypairContext
@@ -374,41 +428,38 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
-typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
-
-class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
-{
-public:
-    /**
-     * @brief Initialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Initialize() = 0;
-
-    /**
-     * @brief Serialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const = 0;
-
-    /**
-     * @brief Deserialize the keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input) = 0;
-};
-
-class P256Keypair : public P256KeypairBase
+class P256Keypair
+    : public ECKeypair<P256PublicKey, P256PlaintextKeypair, P256SerializedKeypair, P256ECDSASignature, P256ECDHDerivedSecret>
 {
 public:
     P256Keypair() {}
+
     ~P256Keypair() override;
 
     /**
-     * @brief Initialize the keypair.
+     * @brief Initialize the keypair by generating a new key.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Initialize() override;
+
+    /**
+     * @brief Initialize the keypair by importing a plaintext key.
+     *
+     * This function takes a key in plaintext format to initialize
+     * the keypair object. Multiple keys can be instantiated from the
+     * same plaintext bytes.
+     *
+     * The plaintext format is defined as the binary concatenation of
+     * the public key and the private key, both in uncompressed form.
+     * For a key on the P256 curve, this means the plaintext key starts
+     * with a byte set to 0x04, followed by 32 bytes of public key X-coordinate,
+     * followed by 32 bytes of public key Y-coordinate, followed by
+     * 32 bytes of private key (all MSB first and zero-extended to
+     * the left if necessary).
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Initialize(P256PlaintextKeypair & input) override;
 
     /**
      * @brief Serialize the keypair.
@@ -461,12 +512,10 @@ public:
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
     /** Release resources associated with this key pair */
-    void Clear();
+    void Clear() override;
 
 private:
-    P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
-    bool mInitialized = false;
 };
 
 /**

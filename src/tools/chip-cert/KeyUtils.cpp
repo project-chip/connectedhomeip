@@ -42,7 +42,7 @@ namespace {
 
 KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
 {
-    static uint32_t p256SerializedKeypairLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
+    static uint32_t p256PlaintextKeypairLen  = kP256_PublicKey_Length + kP256_PrivateKey_Length;
     static const uint8_t chipRawPrefix[]     = { 0x04 };
     static const char * chipHexPrefix        = "04";
     static const char * chipB64Prefix        = "B";
@@ -54,15 +54,15 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
 
     VerifyOrReturnError(key != nullptr, kKeyFormat_Unknown);
 
-    if ((keyLen == p256SerializedKeypairLen) && (memcmp(key, chipRawPrefix, sizeof(chipRawPrefix)) == 0))
+    if ((keyLen == p256PlaintextKeypairLen) && (memcmp(key, chipRawPrefix, sizeof(chipRawPrefix)) == 0))
     {
         return kKeyFormat_Chip_Raw;
     }
-    if ((keyLen == HEX_ENCODED_LENGTH(p256SerializedKeypairLen)) && (memcmp(key, chipHexPrefix, strlen(chipHexPrefix)) == 0))
+    if ((keyLen == HEX_ENCODED_LENGTH(p256PlaintextKeypairLen)) && (memcmp(key, chipHexPrefix, strlen(chipHexPrefix)) == 0))
     {
         return kKeyFormat_Chip_Hex;
     }
-    if ((keyLen == BASE64_ENCODED_LEN(p256SerializedKeypairLen)) && (memcmp(key, chipB64Prefix, strlen(chipB64Prefix)) == 0))
+    if ((keyLen == BASE64_ENCODED_LEN(p256PlaintextKeypairLen)) && (memcmp(key, chipB64Prefix, strlen(chipB64Prefix)) == 0))
     {
         return kKeyFormat_Chip_Base64;
     }
@@ -160,7 +160,7 @@ bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY *
 
 } // namespace
 
-bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
+bool SerializeKeyPair(EVP_PKEY * key, P256PlaintextKeypair & serializedKeypair)
 {
     const EC_KEY * ecKey     = nullptr;
     const BIGNUM * privKeyBN = nullptr;
@@ -394,7 +394,7 @@ bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
             dataFormat = kDataFormat_Hex;
 
         {
-            P256SerializedKeypair serializedKeypair;
+            P256PlaintextKeypair serializedKeypair;
             VerifyOrExit(SerializeKeyPair(key, serializedKeypair), res = false);
             VerifyOrExit(WriteDataIntoFile(fileName, serializedKeypair.Bytes(), serializedKeypair.Length(), dataFormat),
                          res = false);

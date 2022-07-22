@@ -33,6 +33,8 @@ public:
 
     CHIP_ERROR Initialize() override;
 
+    CHIP_ERROR Initialize(chip::Crypto::P256PlaintextKeypair & input) override;
+
     CHIP_ERROR Serialize(chip::Crypto::P256SerializedKeypair & output) const override;
 
     CHIP_ERROR Deserialize(chip::Crypto::P256SerializedKeypair & input) override;

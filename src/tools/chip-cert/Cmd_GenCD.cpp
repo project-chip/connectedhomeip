@@ -1156,9 +1156,9 @@ bool Cmd_GenCD(int argc, char * argv[])
         // Initialize P256Keypair from EVP_PKEY.
         P256Keypair keypair;
         {
-            P256SerializedKeypair serializedKeypair;
-            VerifyOrReturnError(SerializeKeyPair(key.get(), serializedKeypair), false);
-            VerifyOrReturnError(keypair.Deserialize(serializedKeypair) == CHIP_NO_ERROR, false);
+            P256PlaintextKeypair plaintextKeypair;
+            VerifyOrReturnError(ExportKeyPair(key.get(), plaintextKeypair), false);
+            VerifyOrReturnError(keypair.Initialize(plaintextKeypair) == CHIP_NO_ERROR, false);
         }
 
         // Encode CD TLV content.

@@ -49,6 +49,14 @@ CHIP_ERROR MTRP256KeypairBridge::Initialize()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MTRP256KeypairBridge::Initialize(P256PlaintextKeypair & input)
+{
+    // Todo: support initialising a key from plaintext bytes when running
+    // FabricTable / CASE unit tests with plaintext keys on a device with
+    // this implementation
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR MTRP256KeypairBridge::Serialize(P256SerializedKeypair & output) const
 {
     if (!HasKeypair()) {

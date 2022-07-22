@@ -116,7 +116,7 @@ private:
 class P256KeypairHSM : public P256Keypair
 {
 public:
-    P256KeypairHSM()
+    P256KeypairHSM() : P256Keypair()
     {
         provisioned_key = false;
         keyid           = 0;
@@ -125,6 +125,8 @@ public:
     ~P256KeypairHSM();
 
     virtual CHIP_ERROR Initialize() override;
+
+    virtual CHIP_ERROR Initialize(P256PlaintextKeypair & input) override;
 
     virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 
