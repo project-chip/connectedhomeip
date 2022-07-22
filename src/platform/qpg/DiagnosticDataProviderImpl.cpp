@@ -69,6 +69,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
+{
+    qvCHIP_ResetHeapStats();
+    return CHIP_NO_ERROR;
+}
+
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
     return DiagnosticDataProviderImpl::GetDefaultInstance();

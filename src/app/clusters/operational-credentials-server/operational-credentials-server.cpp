@@ -508,22 +508,11 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
         }
     }
 
-    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
-
-    // Fetch current fabric
-    const FabricInfo * fabric = RetrieveCurrentFabric(commandObj);
-    if (fabric == nullptr)
-    {
-        SendNOCResponse(commandObj, commandPath, OperationalCertStatus::kInsufficientPrivilege, ourFabricIndex,
-                        CharSpan::fromCharString("Current fabric not found"));
-        return true;
-    }
-
     // Set Label on fabric. Any error on this is basically an internal error...
     // NOTE: if an UpdateNOC had caused a pending fabric, that pending fabric is
     //       the one updated thereafter. Otherwise, the data is committed to storage
     //       as soon as the update is done.
-    err = fabricTable.SetFabricLabel(ourFabricIndex, label);
+    CHIP_ERROR err = fabricTable.SetFabricLabel(ourFabricIndex, label);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::Failure);
 
     finalStatus = Status::Success;
@@ -606,10 +595,6 @@ OperationalCertStatus ConvertToNOCResponseStatus(CHIP_ERROR err)
     {
         return OperationalCertStatus::kInvalidAdminSubject;
     }
-    if (err == CHIP_ERROR_INSUFFICIENT_PRIVILEGE)
-    {
-        return OperationalCertStatus::kInsufficientPrivilege;
-    }
 
     return OperationalCertStatus::kInvalidNOC;
 }
@@ -667,9 +652,6 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
-
-    // TODO: Add support for calling AddNOC without a prior AddTrustedRootCertificate if
-    //       the root properly matches an existing one.
 
     // We can't possibly have a matching root based on the fact that we don't have
     // a shared root store. Therefore we would later fail path validation due to
@@ -1196,8 +1178,6 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 
     // Flush acks before really slow work
     commandObj->FlushAcksRightAwayOnSlowCommand();
-
-    // TODO(#17208): Handle checking for byte-to-byte match with existing fabrics before allowing the add
 
     err = ValidateChipRCAC(rootCertificate);
     VerifyOrExit(err == CHIP_NO_ERROR, finalStatus = Status::InvalidCommand);

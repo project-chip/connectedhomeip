@@ -50,6 +50,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Platform;
 using namespace ::chip::Credentials;
+using namespace ::chip::app::Clusters;
 
 static AppDeviceCallbacks AppCallback;
 
@@ -326,6 +327,15 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
                                                ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclName);
     }
+}
+
+bool emberAfBridgedActionsClusterInstantActionCallback(app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const BridgedActions::Commands::InstantAction::DecodableType & commandData)
+{
+    // No actions are implemented, just return status NotFound.
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
+    return true;
 }
 
 const EmberAfDeviceType gBridgedRootDeviceTypes[] = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },

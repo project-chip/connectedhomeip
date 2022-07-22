@@ -235,7 +235,11 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     enable_host_gcc_build = enable_default_builds && host_os != "win"
 
     # Enable building chip with gcc & mbedtls.
-    enable_host_gcc_mbedtls_build = enable_default_builds && host_os != "win"
+    enable_host_gcc_mbedtls_build = false
+
+    # Enable limited testing with gcc & mbedtls.
+    enable_host_gcc_mbedtls_crypto_tests =
+        enable_default_builds && host_os != "win"
 
     # Build the chip-cert tool.
     enable_standalone_chip_cert_build =
@@ -349,6 +353,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     builds += [ ":host_gcc_mbedtls" ]
   }
 
+  if (enable_host_gcc_mbedtls_crypto_tests) {
+    chip_build("host_gcc_mbedtls_crypto_tests") {
+      test_group = "//src:crypto_tests"
+      toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+    }
+
+    builds += [ ":host_gcc_mbedtls_crypto_tests" ]
+  }
+
   if (enable_android_builds) {
     chip_build("android_arm") {
       toolchain = "${build_root}/toolchain/android:android_arm"
@@ -376,6 +389,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_fake_tests) {
     chip_build("fake_platform") {
+      test_group = "//src:fake_platform_tests"
       toolchain = "${build_root}/toolchain/fake:fake_${host_cpu}_gcc"
     }
 

@@ -100,7 +100,7 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="3"/>
     <attribute side="server" code="0x0000" define="GROUP_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" optional="false">name support</attribute>
     <!-- NAME_SUPPORT -->
-    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" optional="false" cli="zcl groups add">
+    <command source="client" code="0x00" name="AddGroup" response="AddGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups add">
       <description>
         Command description for AddGroup
       </description>
@@ -108,32 +108,32 @@ limitations under the License.
       <arg name="groupName" type="CHAR_STRING"/>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" optional="false" cli="zcl groups view">
+    <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
       <description>
         Command description for ViewGroup
       </description>
       <arg name="groupId" type="group_id"/>
     </command>
-    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" optional="false" cli="zcl groups get">
+    <command source="client" code="0x02" name="GetGroupMembership" response="GetGroupMembershipResponse" cliFunctionName="zclGroupsGetCommand" isFabricScoped="true" optional="false" cli="zcl groups get">
       <description>
         Command description for GetGroupMembership
       </description>
       <arg name="groupList" type="group_id" array="true"/>
     </command>
-    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" optional="false" cli="zcl groups remove">
+    <command source="client" code="0x03" name="RemoveGroup" response="RemoveGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups remove">
       <description>
         Command description for RemoveGroup
       </description>
       <arg name="groupId" type="group_id"/>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x04" name="RemoveAllGroups" optional="false" cli="zcl groups rmall">
+    <command source="client" code="0x04" name="RemoveAllGroups" isFabricScoped="true" optional="false" cli="zcl groups rmall">
       <description>
         Command description for RemoveAllGroups
       </description>
       <access op="invoke" role="manage"/>
     </command>
-    <command source="client" code="0x05" name="AddGroupIfIdentifying" optional="false" cli="zcl groups add-if-id">
+    <command source="client" code="0x05" name="AddGroupIfIdentifying" isFabricScoped="true" optional="false" cli="zcl groups add-if-id">
       <description>
         Command description for AddGroupIfIdentifying
       </description>

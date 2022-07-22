@@ -608,38 +608,23 @@ PICS:
       id: DGSW.S.C00.Rsp
 
       # Thermostat cluster
-    - label: "Does the device implement the Heating feature"
+    - label: "Thermostat is capable of managing a heating device"
       id: TSTAT.S.F00
 
-    - label: "Does the device implement the Cooling feature"
+    - label: "Thermostat is capable of managing a cooling device"
       id: TSTAT.S.F01
 
-    - label: "Does the device implement the Occupancy feature"
+    - label: "Supports Occupied and Unoccupied setpoints"
       id: TSTAT.S.F02
 
-    - label: "Does the device implement the Auto feature"
+    - label: "Supports a weekly schedule of setpoint transitions(Schedule)"
+      id: TSTAT.S.F03
+
+    - label: "Supports configurable setback (or span)"
+      id: TSTAT.S.F04
+
+    - label: "Supports a System Mode of Auto"
       id: TSTAT.S.F05
-
-    - label: "Does the device implement the MinHeatSetpointLimit attribute"
-      id: A_MINHEATSETPOINTLIMIT
-
-    - label: "Does the device implement the MaxHeatSetpointLimit attribute"
-      id: A_MAXHEATSETPOINTLIMIT
-
-    - label: "Does the device implement the MinCoolSetpointLimit attribute"
-      id: A_MINCOOLSETPOINTLIMIT
-
-    - label: "Does the device implement the MaxCoolSetpointLimit attribute"
-      id: A_MAXCOOLSETPOINTLIMIT
-
-    - label: "Does the device implement the Tolerance attribute?"
-      id: A_TEMPERATURE_TOLERANCE
-
-    - label: "Does the device implement the OccupiedCoolingSetpoint attribute?"
-      id: A_OCCUPIEDCOOLINGSETPOINT
-
-    - label: "Does the device implement the OccupiedHeatingSetpoint attribute?"
-      id: A_OCCUPIEDHEATINGSETPOINT
 
     - label: "Does the device implement the LocalTemperature attribute?"
       id: TSTAT.S.A0000
@@ -818,24 +803,6 @@ PICS:
 
     - label: "Does the device implement the GetRelayStatusLog command?"
       id: TSTAT.S.C04.Rsp
-
-    - label: "Thermostat is capable of managing a heating device"
-      id: TSTAT.S.F00
-
-    - label: "Thermostat is capable of managing a cooling device"
-      id: TSTAT.S.F01
-
-    - label: "Supports Occupied and Unoccupied setpoints"
-      id: TSTAT.S.F02
-
-    - label: "Supports a weekly schedule of setpoint transitions"
-      id: TSTAT.S.F03
-
-    - label: "Supports configurable setback (or span)"
-      id: TSTAT.S.F04
-
-    - label: "Supports a System Mode of Auto"
-      id: TSTAT.S.F05
 
     #Client Commands
     - label: "Does the device implement sending the SetpointRaiseLower command?"
