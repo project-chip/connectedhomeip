@@ -75,7 +75,7 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime,TH read CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -109,7 +109,7 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime,TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C05.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

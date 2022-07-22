@@ -79,7 +79,7 @@ tests:
       arguments:
           values:
               - name: "colorTemperature"
-                value: 100
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -100,7 +100,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
-          value: 100
+          value: ColorTempPhysicalMaxMiredsValue
           constraints:
               type: uint16
               minValue: ColorTempPhysicalMinMiredsValue

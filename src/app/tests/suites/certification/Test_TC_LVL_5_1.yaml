@@ -62,9 +62,9 @@ tests:
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
       PICS: LVL.S.C04.Rsp && !LVL.S.A0002
@@ -76,12 +76,12 @@ tests:
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Reads current level attribute from DUT"
-      PICS: LVL.S.A0000
+      PICS: LVL.S.A0000 && LVL.S.C04.Rsp
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -93,7 +93,7 @@ tests:
               maxValue: 255
 
     - label: "Reads current level attribute from DUT"
-      PICS: LVL.S.A0000 && !LVL.S.A0002
+      PICS: LVL.S.A0000 && !LVL.S.A0002 && LVL.S.C04.Rsp
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -115,9 +115,9 @@ tests:
               - name: "transitionTime"
                 value: 20
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 4000ms"
       cluster: "DelayCommands"
@@ -128,7 +128,7 @@ tests:
                 value: 4000
 
     - label: "Reads current level attribute from DUT"
-      PICS: LVL.S.A0000 && LVL.S.C02.Rsp
+      PICS: LVL.S.A0000 && LVL.S.C02.Rsp && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -149,9 +149,9 @@ tests:
               - name: "transitionTime"
                 value: 20
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 4000ms"
       cluster: "DelayCommands"
@@ -162,14 +162,14 @@ tests:
                 value: 4000
 
     - label: "Reads current level attribute from DUT"
-      PICS: LVL.S.C06.Rsp && LVL.S.A0000
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:
           value: CurrentlevelValue
 
     - label: "Reads current level attribute from DUT"
-      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002
+      PICS: LVL.S.C06.Rsp && LVL.S.A0000 && !LVL.S.A0002 && LVL.S.M.VarRate
       command: "readAttribute"
       attribute: "current level"
       response:

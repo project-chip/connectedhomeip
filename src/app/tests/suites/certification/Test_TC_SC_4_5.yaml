@@ -33,27 +33,13 @@ tests:
     - label:
           "By any means, DUT is instructed to perform an unicast UDP query to
           the DNS-SD Discovery Proxy on TH for services"
+      PICS:
+          MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
+          MCORE.SC.T_KEY
       verification: |
-          1. Proviosion the node(accessory/device) to thread network
-
-          2. Open the matter shell in the SDK and run resolve command, Verify if the device detects the published IP address and the Common Txt Key/Value Pairs , as advertised in the service. Ref below example.
-
-
-          uart:~$ matter dns resolve 9791300599901692208 10360380464321857174
-          Resolving ...
-          uart:~$ I: 127317 [DIS]Node ID resolved for 0x8FC7772401CD0696 to [fd7b:a81b:9770:0:dea6:32ff:fe8d:7072]:22222
-          DNS resolve for 87E1B004E235A130-8FC7772401CD0696 succeeded:
-             Hostname: ubuntuserverAcce
-             IP address: fd7b:a81b:9770:0:dea6:32ff:fe8d:7072
-             Port: 22222
-             MRP retry interval (idle): 3000ms
-             MRP retry interval (active): 4000ms
-             Supports TCP: no
-
-
           avahi-browse -rt _matter._tcp
 
-
+          Verify on the TH Log:
 
           +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
@@ -77,34 +63,25 @@ tests:
       disabled: true
 
     - label: "DUT must receive a notification with new data"
+      PICS:
+          MCORE.SC.SII_OP_DISCOVERY_KEY && MCORE.SC.SAI_OP_DISCOVERY_KEY &&
+          MCORE.SC.T_KEY
       verification: |
-          1. Open the matter shell in the SDK and run resolve command, Verify if the device detects updated values in the service, i..e Support TCP is '1'(Yes)
-
-
-          uart:~$ matter dns resolve 9791300599901692208 10360380464321857174
-          Resolving ...
-          uart:~$ I: 542364 [DIS]Node ID resolved for 0x8FC7772401CD0696 to [fd7b:a81b:9770:0:dea6:32ff:fe8d:7072]:22222
-          DNS resolve for 87E1B004E235A130-8FC7772401CD0696 succeeded:
-             Hostname: ubuntuserverAcce
-             IP address: fd7b:a81b:9770:0:dea6:32ff:fe8d:7072
-             Port: 22222
-             MRP retry interval (idle): 3000ms
-             MRP retry interval (active): 4000ms
-             Supports TCP: yes
-
-
-
           avahi-browse -rt _matter._tcp
+
+
+          Verify on the TH Log:
+
           +   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           +   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
           =   eth0 IPv4 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
              hostname = [D21165B5F440B033.local]
              address = [fd11:22::4b31:9932:cffe:b41a]
              port = [5540]
-             txt = ["T=0" "SAI=300" "SII=5000"]
+             txt = ["T=1" "SAI=300" "SII=5000"]
           =   eth0 IPv6 3A235FF3FA2DAC10-0000000000000055             _matter._tcp         local
              hostname = [D21165B5F440B033.local]
              address = [fd11:22::4b31:9932:cffe:b41a]
              port = [5540]
-             txt = ["T=0" "SAI=300" "SII=5000"]
+             txt = ["T=1" "SAI=300" "SII=5000"]
       disabled: true

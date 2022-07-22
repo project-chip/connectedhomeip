@@ -39,7 +39,7 @@ tests:
       response:
           value: 1
 
-    - label: "Check Saturation attribute value matched before any change"
+    - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -49,7 +49,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Move to saturation command"
+    - label: "TH sends MoveToSaturation command to DUT"
       PICS: CC.S.F00 && CC.S.C03.Rsp
       command: "MoveToSaturation"
       arguments:
@@ -72,9 +72,8 @@ tests:
                 value: 500
 
     - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.F00 && CC.S.A0001
+          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C03.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -92,9 +91,8 @@ tests:
                 value: 500
 
     - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.F00 && CC.S.A0001
+          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C03.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -112,9 +110,8 @@ tests:
                 value: 1000
 
     - label:
-          "Check current saturation attribute value matched the value sent by
-          the last command"
-      PICS: CC.S.F00 && CC.S.A0001
+          "Over TransitionTime, TH reads CurrentSaturation attribute from DUT."
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C03.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
