@@ -272,7 +272,7 @@ class TestDefinition:
 
             else:
                 runner.RunSubprocess(pairing_cmd,
-                                 name='PAIR', dependencies=[apps_register])
+                                     name='PAIR', dependencies=[apps_register])
 
                 runner.RunSubprocess(
                     test_cmd,
