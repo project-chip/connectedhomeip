@@ -518,30 +518,6 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EventManagement::WriteEventStatusIB(TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus)
-{
-    TLVType containerType;
-    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
-
-    EventStatusIB::Builder builder;
-    builder.Init(&aWriter, to_underlying(EventReportIB::Tag::kEventStatus));
-
-    ReturnErrorOnFailure(builder.CreatePath()
-                             .Endpoint(aEvent.mEndpointId)
-                             .Cluster(aEvent.mClusterId)
-                             .Event(aEvent.mEventId)
-                             .EndOfEventPathIB()
-                             .GetError());
-
-    ReturnErrorOnFailure(builder.CreateErrorStatus().EncodeStatusIB(aStatus).GetError());
-
-    ReturnErrorOnFailure(builder.EndOfEventStatusIB().GetError());
-
-    ReturnErrorOnFailure(aWriter.EndContainer(containerType));
-    ReturnErrorOnFailure(aWriter.Finalize());
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOutContext,
                                               const EventManagement::EventEnvelopeContext & event)
 {

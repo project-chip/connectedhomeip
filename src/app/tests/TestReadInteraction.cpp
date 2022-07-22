@@ -23,6 +23,7 @@
  */
 
 #include "lib/support/CHIPMem.h"
+#include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -41,9 +42,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <protocols/interaction_model/Constants.h>
-
 #include <nlunit-test.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>
 
@@ -1065,6 +1065,8 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    chip::Access::Examples::setDenied(true);
+
     // When reading events with concrete paths without enough privilege, we will get a EventStatusIB
     {
         chip::app::EventPathParams eventPathParams[1];
@@ -1126,6 +1128,7 @@ void TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport(nlTest
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+    chip::Access::Examples::setDenied(false);
 }
 
 void TestReadInteraction::TestReadWildcard(nlTestSuite * apSuite, void * apContext)
@@ -2736,9 +2739,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadRoundtripWithNoMatchPathDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithNoMatchPathDataVersionFilter),
     NL_TEST_DEF("TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithMultiSamePathDifferentDataVersionFilter),
     NL_TEST_DEF("TestReadRoundtripWithSameDifferentPathsDataVersionFilter", chip::app::TestReadInteraction::TestReadRoundtripWithSameDifferentPathsDataVersionFilter),
-    // TODO(#10253): In unit tests, the access control delegate will always pass, in this case, we will never get a StatusIB for
-    // UnsupportedAccess status code, the test below can be re-enabled after we have a better access control function in unit tests.
-    // NL_TEST_DEF("TestReadRoundtripWithEventStatusIBInEventReport", chip::app::TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport),
+    NL_TEST_DEF("TestReadRoundtripWithEventStatusIBInEventReport", chip::app::TestReadInteraction::TestReadRoundtripWithEventStatusIBInEventReport),
     NL_TEST_DEF("TestReadWildcard", chip::app::TestReadInteraction::TestReadWildcard),
     NL_TEST_DEF("TestReadChunking", chip::app::TestReadInteraction::TestReadChunking),
     NL_TEST_DEF("TestSetDirtyBetweenChunks", chip::app::TestReadInteraction::TestSetDirtyBetweenChunks),
