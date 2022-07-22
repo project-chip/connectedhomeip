@@ -21,7 +21,7 @@
 namespace chip {
 namespace Access {
 namespace Examples {
-
+void setDenied(bool aDenied);
 AccessControl::Delegate * GetPermissiveAccessControlDelegate();
 
 } // namespace Examples

@@ -109,6 +109,11 @@ private:
     EventStatusIB::Builder mEventStatus;
     EventDataIB::Builder mEventData;
 };
+
+/**
+ * @brief construct EventStatusIB to target buffer for report
+ */
+CHIP_ERROR ConstructEventStatusIB(TLV::TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus);
 } // namespace EventReportIB
 } // namespace app
 } // namespace chip

@@ -27,6 +27,8 @@ using Entry         = chip::Access::AccessControl::Entry;
 using EntryIterator = chip::Access::AccessControl::EntryIterator;
 using Target        = Entry::Target;
 
+bool sDenied = false;
+
 class AccessControlDelegate : public AccessControl::Delegate
 {
 public:
@@ -63,7 +65,14 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        return CHIP_NO_ERROR;
+        if (sDenied)
+        {
+            return CHIP_ERROR_ACCESS_DENIED;
+        }
+        else
+        {
+            return CHIP_NO_ERROR;
+        }
     }
 };
 
@@ -72,6 +81,11 @@ public:
 namespace chip {
 namespace Access {
 namespace Examples {
+
+void setDenied(bool aDenied)
+{
+    sDenied = aDenied;
+}
 
 AccessControl::Delegate * GetPermissiveAccessControlDelegate()
 {

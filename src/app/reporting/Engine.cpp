@@ -24,6 +24,7 @@
  */
 
 #include <app/AppBuildConfig.h>
+#include <app/RequiredPrivilege.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
@@ -290,14 +291,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::Writer & aWriter, bool & aItemRemoved, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool & aItemRemoved, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ObjectList<EventPathParams> * deletedEventPathList = nullptr;
     ObjectList<EventPathParams> ** previousIteratedEventPathListNextPtr = &(apReadHandler->mpEventPathList);
 
     aItemRemoved = false;
-
     for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
     {
         if (current->mValue.HasEventWildcard())
@@ -306,7 +306,11 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::Writer & aWriter, bool & aI
             continue;
         }
 
-        Access::RequestPath requestPath{ .cluster = current.mValue.mClusterId, .endpoint = current.mValue.mEndpointId };
+        Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
+        ConcreteEventPath path;
+        path.mClusterId = current->mValue.mClusterId;
+        path.mEndpointId = current->mValue.mEndpointId;
+        path.mEventId = current->mValue.mEventId;
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
@@ -321,16 +325,14 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::Writer & aWriter, bool & aI
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err = WriteEventStatusIB(aWriter, ConcreteEventPath(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId),
-                                    StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
-
+            err = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
 
-            ChipLogDetail(DataManagement, "Removed event path (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege", current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId), ChipLogValueMEI(current->mValue.mEventId));
+            ChipLogDetail(InteractionModel, "Removed event path (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege", current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId), ChipLogValueMEI(current->mValue.mEventId));
 
             auto next = current->mpNext;
 
@@ -456,7 +458,7 @@ exit:
     }
 
     // Maybe encoding the attributes has already used up all space.
-    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) && !hasEncodedData))
+    if ((err == CHIP_NO_ERROR || err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL) && !hasEncodedData)
     {
         aReportDataBuilder.Rollback(backup);
         aReportDataBuilder.ResetError();
