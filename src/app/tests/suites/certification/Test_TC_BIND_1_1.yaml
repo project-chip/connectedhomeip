@@ -30,7 +30,7 @@ tests:
       verification: |
           ./chip-tool binding read cluster-revision 1 0
 
-          On TH, verify  DUT responsds ClusterRevision attribute as the value 1 
+          On TH, verify  DUT responsds ClusterRevision attribute as the value 1
 
           [1649417989.863435][3040:3045] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFD DataVersion: 1411817517
           [1649417989.863557][3040:3045] CHIP:TOO:   ClusterRevision: 1
