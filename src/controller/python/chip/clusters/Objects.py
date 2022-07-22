@@ -11042,7 +11042,6 @@ class OperationalCredentials(Cluster):
             kMissingCsr = 0x04
             kTableFull = 0x05
             kInvalidAdminSubject = 0x06
-            kInsufficientPrivilege = 0x08
             kFabricConflict = 0x09
             kLabelConflict = 0x0A
             kInvalidFabricIndex = 0x0B
