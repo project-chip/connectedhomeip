@@ -621,7 +621,6 @@ server cluster OperationalCredentials = 62 {
     kMissingCsr = 4;
     kTableFull = 5;
     kInvalidAdminSubject = 6;
-    kInsufficientPrivilege = 8;
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
