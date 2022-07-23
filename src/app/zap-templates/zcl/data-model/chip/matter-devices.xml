@@ -1975,15 +1975,15 @@ limitations under the License.
             </include>
             <include cluster="Media Playback" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Account Login" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Account Login" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Content Launcher" client="false" server="true" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -1998,11 +1998,11 @@ limitations under the License.
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2015,39 +2015,39 @@ limitations under the License.
             <include cluster="Media Playback" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Content Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Account Login" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Account Login" client="true" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Wake on LAN" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Channel" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Target Navigator" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Media Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Low Power" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Audio Output" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Application Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Application Basic" client="true" server="false" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Media Input" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Application Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Application Basic" client="true" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-casting-videoclient</name>
+        <name>MA-video-remotecontrol</name>
         <domain>CHIP</domain>
-        <typeName>Matter Casting Video Client</typeName>
+        <typeName>Matter Video Remote Control</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x002A</deviceId>
         <clusters lockOthers="true">
             <include cluster="Media Playback" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Content Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Content Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Keypad Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Account Login" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Account Login" client="true" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Wake on LAN" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Channel" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Target Navigator" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Media Input" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Low Power" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Audio Output" client="true" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Application Launcher" client="true" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Level Control" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Channel" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Target Navigator" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Media Input" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Low Power" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Audio Output" client="true" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Application Launcher" client="true" server="false" clientLocked="false" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
