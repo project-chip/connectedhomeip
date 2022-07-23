@@ -72,16 +72,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
 {
     uint32_t reason = 0;
+    ReturnErrorOnFailure(ConfigurationMgr().GetBootReason(reason));
 
-    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
+    VerifyOrReturnError(CanCastTo<BootReasonType>(reason), CHIP_ERROR_INVALID_INTEGER_VALUE);
+    bootReason = static_cast<BootReasonType>(reason);
 
-    if (err == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(CanCastTo<BootReasonType>(reason), CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReason = static_cast<BootReasonType>(reason);
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
