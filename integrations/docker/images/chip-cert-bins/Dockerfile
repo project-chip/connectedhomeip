@@ -1,6 +1,8 @@
+# Stage 1: Setup dependencies (based on chip-build).
 FROM ubuntu:focal as chip-build-cert
 ARG TARGETPLATFORM
-ARG BRANCH=master
+# BRANCH defines the target branch or tag to build from.
+ARG BRANCH=sve
 VOLUME "/var/source"
 
 # Ensure TARGETPLATFORM is set
@@ -14,7 +16,7 @@ RUN case ${TARGETPLATFORM} in \
         *) \
 	    if [ -z "$TARGETPLATFORM" ] ;\
 	    then \
-	        echo "TARGETPLATFORM not defined! Please run from buildx." \
+	        echo "TARGETPLATFORM not defined! Please run from buildkit (buildx)." \
 		&& return 1 ;\
 	    else \
 	        echo "Unsupported platform ${TARGETPLATFORM}." \
@@ -23,6 +25,7 @@ RUN case ${TARGETPLATFORM} in \
 	    ;; \
     esac
 
+# Below should be the same as chip-build except arm64 logic for cmake and node.
 
 # base build and check tools and libraries layer
 RUN set -x \
@@ -180,20 +183,22 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
+# Stage 1.5: Bootstrap Matter.
 # Set python to python3
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 RUN mkdir /root/connectedhomeip
 RUN git clone --depth 1 --single-branch --branch ${BRANCH} https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
-#RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
 WORKDIR /root/connectedhomeip/
-#RUN git checkout 89009338630d829892665447f9716c66120726ee
 RUN scripts/build/gn_bootstrap.sh
 RUN gn gen out/debug --args='chip_mdns="platform" chip_inet_config_enable_ipv4=false'
 RUN ninja -C out/debug
 
+# Stage 2: Build.
 from chip-build-cert as chip-build-cert-bins
 SHELL ["/bin/bash", "-c"]
+# Records Matter SDK commit hash to include in the image.
+RUN git rev-parse HEAD > /root/.sdk-sha-version
 RUN case ${TARGETPLATFORM} in \
         "linux/amd64") \
             set -x \
@@ -245,13 +250,14 @@ RUN case ${TARGETPLATFORM} in \
 RUN npm --prefix third_party/zap/repo/ ci
 RUN scripts/examples/gn_build_test_example.sh app1
 
-# Stage 2: Copy relevant test harness bins to a new image
+# Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:21.10
 ENV TZ=Etc/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update -y
 RUN apt-get install -y libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev avahi-utils iproute2
 WORKDIR /root/
+COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-tool chip-tool
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-shell chip-shell
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/debug/chip-cert chip-cert
