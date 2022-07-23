@@ -34,14 +34,13 @@ namespace chip {
  * of type U to the given type T.  It does this by verifying that the value is
  * in the range of valid values for T.
  */
-template <typename T, typename U>
+template <typename T, typename U, std::enable_if_t<std::is_integral<T>::value, int> = 0>
 bool CanCastTo(U arg)
 {
     using namespace std;
     // U might be a reference to an integer type, if we're assigning from
     // something passed by reference.
     typedef typename remove_reference<U>::type V; // V for "value"
-    static_assert(is_integral<T>::value, "Must be assigning to an integral type");
     static_assert(is_integral<V>::value, "Must be assigning from an integral type");
 
     // We want to check that "arg" can fit inside T but without doing any tests
@@ -103,6 +102,12 @@ bool CanCastTo(U arg)
     }
 
     return 0 <= arg && static_cast<uintmax_t>(arg) <= static_cast<uintmax_t>(numeric_limits<T>::max());
+}
+
+template <typename T, typename U, std::enable_if_t<std::is_enum<T>::value, int> = 0>
+bool CanCastTo(U arg)
+{
+    return CanCastTo<std::underlying_type_t<T>>(arg);
 }
 
 /**
