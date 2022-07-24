@@ -22,6 +22,7 @@
  *
  */
 
+#include "system/SystemClock.h"
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelHelper.h>
@@ -115,11 +116,20 @@ uint32_t ReadClient::ComputeTimeTillNextSubscription()
     return waitTimeInMsec;
 }
 
-CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, bool establishCASE)
+CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle, bool aReestablishCASE)
 {
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
-    mDoCaseOnNextResub = establishCASE;
+    //
+    // If we're establishing CASE, make sure we not provided a new SessionHandle as well.
+    //
+    VerifyOrReturnError(!aReestablishCASE || !aNewSessionHandle.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (aNewSessionHandle.HasValue()) {
+        mReadPrepareParams.mSessionHolder.Grab(aNewSessionHandle.Value());
+    }
+
+    mDoCaseOnNextResub = aReestablishCASE;
 
     ReturnErrorOnFailure(
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
@@ -147,6 +157,7 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
             // We infer that re-subscription was requested by virtue of having a non-zero list of event OR attribute paths present
             // in mReadPrepareParams. This would only be the case if an application called SendAutoResubscribeRequest which
             // populates mReadPrepareParams with the values provided by the application.
+            //
             if (allowResubscription &&
                 (mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0))
             {
@@ -541,7 +552,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 exit:
     if (IsSubscriptionType())
     {
-        if (IsAwaitingInitialReport())
+        if (IsAwaitingInitialReport() || IsAwaitingSubscribeResponse())
         {
             MoveToState(ClientState::AwaitingSubscribeResponse);
         }
@@ -715,6 +726,11 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
     return err;
 }
 
+void ReadClient::OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout)
+{
+    mLivenessTimeoutOverride = aLivenessTimeout;
+}
+
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -724,7 +740,14 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mExchange->HasSessionHandle(), CHIP_ERROR_INCORRECT_STATE);
 
-    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxInterval) + mExchange->GetSessionHandle()->GetAckTimeout();
+    System::Clock::Timeout timeout;
+
+    if (mLivenessTimeoutOverride != System::Clock::kZero) {
+        timeout = mLivenessTimeoutOverride;
+    }
+    else {
+        timeout = System::Clock::Seconds16(mMaxInterval) + mExchange->GetSessionHandle()->GetAckTimeout();
+    }
 
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
     ChipLogProgress(
@@ -937,7 +960,7 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
                     "ms due to error %" CHIP_ERROR_FORMAT,
                     GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()), mNumRetries, timeTillNextResubscription,
                     aTerminationCause.Format());
-    ReturnErrorOnFailure(ScheduleResubscription(timeTillNextResubscription, aTerminationCause == CHIP_ERROR_TIMEOUT));
+    ReturnErrorOnFailure(ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT));
     return CHIP_NO_ERROR;
 }
 

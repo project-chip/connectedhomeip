@@ -23,6 +23,7 @@
  */
 
 #pragma once
+#include "system/SystemClock.h"
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
@@ -56,8 +57,12 @@ class InteractionModelEngine;
 /**
  *  @class ReadClient
  *
- *  @brief The read client represents the initiator side of a Read Interaction, and is responsible
- *  for generating one Read Request for a particular set of attributes and/or events, and handling the Report Data response.
+ *  @brief The read client represents the initiator side of a Read Or Subscribe Interaction (depending on the APIs invoked).
+ *         
+ *         When used to manage subscriptions, the client provides functionality to automatically re-subscribe as needed,
+ *         including re-establishing CASE under certain conditions (see Callback::OnResubscriptionNeeded for more info).
+ *         This is the default behavior. A consumer can completely opt-out of this behavior by over-riding Callback::OnResubscriptionNeeded
+ *         and providing an alternative implementation.
  *
  */
 class ReadClient : public Messaging::ExchangeDelegate
@@ -352,12 +357,20 @@ public:
     uint32_t ComputeTimeTillNextSubscription();
 
     //
-    // Schedules a re-subscription aTimeTillNextResubscriptionMs into the future.
+    // Schedules a re-subscription aTimeTillNextResubscriptionMs into the future. 
     //
-    // If restablishCASE is true, operational discovery and CASE will be attempted at that time before
+    // If an application wants to setup CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next interval
+    // at which they should attempt CASE and attempt CASE at that time. On successful CASE establishment, this method should be called with
+    // the new SessionHandle provided through 'aNewSessionHandle', 'aTimeTillNextResubscriptionMs' set to 0 (i.e re-subscribe immediately) and
+    // 'aReestablishCASE' set to false.
+    //
+    // Otherwise, if aReestablishCASE is true, operational discovery and CASE will be attempted at that time before
     // the actual IM interaction is initiated.
     //
-    CHIP_ERROR ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, bool restablishCASE = true);
+    // aReestablishCASE SHALL NOT be set to true if a valid SessionHandle is provided through newSessionHandle.
+    //
+    //
+    CHIP_ERROR ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle, bool aReestablishCASE);
 
     // Like SendSubscribeRequest, but allows sending certain forms of invalid
     // subscribe requests that servers are expected to reject, for testing
@@ -368,6 +381,14 @@ public:
         return SendSubscribeRequestImpl(aReadPrepareParams);
     }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
+    //
+    // Override the interval at which liveness of the subscription is assessed.
+    // By default, this is set set to the max interval of the subscription + ACK timeout of the underlying session.
+    //
+    // This can be called at any time.
+    //
+    void OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout);
 
 private:
     friend class TestReadInteraction;
@@ -487,6 +508,8 @@ private:
     InteractionModelEngine * mpImEngine = nullptr;
     ReadPrepareParams mReadPrepareParams;
     uint32_t mNumRetries = 0;
+
+    System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
