@@ -110,7 +110,7 @@ static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, Gr
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, EMBER_ZCL_STATUS_NOT_FOUND);
-    VerifyOrReturnError(KeyExists(fabricIndex, groupId), EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+    VerifyOrReturnError(!KeyExists(fabricIndex, groupId), EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
 
     // Add a new entry to the GroupTable
     CHIP_ERROR err = provider->SetGroupInfo(fabricIndex, GroupDataProvider::GroupInfo(groupId, groupName));
