@@ -36,7 +36,7 @@ constexpr uint8_t kListAttributeType = 0x48;
 
 CHIP_ERROR WriteHandler::Init()
 {
-    VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
     MoveToState(State::Initialized);
 
@@ -51,31 +51,11 @@ void WriteHandler::Close()
     mSuppressResponse = false;
     VerifyOrReturn(mState != State::Uninitialized);
 
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx = nullptr;
-    }
-
     ClearState();
 }
 
 void WriteHandler::Abort()
 {
-    if (mpExchangeCtx != nullptr)
-    {
-        // We might be a delegate for this exchange, and we don't want the
-        // OnExchangeClosing notification in that case.  Null out the delegate
-        // to avoid that.
-        //
-        // TODO: This makes all sorts of assumptions about what the delegate is
-        // (notice the "might" above!) that might not hold in practice.  We
-        // really need a better solution here....
-        mpExchangeCtx->SetDelegate(nullptr);
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-
     ClearState();
 }
 
@@ -110,13 +90,11 @@ Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apEx
 Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
                                     bool aIsTimedWrite)
 {
-    mpExchangeCtx = apExchangeContext;
-
     //
     // Let's take over further message processing on this exchange from the IM.
     // This is only relevant during chunked requests.
     //
-    mpExchangeCtx->SetDelegate(this);
+    mExchangeCtx.Grab(apExchangeContext);
 
     Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
 
@@ -134,7 +112,7 @@ CHIP_ERROR WriteHandler::OnMessageReceived(Messaging::ExchangeContext * apExchan
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrDieWithMsg(apExchangeContext == mpExchangeCtx, DataManagement,
+    VerifyOrDieWithMsg(apExchangeContext == mExchangeCtx.Get(), DataManagement,
                        "Incoming exchange context should be same as the initial request.");
     VerifyOrDieWithMsg(!apExchangeContext->IsGroupExchangeContext(), DataManagement,
                        "OnMessageReceived should not be called on GroupExchangeContext");
@@ -191,11 +169,11 @@ CHIP_ERROR WriteHandler::SendWriteResponse(System::PacketBufferTLVWriter && aMes
     err = FinalizeMessage(std::move(aMessageWriter), packet);
     SuccessOrExit(err);
 
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    mpExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
-                                     mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
-                                                    : Messaging::SendMessageFlags::kNone);
+    VerifyOrExit(mExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+    mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    err = mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(packet),
+                                    mHasMoreChunks ? Messaging::SendMessageFlags::kExpectResponse
+                                                   : Messaging::SendMessageFlags::kNone);
     SuccessOrExit(err);
 
     MoveToState(State::Sending);
@@ -237,7 +215,7 @@ CHIP_ERROR WriteHandler::DeliverFinalListWriteEndForGroupWrite(bool writeWasSucc
     Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
     Credentials::GroupDataProvider::EndpointIterator * iterator;
 
-    GroupId groupId         = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
+    GroupId groupId         = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     FabricIndex fabricIndex = GetAccessingFabricIndex();
 
     auto processingConcreteAttributePath = mProcessingAttributePath.Value();
@@ -289,8 +267,8 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(mpExchangeCtx == nullptr, CHIP_ERROR_INTERNAL);
-    const Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
+    const Access::SubjectDescriptor subjectDescriptor = mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
@@ -396,11 +374,11 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ReturnErrorCodeIf(mpExchangeCtx == nullptr, CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(!mExchangeCtx, CHIP_ERROR_INTERNAL);
     const Access::SubjectDescriptor subjectDescriptor =
-        mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
+        mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetSubjectDescriptor();
 
-    GroupId groupId    = mpExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
+    GroupId groupId    = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     FabricIndex fabric = GetAccessingFabricIndex();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
@@ -590,7 +568,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     }
     SuccessOrExit(err);
 
-    if (mHasMoreChunks && (mpExchangeCtx->IsGroupExchangeContext() || mIsTimedRequest))
+    if (mHasMoreChunks && (mExchangeCtx->IsGroupExchangeContext() || mIsTimedRequest))
     {
         // Sanity check: group exchange context should only have one chunk.
         // Also, timed requests should not have more than one chunk.
@@ -610,7 +588,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
 
-    if (mpExchangeCtx->IsGroupExchangeContext())
+    if (mExchangeCtx->IsGroupExchangeContext())
     {
         err = ProcessGroupAttributeDataIBs(AttributeDataIBsReader);
     }
@@ -680,7 +658,7 @@ CHIP_ERROR WriteHandler::AddStatus(const ConcreteDataAttributePath & aPath, cons
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle()->GetFabricIndex();
+    return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
 }
 
 const char * WriteHandler::GetStateStr() const
@@ -712,6 +690,7 @@ void WriteHandler::MoveToState(const State aTargetState)
 void WriteHandler::ClearState()
 {
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
+    mExchangeCtx.Release();
     MoveToState(State::Uninitialized);
 }
 
