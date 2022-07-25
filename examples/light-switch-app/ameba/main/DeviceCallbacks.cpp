@@ -138,8 +138,8 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     }
 }
 
-void DeviceCallbacks::OnOffSwitchConfigurationAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId,
-                                                                         uint8_t type, uint8_t * value, uint16_t size)
+void DeviceCallbacks::OnOffSwitchConfigurationAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t type,
+                                                                      uint8_t * value, uint16_t size)
 {
     ChipLogProgress(Zcl, "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                     ChipLogValueMEI(attributeId), type, *value, size);

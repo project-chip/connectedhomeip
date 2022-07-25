@@ -28,14 +28,13 @@
 
 #include "serial_api.h"
 
-//UART pin location:
-//KM4 UART0:
-//PA_18  (TX)
-//PA_19  (RX)
+// UART pin location:
+// KM4 UART0:
+// PA_18  (TX)
+// PA_19  (RX)
 
-#define UART_TX    PA_18    //UART0  TX
-#define UART_RX    PA_19    //UART0  RX
-
+#define UART_TX PA_18 // UART0  TX
+#define UART_RX PA_19 // UART0  RX
 
 namespace chip {
 namespace Shell {

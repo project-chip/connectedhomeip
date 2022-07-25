@@ -17,8 +17,8 @@
 
 #include <platform_stdlib.h>
 
-#include "CHIPDeviceManager.h"
 #include "BindingHandler.h"
+#include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
