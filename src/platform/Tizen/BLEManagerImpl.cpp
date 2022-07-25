@@ -1290,7 +1290,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint16_
     mBLEScanConfig.mDiscriminator      = discriminator;
     mBLEScanConfig.mShortDiscriminator = shortDiscriminator;
     mBLEScanConfig.mAppState           = appState;
-    ChipLogProgress(DeviceLayer, "NewConnection: discriminator value [%u]", connDiscriminator);
+    ChipLogProgress(DeviceLayer, "NewConnection: discriminator value [%u]", discriminator);
 
     // Initiate Scan.
     PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
