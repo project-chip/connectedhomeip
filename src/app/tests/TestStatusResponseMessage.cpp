@@ -22,9 +22,7 @@
  *
  */
 
-#if CHIP_HAVE_CONFIG_H
-#include <app/AppBuildConfig.h>
-#endif
+#include <app/AppConfig.h>
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>

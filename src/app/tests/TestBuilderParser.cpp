@@ -16,9 +16,7 @@
  *    limitations under the License.
  */
 
-#if CHIP_HAVE_CONFIG_H
-#include <app/AppBuildConfig.h>
-#endif
+#include <app/AppConfig.h>
 #include <app/MessageDef/ArrayBuilder.h>
 #include <app/MessageDef/ArrayParser.h>
 #include <app/MessageDef/ListBuilder.h>

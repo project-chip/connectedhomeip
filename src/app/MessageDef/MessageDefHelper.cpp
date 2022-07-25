@@ -23,9 +23,7 @@
 
 #include "MessageDefHelper.h"
 #include <algorithm>
-#if CHIP_HAVE_CONFIG_H
-#include <app/AppBuildConfig.h>
-#endif
+#include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
 #include <inttypes.h>
