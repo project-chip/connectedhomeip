@@ -54,13 +54,9 @@ buildconfig_header("app_buildconfig") {
 }
 
 source_set("app_config") {
-  sources = [
-    "AppConfig.h",
-  ]
+  sources = [ "AppConfig.h" ]
 
-  public_deps = [
-    ":app_buildconfig",
-  ]
+  public_deps = [ ":app_buildconfig" ]
 }
 
 static_library("app") {
