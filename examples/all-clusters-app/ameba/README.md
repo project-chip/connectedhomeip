@@ -89,7 +89,6 @@ to be On or Off.
           $ ./chip-tool onoff on <nodeID> 1
           $ ./chip-tool onoff off <nodeID> 1
 
-
 ## Running RPC Console
 
 -   Connect a USB-TTL adapter as shown below
@@ -98,7 +97,6 @@ to be On or Off.
             A19           TX
             A18           RX
             GND           GND
-
 
 *   Build the
     [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
@@ -110,19 +108,15 @@ to be On or Off.
 
             $ pip3 install out/debug/chip_rpc_console_wheels/*.whl
 
-
 -   Launch the chip-rpc console after resetting Ameba board
 
             $ chip-console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
-
 
 *   Get and Set lighting directly using the RPC console
 
             python
             rpcs.chip.rpc.Lighting.Get()
             rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
-
-
 
 ## Running Matter Shell
 
@@ -134,7 +128,6 @@ to be On or Off.
 -   Connect Ameba to the USB-TTL adapter as shown in the RPC section.
 
 -   Open the USB-TTL serial port and type `help` to view the available commands
-
 
 ## Binding and Controlling a Lighting Device
 
@@ -148,12 +141,10 @@ to be On or Off.
               $ ./chip-tool pairing ble-wifi 1 <SSID> <PASSWORD> 20202021 3840
               $ ./chip-tool pairing ble-wifi 2 <SSID> <PASSWORD> 20202021 3840
 
-
--   After successful commissioning, configure the ACL in the lighting device to
+*   After successful commissioning, configure the ACL in the lighting device to
     allow access from switch device and chip-tool.
 
               $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1], "targets": null }]' 2 0
-
 
 -   Bind the lighting device to the switch device.
 
