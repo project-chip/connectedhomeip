@@ -52,7 +52,7 @@ public:
 
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
     // out of a peripheral discriminator.
-    virtual void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) = 0;
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator) = 0;
 
     // Call this function to stop the connection
     virtual CHIP_ERROR CancelConnection() = 0;

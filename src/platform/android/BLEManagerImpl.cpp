@@ -40,9 +40,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {
-
-} // namespace
+namespace {} // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
@@ -282,7 +280,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
     rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
-                                       svcIdObj, charIdObj);
+                                               svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -449,7 +447,7 @@ exit:
 
 // ===== start implement virtual methods on BleConnectionDelegate.
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -461,7 +459,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const u
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
-    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(connDiscriminator));
+    env->CallVoidMethod(mBLEManagerObject, mOnNewConnectionMethod, static_cast<jint>(discriminator));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:

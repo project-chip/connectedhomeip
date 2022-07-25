@@ -67,11 +67,12 @@ namespace DeviceLayer {
     namespace Internal {
         BleConnection * ble;
 
-        void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t deviceDiscriminator)
+        void BleConnectionDelegateImpl::NewConnection(
+            Ble::BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
             CancelConnection();
-            ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
+            ble = [[BleConnection alloc] initWithDiscriminator:discriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;

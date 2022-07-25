@@ -114,8 +114,8 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverBle(SetupPayload & payload)
 
     // Handle possibly-sync callbacks.
     mWaitingForDiscovery[kBLETransport] = true;
-    CHIP_ERROR err = mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, this, OnDiscoveredDeviceOverBleSuccess,
-                                                                OnDiscoveredDeviceOverBleError);
+    CHIP_ERROR err = mBleLayer->NewBleConnectionByDiscriminator(payload.discriminator, payload.isShortDiscriminator, this,
+                                                                OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError);
     if (err != CHIP_NO_ERROR)
     {
         mWaitingForDiscovery[kBLETransport] = false;

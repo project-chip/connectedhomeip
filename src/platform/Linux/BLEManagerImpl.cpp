@@ -712,10 +712,11 @@ void BLEManagerImpl::InitiateScan(intptr_t arg)
     sInstance.InitiateScan(static_cast<BleScanState>(arg));
 }
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator)
 {
-    mBLEScanConfig.mDiscriminator = connDiscriminator;
-    mBLEScanConfig.mAppState      = appState;
+    mBLEScanConfig.mDiscriminator      = discriminator;
+    mBLEScanConfig.mShortDiscriminator = shortDiscriminator;
+    mBLEScanConfig.mAppState           = appState;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
     PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
@@ -768,10 +769,8 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
-        if (info.GetDeviceDiscriminator() != mBLEScanConfig.mDiscriminator)
-        {
-            return;
-        }
+        const uint16_t discr = mBLEScanConfig.mShortDiscriminator ? info.GetShortDiscriminator() : info.GetDeviceDiscriminator();
+        VerifyOrReturn(discr == mBLEScanConfig.mDiscriminator);
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)

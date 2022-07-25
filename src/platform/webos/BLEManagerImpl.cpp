@@ -511,7 +511,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 {
     bool result = false;
     result      = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                            static_cast<const uint8_t *>(charId->bytes));
+                                                 static_cast<const uint8_t *>(charId->bytes));
     return result;
 }
 
@@ -609,8 +609,7 @@ bool BLEManagerImpl::SendWriteRequestToWebOS(void * bleConnObj, const uint8_t * 
         valueParam.put("string", value);
     }
     else
-    {
-    }
+    {}
     param.put("value", valueParam);
 
     ChipLogProgress(Ble, "SendWriteRequestToWebOS Param : param  %s", param.stringify().c_str());
@@ -888,10 +887,11 @@ void BLEManagerImpl::InitiateScan(intptr_t arg)
     sInstance.InitiateScan(static_cast<BleScanState>(arg));
 }
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator)
 {
-    mBLEScanConfig.mDiscriminator = connDiscriminator;
-    mBLEScanConfig.mAppState      = appState;
+    mBLEScanConfig.mDiscriminator      = discriminator;
+    mBLEScanConfig.mShortDiscriminator = shortDiscriminator;
+    mBLEScanConfig.mAppState           = appState;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
     PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));

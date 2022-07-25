@@ -455,10 +455,8 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const chip::Ble::ChipBLE
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
-        if (info.GetDeviceDiscriminator() != mBLEScanConfig.mDiscriminator)
-        {
-            return;
-        }
+        const uint16_t discr = mBLEScanConfig.mShortDiscriminator ? info.GetShortDiscriminator() : info.GetDeviceDiscriminator();
+        VerifyOrReturn(discr == mBLEScanConfig.mDiscriminator);
         ChipLogProgress(DeviceLayer, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
@@ -1287,10 +1285,11 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator)
 {
-    mBLEScanConfig.mDiscriminator = connDiscriminator;
-    mBLEScanConfig.mAppState      = appState;
+    mBLEScanConfig.mDiscriminator      = discriminator;
+    mBLEScanConfig.mShortDiscriminator = shortDiscriminator;
+    mBLEScanConfig.mAppState           = appState;
     ChipLogProgress(DeviceLayer, "NewConnection: discriminator value [%u]", connDiscriminator);
 
     // Initiate Scan.

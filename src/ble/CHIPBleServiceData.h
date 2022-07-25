@@ -46,6 +46,7 @@ enum chipBLEServiceDataType
 struct ChipBLEDeviceIdentificationInfo
 {
     constexpr static uint16_t kDiscriminatorMask            = 0xfff;
+    constexpr static uint16_t kShortDiscriminatorMask       = 0xf00;
     constexpr static uint8_t kAdditionalDataFlagMask        = 0x1;
     constexpr static uint8_t kAdvertisementVersionMask      = 0xf0;
     constexpr static uint8_t kAdvertisementVersionShiftBits = 4u;
@@ -90,6 +91,8 @@ struct ChipBLEDeviceIdentificationInfo
     {
         return chip::Encoding::LittleEndian::Get16(DeviceDiscriminatorAndAdvVersion) & kDiscriminatorMask;
     }
+
+    uint16_t GetShortDiscriminator() const { return GetDeviceDiscriminator() & kShortDiscriminatorMask; }
 
     void SetDeviceDiscriminator(uint16_t deviceDiscriminator)
     {

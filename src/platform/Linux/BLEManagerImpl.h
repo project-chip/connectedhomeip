@@ -68,6 +68,9 @@ struct BLEScanConfig
     // If scanning by discriminator, what are we scanning for
     uint16_t mDiscriminator = 0;
 
+    // Match only 4 most significant bits of the discriminator
+    bool mShortDiscriminator = false;
+
     // If scanning by address, what address are we searching for
     std::string mAddress;
 
@@ -148,7 +151,7 @@ private:
 
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
-    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, uint16_t discriminator, bool shortDiscriminator) override;
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
