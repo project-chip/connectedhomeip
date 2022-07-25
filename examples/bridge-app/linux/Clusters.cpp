@@ -1,36 +1,75 @@
 #include "Clusters.h"
 
-EmberAfStatus CommonCluster::WriteCallback(chip::AttributeId id, uint8_t * buffer)
+#include "Device.h"
+
+CommonCluster * CommonAttributeAccessInterface::FindCluster(const chip::app::ConcreteClusterPath & path)
 {
-    // If there is a callback then the implementation is responsible for propagating writes.
+    Device * dev = FindDeviceEndpoint(path.mEndpointId);
+    if (dev)
+    {
+        for (auto c : dev->clusters())
+        {
+            if (c->GetClusterId() == path.mClusterId)
+                return static_cast<CommonCluster *>(c);
+        }
+    }
+    return nullptr;
+}
+
+void CommonCluster::SetEndpointId(chip::EndpointId id)
+{
+    mEndpoint = id;
+}
+chip::EndpointId CommonCluster::GetEndpointId() const
+{
+    return mEndpoint;
+}
+
+void CommonCluster::SetCallback(PropagateWriteCB * cb)
+{
+    mCallback = cb;
+}
+
+bool CommonCluster::active() const
+{
+    return mEndpoint < 0xFFFF;
+}
+
+CHIP_ERROR CommonCluster::ForwardWriteToBridge(const chip::app::ConcreteDataAttributePath & aPath,
+                                               chip::app::AttributeValueDecoder & aDecoder)
+{
     if (mCallback)
-        return (*mCallback)(this, mEndpoint, GetClusterId(), id, buffer);
-    WriteFromBridge(id, buffer);
-    return EMBER_ZCL_STATUS_SUCCESS;
+        return (*mCallback)(this, aPath, aDecoder);
+    return WriteFromBridge(aPath, aDecoder);
+}
+
+void CommonCluster::OnUpdated(chip::AttributeId attr)
+{
+    if (active())
+        MatterReportingAttributeChangeCallback(GetEndpointId(), GetClusterId(), attr);
+}
+
+bool CommonCluster::Push(chip::AttributeId attr, chip::TLV::TLVReader & reader)
+{
+    chip::app::AttributeValueDecoder decoder(reader, chip::Access::SubjectDescriptor());
+    if (WriteFromBridge(chip::app::ConcreteDataAttributePath(GetEndpointId(), GetClusterId(), attr), decoder) != CHIP_NO_ERROR)
+        return false;
+    OnUpdated(attr);
+    return true;
 }
 
 namespace clusters {
 BridgedDeviceBasicCluster::BridgedDeviceBasicCluster() {}
 
-EmberAfStatus BridgedDeviceBasicCluster::Read(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                              uint16_t maxReadLength)
+CHIP_ERROR BridgedDeviceBasicCluster::WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath,
+                                                      chip::app::AttributeValueDecoder & aDecoder)
 {
-    if (mReachable.IsAttribute(attributeMetadata))
-        return mReachable.Read(attributeMetadata, buffer, maxReadLength);
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus BridgedDeviceBasicCluster::Write(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
-{
-    if (mReachable.IsAttribute(attributeMetadata))
-        return mReachable.WriteFromMatter(attributeMetadata, buffer, this);
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-void BridgedDeviceBasicCluster::WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer)
-{
-    if (mReachable.IsAttribute(attributeId))
-        return mReachable.WriteFromBridge(buffer, this);
+    switch (aPath.mAttributeId)
+    {
+    case ZCL_REACHABLE_ATTRIBUTE_ID:
+        return mReachable.Write(aPath, aDecoder);
+    }
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace clusters

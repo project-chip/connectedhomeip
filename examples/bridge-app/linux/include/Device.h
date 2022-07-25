@@ -58,10 +58,6 @@ public:
     chip::EndpointId GetEndpointId() { return mEndpointId; }
     chip::EndpointId GetParentEndpointId() { return mParentEndpointId; }
 
-    EmberAfStatus Read(chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                       uint16_t maxReadLength);
-    EmberAfStatus Write(chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
-
     const char * GetName();
     void SetName(const char * name);
 
@@ -78,3 +74,4 @@ private:
 
 int AddDeviceEndpoint(Device * dev);
 int RemoveDeviceEndpoint(Device * dev);
+Device * FindDeviceEndpoint(chip::EndpointId id);

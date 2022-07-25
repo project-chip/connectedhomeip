@@ -13,32 +13,14 @@ struct FirstCluster : public CommonCluster
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
-  EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
+  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
   {
-    switch(am->attributeId) {
+    switch(aPath.mAttributeId)
+    {
     case 1:
-      return mSomeInteger.Read(am, buffer, maxReadLength);
+      return mSomeInteger.Write(aPath, aDecoder);
     default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
-  {
-    switch(am->attributeId) {
-    case 1:
-      return mSomeInteger.WriteFromMatter(am, buffer, this);
-    default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
-  {
-    switch(attributeId) {
-    case 1:
-      mSomeInteger.WriteFromBridge(buffer, this);
-      break;
+      return CHIP_ERROR_NOT_IMPLEMENTED;
     }
   }
 
@@ -50,15 +32,67 @@ struct FirstCluster : public CommonCluster
 
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
+    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
+      { 1, ZCL_INT16U_ATTRIBUTE_TYPE, 2, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
+    };
     return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
   }
 
 
   Attribute<1, ATTRIBUTE_MASK_WRITABLE, PrimitiveType<uint16_t, 2, ZCL_INT16U_ATTRIBUTE_TYPE>> mSomeInteger;
+};
 
-  static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-    { 1, ZCL_INT16U_ATTRIBUTE_TYPE, 2, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-  };
+struct FirstAccess : public CommonAttributeAccessInterface
+{
+  FirstAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), FirstCluster::kClusterId) {}
+
+  FirstCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  {
+    CommonCluster * cluster = FindCluster(aPath);
+    return cluster ? static_cast<FirstCluster*>(cluster) : nullptr;
+  }
+
+  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+
+    switch(aPath.mAttributeId) {
+    case 1:
+      return c->mSomeInteger.Read(aPath, aEncoder);
+    default:
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+  }
+
+  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    return c->ForwardWriteToBridge(aPath, aDecoder);
+  }
+
+  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
+
+  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
 };
 struct SecondCluster : public CommonCluster
 {
@@ -68,30 +102,14 @@ struct SecondCluster : public CommonCluster
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
-  EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
+  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
   {
-    switch(am->attributeId) {
+    switch(aPath.mAttributeId)
+    {
     case 123:
-      return mSomeBytes.Read(am, buffer, maxReadLength);
+      return mSomeBytes.Write(aPath, aDecoder);
     default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
-  {
-    switch(am->attributeId) {
-    default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
-  {
-    switch(attributeId) {
-    case 123:
-      mSomeBytes.WriteFromBridge(buffer, this);
-      break;
+      return CHIP_ERROR_NOT_IMPLEMENTED;
     }
   }
 
@@ -103,15 +121,67 @@ struct SecondCluster : public CommonCluster
 
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
+    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
+      { 123, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, 32, 0 | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
+    };
     return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
   }
 
 
   Attribute<123, 0, OctetString<32, ZCL_OCTET_STRING_ATTRIBUTE_TYPE>> mSomeBytes;
+};
 
-  static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-    { 123, ZCL_OCTET_STRING_ATTRIBUTE_TYPE, 32, 0 | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-  };
+struct SecondAccess : public CommonAttributeAccessInterface
+{
+  SecondAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), SecondCluster::kClusterId) {}
+
+  SecondCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  {
+    CommonCluster * cluster = FindCluster(aPath);
+    return cluster ? static_cast<SecondCluster*>(cluster) : nullptr;
+  }
+
+  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+
+    switch(aPath.mAttributeId) {
+    case 123:
+      return c->mSomeBytes.Read(aPath, aEncoder);
+    default:
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+  }
+
+  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    return c->ForwardWriteToBridge(aPath, aDecoder);
+  }
+
+  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
+
+  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
 };
 struct ThirdCluster : public CommonCluster
 {
@@ -121,32 +191,14 @@ struct ThirdCluster : public CommonCluster
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
-  EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
+  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
   {
-    switch(am->attributeId) {
+    switch(aPath.mAttributeId)
+    {
     case 10:
-      return mSomeEnum.Read(am, buffer, maxReadLength);
+      return mSomeEnum.Write(aPath, aDecoder);
     default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
-  {
-    switch(am->attributeId) {
-    case 10:
-      return mSomeEnum.WriteFromMatter(am, buffer, this);
-    default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
-  {
-    switch(attributeId) {
-    case 10:
-      mSomeEnum.WriteFromBridge(buffer, this);
-      break;
+      return CHIP_ERROR_NOT_IMPLEMENTED;
     }
   }
 
@@ -158,15 +210,67 @@ struct ThirdCluster : public CommonCluster
 
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
+    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
+      { 10, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
+    };
     return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
   }
 
 
   Attribute<10, ATTRIBUTE_MASK_WRITABLE, PrimitiveType<uint8_t, 1, ZCL_ENUM8_ATTRIBUTE_TYPE>> mSomeEnum;
+};
 
-  static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-    { 10, ZCL_ENUM8_ATTRIBUTE_TYPE, 1, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-  };
+struct ThirdAccess : public CommonAttributeAccessInterface
+{
+  ThirdAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), ThirdCluster::kClusterId) {}
+
+  ThirdCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  {
+    CommonCluster * cluster = FindCluster(aPath);
+    return cluster ? static_cast<ThirdCluster*>(cluster) : nullptr;
+  }
+
+  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+
+    switch(aPath.mAttributeId) {
+    case 10:
+      return c->mSomeEnum.Read(aPath, aEncoder);
+    default:
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+  }
+
+  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    return c->ForwardWriteToBridge(aPath, aDecoder);
+  }
+
+  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
+
+  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
 };
 
 struct ClusterInfo
@@ -175,7 +279,7 @@ struct ClusterInfo
   const char *name;
   uint16_t size;
   CommonCluster* (*ctor)(void*);
-} const kKnownClusters[] = {
+} static const kKnownClusters[] = {
 
   {
     ZCL_FIRST_CLUSTER_ID,
@@ -201,6 +305,30 @@ struct ClusterInfo
       return new(mem) ThirdCluster();
     },
   },
+};
+
+inline void BridgeRegisterAllAttributeOverrides()
+{
+
+  static FirstAccess First;
+  registerAttributeAccessOverride(&First);
+  static SecondAccess Second;
+  registerAttributeAccessOverride(&Second);
+  static ThirdAccess Third;
+  registerAttributeAccessOverride(&Third);
+}
+
+struct AttrInfo
+{
+  chip::ClusterId cluster;
+  chip::AttributeId attr;
+  const char *name;
+} static const kKnownAttributes[] = {
+
+  {ZCL_FIRST_CLUSTER_ID, 1, "SomeInteger" },
+  {ZCL_SECOND_CLUSTER_ID, 123, "SomeBytes" },
+  {ZCL_THIRD_CLUSTER_ID, 10, "SomeEnum" },
+  
 };
 
 }

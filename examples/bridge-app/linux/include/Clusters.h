@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 
@@ -39,302 +41,223 @@ class ClusterImpl
 public:
     virtual ~ClusterImpl() = default;
 
-    virtual void SetEndpointId(chip::EndpointId id)                                                                          = 0;
-    virtual chip::ClusterId GetClusterId()                                                                                   = 0;
-    virtual EmberAfStatus Read(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength) = 0;
-    virtual EmberAfStatus Write(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)                        = 0;
-    virtual void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer)                                      = 0;
-    virtual chip::Span<const EmberAfAttributeMetadata> GetAllAttributes()                                                    = 0;
+    virtual void SetEndpointId(chip::EndpointId id)                          = 0;
+    virtual chip::ClusterId GetClusterId()                                   = 0;
+    virtual chip::Span<const EmberAfAttributeMetadata> GetAllAttributes()    = 0;
+    virtual bool Push(chip::AttributeId attr, chip::TLV::TLVReader & reader) = 0;
 };
 
-// *Type classes are used by code generation to specialize storage for a particular underlying type.
-
 // This provides storage for a primitive binary type, eg uintN_t, float, double
-// Values in ValueType are native, values in byte buffers are LE.
-template <typename T, size_t Bytes, EmberAfAttributeType AfType>
+template <typename T, size_t Bytes, EmberAfAttributeType AfType, bool IsFabricScoped = false>
 struct PrimitiveType
 {
     static constexpr EmberAfAttributeType kMatterType = AfType;
     // Note that Bytes can be < sizeof(T) due to non-power-of-two byte lengths.
     static constexpr uint16_t kMaxSize = Bytes;
     static_assert(Bytes <= sizeof(T), "Incorrect type / byte specification");
-    typedef T ValueType;
+
+    static constexpr bool kIsFabricScoped = IsFabricScoped;
 
     PrimitiveType() = default;
-    PrimitiveType(ValueType initial) : mValue(initial) {}
+    PrimitiveType(T initial) : mValue(initial) {}
 
-    EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
     {
-        if (sz != kMaxSize)
-            return EMBER_ZCL_STATUS_FAILURE;
-        memcpy(buffer, &mValue, kMaxSize);
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return aDecoder.Decode(*this);
+    }
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder)
+    {
+        return aEncoder.Encode(*this);
     }
 
-    bool Equal(const uint8_t * buffer) const { return !memcmp(buffer, &mValue, kMaxSize); }
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader) { return reader.Get(mValue); }
 
-    void Write(const uint8_t * buffer) { memcpy(&mValue, buffer, kMaxSize); }
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const { return writer.Put(tag, mValue); }
 
-    bool TryWrite(ValueType newV)
-    {
-        if (mValue == newV)
-            return false;
-        mValue = newV;
-        return true;
-    }
-    bool TryWrite(const uint8_t * buffer)
-    {
-        if (Equal(buffer))
-            return false;
-        Write(buffer);
-        return true;
-    }
+    void operator=(T v) { mValue = v; }
+    operator T() const { return mValue; }
 
-    ValueType Peek() const { return mValue; }
-
-    uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
+    T Peek() const { return mValue; }
 
 private:
-    ValueType mValue;
-    static_assert(std::is_standard_layout<ValueType>::value, "PrimitiveType not standard layout!");
+    T mValue;
+    static_assert(std::is_standard_layout<T>::value, "PrimitiveType not standard layout!");
 };
 
-// This provides access to a struct. It is similar to PrimitiveType except it is assumed
-// that each member handes its own endianness, instead of the whole type.
-template <typename T>
-struct StructType
+// This provides access to a struct. Each struct generates its own access logic.
+template <typename T, bool IsFabricScoped = false>
+struct StructType : public T
 {
     static constexpr EmberAfAttributeType kMatterType = ZCL_STRUCT_ATTRIBUTE_TYPE;
     static constexpr uint16_t kMaxSize                = sizeof(T);
-    typedef const uint8_t * ValueType;
-
-    EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
-    {
-        if (sz != kMaxSize)
-            return EMBER_ZCL_STATUS_FAILURE;
-        memcpy(buffer, &mValue, kMaxSize);
-        return EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    bool Equal(const uint8_t * buffer) const { return !memcmp(buffer, &mValue, kMaxSize); }
-
-    void Write(const uint8_t * buffer) { memcpy(&mValue, buffer, kMaxSize); }
-
-    bool TryWrite(const uint8_t * buffer)
-    {
-        if (Equal(buffer))
-            return false;
-        Write(buffer);
-        return true;
-    }
-
-    const ValueType & Peek() const { return mValue; }
-
-    uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
-
-private:
     static_assert(std::is_standard_layout<T>::value, "StructType not standard layout!");
-    T mValue;
+    static constexpr bool kIsFabricScoped = IsFabricScoped;
+
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
+    {
+        return aDecoder.Decode(*this);
+    }
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder)
+    {
+        return aEncoder.Encode(*this);
+    }
 };
 
-// This provides storage for short and long octet and char strings
+// This provides storage for short and long octet and char strings.
 template <size_t Bytes, EmberAfAttributeType AfType>
 struct OctetString
 {
     static constexpr EmberAfAttributeType kMatterType = AfType;
-    static constexpr bool kIsLong =
-        (AfType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE || AfType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE);
+    static constexpr bool kIsChar = (AfType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE || AfType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
     static constexpr uint16_t kMaxSize = Bytes;
-    typedef const uint8_t * ValueType;
 
     OctetString() = default;
 
-    EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
     {
-        // There should be at least enough space to hold the size
-        if (kIsLong && sz < 2)
-            return EMBER_ZCL_STATUS_FAILURE;
-        if (kIsLong)
+        chip::app::DataModel::Nullable<chip::ByteSpan> v;
+        CHIP_ERROR err = aDecoder.Decode(v);
+        if (err == CHIP_NO_ERROR)
         {
-            emberAfCopyLongString(buffer, mValue, sz);
+            if (v.IsNull() && !IsNull())
+            {
+                mLength = 0xFFFF;
+            }
+            else if (v.Value().size() > kMaxSize)
+            {
+                err = CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
+            else
+            {
+                mLength = static_cast<uint16_t>(v.Value().size());
+                memcpy(mValue, v.Value().data(), mLength);
+            }
         }
-        else
-        {
-            emberAfCopyString(buffer, mValue, sz);
-        }
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return err;
     }
-
-    bool Equal(const uint8_t * buffer) { return !memcmp(buffer, &mValue, kMaxSize); }
-
-    void Write(const uint8_t * buffer)
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder)
     {
-        if (kIsLong)
-            emberAfCopyLongString(buffer, mValue, kMaxSize);
-        else
-            emberAfCopyString(buffer, mValue, kMaxSize);
+        if (IsNull())
+            return aEncoder.EncodeNull();
+        if (kIsChar)
+            return aEncoder.Encode(chip::CharSpan(static_cast<char *>(mValue), mLength));
+        return aEncoder.Encode(chip::ByteSpan(mValue, mLength));
     }
 
-    bool TryWrite(const uint8_t * newV)
-    {
-        if (Equal(newV))
-            return false;
-        Write(newV);
-        return true;
-    }
+    chip::ByteSpan Peek() const { return IsNull() ? chip::ByteSpan() : chip::ByteSpan(mValue, mLength); }
 
-    ValueType Peek() const { return mValue; }
-
-    uint8_t * GetBytes() { return mValue; }
+    bool IsNull() const { return mLength == 0xFFFF; }
 
 private:
-    uint16_t GetSize(const uint8_t * buf)
-    {
-        if (kIsLong)
-            return emberAfLongStringLength(buf);
-        return emberAfStringLength(buf);
-    }
+    uint16_t mLength = 0xFFFF;
     uint8_t mValue[kMaxSize];
 };
 
-// This allows for an array of up to MaxElements of a specified type. It assumes that T
-// handles endian-ness.
+// This allows for an array of up to MaxElements of a specified type.
 template <size_t MaxElements, typename T>
 struct ArrayType
 {
     static constexpr EmberAfAttributeType kMatterType = ZCL_ARRAY_ATTRIBUTE_TYPE;
-    struct Data
-    {
-        uint16_t length;
-        T array[MaxElements];
-    };
-    // We need this to be standard layout to get a reliable byte view.
+    static constexpr uint16_t kMaxSize                = sizeof(T) * MaxElements;
     static_assert(std::is_standard_layout<T>::value, "Array element not standard layout!");
-    static_assert(std::is_standard_layout<Data>::value, "Array of elements not standard layout!");
 
-    static constexpr uint16_t kMaxSize = sizeof(Data);
-    typedef const uint8_t * ValueType;
+    void ListWriteBegin(const chip::app::ConcreteAttributePath & aPath) {}
 
-    EmberAfStatus Read(uint8_t * buffer, uint16_t sz) const
+    void ListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) {}
+
+    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder)
     {
-        // There should be at least enough space to hold the size
-        if (sz < 2)
-            return EMBER_ZCL_STATUS_FAILURE;
-        memcpy(buffer, &mValue, std::min(sz, kMaxSize));
-        return EMBER_ZCL_STATUS_SUCCESS;
+        return CHIP_NO_ERROR;
     }
 
-    bool Equal(const uint8_t * buffer)
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder)
     {
-        uint16_t newsz = GetSize(buffer);
-        if (newsz != GetSize(GetBytes()))
-            return false;
-        return !memcmp(buffer, &mValue, newsz);
+        if (aPath.mListIndex.HasValue())
+        {
+            uint16_t index = aPath.mListIndex.Value();
+            if (index >= mLength || IsNull())
+                return CHIP_ERROR_INVALID_ARGUMENT;
+
+            return aEncoder.Encode(mArray[index]);
+        }
+
+        if (IsNull())
+            return aEncoder.EncodeNull();
+        if (mLength == 0)
+            return aEncoder.EncodeEmptyList();
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            for (uint16_t i = 0; i < mLength && err == CHIP_NO_ERROR; i++)
+                err = encoder.Encode(mArray[i]);
+            return err;
+        });
     }
 
-    void Write(const uint8_t * buffer) { memcpy(GetBytes(), buffer, std::min(GetSize(buffer), kMaxSize)); }
-
-    bool TryWrite(const uint8_t * newV)
-    {
-        if (Equal(newV))
-            return false;
-        Write(newV);
-        return true;
-    }
-
-    ValueType Peek() const { return GetBytes(); }
-
-    uint8_t * GetBytes() { return reinterpret_cast<uint8_t *>(&mValue); }
-    const uint8_t * GetBytes() const { return reinterpret_cast<const uint8_t *>(&mValue); }
+    bool IsNull() const { return mLength == 0xFFFF; }
 
 private:
-    uint16_t GetSize(const uint8_t * buf) { return static_cast<uint16_t>(2 + sizeof(T) * mValue.length); }
+    uint16_t mLength = 0xFFFF;
+    T mArray[MaxElements];
+};
 
-    Data mValue;
+// This is used by code generation to provide specific attributes. Type should be one of
+// PrimitiveType, OctetString, ArrayType, etc to provide storage and type-specific
+// functionality.
+template <chip::AttributeId id, EmberAfAttributeMask mask, typename Type>
+struct Attribute : public Type
+{
+    static constexpr chip::AttributeId kId    = id;
+    static constexpr EmberAfClusterMask kMask = mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE);
+
+    using Type::Type;
+    using Type::operator=;
 };
 
 struct CommonCluster;
-
-typedef std::function<EmberAfStatus(CommonCluster *, chip::EndpointId, chip::ClusterId, chip::AttributeId, const uint8_t *)>
+typedef std::function<CHIP_ERROR(CommonCluster *, const chip::app::ConcreteDataAttributePath &, chip::app::AttributeValueDecoder &)>
     PropagateWriteCB;
 
 // This is the base type of all generated clusters, providing the backend access to
 // implementation details.
 struct CommonCluster : public ClusterImpl
 {
-    void SetEndpointId(chip::EndpointId id) override { mEndpoint = id; }
-    chip::EndpointId GetEndpointId() const { return mEndpoint; }
+    void SetEndpointId(chip::EndpointId id) override;
+    chip::EndpointId GetEndpointId() const;
 
-    EmberAfStatus WriteCallback(chip::AttributeId id, uint8_t * buffer);
+    void SetCallback(PropagateWriteCB * cb);
 
-    void SetCallback(PropagateWriteCB * cb) { mCallback = cb; }
+    bool active() const;
 
-    bool active() const { return mEndpoint < 0xFFFF; }
+    virtual CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath,
+                                       chip::app::AttributeValueDecoder & aDecoder) = 0;
+
+    CHIP_ERROR ForwardWriteToBridge(const chip::app::ConcreteDataAttributePath & aPath,
+                                    chip::app::AttributeValueDecoder & aDecoder);
+
+    template <typename T, typename U>
+    void Push(T & attr, U v)
+    {
+        attr = v;
+        OnUpdated(T::kId);
+    }
+    bool Push(chip::AttributeId attr, chip::TLV::TLVReader & reader);
+
+    void OnUpdated(chip::AttributeId attr);
+    template <typename T>
+    void OnUpdated(const T & attr)
+    {
+        OnUpdated(T::kId);
+    }
 
 protected:
-    bool mActive                 = false;
     chip::EndpointId mEndpoint   = 0xFFFF;
     PropagateWriteCB * mCallback = nullptr;
 };
 
-// This is used by code generation to provide specific attributes. Type should be one of
-// PrimitiveType, OctetString, ArrayType, etc to provide storage and any type-specific
-// functionality. This class provides all non-type-specific matter logic
-template <chip::AttributeId id, EmberAfAttributeMask mask, typename Type>
-struct Attribute
+struct CommonAttributeAccessInterface : public chip::app::AttributeAccessInterface
 {
-    static constexpr chip::AttributeId kId            = id;
-    static constexpr EmberAfClusterMask kMask         = mask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE);
-    static constexpr uint16_t kMaxSize                = Type::kMaxSize;
-    static constexpr EmberAfAttributeType kMatterType = Type::kMatterType;
-
-    Attribute() : mValue() {}
-    template <typename U>
-    Attribute(U v) : mValue(v)
-    {}
-
-    bool IsAttribute(const EmberAfAttributeMetadata * attributeMetadata) const { return attributeMetadata->attributeId == kId; }
-    bool IsAttribute(chip::AttributeId attrId) const { return attrId == kId; }
-
-    // Read up to maxReadLength bytes. Strings must read at least the length, primitive types
-    // must read all bytes.
-    EmberAfStatus Read(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength) const
-    {
-        // Length of 0 means read everything
-        return mValue.Read(buffer, maxReadLength ? maxReadLength : kMaxSize);
-    }
-    EmberAfStatus WriteFromMatter(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, CommonCluster * cluster)
-    {
-        if (!(kMask & ATTRIBUTE_MASK_WRITABLE))
-            return EMBER_ZCL_STATUS_READ_ONLY;
-
-        if (mValue.Equal(buffer))
-            return EMBER_ZCL_STATUS_SUCCESS;
-
-        // Don't directly write the value. The theory of operation of the bridge is that
-        // some external device is being presented, so we shouldn't change matter-visible
-        // attributes until the backend has had a chance to intercept it first.
-        return cluster->WriteCallback(attributeMetadata->attributeId, buffer);
-    }
-    template <typename T>
-    void WriteFromBridge(const T & value, CommonCluster * cluster)
-    {
-        if (mValue.TryWrite(value) && cluster->active())
-        {
-            OnChanged(cluster);
-        }
-    }
-
-    auto Peek() const { return mValue.Peek(); }
-
-protected:
-    void OnChanged(CommonCluster * cluster)
-    {
-        MatterReportingAttributeChangeCallback(cluster->GetEndpointId(), cluster->GetClusterId(), kId, kMatterType,
-                                               mValue.GetBytes());
-    }
-
-    Type mValue;
+    using chip::app::AttributeAccessInterface::AttributeAccessInterface;
+    static CommonCluster * FindCluster(const chip::app::ConcreteClusterPath & path);
 };
 
 #include "cpp/BridgeClustersImpl.h"
@@ -347,9 +270,8 @@ struct BridgedDeviceBasicCluster : public CommonCluster
     BridgedDeviceBasicCluster();
 
     chip::ClusterId GetClusterId() override { return kClusterId; }
-    EmberAfStatus Read(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus Write(const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer) override;
-    void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override;
+    CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath,
+                               chip::app::AttributeValueDecoder & aDecoder) override;
 
     template <typename T>
     void AddAllAttributes(T * list)
@@ -357,11 +279,11 @@ struct BridgedDeviceBasicCluster : public CommonCluster
         list->Add(mReachable);
     }
 
-    static constexpr EmberAfAttributeMetadata kAllAttributes[] = {
-        { ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, 0, 0u },
-    };
     chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
     {
+        static constexpr EmberAfAttributeMetadata kAllAttributes[] = {
+            { ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, 0, 0u },
+        };
         return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
     }
 

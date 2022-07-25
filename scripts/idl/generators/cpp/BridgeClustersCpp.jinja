@@ -7,8 +7,29 @@ namespace clusters {
 {% for struct in structs %}
 struct {{struct.name}}
 {
+  CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+  {
+    chip::app::Clusters::detail::Structs::{{struct.name}}::DecodableType t;
+    CHIP_ERROR err = t.Decode(reader);
+    if(err == CHIP_NO_ERROR) {
+      {%-      for field in struct.fields %}
+      {{field.name}} = t.{{field.name}};
+      {%-      endfor  %}
+    }
+    return err;
+  }
+
+  CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+  {
+    chip::app::Clusters::detail::Structs::{{struct.name}}::Type t;
+    {%-      for field in struct.fields %}
+    t.{{field.name}} = {{field.name}};
+    {%-      endfor  %}
+    return t.Encode(writer, tag);
+  }
+
   {%-   for field in struct.fields %}
-  {{field | getField(cluster, idl)}} {{field.name}};
+  {{field | getField(None, idl)}} {{field.name}};
   {%-  endfor  %}
 };
 {%- endfor %}
@@ -18,12 +39,35 @@ struct {{struct.name}}
 struct {{cluster.name}}Cluster : public CommonCluster
 {
   {%-   for struct in cluster.structs %}
+  {%-     if struct.tag == None %}
   struct {{struct.name}}
   {
-    {%-     for field in struct.fields %}
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+      chip::app::Clusters::{{cluster.name}}::Structs::{{struct.name}}::DecodableType t;
+      CHIP_ERROR err = t.Decode(reader);
+      if(err == CHIP_NO_ERROR) {
+        {%-      for field in struct.fields %}
+        {{field.name}} = t.{{field.name}};
+        {%-      endfor  %}
+      }
+      return err;
+    }
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+      chip::app::Clusters::{{cluster.name}}::Structs::{{struct.name}}::Type t;
+      {%-      for field in struct.fields %}
+      t.{{field.name}} = {{field.name}};
+      {%-      endfor  %}
+      return t.Encode(writer, tag);
+    }
+
+    {%-      for field in struct.fields %}
     {{field | getField(cluster, idl)}} {{field.name}};
-    {%-    endfor  %}
+    {%-      endfor  %}
   };
+  {%-     endif %}
   {%-   endfor %}
 
 
@@ -31,42 +75,16 @@ struct {{cluster.name}}Cluster : public CommonCluster
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
-  EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
+  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
   {
-    switch(am->attributeId) {
-  {%-  for attr in cluster.attributes -%}
-  {%-    if attr.is_readable %}
-    case {{attr.definition.code}}:
-      return m{{attr.definition.name | capitalcase}}.Read(am, buffer, maxReadLength);
-  {%-    endif %}
-  {%-  endfor  %}
-    default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
-  {
-    switch(am->attributeId) {
-  {%-  for attr in cluster.attributes -%}
-  {%-    if attr.is_writable %}
-    case {{attr.definition.code}}:
-      return m{{attr.definition.name | capitalcase}}.WriteFromMatter(am, buffer, this);
-  {%-    endif %}
-  {%-  endfor  %}
-    default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
-  {
-    switch(attributeId) {
+    switch(aPath.mAttributeId)
+    {
   {%-  for attr in cluster.attributes %}
     case {{attr.definition.code}}:
-      m{{attr.definition.name | capitalcase}}.WriteFromBridge(buffer, this);
-      break;
+      return m{{attr.definition.name | capitalcase}}.Write(aPath, aDecoder);
   {%-  endfor  %}
+    default:
+      return CHIP_ERROR_NOT_IMPLEMENTED;
     }
   }
 
@@ -80,18 +98,92 @@ struct {{cluster.name}}Cluster : public CommonCluster
 
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
+    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
+{%-  for attr in cluster.attributes %}
+      { {{attr.definition.code}}, {{attr | getRawSizeAndType(cluster, idl)}}, {{attr | getMask(cluster, idl)}} | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
+{%-  endfor  %}
+    };
     return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
   }
 
 {%  for attr in cluster.attributes %}
   Attribute<{{attr.definition.code}}, {{attr | getMask(cluster, idl)}}, {{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}}{{attr | getInit(cluster, idl)}};
 {%-  endfor  %}
+};
 
-  static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-{%-  for attr in cluster.attributes %}
-    { {{attr.definition.code}}, {{attr | getRawSizeAndType(cluster, idl)}}, {{attr | getMask(cluster, idl)}} | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-{%-  endfor  %}
-  };
+struct {{cluster.name}}Access : public CommonAttributeAccessInterface
+{
+  {{cluster.name}}Access() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), {{cluster.name}}Cluster::kClusterId) {}
+
+  {{cluster.name}}Cluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  {
+    CommonCluster * cluster = FindCluster(aPath);
+    return cluster ? static_cast<{{cluster.name}}Cluster*>(cluster) : nullptr;
+  }
+
+  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+
+    switch(aPath.mAttributeId) {
+  {%-  for attr in cluster.attributes -%}
+  {%-    if attr.is_readable %}
+    case {{attr.definition.code}}:
+      return c->m{{attr.definition.name | capitalcase}}.Read(aPath, aEncoder);
+  {%-    endif %}
+  {%-  endfor  %}
+    default:
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+  }
+
+  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    return c->ForwardWriteToBridge(aPath, aDecoder);
+  }
+
+  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+  {%-  for attr in cluster.attributes -%}
+  {%-    if attr.is_writable %}
+  {%-      if attr.definition.is_list %}
+    case {{attr.definition.code}}:
+      m{{attr.definition.name | capitalcase}}.ListWriteBegin(aPath);
+      return;
+  {%-      endif %}
+  {%-    endif %}
+  {%-  endfor  %}
+    }
+  }
+
+  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+  {%-  for attr in cluster.attributes -%}
+  {%-    if attr.is_writable %}
+  {%-      if attr.definition.is_list %}
+    case {{attr.definition.code}}:
+      m{{attr.definition.name | capitalcase}}.ListWriteEnd(aPath, aWriteWasSuccessful);
+      return;
+  {%-      endif %}
+  {%-    endif %}
+  {%-  endfor  %}
+    }
+  }
 };
 {%-   endif %}
 {%- endfor %}
@@ -102,7 +194,7 @@ struct ClusterInfo
   const char *name;
   uint16_t size;
   CommonCluster* (*ctor)(void*);
-} const kKnownClusters[] = {
+} static const kKnownClusters[] = {
 {% for cluster in clusters %}
 {%-   if cluster | dynamicCluster(idl) %}
   {
@@ -115,6 +207,34 @@ struct ClusterInfo
   },
 {%-   endif %}
 {%- endfor %}
+};
+
+inline void BridgeRegisterAllAttributeOverrides()
+{
+{% for cluster in clusters %}
+{%-   if cluster | dynamicCluster(idl) %}
+  static {{cluster.name}}Access {{cluster.name}};
+  registerAttributeAccessOverride(&{{cluster.name}});
+{%-   endif %}
+{%- endfor %}
+}
+
+struct AttrInfo
+{
+  chip::ClusterId cluster;
+  chip::AttributeId attr;
+  const char *name;
+} static const kKnownAttributes[] = {
+{% for cluster in clusters %}
+{%-   if cluster | dynamicCluster(idl) %}
+
+{%-      for attr in cluster.attributes %}
+  {ZCL_{{cluster.name | cameltoconst}}_CLUSTER_ID, {{attr.definition.code}}, "{{attr.definition.name | capitalcase}}" },
+{%-      endfor  %}
+
+{%-   endif %}
+{%- endfor %}
+  
 };
 
 }

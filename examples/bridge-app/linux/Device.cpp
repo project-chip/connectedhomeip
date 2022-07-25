@@ -49,28 +49,3 @@ void Device::SetEndpointId(chip::EndpointId id)
     for (auto * c : mClusterImpl)
         c->SetEndpointId(id);
 }
-
-EmberAfStatus Device::Read(chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                           uint16_t maxReadLength)
-{
-    for (size_t i = 0; i < mClusterImpl.size(); i++)
-    {
-        if (mClusterImpl.data()[i]->GetClusterId() == clusterId)
-        {
-            return mClusterImpl.data()[i]->Read(attributeMetadata, buffer, maxReadLength);
-        }
-    }
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus Device::Write(chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
-{
-    for (size_t i = 0; i < mClusterImpl.size(); i++)
-    {
-        if (mClusterImpl.data()[i]->GetClusterId() == clusterId)
-        {
-            return mClusterImpl.data()[i]->Write(attributeMetadata, buffer);
-        }
-    }
-    return EMBER_ZCL_STATUS_FAILURE;
-}

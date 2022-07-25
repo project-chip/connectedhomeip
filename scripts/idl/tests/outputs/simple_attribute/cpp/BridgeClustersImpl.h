@@ -13,32 +13,14 @@ struct MyClusterCluster : public CommonCluster
 
   chip::ClusterId GetClusterId() override { return kClusterId; }
 
-  EmberAfStatus Read(const EmberAfAttributeMetadata * am, uint8_t * buffer, uint16_t maxReadLength) override
+  CHIP_ERROR WriteFromBridge(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
   {
-    switch(am->attributeId) {
+    switch(aPath.mAttributeId)
+    {
     case 1:
-      return mClusterAttr.Read(am, buffer, maxReadLength);
+      return mClusterAttr.Write(aPath, aDecoder);
     default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  EmberAfStatus Write(const EmberAfAttributeMetadata * am, uint8_t * buffer) override
-  {
-    switch(am->attributeId) {
-    case 1:
-      return mClusterAttr.WriteFromMatter(am, buffer, this);
-    default:
-      return EMBER_ZCL_STATUS_FAILURE;
-    }
-  }
-
-  void WriteFromBridge(chip::AttributeId attributeId, const uint8_t * buffer) override
-  {
-    switch(attributeId) {
-    case 1:
-      mClusterAttr.WriteFromBridge(buffer, this);
-      break;
+      return CHIP_ERROR_NOT_IMPLEMENTED;
     }
   }
 
@@ -50,15 +32,67 @@ struct MyClusterCluster : public CommonCluster
 
   chip::Span<const EmberAfAttributeMetadata> GetAllAttributes() override
   {
+    static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
+      { 1, ZCL_INT16U_ATTRIBUTE_TYPE, 2, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
+    };
     return chip::Span<const EmberAfAttributeMetadata>(kAllAttributes);
   }
 
 
   Attribute<1, ATTRIBUTE_MASK_WRITABLE, PrimitiveType<uint16_t, 2, ZCL_INT16U_ATTRIBUTE_TYPE>> mClusterAttr;
+};
 
-  static constexpr const EmberAfAttributeMetadata kAllAttributes[] = {
-    { 1, ZCL_INT16U_ATTRIBUTE_TYPE, 2, ATTRIBUTE_MASK_WRITABLE | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },
-  };
+struct MyClusterAccess : public CommonAttributeAccessInterface
+{
+  MyClusterAccess() : CommonAttributeAccessInterface(chip::Optional<chip::EndpointId>(), MyClusterCluster::kClusterId) {}
+
+  MyClusterCluster* GetCluster(const chip::app::ConcreteClusterPath & aPath)
+  {
+    CommonCluster * cluster = FindCluster(aPath);
+    return cluster ? static_cast<MyClusterCluster*>(cluster) : nullptr;
+  }
+
+  CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+
+    switch(aPath.mAttributeId) {
+    case 1:
+      return c->mClusterAttr.Read(aPath, aEncoder);
+    default:
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+  }
+
+  CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath & aPath, chip::app::AttributeValueDecoder & aDecoder) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return CHIP_ERROR_NOT_IMPLEMENTED;
+    return c->ForwardWriteToBridge(aPath, aDecoder);
+  }
+
+  void OnListWriteBegin(const chip::app::ConcreteAttributePath & aPath) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
+
+  void OnListWriteEnd(const chip::app::ConcreteAttributePath & aPath, bool aWriteWasSuccessful) override
+  {
+    auto * c = GetCluster(aPath);
+    if (!c)
+      return;
+
+    switch(aPath.mAttributeId) {
+    }
+  }
 };
 
 struct ClusterInfo
@@ -67,7 +101,7 @@ struct ClusterInfo
   const char *name;
   uint16_t size;
   CommonCluster* (*ctor)(void*);
-} const kKnownClusters[] = {
+} static const kKnownClusters[] = {
 
   {
     ZCL_MY_CLUSTER_CLUSTER_ID,
@@ -77,6 +111,24 @@ struct ClusterInfo
       return new(mem) MyClusterCluster();
     },
   },
+};
+
+inline void BridgeRegisterAllAttributeOverrides()
+{
+
+  static MyClusterAccess MyCluster;
+  registerAttributeAccessOverride(&MyCluster);
+}
+
+struct AttrInfo
+{
+  chip::ClusterId cluster;
+  chip::AttributeId attr;
+  const char *name;
+} static const kKnownAttributes[] = {
+
+  {ZCL_MY_CLUSTER_CLUSTER_ID, 1, "ClusterAttr" },
+  
 };
 
 }

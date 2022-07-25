@@ -6,7 +6,6 @@
 #include <charconv>
 #include <iostream>
 #include <iterator>
-#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -20,11 +19,12 @@ std::unique_ptr<DynamicDeviceImpl> g_pending;
 // Pseudo-index representing the device being built.
 static constexpr int kPendingDeviceIndex = -1;
 
-PropagateWriteCB g_write_cb = [](CommonCluster * cluster, chip::EndpointId ep, chip::ClusterId clusterId, chip::AttributeId attr,
-                                 const uint8_t * buffer) -> EmberAfStatus {
-    printf("Write to ep %d cluster %d attribute %d\n", ep, clusterId, attr);
-    cluster->WriteFromBridge(attr, buffer);
-    return EMBER_ZCL_STATUS_SUCCESS;
+PropagateWriteCB g_write_cb = [](CommonCluster * cluster, const chip::app::ConcreteDataAttributePath & path,
+                                 chip::app::AttributeValueDecoder & decoder) -> CHIP_ERROR {
+    CHIP_ERROR ret = cluster->WriteFromBridge(path, decoder);
+    printf("Write to ep %d cluster %d attribute %d ret %" CHIP_ERROR_FORMAT "\n", path.mEndpointId, path.mClusterId,
+           path.mAttributeId, ret.Format());
+    return ret;
 };
 
 const char * ParseValue(const std::vector<std::string> & tokens, size_t index, std::string * v)
@@ -34,10 +34,10 @@ const char * ParseValue(const std::vector<std::string> & tokens, size_t index, s
     *v = tokens[index];
     return nullptr;
 }
-const char * ParseValue(const std::vector<std::string> & tokens, size_t index, std::optional<std::string> * v)
+const char * ParseValue(const std::vector<std::string> & tokens, size_t index, chip::Optional<std::string> * v)
 {
     if (index < tokens.size())
-        *v = tokens[index];
+        v->SetValue(tokens[index]);
     return nullptr;
 }
 
@@ -55,11 +55,11 @@ const char * ParseValue(const std::vector<std::string> & tokens, size_t index, T
 }
 
 template <typename T, typename = std::enable_if<std::is_arithmetic<T>::value>>
-const char * ParseValue(const std::vector<std::string> & tokens, size_t index, std::optional<T> * v)
+const char * ParseValue(const std::vector<std::string> & tokens, size_t index, chip::Optional<T> * v)
 {
     uint32_t temp;
     if (!ParseValue(tokens, index, &temp))
-        *v = temp;
+        v->SetValue(temp);
     return nullptr;
 }
 
@@ -85,23 +85,23 @@ void NewDevice(const std::vector<std::string> & tokens)
         return;
     }
 
-    std::optional<std::string> type;
+    chip::Optional<std::string> type;
     const char * err = Parse(tokens, 0, &type);
     if (err)
     {
         printf("Error: %s\nExpected [prebuilt-device-type]\n", err);
     }
-    else if (!type)
+    else if (!type.HasValue())
     {
         g_pending = std::make_unique<DynamicDeviceImpl>();
     }
-    else if (type.value() == "switch")
+    else if (type.Value() == "switch")
     {
         g_pending = std::make_unique<DynamicSwitchDevice>();
     }
     else
     {
-        printf("Unknown device type %s\nSupported types: switch\n", type.value().c_str());
+        printf("Unknown device type %s\nSupported types: switch\n", type.Value().c_str());
     }
 }
 
@@ -218,14 +218,14 @@ void AddType(const std::vector<std::string> & tokens)
         return;
     }
     uint32_t type;
-    std::optional<uint32_t> version;
+    chip::Optional<uint32_t> version;
     const char * err = Parse(tokens, 0, &type, &version);
     if (err)
     {
         printf("Error: %s.\nExpected: type [version]\n", err);
         return;
     }
-    EmberAfDeviceType devType = { (uint16_t) type, (uint8_t) version.value_or(1u) };
+    EmberAfDeviceType devType = { (uint16_t) type, (uint8_t) version.ValueOr(1u) };
     printf("Adding device type %d ver %d\n", devType.deviceId, devType.deviceVersion);
 
     g_pending->AddDeviceType(devType);
@@ -289,11 +289,30 @@ ClusterImpl * FindCluster(DynamicDeviceImpl * dev, const std::string & clusterId
     return nullptr;
 }
 
-const EmberAfAttributeMetadata * FindAttrib(ClusterImpl * cluster, uint32_t attrId)
+const EmberAfAttributeMetadata * FindAttrib(ClusterImpl * cluster, const std::string & attrId)
 {
+    uint32_t id;
+    const char * start = attrId.data();
+    const char * end   = start + attrId.size();
+    if (std::from_chars(start, end, id).ptr != end)
+    {
+        auto clusterId = cluster->GetClusterId();
+        id             = 0;
+        for (const auto & c : clusters::kKnownAttributes)
+        {
+            if (c.cluster == clusterId && attrId == c.name)
+            {
+                id = c.attr;
+                break;
+            }
+        }
+        if (!id)
+            return nullptr;
+    }
+
     for (auto & attr : cluster->GetAllAttributes())
     {
-        if (attr.attributeId == attrId)
+        if (attr.attributeId == id)
         {
             return &attr;
         }
@@ -303,55 +322,39 @@ const EmberAfAttributeMetadata * FindAttrib(ClusterImpl * cluster, uint32_t attr
 
 void ParseValue(std::vector<uint8_t> * data, uint16_t size, const std::string & str, EmberAfAttributeType type)
 {
+    chip::TLV::TLVWriter wr;
+    wr.Init(data->data(), data->size());
     switch (type)
     {
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
-        if (str.size() >= size)
-            return;
-        data->resize(size);
-        memcpy(data->data() + 1, str.data(), str.size());
-        data->data()[0] = (uint8_t) str.size();
+        wr.PutString(chip::TLV::Tag(), str.data(), (uint32_t) str.size());
         break;
     case ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE:
-    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE: {
-        if (str.size() >= size)
-            return;
-        data->resize(size);
-        memcpy(data->data() + 2, str.data(), str.size());
-        (*data)[0]      = (uint8_t)(size & 0xFF);
-        (*data)[1]      = (uint8_t)((size >> 8) & 0xFF);
-        data->data()[0] = (uint8_t) str.size();
-    }
-    break;
+    case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
+        wr.PutBytes(chip::TLV::Tag(), (const uint8_t *) str.data(), (uint32_t) str.size());
+        break;
     case ZCL_STRUCT_ATTRIBUTE_TYPE:
         // Writing structs not supported yet
         break;
-    case ZCL_SINGLE_ATTRIBUTE_TYPE: {
-        float v = (float) atof(str.c_str());
-        data->resize(size);
-        memcpy(data->data(), &v, size);
-    }
-    break;
-    case ZCL_DOUBLE_ATTRIBUTE_TYPE: {
-        double v = atof(str.c_str());
-        data->resize(size);
-        memcpy(data->data(), &v, size);
-    }
-    break;
-    default: {
+    case ZCL_SINGLE_ATTRIBUTE_TYPE:
+        wr.Put(chip::TLV::Tag(), (float) atof(str.c_str()));
+        break;
+    case ZCL_DOUBLE_ATTRIBUTE_TYPE:
+        wr.Put(chip::TLV::Tag(), atof(str.c_str()));
+        break;
+    default:
         // Assume integer
-        uint64_t v = strtoull(str.c_str(), nullptr, 10);
-        data->resize(size);
-        memcpy(data->data(), &v, size);
+        wr.Put(chip::TLV::Tag(), (int64_t) strtoll(str.c_str(), nullptr, 10));
+        break;
     }
-    break;
-    }
+    wr.Finalize();
+    data->resize(wr.GetLengthWritten());
 }
 
 void SetValue(const std::vector<std::string> & tokens)
 {
-    uint32_t attrId;
+    std::string attrId;
     int32_t index;
     std::string clusterId;
     std::string value;
@@ -384,7 +387,7 @@ void SetValue(const std::vector<std::string> & tokens)
     const EmberAfAttributeMetadata * attr = FindAttrib(cluster, attrId);
     if (!attr)
     {
-        printf("Cluster does not implement atttr %d\nSupported attributes: ", attrId);
+        printf("Cluster does not implement attr %s\nSupported attributes: ", attrId.c_str());
         for (auto attrMeta : cluster->GetAllAttributes())
         {
             printf("%d ", attrMeta.attributeId);
@@ -393,15 +396,16 @@ void SetValue(const std::vector<std::string> & tokens)
         return;
     }
 
-    std::vector<uint8_t> data;
+    std::vector<uint8_t> data(attr->size + 64);
     ParseValue(&data, attr->size, value, attr->attributeType);
-    if (data.size() > attr->size)
-    {
-        printf("Data is too large. Maximum size %d bytes\n", attr->size);
-        return;
-    }
 
-    cluster->WriteFromBridge(attrId, data.data());
+    chip::TLV::TLVReader rd;
+    rd.Init(data.data(), data.size());
+
+    if (!cluster->Push(attr->attributeId, rd))
+    {
+        printf("Write failed\n");
+    }
 }
 
 void AddRoom(const std::vector<std::string> & tokens)

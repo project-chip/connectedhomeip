@@ -98,9 +98,8 @@ def get_field_type(definition: Field, cluster: Cluster, idl: Idl):
     if container == 'StructType':
         return 'StructType<{}>'.format(cType)
     if container == 'OctetString':
-        return '{}<{}, {}>'.format(container, size, matterType)
+        return 'OctetString<{}, {}>'.format(size, matterType)
     return '{}<{}, {}, {}>'.format(container, cType, size, matterType)
-
 
 def get_attr_type(attr: Attribute, cluster: Cluster, idl: Idl):
     decl = get_field_type(attr.definition, cluster, idl)

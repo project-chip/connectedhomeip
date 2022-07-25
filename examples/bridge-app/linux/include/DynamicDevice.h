@@ -107,45 +107,17 @@ public:
     DynamicSwitchDevice() { AddCluster(mBridgedDevice).AddCluster(mSwitch).AddCluster(mDescriptor); }
     ~DynamicSwitchDevice() override = default;
 
-    void SetNumberOfPositions(uint8_t aNumberOfPositions)
-    {
-        mSwitch.mNumberOfPositions.WriteFromBridge(aNumberOfPositions, &mSwitch);
-    }
-    void SetCurrentPosition(uint8_t aCurrentPosition) { mSwitch.mNumberOfPositions.WriteFromBridge(aCurrentPosition, &mSwitch); }
-    void SetMultiPressMax(uint8_t aMultiPressMax) { mSwitch.mNumberOfPositions.WriteFromBridge(aMultiPressMax, &mSwitch); }
+    void SetNumberOfPositions(uint8_t aNumberOfPositions) { mSwitch.Push(mSwitch.mNumberOfPositions, aNumberOfPositions); }
+    void SetCurrentPosition(uint8_t aCurrentPosition) { mSwitch.Push(mSwitch.mNumberOfPositions, aCurrentPosition); }
+    void SetMultiPressMax(uint8_t aMultiPressMax) { mSwitch.Push(mSwitch.mNumberOfPositions, aMultiPressMax); }
 
     inline uint8_t GetNumberOfPositions() { return mSwitch.mNumberOfPositions.Peek(); };
     inline uint8_t GetCurrentPosition() { return mSwitch.mCurrentPosition.Peek(); };
     inline uint8_t GetMultiPressMax() { return mSwitch.mMultiPressMax.Peek(); };
     inline uint32_t GetFeatureMap() { return mSwitch.mFeatureMap.Peek(); };
 
-    using DeviceCallback_fn = std::function<void(DynamicSwitchDevice *, chip::AttributeId)>;
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB)
-    {
-        mCallback = std::move(aChanged_CB);
-        if (mCallback)
-        {
-            if (!mInternalCallback)
-            {
-                mInternalCallback = [this](CommonCluster *, chip::EndpointId, chip::ClusterId, chip::AttributeId attr,
-                                           const uint8_t *) -> EmberAfStatus {
-                    mCallback(this, attr);
-                    return EMBER_ZCL_STATUS_SUCCESS;
-                };
-                mSwitch.SetCallback(&mInternalCallback);
-            }
-        }
-        else
-        {
-            mSwitch.SetCallback(nullptr);
-        }
-    }
-
 private:
     DynamicCluster<clusters::BridgedDeviceBasicCluster> mBridgedDevice;
     DynamicCluster<clusters::SwitchCluster> mSwitch;
     DynamicCluster<clusters::DescriptorCluster> mDescriptor;
-
-    DeviceCallback_fn mCallback;
-    PropagateWriteCB mInternalCallback;
 };

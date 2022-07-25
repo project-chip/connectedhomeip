@@ -64,6 +64,16 @@ static EndpointId gFirstDynamicEndpointId;
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 Room gRooms[kMaxRooms];
 
+Device * FindDeviceEndpoint(chip::EndpointId id)
+{
+    for (auto dev : gDevices)
+    {
+        if (dev && dev->GetEndpointId() == id)
+            return dev;
+    }
+    return nullptr;
+}
+
 int AddDeviceEndpoint(Device * dev)
 {
     uint8_t index = 0;
@@ -123,37 +133,6 @@ int RemoveDeviceEndpoint(Device * dev)
     return -1;
 }
 
-EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength)
-{
-    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
-
-    ChipLogProgress(DeviceLayer, "emberAfExternalAttributeReadCallback: ep=%d", endpoint);
-
-    if (endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT && gDevices[endpointIndex] != nullptr)
-    {
-        return gDevices[endpointIndex]->Read(clusterId, attributeMetadata, buffer, maxReadLength);
-    }
-
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
-{
-    uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
-
-    ChipLogProgress(DeviceLayer, "emberAfExternalAttributeWriteCallback: ep=%d", endpoint);
-
-    if (endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT && gDevices[endpointIndex] != nullptr)
-    {
-        return gDevices[endpointIndex]->Write(clusterId, attributeMetadata, buffer);
-    }
-
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
 Room * FindRoom(const std::string & name)
 {
     for (auto & room : gRooms)
@@ -166,6 +145,8 @@ Room * FindRoom(const std::string & name)
 
 void ApplicationInit()
 {
+    clusters::BridgeRegisterAllAttributeOverrides();
+
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     gCurrentEndpointId = gFirstDynamicEndpointId;
