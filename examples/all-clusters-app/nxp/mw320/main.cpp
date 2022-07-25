@@ -1133,36 +1133,15 @@ void task_test_main(void * param)
     return;
 }
 
-void ShellCLIMain(void * pvParameter)
+void init_mw320_sdk()
 {
     flash_desc_t fl;
     struct partition_entry *p, *f1, *f2;
     short history = 0;
-    uint32_t * wififw;
+    uint32_t *wififw;
     struct partition_entry * psm;
 
-    const int rc = streamer_init(streamer_get());
-    if (rc != 0)
-    {
-        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
-        return;
-    }
-
-    ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
-
-    chip::Platform::MemoryInit();
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-    ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
-#endif
-
-    cmd_misc_init();
-    // cmd_otcli_init();
-
-    ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
+    PRINTF("=> init mw320 sdk \r\n");
     PRINTF("call mcuInitPower() \r\n");
     mcuInitPower();
     boot_init();
@@ -1188,22 +1167,53 @@ void ShellCLIMain(void * pvParameter)
     }
     else
     {
-        //        PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
+        //PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
         p = NULL;
     }
     if (p != NULL)
     {
         part_to_flash_desc(p, &fl);
         wififw = (uint32_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
-        //        assert(wififw != NULL);
+        //assert(wififw != NULL);
         /* First word in WIFI firmware is magic number. */
         assert(*wififw == (('W' << 0) | ('L' << 8) | ('F' << 16) | ('W' << 24)));
         wlan_init((const uint8_t *) (wififw + 2U), *(wififw + 1U));
-        //        PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
+        //PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
         wlan_start(wlan_event_callback);
-        //		demo_init();
+        //demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
     }
+    PRINTF(" mw320 init complete! \r\n");
+
+    return;
+}
+
+void ShellCLIMain(void * pvParameter)
+{
+    const int rc = streamer_init(streamer_get());
+    if (rc != 0)
+    {
+        ChipLogError(Shell, "Streamer initialization failed: %d", rc);
+        return;
+    }
+
+    // Initialize the SDK components
+    init_mw320_sdk();
+
+    ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
+
+    chip::Platform::MemoryInit();
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    ConfigurationMgr().LogDeviceConfig();
+    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
+#endif
+
+    cmd_misc_init();
+    // cmd_otcli_init();
+    ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
 
     //    std::string qrCodeText = createSetupPayload();
     //    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
