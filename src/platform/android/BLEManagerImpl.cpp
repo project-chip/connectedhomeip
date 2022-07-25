@@ -40,7 +40,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-namespace {} // namespace
+namespace {
+} // namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
@@ -280,7 +281,7 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(conId);
     rc         = (bool) env->CallBooleanMethod(mBLEManagerObject, mOnUnsubscribeCharacteristicMethod, static_cast<jint>(tmpConnObj),
-                                               svcIdObj, charIdObj);
+                                       svcIdObj, charIdObj);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
