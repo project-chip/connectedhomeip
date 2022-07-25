@@ -323,53 +323,56 @@ public:
     ReadClient * GetNextClient() { return mpNext; }
     void SetNextClient(ReadClient * apClient) { mpNext = apClient; }
 
-    // Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
-    // we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
-    // by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
-    // used.
-    //
-    // The application has to know to
-    // a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList and
-    // mpDataVersionFilterList with lifetimes as long as the ReadClient itself and b) free those up later in the call to
-    // OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
-    // that has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not have
-    // a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
-    // OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
-    // that's the only case when the consumer moved a ReadParams into the client.
+    /**
+     *  Like SendSubscribeRequest, but the ReadClient will automatically attempt to re-establish the subscription if
+     *  we decide that the subscription has dropped.  The exact behavior of the re-establishment can be controlled
+     *  by setting mResubscribePolicy in the ReadPrepareParams.  If not set, a default behavior with exponential backoff will be
+     *  used.
+     *
+     *  The application has to know to
+     *  a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList and
+     *  mpDataVersionFilterList with lifetimes as long as the ReadClient itself and b) free those up later in the call to
+     *  OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
+     *  that has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
+     * have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
+     *  OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
+     *  that's the only case when the consumer moved a ReadParams into the client.
+     *
+     */
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
 
-    //
-    // This provides a standard re-subscription policy implementation that given a termination cause, does the following:
-    //      - Calculates the time till next subscription with fibonacci back-off (implemented by ComputeTimeTillNextSubscription()).
-    //      - Schedules the next subscription attempt at the computed interval from the previous step. Operational discovery and
-    //        CASE establishment will be attempted if aTerminationCause was CHIP_ERROR_TIMEOUT. In all other cases, it will attempt
-    //        to re-use a previously established session.
-    //
+    /**
+     *   This provides a standard re-subscription policy implementation that given a termination cause, does the following:
+     *   - Calculates the time till next subscription with fibonacci back-off (implemented by ComputeTimeTillNextSubscription()).
+     *   - Schedules the next subscription attempt at the computed interval from the previous step. Operational discovery and
+     *     CASE establishment will be attempted if aTerminationCause was CHIP_ERROR_TIMEOUT. In all other cases, it will attempt
+     *     to re-use a previously established session.
+     */
     CHIP_ERROR DefaultResubscribePolicy(CHIP_ERROR aTerminationCause);
 
-    //
-    // Computes the time till the next re-subscription with millisecond resolution over
-    // an ever increasing window following a fibonacci sequence with the current retry count
-    // used as input to the fibonacci algorithm.
-    //
-    // CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX is used as the maximum ceiling for that input.
-    //
+    /**
+     * Computes the time till the next re-subscription with millisecond resolution over
+     * an ever increasing window following a fibonacci sequence with the current retry count
+     * used as input to the fibonacci algorithm.
+     *
+     * CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX is used as the maximum ceiling for that input.
+     *
+     */
     uint32_t ComputeTimeTillNextSubscription();
 
-    //
-    // Schedules a re-subscription aTimeTillNextResubscriptionMs into the future.
-    //
-    // If an application wants to setup CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next
-    // interval at which they should attempt CASE and attempt CASE at that time. On successful CASE establishment, this method
-    // should be called with the new SessionHandle provided through 'aNewSessionHandle', 'aTimeTillNextResubscriptionMs' set to 0
-    // (i.e re-subscribe immediately) and 'aReestablishCASE' set to false.
-    //
-    // Otherwise, if aReestablishCASE is true, operational discovery and CASE will be attempted at that time before
-    // the actual IM interaction is initiated.
-    //
-    // aReestablishCASE SHALL NOT be set to true if a valid SessionHandle is provided through newSessionHandle.
-    //
-    //
+    /**
+     * Schedules a re-subscription aTimeTillNextResubscriptionMs into the future.
+     *
+     * If an application wants to setup CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next
+     * interval at which they should attempt CASE and attempt CASE at that time. On successful CASE establishment, this method
+     * should be called with the new SessionHandle provided through 'aNewSessionHandle', 'aTimeTillNextResubscriptionMs' set to 0
+     * (i.e re-subscribe immediately) and 'aReestablishCASE' set to false.
+     *
+     * Otherwise, if aReestablishCASE is true, operational discovery and CASE will be attempted at that time before
+     * the actual IM interaction is initiated.
+     *
+     * aReestablishCASE SHALL NOT be set to true if a valid SessionHandle is provided through newSessionHandle.
+     */
     CHIP_ERROR ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle,
                                       bool aReestablishCASE);
 
