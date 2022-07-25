@@ -97,8 +97,6 @@ using namespace chip::Encoding;
 using namespace chip::Protocols::UserDirectedCommissioning;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
-constexpr uint32_t kSessionEstablishmentTimeout = 40 * kMillisecondsPerSecond;
-
 DeviceController::DeviceController()
 {
     mState = State::NotInitialized;
@@ -546,6 +544,10 @@ void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * dev
     {
         mDeviceInPASEEstablishment = nullptr;
     }
+    if (mDeviceBeingCommissioned == device)
+    {
+        mDeviceBeingCommissioned = nullptr;
+    }
 }
 
 CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** out_device)
@@ -759,9 +761,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId)
 
     ChipLogProgress(Controller, "Commission called for node ID 0x" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
 
-    mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
-                                            OnSessionEstablishmentTimeoutCallback, this);
-
     mDefaultCommissioner->SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
     if (device->IsSecureConnected())
     {
@@ -859,9 +858,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
 void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    // PASE session establishment failure.
-    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
@@ -976,6 +972,12 @@ void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * conte
 {
     MATTER_TRACE_EVENT_SCOPE("OnDeviceAttestationInformationVerification", "DeviceCommissioner");
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+
+    if (!commissioner->mDeviceBeingCommissioned)
+    {
+        ChipLogError(Controller, "Device attestation verification result received when we're not commissioning a device");
+        return;
+    }
 
     if (result != AttestationVerificationResult::kSuccess)
     {
@@ -1363,8 +1365,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mSystemState->SystemLayer()->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
@@ -1394,26 +1394,6 @@ void DeviceCommissioner::CloseBleConnection()
     mSystemState->BleLayer()->CloseAllBleConnections();
 }
 #endif
-
-void DeviceCommissioner::OnSessionEstablishmentTimeout()
-{
-    // This is called from the session establishment timer. Please see
-    // https://github.com/project-chip/connectedhomeip/issues/14650
-    VerifyOrReturn(mState == State::Initialized);
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
-
-    StopPairing(mDeviceBeingCommissioned->GetDeviceId());
-
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(CHIP_ERROR_TIMEOUT);
-    }
-}
-
-void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState)
-{
-    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
-}
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
@@ -1522,6 +1502,10 @@ void DeviceCommissioner::OnDisarmFailsafeFailure(void * context, CHIP_ERROR erro
 
 void DeviceCommissioner::DisarmDone()
 {
+    // If someone nulled out our mDeviceBeingCommissioned, there's nothing else
+    // to do here.
+    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
+
     // At this point, we also want to close off the pase session so we need to re-establish
     CommissioneeDeviceProxy * commissionee = FindCommissioneeDevice(mDeviceBeingCommissioned->GetDeviceId());
 
