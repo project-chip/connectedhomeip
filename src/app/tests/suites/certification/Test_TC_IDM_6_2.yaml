@@ -29,7 +29,11 @@ tests:
           specific node that is, [Node = Specific, Endpoint = Specific, Cluster
           = Specific, Event = Specific]."
       verification: |
-          chip tool is used as TH and send the below command from TH
+          The cluster used in the below command is an example, User can use any supported chip cluster on DUT.
+
+          Pls run this test in chip tool interactive mode ./chip-tool interactive start
+
+          On the TH (chip-tool) pls subscribe to start-up event (below command), right after you power on the DUT. If DUT vendor is subscribing to any other event, Pls use appropriate steps on the DUT to generate that event and use subscribe to that event from TH.
 
           basic subscribe-event  start-up  20 100 1 0
 
@@ -85,6 +89,7 @@ tests:
           = Specific, Event = Wildcard]."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Pls run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event-by-id 0xFFFFFFFF 10 100 1 0
 
@@ -141,7 +146,7 @@ tests:
           Event = Wildcard]."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
-
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 20 100  1 0
 
           On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
@@ -248,6 +253,7 @@ tests:
           Specific, Event = Specific]."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event-by-id 0x00 10 700 1 0xFFFF
           On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
@@ -300,6 +306,7 @@ tests:
           Event = Wildcard]."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
            basic subscribe-event-by-id 0xFFFFFFFF 10 100 1 0xFFFF
           On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
@@ -353,6 +360,8 @@ tests:
           is, [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
           On TH verify that the Report Data Message with SubscriptionId which uniquely identifies this subscription on the publisher and data for events in Subscribe Request Message from DUT
           [1657456221.167627][11635:11640] CHIP:DMG: ReportDataMessage =
@@ -571,7 +580,7 @@ tests:
           is, [Node = Specific, Endpoint = Wildcard, Cluster = Wildcard, Event =
           Wildcard]."
       verification: |
-          Repeat the above Test step
+          test step repeated, needs to be removed from test plan, https://github.com/CHIP-Specifications/chip-test-plans/issues/1888
       disabled: true
 
     - label:
@@ -579,6 +588,7 @@ tests:
           event on the DUT before minimum interval."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
            basic subscribe-event-by-id 0x000 100 1000 1 0
 
@@ -633,6 +643,7 @@ tests:
           SubscribeRequestMessage."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event start-up  30 100 1 0 --is-urgent true
 
@@ -683,9 +694,9 @@ tests:
           triggering attribute values before maximum interval."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event  start-up  20 100 1 0
-
 
           On TH verify that the Report Data Message from DUT to TH
 
@@ -736,6 +747,7 @@ tests:
           Subscribe Request Message to DUT with KeepSubscriptions as False."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event-by-id 0x000 10 500 1 0
 
@@ -830,6 +842,7 @@ tests:
           code."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event-by-id 0x000 20 400 1 0
 
@@ -850,14 +863,14 @@ tests:
           Status."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
-          This test is not testable.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
       disabled: true
 
     - label:
           "TH sends Subscribe Request Message to DUT with EventRequests set to
           path which indicates a cluster event that is not supported."
       verification: |
-          Out of Scope for V1.0
+          Mark this as not testable /NA. Out of Scope for V1.0
       disabled: true
 
     - label:
@@ -866,10 +879,14 @@ tests:
           the path."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send the below mentioned ACL command
 
-          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+
+           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+
 
           basic subscribe-event-by-id 0x000 100 1000 1 0
           In TH log verify DUT responds with UNSUPPORTED_ACCESS  for the data sent in the above command
@@ -905,6 +922,9 @@ tests:
           [1653479886.551532][22629:22634] CHIP:DMG:         InteractionModelRevision = 1
           [1653479886.551538][22629:22634] CHIP:DMG: }
           [1653479886.551583][22629:22634] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -914,13 +934,15 @@ tests:
       verification: |
           chip tool is used as TH and send the below command from TH
 
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
           To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
 
           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
-           any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
+          any subscribe-event-by-id 0xFFFFFFFF 0xFFFFFFFF 100 1000 1 0xFFFF
 
-          verify DUT is responsds with Report Data Message with no entry for that event in EventReports list.  for the data sent in the above command
+          verify DUT is responds with Report Data Message with no entry for that event in the EventReports list.  for the data sent in the above command
 
           [1653480007.965861][22654:22659] CHIP:DMG: ReportDataMessage =
           [1653480007.965882][22654:22659] CHIP:DMG: {
@@ -928,6 +950,8 @@ tests:
           [1653480007.965916][22654:22659] CHIP:DMG:         InteractionModelRevision = 1
           [1653480007.965929][22654:22659] CHIP:DMG: }
           [1653480007.965969][22654:22659] CHIP:DMG: MoveToState ReadClient[0x7efe84002fd0]: Moving to [AwaitingSu]
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -937,10 +961,15 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+           accesscontrol subscribe-event access-control-entry-changed 5 10 1 0
+
+
           On TH, verify that the Report Data Message with EventReports for event numbers higher than the EventMin field and
            Verify that the subsequent ReportData actions as part of the subscription include the latest EventNo associated with each node generating new events
 
-           accesscontrol subscribe-event access-control-entry-changed 5 10 1 0
+
           [1655979825.174136][4566:4571] CHIP:DMG: ReportDataMessage =
           [1655979825.174177][4566:4571] CHIP:DMG: {
           [1655979825.174213][4566:4571] CHIP:DMG:         SubscriptionId = 0xd263227e,
@@ -1006,8 +1035,7 @@ tests:
           [1655979825.177433][4566:4571] CHIP:DMG: MoveToState ReadClient[0xffff84006d40]: Moving to [AwaitingSu]
 
 
-
-           sudo ./chip-tool accesscontrol subscribe-event access-control-entry-changed 5 10 1 0 --event-min 0
+           accesscontrol subscribe-event access-control-entry-changed 5 10 1 0 --event-min 0
           [1655979915.863156][4607:4612] CHIP:DMG: ReportDataMessage =
           [1655979915.863196][4607:4612] CHIP:DMG: {
           [1655979915.863232][4607:4612] CHIP:DMG:         SubscriptionId = 0xeb39dedd,
@@ -1144,6 +1172,9 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
           basic subscribe-event-by-id 0x000 100 1000 1 0  --event-min 1
 
 
@@ -1164,145 +1195,127 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          Provision DUT and TH.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
-          To generate the software fault event, execute the following
-          1. Get the PID of the DUT & KIll it .
-                      ps  -aef|grep all-clusters-app
-                      sudo kill -SIGUSR1 <PID of DUT>
+          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0
+          On TH verify that each event number
+          [1658405014.975407][4236:4241] CHIP:DMG: }
+          [1658405014.975582][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405014.975608][4236:4241] CHIP:TOO:          Event number: 2
+          [1658405014.975632][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405014.975656][4236:4241] CHIP:TOO:          Timestamp: 24429982
+          [1658405014.975774][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405014.975802][4236:4241] CHIP:TOO:     AdminNodeID: null
+          [1658405014.975837][4236:4241] CHIP:TOO:     AdminPasscodeID: 0
+          [1658405014.975864][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405014.975889][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405014.975913][4236:4241] CHIP:TOO:       Privilege: 5
+          [1658405014.975938][4236:4241] CHIP:TOO:       AuthMode: 2
+          [1658405014.975968][4236:4241] CHIP:TOO:       Subjects: 1 entries
+          [1658405014.975999][4236:4241] CHIP:TOO:         [1]: 112233
+          [1658405014.976027][4236:4241] CHIP:TOO:       Targets: null
+          [1658405014.976052][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405014.976075][4236:4241] CHIP:TOO:      }
+          [1658405014.976100][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405014.976124][4236:4241] CHIP:TOO:    }
+          [1658405014.976188][4236:4241] CHIP:DMG: MoveToState ReadClient[0xffffa4008e30]: Moving to [AwaitingSu]
 
+          By sending the command mentioned below, change attribute values on DUT to create events multiple times.
 
-          On TH, Verify that each event record is assigned a number that is exactly 1 greater than the last created event record on that Node. by sending the below command
-           softwarediagnostics subscribe-event software-fault 1 0
-          [1656509949.252105][1593:1598] CHIP:DMG:         InteractionModelRevision = 1
-          [1656509949.252131][1593:1598] CHIP:DMG: }
-          [1656509949.252482][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.252514][1593:1598] CHIP:TOO:          Event number: 7
-          [1656509949.252540][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.252564][1593:1598] CHIP:TOO:          Timestamp: 1667389
-          [1656509949.252673][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.252726][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.252755][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.252785][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33343A353220323032320A
-          [1656509949.252812][1593:1598] CHIP:TOO:    }
-          [1656509949.252919][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.252946][1593:1598] CHIP:TOO:          Event number: 8
-          [1656509949.252970][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.252994][1593:1598] CHIP:TOO:          Timestamp: 1668865
-          [1656509949.253028][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.253054][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.253079][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.253106][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33343A353420323032320A
-          [1656509949.253131][1593:1598] CHIP:TOO:    }
-          [1656509949.253235][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.253262][1593:1598] CHIP:TOO:          Event number: 9
-          [1656509949.253286][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.253310][1593:1598] CHIP:TOO:          Timestamp: 1671097
-          [1656509949.253343][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.253370][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.253394][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.253420][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33343A353620323032320A
-          [1656509949.253445][1593:1598] CHIP:TOO:    }
-          [1656509949.253552][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.253578][1593:1598] CHIP:TOO:          Event number: 10
-          [1656509949.253602][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.253626][1593:1598] CHIP:TOO:          Timestamp: 1899745
-          [1656509949.253658][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.253685][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.253708][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.253734][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343520323032320A
-          [1656509949.253755][1593:1598] CHIP:TOO:    }
-          [1656509949.253856][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.253883][1593:1598] CHIP:TOO:          Event number: 11
-          [1656509949.253904][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.253924][1593:1598] CHIP:TOO:          Timestamp: 1901573
-          [1656509949.253954][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.253977][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.253997][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.254020][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343620323032320A
-          [1656509949.254042][1593:1598] CHIP:TOO:    }
-          [1656509949.254132][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.254155][1593:1598] CHIP:TOO:          Event number: 12
-          [1656509949.254176][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.254196][1593:1598] CHIP:TOO:          Timestamp: 1903174
-          [1656509949.254225][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.254247][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.254268][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.254291][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343820323032320A
-          [1656509949.254313][1593:1598] CHIP:TOO:    }
-          [1656509949.254403][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.254426][1593:1598] CHIP:TOO:          Event number: 13
-          [1656509949.254447][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.254468][1593:1598] CHIP:TOO:          Timestamp: 1904273
-          [1656509949.254496][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.254519][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.254540][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.254563][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A343920323032320A
-          [1656509949.254584][1593:1598] CHIP:TOO:    }
-          [1656509949.254674][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.254697][1593:1598] CHIP:TOO:          Event number: 14
-          [1656509949.254718][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.254739][1593:1598] CHIP:TOO:          Timestamp: 1905286
-          [1656509949.254766][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.254789][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.254810][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.254833][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353020323032320A
-          [1656509949.254854][1593:1598] CHIP:TOO:    }
-          [1656509949.254945][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.254967][1593:1598] CHIP:TOO:          Event number: 15
-          [1656509949.254988][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.255008][1593:1598] CHIP:TOO:          Timestamp: 1907173
-          [1656509949.255036][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.255059][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.255080][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.255103][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353220323032320A
-          [1656509949.255125][1593:1598] CHIP:TOO:    }
-          [1656509949.255214][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.255236][1593:1598] CHIP:TOO:          Event number: 16
-          [1656509949.255257][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.255277][1593:1598] CHIP:TOO:          Timestamp: 1908021
-          [1656509949.255305][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.255328][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.255349][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.255372][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353320323032320A
-          [1656509949.255393][1593:1598] CHIP:TOO:    }
-          [1656509949.255484][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.255506][1593:1598] CHIP:TOO:          Event number: 17
-          [1656509949.255527][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.255548][1593:1598] CHIP:TOO:          Timestamp: 1908798
-          [1656509949.255575][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.255598][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.255618][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.255641][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353420323032320A
-          [1656509949.255663][1593:1598] CHIP:TOO:    }
-          [1656509949.255752][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.255774][1593:1598] CHIP:TOO:          Event number: 18
-          [1656509949.255796][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.255816][1593:1598] CHIP:TOO:          Timestamp: 1909478
-          [1656509949.255844][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.255866][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.255887][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.255910][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353420323032320A
-          [1656509949.255931][1593:1598] CHIP:TOO:    }
-          [1656509949.256022][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.256044][1593:1598] CHIP:TOO:          Event number: 19
-          [1656509949.256065][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.256086][1593:1598] CHIP:TOO:          Timestamp: 1910178
-          [1656509949.256114][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.256136][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.256157][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.256193][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353520323032320A
-          [1656509949.256216][1593:1598] CHIP:TOO:    }
-          [1656509949.256306][1593:1598] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Event 0x0000_0000
-          [1656509949.256328][1593:1598] CHIP:TOO:          Event number: 20
-          [1656509949.256349][1593:1598] CHIP:TOO:          Priority: Info
-          [1656509949.256370][1593:1598] CHIP:TOO:          Timestamp: 1911229
-          [1656509949.256398][1593:1598] CHIP:TOO:   SoftwareFault: {
-          [1656509949.256420][1593:1598] CHIP:TOO:     Id: 1609
-          [1656509949.256442][1593:1598] CHIP:TOO:     Name: 1609
-          [1656509949.256464][1593:1598] CHIP:TOO:     FaultRecording: 576564204A756E2032392031333A33383A353620323032320A
-          [1656509949.256486][1593:1598] CHIP:TOO:    }
-          [1656509949.256679][1593:1598] CHIP:DMG: MoveToState ReadClient[0xffff74004470]: Moving to [AwaitingSu]
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]' 1 0
+
+          On TH Verify that each event record is assigned a number that is exactly 1 greater than the last created event record on that Node.
+
+          [1658405515.109232][4236:4241] CHIP:DMG: }
+          [1658405515.109475][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.109503][4236:4241] CHIP:TOO:          Event number: 3
+          [1658405515.109529][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.109555][4236:4241] CHIP:TOO:          Timestamp: 24557931
+          [1658405515.109621][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.109654][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.109682][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.109710][4236:4241] CHIP:TOO:     ChangeType: 2
+          [1658405515.109736][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.109762][4236:4241] CHIP:TOO:       Privilege: 5
+          [1658405515.109788][4236:4241] CHIP:TOO:       AuthMode: 2
+          [1658405515.109819][4236:4241] CHIP:TOO:       Subjects: 1 entries
+          [1658405515.109852][4236:4241] CHIP:TOO:         [1]: 112233
+          [1658405515.109881][4236:4241] CHIP:TOO:       Targets: null
+          [1658405515.109907][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.109933][4236:4241] CHIP:TOO:      }
+          [1658405515.109960][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.109985][4236:4241] CHIP:TOO:    }
+          [1658405515.110118][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.110146][4236:4241] CHIP:TOO:          Event number: 4
+          [1658405515.110171][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.110196][4236:4241] CHIP:TOO:          Timestamp: 24557933
+          [1658405515.110240][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.110269][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.110296][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.110322][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405515.110348][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.110373][4236:4241] CHIP:TOO:       Privilege: 5
+          [1658405515.110399][4236:4241] CHIP:TOO:       AuthMode: 2
+          [1658405515.110427][4236:4241] CHIP:TOO:       Subjects: 1 entries
+          [1658405515.110457][4236:4241] CHIP:TOO:         [1]: 112233
+          [1658405515.110485][4236:4241] CHIP:TOO:       Targets: null
+          [1658405515.110511][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.110536][4236:4241] CHIP:TOO:      }
+          [1658405515.110562][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.110587][4236:4241] CHIP:TOO:    }
+          [1658405515.110735][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.110762][4236:4241] CHIP:TOO:          Event number: 5
+          [1658405515.110788][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.110813][4236:4241] CHIP:TOO:          Timestamp: 24557935
+          [1658405515.110861][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.110890][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.110917][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.110943][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405515.110969][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.110994][4236:4241] CHIP:TOO:       Privilege: 1
+          [1658405515.111020][4236:4241] CHIP:TOO:       AuthMode: 3
+          [1658405515.111050][4236:4241] CHIP:TOO:       Subjects: 4 entries
+          [1658405515.111080][4236:4241] CHIP:TOO:         [1]: 111
+          [1658405515.111109][4236:4241] CHIP:TOO:         [2]: 222
+          [1658405515.111137][4236:4241] CHIP:TOO:         [3]: 333
+          [1658405515.111166][4236:4241] CHIP:TOO:         [4]: 444
+          [1658405515.111198][4236:4241] CHIP:TOO:       Targets: 1 entries
+          [1658405515.111240][4236:4241] CHIP:TOO:         [1]: {
+          [1658405515.111268][4236:4241] CHIP:TOO:           Cluster: 11
+          [1658405515.111296][4236:4241] CHIP:TOO:           Endpoint: 22
+          [1658405515.111322][4236:4241] CHIP:TOO:           DeviceType: null
+          [1658405515.111348][4236:4241] CHIP:TOO:          }
+          [1658405515.111376][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.111402][4236:4241] CHIP:TOO:      }
+          [1658405515.111428][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.111453][4236:4241] CHIP:TOO:    }
+          [1658405515.111600][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.111628][4236:4241] CHIP:TOO:          Event number: 6
+          [1658405515.111653][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.111678][4236:4241] CHIP:TOO:          Timestamp: 24557937
+          [1658405515.111726][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.111755][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.111781][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.111807][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405515.111833][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.111859][4236:4241] CHIP:TOO:       Privilege: 3
+          [1658405515.111884][4236:4241] CHIP:TOO:       AuthMode: 3
+          [1658405515.111914][4236:4241] CHIP:TOO:       Subjects: 4 entries
+          [1658405515.111944][4236:4241] CHIP:TOO:         [1]: 555
+          [1658405515.111973][4236:4241] CHIP:TOO:         [2]: 666
+          [1658405515.112002][4236:4241] CHIP:TOO:         [3]: 777
+          [1658405515.112030][4236:4241] CHIP:TOO:         [4]: 888
+          [1658405515.112063][4236:4241] CHIP:TOO:       Targets: 1 entries
+          [1658405515.112097][4236:4241] CHIP:TOO:         [1]: {
+          [1658405515.112125][4236:4241] CHIP:TOO:           Cluster: 55
+          [1658405515.112151][4236:4241] CHIP:TOO:           Endpoint: 66
+          [1658405515.112177][4236:4241] CHIP:TOO:           DeviceType: null
+          [1658405515.112203][4236:4241] CHIP:TOO:          }
+          [1658405515.112231][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.112257][4236:4241] CHIP:TOO:      }
+          [1658405515.112283][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.112308][4236:4241] CHIP:TOO:    }
+          [1658405515.112462][4236:4241] CHIP:DMG: Refresh LivenessCheckTime for 525000 milliseconds with SubscriptionId = 0x0a5a629c Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -1311,5 +1324,131 @@ tests:
           reset on DUT, re-subscribe to events and continue to change attribute
           values on DUT to create events multiple times."
       verification: |
-          https://github.com/CHIP-Specifications/chip-test-plans/issues/1700
+          The cluster used in the below command is an example, User can use any supported chip cluster.
+
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
+          On Raspi platform the event is triggered with this command, Pls use equivalent command on the respective DUT
+
+          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0
+          On TH verify that each event number
+          [1658405014.975407][4236:4241] CHIP:DMG: }
+          [1658405014.975582][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405014.975608][4236:4241] CHIP:TOO:          Event number: 2
+          [1658405014.975632][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405014.975656][4236:4241] CHIP:TOO:          Timestamp: 24429982
+          [1658405014.975774][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405014.975802][4236:4241] CHIP:TOO:     AdminNodeID: null
+          [1658405014.975837][4236:4241] CHIP:TOO:     AdminPasscodeID: 0
+          [1658405014.975864][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405014.975889][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405014.975913][4236:4241] CHIP:TOO:       Privilege: 5
+          [1658405014.975938][4236:4241] CHIP:TOO:       AuthMode: 2
+          [1658405014.975968][4236:4241] CHIP:TOO:       Subjects: 1 entries
+          [1658405014.975999][4236:4241] CHIP:TOO:         [1]: 112233
+          [1658405014.976027][4236:4241] CHIP:TOO:       Targets: null
+          [1658405014.976052][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405014.976075][4236:4241] CHIP:TOO:      }
+          [1658405014.976100][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405014.976124][4236:4241] CHIP:TOO:    }
+          [1658405014.976188][4236:4241] CHIP:DMG: MoveToState ReadClient[0xffffa4008e30]: Moving to [AwaitingSu]
+
+          By sending the command mentioned below, change attribute values on DUT to create events multiple times.
+
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": [111,222,333,444], "targets": [{"cluster":11 , "endpoint":22, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": [555,666,777,888], "targets": [{"cluster": 55, "endpoint": 66, "deviceType":null }]}]' 1 0
+
+          On TH Verify that each event record is assigned a number that is exactly 1 greater than the last created event record on that Node.
+
+          [1658405515.109232][4236:4241] CHIP:DMG: }
+          [1658405515.109475][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.109503][4236:4241] CHIP:TOO:          Event number: 3
+          [1658405515.109529][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.109555][4236:4241] CHIP:TOO:          Timestamp: 24557931
+          [1658405515.109621][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.109654][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.109682][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.109710][4236:4241] CHIP:TOO:     ChangeType: 2
+          [1658405515.109736][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.109762][4236:4241] CHIP:TOO:       Privilege: 5
+          [1658405515.109788][4236:4241] CHIP:TOO:       AuthMode: 2
+          [1658405515.109819][4236:4241] CHIP:TOO:       Subjects: 1 entries
+          [1658405515.109852][4236:4241] CHIP:TOO:         [1]: 112233
+          [1658405515.109881][4236:4241] CHIP:TOO:       Targets: null
+          [1658405515.109907][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.109933][4236:4241] CHIP:TOO:      }
+          [1658405515.109960][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.109985][4236:4241] CHIP:TOO:    }
+          [1658405515.110118][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.110146][4236:4241] CHIP:TOO:          Event number: 4
+          [1658405515.110171][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.110196][4236:4241] CHIP:TOO:          Timestamp: 24557933
+          [1658405515.110240][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.110269][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.110296][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.110322][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405515.110348][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.110373][4236:4241] CHIP:TOO:       Privilege: 5
+          [1658405515.110399][4236:4241] CHIP:TOO:       AuthMode: 2
+          [1658405515.110427][4236:4241] CHIP:TOO:       Subjects: 1 entries
+          [1658405515.110457][4236:4241] CHIP:TOO:         [1]: 112233
+          [1658405515.110485][4236:4241] CHIP:TOO:       Targets: null
+          [1658405515.110511][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.110536][4236:4241] CHIP:TOO:      }
+          [1658405515.110562][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.110587][4236:4241] CHIP:TOO:    }
+          [1658405515.110735][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.110762][4236:4241] CHIP:TOO:          Event number: 5
+          [1658405515.110788][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.110813][4236:4241] CHIP:TOO:          Timestamp: 24557935
+          [1658405515.110861][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.110890][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.110917][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.110943][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405515.110969][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.110994][4236:4241] CHIP:TOO:       Privilege: 1
+          [1658405515.111020][4236:4241] CHIP:TOO:       AuthMode: 3
+          [1658405515.111050][4236:4241] CHIP:TOO:       Subjects: 4 entries
+          [1658405515.111080][4236:4241] CHIP:TOO:         [1]: 111
+          [1658405515.111109][4236:4241] CHIP:TOO:         [2]: 222
+          [1658405515.111137][4236:4241] CHIP:TOO:         [3]: 333
+          [1658405515.111166][4236:4241] CHIP:TOO:         [4]: 444
+          [1658405515.111198][4236:4241] CHIP:TOO:       Targets: 1 entries
+          [1658405515.111240][4236:4241] CHIP:TOO:         [1]: {
+          [1658405515.111268][4236:4241] CHIP:TOO:           Cluster: 11
+          [1658405515.111296][4236:4241] CHIP:TOO:           Endpoint: 22
+          [1658405515.111322][4236:4241] CHIP:TOO:           DeviceType: null
+          [1658405515.111348][4236:4241] CHIP:TOO:          }
+          [1658405515.111376][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.111402][4236:4241] CHIP:TOO:      }
+          [1658405515.111428][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.111453][4236:4241] CHIP:TOO:    }
+          [1658405515.111600][4236:4241] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658405515.111628][4236:4241] CHIP:TOO:          Event number: 6
+          [1658405515.111653][4236:4241] CHIP:TOO:          Priority: Info
+          [1658405515.111678][4236:4241] CHIP:TOO:          Timestamp: 24557937
+          [1658405515.111726][4236:4241] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658405515.111755][4236:4241] CHIP:TOO:     AdminNodeID: 112233
+          [1658405515.111781][4236:4241] CHIP:TOO:     AdminPasscodeID: null
+          [1658405515.111807][4236:4241] CHIP:TOO:     ChangeType: 1
+          [1658405515.111833][4236:4241] CHIP:TOO:     LatestValue: {
+          [1658405515.111859][4236:4241] CHIP:TOO:       Privilege: 3
+          [1658405515.111884][4236:4241] CHIP:TOO:       AuthMode: 3
+          [1658405515.111914][4236:4241] CHIP:TOO:       Subjects: 4 entries
+          [1658405515.111944][4236:4241] CHIP:TOO:         [1]: 555
+          [1658405515.111973][4236:4241] CHIP:TOO:         [2]: 666
+          [1658405515.112002][4236:4241] CHIP:TOO:         [3]: 777
+          [1658405515.112030][4236:4241] CHIP:TOO:         [4]: 888
+          [1658405515.112063][4236:4241] CHIP:TOO:       Targets: 1 entries
+          [1658405515.112097][4236:4241] CHIP:TOO:         [1]: {
+          [1658405515.112125][4236:4241] CHIP:TOO:           Cluster: 55
+          [1658405515.112151][4236:4241] CHIP:TOO:           Endpoint: 66
+          [1658405515.112177][4236:4241] CHIP:TOO:           DeviceType: null
+          [1658405515.112203][4236:4241] CHIP:TOO:          }
+          [1658405515.112231][4236:4241] CHIP:TOO:       FabricIndex: 1
+          [1658405515.112257][4236:4241] CHIP:TOO:      }
+          [1658405515.112283][4236:4241] CHIP:TOO:     AdminFabricIndex: 1
+          [1658405515.112308][4236:4241] CHIP:TOO:    }
+          [1658405515.112462][4236:4241] CHIP:DMG: Refresh LivenessCheckTime for 525000 milliseconds with SubscriptionId = 0x0a5a629c Peer = 01:0000000000000001
+
+          After this test step you need to factory reset the DUT and reprovision the DUT again, and  re-subscribe  the events to continue to change attribute values on DUT to create events multiple times
       disabled: true

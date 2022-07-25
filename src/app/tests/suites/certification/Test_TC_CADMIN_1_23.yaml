@@ -19,83 +19,81 @@ name:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    timeout: 330
     endpoint: 0
 
 tests:
-    - label: "Reset DUT_CR1 to factory defaults"
-      verification: |
+    - label: "Factory Reset the DUT_CE"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
 
-      disabled: true
-
-    - label: "DUT_CR1 starts a commissioning process with TH_CE"
+    - label: "Factory Reset the DUT_CE"
       verification: |
-          "1. Provision the device using your DUT controller(use above instructions) ,
-          "
-      disabled: true
+          Not implemented in YAML
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S.C01.Rsp
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Wait for commissioning Window to 301 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 181000
 
     - label:
-          "DUT_CR1 sends command to TH_CE to open a commissioning window with a
-          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C00.Rsp
-      verification: |
-          On your DUT controller chip tool, open commissioning window
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0
 
-          Below is the example when using chip tool as controller
-
-          ./chip-tool pairing open-commissioning-window 1 1 300 1000 3840
-
-          [1635925713.966786][9695:9700] CHIP:SC: Success status report received. Session was established
-          [1635925713.966839][9695:9700] CHIP:IN: New secure session created for device 0x0000000000000001, key 33!!
-          [1635925713.966938][9695:9700] CHIP:CTL: OpenCommissioningWindow for device ID 1
-          [1635925713.972601][9695:9700] CHIP:DMG: ICR moving to [AddingComm]
-          [1635925713.972705][9695:9700] CHIP:DMG: ICR moving to [AddedComma]
-          [1635925713.972815][9695:9700] CHIP:IN: Prepared encrypted message 0xaaaad9b57d10 to 0x0000000000000001 of type 0x8 and protocolId (0, 1) on exchange 31056i with MessageCounter:0.
-          [1635925713.972876][9695:9700] CHIP:IN: Sending encrypted msg 0xaaaad9b57d10 with MessageCounter:0 to 0x0000000000000001 at monotonic time: 13449459 msec
-          [1635925713.973006][9695:9700] CHIP:DMG: ICR moving to [CommandSen]
-          [1635925713.973061][9695:9700] CHIP:CTL: Manual pairing code: [36217551633]
-          [1635925713.973120][9695:9700] CHIP:CTL: SetupQRCode: [MT:00000CQM00A7F87ZT10]
-          [1635925713.973178][9695:9700] CHIP:EM: Sending Standalone Ack for MessageCounter:1964916542 on exchange 31055i
-      disabled: true
-
-    - label: "THn starts a commissioning process with TH_CE"
-      verification: |
-          On nth controller using chip tool connect to the accessory
-
-
-          ./chip-tool pairing code 1 36217551633
-
-          Verify you got below message
-          Device commissioning completed with success
-      disabled: true
+    - label: "TH_CR1 opens a commissioning window on DUT_CE"
+      cluster: "AdministratorCommissioning"
+      command: "OpenBasicCommissioningWindow"
+      PICS: CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 179
+      response:
+          error: INVALID_COMMAND
 
     - label:
-          "Repeat Step 3 an additional (SupportedFabrics - 2) times to reach an
-          index value of SupportedFabrics on TH_CE"
-      PICS: CADMIN.S.C00.Rsp
-      verification: |
-          Repeat Step 3 an additional (SupportedFabrics - 2) times to reach an index value of SupportedFabrics on TH_CE
-      disabled: true
-
-    - label: "THn starts a commissioning process with TH_CE"
-      verification: |
-          On nth controller using chip tool connect to the accessory
-
-
-          ./chip-tool pairing code 1 36217551633
-
-          CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
-          [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC
-          [1649756670.402221][10794:10799] CHIP:CTL: Add NOC failed with error ../../third_party/connectedhomeip/src/controller/CHIPDeviceController.cpp:1110: CHIP Error 0x0000000B: No memory
-          [1649756670.402241][10794:10799] CHIP:CTL: Failed to perform commissioning step 12
-      disabled: true
-
-    - label: "DUT_CR1 sends command to TH_CE to remove FabricIndex1"
-      PICS: OPCREDS.C.C0a.Tx
-      verification: |
-          on your DUT controller, remove fabric with FabricIndex=1
-
-          Below is the example when using chip tool as controller
-
-          ./chip-tool operationalcredentials remove-fabric 1 1 0
-      disabled: true
+          "TH_CR1 reads the window status to verify the DUT_CE window is closed"
+      cluster: "AdministratorCommissioning"
+      command: "readAttribute"
+      attribute: "WindowStatus"
+      PICS: CADMIN.S.A0000
+      response:
+          value: 0

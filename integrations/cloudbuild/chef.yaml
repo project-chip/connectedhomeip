@@ -54,4 +54,4 @@ artifacts:
 # slow.
 options:
     machineType: "E2_HIGHCPU_32"
-    diskSizeGb: 200
+    diskSizeGb: 500

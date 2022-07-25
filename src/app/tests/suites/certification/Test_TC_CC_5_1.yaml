@@ -84,7 +84,7 @@ tests:
                 value: 1500
 
     - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0003
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -95,7 +95,7 @@ tests:
               maxValue: 65279
 
     - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0004
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:

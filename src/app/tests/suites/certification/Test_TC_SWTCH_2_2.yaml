@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 73.2.2. [TC-SWTCH-2.2] Primary functionality with server as DUT
+name: 74.2.2. [TC-SWTCH-2.2] Primary functionality with server as DUT
 
 config:
     nodeId: 0x12344321
@@ -31,7 +31,7 @@ tests:
       verification: |
           ./chip-tool switch subscribe-event switch-latched 1 100 1 1
 
-          Verify in TH Log:
+          Verify inTH Log:
 
           [1646209067.917157][2496:2501] CHIP:DMG: SubscribeResponseMessage =
           [1646209067.917184][2496:2501] CHIP:DMG: {
@@ -53,7 +53,7 @@ tests:
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify in TH Log:
+          Verify inTH Log:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
@@ -70,6 +70,9 @@ tests:
       PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch read current-position 1 1
+
+          Verify inTH Log:
+
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 1
       disabled: true
@@ -81,7 +84,7 @@ tests:
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify in TH Log:
+          Verify inTH Log:
 
           Event (content will vary on the device)
           [1646209167.923346][2190:2190] CHIP:DMG: StatusResponseMessage =
@@ -98,7 +101,7 @@ tests:
           Read CurrentPosition attribute"
       PICS: SWTCH.S.F00
       verification: |
-          2
+
       disabled: true
 
     - label: "Operator returns switch to first position"
@@ -111,8 +114,7 @@ tests:
       PICS: SWTCH.S.F00
       verification: |
           ./chip-tool switch read current-position 1 1
-
-          Verify in TH Log:
+          Verify inTH Log:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
@@ -122,8 +124,7 @@ tests:
       PICS: SWTCH.S.F01
       verification: |
           ./chip-tool switch subscribe-event initial-press 1 100 1 1
-
-          Verify in TH Log:
+          Verify inTH Log:
 
           [1646209546.313236][2641:2646] CHIP:DMG: SubscribeResponseMessage =
           [1646209546.313263][2641:2646] CHIP:DMG: {
@@ -146,7 +147,7 @@ tests:
       verification: |
           ./chip-tool switch read current-position 1 1
 
-          Verify in TH Log:
+          Verify inTH Log:
 
           [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
           [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
@@ -162,6 +163,10 @@ tests:
       PICS: SWTCH.S.F01
       verification: |
           ./chip-tool switch read current-position 1 1
+
+          Verify inTH Log:
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 1
       disabled: true
 
     - label: "Operator does not operate switch (release switch)"
@@ -173,15 +178,19 @@ tests:
     - label: "Read CurrentPosition attribute"
       PICS: SWTCH.S.F01
       verification: |
-          Read attrbute
+          ./chip-tool switch read current-position 1 1
+
+          Verify inTH Log:
+          [1646209289.746157][2617:2622] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0001DataVersion: 1206711661
+          [1646209289.746228][2617:2622] CHIP:TOO:   current position: 0
       disabled: true
 
     - label: "Set up subscription to InitialPress and ShortRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 1
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1 1
+          ./chip-tool switch subscribe-event short-release 1 100 1 1
       disabled: true
 
     - label: "Operator does not operate switch"
@@ -220,11 +229,11 @@ tests:
           LongRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
+          Verify inTH Log:
+
           ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
           ./chip-tool switch subscribe-event short-release 1 100 1 1
-
-          Verify in TH Log:
 
           [1655272080.983330][2922:2927] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0003
           [1655272080.983357][2922:2927] CHIP:TOO:          Event number: 2
@@ -381,13 +390,13 @@ tests:
           MultiPressComplete events"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          ./chip-tool switch subscribe-event initial-press 1 100 1 1 1
+          ./chip-tool switch subscribe-event initial-press 1 100 1 1
 
-          ./chip-tool switch subscribe-event short-release 1 100 1 1 1
+          ./chip-tool switch subscribe-event short-release 1 100 1 1
 
-          ./chip-tool switch subscribe-event multi-press-ongoing 1 100 1 1 1
+          ./chip-tool switch subscribe-event multi-press-ongoing 1 100 1 1
 
-          ./chip-tool switch subscribe-event multi-press-complete 1 100 1 1 1
+          ./chip-tool switch subscribe-event multi-press-complete 1 100 1 1
       disabled: true
 
     - label: "Operator does not operate switch"
@@ -432,7 +441,8 @@ tests:
           receive 2 events
       disabled: true
 
-    - label: "If MultiPressMax == 2, skip steps 6j .. 6o"
+    - label:
+          "If MultiPressMax == 2 (see 2c of TC-SWTCH-2.1), skip steps 6j .. 6o"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           no Matter messages for this step

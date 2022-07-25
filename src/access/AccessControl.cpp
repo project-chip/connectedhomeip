@@ -19,7 +19,7 @@
 // Included for the default AccessControlDelegate logging enables/disables.
 // See `chip_access_control_policy_logging_verbosity` in `src/app/BUILD.gn` for
 // the levels available.
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 
 #include "AccessControl.h"
 

@@ -27,6 +27,9 @@ tests:
           "DUT sends Subscribe Request Message to the TH for a supported event."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
           basic subscribe-event start-up 10 100 1 0
 
           On TH (On the reference app), On reference app verify that  the subscription message received has the all fields which mentioned in expected outcome
@@ -57,6 +60,49 @@ tests:
           [1657455555.195593][11525:11525] CHIP:DMG: Final negotiated min/max parameters: Min = 10s, Max = 100s
           [1657455555.195766][11525:11525] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1657455555.195955][11525:11525] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
+          On DUT as a client side, verify that TH all-clusters-app sent  ReportDataMessage
+
+          [1657886501.456822][3430:3435] CHIP:DMG: ReportDataMessage =
+          [1657886501.456851][3430:3435] CHIP:DMG: {
+          [1657886501.456886][3430:3435] CHIP:DMG:         SubscriptionId = 0xb746e9ed,
+          [1657886501.456911][3430:3435] CHIP:DMG:         EventReportIBs =
+          [1657886501.456944][3430:3435] CHIP:DMG:         [
+          [1657886501.456979][3430:3435] CHIP:DMG:                 EventReportIB =
+          [1657886501.457015][3430:3435] CHIP:DMG:                 {
+          [1657886501.457049][3430:3435] CHIP:DMG:                         EventDataIB =
+          [1657886501.457091][3430:3435] CHIP:DMG:                         {
+          [1657886501.457118][3430:3435] CHIP:DMG:                                 EventPath =
+          [1657886501.457162][3430:3435] CHIP:DMG:                                 {
+          [1657886501.457199][3430:3435] CHIP:DMG:                                         Endpoint = 0x0,
+          [1657886501.457245][3430:3435] CHIP:DMG:                                         Cluster = 0x28,
+          [1657886501.457288][3430:3435] CHIP:DMG:                                         Event = 0x0,
+          [1657886501.457329][3430:3435] CHIP:DMG:                                 },
+          [1657886501.457365][3430:3435] CHIP:DMG:
+          [1657886501.457404][3430:3435] CHIP:DMG:                                 EventNumber = 0x0,
+          [1657886501.457437][3430:3435] CHIP:DMG:                                 PriorityLevel = 0x2,
+          [1657886501.457479][3430:3435] CHIP:DMG:                                 SystemTimestamp = 0xa1de6f,
+          [1657886501.457519][3430:3435] CHIP:DMG:                                 EventData =
+          [1657886501.457584][3430:3435] CHIP:DMG:                                 {
+          [1657886501.457632][3430:3435] CHIP:DMG:                                         0x0 = 1,
+          [1657886501.457666][3430:3435] CHIP:DMG:                                 },
+          [1657886501.457696][3430:3435] CHIP:DMG:                         },
+          [1657886501.457738][3430:3435] CHIP:DMG:
+          [1657886501.457766][3430:3435] CHIP:DMG:                 },
+          [1657886501.457806][3430:3435] CHIP:DMG:
+          [1657886501.457830][3430:3435] CHIP:DMG:         ],
+          [1657886501.457873][3430:3435] CHIP:DMG:
+          [1657886501.457897][3430:3435] CHIP:DMG:         InteractionModelRevision = 1
+          [1657886501.457929][3430:3435] CHIP:DMG: }
+          [1657886501.458091][3430:3435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1657886501.458116][3430:3435] CHIP:TOO:          Event number: 0
+          [1657886501.458139][3430:3435] CHIP:TOO:          Priority: Critical
+          [1657886501.458160][3430:3435] CHIP:TOO:          Timestamp: 10608239
+          [1657886501.458237][3430:3435] CHIP:TOO:   StartUp: {
+          [1657886501.458284][3430:3435] CHIP:TOO:     SoftwareVersion: 1
+          [1657886501.458309][3430:3435] CHIP:TOO:    }
+          [1657886501.458358][3430:3435] CHIP:DMG: MoveToState ReadClient[0xffff6c0091f0]: Moving to [AwaitingSu]
+          [1657886501.458420][3430:3435] CHIP:EM: Piggybacking Ack for MessageCounter:245754654 on exchange: 20326i
       disabled: true
 
     - label:
@@ -64,6 +110,8 @@ tests:
           message to DUT."
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
+
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
 
           basic subscribe-event-by-id 0x000 20 400 1 0
           Verify DUT is responsds with  status response  for the data sent in the above command
@@ -77,6 +125,32 @@ tests:
           [1657455691.695574][11525:11525] CHIP:DMG: }
           [1657455691.695600][11525:11525] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
           [1657455691.695643][11525:11525] CHIP:DMG: Refresh Subscribe Sync Timer with max 400 seconds
+
+          On DUT as a client side, verify that TH all-clusters-app sent  ReportDataMessage
+
+          [1657886532.588762][3430:3435] CHIP:DMG: }
+          [1657886532.588882][3430:3435] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0000
+          [1657886532.588908][3430:3435] CHIP:TOO:          Event number: 0
+          [1657886532.588930][3430:3435] CHIP:TOO:          Priority: Critical
+          [1657886532.588952][3430:3435] CHIP:TOO:          Timestamp: 10608239
+          [1657886532.588986][3430:3435] CHIP:TOO:   StartUp: {
+          [1657886532.589013][3430:3435] CHIP:TOO:     SoftwareVersion: 1
+          [1657886532.589036][3430:3435] CHIP:TOO:    }
+          [1657886532.589085][3430:3435] CHIP:DMG: MoveToState ReadClient[0xffff6c0092e0]: Moving to [AwaitingSu]
+          [1657886532.589143][3430:3435] CHIP:EM: Piggybacking Ack for MessageCounter:245754656 on exchange: 20327i
+          [1657886532.589207][3430:3435] CHIP:IN: Prepared secure message 0xaaab13395548 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 20327i with MessageCounter:216322285.
+          [1657886532.589245][3430:3435] CHIP:IN: Sending encrypted msg 0xaaab13395548 with MessageCounter:216322285 to 0x0000000000000001 (1) at monotonic time: 00000000008CF0C5 msec
+          [1657886532.590633][3430:3435] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:245754657 on exchange 20327i
+          [1657886532.590669][3430:3435] CHIP:EM: Found matching exchange: 20327i, Delegate: 0xffff6c0092e0
+          [1657886532.590700][3430:3435] CHIP:EM: Rxd Ack; Removing MessageCounter:216322285 from Retrans Table on exchange 20327i
+          [1657886532.590726][3430:3435] CHIP:EM: Removed CHIP MessageCounter:216322285 from RetransTable on exchange 20327i
+          [1657886532.590772][3430:3435] CHIP:DMG: SubscribeResponseMessage =
+          [1657886532.590811][3430:3435] CHIP:DMG: {
+          [1657886532.590836][3430:3435] CHIP:DMG:         SubscriptionId = 0x84d07a37,
+          [1657886532.590862][3430:3435] CHIP:DMG:         MaxInterval = 0x190,
+          [1657886532.590887][3430:3435] CHIP:DMG:         InteractionModelRevision = 1
+          [1657886532.590910][3430:3435] CHIP:DMG: }
+          [1657886532.590935][3430:3435] CHIP:DMG: Subscription established with SubscriptionID = 0x84d07a37 MinInterval = 20s MaxInterval = 400s Peer = 01:0000000000000001
       disabled: true
 
     - label:
@@ -84,6 +158,7 @@ tests:
           with Report Data message to DUT."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
       disabled: true
 
     - label:
@@ -92,6 +167,7 @@ tests:
           not respond with Subscribe Response message to DUT."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
       disabled: true
 
     - label:
@@ -99,6 +175,7 @@ tests:
           Data message to DUT with an inactive SubscriptionId."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
       disabled: true
 
     - label:
@@ -107,4 +184,5 @@ tests:
           Data."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
       disabled: true

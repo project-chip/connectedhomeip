@@ -14,7 +14,7 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    109.2.1. [TC-LTIME-2.1] Read and Write Time Format Localization Cluster
+    110.2.1. [TC-LTIME-2.1] Read and Write Time Format Localization Cluster
     Attributes [DUT as Client]
 
 config:
@@ -26,9 +26,8 @@ tests:
     - label: "DUT reads HourFormat attribute from TH"
       PICS: LTIME.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify in DUT as client side: Verify that the HourFormat attribute value
 
           [1657106866.828694][4891:4896] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 2232855152
           [1657106866.828763][4891:4896] CHIP:TOO:   HourFormat: 0
@@ -37,9 +36,8 @@ tests:
     - label: "If (LTIME.C.A0000.12HR) DUT writes 0 to HourFormat attribute"
       PICS: LTIME.C.A0000.12HR
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write hour-format 0 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657106893.878113][4897:4902] CHIP:DMG: WriteResponseMessage =
           [1657106893.878138][4897:4902] CHIP:DMG: {
@@ -71,9 +69,8 @@ tests:
     - label: "DUT reads HourFormat attribute"
       PICS: LTIME.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify in DUT as client side: Verify that the HourFormat attribute value as 0
 
           [1657106866.828694][4891:4896] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 2232855152
           [1657106866.828763][4891:4896] CHIP:TOO:   HourFormat: 0
@@ -82,9 +79,8 @@ tests:
     - label: "If (LTIME.C.A0000.24HR) DUT writes 1 to HourFormat attribute"
       PICS: LTIME.C.A0000.24HR
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write hour-format 1 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657106989.102102][4907:4912] CHIP:DMG: WriteResponseMessage =
           [1657106989.102137][4907:4912] CHIP:DMG: {
@@ -116,9 +112,8 @@ tests:
     - label: "DUT reads HourFormat attribute"
       PICS: LTIME.C.A0000
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read hour-format 1 0
+          Verify in DUT as client side: Verify that  HourFormat attribute value as 1
           [1654605170.332304][7266:7271] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3185003975
           [1654605170.332388][7266:7271] CHIP:TOO:   HourFormat: 1
           [1654605170.332493][7266:7271] CHIP:EM: Sending Standalone Ack for MessageCounter:6045450 on exchange 44106i
@@ -127,9 +122,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute from DUT"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  the ActiveCalendarType attribute value
 
           [1657107039.005036][4917:4922] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855154
           [1657107039.005112][4917:4922] CHIP:TOO:   ActiveCalendarType: 0
@@ -138,9 +132,8 @@ tests:
     - label: "DUT reads SupportedCalendarTypes attribute from DUT"
       PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read supported-calendar-types 1 0
+          Verify in DUT as client side: Verify that  SupportedCalendarTypes attribute value
 
           [1657107056.982007][4924:4929] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0002 DataVersion: 2232855154
           [1657107056.982095][4924:4929] CHIP:TOO:   SupportedCalendarTypes: 12 entries
@@ -161,11 +154,10 @@ tests:
     - label:
           "If (0 in LTIME.C.A0002.SCT) DUT writes 0 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 0 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107074.760869][4932:4937] CHIP:DMG: WriteResponseMessage =
           [1657107074.760897][4932:4937] CHIP:DMG: {
@@ -197,9 +189,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that the  ActiveCalendarType attribute value as 0
 
           [1657107039.005036][4917:4922] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855154
           [1657107039.005112][4917:4922] CHIP:TOO:   ActiveCalendarType: 0
@@ -208,11 +199,10 @@ tests:
     - label:
           "If (1 in LTIME.C.A0002.SCT) DUT writes 1 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 1 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107238.274764][4949:4954] CHIP:DMG: WriteResponseMessage =
           [1657107238.274795][4949:4954] CHIP:DMG: {
@@ -244,9 +234,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that the  ActiveCalendarType attribute value as 1
 
           [1657107039.005036][4917:4922] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855154
           [1657107039.005112][4917:4922] CHIP:TOO:   ActiveCalendarType: 1
@@ -255,11 +244,10 @@ tests:
     - label:
           "If (2 in LTIME.C.A0002.SCT) DUT writes 2 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107378.279674][4960:4965] CHIP:DMG: WriteResponseMessage =
           [1657107378.279720][4960:4965] CHIP:DMG: {
@@ -291,9 +279,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that the  ActiveCalendarType attribute value as 2
 
           [1657107404.774339][4968:4973] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855157
           [1657107404.774453][4968:4973] CHIP:TOO:   ActiveCalendarType: 2
@@ -302,11 +289,10 @@ tests:
     - label:
           "If (3 in LTIME.C.A0002.SCT) DUT writes 3 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107432.589832][4975:4980] CHIP:DMG: WriteResponseMessage =
           [1657107432.589869][4975:4980] CHIP:DMG: {
@@ -338,9 +324,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  ActiveCalendarType attribute value as 3
 
           [1657107452.389424][4983:4988] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855158
           [1657107452.389490][4983:4988] CHIP:TOO:   ActiveCalendarType: 3
@@ -349,11 +334,10 @@ tests:
     - label:
           "If (4 in LTIME.C.A0002.SCT) DUT writes 4 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107472.754436][4990:4996] CHIP:DMG: WriteResponseMessage =
           [1657107472.754462][4990:4996] CHIP:DMG: {
@@ -385,9 +369,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  ActiveCalendarType attribute value as 4
 
           [1657107496.925134][4997:5002] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855159
           [1657107496.925199][4997:5002] CHIP:TOO:   ActiveCalendarType: 4
@@ -396,11 +379,10 @@ tests:
     - label:
           "If (5 in LTIME.C.A0002.SCT) DUT writes 5 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107518.977989][5005:5010] CHIP:DMG: WriteResponseMessage =
           [1657107518.978030][5005:5010] CHIP:DMG: {
@@ -432,9 +414,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  ActiveCalendarType attribute value as 5
 
           [1657107552.874504][5011:5016] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855160
           [1657107552.874572][5011:5016] CHIP:TOO:   ActiveCalendarType: 5
@@ -443,12 +424,10 @@ tests:
     - label:
           "If (6 in LTIME.C.A0002.SCT) DUT writes 6 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
-
           ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107711.004508][5030:5035] CHIP:DMG: WriteResponseMessage =
           [1657107711.004535][5030:5035] CHIP:DMG: {
@@ -480,9 +459,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that ActiveCalendarType attribute value as 6
 
           [1657107808.981214][5042:5047] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855162
           [1657107808.981291][5042:5047] CHIP:TOO:   ActiveCalendarType: 6
@@ -491,11 +469,10 @@ tests:
     - label:
           "If (7 in LTIME.C.A0002.SCT) DUT writes 7 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107845.528814][5048:5053] CHIP:DMG: WriteResponseMessage =
           [1657107845.528843][5048:5053] CHIP:DMG: {
@@ -527,9 +504,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  ActiveCalendarType attribute value as 7
 
           [1657107867.321473][5055:5060] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855163
           [1657107867.321550][5055:5060] CHIP:TOO:   ActiveCalendarType: 7
@@ -538,11 +514,10 @@ tests:
     - label:
           "If (8 in LTIME.C.A0002.SCT) DUT writes 8 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107895.609252][5062:5067] CHIP:DMG: WriteResponseMessage =
           [1657107895.609278][5062:5067] CHIP:DMG: {
@@ -574,9 +549,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  ActiveCalendarType attribute value as 8
 
           [1657107912.560322][5068:5073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855164
           [1657107912.560397][5068:5073] CHIP:TOO:   ActiveCalendarType: 8
@@ -585,11 +559,10 @@ tests:
     - label:
           "If (9 in LTIME.C.A0002.SCT) DUT writes 9 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 9 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107930.629239][5076:5081] CHIP:DMG: WriteResponseMessage =
           [1657107930.629265][5076:5081] CHIP:DMG: {
@@ -621,9 +594,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that the  ActiveCalendarType attribute value as 9
 
           [1657107951.056785][5082:5087] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855165
           [1657107951.056861][5082:5087] CHIP:TOO:   ActiveCalendarType: 9
@@ -632,11 +604,10 @@ tests:
     - label:
           "If (10 in LTIME.C.A0002.SCT) DUT writes 10 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 10 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657107969.768286][5090:5095] CHIP:DMG: WriteResponseMessage =
           [1657107969.768313][5090:5095] CHIP:DMG: {
@@ -668,9 +639,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that the  ActiveCalendarType attribute value as 10
 
           [1657107989.893985][5097:5102] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855166
           [1657107989.894063][5097:5102] CHIP:TOO:   ActiveCalendarType: 10
@@ -679,11 +649,10 @@ tests:
     - label:
           "If (11 in LTIME.C.A0002.SCT) DUT writes 11 to ActiveCalendarType
           attribute"
-      PICS: LTIME.C.A0002.SCT
+      PICS: LTIME.C.A0002
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
+          Verify in DUT as client side: verify that  TH sends a success response
 
           [1657108006.545369][5103:5108] CHIP:DMG: WriteResponseMessage =
           [1657108006.545394][5103:5108] CHIP:DMG: {
@@ -715,9 +684,8 @@ tests:
     - label: "DUT reads ActiveCalendarType attribute"
       PICS: LTIME.C.A0001
       verification: |
-          verify on Reference app receives the right response for the data sent in the below commands
-
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
+          Verify in DUT as client side: Verify that  ActiveCalendarType attribute value as 11
 
           [1657108026.518564][5111:5116] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0001 DataVersion: 2232855167
           [1657108026.518640][5111:5116] CHIP:TOO:   ActiveCalendarType: 11

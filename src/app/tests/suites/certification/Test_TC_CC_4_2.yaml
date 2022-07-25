@@ -72,7 +72,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -90,7 +90,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -108,7 +108,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -140,7 +140,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -158,7 +158,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -176,7 +176,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -210,7 +210,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -244,7 +244,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -263,7 +263,7 @@ tests:
                 value: 1000
 
     - label: "CurrentSaturation value Stops incrementing"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -294,7 +294,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -313,7 +313,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT several times."
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -347,7 +347,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
@@ -366,7 +366,7 @@ tests:
                 value: 1000
 
     - label: "CurrentSaturation value Stops decrementing"
-      PICS: CC.S.F00 && CC.S.A0001
+      PICS: CC.S.F00 && CC.S.A0001 && CC.S.C04.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

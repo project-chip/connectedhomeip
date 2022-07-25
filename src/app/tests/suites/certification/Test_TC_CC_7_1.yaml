@@ -57,7 +57,7 @@ tests:
                 value: 0
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -91,7 +91,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -109,7 +109,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -127,7 +127,7 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -162,7 +162,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -180,7 +180,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -198,7 +198,7 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -233,7 +233,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -251,7 +251,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -269,7 +269,7 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -304,7 +304,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -322,7 +322,7 @@ tests:
                 value: 5500
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
@@ -340,7 +340,7 @@ tests:
                 value: 20000
 
     - label: "TH reads EnhancedCurrentHue attribute from DUT periodically"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C40.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:

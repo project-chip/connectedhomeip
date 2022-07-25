@@ -101,7 +101,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -119,7 +119,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -137,7 +137,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -175,7 +175,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -193,7 +193,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
@@ -211,7 +211,7 @@ tests:
                 value: 500
 
     - label: "TH reads ColorTemperatureMireds attribute from DUT several times"
-      PICS: CC.S.F04 && CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4C.Rsp
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:

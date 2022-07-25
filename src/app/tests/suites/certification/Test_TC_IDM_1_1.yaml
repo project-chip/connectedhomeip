@@ -30,8 +30,8 @@ tests:
 
           ./chip-tool onoff on 1 1
 
-          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
-          Verify TH all-clusters-app Log
+          On TH all-clusters-app,  Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+
           [1655717373.046081][10909:10909] CHIP:DMG: InvokeRequestMessage =
           [1655717373.046137][10909:10909] CHIP:DMG: {
           [1655717373.046185][10909:10909] CHIP:DMG:         suppressResponse = false,
@@ -58,6 +58,13 @@ tests:
           [1655717373.047482][10909:10909] CHIP:DMG: },
           [1655717373.047599][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
           [1655717373.047665][10909:10909] CHIP:DMG: AccessControl: allowed
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          [1657867897.521090][2728:2733] CHIP:DMG: },
+          [1657867897.521162][2728:2733] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
+          [1657867897.521212][2728:2733] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657867897.521275][2728:2733] CHIP:EM: Sending Standalone Ack for MessageCounter:30068876 on exchange 7104i
       disabled: true
 
     - label:
@@ -86,10 +93,7 @@ tests:
           In case of chip tool, here is an example command to use
           ./chip-tool onoff off 1 1
 
-          Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
-
-          Verify TH all-clusters-app Log
-
+          On TH all-clusters-app, verify that we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
           [1655717456.105815][10909:10909] CHIP:DMG: InvokeRequestMessage =
           [1655717456.105853][10909:10909] CHIP:DMG: {
           [1655717456.105887][10909:10909] CHIP:DMG:         suppressResponse = false,
@@ -116,6 +120,16 @@ tests:
           [1655717456.106783][10909:10909] CHIP:DMG: },
           [1655717456.106904][10909:10909] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
           [1655717456.106954][10909:10909] CHIP:DMG: AccessControl: allowed
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657868210.442226][2746:2751] CHIP:DMG:
+          [1657868210.442265][2746:2751] CHIP:DMG:         InteractionModelRevision = 1
+          [1657868210.442306][2746:2751] CHIP:DMG: },
+          [1657868210.442398][2746:2751] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000 Status=0x0
+          [1657868210.442463][2746:2751] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657868210.442539][2746:2751] CHIP:EM: Sending Standalone Ack for MessageCounter:19470563 on exchange 18884i
+
 
 
           ./chip-tool onoff off 1 1

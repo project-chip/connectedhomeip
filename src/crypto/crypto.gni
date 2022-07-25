@@ -30,5 +30,5 @@ if (chip_crypto == "") {
 
 assert(
     chip_crypto == "mbedtls" || chip_crypto == "openssl" ||
-        chip_crypto == "boringssl",
-    "Please select a valid crypto implementation: mbedtls, openssl, boringssl")
+        chip_crypto == "tinycrypt" || chip_crypto == "boringssl",
+    "Please select a valid crypto implementation: mbedtls, openssl, tinycrypt, boringssl")

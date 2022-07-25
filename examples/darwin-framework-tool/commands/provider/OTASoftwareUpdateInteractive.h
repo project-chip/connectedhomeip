@@ -27,7 +27,7 @@ public:
         : CHIPCommandBridge(commandName)
     {
     }
-    void SetCandidatesFromFilePath(char * _Nonnull filePath);
+    CHIP_ERROR SetCandidatesFromFilePath(char * _Nonnull filePath);
     CHIP_ERROR SetUserConsentStatus(char * _Nonnull status);
     static constexpr size_t kFilepathBufLen = 256;
 

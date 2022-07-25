@@ -165,7 +165,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 

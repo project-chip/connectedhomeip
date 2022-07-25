@@ -71,9 +71,9 @@ tests:
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 100ms"
       cluster: "DelayCommands"
@@ -100,9 +100,9 @@ tests:
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 100 ms"
       cluster: "DelayCommands"
@@ -129,9 +129,9 @@ tests:
               - name: "transitionTime"
                 value: 100
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 11000ms"
       cluster: "DelayCommands"
@@ -169,9 +169,9 @@ tests:
               - name: "transitionTime"
                 value: 0xFFFF
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 1000ms"
       cluster: "DelayCommands"
