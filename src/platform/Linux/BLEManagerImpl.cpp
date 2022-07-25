@@ -712,7 +712,7 @@ void BLEManagerImpl::InitiateScan(intptr_t arg)
     sInstance.InitiateScan(static_cast<BleScanState>(arg));
 }
 
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator)
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
     mBLEScanConfig.mDiscriminator = connDiscriminator;
     mBLEScanConfig.mAppState      = appState;
@@ -768,7 +768,7 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 * device, const chip::Ble::Chi
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
-        if (info.GetDeviceDiscriminator() != mBLEScanConfig.mDiscriminator)
+        if (!mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(info.GetDeviceDiscriminator()))
         {
             return;
         }
