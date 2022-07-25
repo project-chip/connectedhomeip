@@ -99,7 +99,6 @@ typedef struct
     CommandId commandId;
     uint8_t moveToLevel;
     bool increasing;
-    bool useOnLevel;
     uint8_t onLevel;
     uint8_t minLevel;
     uint8_t maxLevel;
@@ -248,18 +247,6 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
             state->commandId == Commands::StepWithOnOff::Id)
         {
             setOnOffValue(endpoint, (currentLevel != state->minLevel));
-            if (currentLevel == state->minLevel && state->useOnLevel)
-            {
-                status = Attributes::CurrentLevel::Set(endpoint, state->onLevel);
-                if (status != EMBER_ZCL_STATUS_SUCCESS)
-                {
-                    emberAfLevelControlClusterPrintln("ERR: writing current level %x", status);
-                }
-                else
-                {
-                    updateCoupledColorTemp(endpoint);
-                }
-            }
         }
         else
         {
@@ -635,9 +622,6 @@ static EmberAfStatus moveToLevelHandler(EndpointId endpoint, CommandId commandId
     state->eventDurationMs = state->transitionTimeMs / actualStepSize;
     state->elapsedTimeMs   = 0;
 
-    // OnLevel is not used for Move commands.
-    state->useOnLevel = false;
-
     state->storedLevel = storedLevel;
 
     // The setup was successful, so mark the new state as active and return.
@@ -754,9 +738,6 @@ static void moveHandler(EndpointId endpoint, CommandId commandId, uint8_t moveMo
 
     state->transitionTimeMs = difference * state->eventDurationMs;
     state->elapsedTimeMs    = 0;
-
-    // OnLevel is not used for Move commands.
-    state->useOnLevel = false;
 
     // storedLevel is not used for Move commands.
     state->storedLevel = INVALID_STORED_LEVEL;
@@ -876,9 +857,6 @@ static void stepHandler(EndpointId endpoint, CommandId commandId, uint8_t stepMo
     state->eventDurationMs = state->transitionTimeMs / actualStepSize;
     state->elapsedTimeMs   = 0;
 
-    // OnLevel is not used for Step commands.
-    state->useOnLevel = false;
-
     // storedLevel is not used for Step commands
     state->storedLevel = INVALID_STORED_LEVEL;
 
@@ -924,6 +902,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     uint8_t temporaryCurrentLevelCache;
     uint16_t currentOnOffTransitionTime;
     EmberAfStatus status;
+    bool useOnLevel = false;
 
     EmberAfLevelControlState * state = getState(endpoint);
     if (state == nullptr)
@@ -942,14 +921,13 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         return;
     }
 
-    // Read the OnLevel attribute.
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
     if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id))
     {
         status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+            emberAfLevelControlClusterPrintln("ERR: reading on level %x", status);
             return;
         }
 
@@ -957,6 +935,10 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         {
             // OnLevel has undefined value; fall back to CurrentLevel.
             resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
+        }
+        else
+        {
+            useOnLevel = true;
         }
     }
     else
@@ -1007,12 +989,18 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         // ...else if newValue is OnOff::Commands::Off::Id...
         // "Move CurrentLevel to the minimum level allowed for the device over the
         // time period OnOffTransitionTime."
-        moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime, 0xFF,
-                           0xFF, temporaryCurrentLevelCache);
-
-        // "If OnLevel is not defined, set the CurrentLevel to the stored level."
-        // The emberAfLevelControlClusterServerTickCallback implementation handles
-        // this.
+        if (useOnLevel)
+        {
+            // If OnLevel is defined, don't revert to stored level.
+            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime,
+                               0xFF, 0xFF, INVALID_STORED_LEVEL);
+        }
+        else
+        {
+            // If OnLevel is not defined, set the CurrentLevel to the stored level.
+            moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime,
+                               0xFF, 0xFF, temporaryCurrentLevelCache);
+        }
     }
 }
 
