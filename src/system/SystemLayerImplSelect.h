@@ -90,6 +90,10 @@ protected:
         int mFD;
         SocketEvents mPendingIO;
         SocketWatchCallback mCallback;
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        dispatch_source_t mRdSource;
+        dispatch_source_t mWrSource;
+#endif
         intptr_t mCallbackData;
     };
     SocketWatch mSocketWatchPool[kSocketWatchMax];
