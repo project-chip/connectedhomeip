@@ -146,11 +146,12 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-          To  Setup the TH2 such that there is no accessing fabric, 1st we need to send below mentioned ACL command
-           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": null, "targets": [{"cluster": 0006 , "endpoint": 1 , "deviceType": null}]}]' 1 0
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
 
-          The cluster used in the below command is an example, User can use any supported chip cluster.
+
           any subscribe-by-id 0006 0 10 100 2 1
 
           verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
@@ -185,6 +186,10 @@ tests:
           [1657450420.474128][8713:8718] CHIP:DMG: }
           [1657450420.474229][8713:8718] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1657450420.474271][8713:8718] CHIP:DMG: MoveToState ReadClient[0xffffa4008e40]: Moving to [AwaitingSu]
+
+
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -193,13 +198,16 @@ tests:
           on a specific Endpoint for which it does not have access.
           AttributePath = [[ Endpoint = EndpointID ]]."
       verification: |
-          In case of chip tool, here is an example command to use
+          The cluster used in the below command is an example, User can use any supported chip cluster.
 
-           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 1, "authMode": 3, "subjects": null, "targets": [{"cluster": null , "endpoint": 1 , "deviceType": null}]}]' 1 0
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
 
-           sudo ./chip-tool thermostatuserinterfaceconfiguration subscribe temperature-display-mode 100 1000 1 1
+           accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
 
-          verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
+          thermostatuserinterfaceconfiguration subscribe temperature-display-mode 100 1000 1 1
+
+          on TH verify DUT is responsds with UNSUPPORTED_ACCESS  for the data sent in the above command
 
           [1654862486.785468][32309:32314] CHIP:DMG: ReportDataMessage =
           [1654862486.785508][32309:32314] CHIP:DMG: {
@@ -232,6 +240,9 @@ tests:
           [1654862486.786720][32309:32314] CHIP:DMG: }
           [1654862486.786862][32309:32314] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
           [1654862486.786918][32309:32314] CHIP:DMG: MoveToState ReadClient[0xffff840040e0]: Moving to
+
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -254,7 +265,7 @@ tests:
 
           onoff  subscribe start-up-on-off  50 800 1 1
 
-          On reference app verify subscription is activated between TH and DUT
+          On reference app verify that subscription is activated between TH and DUT
 
           [1657450742.453824][11635:11640] CHIP:EM: Removed CHIP MessageCounter:190733047 from RetransTable on exchange 33629i
           [1657450742.453885][11635:11640] CHIP:DMG: ReportDataMessage =

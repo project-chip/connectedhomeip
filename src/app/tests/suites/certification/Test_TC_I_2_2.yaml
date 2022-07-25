@@ -39,14 +39,14 @@ tests:
               - name: "IdentifyTime"
                 value: 60
 
-    - label: "TH reads immediately IdentifyTime attribute from DUT1"
+    - label: "TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "identify time"
       response:
           constraints:
-              minValue: 55
-              maxValue: 65
+              minValue: 51
+              maxValue: 69
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -62,8 +62,8 @@ tests:
       attribute: "identify time"
       response:
           constraints:
-              minValue: 45
-              maxValue: 55
+              minValue: 43
+              maxValue: 57
 
     - label:
           "TH sends IdentifyQuery command to DUT and Verify
@@ -73,7 +73,7 @@ tests:
           IdentifyQuery is not supported by Matter
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
       arguments:
           values:
               - name: "message"
@@ -91,7 +91,7 @@ tests:
               - name: "IdentifyTime"
                 value: 0
 
-    - label: "TH reads immediately IdentifyTime attribute from DUT2"
+    - label: "TH reads immediately IdentifyTime attribute from DUT"
       PICS: I.S.A0000
       command: "readAttribute"
       attribute: "identify time"
@@ -104,7 +104,7 @@ tests:
           IdentifyQuery is not supported by Matter
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && I.S.C01.Rsp && I.S.C00.Tx
       arguments:
           values:
               - name: "message"

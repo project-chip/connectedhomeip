@@ -58,6 +58,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "Commission from gamma"
       identity: "gamma"
@@ -90,6 +92,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "Commission from beta"
       identity: "beta"
@@ -121,6 +125,8 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "discriminator"
+                value: discriminator
 
     - label: "TH_CR1 opens a new commissioning window on DUT_CE"
       identity: "alpha"

@@ -51,7 +51,7 @@ tests:
                 value: "y"
 
     - label: "read the mandatory attribute: MeasuredValue"
-      PICS: FLW.S.A0000
+      PICS: FLW.S.A0000 && FLW.M.FlowChange
       command: "readAttribute"
       attribute: "MeasuredValue"
       response:

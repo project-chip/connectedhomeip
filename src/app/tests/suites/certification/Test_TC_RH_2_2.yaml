@@ -39,7 +39,7 @@ tests:
               maxValue: 9999
 
     - label: "Reads constraints of attribute: MaxMeasuredValue"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: RH.S.A0002
       command: "readAttribute"
       attribute: "max measured value"
       response:
@@ -73,7 +73,7 @@ tests:
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "measured value"
-      PICS: RH.S.A0000
+      PICS: RH.S.A0000 && RH.M.ManuallyControlled
       response:
           constraints:
               type: uint16

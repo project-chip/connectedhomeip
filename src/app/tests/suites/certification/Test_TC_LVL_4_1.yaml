@@ -97,7 +97,7 @@ tests:
           maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C01.Rsp
       arguments:
           values:
               - name: "message"
@@ -120,9 +120,9 @@ tests:
       response:
           value: MaxlevelValue
 
-    - label: "sends a MoveWithOnOff command"
+    - label: "sends a Move command"
       PICS: LVL.S.C05.Rsp
-      command: "MoveWithOnOff"
+      command: "Move"
       arguments:
           values:
               - name: "moveMode"
@@ -140,7 +140,7 @@ tests:
           minimum level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C05.Rsp
       arguments:
           values:
               - name: "message"
@@ -191,20 +191,20 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 100ms"
+    - label: "Wait 500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: 500
 
     - label:
           "Physically verify that the device moves at the rate recorded in step
           3a and completes moving to its maximum level"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C05.Rsp && LVL.S.A0014
       arguments:
           values:
               - name: "message"

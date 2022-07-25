@@ -58,7 +58,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "read the optional attribute: Tolerance"
+    - label: "Read the optional attribute: Tolerance"
       PICS: FLW.S.A0003
       command: "readAttribute"
       attribute: "Tolerance"

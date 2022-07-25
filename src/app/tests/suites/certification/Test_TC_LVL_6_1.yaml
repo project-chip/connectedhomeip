@@ -67,7 +67,7 @@ tests:
                 value: 1
 
     - label: "Reads CurrentLevel attribute from DUT"
-      PICS: LVL.S.A0000
+      PICS: LVL.S.A0000 && LVL.S.C04.Rsp
       command: "readAttribute"
       attribute: "current level"
       response:
@@ -111,7 +111,7 @@ tests:
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C03.Rsp
       arguments:
           values:
               - name: "message"
@@ -125,8 +125,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 22
-              maxValue: 28
+              minValue: 21
+              maxValue: 29
               notValue: CurrentLevelValue
 
     - label: "Sends a move up command to DUT"
@@ -151,8 +151,9 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Sends stop command to DUT"
-      command: "Stop"
+    - label: "Sends StopWithOnOff command to DUT"
+      PICS: LVL.S.C07.Rsp
+      command: "StopWithOnOff"
       arguments:
           values:
               - name: "optionMask"
@@ -163,7 +164,7 @@ tests:
     - label: "Physically verify that the device has stopped transitioning"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && LVL.S.C07.Rsp
       arguments:
           values:
               - name: "message"
@@ -177,8 +178,8 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              minValue: 45
-              maxValue: 55
+              minValue: 43
+              maxValue: 57
               notValue: CurrentLevelValue
 
     - label: "Precondition send Off Command"

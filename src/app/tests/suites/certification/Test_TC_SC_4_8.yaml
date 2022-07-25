@@ -30,9 +30,12 @@ tests:
 
           ./chip-tool pairing onnetwork 2 20202021
 
-          Assigned compressed fabric ID: 0xF3C001637A30CEEC
-          Assigned compressed fabric ID: 0xBE320A8460153487
-          Assigned compressed fabric ID: 0x8A124463B858624F
+
+          avahi-browse _matter._tcp -rt
+
+          Verify on the TH Log:
+
+          eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
 
     - label: "Commission TH2 to DUTs Fabric"
@@ -43,19 +46,26 @@ tests:
 
           ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
 
-          Assigned compressed fabric ID: 0xF3C001637A30CEEC
-          Assigned compressed fabric ID: 0xBE320A8460153487
-          Assigned compressed fabric ID: 0x8A124463B858624F
+
 
           Verify you got below message
           Device commissioning completed with success
+
+
+          avahi-browse _matter._tcp -rt
+
+          Verify on the TH Log:
+
+          +   eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
 
     - label: "Send RemoveFabric from DUT to TH1 and comission DUT to TH1 again"
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 1 0
 
-          Verify the below log on the DUT as client device
+          Verify in TH all-clusters-app log
+
+
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1651571274.154864][10562:10567] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -67,14 +77,18 @@ tests:
 
           ./chip-tool pairing ble-wifi 1 chipsetup4 matter123 20202021 3841
 
-          Assigned compressed fabric ID: 0xF3C001637A30CEEC
-          Assigned compressed fabric ID: 0xBE320A8460153487
-          Assigned compressed fabric ID: 0x8A124463B858624F
+          avahi-browse _matter._tcp -rt
+
+          Verify on the TH Log:
+
+          +   eth0 IPv6 8840D142C33AB653-0000000000000001             _matter._tcp         local
       disabled: true
 
     - label: "Send RemoveFabric from DUT to TH2 and comission DUT to TH2 again"
       verification: |
           ./chip-tool operationalcredentials remove-fabric 1 2 0
+
+          Verify in TH all-clusters-app log
 
           [1657628679275] [78509:912135] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1657628679275] [78509:912135] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
@@ -88,7 +102,9 @@ tests:
 
           ./chip-tool pairing onnetwork 2 20202021
 
-          Assigned compressed fabric ID: 0xF3C001637A30CEEC
-          Assigned compressed fabric ID: 0xBE320A8460153487
-          Assigned compressed fabric ID: 0x8A124463B858624F
+          avahi-browse _matter._tcp -rt
+
+          Verify on the TH Log:
+
+          +   eth0 IPv6 8840D142C33AB653-0000000000000002
       disabled: true

@@ -32,21 +32,21 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
               - name: "status"
                 value: 0
 
     - label: "Reads the CurrentState attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0000
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
     - label: "Sends a Play command to the DUT"
-      PICS: MEDIAPLAYBACK.S.C0000
+      PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
           values:
@@ -56,7 +56,7 @@ tests:
     - label: "Verify that the media state is playing"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C00.Rsp
       arguments:
           values:
               - name: "message"
@@ -65,7 +65,7 @@ tests:
                 value: "y"
 
     - label: "Reads the CurrentState attribute"
-      PICS: MEDIAPLAYBACK.S.A0000
+      PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C00.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
@@ -82,7 +82,7 @@ tests:
     - label: "Verify that the media is started over"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C03.Rsp
       arguments:
           values:
               - name: "message"
@@ -101,7 +101,7 @@ tests:
     - label: "Verify that the next media item in the queue has been loaded"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C05.Rsp
       arguments:
           values:
               - name: "message"
@@ -121,7 +121,7 @@ tests:
     - label: "Verify that the previous media item in the queue has been loaded"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C04.Rsp
       arguments:
           values:
               - name: "message"
@@ -146,7 +146,7 @@ tests:
     - label: "Verify that the media has skipped forward 10 seconds"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C08.Rsp
       arguments:
           values:
               - name: "message"
@@ -156,7 +156,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0003
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C08.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
@@ -177,7 +177,7 @@ tests:
     - label: "Verify that the media has skipped backward 10 seconds"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C09.Rsp
       arguments:
           values:
               - name: "message"
@@ -187,7 +187,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute from the DUT"
-      PICS: MEDIAPLAYBACK.S.A0003
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C09.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:

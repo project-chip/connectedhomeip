@@ -153,6 +153,7 @@ tests:
           constraints:
               type: list
               contains: [6]
+
     - label: "Read the optional command(FastForward) in AcceptedCommandList"
       PICS: MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
