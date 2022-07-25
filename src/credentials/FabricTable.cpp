@@ -907,6 +907,18 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
+    {
+        FabricTable::Delegate * delegate = mDelegateListRoot;
+        while (delegate)
+        {
+            // It is possible that delegate will remove itself from the list in FabricWillBeRemoved,
+            // so we grab the next delegate in the list now.
+            FabricTable::Delegate * nextDelegate = delegate->next;
+            delegate->FabricWillBeRemoved(*this, fabricIndex);
+            delegate = nextDelegate;
+        }
+    }
+
     FabricInfo * fabricInfo = GetMutableFabricByIndex(fabricIndex);
     if (fabricInfo == &mPendingFabric)
     {
