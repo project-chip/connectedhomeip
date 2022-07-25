@@ -134,8 +134,8 @@ static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & 
     ByteSpan nocSpan(TestCerts::sTestCert_Node02_01_Chip, TestCerts::sTestCert_Node02_01_Chip_Len);
 
     NL_TEST_ASSERT(inSuite,
-                   opKeys.SetLength(TestCerts::sTestCert_Node02_01_PublicKey_Len +
-                                             TestCerts::sTestCert_Node02_01_PrivateKey_Len) == CHIP_NO_ERROR);
+                   opKeys.SetLength(TestCerts::sTestCert_Node02_01_PublicKey_Len + TestCerts::sTestCert_Node02_01_PrivateKey_Len) ==
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gFabric2OpKey.Initialize(opKeys) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, fabricTable.AddNewPendingTrustedRootCert(rcacSpan) == CHIP_NO_ERROR);

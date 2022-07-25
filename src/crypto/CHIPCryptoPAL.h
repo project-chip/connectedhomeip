@@ -73,8 +73,8 @@ constexpr size_t kSpake2p_Max_PBKDF_Salt_Length  = 32;
 constexpr uint32_t kSpake2p_Min_PBKDF_Iterations = 1000;
 constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 
-constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
-constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+constexpr size_t kP256_PrivateKey_Length  = CHIP_CRYPTO_GROUP_SIZE_BYTES;
+constexpr size_t kP256_PublicKey_Length   = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 constexpr size_t kMax_SerializeKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
 constexpr size_t kMax_PlaintextKey_Length = kP256_PublicKey_Length + kP256_PrivateKey_Length;
 
