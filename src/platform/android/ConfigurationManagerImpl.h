@@ -83,5 +83,13 @@ private:
     jobject mConfigurationManagerObject = nullptr;
 };
 
+/**
+ * Returns the platform-specific implementation of the ConfigurationManager object.
+ *
+ * Applications can use this to gain access to features of the ConfigurationManager
+ * that are specific to the selected platform.
+ */
+ConfigurationManager & ConfigurationMgrImpl();
+
 } // namespace DeviceLayer
 } // namespace chip

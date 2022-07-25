@@ -496,5 +496,10 @@ void ConfigurationManagerImpl::RunConfigUnitTest(void)
 #endif // CHIP_DISABLE_PLATFORM_KVS
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

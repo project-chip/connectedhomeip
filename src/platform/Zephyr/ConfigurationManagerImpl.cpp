@@ -180,5 +180,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     PlatformMgr().Shutdown();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

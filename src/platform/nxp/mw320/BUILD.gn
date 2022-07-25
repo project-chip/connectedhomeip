@@ -25,6 +25,7 @@ if (chip_enable_openthread) {
 static_library("mw320") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",

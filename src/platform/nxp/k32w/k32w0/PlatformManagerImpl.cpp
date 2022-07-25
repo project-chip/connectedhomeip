@@ -130,8 +130,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
