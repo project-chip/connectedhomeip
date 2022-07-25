@@ -62,6 +62,7 @@ class RunContext:
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
     chip_tool: str
+    dry_run: bool
 
 
 @click.group(chain=True)
@@ -70,6 +71,11 @@ class RunContext:
     default='info',
     type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
     help='Determines the verbosity of script output.')
+@click.option(
+    '--dry-run',
+    default=False,
+    is_flag=True,
+    help='Only print out shell commands that would be executed')
 @click.option(
     '--target',
     default=['all'],
@@ -106,7 +112,7 @@ class RunContext:
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
-def main(context, log_level, target, target_glob, target_skip_glob,
+def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
          no_log_timestamps, root, internal_inside_unshare, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
@@ -151,7 +157,7 @@ def main(context, log_level, target, target_glob, target_skip_glob,
 
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
-                             chip_tool=chip_tool)
+                             chip_tool=chip_tool, dry_run=dry_run)
 
 
 @main.command(
@@ -245,7 +251,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         for test in context.obj.tests:
             test_start = time.monotonic()
             try:
-                test.Run(runner, apps_register, paths, pics_file, test_timeout_seconds)
+                if context.obj.dry_run:
+                    logging.info("Would run test %s:" % test.name)
+
+                test.Run(runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run)
                 test_end = time.monotonic()
                 logging.info('%-20s - Completed in %0.2f seconds' %
                              (test.name, (test_end - test_start)))
