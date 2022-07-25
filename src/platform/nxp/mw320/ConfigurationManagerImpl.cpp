@@ -48,11 +48,6 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-ConfigurationManager & ConfigurationMgr()
-{
-    return ConfigurationManagerImpl::GetDefaultInstance();
-}
-
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
@@ -198,6 +193,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     //__NVIC_SystemReset(void);
+}
+
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
 }
 
 } // namespace DeviceLayer
