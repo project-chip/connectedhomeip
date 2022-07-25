@@ -251,9 +251,7 @@ list(
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
-    -DCHIP_SUPPORT_ENABLE_STORAGE_API_AUDIT
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
-    -DMATTER_ALL_CLUSTERS_APP=1
 )
 
 if (matter_enable_persistentstorage_audit)
