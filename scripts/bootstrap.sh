@@ -48,7 +48,7 @@ _bootstrap_or_activate() {
 
     _chip_bootstrap_banner() {
         if [ -z "$PW_ENVSETUP_QUIET" ] && [ -z "$PW_ENVSETUP_NO_BANNER" ]; then
-            cat $PW_BRANDING_BANNER
+            cat "$PW_BRANDING_BANNER"
             echo
         fi
     }
