@@ -21,9 +21,9 @@
 
 #include <psa/crypto.h>
 
+#include "Efr32OpaqueKeypair.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/EFR32/EFR32Config.h>
-#include "Efr32OpaqueKeypair.h"
 
 #ifndef SL_MATTER_MAX_STORED_OP_KEYS
 #define SL_MATTER_MAX_STORED_OP_KEYS (kMaxValidFabricIndex - kMinValidFabricIndex + 1)
@@ -44,7 +44,7 @@ namespace Internal {
 class Efr32PsaOperationalKeystore : public chip::Crypto::OperationalKeystore
 {
 public:
-    Efr32PsaOperationalKeystore() {};
+    Efr32PsaOperationalKeystore(){};
     virtual ~Efr32PsaOperationalKeystore() override;
 
     // Non-copyable
@@ -81,10 +81,10 @@ protected:
 
     // This pending fabric index is `kUndefinedFabricIndex` if there isn't a
     // pending keypair override for a given fabric.
-    FabricIndex mPendingFabricIndex             = kUndefinedFabricIndex;
-    EFR32OpaqueP256Keypair * mPendingKeypair    = nullptr;
-    bool mIsPendingKeypairActive                = false;
-    bool mIsInitialized                         = false;
+    FabricIndex mPendingFabricIndex          = kUndefinedFabricIndex;
+    EFR32OpaqueP256Keypair * mPendingKeypair = nullptr;
+    bool mIsPendingKeypairActive             = false;
+    bool mIsInitialized                      = false;
 
 private:
     void ResetPendingKey()
@@ -94,9 +94,9 @@ private:
             mPendingKeypair->Delete();
             Platform::Delete(mPendingKeypair);
         }
-        mPendingKeypair           = nullptr;
-        mIsPendingKeypairActive   = false;
-        mPendingFabricIndex       = kUndefinedFabricIndex;
+        mPendingKeypair         = nullptr;
+        mIsPendingKeypairActive = false;
+        mPendingFabricIndex     = kUndefinedFabricIndex;
     }
 };
 

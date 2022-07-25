@@ -25,15 +25,15 @@ namespace DeviceLayer {
 namespace Internal {
 
 typedef uint16_t EFR32OpaqueKeyId;
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdUnknown = 0xFFFFU;      // Do not modify, will impact existing deployments
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdVolatile = 0xFFFEU;     // Do not modify, will impact existing deployments
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMin = 0x0U;   // Do not modify, will impact existing deployments
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMax = 0x1FFU; // Do not decrease, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdUnknown       = 0xFFFFU; // Do not modify, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdVolatile      = 0xFFFEU; // Do not modify, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMin = 0x0U;    // Do not modify, will impact existing deployments
+constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMax = 0x1FFU;  // Do not decrease, will impact existing deployments
 
 enum class EFR32OpaqueKeyUsages : uint8_t
 {
     ECDSA_P256_SHA256 = 0,
-    ECDH_P256 = 1,
+    ECDH_P256         = 1,
 };
 
 /**
@@ -85,7 +85,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetPublicKey(uint8_t* output, size_t output_size, size_t * output_length) const;
+    CHIP_ERROR GetPublicKey(uint8_t * output, size_t output_size, size_t * output_length) const;
 
     /**
      * @brief Get the key ID for this keypair
@@ -110,8 +110,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Sign(const uint8_t* msg, size_t msg_len,
-                    uint8_t* output, size_t output_size, size_t * output_length) const;
+    CHIP_ERROR Sign(const uint8_t * msg, size_t msg_len, uint8_t * output, size_t output_size, size_t * output_length) const;
 
     /**
      * @brief Use this keypair to derive a key using the raw ECDH algorithm
@@ -125,8 +124,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Derive(const uint8_t* their_key, size_t their_key_len,
-                      uint8_t* output, size_t output_size, size_t * output_length) const;
+    CHIP_ERROR Derive(const uint8_t * their_key, size_t their_key_len, uint8_t * output, size_t output_size,
+                      size_t * output_length) const;
 
     /**
      * @brief Delete the keypair from storage
@@ -136,11 +135,11 @@ public:
     CHIP_ERROR Delete();
 
 protected:
-    void * mContext = nullptr;
-    bool mHasKey = false;
-    bool mIsPersistent = false;
+    void * mContext      = nullptr;
+    bool mHasKey         = false;
+    bool mIsPersistent   = false;
     uint8_t * mPubkeyRef = nullptr;
-    size_t mPubkeySize = 0;
+    size_t mPubkeySize   = 0;
     size_t mPubkeyLength = 0;
 };
 
@@ -193,7 +192,8 @@ public:
      * in raw <r,s> point form (see SEC1).
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, chip::Crypto::P256ECDSASignature & out_signature) const override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length,
+                              chip::Crypto::P256ECDSASignature & out_signature) const override;
 
     /**
      * @brief A function to derive a shared secret using ECDH
@@ -208,7 +208,8 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key, chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
+    CHIP_ERROR ECDH_derive_secret(const chip::Crypto::P256PublicKey & remote_public_key,
+                                  chip::Crypto::P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/

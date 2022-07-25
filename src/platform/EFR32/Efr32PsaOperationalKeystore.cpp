@@ -23,9 +23,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
-#include "Efr32PsaOperationalKeystore.h"
-#include "Efr32OpaqueKeypair.h"
 #include "EFR32Config.h"
+#include "Efr32OpaqueKeypair.h"
+#include "Efr32PsaOperationalKeystore.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -74,7 +74,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
             return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
         }
 
-        uint8_t* temp_buf = (uint8_t*) MemoryCalloc(1, existingLen);
+        uint8_t * temp_buf = (uint8_t *) MemoryCalloc(1, existingLen);
         if (!temp_buf)
         {
             return CHIP_ERROR_NO_MEMORY;
@@ -231,7 +231,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
 
     // Set CSR and state
     size_t csrLength = outCertificateSigningRequest.size();
-    error = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
+    error            = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
     if (error != CHIP_NO_ERROR)
     {
         ResetPendingKey();
@@ -293,9 +293,9 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     // There's a good chance we'll need the key again soon
     mCachedKey->Load(id);
 
-    mPendingKeypair           = nullptr;
-    mIsPendingKeypairActive   = false;
-    mPendingFabricIndex       = kUndefinedFabricIndex;
+    mPendingKeypair         = nullptr;
+    mIsPendingKeypairActive = false;
+    mPendingFabricIndex     = kUndefinedFabricIndex;
 
     return CHIP_NO_ERROR;
 }
@@ -438,7 +438,7 @@ Crypto::P256Keypair * Efr32PsaOperationalKeystore::AllocateEphemeralKeypairForCA
 
 void Efr32PsaOperationalKeystore::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
-    Platform::Delete<EFR32OpaqueP256Keypair>((EFR32OpaqueP256Keypair *)keypair);
+    Platform::Delete<EFR32OpaqueP256Keypair>((EFR32OpaqueP256Keypair *) keypair);
 }
 
 } // namespace Internal
