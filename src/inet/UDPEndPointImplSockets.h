@@ -26,10 +26,6 @@
 #include <inet/EndPointStateSockets.h>
 #include <inet/UDPEndPoint.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
-
 namespace chip {
 namespace Inet {
 
@@ -64,10 +60,6 @@ private:
 
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 public:
