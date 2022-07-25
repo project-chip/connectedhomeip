@@ -26,12 +26,15 @@
 
 #include <cstdint>
 
+#if CHIP_HAVE_CONFIG_H
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
+#endif
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
 namespace chip {
 namespace Ble {

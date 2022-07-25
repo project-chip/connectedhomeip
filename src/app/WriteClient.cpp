@@ -23,7 +23,7 @@
  */
 
 #include "lib/core/CHIPError.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/TimedRequest.h>
 #include <app/WriteClient.h>
