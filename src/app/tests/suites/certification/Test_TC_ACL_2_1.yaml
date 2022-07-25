@@ -1,0 +1,84 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 129.2.1. [TC-ACL-2.1] Simple attributes
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "TH1 commissions DUT using admin node ID N1"
+      verification: |
+
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          SubjectsPerAccessControlEntry attribute"
+      PICS: ACL.S.A0002
+      verification: |
+          ./chip-tool accesscontrol read subjects-per-access-control-entry 1 0
+          On TH, verify DUT responds with value 4 or greater as  subjects-per-access-control-entry.
+          [1656409485.639551][2769:2774] CHIP:DMG:        ],
+          [1656409485.639582][2769:2774] CHIP:DMG:
+          [1656409485.639608][2769:2774] CHIP:DMG:        SuppressResponse = true,
+          [1656409485.639635][2769:2774] CHIP:DMG:        InteractionModelRevision = 1
+          [1656409485.639659][2769:2774] CHIP:DMG: }
+          [1656409485.639821][2769:2774] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0002 DataVersion: 317167335
+          [1656409485.639880][2769:2774] CHIP:TOO:   SubjectsPerAccessControlEntry: 4
+          [1656409485.639957][2769:2774] CHIP:EM: Sending Standalone Ack for MessageCounter:137518483 on exchange 39758i
+          [1656409485.640080][2769:2774] CHIP:IN: Prepared secure message 0xffffaf7ed958 to 0x0000000000000001 (1)  of type 0x10 and prot
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          TargetsPerAccessControlEntry attribute"
+      PICS: ACL.S.A0003
+      verification: |
+          ./chip-tool accesscontrol read targets-per-access-control-entry 1 0
+          On TH, verify DUT responds with value 3  or greater as  Targets-per-access-control-entry.
+
+          [1656409746.779627][2799:2804] CHIP:DMG:                },
+          [1656409746.779672][2799:2804] CHIP:DMG:
+          [1656409746.779707][2799:2804] CHIP:DMG:        ],
+          [1656409746.779751][2799:2804] CHIP:DMG:
+          [1656409746.779788][2799:2804] CHIP:DMG:        SuppressResponse = true,
+          [1656409746.779826][2799:2804] CHIP:DMG:        InteractionModelRevision = 1
+          [1656409746.779861][2799:2804] CHIP:DMG: }
+          [1656409746.780073][2799:2804] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0003 DataVersion: 262648338
+          [1656409746.780156][2799:2804] CHIP:TOO:   TargetsPerAccessControlEntry: 3
+          [1656409746.780257][2799:2804] CHIP:EM: Sending Standalone Ack for MessageCounter:133466432 on exchange 34792i
+      disabled: true
+
+    - label:
+          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          AccessControlEntriesPerFabric attribute"
+      PICS: ACL.S.A0004
+      verification: |
+          ./chip-tool accesscontrol read  access-control-entries-per-fabric 1 0
+          On TH, verify DUT responds with value 3  or greater as AccessControlEntriesPerFabric.
+
+          [1656409955.865361][2822:2827] CHIP:DMG:
+          [1656409955.865393][2822:2827] CHIP:DMG:        ],
+          [1656409955.865431][2822:2827] CHIP:DMG:
+          [1656409955.865456][2822:2827] CHIP:DMG:        SuppressResponse = true,
+          [1656409955.865481][2822:2827] CHIP:DMG:        InteractionModelRevision = 1
+          [1656409955.865504][2822:2827] CHIP:DMG: }
+          [1656409955.865632][2822:2827] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0004 DataVersion: 317167335
+          [1656409955.865691][2822:2827] CHIP:TOO:   AccessControlEntriesPerFabric: 3
+          [1656409955.865765][2822:2827] CHIP:EM: Sending Standalone Ack for MessageCounter:204634557 on exchange 23676i
+      disabled: true

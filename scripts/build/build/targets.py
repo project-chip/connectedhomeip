@@ -22,10 +22,11 @@ from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
-from builders.host import HostApp, HostBoard, HostBuilder
+from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
+from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
@@ -113,6 +114,17 @@ class AcceptNameWithSubstrings:
             if s in name:
                 return True
         return False
+
+
+class RejectNameWithSubstrings:
+    def __init__(self, substr: List[str]):
+        self.substr = substr
+
+    def Accept(self, name: str):
+        for s in self.substr:
+            if s in name:
+                return False
+        return True
 
 
 class BuildVariant:
@@ -225,7 +237,7 @@ def HostTargets():
     # x64 linux  supports cross compile
     cross_compile = (HostBoard.NATIVE.PlatformName() == 'linux') and (HostBoard.NATIVE.BoardName() != HostBoard.ARM64.BoardName())
     if cross_compile:
-        targets.append(target.Extend('arm64', board=HostBoard.ARM64))
+        targets.append(target.Extend('arm64-clang', board=HostBoard.ARM64, use_clang=True))
 
     app_targets = []
 
@@ -277,11 +289,19 @@ def HostTargets():
     builder.AppendVariant(name="no-ble", enable_ble=False),
     builder.AppendVariant(name="no-wifi", enable_wifi=False),
     builder.AppendVariant(name="no-thread", enable_thread=False),
+    builder.AppendVariant(name="mbedtls", conflicts=['boringssl'], crypto_library=HostCryptoLibrary.MBEDTLS),
+    builder.AppendVariant(name="boringssl", conflicts=['mbedtls'], crypto_library=HostCryptoLibrary.BORINGSSL),
     builder.AppendVariant(name="tsan", conflicts=['asan'], use_tsan=True),
     builder.AppendVariant(name="asan", conflicts=['tsan'], use_asan=True),
     builder.AppendVariant(name="libfuzzer", requires=[
                           "clang"], use_libfuzzer=True),
-    builder.AppendVariant(name="clang", use_clang=True),
+    if cross_compile:
+        builder.AppendVariant(name="clang", use_clang=True, validator=RejectNameWithSubstrings(
+            ['arm64']
+        )),
+    else:
+        builder.AppendVariant(name="clang", use_clang=True)
+
     builder.AppendVariant(name="test", extra_tests=True),
 
     builder.WhitelistVariantNameForGlob('ipv6only')
@@ -296,6 +316,10 @@ def HostTargets():
     for target in builder.AllVariants():
         yield target
 
+    # limited subset for coverage
+    yield target_native.Extend('all-clusters-coverage', app=HostApp.ALL_CLUSTERS, use_coverage=True)
+    yield target_native.Extend('chip-tool-coverage', app=HostApp.CHIP_TOOL, use_coverage=True)
+
     # Without extra build variants
     yield target_native.Extend('chip-cert', app=HostApp.CERT_TOOL)
     yield target_native.Extend('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE)
@@ -306,9 +330,13 @@ def HostTargets():
     yield target_native.Extend('address-resolve-tool-platform-mdns-ipv6only', app=HostApp.ADDRESS_RESOLVE,
                                use_platform_mdns=True, enable_ipv4=False).GlobBlacklist("Reduce default build variants")
 
+    yield target_native.Extend('tests', app=HostApp.TESTS)
+    yield target_native.Extend('tests-mbedtls', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.MBEDTLS).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-boringssl', app=HostApp.TESTS, crypto_library=HostCryptoLibrary.BORINGSSL).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-coverage', app=HostApp.TESTS, use_coverage=True).GlobBlacklist("Non-default test")
+    yield target_native.Extend('tests-clang', app=HostApp.TESTS, use_clang=True).GlobBlacklist("Non-default test")
+
     test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
-    yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests', board=HostBoard.NATIVE, app=HostApp.TESTS)
-    yield test_target.Extend(HostBoard.NATIVE.BoardName() + '-tests-clang', board=HostBoard.NATIVE, app=HostApp.TESTS, use_clang=True)
     yield test_target.Extend(HostBoard.FAKE.BoardName() + '-tests', board=HostBoard.FAKE, app=HostApp.TESTS)
 
 
@@ -453,8 +481,8 @@ def AndroidTargets():
     yield target.Extend('arm-tv-server', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
     yield target.Extend('x86-tv-server', board=AndroidBoard.X86, app=AndroidApp.TV_SERVER)
     yield target.Extend('x64-tv-server', board=AndroidBoard.X64, app=AndroidApp.TV_SERVER)
-    yield target.Extend('arm64-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.TV_SERVER)
-    yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_SERVER)
+    yield target.Extend('arm64-tv-casting-app', board=AndroidBoard.ARM64, app=AndroidApp.TV_CASTING_APP)
+    yield target.Extend('arm-tv-casting-app', board=AndroidBoard.ARM, app=AndroidApp.TV_CASTING_APP)
 
 
 def MbedTargets():
@@ -508,7 +536,7 @@ def K32WTargets():
     target = Target('k32w', K32WBuilder)
 
     yield target.Extend('light-ota-se', app=K32WApp.LIGHT, release=True, disable_ble=True, se05x=True).GlobBlacklist("Only on demand build")
-    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True)
+    yield target.Extend('light-release-no-ota', app=K32WApp.LIGHT, tokenizer=True, disable_ota=True, release=True, tinycrypt=True)
     yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
     yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK,
@@ -591,6 +619,12 @@ def IMXTargets():
     yield target.Extend('ota-provider-app-release', app=IMXApp.OTA_PROVIDER, release=True)
 
 
+def MW320Targets():
+    target = Target('mw320', MW320Builder)
+
+    yield target.Extend('all-clusters-app', app=MW320App.ALL_CLUSTERS)
+
+
 ALL = []
 
 target_generators = [
@@ -609,6 +643,7 @@ target_generators = [
     TizenTargets(),
     Bl602Targets(),
     IMXTargets(),
+    MW320Targets(),
 ]
 
 for generator in target_generators:

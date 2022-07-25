@@ -1,1 +1,1 @@
-0.5.85 Version bump reason: remove two Yocto SDKs to decrease the imx docker image size
+0.5.90 Version bump reason: [Ameba] Add light-switch-app build option and enable matter_shell macro

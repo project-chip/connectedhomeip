@@ -30,6 +30,11 @@ import chip.interaction_model
 import inspect
 import sys
 import builtins
+import logging
+
+
+logger = logging.getLogger('chip.cluster.Command')
+logger.setLevel(logging.ERROR)
 
 
 @dataclass
@@ -94,7 +99,7 @@ class AsyncCommandTransaction:
         self._event_loop.call_soon_threadsafe(
             self._handleResponse, path, status, response)
 
-    def _handleError(self, imError: int, chipError: int, exception: Exception):
+    def _handleError(self, imError: Status, chipError: int, exception: Exception):
         if exception:
             self._future.set_exception(exception)
         elif chipError != 0:
@@ -103,8 +108,9 @@ class AsyncCommandTransaction:
         else:
             try:
                 self._future.set_exception(
-                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(status.IMStatus)))
-            except:
+                    chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus)))
+            except Exception as e2:
+                logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
 
@@ -139,13 +145,18 @@ def _OnCommandSenderDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None) -> int:
+def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> int:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
             - Raises an exception if any errors are encountered.
 
         If no response type is provided above, the type will be automatically deduced.
+
+        If a valid timedRequestTimeoutMs is provided, a timed interaction will be initiated instead.
+        If a valid interactionTimeoutMs is provided, the interaction will terminate with a CHIP_ERROR_TIMEOUT if a response
+        has not been received within that timeout. If it isn't provided, a sensible value will be automatically computed that
+        accounts for the underlying characteristics of both the transport and the responsiveness of the receiver.
     '''
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
         raise ValueError("responseType must be a ClusterCommand or None")
@@ -160,7 +171,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     return builtins.chipStack.Call(
         lambda: handle.pychip_CommandSender_SendCommand(ctypes.py_object(
-            transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV)))
+            transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV), ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs)))
 
 
 def Init():

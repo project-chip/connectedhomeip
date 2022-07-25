@@ -23,7 +23,6 @@ chip_test_suite("tests") {
 
   sources = [
     "AES_CCM_128_test_vectors.h",
-    "AES_CCM_256_test_vectors.h",
     "CHIPCryptoPALTest.cpp",
     "DerSigConversion_test_vectors.h",
     "ECDH_P256_test_vectors.h",

@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 79.1.3. [TC-MOD-1.3] Attributes with client as DUT
+name: 80.1.3. [TC-MOD-1.3] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -25,7 +25,11 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
           ./chip-tool modeselect read supported-modes 1 1
+
+          Verify in TH all-clusters-app log
 
           [1650968776.863713][12747:12747] CHIP:IM: Received Read request
           [1650968776.863767][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -53,6 +57,8 @@ tests:
 
 
           ./chip-tool modeselect read current-mode 1 1
+
+          Verify in TH all-clusters-app log
 
           1650968848.687576][12747:12747] CHIP:IM: Received Read request
           [1650968848.687628][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -131,6 +137,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
           ./chip-tool modeselect read on-mode 1 1
 
           [1650969570.494960][12747:12747] CHIP:IM: Received Read request
@@ -178,14 +185,14 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          no writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          no writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
@@ -194,7 +201,12 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
+
           ./chip-tool modeselect read attribute-list  1 1
+
+          Verify in TH all-clusters-app log
 
           [1654244736050] [91506:3999585] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_FFFB DataVersion: 1865308556
           [1654244736050] [91506:3999585] CHIP: [TOO]   AttributeList: 9 entries
@@ -212,6 +224,8 @@ tests:
 
 
           "./chip-tool modeselect read supported-modes 1 1
+
+          Verify in TH all-clusters-app log
 
           [1650968776.863713][12747:12747] CHIP:IM: Received Read request
           [1650968776.863767][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -240,6 +254,8 @@ tests:
 
           ./chip-tool modeselect read current-mode 1 1
 
+          Verify in TH all-clusters-app log
+
           1650968848.687576][12747:12747] CHIP:IM: Received Read request
           [1650968848.687628][12747:12747] CHIP:DMG: ReadRequestMessage =
           [1650968848.687653][12747:12747] CHIP:DMG: {
@@ -263,6 +279,8 @@ tests:
 
 
            ./chip-tool modeselect read standard-namespace 1 1
+
+          Verify in TH all-clusters-app log
 
           1650968644.223891][12747:12747] CHIP:IM: Received Read request
           [1650968644.223954][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -292,6 +310,8 @@ tests:
 
           ./chip-tool modeselect read description 1 1
 
+          Verify in TH all-clusters-app log
+
           [1650969447.413679][12747:12747] CHIP:EM: Handling via exchange: 65381r, Delegate: 0xaaaae5201098
           [1650969447.413718][12747:12747] CHIP:IM: Received Read request
           [1650969447.413769][12747:12747] CHIP:DMG: ReadRequestMessage =
@@ -317,6 +337,10 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          verify on Reference app receives the right response for the data sent in the above commands
+
+          Verify in TH all-clusters-app log
+
           ./chip-tool modeselect read on-mode 1 1
            General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
@@ -328,5 +352,5 @@ tests:
           "DUT writes a suitable value to all supported optional attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          no writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true

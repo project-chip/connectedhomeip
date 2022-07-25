@@ -32,8 +32,6 @@ constexpr const char * kInteractiveModeStopCommand = "quit()";
 
 namespace {
 
-bool gIsCommandRunning = NO;
-
 void ClearLine()
 {
     printf("\r\x1B[0J"); // Move cursor to the beginning of the line and clear from cursor to end of the screen
@@ -44,10 +42,6 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     ClearLine();
     chip::Logging::Platform::LogV(module, category, msg, args);
     ClearLine();
-
-    if (gIsCommandRunning == NO) {
-        rl_forced_update_display();
-    }
 }
 } // namespace
 
@@ -102,11 +96,9 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     std::string arg;
 
     std::stringstream ss(command);
-    while (ss >> std::quoted(arg)) {
+    while (ss >> std::quoted(arg, '\'')) {
         if (argsCount == kInteractiveModeArgumentsMaxLength) {
-            gIsCommandRunning = YES;
             ChipLogError(chipTool, "Too many arguments. Ignoring.");
-            gIsCommandRunning = NO;
             return YES;
         }
 
@@ -116,9 +108,7 @@ bool InteractiveStartCommand::ParseCommand(char * command)
     }
 
     ClearLine();
-    gIsCommandRunning = YES;
     mHandler->RunInteractive(argsCount, args);
-    gIsCommandRunning = NO;
 
     // Do not delete arg[0]
     while (--argsCount)

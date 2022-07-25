@@ -22,7 +22,7 @@ config:
 
 tests:
     - label: "TH reads the MACAddress attribute from the DUT"
-      PICS: MC_WAKEONLAN.S.A0000
+      PICS: WAKEONLAN.S.A0000
       verification: |
           ./chip-tool wakeonlan read macaddress 1 1
 
@@ -70,7 +70,7 @@ tests:
     - label:
           "TH sends a Wake-On LAN magic packet containing the MAC address from
           step 1"
-      PICS: MC_LOWPOWER.S
+      PICS: LOWPOWER.S
       verification: |
           ./chip-tool lowpower read accepted-command-list 1 1
           [1654248854.491911][3652:3657] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0508 Attribute 0x0000_FFF9 DataVersion: 2125568804

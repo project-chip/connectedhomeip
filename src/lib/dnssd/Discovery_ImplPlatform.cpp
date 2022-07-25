@@ -78,6 +78,7 @@ static void HandleNodeResolve(void * context, DnssdService * result, const Span<
         FillNodeDataFromTxt(key, val, nodeData.commissionData);
     }
 
+    nodeData.LogDetail();
     proxy->OnNodeDiscovered(nodeData);
     proxy->Release();
 }

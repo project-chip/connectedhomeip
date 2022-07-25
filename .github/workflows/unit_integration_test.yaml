@@ -75,12 +75,13 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Setup Build
+              # TODO: If rotating_device_id is ever removed/combined, we have to cover boringssl otherwise
               run: |
                   case $BUILD_TYPE in
                      "main") GN_ARGS='';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
-                     "rotating_device_id") GN_ARGS='chip_enable_rotating_device_id=true';;
+                     "rotating_device_id") GN_ARGS='chip_crypto="boringssl" chip_enable_rotating_device_id=true';;
                      *) ;;
                   esac
 

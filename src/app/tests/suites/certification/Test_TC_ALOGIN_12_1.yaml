@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 19.14.1. [TC-ALOGIN-12.1] Account Login Verification
+name: 3.14.1. [TC-ALOGIN-12.1] Account Login Verification
 
 config:
     nodeId: 0x12344321
@@ -27,7 +27,7 @@ tests:
       verification: |
           The following command on the example tv-app will launch a content app on endpoint 6:
            ./chip-tool applicationlauncher launch-app '{"catalogVendorId": 123, "applicationId": "exampleid"}' 1 1
-
+          Verify in TH Log:
           [1654004240716] [9799:7814889] CHIP: [DMG] Received Command Response Data, Endpoint=1 Cluster=0x0000_050C Command=0x0000_0003
           [1654004240717] [9799:7814889] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_050C Command 0x0000_0003
           [1654004240717] [9799:7814889] CHIP: [TOO]   LauncherResponse: {
@@ -39,9 +39,10 @@ tests:
     - label:
           "TH sends a GetSetupPIN command to the DUT with test values provided
           by the product maker."
+      PICS: ALOGIN.S.COMMISSIONABLE
       verification: |
           ./chip-tool accountlogin get-setup-pin 1111 1 6 --timedInteractionTimeoutMs 1000
-
+          Verify in TH Log:
           [1654004273684] [9851:7821178] CHIP: [DMG] Received Command Response Data, Endpoint=6 Cluster=0x0000_050E Command=0x0000_0001
           [1654004273684] [9851:7821178] CHIP: [TOO] Endpoint: 6 Cluster: 0x0000_050E Command 0x0000_0001
           [1654004273684] [9851:7821178] CHIP: [TOO]   GetSetupPINResponse: {
@@ -52,18 +53,20 @@ tests:
     - label:
           "TH sends a Login command to the DUT with test values provided by the
           product maker."
+      PICS: ALOGIN.S.COMMISSIONABLE
       verification: |
           ./chip-tool accountlogin login 11111 34567890 1 6 --timedInteractionTimeoutMs 1000
-
+          Verify in TH Log:
           [1654004350009] [9951:7836487] CHIP: [DMG] Received Command Response Status for Endpoint=6 Cluster=0x0000_050E Command=0x0000_0002 Status=0x0
       disabled: true
 
     - label:
           "TH sends a Logout command to the DUT with test values provided by the
           product maker."
+      PICS: ALOGIN.S.COMMISSIONABLE
       verification: |
-          ./chip-tool accountlogin logout  2 6 --timedInteractionTimeoutMs 1000
-
+          ./chip-tool accountlogin logout  1 6 --timedInteractionTimeoutMs 1000
+          Verify in TH Log:
 
           [1654004400892] [9988:7841997] CHIP: [DMG] Received Command Response Status for Endpoint=6 Cluster=0x0000_050E Command=0x0000_0003 Status=0x0
       disabled: true

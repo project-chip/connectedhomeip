@@ -316,7 +316,9 @@ jobs:
             - name: Run Python library specific unit tests
               timeout-minutes: 5
               run: |
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl'
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl'
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl'
+                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl'
                   scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
 
     build_darwin:
@@ -389,7 +391,7 @@ jobs:
                           #   use that on Darwin.
                           # * the "host clang" build, which uses the pigweed
                           #   clang.
-                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false enable_host_gcc_mbedtls_build=false';;
+                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false enable_host_clang_boringssl_crypto_tests=false';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands

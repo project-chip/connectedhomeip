@@ -44,9 +44,9 @@ tests:
                   },
               ]
       response:
-          error: FAILURE
+          error: CONSTRAINT_ERROR
 
-    - label: "TH reads LabelList attribute of the DUT"
+    - label: "TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
       attribute: "label list"
@@ -59,4 +59,4 @@ tests:
                   },
               ]
       response:
-          error: FAILURE
+          error: CONSTRAINT_ERROR

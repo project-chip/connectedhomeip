@@ -50,8 +50,6 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
     CHIP_ERROR _Init(void);
     void _Shutdown() {}
-    CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
-    CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -127,12 +125,18 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     char mDeviceName[kMaxDeviceNameLength + 1];
     // The advertising set handle allocated from Bluetooth stack.
     uint8_t advertising_set_handle = 0xff;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    PacketBufferHandle c3AdditionalDataBufferHandle;
+#endif
 
     CHIP_ERROR MapBLEError(int bleErr);
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR EncodeAdditionalDataTlv();
+#endif
     void UpdateMtu(volatile sl_bt_msg_t * evt);
     void HandleBootEvent(void);
     void HandleConnectEvent(volatile sl_bt_msg_t * evt);
@@ -147,10 +151,14 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
     void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
-    uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
     static void bluetoothStackEventHandler(void * p_arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static void HandleC3ReadRequest(volatile sl_bt_msg_t * evt);
+#endif
 };
 
 /**
@@ -178,11 +186,6 @@ inline BLEManagerImpl & BLEMgrImpl(void)
 inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
-}
-
-inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
-{
-    return mServiceMode;
 }
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)

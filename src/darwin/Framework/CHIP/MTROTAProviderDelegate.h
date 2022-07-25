@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * All delegate methods will be called on the supplied Delegate Queue.
  */
 @protocol MTROTAProviderDelegate <NSObject>
-@optional
+@required
 /**
  * Notify the delegate when query image command is received
  *
@@ -50,6 +50,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)handleNotifyUpdateApplied:(MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                 completionHandler:(StatusCompletion)completionHandler;
 
+/**
+ * Notify the delegate when a BDX Session starts
+ *
+ */
+- (void)handleBDXTransferSessionBegin:(NSString * _Nonnull)fileDesignator
+                               offset:(NSNumber * _Nonnull)offset
+                    completionHandler:(void (^)(NSError * error))completionHandler;
+
+/**
+ * Notify the delegate when a BDX Session ends
+ *
+ */
+- (void)handleBDXTransferSessionEnd:(NSError * _Nullable)error;
+
+/**
+ * Notify the delegate when a BDX Query message has been received
+ *
+ */
+- (void)handleBDXQuery:(NSNumber * _Nonnull)blockSize
+            blockIndex:(NSNumber * _Nonnull)blockIndex
+           bytesToSkip:(NSNumber * _Nonnull)bytesToSkip
+     completionHandler:(void (^)(NSData * _Nullable data, BOOL isEOF))completionHandler;
 @end
 
 NS_ASSUME_NONNULL_END

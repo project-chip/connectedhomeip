@@ -24,7 +24,7 @@ config:
 
 tests:
     - label: "DUT sends Play command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0000
+      PICS: MEDIAPLAYBACK.C.C0000
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -57,7 +57,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Start Over command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0003
+      PICS: MEDIAPLAYBACK.C.C0003
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -90,7 +90,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Next command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0005
+      PICS: MEDIAPLAYBACK.C.C0005
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -123,7 +123,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Previous command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0004
+      PICS: MEDIAPLAYBACK.C.C0004
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -156,7 +156,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Skip Forward command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0008
+      PICS: MEDIAPLAYBACK.C.C0008
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 
@@ -190,7 +190,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Skip Backward command to TH"
-      PICS: MC_MEDIAPLAYBACK.C.C0009
+      PICS: MEDIAPLAYBACK.C.C0009
       verification: |
           The following chip-tool command simulates the interaction of the DUT and the log below shows the resulting log on the TH.
 

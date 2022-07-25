@@ -1536,45 +1536,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::MediaPlayback::Structs
     ComplexArgumentParser::Finalize(request.position);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PowerProfileRecord.powerProfileId", "powerProfileId",
-                                                                  value.isMember("powerProfileId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PowerProfileRecord.energyPhaseId", "energyPhaseId",
-                                                                  value.isMember("energyPhaseId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist(
-        "PowerProfileRecord.powerProfileRemoteControl", "powerProfileRemoteControl", value.isMember("powerProfileRemoteControl")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PowerProfileRecord.powerProfileState", "powerProfileState",
-                                                                  value.isMember("powerProfileState")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerProfileId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.powerProfileId, value["powerProfileId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "energyPhaseId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.energyPhaseId, value["energyPhaseId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerProfileRemoteControl");
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::Setup(labelWithMember, request.powerProfileRemoteControl, value["powerProfileRemoteControl"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "powerProfileState");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.powerProfileState, value["powerProfileState"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.powerProfileId);
-    ComplexArgumentParser::Finalize(request.energyPhaseId);
-    ComplexArgumentParser::Finalize(request.powerProfileRemoteControl);
-    ComplexArgumentParser::Finalize(request.powerProfileState);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & request,
                                         Json::Value & value)
 {
@@ -1673,32 +1634,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ThreadNetworkDiagnosti
     ComplexArgumentParser::Finalize(request.age);
     ComplexArgumentParser::Finalize(request.allocated);
     ComplexArgumentParser::Finalize(request.linkEstablished);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScheduledPhase.energyPhaseId", "energyPhaseId", value.isMember("energyPhaseId")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ScheduledPhase.scheduledTime", "scheduledTime", value.isMember("scheduledTime")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "energyPhaseId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.energyPhaseId, value["energyPhaseId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "scheduledTime");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.scheduledTime, value["scheduledTime"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.energyPhaseId);
-    ComplexArgumentParser::Finalize(request.scheduledTime);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & request,
@@ -2174,55 +2109,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::SoftwareDiagnostics::S
     ComplexArgumentParser::Finalize(request.stackFreeCurrent);
     ComplexArgumentParser::Finalize(request.stackFreeMinimum);
     ComplexArgumentParser::Finalize(request.stackSize);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransferredPhase.energyPhaseId", "energyPhaseId",
-                                                                  value.isMember("energyPhaseId")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TransferredPhase.macroPhaseId", "macroPhaseId", value.isMember("macroPhaseId")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransferredPhase.expectedDuration", "expectedDuration",
-                                                                  value.isMember("expectedDuration")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("TransferredPhase.peakPower", "peakPower", value.isMember("peakPower")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransferredPhase.energy", "energy", value.isMember("energy")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("TransferredPhase.maxActivationDelay", "maxActivationDelay",
-                                                                  value.isMember("maxActivationDelay")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "energyPhaseId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.energyPhaseId, value["energyPhaseId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "macroPhaseId");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.macroPhaseId, value["macroPhaseId"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "expectedDuration");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.expectedDuration, value["expectedDuration"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "peakPower");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.peakPower, value["peakPower"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "energy");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.energy, value["energy"]));
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxActivationDelay");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxActivationDelay, value["maxActivationDelay"]));
-
-    return CHIP_NO_ERROR;
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.energyPhaseId);
-    ComplexArgumentParser::Finalize(request.macroPhaseId);
-    ComplexArgumentParser::Finalize(request.expectedDuration);
-    ComplexArgumentParser::Finalize(request.peakPower);
-    ComplexArgumentParser::Finalize(request.energy);
-    ComplexArgumentParser::Finalize(request.maxActivationDelay);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request,

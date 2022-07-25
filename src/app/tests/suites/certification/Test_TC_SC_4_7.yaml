@@ -31,6 +31,9 @@ tests:
     - label: "Scan for DNS-SD commissioner advertisements from TH"
       verification: |
           if DUT supports discovering UDC, DUT should be able to scan the TV-app
+
+          Execute teh below command on TH terminal.
+
           ~$ avahi-browse -rt _matterc._udp
 
           =+ wlp3s0 IPv4 DD200C20D25AE5F7                              _matterd._udp        local
@@ -56,7 +59,7 @@ tests:
              hostname = [E45F010F28770000.local]
              address = [fe80::e65f:1ff:fe0f:2877]
              port = [5550]
-             txt = ["T=1" "CRA=300" "CRI=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
+             txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
       disabled: true
 
     - label:

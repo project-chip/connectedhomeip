@@ -182,22 +182,21 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CancelTimer(onComplete, appState);
-
-    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
-    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
-
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     dispatch_queue_t dispatchQueue = GetDispatchQueue();
     if (dispatchQueue)
     {
-        (void) mTimerList.Add(timer);
         dispatch_async(dispatchQueue, ^{
-            this->HandleTimerComplete(timer);
+            onComplete(this, appState);
         });
         return CHIP_NO_ERROR;
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
+    CancelTimer(onComplete, appState);
+
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
+    VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
     {
@@ -247,6 +246,30 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingRead(SocketWatchToken token)
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     watch->mPendingIO.Set(SocketEventFlags::kRead);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t dispatchQueue = GetDispatchQueue();
+    if (watch->mWrSource)
+    {
+        dispatch_resume(watch->mRdSource);
+    }
+    else
+    {
+        if (dispatchQueue)
+        {
+            watch->mRdSource =
+                dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
+            ReturnErrorCodeIf(watch->mRdSource == nullptr, CHIP_ERROR_NO_MEMORY);
+            dispatch_source_set_event_handler(watch->mRdSource, ^{
+                SocketEvents events;
+                events.Set(SocketEventFlags::kRead);
+                watch->mCallback(events, watch->mCallbackData);
+            });
+            dispatch_activate(watch->mRdSource);
+        }
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     return CHIP_NO_ERROR;
 }
 
@@ -256,6 +279,30 @@ CHIP_ERROR LayerImplSelect::RequestCallbackOnPendingWrite(SocketWatchToken token
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     watch->mPendingIO.Set(SocketEventFlags::kWrite);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (watch->mWrSource)
+    {
+        dispatch_resume(watch->mWrSource);
+    }
+    else
+    {
+        dispatch_queue_t dispatchQueue = GetDispatchQueue();
+        if (dispatchQueue)
+        {
+            watch->mWrSource =
+                dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, static_cast<uintptr_t>(watch->mFD), 0, dispatchQueue);
+            ReturnErrorCodeIf(watch->mWrSource == nullptr, CHIP_ERROR_NO_MEMORY);
+            dispatch_source_set_event_handler(watch->mWrSource, ^{
+                SocketEvents events;
+                events.Set(SocketEventFlags::kWrite);
+                watch->mCallback(events, watch->mCallbackData);
+            });
+            dispatch_activate(watch->mWrSource);
+        }
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     return CHIP_NO_ERROR;
 }
 
@@ -264,6 +311,14 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingRead(SocketWatchToken token)
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     watch->mPendingIO.Clear(SocketEventFlags::kRead);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (watch->mRdSource)
+    {
+        dispatch_suspend(watch->mRdSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     return CHIP_NO_ERROR;
 }
 
@@ -272,6 +327,14 @@ CHIP_ERROR LayerImplSelect::ClearCallbackOnPendingWrite(SocketWatchToken token)
     SocketWatch * watch = reinterpret_cast<SocketWatch *>(token);
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     watch->mPendingIO.Clear(SocketEventFlags::kWrite);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (watch->mWrSource)
+    {
+        dispatch_suspend(watch->mWrSource);
+    }
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     return CHIP_NO_ERROR;
 }
 
@@ -283,10 +346,25 @@ CHIP_ERROR LayerImplSelect::StopWatchingSocket(SocketWatchToken * tokenInOut)
     VerifyOrReturnError(watch != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(watch->mFD >= 0, CHIP_ERROR_INCORRECT_STATE);
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    if (watch->mRdSource)
+    {
+        dispatch_cancel(watch->mRdSource);
+        dispatch_release(watch->mRdSource);
+    }
+    if (watch->mWrSource)
+    {
+        dispatch_cancel(watch->mWrSource);
+        dispatch_release(watch->mWrSource);
+    }
+#endif
+
     watch->Clear();
 
+#if !CHIP_SYSTEM_CONFIG_USE_DISPATCH
     // Wake the thread calling select so that it stops selecting on the socket.
     Signal();
+#endif
 
     return CHIP_NO_ERROR;
 }
@@ -427,6 +505,10 @@ void LayerImplSelect::SocketWatch::Clear()
     mPendingIO.ClearAll();
     mCallback     = nullptr;
     mCallbackData = 0;
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    mRdSource = nullptr;
+    mWrSource = nullptr;
+#endif
 }
 
 } // namespace System

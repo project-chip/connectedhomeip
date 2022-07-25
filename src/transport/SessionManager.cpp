@@ -112,6 +112,9 @@ void SessionManager::Shutdown()
         mFabricTable = nullptr;
     }
 
+    // Ensure that we don't create new sessions as we iterate our session table.
+    mState = State::kNotReady;
+
     mSecureSessions.ForEachSession([&](auto session) {
         session->MarkForEviction();
         return Loop::Continue;
@@ -119,7 +122,6 @@ void SessionManager::Shutdown()
 
     mMessageCounterManager = nullptr;
 
-    mState        = State::kNotReady;
     mSystemLayer  = nullptr;
     mTransportMgr = nullptr;
     mCB           = nullptr;
@@ -386,6 +388,7 @@ void SessionManager::ExpireAllPASESessions()
 Optional<SessionHandle> SessionManager::AllocateSession(SecureSession::Type secureSessionType,
                                                         const ScopedNodeId & sessionEvictionHint)
 {
+    VerifyOrReturnValue(mState == State::kInitialized, NullOptional);
     return mSecureSessions.CreateNewSecureSession(secureSessionType, sessionEvictionHint);
 }
 
@@ -436,7 +439,12 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     CHIP_TRACE_PREPARED_MESSAGE_RECEIVED(&peerAddress, &msg);
     PacketHeader packetHeader;
 
-    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+    CHIP_ERROR err = packetHeader.DecodeAndConsume(msg);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to decode packet header: %" CHIP_ERROR_FORMAT, err.Format());
+        return;
+    }
 
     if (packetHeader.IsEncrypted())
     {

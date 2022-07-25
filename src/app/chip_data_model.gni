@@ -31,10 +31,6 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #  zap_file
 #    Path to the ZAP input file.
 #
-#  cluster_sources
-#    Names of the clusters directories to compile.
-#    Deprecated, specify zap_file instead.
-#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
@@ -56,7 +52,6 @@ template("chip_data_model") {
                            "*",
                            [
                              "zap_pregenerated_dir",
-                             "cluster_sources",
                              "zap_file",
                              "is_server",
                            ])
@@ -93,9 +88,7 @@ template("chip_data_model") {
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
 
-    if (defined(invoker.cluster_sources)) {
-      _cluster_sources = invoker.cluster_sources
-    } else if (defined(invoker.zap_file)) {
+    if (defined(invoker.zap_file)) {
       _zap_path = rebase_path(invoker.zap_file, root_build_dir)
       _script_path = rebase_path(_zap_cluster_list_script, root_build_dir)
       _script_args = [ "--zap_file=" + _zap_path ]
@@ -108,7 +101,10 @@ template("chip_data_model") {
 
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
-        sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
+        sources += [
+          "${_app_root}/clusters/${cluster}/door-lock-server-callback.cpp",
+          "${_app_root}/clusters/${cluster}/door-lock-server.cpp",
+        ]
       } else if (cluster == "mode-select-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",

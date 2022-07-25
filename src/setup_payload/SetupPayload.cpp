@@ -111,6 +111,20 @@ bool PayloadContents::isValidManualCode() const
     return CheckPayloadCommonConstraints();
 }
 
+bool PayloadContents::IsValidSetupPIN(uint32_t setupPIN)
+{
+    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal), excluding the invalid Passcode
+    // values.
+    if (setupPIN == kSetupPINCodeUndefinedValue || setupPIN > kSetupPINCodeMaximumValue || setupPIN == 11111111 ||
+        setupPIN == 22222222 || setupPIN == 33333333 || setupPIN == 44444444 || setupPIN == 55555555 || setupPIN == 66666666 ||
+        setupPIN == 77777777 || setupPIN == 88888888 || setupPIN == 12345678 || setupPIN == 87654321)
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool PayloadContents::CheckPayloadCommonConstraints() const
 {
     // A version not equal to 0 would be invalid for v1 and would indicate new format (e.g. version 2)
@@ -119,11 +133,7 @@ bool PayloadContents::CheckPayloadCommonConstraints() const
         return false;
     }
 
-    // SHALL be restricted to the values 0x0000001 to 0x5F5E0FE (00000001 to 99999998 in decimal), excluding the invalid Passcode
-    // values.
-    if (setUpPINCode < 0x0000001 || setUpPINCode > 0x5F5E0FE || setUpPINCode == 11111111 || setUpPINCode == 22222222 ||
-        setUpPINCode == 33333333 || setUpPINCode == 44444444 || setUpPINCode == 55555555 || setUpPINCode == 66666666 ||
-        setUpPINCode == 77777777 || setUpPINCode == 88888888 || setUpPINCode == 12345678 || setUpPINCode == 87654321)
+    if (!IsValidSetupPIN(setUpPINCode))
     {
         return false;
     }

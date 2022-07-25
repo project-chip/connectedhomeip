@@ -170,17 +170,6 @@ typedef void (*NullableLevelControlClusterMoveModeAttributeCallback)(
 typedef void (*LevelControlClusterStepModeAttributeCallback)(void *, chip::app::Clusters::LevelControl::StepMode);
 typedef void (*NullableLevelControlClusterStepModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> &);
-typedef void (*ApplianceControlClusterApplianceStatusAttributeCallback)(void *,
-                                                                        chip::app::Clusters::ApplianceControl::ApplianceStatus);
-typedef void (*NullableApplianceControlClusterApplianceStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> &);
-typedef void (*ApplianceControlClusterCommandIdentificationAttributeCallback)(
-    void *, chip::app::Clusters::ApplianceControl::CommandIdentification);
-typedef void (*NullableApplianceControlClusterCommandIdentificationAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> &);
-typedef void (*ApplianceControlClusterWarningEventAttributeCallback)(void *, chip::app::Clusters::ApplianceControl::WarningEvent);
-typedef void (*NullableApplianceControlClusterWarningEventAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> &);
 typedef void (*AccessControlClusterAuthModeAttributeCallback)(void *, chip::app::Clusters::AccessControl::AuthMode);
 typedef void (*NullableAccessControlClusterAuthModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> &);
@@ -533,29 +522,6 @@ typedef void (*ApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum);
 typedef void (*NullableApplicationBasicClusterApplicationStatusEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> &);
-typedef void (*MessagingClusterEventIdAttributeCallback)(void *, chip::app::Clusters::Messaging::EventId);
-typedef void (*NullableMessagingClusterEventIdAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::EventId> &);
-typedef void (*MessagingClusterMessagingControlConfirmationAttributeCallback)(
-    void *, chip::app::Clusters::Messaging::MessagingControlConfirmation);
-typedef void (*NullableMessagingClusterMessagingControlConfirmationAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlConfirmation> &);
-typedef void (*MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback)(
-    void *, chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation);
-typedef void (*NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> &);
-typedef void (*MessagingClusterMessagingControlImportanceAttributeCallback)(
-    void *, chip::app::Clusters::Messaging::MessagingControlImportance);
-typedef void (*NullableMessagingClusterMessagingControlImportanceAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlImportance> &);
-typedef void (*MessagingClusterMessagingControlTransmissionAttributeCallback)(
-    void *, chip::app::Clusters::Messaging::MessagingControlTransmission);
-typedef void (*NullableMessagingClusterMessagingControlTransmissionAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlTransmission> &);
-typedef void (*ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
-    void *, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification);
-typedef void (*NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> &);
 typedef void (*TestClusterClusterSimpleEnumAttributeCallback)(void *, chip::app::Clusters::TestCluster::SimpleEnum);
 typedef void (*NullableTestClusterClusterSimpleEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &);
@@ -949,6 +915,12 @@ typedef void (*ColorControlAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BallastConfigurationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BallastConfigurationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BallastConfigurationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*IlluminanceMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*IlluminanceMeasurementAcceptedCommandListListAttributeCallback)(
@@ -6854,6 +6826,90 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationGeneratedCommandListListAttributeCallback>
+{
+public:
+    MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<BallastConfigurationGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationAcceptedCommandListListAttributeCallback>
+{
+public:
+    MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<BallastConfigurationAcceptedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+};
+
+class MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationAttributeListListAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationAttributeListListAttributeCallback>
+{
+public:
+    MTRBallastConfigurationAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    MTRActionBlock action, bool keepAlive = false) :
+        MTRCallbackBridge<BallastConfigurationAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationAttributeListListAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action,
+                                                                                SubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge
     : public MTRCallbackBridge<IlluminanceMeasurementGeneratedCommandListListAttributeCallback>
 {
@@ -10484,178 +10540,6 @@ public:
                                                                               MTRActionBlock action,
                                                                               SubscriptionEstablishedHandler establishedHandler) :
         MTRNullableLevelControlClusterStepModeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceControlClusterApplianceStatusAttributeCallback>
-{
-public:
-    MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<ApplianceControlClusterApplianceStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceControl::ApplianceStatus value);
-};
-
-class MTRApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge
-    : public MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge
-{
-public:
-    MTRApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRApplianceControlClusterApplianceStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceControlClusterApplianceStatusAttributeCallback>
-{
-public:
-    MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableApplianceControlClusterApplianceStatusAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> & value);
-};
-
-class MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceControlClusterCommandIdentificationAttributeCallback>
-{
-public:
-    MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<ApplianceControlClusterCommandIdentificationAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceControl::CommandIdentification value);
-};
-
-class MTRApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge
-    : public MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge
-{
-public:
-    MTRApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRApplianceControlClusterCommandIdentificationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceControlClusterCommandIdentificationAttributeCallback>
-{
-public:
-    MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableApplianceControlClusterCommandIdentificationAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> & value);
-};
-
-class MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge
-    : public MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge
-{
-public:
-    MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRApplianceControlClusterWarningEventAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceControlClusterWarningEventAttributeCallback>
-{
-public:
-    MTRApplianceControlClusterWarningEventAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<ApplianceControlClusterWarningEventAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceControl::WarningEvent value);
-};
-
-class MTRApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge
-    : public MTRApplianceControlClusterWarningEventAttributeCallbackBridge
-{
-public:
-    MTRApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              MTRActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        MTRApplianceControlClusterWarningEventAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceControlClusterWarningEventAttributeCallback>
-{
-public:
-    MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableApplianceControlClusterWarningEventAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> & value);
-};
-
-class MTRNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge
-    : public MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge
-{
-public:
-    MTRNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableApplianceControlClusterWarningEventAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -16472,354 +16356,6 @@ public:
     MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
         MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRMessagingClusterEventIdAttributeCallbackBridge : public MTRCallbackBridge<MessagingClusterEventIdAttributeCallback>
-{
-public:
-    MTRMessagingClusterEventIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-                                                      bool keepAlive = false) :
-        MTRCallbackBridge<MessagingClusterEventIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::EventId value);
-};
-
-class MTRMessagingClusterEventIdAttributeCallbackSubscriptionBridge : public MTRMessagingClusterEventIdAttributeCallbackBridge
-{
-public:
-    MTRMessagingClusterEventIdAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action,
-                                                                  SubscriptionEstablishedHandler establishedHandler) :
-        MTRMessagingClusterEventIdAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableMessagingClusterEventIdAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterEventIdAttributeCallback>
-{
-public:
-    MTRNullableMessagingClusterEventIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableMessagingClusterEventIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::EventId> & value);
-};
-
-class MTRNullableMessagingClusterEventIdAttributeCallbackSubscriptionBridge
-    : public MTRNullableMessagingClusterEventIdAttributeCallbackBridge
-{
-public:
-    MTRNullableMessagingClusterEventIdAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableMessagingClusterEventIdAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRMessagingClusterMessagingControlConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlConfirmationAttributeCallback>
-{
-public:
-    MTRMessagingClusterMessagingControlConfirmationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MessagingClusterMessagingControlConfirmationAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlConfirmation value);
-};
-
-class MTRMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge
-    : public MTRMessagingClusterMessagingControlConfirmationAttributeCallbackBridge
-{
-public:
-    MTRMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRMessagingClusterMessagingControlConfirmationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlConfirmationAttributeCallback>
-{
-public:
-    MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableMessagingClusterMessagingControlConfirmationAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlConfirmation> & value);
-};
-
-class MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge
-    : public MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge
-{
-public:
-    MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>
-{
-public:
-    MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation value);
-};
-
-class MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge
-    : public MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge
-{
-public:
-    MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>
-{
-public:
-    MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                           ResponseHandler handler,
-                                                                                           MTRActionBlock action,
-                                                                                           bool keepAlive = false) :
-        MTRCallbackBridge<NullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallback>(queue, handler, action,
-                                                                                                         OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> & value);
-};
-
-class MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge
-    : public MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge
-{
-public:
-    MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRMessagingClusterMessagingControlImportanceAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlImportanceAttributeCallback>
-{
-public:
-    MTRMessagingClusterMessagingControlImportanceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MessagingClusterMessagingControlImportanceAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlImportance value);
-};
-
-class MTRMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge
-    : public MTRMessagingClusterMessagingControlImportanceAttributeCallbackBridge
-{
-public:
-    MTRMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRMessagingClusterMessagingControlImportanceAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlImportanceAttributeCallback>
-{
-public:
-    MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                 MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableMessagingClusterMessagingControlImportanceAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                               keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlImportance> & value);
-};
-
-class MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge
-    : public MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge
-{
-public:
-    MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRMessagingClusterMessagingControlTransmissionAttributeCallbackBridge
-    : public MTRCallbackBridge<MessagingClusterMessagingControlTransmissionAttributeCallback>
-{
-public:
-    MTRMessagingClusterMessagingControlTransmissionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<MessagingClusterMessagingControlTransmissionAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::Messaging::MessagingControlTransmission value);
-};
-
-class MTRMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge
-    : public MTRMessagingClusterMessagingControlTransmissionAttributeCallbackBridge
-{
-public:
-    MTRMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRMessagingClusterMessagingControlTransmissionAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableMessagingClusterMessagingControlTransmissionAttributeCallback>
-{
-public:
-    MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<NullableMessagingClusterMessagingControlTransmissionAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlTransmission> & value);
-};
-
-class MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge
-    : public MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge
-{
-public:
-    MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>
-{
-public:
-    MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                MTRActionBlock action, bool keepAlive = false) :
-        MTRCallbackBridge<ApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification value);
-};
-
-class MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge
-    : public MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge
-{
-public:
-    MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>
-{
-public:
-    MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        MTRActionBlock action,
-                                                                                        bool keepAlive = false) :
-        MTRCallbackBridge<NullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> & value);
-};
-
-class MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge
-    : public MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge
-{
-public:
-    MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action, SubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

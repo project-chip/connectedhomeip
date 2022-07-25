@@ -19,17 +19,15 @@ all of the EFR32 example applications.
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
            ```
 
--   Build or download the Gecko Bootloader binary. Bootloader should be built
-    with the Gecko SDK version 3.2.1 or earlier. For the bootloader using the
-    external flash select the "external SPI" bootloader type configured with a
-    single slot of at least 1000 KB. For the bootloader using the internal flash
-    (supported on MG24 boards only) select the "internal storage" bootloader
-    type. Follow the instructions in "UG266: Silicon Labs Gecko Bootloader
-    User’s Guide". Pre-built binaries for some configurations should be
-    available in
+-   Build or download the Gecko Bootloader binary. Follow the instructions in
+    "UG266: Silicon Labs Gecko Bootloader User’s Guide". For the bootloader
+    using the external flash select the "external SPI" bootloader type
+    configured with a single slot of at least 1000 KB. For the bootloader using
+    the internal flash see the Internal Storage Bootloader section below.
+    Pre-built binaries for some configurations should be available in
 
            ```
-           third_party/efr32_sdk/repo/platform/bootloader/sample-apps/bootloader-storage-spiflash-single
+           third_party/silabs/matter_support/matter/efr32/bootloader_binaries
            ```
 
 -   Using the commander tool upload the bootloader to the device running the
@@ -45,7 +43,7 @@ all of the EFR32 example applications.
 -   Create the Matter OTA file from the bootable image file:
 
            ```
-           ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 1 -vs "1.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
+           ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
            ```
 
 -   In a terminal start the Provider app passing to it the path to the Matter
@@ -84,7 +82,55 @@ where operationalDataset is obtained from the OpenThread Border Router.
     download. Once the image is downloaded the device will reboot into the
     downloaded image.
 
-## Managing the Software Version, Vendor and Product ID
+## Internal Storage Bootloader
+
+Internal storage bootloader for Matter OTA software update is supported on MG24
+boards only. In this use case both the running image and the downloadable update
+image must fit on the internal flash at the same time. This in turn requires
+that both images are built with a reduced feature set such as disabled logging
+and Matter shell. The following set of compile flags leaves out all the optional
+features and results in the minimal image size:
+
+           ```
+           chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
+           ```
+
+Using LZMA compression when building the .gbl file ( passing `--compress lzma`
+parameter to the `commander gbl create` command) further reduces the downloaded
+image size.
+
+When building an internal storage bootloader the two key configuration
+parameters are the Slot Start Address and Slot Size in the Bootloader Storage
+Slot component. The storage slot must not overlap with the running image and the
+NVM section of the flash. In other words, the slot start address must be greater
+than the end of the running image address and the sum of the start address and
+the slot size must be less than the address of the NVM section. The simplest way
+to get the relevant addresses for the running image and NVM would be by using
+the Silicon Labs `commander` tool (Device Info->Main Flash->Flash Map).
+
+The pre-built bootloader binaries are configured with slot start address of
+0x080EC000 and slot size of 548864
+
+## Managing the Software Version
+
+In order for the Provider to successfully serve the image to a device during the
+OTA Software Update process the Software Version parameter that the .ota file
+was built with must be greater than the
+CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION parameter set in the application's
+`CHIPProjectConfig.h` file. The Software Version parameter is set by the `-vn`
+parameter passed to the `ota_image_tool.py create` command. For example, if the
+application's running image was built with
+CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION set to 1 and if the `.ota` file is
+built with `-vn 2` then the Provider will serve the update image when requested.
+
+In order for the OTA Software Update subsystem to consider an update to be
+successful and for the NotifyUpdateApplied command to be transmitted the
+CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION in the updated image must exceed the
+software version of the running image (continuing the above example, the image
+for the update must be built with CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION set
+to 2).
+
+## Managing the Vendor and Product ID
 
 Starting the ota-provider-app with the --otaImageList command line option allows
 the user to supply a JSON file specifying the Software Version, Vendor and
@@ -102,7 +148,8 @@ Example provider configuration file:
 }
 ```
 
-In order for the Provider to successfully serve the image to a device during the
-OTA Software Update process the softwareVersion parameter in the Provider config
-file must be greater than the CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-parameter set in the application's CHIPProjectConfig.h file.
+## Additional Info
+
+Developers can find more resources on
+[Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US)
+.

@@ -1,5 +1,7 @@
 {
-    "version": "ZCL Test Data",
+    "description": "Matter SDK ZCL data",
+    "category": "matter",
+    "version": 1,
     "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
@@ -66,7 +68,6 @@
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
-        "ami.xml",
         "general.xml",
         "ha-devices.xml",
         "ha.xml",

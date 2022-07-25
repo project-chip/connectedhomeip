@@ -127,7 +127,7 @@ To print all the onboardingcodes:
 ```shell
 uart:~$ matter onboardingcodes none
 QRCode:             MT:W0GU2OTB00KA0648G00
-QRCodeUrl:          https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+QRCodeUrl:          https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ManualPairingCode:  34970112332
 ```
 
@@ -152,7 +152,7 @@ in a web browser. Takes no arguments.
 
 ```shell
 uart:~$ matter onboardingcodes none qrcodeurl
-https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
+https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ```
 
 #### manualpairingcode

@@ -25,7 +25,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/af-event.h>
@@ -35,7 +34,6 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/EventLogging.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;
@@ -385,7 +383,7 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
-            if (user.credentials.size() > 0)
+            if (!user.credentials.empty())
             {
                 TLV::TLVType credentialsContainer;
                 SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(to_underlying(ResponseFields::kCredentials)),
@@ -797,7 +795,7 @@ void DoorLockServer::setWeekDayScheduleCommandHandler(chip::app::CommandHandler 
                                                       uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -905,7 +903,7 @@ void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler 
                                                       uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -948,7 +946,7 @@ void DoorLockServer::clearWeekDayScheduleCommandHandler(chip::app::CommandHandle
                                                         uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsWeekDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearWeekDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1025,7 +1023,7 @@ void DoorLockServer::setYearDayScheduleCommandHandler(chip::app::CommandHandler 
                                                       uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1105,7 +1103,7 @@ void DoorLockServer::getYearDayScheduleCommandHandler(chip::app::CommandHandler 
                                                       uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1147,7 +1145,7 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
                                                         uint16_t userIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsYearDaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearYearDaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1218,12 +1216,15 @@ void DoorLockServer::clearYearDayScheduleCommandHandler(chip::app::CommandHandle
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
+chip::BitFlags<DoorLockFeature> DoorLockServer::GetFeatures(chip::EndpointId endpointId)
 {
-    uint32_t featureMap = 0;
-    bool success        = GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, featureMap);
-
-    return success && ((featureMap & to_underlying(feature)) != 0);
+    chip::BitFlags<DoorLockFeature> featureMap;
+    if (!GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, *featureMap.RawStorage()))
+    {
+        ChipLogError(Zcl, "Unable to get the door lock feature map: attribute read error");
+        featureMap.ClearAll();
+    }
+    return featureMap;
 }
 
 bool DoorLockServer::OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex)
@@ -1948,7 +1949,7 @@ DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endp
     // Not in the spec, but common sense: I don't think we need to modify the credential if user slot is not occupied
     if (user.userStatus == DlUserStatus::kAvailable)
     {
-        emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to user: user clot is empty "
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to user: user slot is empty "
                                       "[endpointId=%d,credentialIndex=%d,userIndex=%d]",
                                       endpointId, credential.CredentialIndex, userIndex);
         return DlStatus::kInvalidField;
@@ -2943,6 +2944,8 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
     case DlCredentialType::kFace:
         // So far there's no distinct data type for face credentials
         return DlLockDataType::kUnspecified;
+    case DlCredentialType::kUnknownEnumValue:
+        return DlLockDataType::kUnspecified;
     }
 
     return DlLockDataType::kUnspecified;
@@ -2955,7 +2958,7 @@ void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler 
     VerifyOrDie(nullptr != commandObj);
 
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[SetHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -3014,7 +3017,7 @@ void DoorLockServer::getHolidayScheduleCommandHandler(chip::app::CommandHandler 
                                                       const ConcreteCommandPath & commandPath, uint8_t holidayIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[GetHolidaySchedule] Ignore command (not supported) [endpointId=%d,scheduleIndex=%d]",
                                       endpointId, holidayIndex);
@@ -3048,7 +3051,7 @@ void DoorLockServer::clearHolidayScheduleCommandHandler(chip::app::CommandHandle
                                                         const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex)
 {
     auto endpointId = commandPath.mEndpointId;
-    if (!SupportsSchedules(endpointId))
+    if (!SupportsHolidaySchedules(endpointId))
     {
         emberAfDoorLockClusterPrintln("[ClearHolidaySchedule] Ignore command (not supported) [endpointId=%d]", endpointId);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -3138,7 +3141,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
         // [EM]: I don't think we should prevent door lock/unlocking if we couldn't find credential associated with user. I
         // think if the app thinks that PIN is correct the door should be unlocked.
         //
-        // [DV]: let's app decide on PIN correctness, we will fail only if 'opHandler' returns false.
+        // [DV]: let app decide on PIN correctness, we will fail only if 'opHandler' returns false.
         credentialsOk =
             true; // findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
     }
@@ -3601,155 +3604,6 @@ void MatterDoorLockPluginServerInitCallback()
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
-
-// =============================================================================
-// 'Default' callbacks for cluster commands
-// =============================================================================
-
-bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
-{
-    err = DlOperationError::kUnspecified;
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode, DlOperationError & err)
-{
-    err = DlOperationError::kUnspecified;
-    return false;
-}
-
-// =============================================================================
-// 'Default' pre-change callbacks for cluster attributes
-// =============================================================================
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, chip::CharSpan newLanguage)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId, uint32_t newTime)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnSoundVolumeChange(chip::EndpointId EndpointId, uint8_t newVolume)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnOperatingModeChange(chip::EndpointId EndpointId, uint8_t newMode)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId, bool enable)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId, bool enable)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId, uint8_t newLimit)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId, uint8_t newTime)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, const chip::app::ConcreteAttributePath & attributePath,
-                                                EmberAfAttributeType attrType, uint16_t attrSize, uint8_t * attrValue)
-{
-    return chip::Protocols::InteractionModel::Status::Success;
-}
-
-// =============================================================================
-// Users and credentials access callbacks
-// =============================================================================
-
-bool __attribute__((weak))
-emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                             const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
-                             DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
-                                   EmberAfPluginDoorLockCredentialInfo & credential)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator,
-                                   chip::FabricIndex modifier, DlCredentialStatus credentialStatus, DlCredentialType credentialType,
-                                   const chip::ByteSpan & credentialData)
-{
-    return false;
-}
-
-DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex,
-                                                                uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak)) emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex,
-                                                                uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockGetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t weekdayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                 DlDaysMaskMap daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status,
-                                 uint32_t localStartTime, uint32_t localEndTime)
-{
-    return DlStatus::kFailure;
-}
-
-DlStatus __attribute__((weak))
-emberAfPluginDoorLockSetSchedule(chip::EndpointId endpointId, uint8_t holidayIndex, DlScheduleStatus status,
-                                 uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
-{
-    return DlStatus::kFailure;
-}
 
 // =============================================================================
 // Timer callbacks

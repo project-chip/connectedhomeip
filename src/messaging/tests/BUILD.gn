@@ -50,6 +50,7 @@ chip_test_suite("tests") {
     # And TestAbortExchangesForFabric does not link on EFR32 for some reason.
     test_sources += [
       "TestAbortExchangesForFabric.cpp",
+      "TestExchangeHolder.cpp",
       "TestExchangeMgr.cpp",
       "TestReliableMessageProtocol.cpp",
     ]

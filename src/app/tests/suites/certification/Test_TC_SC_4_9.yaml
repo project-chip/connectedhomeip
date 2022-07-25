@@ -28,6 +28,8 @@ tests:
       verification: |
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": [{"cluster": null, "endpoint": 0, "deviceType": null}]}, {"fabricIndex": 1, "privilege": 3, "authMode": 3, "subjects": null, "targets": [{"cluster": null, "endpoint": 1, "deviceType": null}]}]' 77 0
 
+          Verify on the TH Log:
+
           [1652330385.328196][3240:3245] CHIP:DMG:                        StatusIB =
           [1652330385.328229][3240:3245] CHIP:DMG:                        {
           [1652330385.328264][3240:3245] CHIP:DMG:                                status = 0x00 (SUCCESS),
@@ -40,6 +42,8 @@ tests:
       verification: |
           ./chip-tool basic read node-label 77 0
 
+          Verify on the TH Log:
+
           [1652420234.342201][2403:2408] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347768
           [1652420234.342277][2403:2408] CHIP:TOO:   NodeLabel:
           [1652420234.342452][2403:2408] CHIP:EM: Sending Standalone Ack for MessageCounter:123718 on exchange 57159i
@@ -48,6 +52,8 @@ tests:
     - label: 'Writes "TestRIO" to the NodeLabel attribute'
       verification: |
           ./chip-tool basic write node-label testrio 77 0
+
+          Verify on the TH Log:
 
           StatusIB =
           [1652421063.833937][2454:2459] CHIP:DMG:                         {
@@ -59,6 +65,8 @@ tests:
       verification: |
           ./chip-tool basic read node-label 77 0
 
+          Verify on the TH Log:
+
           [1652421068.143200][2460:2465] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347769
           [1652421068.143276][2460:2465] CHIP:TOO:   NodeLabel: testrio
           [1652421068.143457][2460:2465] CHIP:EM: Sending Standalone Ack for MessageCounter:2274062 on exchange 46531i
@@ -67,6 +75,8 @@ tests:
     - label: 'Writes "TestRIO2" to the NodeLabel attribute'
       verification: |
           ./chip-tool basic write node-label testrio2 77 0
+
+          Verify on the TH Log:
 
           StatusIB =
           [1652421082.185625][2467:2473] CHIP:DMG:                         {
@@ -77,6 +87,8 @@ tests:
     - label: "Reads NodeLabel attribute"
       verification: |
           ./chip-tool basic read node-label 77 0
+
+          Verify on the TH Log:
 
           [1652421088.232903][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 2144347770
           [1652421088.232983][2474:2479] CHIP:TOO:   NodeLabel: testrio2

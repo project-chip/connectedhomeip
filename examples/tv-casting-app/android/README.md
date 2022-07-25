@@ -9,12 +9,12 @@ the TV.
 
 <hr>
 
--   [Requirements for building](#requirements)
-    -   [ABIs and TARGET_CPU](#abi)
-    -   [Gradle & JDK Version](#jdk)
--   [Preparing for build](#preparing)
--   [Building & Installing the app](#building-installing)
--   [Running the app on Android](#running-the-app-on-android)
+-   [Matter TV Casting Android App Example](#matter-tv-casting-android-app-example)
+    -   [Requirements for building](#requirements-for-building)
+        -   [ABIs and TARGET_CPU](#abis-and-target_cpu)
+        -   [Gradle & JDK Version](#gradle--jdk-version)
+    -   [Preparing for build](#preparing-for-build)
+    -   [Building & Installing the app](#building--installing-the-app)
 
 <hr>
 
@@ -79,17 +79,17 @@ This is the simplest option. In the command line, run the following command from
 the top Matter directory:
 
 ```shell
-./scripts/build/build_examples.py --target android-arm64-chip-tv-casting-app build
+./scripts/build/build_examples.py --target android-arm64-tv-casting-app build
 ```
 
 See the table above for other values of `TARGET_CPU`.
 
 The debug Android package `app-debug.apk` will be generated at
-`out/android-$TARGET_CPU-chip-tv-casting-app/outputs/apk/debug/`, and can be
+`out/android-$TARGET_CPU-tv-casting-app/outputs/apk/debug/`, and can be
 installed with
 
 ```shell
-adb install out/android-$TARGET_CPU-chip-tv-casting-app/outputs/apk/debug/app-debug.apk
+adb install out/android-$TARGET_CPU-tv-casting-app/outputs/apk/debug/app-debug.apk
 ```
 
 You can use Android Studio to edit the Android app itself and run it after

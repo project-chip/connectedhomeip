@@ -29,6 +29,8 @@
 #include <cstdio>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <lib/core/Optional.h>
+
 using namespace chip;
 using namespace chip::app;
 
@@ -241,7 +243,8 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
 chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
-                                                                uint16_t timedWriteTimeoutMs, size_t n, ...);
+                                                                uint16_t timedWriteTimeoutMs, uint16_t interactionTimeoutMs,
+                                                                size_t n, ...);
 chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
                                                               ReadClientCallback ** pCallback, DeviceProxy * device,
                                                               uint8_t * readParamsBuf, size_t n, size_t total, ...);
@@ -319,7 +322,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 }
 
 chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
-                                                                uint16_t timedWriteTimeoutMs, size_t n, ...)
+                                                                uint16_t timedWriteTimeoutMs, uint16_t interactionTimeoutMs,
+                                                                size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -331,7 +335,7 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
     va_list args;
     va_start(args, n);
 
-    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
     {
         for (size_t i = 0; i < n; i++)
@@ -359,7 +363,9 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
         }
     }
 
-    SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value()));
+    SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
+                                                 interactionTimeoutMs != 0 ? System::Clock::Milliseconds32(interactionTimeoutMs)
+                                                                           : System::Clock::kZero));
 
     client.release();
     callback.release();

@@ -38,23 +38,40 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Read the optional global attribute: FeatureMap"
-      PICS: MC_MEDIAINPUT.S.NU
+    - label: "Read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: map32
+              minValue: 0
+              maxValue: 1
 
     - label: "Read the global attribute: AttributeList"
-      PICS: MC_MEDIAINPUT.S.A0000 && MC_MEDIAINPUT.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label: "Read the optional attribute(InputList) in AttributeList"
+      PICS: MEDIAINPUT.S.A0000
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Read the optional attribute(CurrentInput) in AttributeList"
+      PICS: MEDIAINPUT.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
 
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"

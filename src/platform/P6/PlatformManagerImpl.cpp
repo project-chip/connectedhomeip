@@ -43,9 +43,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
     SuccessOrExit(err);

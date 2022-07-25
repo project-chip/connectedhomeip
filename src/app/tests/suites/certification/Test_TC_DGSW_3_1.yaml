@@ -27,7 +27,7 @@ tests:
       disabled: true
 
     - label: "DUT reads a list of ThreadMetrics struct attribute from TH."
-      PICS: DGSW.S.A0001
+      PICS: DGSW.S.A0000
       verification: |
           ./chip-tool softwarediagnostics read thread-metrics 1 0
           Verify the thread-metrics attribute has entries with ThreadMetrics Struct.
@@ -79,7 +79,7 @@ tests:
       disabled: true
 
     - label: "DUT reads an attribute value from TH."
-      PICS: DGSW.S.A0002
+      PICS: DGSW.S.A0001
       verification: |
           ./chip-tool softwarediagnostics read current-heap-free 1 0
           Verify the value of CurrentHeapFree is in range uint64
@@ -89,7 +89,7 @@ tests:
       disabled: true
 
     - label: "DUT reads an attribute value from TH."
-      PICS: DGSW.S.A0003
+      PICS: DGSW.S.A0002
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
           Verify the value of CurrentHeapUsed is in range uint64
@@ -99,7 +99,7 @@ tests:
       disabled: true
 
     - label: "DUT reads an attribute value from TH."
-      PICS: DGSW.S.A0004
+      PICS: DGSW.S.A0003
       verification: |
           ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
           Verify the value of CurrentHeapHighWatermark is in range uint64

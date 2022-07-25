@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 20.6.6. [TC-IDM-8.1] Fabric scoped Test Cases. DUT as the server.
+name: 3.6.6. [TC-IDM-8.1] Fabric scoped Test Cases. [{DUT_Server}]
 
 config:
     nodeId: 0x12344321
@@ -26,7 +26,52 @@ tests:
           attribute, which is a fabric scoped list, from the DUT. Fabric
           filtered should be set to false."
       verification: |
-          Verify that the number of entries returned by the DUT for both the reads are same. Verify that the response to RC1 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values. Verify that the response to RC2 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values.
+          On RC1 and RC2, Verify that the number of entries returned by the DUT for both the reads are same.By sending below commands
+
+
+          ./chip-tool  accesscontrol  read acl 1 0 --fabric-filtered 0
+          On RC1, verify that the number of entries
+          [1657779742.905642][2620:2625] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 4140182590
+          [1657779742.905736][2620:2625] CHIP:TOO:   ACL: 2 entries
+          [1657779742.905794][2620:2625] CHIP:TOO:     [1]: {
+          [1657779742.905845][2620:2625] CHIP:TOO:       Privilege: 5
+          [1657779742.905877][2620:2625] CHIP:TOO:       AuthMode: 2
+          [1657779742.905913][2620:2625] CHIP:TOO:       Subjects: 1 entries
+          [1657779742.905952][2620:2625] CHIP:TOO:         [1]: 112233
+          [1657779742.905986][2620:2625] CHIP:TOO:       Targets: null
+          [1657779742.906017][2620:2625] CHIP:TOO:       FabricIndex: 1
+          [1657779742.906047][2620:2625] CHIP:TOO:      }
+          [1657779742.906083][2620:2625] CHIP:TOO:     [2]: {
+          [1657779742.906114][2620:2625] CHIP:TOO:       Privilege: 0
+          [1657779742.906144][2620:2625] CHIP:TOO:       AuthMode: 0
+          [1657779742.906174][2620:2625] CHIP:TOO:       Subjects: null
+          [1657779742.906203][2620:2625] CHIP:TOO:       Targets: null
+          [1657779742.906233][2620:2625] CHIP:TOO:       FabricIndex: 2
+          [1657779742.906262][2620:2625] CHIP:TOO:      }
+          [1657779742.906365][2620:2625] CHIP:EM: Sending Standalone Ack for MessageCounter:156304177 on exchange 7994i
+
+
+
+           ./chip-tool  accesscontrol  read acl 2 0 --fabric-filtered 0
+          On RC2, verify that the number of entries
+          [1657777306.528148][2474:2479] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 3942609879
+          [1657777306.529101][2474:2479] CHIP:TOO:   ACL: 2 entries
+          [1657777306.529144][2474:2479] CHIP:TOO:     [1]: {
+          [1657777306.531412][2474:2479] CHIP:TOO:       Privilege: 0
+          [1657777306.531449][2474:2479] CHIP:TOO:       AuthMode: 0
+          [1657777306.531476][2474:2479] CHIP:TOO:       Subjects: null
+          [1657777306.531502][2474:2479] CHIP:TOO:       Targets: null
+          [1657777306.531527][2474:2479] CHIP:TOO:       FabricIndex: 1
+          [1657777306.531551][2474:2479] CHIP:TOO:      }
+          [1657777306.531596][2474:2479] CHIP:TOO:     [2]: {
+          [1657777306.531623][2474:2479] CHIP:TOO:       Privilege: 5
+          [1657777306.531647][2474:2479] CHIP:TOO:       AuthMode: 2
+          [1657777306.531675][2474:2479] CHIP:TOO:       Subjects: 1 entries
+          [1657777306.531708][2474:2479] CHIP:TOO:         [1]: 112233
+          [1657777306.531736][2474:2479] CHIP:TOO:       Targets: null
+          [1657777306.531761][2474:2479] CHIP:TOO:       FabricIndex: 2
+          [1657777306.531785][2474:2479] CHIP:TOO:      }
+          [1657777306.531885][2474:2479] CHIP:EM: Sending Standalone Ack for MessageCounter:98574249 on exchange 20274i
       disabled: true
 
     - label:
@@ -38,18 +83,259 @@ tests:
           fabric-filtered Read Request Message from each of RC1 and RC2 to read
           the fabric scoped list from the DUT."
       verification: |
-          Verify that the data received from DUT after the second read request from RC2 is same as the data received after the first read request from RC2. Verify that the data received from the DUT after the second read request from RC1 has the correct modifications to the data.
+          By sending the command mentioned below, change attribute values on DUT to create events multiple times.Send a fabric-filtered Read Request Message from each of RC1 and RC2
+
+          ./chip-tool  accesscontrol  read acl 1 0  --commissioner-name beta
+           On RC1, verify that acl atrribute reading an entries from DUT
+          [1657781757.866389][2878:2883] CHIP:DMG: }
+          [1657781757.866649][2878:2883] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 4140182590
+          [1657781757.866722][2878:2883] CHIP:TOO:   ACL: 1 entries
+          [1657781757.866769][2878:2883] CHIP:TOO:     [1]: {
+          [1657781757.866809][2878:2883] CHIP:TOO:       Privilege: 5
+          [1657781757.866832][2878:2883] CHIP:TOO:       AuthMode: 2
+          [1657781757.866859][2878:2883] CHIP:TOO:       Subjects: 1 entries
+          [1657781757.866887][2878:2883] CHIP:TOO:         [1]: 112233
+          [1657781757.866913][2878:2883] CHIP:TOO:       Targets: null
+          [1657781757.866935][2878:2883] CHIP:TOO:       FabricIndex: 1
+          [1657781757.866958][2878:2883] CHIP:TOO:      }
+          [1657781757.867038][2878:2883] CHIP:EM: Sending Standalone Ack for MessageCounter:31035884 on exchange 64038i
+
+
+           ./chip-tool  accesscontrol  read acl 2 0  --commissioner-name gamma
+           On RC2, verify that acl atrribute reading an entries from DUT
+          [1657781810.474993][2821:2826] CHIP:DMG: }
+          [1657781810.475304][2821:2826] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 4140182590
+          [1657781810.475389][2821:2826] CHIP:TOO:   ACL: 1 entries
+          [1657781810.475442][2821:2826] CHIP:TOO:     [1]: {
+          [1657781810.475488][2821:2826] CHIP:TOO:       Privilege: 5
+          [1657781810.475517][2821:2826] CHIP:TOO:       AuthMode: 2
+          [1657781810.475549][2821:2826] CHIP:TOO:       Subjects: 1 entries
+          [1657781810.475583][2821:2826] CHIP:TOO:         [1]: 112233
+          [1657781810.475614][2821:2826] CHIP:TOO:       Targets: null
+          [1657781810.475643][2821:2826] CHIP:TOO:       FabricIndex: 2
+          [1657781810.475670][2821:2826] CHIP:TOO:      }
+          [1657781810.475763][2821:2826] CHIP:EM: Sending Standalone Ack for MessageCounter:227198602 on exchange 37948i
+
+
+          From RC1 send a Write Request message to the DUT to write to an entry in the fabric scoped list associated with its own fabric.
+
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0 --commissioner-name beta
+
+          On RC1, Verify that DUT responds as success
+
+          [1657782547.448455][2974:2979] CHIP:DMG: WriteResponseMessage =
+          [1657782547.448486][2974:2979] CHIP:DMG: {
+          [1657782547.448513][2974:2979] CHIP:DMG:         AttributeStatusIBs =
+          [1657782547.448551][2974:2979] CHIP:DMG:         [
+          [1657782547.448581][2974:2979] CHIP:DMG:                 AttributeStatusIB =
+          [1657782547.448619][2974:2979] CHIP:DMG:                 {
+          [1657782547.448651][2974:2979] CHIP:DMG:                         AttributePathIB =
+          [1657782547.448690][2974:2979] CHIP:DMG:                         {
+          [1657782547.448730][2974:2979] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657782547.448776][2974:2979] CHIP:DMG:                                 Cluster = 0x1f,
+          [1657782547.448818][2974:2979] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657782547.448857][2974:2979] CHIP:DMG:                         }
+          [1657782547.448899][2974:2979] CHIP:DMG:
+          [1657782547.448941][2974:2979] CHIP:DMG:                         StatusIB =
+          [1657782547.448980][2974:2979] CHIP:DMG:                         {
+          [1657782547.449018][2974:2979] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657782547.449061][2974:2979] CHIP:DMG:                         },
+          [1657782547.449100][2974:2979] CHIP:DMG:
+          [1657782547.449134][2974:2979] CHIP:DMG:                 },
+          [1657782547.449178][2974:2979] CHIP:DMG:
+          [1657782547.449208][2974:2979] CHIP:DMG:                 AttributeStatusIB =
+          [1657782547.449244][2974:2979] CHIP:DMG:                 {
+          [1657782547.449278][2974:2979] CHIP:DMG:                         AttributePathIB =
+          [1657782547.449316][2974:2979] CHIP:DMG:                         {
+          [1657782547.449356][2974:2979] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657782547.449397][2974:2979] CHIP:DMG:                                 Cluster = 0x1f,
+          [1657782547.449439][2974:2979] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657782547.449483][2974:2979] CHIP:DMG:                                 ListIndex = Null,
+          [1657782547.449525][2974:2979] CHIP:DMG:                         }
+          [1657782547.449568][2974:2979] CHIP:DMG:
+          [1657782547.449642][2974:2979] CHIP:DMG:                         StatusIB =
+          [1657782547.449687][2974:2979] CHIP:DMG:                         {
+          [1657782547.449727][2974:2979] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657782547.449766][2974:2979] CHIP:DMG:                         },
+          [1657782547.449805][2974:2979] CHIP:DMG:
+          [1657782547.449838][2974:2979] CHIP:DMG:                 },
+          [1657782547.449878][2974:2979] CHIP:DMG:
+          [1657782547.449907][2974:2979] CHIP:DMG:         ],
+          [1657782547.449948][2974:2979] CHIP:DMG:
+          [1657782547.449978][2974:2979] CHIP:DMG:         InteractionModelRevision = 1
+          [1657782547.450006][2974:2979] CHIP:DMG: }
+          [1657782547.450127][2974:2979] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+
+
+           Send a fabric-filtered Read Request Message from each of RC1 and RC2 to read the fabric scoped list from the DUT.
+
+          ./chip-tool  accesscontrol  read acl 2 0   --fabric-filtered 0  --commissioner-name gamma
+          On RC2, Verify that the data received from DUT  is same as the data received in first read request
+          [1657782203.827787][2957:2962] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_0000 DataVersion: 4140182592
+          [1657782203.827866][2957:2962] CHIP:TOO:   ACL: 2 entries
+          [1657782203.827914][2957:2962] CHIP:TOO:     [1]: {
+          [1657782203.827956][2957:2962] CHIP:TOO:       Privilege: 5
+          [1657782203.827982][2957:2962] CHIP:TOO:       AuthMode: 2
+          [1657782203.828011][2957:2962] CHIP:TOO:       Subjects: 1 entries
+          [1657782203.828042][2957:2962] CHIP:TOO:         [1]: 112233
+          [1657782203.828070][2957:2962] CHIP:TOO:       Targets: null
+          [1657782203.828095][2957:2962] CHIP:TOO:       FabricIndex: 1
+          [1657782203.828115][2957:2962] CHIP:TOO:      }
+          [1657782203.828140][2957:2962] CHIP:TOO:     [2]: {
+          [1657782203.828159][2957:2962] CHIP:TOO:       Privilege: 0
+          [1657782203.828178][2957:2962] CHIP:TOO:       AuthMode: 0
+          [1657782203.828198][2957:2962] CHIP:TOO:       Subjects: null
+          [1657782203.828216][2957:2962] CHIP:TOO:       Targets: null
+          [1657782203.828235][2957:2962] CHIP:TOO:       FabricIndex: 2
+          [1657782203.828253][2957:2962] CHIP:TOO:      }
+          [1657782203.828346][2957:2962] CHIP:EM: Sending Standalone Ack for MessageCounter:211465645 on exchange 51184i
+
+
+          ./chip-tool  accesscontrol  read acl 1 0  --commissioner-name beta
+
+          On RC1, Verify that DUT responds as UNSUPPORTED_ACCESS
+          [1657782688.737945][2996:3001] CHIP:DMG:         SuppressResponse = true,
+          [1657782688.737974][2996:3001] CHIP:DMG:         InteractionModelRevision = 1
+          [1657782688.737999][2996:3001] CHIP:DMG: }
+          [1657782688.738108][2996:3001] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1657782688.738197][2996:3001] CHIP:EM: Sending Standalone Ack for MessageCounter:110177776 on exchange 22939i
       disabled: true
 
     - label:
-          "Send a Read Request Message to the DUT from RC1 and RC2 to read the
-          fabric scoped list 'Fabrics' from OperationalCredentialsCluster.
+          'Send a Read Request Message to the DUT from RC1 and RC2 to read the
+          fabric scoped list "Fabrics" from OperationalCredentialsCluster.
           Fabric filtered should be set to false. RC1 sends an Invoke
           command(UpdateFabricLabel) to update the label of its fabric. Send a
           non-filtered Read Request Message from RC1 and RC2 to read the fabric
-          scoped list from the DUT."
+          scoped list from the DUT.'
       verification: |
-          Verify that the label only for the fabric on which RC1 and DUT are present is updated. Verify that the label for the other fabric RC2 is on is not modified.
+          Send a Read Request Message to the DUT from RC1 and RC2 to read the fabric scoped list "Fabrics" from OperationalCredentialsCluster. Fabric filtered should be set to false.
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0  --commissioner-name beta
+
+          [1657780124.975404][2664:2669] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 1307873919
+          [1657780124.975642][2664:2669] CHIP:TOO:   Fabrics: 2 entries
+          [1657780124.975710][2664:2669] CHIP:TOO:     [1]: {
+          [1657780124.975747][2664:2669] CHIP:TOO:       RootPublicKey: 04100A4370AD71A180C267C29E364FC595A24A0D3CC2EC1A0595B2319E8E65D0BC1C7B62EBB0D91F7207CE306A094EAD0084A8A9359FC568D1279BDD275701F0ED
+          [1657780124.975791][2664:2669] CHIP:TOO:       VendorId: 65521
+          [1657780124.975829][2664:2669] CHIP:TOO:       FabricId: 2
+          [1657780124.975854][2664:2669] CHIP:TOO:       NodeId: 1
+          [1657780124.975891][2664:2669] CHIP:TOO:       Label:
+          [1657780124.975916][2664:2669] CHIP:TOO:       FabricIndex: 1
+          [1657780124.975940][2664:2669] CHIP:TOO:      }
+          [1657780124.975985][2664:2669] CHIP:TOO:     [2]: {
+          [1657780124.976026][2664:2669] CHIP:TOO:       RootPublicKey: 04BC41C77289C6CCE2752CA88DFE1C1A0EB3742B31A32D32C7185CAE22CC0665889702E82706F952524618EFC34A5462A08B793C5AC3C5B45E55598AD362975FFC
+          [1657780124.976053][2664:2669] CHIP:TOO:       VendorId: 65521
+          [1657780124.976088][2664:2669] CHIP:TOO:       FabricId: 3
+          [1657780124.976112][2664:2669] CHIP:TOO:       NodeId: 2
+          [1657780124.976135][2664:2669] CHIP:TOO:       Label:
+          [1657780124.976217][2664:2669] CHIP:TOO:       FabricIndex: 2
+          [1657780124.976242][2664:2669] CHIP:TOO:      }
+          [1657780124.976356][2664:2669] CHIP:EM: Sending Standalone Ack for MessageCounter:266273154 on exchange 62310i
+
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0  --commissioner-name gamma
+          [1657780154.150519][2728:2733] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 1307873919
+          [1657780154.150627][2728:2733] CHIP:TOO:   Fabrics: 2 entries
+          [1657780154.150694][2728:2733] CHIP:TOO:     [1]: {
+          [1657780154.150734][2728:2733] CHIP:TOO:       RootPublicKey: 04100A4370AD71A180C267C29E364FC595A24A0D3CC2EC1A0595B2319E8E65D0BC1C7B62EBB0D91F7207CE306A094EAD0084A8A9359FC568D1279BDD275701F0ED
+          [1657780154.150782][2728:2733] CHIP:TOO:       VendorId: 65521
+          [1657780154.150826][2728:2733] CHIP:TOO:       FabricId: 2
+          [1657780154.150855][2728:2733] CHIP:TOO:       NodeId: 1
+          [1657780154.150882][2728:2733] CHIP:TOO:       Label:
+          [1657780154.150910][2728:2733] CHIP:TOO:       FabricIndex: 1
+          [1657780154.150937][2728:2733] CHIP:TOO:      }
+          [1657780154.150977][2728:2733] CHIP:TOO:     [2]: {
+          [1657780154.151011][2728:2733] CHIP:TOO:       RootPublicKey: 04BC41C77289C6CCE2752CA88DFE1C1A0EB3742B31A32D32C7185CAE22CC0665889702E82706F952524618EFC34A5462A08B793C5AC3C5B45E55598AD362975FFC
+          [1657780154.151041][2728:2733] CHIP:TOO:       VendorId: 65521
+          [1657780154.151069][2728:2733] CHIP:TOO:       FabricId: 3
+          [1657780154.151096][2728:2733] CHIP:TOO:       NodeId: 2
+          [1657780154.151122][2728:2733] CHIP:TOO:       Label:
+          [1657780154.151149][2728:2733] CHIP:TOO:       FabricIndex: 2
+          [1657780154.151176][2728:2733] CHIP:TOO:      }
+          [1657780154.151277][2728:2733] CHIP:EM: Sending Standalone Ack for MessageCounter:218603951 on exchange 21910i
+
+
+
+
+
+          ./chip-tool operationalcredentials update-fabric-label 1 1 0 --commissioner-name beta
+          [1657780486.902409][2687:2692] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1657780486.902474][2687:2692] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1657780486.902544][2687:2692] CHIP:TOO:   NOCResponse: {
+          [1657780486.902612][2687:2692] CHIP:TOO:     statusCode: 0
+          [1657780486.902649][2687:2692] CHIP:TOO:     fabricIndex: 1
+          [1657780486.902684][2687:2692] CHIP:TOO:    }
+          [1657780486.902736][2687:2692] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657780486.902804][2687:2692] CHIP:EM: Sending Standalone Ack for MessageCounter:243850872 on exchange 45753i
+
+
+          ./chip-tool operationalcredentials update-fabric-label 2 2 0 --commissioner-name beta
+          [1657780486.902409][2687:2692] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1657780486.902474][2687:2692] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1657780486.902544][2687:2692] CHIP:TOO:   NOCResponse: {
+          [1657780486.902612][2687:2692] CHIP:TOO:     statusCode: 0
+          [1657780486.902649][2687:2692] CHIP:TOO:     fabricIndex: 2
+          [1657780486.902684][2687:2692] CHIP:TOO:    }
+          [1657780486.902736][2687:2692] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657780486.902804][2687:2692] CHIP:EM: Sending Standalone Ack for MessageCounter:243850872 on exchange 45753i
+
+
+
+          ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0  --commissioner-name beta
+          [1657780552.471227][2696:2701] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 1307873920
+          [1657780552.471361][2696:2701] CHIP:TOO:   Fabrics: 2 entries
+          [1657780552.471450][2696:2701] CHIP:TOO:     [1]: {
+          [1657780552.471503][2696:2701] CHIP:TOO:       RootPublicKey: 04100A4370AD71A180C267C29E364FC595A24A0D3CC2EC1A0595B2319E8E65D0BC1C7B62EBB0D91F7207CE306A094EAD0084A8A9359FC568D1279BDD275701F0ED
+          [1657780552.471566][2696:2701] CHIP:TOO:       VendorId: 65521
+          [1657780552.471605][2696:2701] CHIP:TOO:       FabricId: 2
+          [1657780552.471642][2696:2701] CHIP:TOO:       NodeId: 1
+          [1657780552.471679][2696:2701] CHIP:TOO:       Label: 2
+          [1657780552.471715][2696:2701] CHIP:TOO:       FabricIndex: 1
+          [1657780552.471752][2696:2701] CHIP:TOO:      }
+          [1657780552.471805][2696:2701] CHIP:TOO:     [2]: {
+          [1657780552.471850][2696:2701] CHIP:TOO:       RootPublicKey: 04BC41C77289C6CCE2752CA88DFE1C1A0EB3742B31A32D32C7185CAE22CC0665889702E82706F952524618EFC34A5462A08B793C5AC3C5B45E55598AD362975FFC
+          [1657780552.471891][2696:2701] CHIP:TOO:       VendorId: 65521
+          [1657780552.471928][2696:2701] CHIP:TOO:       FabricId: 3
+          [1657780552.471965][2696:2701] CHIP:TOO:       NodeId: 2
+          [1657780552.472001][2696:2701] CHIP:TOO:       Label:
+          [1657780552.472037][2696:2701] CHIP:TOO:       FabricIndex: 2
+          [1657780552.472073][2696:2701] CHIP:TOO:      }
+          [1657780552.472199][2696:2701] CHIP:EM: Sending Standalone Ack for MessageCounter:2814032 on exchange 31449i
+
+
+            ./chip-tool operationalcredentials update-fabric-label 1 2 0 --commissioner-name gamma
+          [1657780809.365523][2771:2776] CHIP:DMG: },
+          [1657780809.365603][2771:2776] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
+          [1657780809.365661][2771:2776] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Command 0x0000_0008
+          [1657780809.365727][2771:2776] CHIP:TOO:   NOCResponse: {
+          [1657780809.365787][2771:2776] CHIP:TOO:     statusCode: 0
+          [1657780809.365822][2771:2776] CHIP:TOO:     fabricIndex: 2
+          [1657780809.365853][2771:2776] CHIP:TOO:    }
+          [1657780809.365902][2771:2776] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1657780809.365966][2771:2776] CHIP:EM: Sending Standalone Ack for MessageCounter:102825987 on exchange 28163i
+
+
+          ./chip-tool operationalcredentials read fabrics 2 0 --fabric-filtered 0  --commissioner-name gamma
+          [1657780904.261593][2741:2746] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 1307873922
+          [1657780904.261701][2741:2746] CHIP:TOO:   Fabrics: 2 entries
+          [1657780904.261761][2741:2746] CHIP:TOO:     [1]: {
+          [1657780904.261797][2741:2746] CHIP:TOO:       RootPublicKey: 04100A4370AD71A180C267C29E364FC595A24A0D3CC2EC1A0595B2319E8E65D0BC1C7B62EBB0D91F7207CE306A094EAD0084A8A9359FC568D1279BDD275701F0ED
+          [1657780904.261840][2741:2746] CHIP:TOO:       VendorId: 65521
+          [1657780904.261865][2741:2746] CHIP:TOO:       FabricId: 2
+          [1657780904.261889][2741:2746] CHIP:TOO:       NodeId: 1
+          [1657780904.261913][2741:2746] CHIP:TOO:       Label: 2
+          [1657780904.261937][2741:2746] CHIP:TOO:       FabricIndex: 1
+          [1657780904.261960][2741:2746] CHIP:TOO:      }
+          [1657780904.261994][2741:2746] CHIP:TOO:     [2]: {
+          [1657780904.262023][2741:2746] CHIP:TOO:       RootPublicKey: 04BC41C77289C6CCE2752CA88DFE1C1A0EB3742B31A32D32C7185CAE22CC0665889702E82706F952524618EFC34A5462A08B793C5AC3C5B45E55598AD362975FFC
+          [1657780904.262049][2741:2746] CHIP:TOO:       VendorId: 65521
+          [1657780904.262073][2741:2746] CHIP:TOO:       FabricId: 3
+          [1657780904.262096][2741:2746] CHIP:TOO:       NodeId: 2
+          [1657780904.262119][2741:2746] CHIP:TOO:       Label: 1
+          [1657780904.262141][2741:2746] CHIP:TOO:       FabricIndex: 2
+          [1657780904.262164][2741:2746] CHIP:TOO:      }
+          [1657780904.262252][2741:2746] CHIP:EM: Sending Standalone Ack for MessageCounter:203207506 on exchange 27504i
       disabled: true
 
     - label:
@@ -59,7 +345,30 @@ tests:
           whose value is a list of structs which contain some fabric-sensitive
           data. Modify attribute1 on the DUT."
       verification: |
-          Verify that the DUT sends a response to RC1 and RC2 with the modified attribute values. Verify that the response to RC1 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values. Verify that the response to RC2 does not contain fabric sensitive data belonging to the other fabric. The fabric sensitive fields in the entries belonging to the other fabric should either be null or contain default values.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
+
+          operationalcredentials subscribe nocs 10 100 1 0
+
+          [1657802879.008816][4548:4553] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 567747175
+          [1657802879.008927][4548:4553] CHIP:TOO:   NOCs: 1 entries
+          [1657802879.009017][4548:4553] CHIP:TOO:     [1]: {
+          [1657802879.009105][4548:4553] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415012411011824070124080130094104EA61A44385992E365092182D59E3DAF164D2B2F1818B071779A8A0C8832720B52691E4100925D0427C7643BDB43D4ECBCF3D740B0DA0D5E00517143E88676E87370A350128011824020136030402040118300414668A31137585F054F68F571251E644FECF98BEEB3005142179BF06A074A00549577FF0F68071038C6019A118300B407E6F0AFEFAF6EA93D8F39B077C97F175B9C417E37816F229C39D2A36F46576E52787E4610075270222053BFDDE853F06EF52F5C4BCC1102A25F089AFA675200418
+          [1657802879.009203][4548:4553] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A37062413011824070124080130094104E02FFF23357C6B135568AA3E456204672E5BDDF5B68B1A9B39E670E56B9982298B1BBEEBD9F3723C2B58944A11ACD9B2CD8DE7C94DC6FEEFA67E2CBF0A8CCDBC370A35012901182402603004142179BF06A074A00549577FF0F68071038C6019A130051474B77548C9D04E936F951F0775C7AE9F88AF9FA318300B405AB8763179CF1E865E20E19F81E1286EF7B9D417BDC85D536406230816A438EDB48E946D5821FE54D97D1C337505AA6DEC1746C884344A769F63E9DC8318186918
+          [1657802879.009273][4548:4553] CHIP:TOO:       FabricIndex: 1
+          [1657802879.009329][4548:4553] CHIP:TOO:      }
+          [1657802879.009426][4548:4553] CHIP:DMG: MoveToState ReadClient[0xffff7c008e40]: Moving to [AwaitingSu]
+
+          operationalcredentials subscribe nocs 10 100 2 0 --commissioner-name beta
+          [1657803363.013803][5522:5527] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 567747179
+          [1657803363.013897][5522:5527] CHIP:TOO:   NOCs: 1 entries
+          [1657803363.013971][5522:5527] CHIP:TOO:     [1]: {
+          [1657803363.014015][5522:5527] CHIP:TOO:       Noc: 1530010101240201370324130118260480228127260580254D3A37062415022411021824070124080130094104CBB7ECF6D0E5814461597F9EA23B2616F55CA3144225CAFDFA651E88C0C6E79B6E02A734F61F8DA0D0A286C9C6E3C786680E8419C505F07DF431D86F7D900A10370A350128011824020136030402040118300414FE58E8B6E61BD3B492E81DF99EC967B0C26BF711300514A75280F34A91D76EA45936672A84D498FB1D67B418300B40175ECC1BA10A4F90D408468F4E212534B74537AE0178B22E05DBD14048748AD50CB7C5324FFE28356E7D37717384EA500B9B6423D12E64D3B825C4E72CCE199918
+          [1657803363.014077][5522:5527] CHIP:TOO:       Icac: 1530010100240201370324140018260480228127260580254D3A3706241301182407012408013009410434E10386BC3B08489513C394AC3EFB2151EEAEFC929D157586DD31838D79A2FCED41CCB036D312EBBC879504CA7C5889E447E1F602141F9C9531D6A3178A0B91370A3501290118240260300414A75280F34A91D76EA45936672A84D498FB1D67B43005144DC5ED208AA1EEC31D5C5A52F95EAC45FE6AFA0D18300B40702DEDF1A21987C4675D53F050024AC51BE975CCAC09BC6398522FF337E023AA20185E9D68D7CA22A26B937FD4A9644015AF75EAAB2F43E8415E17F698A48CEA18
+          [1657803363.014113][5522:5527] CHIP:TOO:       FabricIndex: 2
+          [1657803363.014141][5522:5527] CHIP:TOO:      }
+          [1657803363.014189][5522:5527] CHIP:DMG: MoveToState ReadClient[0xffff6c008e70]: Moving to [AwaitingSu]
+          [1657803363.014248][5522:5527] CHIP:EM: Piggybacking Ack for MessageCounter:84457338 on exchange: 56555i
       disabled: true
 
     - label:
@@ -68,7 +377,115 @@ tests:
           same Event1 which is fabric sensitive. Trigger Event1 on DUT on the
           fabric where RC1 is present."
       verification: |
-          Verify that the DUT sends a response to RC1 and not RC2.
+          Please  run this test in chip tool interactive mode ./chip-tool interactive start
+
+
+          Activate the subscription between RC1 and DUT for an Event1 which is fabric sensitive
+          accesscontrol subscribe-event access-control-entry-changed  20 500 1 0
+
+
+          [1657887424.932830][3496:3501] CHIP:DMG: }
+          [1657887424.933020][3496:3501] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1657887424.933049][3496:3501] CHIP:TOO:          Event number: 1
+          [1657887424.933075][3496:3501] CHIP:TOO:          Priority: Info
+          [1657887424.933100][3496:3501] CHIP:TOO:          Timestamp: 10640831
+          [1657887424.933204][3496:3501] CHIP:TOO:   AccessControlEntryChanged: {
+          [1657887424.933247][3496:3501] CHIP:TOO:     AdminNodeID: null
+          [1657887424.933287][3496:3501] CHIP:TOO:     AdminPasscodeID: 0
+          [1657887424.933315][3496:3501] CHIP:TOO:     ChangeType: 1
+          [1657887424.933342][3496:3501] CHIP:TOO:     LatestValue: {
+          [1657887424.933368][3496:3501] CHIP:TOO:       Privilege: 5
+          [1657887424.933395][3496:3501] CHIP:TOO:       AuthMode: 2
+          [1657887424.933426][3496:3501] CHIP:TOO:       Subjects: 1 entries
+          [1657887424.933460][3496:3501] CHIP:TOO:         [1]: 112233
+          [1657887424.933489][3496:3501] CHIP:TOO:       Targets: null
+          [1657887424.933515][3496:3501] CHIP:TOO:       FabricIndex: 1
+          [1657887424.933541][3496:3501] CHIP:TOO:      }
+          [1657887424.933567][3496:3501] CHIP:TOO:     AdminFabricIndex: 1
+          [1657887424.933593][3496:3501] CHIP:TOO:    }
+          [1657887424.933661][3496:3501] CHIP:DMG: MoveToState ReadClient[0xffff940091f0]: Moving to [AwaitingSu]
+          [1657887424.933717][3496:3501] CHIP:EM: Piggybacking Ack for MessageCounter:100554100 on exchange: 44633i
+
+
+          accesscontrol subscribe-event access-control-entry-changed  20 700 2 0 --commissioner-name beta
+          [1657887441.417553][2862:2867] CHIP:DMG: }
+          [1657887441.417766][2862:2867] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1657887441.417796][2862:2867] CHIP:TOO:          Event number: 2
+          [1657887441.417822][2862:2867] CHIP:TOO:          Priority: Info
+          [1657887441.417849][2862:2867] CHIP:TOO:          Timestamp: 13545202
+          [1657887441.417964][2862:2867] CHIP:TOO:   AccessControlEntryChanged: {
+          [1657887441.418020][2862:2867] CHIP:TOO:     AdminNodeID: null
+          [1657887441.418061][2862:2867] CHIP:TOO:     AdminPasscodeID: 0
+          [1657887441.418090][2862:2867] CHIP:TOO:     ChangeType: 1
+          [1657887441.418128][2862:2867] CHIP:TOO:     LatestValue: {
+          [1657887441.418156][2862:2867] CHIP:TOO:       Privilege: 5
+          [1657887441.418193][2862:2867] CHIP:TOO:       AuthMode: 2
+          [1657887441.418228][2862:2867] CHIP:TOO:       Subjects: 1 entries
+          [1657887441.418273][2862:2867] CHIP:TOO:         [1]: 112233
+          [1657887441.418305][2862:2867] CHIP:TOO:       Targets: null
+          [1657887441.418344][2862:2867] CHIP:TOO:       FabricIndex: 2
+          [1657887441.418371][2862:2867] CHIP:TOO:      }
+          [1657887441.418409][2862:2867] CHIP:TOO:     AdminFabricIndex: 2
+          [1657887441.418436][2862:2867] CHIP:TOO:    }
+          [1657887441.418517][2862:2867] CHIP:DMG: MoveToState ReadClient[0xffff74009260]: Moving to [AwaitingSu]
+          [1657887441.418591][2862:2867] CHIP:EM: Piggybacking Ack for MessageCounter:217452290 on exchange: 44658i
+
+
+          accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+          [1658231022.614323][2305:2310] CHIP:DMG: }
+          [1658231022.614489][2305:2310] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1658231022.614598][2305:2310] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1658231022.614699][2305:2310] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+          [1658231022.614795][2305:2310] CHIP:DMG: MoveToState ReadClient[0xffff88008e70]: Moving to [AwaitingSu]
+          [1658231022.614873][2305:2310] CHIP:EM: Piggybacking Ack for MessageCounter:177580574 on exchange: 34289i
+          [1658231022.614987][2305:2310] CHIP:IN: Prepared secure message 0xffff880057e8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 34289i with MessageCounter:134890885.
+          [1658231022.615047][2305:2310] CHIP:IN: Sending encrypted msg 0xffff880057e8 with MessageCounter:134890885 to 0x0000000000000001 (1) at monotonic time: 00000000000C7D98 msec
+          [1658231022.616881][2305:2310] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:177580575 on exchange 34289i
+          [1658231022.616932][2305:2310] CHIP:EM: Found matching exchange: 34289i, Delegate: 0xffff88008e70
+          [1658231022.616983][2305:2310] CHIP:EM: Rxd Ack; Removing MessageCounter:134890885 from Retrans Table on exchange 34289i
+          [1658231022.617023][2305:2310] CHIP:EM: Removed CHIP MessageCounter:134890885 from RetransTable on exchange 34289i
+          [1658231022.617085][2305:2310] CHIP:DMG: SubscribeResponseMessage =
+          [1658231022.617129][2305:2310] CHIP:DMG: {
+          [1658231022.617169][2305:2310] CHIP:DMG:         SubscriptionId = 0x1cf72de7,
+          [1658231022.617214][2305:2310] CHIP:DMG:         MaxInterval = 0x1f4,
+          [1658231022.617257][2305:2310] CHIP:DMG:         InteractionModelRevision = 1
+          [1658231022.617297][2305:2310] CHIP:DMG: }
+          [1658231022.617340][2305:2310] CHIP:DMG: Subscription established with SubscriptionID = 0x1cf72de7 MinInterval = 20s MaxInterval = 500s Peer = 01:0000000000000001
+
+
+          [1658231053.511709][10291:10296] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
+          [1658231053.511772][10291:10296] CHIP:TOO:          Event number: 3
+          [1658231053.511828][10291:10296] CHIP:TOO:          Priority: Info
+          [1658231053.511879][10291:10296] CHIP:TOO:          Timestamp: 386270
+          [1658231053.511997][10291:10296] CHIP:TOO:   AccessControlEntryChanged: {
+          [1658231053.512038][10291:10296] CHIP:TOO:     AdminNodeID: null
+          [1658231053.512076][10291:10296] CHIP:TOO:     AdminPasscodeID: 0
+          [1658231053.512183][10291:10296] CHIP:TOO:     ChangeType: 1
+          [1658231053.512222][10291:10296] CHIP:TOO:     LatestValue: {
+          [1658231053.512256][10291:10296] CHIP:TOO:       Privilege: 5
+          [1658231053.512291][10291:10296] CHIP:TOO:       AuthMode: 2
+          [1658231053.512333][10291:10296] CHIP:TOO:       Subjects: 1 entries
+          [1658231053.512376][10291:10296] CHIP:TOO:         [1]: 112233
+          [1658231053.512415][10291:10296] CHIP:TOO:       Targets: null
+          [1658231053.512450][10291:10296] CHIP:TOO:       FabricIndex: 2
+          [1658231053.512484][10291:10296] CHIP:TOO:      }
+          [1658231053.512519][10291:10296] CHIP:TOO:     AdminFabricIndex: 2
+          [1658231053.512553][10291:10296] CHIP:TOO:    }
+          [1658231053.512642][10291:10296] CHIP:DMG: MoveToState ReadClient[0xffff98009000]: Moving to [AwaitingSu]
+          [1658231053.512715][10291:10296] CHIP:EM: Piggybacking Ack for MessageCounter:36331302 on exchange: 58513i
+          [1658231053.512799][10291:10296] CHIP:IN: Prepared secure message 0xaaaac4ba0828 to 0x0000000000000002 (2)  of type 0x1 and protocolId (0, 1) on exchange 58513i with MessageCounter:160830417.
+          [1658231053.512853][10291:10296] CHIP:IN: Sending encrypted msg 0xaaaac4ba0828 with MessageCounter:160830417 to 0x0000000000000002 (2) at monotonic time: 0000000001A6A793 msec
+          [1658231053.514813][10291:10296] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:36331303 on exchange 58513i
+          [1658231053.514863][10291:10296] CHIP:EM: Found matching exchange: 58513i, Delegate: 0xffff98009000
+          [1658231053.514909][10291:10296] CHIP:EM: Rxd Ack; Removing MessageCounter:160830417 from Retrans Table on exchange 58513i
+          [1658231053.514946][10291:10296] CHIP:EM: Removed CHIP MessageCounter:160830417 from RetransTable on exchange 58513i
+          [1658231053.515006][10291:10296] CHIP:DMG: SubscribeResponseMessage =
+          [1658231053.515046][10291:10296] CHIP:DMG: {
+          [1658231053.515082][10291:10296] CHIP:DMG:         SubscriptionId = 0x8260b5,
+          [1658231053.515121][10291:10296] CHIP:DMG:         MaxInterval = 0x2bc,
+          [1658231053.515160][10291:10296] CHIP:DMG:         InteractionModelRevision = 1
+          [1658231053.515195][10291:10296] CHIP:DMG: }
+          [1658231053.515235][10291:10296] CHIP:DMG: Subscription established with SubscriptionID = 0x008260b5 MinInterval = 20s MaxInterval = 700s Peer = 02:0000000000000002
       disabled: true
 
     - label:
@@ -76,7 +493,7 @@ tests:
           path where an event in the path is fabric-sensitive and the associated
           fabric does not match the accessing fabric."
       verification: |
-          Verify that the DUT sends a Report Data Message with no entry for that event in EventReports list.
+
       disabled: true
 
     - label:
@@ -84,5 +501,5 @@ tests:
           where an event in the path is fabric-sensitive and the associated
           fabric does not match the accessing fabric."
       verification: |
-          Verify that the DUT sends a Report Data Message with no entry for that event in EventReports list.
+
       disabled: true

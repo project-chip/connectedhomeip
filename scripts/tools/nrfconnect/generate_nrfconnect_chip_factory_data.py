@@ -16,6 +16,7 @@
 #
 
 from os.path import exists
+import os
 import sys
 import json
 import jsonschema
@@ -24,6 +25,7 @@ import argparse
 import subprocess
 import logging as log
 import base64
+from collections import namedtuple
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 
@@ -31,6 +33,7 @@ from cryptography.hazmat.primitives.serialization import load_der_private_key
 # the factory data version set in the nRF Connect platform Kconfig file (CHIP_FACTORY_DATA_VERSION).
 FACTORY_DATA_VERSION = 1
 
+MATTER_ROOT = os.path.dirname(os.path.realpath(__file__))[:-len("/scripts/tools/nrfconnect")]
 HEX_PREFIX = "hex:"
 PUB_KEY_PREFIX = b'\x04'
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
@@ -61,14 +64,120 @@ def get_raw_private_key_der(der_file: str, password: str):
         return None
 
 
-def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> dict:
-    """ Generate spake2 params using external spake2p script
+def gen_test_certs(chip_cert_exe: str,
+                   output: str,
+                   vendor_id: int,
+                   product_id: int,
+                   device_name: str,
+                   generate_cd: bool = False,
+                   paa_cert_path: str = None,
+                   paa_key_path: str = None):
+    """
+    Generate Matter certificates according to given Vendor ID and Product ID using the chip-cert executable.
+    To use own Product Attestation Authority certificate provide paa_cert_path and paa_key_path arguments.
+    Without providing these arguments a PAA certificate will be get from /credentials/test/attestation directory
+    in the Matter repository.
 
     Args:
-        spake2p_path (str): path to spake2 executable
-        passcode (int): Pairing passcode using in SPAKE 2
-        it (int): Iteration counter for SPAKE2 Verifier generation
-        salt (str): Salt used to generate SPAKE2 password
+        chip_cert_exe (str): path to chip-cert executable
+        output (str): output path to store a newly generated certificates (CD, DAC, PAI)
+        vendor_id (int): an identification number specific to Vendor
+        product_id (int): an identification number specific to Product
+        device_name (str): human-readable device name
+        generate_cd (bool, optional): Generate Certificate Declaration and store it in thee output directory. Defaults to False.
+        paa_cert_path (str, optional): provide PAA certification path. Defaults to None - a path will be set to /credentials/test/attestation directory.
+        paa_key_path (str, optional): provide PAA key path. Defaults to None - a path will be set to /credentials/test/attestation directory.
+
+    Returns:
+        dictionary: ["PAI_CERT": (str)<path to PAI cert .der file>, 
+                     "DAC_CERT": (str)<path to DAC cert .der file>,
+                     "DAC_KEY": (str)<path to DAC key .der file>]
+    """
+
+    CD_PATH = MATTER_ROOT + "/credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem"
+    CD_KEY_PATH = MATTER_ROOT + "/credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem"
+    PAA_PATH = paa_cert_path if paa_cert_path != None else MATTER_ROOT + "/credentials/test/attestation/Chip-Test-PAA-NoVID-Cert.pem"
+    PAA_KEY_PATH = paa_key_path if paa_key_path != None else MATTER_ROOT + "/credentials/test/attestation/Chip-Test-PAA-NoVID-Key.pem"
+
+    attestation_certs = namedtuple("attestation_certs", ["dac_cert", "dac_key", "pai_cert"])
+
+    log.info("Generating new certificates using chip-cert...")
+
+    if generate_cd:
+        # generate Certification Declaration
+        cmd = [chip_cert_exe, "gen-cd",
+               "--key", CD_KEY_PATH,
+               "--cert", CD_PATH,
+               "--out", output + "/CD.der",
+               "--format-version",  str(1),
+               "--vendor-id",  hex(vendor_id),
+               "--product-id",  hex(product_id),
+               "--device-type-id", "0xA",
+               "--certificate-id", "ZIG20142ZB330003-24",
+               "--security-level",  str(0),
+               "--security-info",  str(0),
+               "--certification-type",  str(0),
+               "--version-number", "0x2694",
+               ]
+        subprocess.run(cmd)
+
+    new_certificates = {"PAI_CERT": output + "/PAI_cert",
+                        "PAI_KEY": output + "/PAI_key",
+                        "DAC_CERT": output + "/DAC_cert",
+                        "DAC_KEY": output + "/DAC_key"
+                        }
+
+    # generate PAI
+    cmd = [chip_cert_exe, "gen-att-cert",
+           "-t", "i",
+           "-c", device_name,
+           "-V", hex(vendor_id),
+           "-C", PAA_PATH,
+           "-K", PAA_KEY_PATH,
+           "-o", new_certificates["PAI_CERT"] + ".pem",
+           "-O", new_certificates["PAI_KEY"] + ".pem",
+           "-l", str(10000),
+           ]
+    subprocess.run(cmd)
+
+    # generate DAC
+    cmd = [chip_cert_exe, "gen-att-cert",
+           "-t", "d",
+           "-c", device_name,
+           "-V", hex(vendor_id),
+           "-P", hex(product_id),
+           "-C", new_certificates["PAI_CERT"] + ".pem",
+           "-K", new_certificates["PAI_KEY"] + ".pem",
+           "-o", new_certificates["DAC_CERT"] + ".pem",
+           "-O", new_certificates["DAC_KEY"] + ".pem",
+           "-l", str(10000),
+           ]
+    subprocess.run(cmd)
+
+    # convert to .der files
+    for cert_k, cert_v in new_certificates.items():
+        action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
+        log.info(cert_v + ".der")
+        cmd = [chip_cert_exe, action_type,
+               cert_v + ".pem",
+               cert_v + ".der",
+               "--x509-der",
+               ]
+        subprocess.run(cmd)
+
+    return attestation_certs(new_certificates["DAC_CERT"] + ".der",
+                             new_certificates["DAC_KEY"] + ".der",
+                             new_certificates["PAI_CERT"] + ".der")
+
+
+def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: bytes) -> dict:
+    """ Generate Spake2+ params using external spake2p tool
+
+    Args:
+        spake2p_path (str): path to spake2p executable
+        passcode (int): Pairing passcode using in Spake2+
+        it (int): Iteration counter for Spake2+ verifier generation
+        salt (str): Salt used to generate Spake2+ verifier
 
     Returns:
         dict: dictionary containing passcode, it, salt, and generated Verifier
@@ -77,7 +186,7 @@ def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> 
     cmd = [
         spake2p_path, 'gen-verifier',
         '--iteration-count', str(it),
-        '--salt', str(salt),
+        '--salt', base64.b64encode(salt),
         '--pin-code', str(passcode),
         '--out', '-',
     ]
@@ -88,7 +197,7 @@ def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: str) -> 
 
 class FactoryDataGenerator:
     """
-    Class to generate factory data from given arguments and generate a Json file
+    Class to generate factory data from given arguments and generate a JSON file
 
     """
 
@@ -112,11 +221,11 @@ class FactoryDataGenerator:
             try:
                 self._user_data = json.loads(self._args.user)
             except json.decoder.JSONDecodeError as e:
-                raise AssertionError("Provided wrong user data, this is not a Json format! {}".format(e))
+                raise AssertionError("Provided wrong user data, this is not a JSON format! {}".format(e))
         assert (self._args.spake2_verifier or (self._args.passcode and self._args.spake2p_path)), \
-            "Can not find spake2 verifier, to generate a new one please provide passcode (--passcode) and path to spake2p script (--spake2p_path)"
+            "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode) and path to spake2p tool (--spake2p_path)"
         assert (self._args.chip_cert_path or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
-            "Can not find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path)"
+            "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path)"
         assert self._args.output.endswith(".json"), \
             "Output path doesn't contain .json file path. ({})".format(self._args.output)
         assert not (self._args.passcode in INVALID_PASSCODES), \
@@ -124,14 +233,14 @@ class FactoryDataGenerator:
 
     def generate_json(self):
         """
-        This function generates JSON data, .json file and validate it
+        This function generates JSON data, .json file and validates it.
 
-        To validate generated JSON data a scheme must be provided within script's arguments
+        To validate generated JSON data a scheme must be provided within script's arguments.
 
         - In the first part, if the rotating device id unique id has been not provided
-            as an argument, it will be created.
-        - If user provided passcode and spake2 verifier have been not provided
-            as an argument, it will be created using an external script
+          as an argument, it will be created.
+        - If user-provided passcode and Spake2+ verifier have been not provided
+          as an argument, it will be created using an external script
         - Passcode is not stored in JSON by default. To store it for debugging purposes, add --include_passcode argument.
         - Validating output JSON is not mandatory, but highly recommended.
 
@@ -144,25 +253,43 @@ class FactoryDataGenerator:
                 # rotating device ID unique ID was not provided, so do not store it in factory data.
                 rd_uid = None
         else:
-            rd_uid = self._args.rd_uid
-        if not self._args.spake2_verifier:
-            spake_2_verifier = base64.b64decode(self._generate_spake2_verifier())
-        else:
-            spake_2_verifier = base64.b64decode(self._args.spake2_verifier)
+            rd_uid = HEX_PREFIX + self._args.rd_uid
 
-        # convert salt to bytestring to be coherent with spake2 verifier type
-        spake_2_salt = base64.b64decode(self._args.spake2_salt)
+        if not self._args.spake2_verifier:
+            spake_2_verifier = self._generate_spake2_verifier()
+        else:
+            spake_2_verifier = self._args.spake2_verifier
+
+        # convert salt to bytestring to be coherent with Spake2+ verifier type
+        spake_2_salt = self._args.spake2_salt
+
+        if self._args.chip_cert_path:
+            certs = gen_test_certs(self._args.chip_cert_path,
+                                   self._args.output[:self._args.output.rfind("/")],
+                                   self._args.vendor_id,
+                                   self._args.product_id,
+                                   self._args.vendor_name + "_" + self._args.product_name,
+                                   self._args.gen_cd,
+                                   self._args.paa_cert,
+                                   self._args.paa_key)
+            dac_cert = certs.dac_cert
+            pai_cert = certs.pai_cert
+            dac_key = certs.dac_key
+        else:
+            dac_cert = self._args.dac_cert
+            dac_key = self._args.dac_key
+            pai_cert = self._args.pai_cert
 
         # try to read DAC public and private keys
-        dac_priv_key = get_raw_private_key_der(self._args.dac_key, self._args.dac_key_password)
+        dac_priv_key = get_raw_private_key_der(dac_key, self._args.dac_key_password)
         if dac_priv_key is None:
-            log.error("Can not read DAC keys from : {}".format(self._args.dac_key))
+            log.error("Cannot read DAC keys from : {}".format(dac_key))
             sys.exit(-1)
 
         try:
             json_file = open(self._args.output, "w+")
         except FileNotFoundError:
-            print("Can not create JSON file in this location: {}".format(self._args.output))
+            print("Cannot create JSON file in this location: {}".format(self._args.output))
             sys.exit(-1)
         with json_file:
             # serialize data
@@ -175,9 +302,9 @@ class FactoryDataGenerator:
             self._add_entry("date", self._args.date)
             self._add_entry("hw_ver", self._args.hw_ver)
             self._add_entry("hw_ver_str", self._args.hw_ver_str)
-            self._add_entry("dac_cert", self._process_der(self._args.dac_cert))
+            self._add_entry("dac_cert", self._process_der(dac_cert))
             self._add_entry("dac_key", dac_priv_key)
-            self._add_entry("pai_cert", self._process_der(self._args.pai_cert))
+            self._add_entry("pai_cert", self._process_der(pai_cert))
             if self._args.include_passcode:
                 self._add_entry("passcode", self._args.passcode)
             self._add_entry("spake2_it", self._args.spake2_it)
@@ -186,8 +313,10 @@ class FactoryDataGenerator:
             self._add_entry("discriminator", self._args.discriminator)
             if rd_uid:
                 self._add_entry("rd_uid", rd_uid)
-            # add user-specific data
-            self._add_entry("user", self._args.user)
+            if self._args.enable_key:
+                self._add_entry("enable_key", HEX_PREFIX + self._args.enable_key)
+            if self._args.user:
+                self._add_entry("user", self._args.user)
 
             factory_data_dict = dict(self._factory_data)
 
@@ -197,12 +326,12 @@ class FactoryDataGenerator:
             if self._args.schema:
                 is_json_valid = self._validate_output_json(json_object)
             else:
-                log.warning("Json Schema file has not been provided, the output file can be wrong. Be aware of that.")
+                log.warning("JSON Schema file has not been provided, the output file can be wrong. Be aware of that.")
             try:
                 if is_json_valid:
                     json_file.write(json_object)
             except IOError as e:
-                log.error("Can not save output file into directory: {}".format(self._args.output))
+                log.error("Cannot save output file into directory: {}".format(self._args.output))
 
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
@@ -216,11 +345,11 @@ class FactoryDataGenerator:
         """ If verifier has not been provided in arguments list it should be generated via external script """
         spake2_params = gen_spake2p_params(self._args.spake2p_path, self._args.passcode,
                                            self._args.spake2_it, self._args.spake2_salt)
-        return spake2_params["Verifier"]
+        return base64.b64decode(spake2_params["Verifier"])
 
     def _generate_rotating_device_uid(self):
         """ If rotating device unique ID has not been provided it should be generated """
-        log.warning("Can not find rotating device UID in provided arguments list. A new one will be generated.")
+        log.warning("Cannot find rotating device UID in provided arguments list. A new one will be generated.")
         rdu = secrets.token_bytes(16)
         log.info("\n\nThe new rotate device UID: {}\n".format(rdu.hex()))
         return rdu
@@ -233,12 +362,12 @@ class FactoryDataGenerator:
         """
         try:
             with open(self._args.schema) as schema_file:
-                log.info("Validating Json with schema...")
+                log.info("Validating JSON with schema...")
                 schema = json.loads(schema_file.read())
                 validator = jsonschema.Draft202012Validator(schema=schema)
                 validator.validate(instance=json.loads(output_json))
         except IOError as e:
-            log.error("provided Json schema file is wrong: {}".format(self._args.schema))
+            log.error("Provided JSON schema file is wrong: {}".format(self._args.schema))
             return False
         else:
             log.info("Validate OK")
@@ -259,18 +388,19 @@ def main():
     parser = argparse.ArgumentParser(description="NrfConnect Factory Data NVS generator tool")
 
     def allow_any_int(i): return int(i, 0)
+    def base64_str(s): return base64.b64decode(s)
 
-    mandatory_arguments = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate Json file")
+    mandatory_arguments = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate JSON file")
     optional_arguments = parser.add_argument_group(
         "Optional keys", "These arguments are optional and they depend on the user-purpose")
     parser.add_argument("-s", "--schema", type=str,
-                        help="Json schema file to validate Json output data")
+                        help="JSON schema file to validate JSON output data")
     parser.add_argument("-o", "--output", type=str, required=True,
                         help="Output path to store .json file, e.g. my_dir/output.json")
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Run this script with DEBUG logging level")
     parser.add_argument("--include_passcode", action="store_true",
-                        help="passcode is used only for generating Spake2 Verifier to include it in factory data add this argument")
+                        help="Include passcode in factory data. By default, it is used only for generating Spake2+ verifier.")
     parser.add_argument("--overwrite", action="store_true",
                         help="If output JSON file exist this argument allows to generate new factory data and overwrite it.")
     # Json known-keys values
@@ -297,9 +427,9 @@ def main():
     mandatory_arguments.add_argument("--hw_ver_str", type=str, required=True,
                                      help="[ascii string] Provide hardware version in string format.")
     mandatory_arguments.add_argument("--spake2_it", type=allow_any_int, required=True,
-                                     help="[int | hex int] Provide Spake2 Iteration Counter.")
-    mandatory_arguments.add_argument("--spake2_salt", type=str, required=True,
-                                     help="[ascii string] Provide Spake2 Salt.")
+                                     help="[int | hex int] Provide Spake2+ iteration count.")
+    mandatory_arguments.add_argument("--spake2_salt", type=base64_str, required=True,
+                                     help="[base64 string] Provide Spake2+ salt.")
     mandatory_arguments.add_argument("--discriminator", type=allow_any_int, required=True,
                                      help="[int] Provide BLE pairing discriminator. \
                                      A 12-bit value matching the field of the same name in \
@@ -320,25 +450,30 @@ def main():
     optional_arguments.add_argument("--pai_cert", type=str,
                                     help="[.der] Provide the path to .der file containing PAI certificate.")
     optional_arguments.add_argument("--rd_uid", type=str,
-                                    help="[hex string] Provide the rotating device unique ID. If this argument is not provided a new rotating device id unique id will be generated.")
+                                    help="[hex string] [128-bit hex-encoded] Provide the rotating device unique ID. If this argument is not provided a new rotating device id unique id will be generated.")
     optional_arguments.add_argument("--passcode", type=allow_any_int,
-                                    help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2 Verifier).")
+                                    help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2+ verifier).")
     optional_arguments.add_argument("--spake2p_path", type=str,
                                     help="[string] Provide a path to spake2p. By default You can find spake2p in connectedhomeip/src/tools/spake2p directory and build it there.")
-    optional_arguments.add_argument("--spake2_verifier", type=str,
-                                    help="[ascii string] Provide Spake2 Verifier without generating it.")
+    optional_arguments.add_argument("--spake2_verifier", type=base64_str,
+                                    help="[base64 string] Provide Spake2+ verifier without generating it.")
+    optional_arguments.add_argument("--enable_key", type=str,
+                                    help="[hex string] [128-bit hex-encoded] The Enable Key is a 128-bit value that triggers manufacturer-specific action while invoking the TestEventTrigger Command."
+                                    "This value is used during Certification Tests, and should not be present on production devices.")
     optional_arguments.add_argument("--user", type=str,
-                                    help="[string] Provide additional user-specific keys in Json format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
+                                    help="[string] Provide additional user-specific keys in JSON format: {'name_1': 'value_1', 'name_2': 'value_2', ... 'name_n', 'value_n'}.")
+    optional_arguments.add_argument("--gen_cd", action="store_true", default=False,
+                                    help="Generate a new Certificate Declaration in .der format according to used Vendor ID and Product ID. This certificate will not be included to the factory data.")
+    optional_arguments.add_argument("--paa_cert", type=str,
+                                    help="Provide a path to the Product Attestation Authority (PAA) certificate to generate the PAI certificate. Without providing it, a testing PAA stored in the Matter repository will be used.")
+    optional_arguments.add_argument("--paa_key", type=str,
+                                    help="Provide a path to the Product Attestation Authority (PAA) key to generate the PAI certificate. Without providing it, a testing PAA key stored in the Matter repository will be used.")
     args = parser.parse_args()
 
     if args.verbose:
         log.basicConfig(format='[%(asctime)s][%(levelname)s] %(message)s', level=log.DEBUG)
     else:
         log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
-
-    if(args.chip_cert_path):
-        log.error("Generating DAC and PAI certificates is not supported yet")
-        return
 
     # check if json file already exist
     if(exists(args.output) and not args.overwrite):
