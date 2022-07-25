@@ -696,7 +696,8 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 
             //
             // Update the event number being tracked in mReadPrepareParams in case
-            // we want to use it for re-subscriptions later.
+            // we want to send it in the next SubscribeRequest message to convey
+            // the event number till which we've already received events for.
             //
             mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
 
@@ -736,6 +737,8 @@ void ReadClient::OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mState == ClientState::SubscriptionActive, CHIP_ERROR_INCORRECT_STATE);
 
     CancelLivenessCheckTimer();
 

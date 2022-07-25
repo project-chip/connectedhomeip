@@ -334,7 +334,7 @@ public:
      *  mpDataVersionFilterList with lifetimes as long as the ReadClient itself and b) free those up later in the call to
      *  OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
      *  that has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
-     * have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
+     *  have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
      *  OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
      *  that's the only case when the consumer moved a ReadParams into the client.
      *
@@ -386,12 +386,16 @@ public:
     }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-    //
-    // Override the interval at which liveness of the subscription is assessed.
-    // By default, this is set set to the max interval of the subscription + ACK timeout of the underlying session.
-    //
-    // This can be called at any time.
-    //
+    /**
+     * Override the interval at which liveness of the subscription is assessed.
+     * By default, this is set set to the max interval of the subscription + ACK timeout of the underlying session.
+     *
+     * This can be only be called once a subscription has been established and is active. Once called, this will cancel any existing
+     * liveness timers and schedule a new one.
+     *
+     * This can be called from the Callback::OnSubscriptionEstablished callback.
+     *
+     */
     void OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout);
 
 private:

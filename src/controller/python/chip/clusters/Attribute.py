@@ -507,6 +507,8 @@ class SubscriptionTransaction:
         Sets the callback function that gets invoked anytime a re-subscription is attempted. The callback is expected
         to have the following signature:
             def Callback(transaction: SubscriptionTransaction, errorEncountered: int, nextResubscribeIntervalMsec: int)
+
+        If the callback is an awaitable co-routine, isAsync should be set to True.
         '''
         if callback is not None:
             self._onResubscriptionAttemptedCb = callback
@@ -517,6 +519,8 @@ class SubscriptionTransaction:
         Sets the callback function that gets invoked when a re-subscription attempt succeeds. The callback
         is expected to have the following signature:
             def Callback(transaction: SubscriptionTransaction)
+
+        If the callback is an awaitable co-routine, isAsync should be set to True.
         '''
         if callback is not None:
             self._onResubscriptionSucceededCb = callback
