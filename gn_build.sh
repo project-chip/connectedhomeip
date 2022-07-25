@@ -154,14 +154,14 @@ fi
 # K32W SDK setup
 k32w_sdk_args=""
 
-if [[ -d "$NXP_K32W061_SDK_ROOT" ]]; then
-    k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W061_SDK_ROOT\""
+if [[ -d "$NXP_K32W0_SDK_ROOT" ]]; then
+    k32w_sdk_args+="k32w0_sdk_root=\"$NXP_K32W0_SDK_ROOT\""
     extra_args+=" $k32w0_sdk_args enable_k32w_builds=true"
 fi
 
 echo
-if [[ ! -d "$NXP_K32W061_SDK_ROOT" ]]; then
-    echo "Hint: Set \$NXP_K32W061_SDK_ROOT to enable building for K32W061"
+if [[ ! -d "$NXP_K32W0_SDK_ROOT" ]]; then
+    echo "Hint: Set \$NXP_K32W0_SDK_ROOT to enable building for K32W061"
 else
     echo 'To build the K32W lock sample as a standalone project':
     echo "(cd $CHIP_ROOT/examples/lock-app/nxp/k32w/k32w0; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"

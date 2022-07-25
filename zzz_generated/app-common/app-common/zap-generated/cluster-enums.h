@@ -934,18 +934,17 @@ namespace OperationalCredentials {
 // Enum for OperationalCertStatus
 enum class OperationalCertStatus : uint8_t
 {
-    kSuccess               = 0x00,
-    kInvalidPublicKey      = 0x01,
-    kInvalidNodeOpId       = 0x02,
-    kInvalidNOC            = 0x03,
-    kMissingCsr            = 0x04,
-    kTableFull             = 0x05,
-    kInvalidAdminSubject   = 0x06,
-    kInsufficientPrivilege = 0x08,
-    kFabricConflict        = 0x09,
-    kLabelConflict         = 0x0A,
-    kInvalidFabricIndex    = 0x0B,
-    kUnknownEnumValue      = 7,
+    kSuccess             = 0x00,
+    kInvalidPublicKey    = 0x01,
+    kInvalidNodeOpId     = 0x02,
+    kInvalidNOC          = 0x03,
+    kMissingCsr          = 0x04,
+    kTableFull           = 0x05,
+    kInvalidAdminSubject = 0x06,
+    kFabricConflict      = 0x09,
+    kLabelConflict       = 0x0A,
+    kInvalidFabricIndex  = 0x0B,
+    kUnknownEnumValue    = 7,
 };
 } // namespace OperationalCredentials
 

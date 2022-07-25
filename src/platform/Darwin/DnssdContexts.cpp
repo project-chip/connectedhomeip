@@ -262,7 +262,7 @@ RegisterContext::RegisterContext(const char * sType, DnssdPublishCallback cb, vo
 
 void RegisterContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Register (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
     callback(context, nullptr, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -283,7 +283,7 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
 
 void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Browse (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
     callback(context, nullptr, 0, CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -309,7 +309,7 @@ ResolveContext::~ResolveContext()
 
 void ResolveContext::DispatchFailure(DNSServiceErrorType err)
 {
-    ChipLogError(DeviceLayer, "Resolve (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
     callback(context, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
     MdnsContexts::GetInstance().Remove(this);
 }
@@ -326,6 +326,7 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
+        ChipLogDetail(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
         callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
         break;
     }
@@ -342,7 +343,7 @@ CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct socka
 #ifdef CHIP_DETAIL_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogDetail(DeviceLayer, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+    ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
 #endif // CHIP_DETAIL_LOGGING
 
     return CHIP_NO_ERROR;
@@ -376,7 +377,7 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-    ChipLogDetail(DeviceLayer, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32, __func__, hostnameWithDomain, fullname,
+    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32, __func__, hostnameWithDomain, fullname,
                   interfaceId);
 
     InterfaceInfo interface;

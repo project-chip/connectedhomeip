@@ -41,48 +41,70 @@ tests:
       response:
           value: 1
 
-    - label: "Read current color temprature"
-      PICS: CC.S.A0007
+    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+      PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
-      attribute: "ColorTemperature"
+      attribute: "ColorTempPhysicalMinMireds"
       response:
+          saveAs: ColorTempPhysicalMinMiredsValue
           constraints:
               type: uint16
               minValue: 0
               maxValue: 65279
 
+    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A400c
+      command: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+      response:
+          saveAs: ColorTempPhysicalMaxMiredsValue
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+      PICS: CC.S.F04 && CC.S.A0007
+      command: "readAttribute"
+      attribute: "ColorTemperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
+
     - label: "Move To Color Temperature command"
-      PICS: CC.S.C0A.Rsp
+      PICS: CC.S.F04 && CC.S.C0A.Rsp
       command: "MoveToColorTemperature"
       arguments:
           values:
               - name: "colorTemperature"
                 value: 100
               - name: "TransitionTime"
-                value: 5
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 700ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 700
+                value: 1500
 
     - label: "Read current color temprature"
-      PICS: CC.S.A0007
+      PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperature"
       response:
           value: 100
           constraints:
               type: uint16
-              minValue: 0
-              maxValue: 65279
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

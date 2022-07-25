@@ -54,6 +54,7 @@ public:
  *    This class represents an ongoing conversation (ExchangeContext) between two or more nodes.
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
+ *
  */
 class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
                                    public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
@@ -204,6 +205,13 @@ public:
      */
     bool IsResponseExpected() const;
 
+    /**
+     * Determine whether we are expecting our consumer to send a message on
+     * this exchange (i.e. WillSendMessage was called and the message has not
+     * yet been sent).
+     */
+    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
+
 private:
     class ExchangeSessionHolder : public SessionHolderWithDelegate
     {
@@ -220,13 +228,6 @@ private:
 
     ExchangeSessionHolder mSession; // The connection state
     uint16_t mExchangeId;           // Assigned exchange ID.
-
-    /**
-     * Determine whether we are expecting our consumer to send a message on
-     * this exchange (i.e. WillSendMessage was called and the message has not
-     * yet been sent).
-     */
-    bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
      *  Track whether we are now expecting a response to a message sent via this exchange (because that

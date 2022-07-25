@@ -65,9 +65,3 @@ jobs:
               run: |
                   cd integrations/docker/images/chip-build${{ matrix.img }}
                   ./build.sh --latest
-            - name: Scan for vulnerabilities
-              uses: crazy-max/docker-scan-action@master
-              with:
-                  # NOTE: This task validates the images built previously with latest tag
-                  image: connectedhomeip/chip-build${{ matrix.img }}:latest
-                  annotations: true

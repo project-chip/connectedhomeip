@@ -20,5 +20,3 @@ k32w0_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_stack_lock_tracking = "fatal"
 chip_enable_ble = true
-
-chip_progress_logging = false

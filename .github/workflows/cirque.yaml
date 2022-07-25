@@ -110,10 +110,11 @@ jobs:
                     chip_build_tests=false \
                     chip_enable_wifi=false \
                     chip_im_force_fabric_quota_check=true \
+                    enable_default_builds=false \
                     enable_host_gcc_build=true \
-                    enable_host_gcc_mbedtls_build=false \
-                    enable_host_clang_build=false \
-                    enable_fake_tests=false
+                    enable_standalone_chip_tool_build=true \
+                    enable_linux_all_clusters_app_build=true \
+                    enable_linux_lighting_app_build=true
             - name: Run Tests
               timeout-minutes: 25
               run: |
