@@ -1,1 +1,1 @@
-0.5.89 Version bump reason: match K32W sdk paths and logic with K32W Dockerfile
+0.5.90 Version bump reason: [Ameba] Add light-switch-app build option and enable matter_shell macro
