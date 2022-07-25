@@ -39,7 +39,7 @@ tests:
       response:
           value: 1
 
-    - label: "Reads CurrentHue attribute from DUT"
+    - label: "TH reads CurrentHue attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F00 && CC.S.A0000
       attribute: "CurrentHue"
@@ -49,7 +49,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Move hue up command"
+    - label: "TH sends MoveHue command to DUT with MoveMode Up"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -71,10 +71,8 @@ tests:
               - name: "ms"
                 value: 3000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -91,10 +89,8 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -111,10 +107,8 @@ tests:
               - name: "ms"
                 value: 3000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -123,7 +117,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Move hue stop command"
+    - label: "TH sends MoveHue command to DUT with MoveMode Stop"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -145,10 +139,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -166,16 +158,14 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           value: CurrentHueValue
 
-    - label: "Move hue down command"
+    - label: "TH sends MoveHue command to DUT with MoveMode Down"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -197,10 +187,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -217,10 +205,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -237,10 +223,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -249,7 +233,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label: "Move hue stop command"
+    - label: "TH sends MoveHue command to DUT with MoveMode Stop"
       PICS: CC.S.F00 && CC.S.C01.Rsp
       command: "MoveHue"
       arguments:
@@ -271,10 +255,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -292,10 +274,8 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label:
-          "Check current hue attribute value matched the value sent by the last
-          command"
-      PICS: CC.S.F00 && CC.S.A0000
+    - label: "TH reads CurrentHue attribute from DUT several times"
+      PICS: CC.S.F00 && CC.S.A0000 && CC.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:

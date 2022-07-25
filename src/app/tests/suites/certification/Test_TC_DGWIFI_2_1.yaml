@@ -28,14 +28,13 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads NetworkInterface structure attribute from DUT"
+    - label: "TH reads BSSID attribute from DUT"
       PICS: DGWIFI.S.A0000
-      cluster: "General Diagnostics"
       command: "readAttribute"
-      attribute: "NetworkInterfaces"
+      attribute: "BSSID"
       response:
           constraints:
-              type: list
+              type: octstr
 
     #issue #13645
     - label: "Reads SecurityType attribute constraints"

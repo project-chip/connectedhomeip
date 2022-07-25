@@ -2080,15 +2080,15 @@ PICS:
 
     - label:
           "Does the DUT support the Media Playback server cluster Play command?"
-      id: MEDIAPLAYBACK.S.C0000
+      id: MEDIAPLAYBACK.S.C00.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Pause command?"
-      id: MEDIAPLAYBACK.S.C0001
+      id: MEDIAPLAYBACK.S.C01.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster Stop command?"
-      id: MEDIAPLAYBACK.S.C0002
+      id: MEDIAPLAYBACK.S.C02.Rsp
 
     - label:
           "Does the DUT support the Media Playback server cluster StartOver
@@ -2833,6 +2833,49 @@ PICS:
 
     - label: "Does the Commissioner support Discovery Capability over BLE?"
       id: MCORE.DD.DISCOVERY_BLE
+
+    - label: "Does the device support discovery over Wi-Fi?"
+      id: MCORE.DD.WIFI
+
+    - label: "Does the device have a vendor specific information element (IE)?"
+      id: MCORE.DD.IE
+
+    - label:
+          "Does the device support TXT Key 'DN' (Device Name) in it’s DNS-SD TXT
+          Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_DN
+
+    - label:
+          "Does the device support TXT Key 'RI' (Rotating Identifier) in it’s
+          DNS-SD TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_RI
+
+    - label:
+          "Does the device support TXT Key 'PH' (Pairing Hint) in it’s DNS-SD
+          TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_PH
+
+    - label:
+          "Does the device support TXT Key 'PI' (Pairing Instruction) in it’s
+          DNS-SD TXT Records for Commissionable Node Discovery?"
+      id: MCORE.DD.TXT_KEY_PI
+
+    - label:
+          "Does the device support Extended Discovery through DNS-SD
+          advertisements when device is not in commissioning mode?"
+      id: MCORE.DD.EXTENDED_DISCOVERY
+
+    - label:
+          "Does the device support advertising the Vendor ID Commissioning
+          Subtype in Commissionable Node Discovery through DNS-SD
+          advertisements?"
+      id: MCORE.DD.COMMISSIONING_SUBTYPE_V
+
+    - label:
+          "Does the device support advertising the Device Type Commissioning
+          Subtype in Commissionable Node Discovery through DNS-SD
+          advertisements?"
+      id: MCORE.DD.COMMISSIONING_SUBTYPE_T
 
     #Ethernet Network Diagnostics Cluster
     - label: "Does the device implement the ResetCounts command?"
@@ -4502,7 +4545,6 @@ PICS:
       id: ACL.S.E01
 
     #Mode select
-    #Mode select
     - label: "Does the DUT support the StartUpMode attribute?"
       id: MOD.S.A0004
 
@@ -4539,3 +4581,49 @@ PICS:
           "Does commissionee provide a Firmware Information field in the
           AttestationResponse?"
       id: MCORE.DA.ATTESTELEMENT_FW_INFO
+
+    #Descriptor Cluster TestPlan
+    #server
+    - label: "Does the DUT(server) support the DEVICETYPELIST attribute?"
+      id: DESC.S.A0000
+
+    - label: "Does the DUT(server) support the SERVERLIST attribute?"
+      id: DESC.S.A0001
+
+    - label: "Does the DUT(server) support the CLIENTLIST attribute?"
+      id: DESC.S.A0002
+
+    - label: "Does the DUT(server) support the PARTSLIST attribute?"
+      id: DESC.S.A0003
+
+    - label: "Does the DUT(server) support the REVISIONFIELD attribute?"
+      id: DESC.S.A0004
+
+    #cluster
+    - label: "Does the DUT(client) support the DEVICETYPELIST attribute?"
+      id: DESC.C.A0000
+
+    - label: "Does the DUT(client) support the SERVERLIST attribute?"
+      id: DESC.C.A0001
+
+    - label: "Does the DUT(client) support the CLIENTLIST attribute?"
+      id: DESC.C.A0002
+
+    - label: "Does the DUT(client) support the PARTSLIST attribute?"
+      id: DESC.C.A0003
+
+    - label: "Does the DUT(client) support the REVISIONFIELD attribute?"
+      id: DESC.C.A0004
+
+    #Secure Channel
+    - label:
+          "Does device support optional key SII in operational discovery mDNS?"
+      id: MCORE.SC.SII_OP_DISCOVERY_KEY
+
+    - label:
+          "Does device support optional key SII in operational discovery mDNS?"
+      id: MCORE.SC.SAI_OP_DISCOVERY_KEY
+
+    - label:
+          "Does device support optional key SII in operational discovery mDNS?"
+      id: MCORE.SC.T_KEY

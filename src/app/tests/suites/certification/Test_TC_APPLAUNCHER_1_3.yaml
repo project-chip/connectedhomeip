@@ -57,7 +57,6 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
-      PICS: APPLAUNCHER.S.A0000 && APPLAUNCHER.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:

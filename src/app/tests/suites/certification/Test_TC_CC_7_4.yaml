@@ -78,7 +78,7 @@ tests:
     - label:
           "Check EnhancedCurrentHue attribute value matched the value sent by
           the last command"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C43.Rsp
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:

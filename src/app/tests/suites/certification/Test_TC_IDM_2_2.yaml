@@ -73,9 +73,9 @@ tests:
       verification: |
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
-          sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0xFFFF
+          sudo ./chip-tool any read-by-id 0x03 0xFFFFFFFF 1 0
 
-          Verify on TH , DUT  responds the right attribute value for above command
+          on TH , Verify  that  DUT  responds the right attribute value for above command
 
           [1655727546.354466][5286:5291] CHIP:DMG:
           [1655727546.354512][5286:5291] CHIP:DMG:         SuppressResponse = true,
@@ -104,30 +104,6 @@ tests:
           [1655727546.356716][5286:5291] CHIP:TOO:     [5]: 65531
           [1655727546.356741][5286:5291] CHIP:TOO:     [6]: 65532
           [1655727546.356766][5286:5291] CHIP:TOO:     [7]: 65533
-          [1655727546.356790][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 236949823
-          [1655727546.356815][5286:5291] CHIP:TOO:   identify time: 0
-          [1655727546.356895][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 236949823
-          [1655727546.356946][5286:5291] CHIP:TOO:   identify type: 2
-          [1655727546.357022][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 236949823
-          [1655727546.357065][5286:5291] CHIP:TOO:   FeatureMap: 0
-          [1655727546.357143][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 236949823
-          [1655727546.357171][5286:5291] CHIP:TOO:   ClusterRevision: 4
-          [1655727546.357312][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 236949823
-          [1655727546.357362][5286:5291] CHIP:TOO:   GeneratedCommandList: 0 entries
-          [1655727546.357555][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 236949823
-          [1655727546.357610][5286:5291] CHIP:TOO:   AcceptedCommandList: 2 entries
-          [1655727546.357638][5286:5291] CHIP:TOO:     [1]: 0
-          [1655727546.357662][5286:5291] CHIP:TOO:     [2]: 64
-          [1655727546.358014][5286:5291] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 236949823
-          [1655727546.358052][5286:5291] CHIP:TOO:   AttributeList: 7 entries
-          [1655727546.358078][5286:5291] CHIP:TOO:     [1]: 0
-          [1655727546.358103][5286:5291] CHIP:TOO:     [2]: 1
-          [1655727546.358127][5286:5291] CHIP:TOO:     [3]: 65528
-          [1655727546.358152][5286:5291] CHIP:TOO:     [4]: 65529
-          [1655727546.358176][5286:5291] CHIP:TOO:     [5]: 65531
-          [1655727546.358200][5286:5291] CHIP:TOO:     [6]: 65532
-          [1655727546.358225][5286:5291] CHIP:TOO:     [7]: 65533
-          [1655727546.358492][5286:5291] CHIP:EM: Sending Standalone Ack for MessageCounter:220291395 on exchange 53799i
       disabled: true
 
     - label:
@@ -597,7 +573,11 @@ tests:
           the path that requires a privilege that is not granted for the cluster
           in the path. DUT responds with the report data action."
       verification: |
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+
+           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
+
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1234], "targets": null}]' 1 0
 
@@ -612,6 +592,9 @@ tests:
           [1652964769.384668][39268:39273] CHIP:DMG:         InteractionModelRevision = 1
           [1652964769.384682][39268:39273] CHIP:DMG: }
           [1652964769.384788][39268:39273] CHIP:TOO: Response Failure: IM Error 0x0000057E: General error: 0x7e (UNSUPPORTED_ACCESS)
+
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
@@ -1046,7 +1029,10 @@ tests:
           The cluster used in the below command is an example, User can use any supported chip cluster.
 
 
-          To  Setup the TH such that there is no accessing fabric, 1st we need to send below mentioned ACL command
+
+          To Setup the TH such that it should not have the privilege for the cluster in the path. , 1st we need to send below mentioned ACL command
+          Here by sending below mentioned ACL command giving only access for identify cluster(3), So except identify cluster command if try to send any other command will get status as unsupported access.
+
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets":[{ "cluster": 3, "endpoint": 1, "deviceType": null }]}]' 1 0
 
@@ -1081,6 +1067,9 @@ tests:
           [1657537120.035342][9438:9443] CHIP:TOO:     [6]: 65532
           [1657537120.035405][9438:9443] CHIP:TOO:     [7]: 65533
           [1657537120.035801][9438:9443] CHIP:EM: Sending Standalone Ack for MessageCounter:64174919 on exchange 48017i
+
+
+          With the above command, we are overwriting the default privilege that chip-tool has as an admin. After this test step you need to factory reset the DUT and reprovision the DUT again, Otherwise the below steps can not be executed.
       disabled: true
 
     - label:
