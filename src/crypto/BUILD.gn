@@ -29,8 +29,10 @@ if (chip_crypto == "") {
   }
 }
 
-assert(chip_crypto == "mbedtls" || chip_crypto == "openssl" || chip_crypto == "platform",
-       "Please select a valid crypto implementation: mbedtls, openssl, platform")
+assert(
+    chip_crypto == "mbedtls" || chip_crypto == "openssl" ||
+        chip_crypto == "platform",
+    "Please select a valid crypto implementation: mbedtls, openssl, platform")
 
 buildconfig_header("crypto_buildconfig") {
   header = "CryptoBuildConfig.h"
