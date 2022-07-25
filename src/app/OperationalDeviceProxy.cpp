@@ -169,11 +169,8 @@ void OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & add
     char peerAddrBuff[Transport::PeerAddress::kMaxToStringSize];
     addr.ToString(peerAddrBuff);
 
-    ChipLogDetail(Discovery,
-                  "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64
-                  "]: Updating device address to %s while in state %d",
-                  ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), peerAddrBuff,
-                  static_cast<int>(mState));
+    ChipLogDetail(Discovery, "OperationalDeviceProxy[%u:" ChipLogFormatX64 "]: Updating device address to %s while in state %d",
+                  mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), peerAddrBuff, static_cast<int>(mState));
 #endif
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -371,9 +368,9 @@ OperationalDeviceProxy::~OperationalDeviceProxy()
     if (mAddressLookupHandle.IsActive())
     {
         ChipLogDetail(Discovery,
-                      "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64
+                      "OperationalDeviceProxy[%u:" ChipLogFormatX64
                       "]: Cancelling incomplete address resolution as device is being deleted.",
-                      ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+                      mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
 
         // Skip cancel callback since the destructor is being called, so we assume that this object is
         // obviously not used anymore
@@ -399,9 +396,9 @@ CHIP_ERROR OperationalDeviceProxy::LookupPeerAddress()
     if (mAddressLookupHandle.IsActive())
     {
         ChipLogProgress(Discovery,
-                        "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64
+                        "OperationalDeviceProxy[%u:" ChipLogFormatX64
                         "]: Operational node lookup already in progress. Will NOT start a new one.",
-                        ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()));
+                        mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()));
         return CHIP_NO_ERROR;
     }
 
@@ -422,10 +419,8 @@ void OperationalDeviceProxy::OnNodeAddressResolved(const PeerId & peerId, const 
 
 void OperationalDeviceProxy::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
 {
-    ChipLogError(Discovery,
-                 "OperationalDeviceProxy[" ChipLogFormatX64 ":" ChipLogFormatX64
-                 "]: operational discovery failed: %" CHIP_ERROR_FORMAT,
-                 ChipLogValueX64(mPeerId.GetCompressedFabricId()), ChipLogValueX64(mPeerId.GetNodeId()), reason.Format());
+    ChipLogError(Discovery, "OperationalDeviceProxy[%u:" ChipLogFormatX64 "]: operational discovery failed: %" CHIP_ERROR_FORMAT,
+                 mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), reason.Format());
 
     if (IsResolvingAddress())
     {

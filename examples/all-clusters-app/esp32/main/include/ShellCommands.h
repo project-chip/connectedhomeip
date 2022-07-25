@@ -140,7 +140,7 @@ private:
         GetInstance().SetOnConnecting(false);
     }
 
-    static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
+    static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
     {
         streamer_printf(streamer_get(), "Establish CASESession Failure!\r\n");
         GetInstance().SetOnConnecting(false);

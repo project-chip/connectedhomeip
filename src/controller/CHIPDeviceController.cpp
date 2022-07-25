@@ -2104,17 +2104,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
 
-        FabricId fabricId;
-        NodeId nodeId;
-        err = ExtractNodeIdFabricIdFromOpCert(params.GetNoc().Value(), &nodeId, &fabricId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Controller, "Error extracting nodeid from cert: %s", err.AsString());
-            CommissioningStageComplete(err);
-            return;
-        }
-
-        err = proxy->SetNodeId(GetPeerScopedId(nodeId));
+        err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error setting peer id: %s", err.AsString());

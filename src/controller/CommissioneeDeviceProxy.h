@@ -86,7 +86,7 @@ public:
     {
         mSessionManager = params.sessionManager;
         mExchangeMgr    = params.exchangeMgr;
-        mPeerId         = ScopedNodeId(deviceId, mPeerId.GetFabricIndex());
+        mPeerId         = PeerId().SetNodeId(deviceId);
         mState          = ConnectionState::Connecting;
 
         mDeviceAddress = peerAddress;
@@ -134,8 +134,8 @@ public:
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
     void ShutdownSubscriptions() override {}
-    ScopedNodeId GetPeerId() const { return mPeerId; }
-    CHIP_ERROR SetNodeId(const ScopedNodeId & nodeId) override;
+    PeerId GetPeerId() const { return mPeerId; }
+    CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) override;
     const Transport::PeerAddress & GetPeerAddress() const { return mDeviceAddress; }
 
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.Get(); }
@@ -154,8 +154,8 @@ private:
         SecureConnected,
     };
 
-    /* NodeId assigned to the device. */
-    ScopedNodeId mPeerId;
+    /* Compressed fabric ID and node ID assigned to the device. */
+    PeerId mPeerId;
 
     /** Address used to communicate with the device.
      */

@@ -111,9 +111,12 @@ CHIP_ERROR CommissioneeDeviceProxy::SetConnected(const SessionHandle & session)
 
 CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
 
-CHIP_ERROR CommissioneeDeviceProxy::SetNodeId(const ScopedNodeId & nodeId)
+CHIP_ERROR CommissioneeDeviceProxy::SetPeerId(ByteSpan rcac, ByteSpan noc)
 {
-    mPeerId = nodeId;
+    CompressedFabricId compressedFabricId;
+    NodeId nodeId;
+    ReturnErrorOnFailure(Credentials::ExtractNodeIdCompressedFabricIdFromOpCerts(rcac, noc, compressedFabricId, nodeId));
+    mPeerId = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
     return CHIP_NO_ERROR;
 }
 

@@ -32,6 +32,7 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         endpointInfo.Reset();
     }
 
+    Server * server = &(chip::Server::GetInstance());
     server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(nodeId, fabricIndex), &mOnConnectedCallback,
                                                             &mOnConnectionFailureCallback);
 

@@ -47,6 +47,7 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
+    Server * server = &(chip::Server::GetInstance());
     server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mDestinationId, fabricIndex), &mOnDeviceConnectedCallback,
                                                             &mOnDeviceConnectionFailureCallback);
     return CHIP_NO_ERROR;
