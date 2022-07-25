@@ -92,7 +92,7 @@ static_library("shell") {
   } else if (chip_device_platform == "ameba") {
     sources += [
       "MainLoopDefault.cpp",
-      "streamer_ameba.cpp"
+      "streamer_ameba.cpp",
     ]
   } else {
     sources += [ "MainLoopDefault.cpp" ]
