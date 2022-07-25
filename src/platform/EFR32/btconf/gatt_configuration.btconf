@@ -81,7 +81,6 @@
         <write authenticated="false" bonded="false" encrypted="false"/>
         <write_no_response authenticated="false" bonded="false" encrypted="false"/>
         <indicate authenticated="false" bonded="false" encrypted="false"/>
-        <notify authenticated="false" bonded="false" encrypted="false"/>
       </properties>
     </characteristic>
     
