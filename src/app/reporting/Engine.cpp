@@ -24,8 +24,8 @@
  */
 
 #include <app/AppBuildConfig.h>
-#include <app/RequiredPrivilege.h>
 #include <app/InteractionModelEngine.h>
+#include <app/RequiredPrivilege.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 
@@ -293,8 +293,8 @@ exit:
 
 CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool & aItemRemoved, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ObjectList<EventPathParams> * deletedEventPathList = nullptr;
+    CHIP_ERROR err                                                      = CHIP_NO_ERROR;
+    ObjectList<EventPathParams> * deletedEventPathList                  = nullptr;
     ObjectList<EventPathParams> ** previousIteratedEventPathListNextPtr = &(apReadHandler->mpEventPathList);
 
     aItemRemoved = false;
@@ -308,9 +308,9 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool &
 
         Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
         ConcreteEventPath path;
-        path.mClusterId = current->mValue.mClusterId;
-        path.mEndpointId = current->mValue.mEndpointId;
-        path.mEventId = current->mValue.mEventId;
+        path.mClusterId                    = current->mValue.mClusterId;
+        path.mEndpointId                   = current->mValue.mEndpointId;
+        path.mEventId                      = current->mValue.mEventId;
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
@@ -320,19 +320,23 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool &
 
             // Proceed to the next item
             previousIteratedEventPathListNextPtr = &(current->mpNext);
-            current = current->mpNext;
+            current                              = current->mpNext;
         }
         else
         {
             TLV::TLVWriter checkpoint = aWriter;
-            err = EventReportIB::ConstructEventStatusIB(aWriter, path, StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
+            err                       = EventReportIB::ConstructEventStatusIB(aWriter, path,
+                                                        StatusIB(Protocols::InteractionModel::Status::UnsupportedAccess));
             if (err != CHIP_NO_ERROR)
             {
                 aWriter = checkpoint;
                 break;
             }
 
-            ChipLogDetail(InteractionModel, "Removed event path (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege", current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId), ChipLogValueMEI(current->mValue.mEventId));
+            ChipLogDetail(InteractionModel,
+                          "Removed event path (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege",
+                          current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
+                          ChipLogValueMEI(current->mValue.mEventId));
 
             auto next = current->mpNext;
 
@@ -340,7 +344,7 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool &
             *previousIteratedEventPathListNextPtr = next;
 
             // Append current item to the deleted event path list
-            current->mpNext = deletedEventPathList;
+            current->mpNext      = deletedEventPathList;
             deletedEventPathList = current;
 
             // proceed to the next item
@@ -361,8 +365,8 @@ exit:
 CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler,
                                                      bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData)
 {
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    size_t eventCount = 0;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    size_t eventCount   = 0;
     bool hasEncodedData = false;
     TLV::TLVWriter backup;
     bool eventClean                = true;
@@ -391,7 +395,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         // Just like what we do in BuildSingleReportDataAttributeReportIBs(), we need to reserve one byte for end of container tag
         // when encoding events to ensure we can close the container successfully.
         const uint32_t kReservedSizeEndOfReportIBs = 1;
-        bool eventPathCleaned = false;
+        bool eventPathCleaned                      = false;
         EventReportIBs::Builder & eventReportIBs   = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
         VerifyOrExit(eventReportIBs.GetWriter() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

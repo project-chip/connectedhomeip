@@ -23,6 +23,7 @@
  */
 
 #include "lib/support/CHIPMem.h"
+#include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -41,9 +42,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
-#include <protocols/interaction_model/Constants.h>
-#include <access/examples/PermissiveAccessControlDelegate.h>
 #include <nlunit-test.h>
+#include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>
 
