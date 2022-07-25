@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "system/SystemClock.h"
 #include <cstdarg>
 #include <memory>
 #include <type_traits>
@@ -385,6 +386,12 @@ void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apC
     VerifyOrDie(apCallback != nullptr);
 
     delete apCallback;
+}
+
+void pychip_ReadClient_OverrideLivenessTimeout(ReadClient * pReadClient, uint32_t livenessTimeoutMs)
+{
+    VerifyOrDie(pReadClient != nullptr);
+    pReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(livenessTimeoutMs));
 }
 
 chip::ChipError::StorageType pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,

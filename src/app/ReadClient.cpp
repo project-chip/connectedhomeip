@@ -38,8 +38,8 @@ namespace app {
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
     mExchange(*this),
-    mpCallback(apCallback),
-    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+    mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
+    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     // Error if already initialized.
     mpExchangeMgr    = apExchangeMgr;
@@ -116,7 +116,8 @@ uint32_t ReadClient::ComputeTimeTillNextSubscription()
     return waitTimeInMsec;
 }
 
-CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle, bool aReestablishCASE)
+CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle,
+                                              bool aReestablishCASE)
 {
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
@@ -125,7 +126,8 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     //
     VerifyOrReturnError(!aReestablishCASE || !aNewSessionHandle.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aNewSessionHandle.HasValue()) {
+    if (aNewSessionHandle.HasValue())
+    {
         mReadPrepareParams.mSessionHolder.Grab(aNewSessionHandle.Value());
     }
 
@@ -729,6 +731,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 void ReadClient::OverrideLivenessTimeout(System::Clock::Timeout aLivenessTimeout)
 {
     mLivenessTimeoutOverride = aLivenessTimeout;
+    RefreshLivenessCheckTimer();
 }
 
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
@@ -737,16 +740,16 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 
     CancelLivenessCheckTimer();
 
-    VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mExchange->HasSessionHandle(), CHIP_ERROR_INCORRECT_STATE);
-
     System::Clock::Timeout timeout;
 
-    if (mLivenessTimeoutOverride != System::Clock::kZero) {
+    if (mLivenessTimeoutOverride != System::Clock::kZero)
+    {
         timeout = mLivenessTimeoutOverride;
     }
-    else {
-        timeout = System::Clock::Seconds16(mMaxInterval) + mExchange->GetSessionHandle()->GetAckTimeout();
+    else
+    {
+        VerifyOrReturnError(mReadPrepareParams.mSessionHolder, CHIP_ERROR_INCORRECT_STATE);
+        timeout = System::Clock::Seconds16(mMaxInterval) + mReadPrepareParams.mSessionHolder->GetAckTimeout();
     }
 
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned

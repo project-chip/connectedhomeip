@@ -58,11 +58,11 @@ class InteractionModelEngine;
  *  @class ReadClient
  *
  *  @brief The read client represents the initiator side of a Read Or Subscribe Interaction (depending on the APIs invoked).
- *         
+ *
  *         When used to manage subscriptions, the client provides functionality to automatically re-subscribe as needed,
  *         including re-establishing CASE under certain conditions (see Callback::OnResubscriptionNeeded for more info).
- *         This is the default behavior. A consumer can completely opt-out of this behavior by over-riding Callback::OnResubscriptionNeeded
- *         and providing an alternative implementation.
+ *         This is the default behavior. A consumer can completely opt-out of this behavior by over-riding
+ * Callback::OnResubscriptionNeeded and providing an alternative implementation.
  *
  */
 class ReadClient : public Messaging::ExchangeDelegate
@@ -357,12 +357,12 @@ public:
     uint32_t ComputeTimeTillNextSubscription();
 
     //
-    // Schedules a re-subscription aTimeTillNextResubscriptionMs into the future. 
+    // Schedules a re-subscription aTimeTillNextResubscriptionMs into the future.
     //
-    // If an application wants to setup CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next interval
-    // at which they should attempt CASE and attempt CASE at that time. On successful CASE establishment, this method should be called with
-    // the new SessionHandle provided through 'aNewSessionHandle', 'aTimeTillNextResubscriptionMs' set to 0 (i.e re-subscribe immediately) and
-    // 'aReestablishCASE' set to false.
+    // If an application wants to setup CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next
+    // interval at which they should attempt CASE and attempt CASE at that time. On successful CASE establishment, this method
+    // should be called with the new SessionHandle provided through 'aNewSessionHandle', 'aTimeTillNextResubscriptionMs' set to 0
+    // (i.e re-subscribe immediately) and 'aReestablishCASE' set to false.
     //
     // Otherwise, if aReestablishCASE is true, operational discovery and CASE will be attempted at that time before
     // the actual IM interaction is initiated.
@@ -370,7 +370,8 @@ public:
     // aReestablishCASE SHALL NOT be set to true if a valid SessionHandle is provided through newSessionHandle.
     //
     //
-    CHIP_ERROR ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle, bool aReestablishCASE);
+    CHIP_ERROR ScheduleResubscription(uint32_t aTimeTillNextResubscriptionMs, Optional<SessionHandle> aNewSessionHandle,
+                                      bool aReestablishCASE);
 
     // Like SendSubscribeRequest, but allows sending certain forms of invalid
     // subscribe requests that servers are expected to reject, for testing

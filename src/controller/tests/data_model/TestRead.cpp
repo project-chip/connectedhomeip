@@ -1476,11 +1476,9 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 class TestResubscriptionCallback : public app::ReadClient::Callback
 {
 public:
-    TestResubscriptionCallback() { }
+    TestResubscriptionCallback() {}
 
-    void SetReadClient(app::ReadClient *apReadClient) {
-        mpReadClient = apReadClient;
-    }
+    void SetReadClient(app::ReadClient * apReadClient) { mpReadClient = apReadClient; }
 
     void OnDone(app::ReadClient *) override { mOnDone++; }
 
@@ -1490,7 +1488,8 @@ public:
         mLastError = aError;
     }
 
-    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { 
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override
+    {
         mOnSubscriptionEstablishedCount++;
 
         //
@@ -1500,29 +1499,29 @@ public:
         mpReadClient->OverrideLivenessTimeout(System::Clock::Milliseconds32(10));
     }
 
-    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient *apReadClient, CHIP_ERROR aTerminationCause) override
+    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
     {
         mOnResubscriptionsAttempted++;
         return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
     }
-    
+
     void ClearCounters()
     {
         mOnSubscriptionEstablishedCount = 0;
         mOnDone                         = 0;
         mOnError                        = 0;
-        mOnResubscriptionsAttempted = 0;
+        mOnResubscriptionsAttempted     = 0;
         mLastError                      = CHIP_NO_ERROR;
     }
 
     int32_t mAttributeCount                 = 0;
     int32_t mOnReportEnd                    = 0;
     int32_t mOnSubscriptionEstablishedCount = 0;
-    int32_t mOnResubscriptionsAttempted = 0;
+    int32_t mOnResubscriptionsAttempted     = 0;
     int32_t mOnDone                         = 0;
     int32_t mOnError                        = 0;
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
-    app::ReadClient *mpReadClient = nullptr;
+    app::ReadClient * mpReadClient          = nullptr;
 };
 
 //
@@ -1535,12 +1534,13 @@ public:
 //
 void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
-    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
 
     {
         TestResubscriptionCallback callback;
-        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback, app::ReadClient::InteractionType::Subscribe);
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
 
         callback.SetReadClient(&readClient);
 
@@ -1551,7 +1551,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         readPrepareParams.mpAttributePathParamsList    = attributePathParams;
         readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
 
-        attributePathParams[0].mClusterId = app::Clusters::TestCluster::Id;
+        attributePathParams[0].mClusterId   = app::Clusters::TestCluster::Id;
         attributePathParams[0].mAttributeId = app::Clusters::TestCluster::Attributes::Boolean::Id;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = 1;
@@ -1561,9 +1561,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         // Drive servicing IO till we have established a subscription at least 2 times.
         //
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(2), [&]() {
-            return callback.mOnSubscriptionEstablishedCount > 1;
-        });
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(2),
+                                        [&]() { return callback.mOnSubscriptionEstablishedCount > 1; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnDone == 0);
 
@@ -1577,7 +1576,7 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
     }
-    
+
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
