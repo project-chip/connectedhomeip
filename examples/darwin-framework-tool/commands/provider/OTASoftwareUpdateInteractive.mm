@@ -59,7 +59,6 @@ bool ParseOTAHeader(chip::OTAImageHeaderParser & parser, const char * otaFilePat
 static bool ParseJsonFileAndPopulateCandidates(
     const char * filepath, NSMutableArray<DeviceSoftwareVersionModel *> ** _Nonnull candidates)
 {
-    bool ret = false;
     Json::Value root;
     Json::CharReaderBuilder builder;
     JSONCPP_STRING errs;
@@ -70,85 +69,112 @@ static bool ParseJsonFileAndPopulateCandidates(
 
     if (!ifs.good()) {
         ChipLogError(SoftwareUpdate, "Error opening ifstream with file: \"%s\"", filepath);
-        return ret;
+        return false;
     }
 
     if (!parseFromStream(builder, ifs, &root, &errs)) {
         ChipLogError(SoftwareUpdate, "Error parsing JSON from file: \"%s\"", filepath);
-        return ret;
+        return false;
     }
 
     const Json::Value devSofVerModValue = root["deviceSoftwareVersionModel"];
     if (!devSofVerModValue || !devSofVerModValue.isArray()) {
         ChipLogError(SoftwareUpdate, "Error: Key deviceSoftwareVersionModel not found or its value is not of type Array");
-    } else {
-        *candidates = [[NSMutableArray alloc] init];
-        for (auto iter : devSofVerModValue) {
-            DeviceSoftwareVersionModel * candidate = [[DeviceSoftwareVersionModel alloc] init];
-            candidate.deviceModelData.vendorId = [NSNumber numberWithUnsignedInt:iter.get("vendorId", 1).asUInt()];
-            candidate.deviceModelData.productId = [NSNumber numberWithUnsignedInt:iter.get("productId", 1).asUInt()];
-            candidate.softwareVersion = [NSNumber numberWithUnsignedLong:iter.get("softwareVersion", 10).asUInt64()];
-            candidate.softwareVersionString =
-                [NSString stringWithUTF8String:iter.get("softwareVersionString", "1.0.0").asCString()];
-            candidate.deviceModelData.cDVersionNumber = [NSNumber numberWithUnsignedInt:iter.get("cDVersionNumber", 0).asUInt()];
-            candidate.deviceModelData.softwareVersionValid = iter.get("softwareVersionValid", true).asBool() ? YES : NO;
-            candidate.deviceModelData.minApplicableSoftwareVersion =
-                [NSNumber numberWithUnsignedLong:iter.get("minApplicableSoftwareVersion", 0).asUInt64()];
-            candidate.deviceModelData.maxApplicableSoftwareVersion =
-                [NSNumber numberWithUnsignedLong:iter.get("maxApplicableSoftwareVersion", 1000).asUInt64()];
-            candidate.deviceModelData.otaURL = [NSString stringWithUTF8String:iter.get("otaURL", "https://test.com").asCString()];
-            [*candidates addObject:candidate];
-            ret = true;
-        }
+        return false;
     }
+
+    *candidates = [[NSMutableArray alloc] init];
+
+    bool ret = false;
+    for (auto iter : devSofVerModValue) {
+        DeviceSoftwareVersionModel * candidate = [[DeviceSoftwareVersionModel alloc] init];
+
+        auto vendorId = [NSNumber numberWithUnsignedInt:iter.get("vendorId", 1).asUInt()];
+        auto productId = [NSNumber numberWithUnsignedInt:iter.get("productId", 1).asUInt()];
+        auto softwareVersion = [NSNumber numberWithUnsignedLong:iter.get("softwareVersion", 10).asUInt64()];
+        auto softwareVersionString = [NSString stringWithUTF8String:iter.get("softwareVersionString", "1.0.0").asCString()];
+        auto cDVersionNumber = [NSNumber numberWithUnsignedInt:iter.get("cDVersionNumber", 0).asUInt()];
+        auto softwareVersionValid = iter.get("softwareVersionValid", true).asBool() ? YES : NO;
+        auto minApplicableSoftwareVersion =
+            [NSNumber numberWithUnsignedLong:iter.get("minApplicableSoftwareVersion", 0).asUInt64()];
+        auto maxApplicableSoftwareVersion =
+            [NSNumber numberWithUnsignedLong:iter.get("maxApplicableSoftwareVersion", 1000).asUInt64()];
+        auto otaURL = [NSString stringWithUTF8String:iter.get("otaURL", "https://test.com").asCString()];
+
+        candidate.deviceModelData.vendorId = vendorId;
+        candidate.deviceModelData.productId = productId;
+        candidate.softwareVersion = softwareVersion;
+        candidate.softwareVersionString = softwareVersionString;
+        candidate.deviceModelData.cDVersionNumber = cDVersionNumber;
+        candidate.deviceModelData.softwareVersionValid = softwareVersionValid;
+        candidate.deviceModelData.minApplicableSoftwareVersion = minApplicableSoftwareVersion;
+        candidate.deviceModelData.maxApplicableSoftwareVersion = maxApplicableSoftwareVersion;
+        candidate.deviceModelData.otaURL = otaURL;
+        [*candidates addObject:candidate];
+        ret = true;
+    }
+
     return ret;
 }
 
 CHIP_ERROR OTASoftwareUpdateSetFilePath::RunCommand()
 {
-    SetCandidatesFromFilePath(mOTACandidatesFilePath);
+    auto error = SetCandidatesFromFilePath(mOTACandidatesFilePath);
     SetCommandExitStatus(nil);
-
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 CHIP_ERROR OTASoftwareUpdateSetStatus::RunCommand()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    error = SetUserConsentStatus(mUserConsentStatus);
+    auto error = SetUserConsentStatus(mUserConsentStatus);
     SetCommandExitStatus(nil);
-
     return error;
 }
 
-void OTASoftwareUpdateBase::SetCandidatesFromFilePath(char * _Nonnull filePath)
+CHIP_ERROR OTASoftwareUpdateBase::SetCandidatesFromFilePath(char * _Nonnull filePath)
 {
     NSMutableArray<DeviceSoftwareVersionModel *> * candidates;
     ChipLogDetail(chipTool, "Setting candidates from file path: %s", filePath);
-    ParseJsonFileAndPopulateCandidates(filePath, &candidates);
+    VerifyOrReturnError(ParseJsonFileAndPopulateCandidates(filePath, &candidates), CHIP_ERROR_INTERNAL);
+
     for (DeviceSoftwareVersionModel * candidate : candidates) {
         chip::OTAImageHeaderParser parser;
         chip::OTAImageHeader header;
-        ParseOTAHeader(parser, [candidate.deviceModelData.otaURL UTF8String], header);
+
+        auto otaURL = [candidate.deviceModelData.otaURL UTF8String];
+        VerifyOrReturnError(ParseOTAHeader(parser, otaURL, header), CHIP_ERROR_INVALID_ARGUMENT);
+
         ChipLogDetail(chipTool, "Validating image list candidate %s: ", [candidate.deviceModelData.otaURL UTF8String]);
-        VerifyOrDie([candidate.deviceModelData.vendorId unsignedIntValue] == header.mVendorId);
-        VerifyOrDie([candidate.deviceModelData.productId unsignedIntValue] == header.mProductId);
-        VerifyOrDie([candidate.softwareVersion unsignedLongValue] == header.mSoftwareVersion);
-        VerifyOrDie([candidate.softwareVersionString length] == header.mSoftwareVersionString.size());
-        VerifyOrDie(memcmp([candidate.softwareVersionString UTF8String], header.mSoftwareVersionString.data(),
-                        header.mSoftwareVersionString.size())
-            == 0);
+
+        auto vendorId = [candidate.deviceModelData.vendorId unsignedIntValue];
+        auto productId = [candidate.deviceModelData.productId unsignedIntValue];
+        auto softwareVersion = [candidate.softwareVersion unsignedLongValue];
+        auto softwareVersionString = [candidate.softwareVersionString UTF8String];
+        auto softwareVersionStringLength = [candidate.softwareVersionString length];
+        auto minApplicableSoftwareVersion = [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue];
+        auto maxApplicableSoftwareVersion = [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue];
+
+        VerifyOrReturnError(vendorId == header.mVendorId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(productId == header.mProductId, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(softwareVersion == header.mSoftwareVersion, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(softwareVersionStringLength == header.mSoftwareVersionString.size(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(
+            memcmp(softwareVersionString, header.mSoftwareVersionString.data(), header.mSoftwareVersionString.size()) == 0,
+            CHIP_ERROR_INVALID_ARGUMENT);
+
         if (header.mMinApplicableVersion.HasValue()) {
-            VerifyOrDie(
-                [candidate.deviceModelData.minApplicableSoftwareVersion unsignedLongValue] == header.mMinApplicableVersion.Value());
+            VerifyOrReturnError(minApplicableSoftwareVersion == header.mMinApplicableVersion.Value(), CHIP_ERROR_INVALID_ARGUMENT);
         }
+
         if (header.mMaxApplicableVersion.HasValue()) {
-            VerifyOrDie(
-                [candidate.deviceModelData.maxApplicableSoftwareVersion unsignedLongValue] == header.mMaxApplicableVersion.Value());
+            VerifyOrReturnError(maxApplicableSoftwareVersion == header.mMaxApplicableVersion.Value(), CHIP_ERROR_INVALID_ARGUMENT);
         }
+
         parser.Clear();
     }
+
     mOTADelegate.candidates = candidates;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTASoftwareUpdateBase::SetUserConsentStatus(char * _Nonnull otaSTatus)
