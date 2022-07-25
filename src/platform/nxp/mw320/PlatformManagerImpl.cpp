@@ -30,7 +30,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
-
+#include <platform/nxp/mw320/DeviceInfoProviderImpl.h>
 #include <lwip/tcpip.h>
 
 namespace chip {
@@ -60,6 +60,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::MW320Config::Init();
     SuccessOrExit(err);
+
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
 
     // Initialize LwIP.
     // tcpip_init(NULL, NULL);

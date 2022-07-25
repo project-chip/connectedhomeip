@@ -75,7 +75,11 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
+    CHIP_ERROR GetWiFiBssId(ByteSpan & value);
+    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
 #endif
+    static const char * GetWiFiIfName() { return "mlan0"; }
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
