@@ -104,6 +104,7 @@ enum
 };
 static int Matter_Selection = MAX_SELECTION;
 #define RUN_RST_LT_DELAY 10
+static const char * TAG = "mw320";
 /*******************************************************************************
  * Variables
  ******************************************************************************/
@@ -1490,6 +1491,37 @@ exit:
     return;
 }
 
+uint32_t identifyTimerCount;
+constexpr uint32_t kIdentifyTimerDelayMS     = 250;
+
+void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
+{
+    PRINTF(" -> %s(%u) \r\n", __FUNCTION__, identifyTimerCount);
+    if (identifyTimerCount)
+    {
+        identifyTimerCount--;
+       emAfWriteAttribute(1, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &identifyTimerCount, sizeof(identifyTimerCount), true,
+                               false);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, nullptr);
+    }
+}
+
+static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
+                 ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
+    VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
+
+   if (identifyTimerCount != *value) {
+        identifyTimerCount = *value;
+        PRINTF("-> Identify: %u \r\n", identifyTimerCount);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, nullptr);
+    }
+
+exit:
+    return;
+}
+
 /*
         Callback to receive the cluster modification event
 */
@@ -1507,6 +1539,9 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // SwitchToggleOnOff();
         // Trigger to send on/off/toggle command to the bound devices
         chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
+        break;
+    case ZCL_IDENTIFY_CLUSTER_ID:
+        OnIdentifyPostAttributeChangeCallback(path.mEndpointId, path.mAttributeId, value);
         break;
     default:
         break;
