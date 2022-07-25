@@ -1321,7 +1321,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)testFloat
 {
     NSDictionary * input =
-        [NSDictionary dictionaryWithObjectsAndKeys:@"Float", @"type", [NSNumber numberWithFloat:0.1245], @"value", nil];
+        [NSDictionary dictionaryWithObjectsAndKeys:@"Float", @"type", [NSNumber numberWithFloat:0.1245f], @"value", nil];
     id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);
@@ -1333,7 +1333,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 - (void)testDouble
 {
     NSDictionary * input =
-        [NSDictionary dictionaryWithObjectsAndKeys:@"Double", @"type", [NSNumber numberWithFloat:0.1245], @"value", nil];
+        [NSDictionary dictionaryWithObjectsAndKeys:@"Double", @"type", [NSNumber numberWithDouble:0.1245], @"value", nil];
     id output = [MTRBaseDevice CHIPEncodeAndDecodeNSObject:input];
     NSLog(@"Conversion input: %@\nOutput: %@", input, output);
     XCTAssertNotNil(output);

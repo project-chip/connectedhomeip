@@ -30,9 +30,10 @@ tests:
 
     - label: "Sends ResetCounts command"
       command: "ResetCounts"
+      PICS: DGTHREAD.S.C00.Rsp
 
     - label: "Read the Overruncount attribute"
-      PICS: DGTHREAD.S.A0007
+      PICS: DGTHREAD.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
       response:

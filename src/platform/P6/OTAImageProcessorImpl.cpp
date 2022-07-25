@@ -16,11 +16,16 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/ota-requestor/OTADownloader.h>
-
 #include "OTAImageProcessorImpl.h"
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
+
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
+namespace DeviceLayer {
 
 #ifdef P6_OTA
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
@@ -96,6 +101,39 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
     }
 
     DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    return CHIP_NO_ERROR;
+}
+
+bool OTAImageProcessorImpl::IsFirstImageRun()
+{
+    OTARequestorInterface * requestor = GetRequestorInstance();
+    ReturnErrorCodeIf(requestor == nullptr, false);
+
+    uint32_t currentVersion;
+    ReturnErrorCodeIf(ConfigurationMgr().GetSoftwareVersion(currentVersion) != CHIP_NO_ERROR, false);
+
+    ChipLogProgress(SoftwareUpdate, "%ld", currentVersion);
+    ChipLogProgress(SoftwareUpdate, "%ld", requestor->GetTargetVersion());
+
+    return ((requestor->GetCurrentUpdateState() == OTARequestorInterface::OTAUpdateStateEnum::kApplying) &&
+            (requestor->GetTargetVersion() == currentVersion));
+}
+
+CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
+{
+    OTARequestorInterface * requestor = chip::GetRequestorInstance();
+    if (requestor == nullptr)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    uint32_t currentVersion;
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    if (currentVersion != requestor->GetTargetVersion())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -264,4 +302,5 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 }
 #endif // P6_OTA
 
+} // namespace DeviceLayer
 } // namespace chip

@@ -125,9 +125,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryInit();
 
-    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
-    mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
-
     // Initialize PersistentStorageDelegate-based storage
     mDeviceStorage            = initParams.persistentStorageDelegate;
     mSessionResumptionStorage = initParams.sessionResumptionStorage;
@@ -164,9 +161,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     mAclStorage = initParams.aclStorage;
     SuccessOrExit(err = mAclStorage->Init(*mDeviceStorage, mFabrics.begin(), mFabrics.end()));
-
-    app::DnssdServer::Instance().SetFabricTable(&mFabrics);
-    app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
@@ -220,6 +214,12 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     err = mUnsolicitedStatusHandler.Init(&mExchangeMgr);
     SuccessOrExit(err);
+
+    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
+    mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
+
+    app::DnssdServer::Instance().SetFabricTable(&mFabrics);
+    app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable());
     SuccessOrExit(err);
@@ -424,6 +424,7 @@ void Server::Shutdown()
 
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    mCommissioningWindowManager.Shutdown();
     mMessageCounterManager.Shutdown();
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
@@ -431,7 +432,6 @@ void Server::Shutdown()
     mAccessControl.Finish();
     Credentials::SetGroupDataProvider(nullptr);
     mAttributePersister.Shutdown();
-    mCommissioningWindowManager.Shutdown();
     // TODO(16969): Remove chip::Platform::MemoryInit() call from Server class, it belongs to outer code
     chip::Platform::MemoryShutdown();
 }

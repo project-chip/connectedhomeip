@@ -554,6 +554,24 @@ CHIP_ERROR FabricTable::FetchRootCert(FabricIndex fabricIndex, MutableByteSpan &
     return mOpCertStore->GetCertificate(fabricIndex, CertChainElement::kRcac, outCert);
 }
 
+CHIP_ERROR FabricTable::FetchPendingNonFabricAssociatedRootCert(MutableByteSpan & outCert) const
+{
+    VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (!mStateFlags.Has(StateFlags::kIsTrustedRootPending))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    if (mStateFlags.Has(StateFlags::kIsAddPending))
+    {
+        // The root certificate is already associated with a pending fabric, so
+        // does not exist for purposes of this API.
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return FetchRootCert(mFabricIndexWithPendingState, outCert);
+}
+
 CHIP_ERROR FabricTable::FetchICACert(FabricIndex fabricIndex, MutableByteSpan & outCert) const
 {
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);

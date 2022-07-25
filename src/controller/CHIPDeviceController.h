@@ -678,10 +678,6 @@ private:
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
-    void OnSessionEstablishmentTimeout();
-
-    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
-
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */

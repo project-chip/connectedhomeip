@@ -111,7 +111,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
     VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(!failSafeContext.IsFailSafeArmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
 
     VerifyOrExit(commissionMgr.CommissioningWindowStatus() == CommissioningWindowStatus::kWindowNotOpen,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
@@ -176,7 +176,7 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 
     VerifyOrExit(commissionMgr.CommissioningWindowStatus() == CommissioningWindowStatus::kWindowNotOpen,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
-    VerifyOrExit(!failSafeContext.IsFailSafeArmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
     VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(),
                  globalStatus = InteractionModel::Status::InvalidCommand);
     VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(),

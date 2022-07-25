@@ -49,6 +49,8 @@ public:
         TestRunner(commandName, testsCount), CHIPCommand(commandName, credsIssuerConfig),
         mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
+        AddArgument("continueOnFailure", 0, 1, &mContinueOnFailure,
+                    "Boolean indicating if the test runner should continue execution if a test fails. Default to false.");
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
         AddArgument("PICS", &mPICSFilePath);
     }
@@ -100,4 +102,8 @@ protected:
     // as it still used by the stack afterward. So a task is scheduled to run to close the
     // test suite as soon as possible, and pending events are ignored in between.
     bool mContinueProcessing = true;
+
+    // When set to true, the test runner continue to run after a test failure.
+    chip::Optional<bool> mContinueOnFailure;
+    std::vector<std::string> mErrorMessages;
 };

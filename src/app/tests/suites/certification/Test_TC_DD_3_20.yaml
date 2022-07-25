@@ -45,7 +45,8 @@ tests:
     - label: "Scan THs QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
@@ -58,7 +59,7 @@ tests:
           [1651109784.452813][31207:31207] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651109784376] [95553:65657838] CHIP: [CTL] Received CommissioningComplete response
           [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
@@ -105,7 +106,8 @@ tests:
     - label: "Scan THs QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
@@ -118,7 +120,7 @@ tests:
           [1651110724.759869][31791:31791] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+          $ ./chip-tool pairing code 1 MT:-24J0AFN00KA0648G00
 
           [1651110724689] [95810:65669790] CHIP: [CTL] Received CommissioningComplete response
           [1651110724689] [95810:65669790] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'

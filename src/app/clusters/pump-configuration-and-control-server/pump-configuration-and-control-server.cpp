@@ -229,6 +229,11 @@ static void updateAttributeLinks(EndpointId endpoint)
         }
     }
     break;
+
+    case PumpOperationMode::kUnknownEnumValue: {
+        // Not expected; see check in MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback.
+        break;
+    }
     }
 
     if (isPumpStatusAvailable)
@@ -384,8 +389,18 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        default:
+        case PumpControlMode::kProportionalPressure:
+            if (!IsFeatureSupported(attributePath.mEndpointId, Attributes::MinCompPressure::Get, Attributes::MaxCompPressure::Get))
+            {
+                status = Protocols::InteractionModel::Status::ConstraintError;
+            }
+            break;
+        case PumpControlMode::kAutomatic:
             status = Protocols::InteractionModel::Status::Success;
+            break;
+        case PumpControlMode::kUnknownEnumValue:
+            status = Protocols::InteractionModel::Status::ConstraintError;
+            break;
         }
     }
     break;
@@ -410,8 +425,13 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        default:
+        case PumpOperationMode::kLocal:
+        case PumpOperationMode::kNormal:
             status = Protocols::InteractionModel::Status::Success;
+            break;
+        case PumpOperationMode::kUnknownEnumValue:
+            status = Protocols::InteractionModel::Status::ConstraintError;
+            break;
         }
 
         break;

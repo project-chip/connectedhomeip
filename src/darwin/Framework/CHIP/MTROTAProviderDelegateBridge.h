@@ -42,19 +42,19 @@ public:
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
 private:
-    void ConvertToQueryImageParams(
+    static CHIP_ERROR ConvertToQueryImageParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
         MTROtaSoftwareUpdateProviderClusterQueryImageParams * commandParams);
-    void ConvertFromQueryImageResponseParms(
+    static void ConvertFromQueryImageResponseParms(
         const MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type & response);
-    void ConvertToApplyUpdateRequestParams(
+    static void ConvertToApplyUpdateRequestParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData,
         MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams * commandParams);
-    void ConvertFromApplyUpdateRequestResponseParms(
+    static void ConvertFromApplyUpdateRequestResponseParms(
         const MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Type & response);
-    void ConvertToNotifyUpdateAppliedParams(
+    static void ConvertToNotifyUpdateAppliedParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData,
         MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams * commandParams);
 

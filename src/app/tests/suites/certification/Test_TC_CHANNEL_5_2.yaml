@@ -35,7 +35,7 @@ tests:
                 value: nodeId
 
     - label: "Reads the ChannelList attribute"
-      PICS: MC_CHANNEL.S.A0000
+      PICS: CHANNEL.S.A0000
       command: "readAttribute"
       attribute: "ChannelList"
       response:
@@ -43,7 +43,7 @@ tests:
               type: list
 
     - label: "TH sends a ChangeChannelByNumber command"
-      PICS: MC_CHANNEL.S.C0002
+      PICS: CHANNEL.S.C02.Rsp
       command: "ChangeChannelByNumber"
       arguments:
           values:
@@ -55,7 +55,7 @@ tests:
     - label: "Verify that the channel has changed on the device"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && CHANNEL.S.C02.Rsp
       arguments:
           values:
               - name: "message"
@@ -64,7 +64,7 @@ tests:
                 value: "y"
 
     - label: "Reads the CurrentChannel attribute"
-      PICS: MC_CHANNEL.S.A0002
+      PICS: CHANNEL.S.A0002
       command: "readAttribute"
       attribute: "CurrentChannel"
       response:

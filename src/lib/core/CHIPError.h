@@ -401,7 +401,8 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_CORE_ERROR(e) CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kCore, (e))
 
 #define CHIP_IM_GLOBAL_STATUS(type)                                                                                                \
-    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, to_underlying(Protocols::InteractionModel::Status::type))
+    CHIP_SDK_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus,                                                                    \
+                   ::chip::to_underlying(::chip::Protocols::InteractionModel::Status::type))
 
 //
 // type must be a compile-time constant as mandated by CHIP_SDK_ERROR.

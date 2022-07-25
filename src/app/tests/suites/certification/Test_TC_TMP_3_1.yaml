@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 7.3.1. [TC-TMP-3.1] Attributes with client as DUT
+name: 3.3.1. [TC-TMP-3.1] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -25,9 +25,7 @@ tests:
           "DUT reads all supported mandatory attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
-          ./chip-tool temperaturemeasurement read measured-value 12345 1
-
-          verify that you see something like this:
+          On Reference app  verify TH receives the read command and knows this attribute for this cluster and provides a plausable value
 
            ./chip-tool temperaturemeasurement read measured-value 1 1
           1650880412.037722][15013:15013] CHIP:DMG: ReadRequestMessage =
@@ -92,6 +90,7 @@ tests:
           "DUT reads all supported optional attributes from TH one at a time in
           a manufacturer specific order"
       verification: |
+          On Reference app  verify TH receives the read command and knows this attribute for this cluster and provides a plausable value
           ./chip-tool temperaturemeasurement read tolerance  1 1
 
           [1650880329.471153][2598:2603] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0402 Attribute 0x0000_0003 DataVersion: 2108803513
@@ -121,6 +120,7 @@ tests:
           To verify all below steps use all-clusters-minimal-app
 
            ./chip-tool temperaturemeasurement read attribute-list  1 1
+          Verify in TH all-clusters-minimal-app Log:
           [1654246677976] [91729:4008220] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0402 Attribute 0x0000_FFFB DataVersion: 1141330314
           [1654246677977] [91729:4008220] CHIP: [TOO]   AttributeList: 8 entries
           [1654246677977] [91729:4008220] CHIP: [TOO]     [1]: 0
@@ -133,11 +133,12 @@ tests:
           [1654246677977] [91729:4008220] CHIP: [TOO]     [8]: 65533
 
 
-          "./chip-tool temperaturemeasurement read measured-value 12345 1
+          ./chip-tool temperaturemeasurement read measured-value 12345 1
 
           verify that you see something like this:
 
            ./chip-tool temperaturemeasurement read measured-value 1 1
+          Verify in TH all-clusters-minimal-app Log:
           1650880412.037722][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880412.037749][15013:15013] CHIP:DMG: {
           [1650880412.037772][15013:15013] CHIP:DMG:         AttributePathIBs =
@@ -158,6 +159,7 @@ tests:
 
 
           ./chip-tool temperaturemeasurement read max-measured-value 1 1
+          Verify in TH all-clusters-minimal-app Log:
           [1650880462.518114][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880462.518149][15013:15013] CHIP:DMG: {
           [1650880462.518176][15013:15013] CHIP:DMG:         AttributePathIBs =
@@ -177,7 +179,7 @@ tests:
 
 
           ./chip-tool temperaturemeasurement read min-measured-value 1 1
-
+          Verify in TH all-clusters-minimal-app Log:
           [1650880507.409653][15013:15013] CHIP:DMG: ReadRequestMessage =
           [1650880507.409703][15013:15013] CHIP:DMG: {
           [1650880507.409727][15013:15013] CHIP:DMG:         AttributePathIBs =

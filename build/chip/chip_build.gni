@@ -20,11 +20,21 @@ template("chip_build") {
   _build_name = target_name
   _toolchain = invoker.toolchain
 
+  if (defined(invoker.test_group) && chip_build_tests) {
+    _build_target = invoker.test_group
+    _check_target = get_label_info(invoker.test_group, "dir") + ":" +
+                    get_label_info(invoker.test_group, "name") + "_run"
+  } else {
+    _build_target = ":default"
+    _check_target = ":check"
+    not_needed(invoker, [ "test_group" ])
+  }
+
   group("${_build_name}") {
-    deps = [ ":default(${_toolchain})" ]
+    deps = [ "${_build_target}(${_toolchain})" ]
   }
 
   group("check_${_build_name}") {
-    deps = [ ":check(${_toolchain})" ]
+    deps = [ "${_check_target}(${_toolchain})" ]
   }
 }

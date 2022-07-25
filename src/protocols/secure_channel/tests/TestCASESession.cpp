@@ -57,6 +57,39 @@ using TestContext = Test::LoopbackMessagingContext;
 namespace chip {
 namespace {
 
+class TemporarySessionManager
+{
+public:
+    TemporarySessionManager(nlTestSuite * suite, TestContext & ctx) : mCtx(ctx)
+    {
+        NL_TEST_ASSERT(suite,
+                       CHIP_NO_ERROR ==
+                           mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(),
+                                                &mStorage, &ctx.GetFabricTable()));
+        // The setup here is really weird: we are using one session manager for
+        // the actual messages we send (the PASE handshake, so the
+        // unauthenticated sessions) and a different one for allocating the PASE
+        // sessions.  Since our Init() set us up as the thing to handle messages
+        // on the transport manager, undo that.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    ~TemporarySessionManager()
+    {
+        mSessionManager.Shutdown();
+        // Reset the session manager on the transport again, just in case
+        // shutdown messed with it.
+        mCtx.GetTransportMgr().SetSessionManager(&mCtx.GetSecureSessionManager());
+    }
+
+    operator SessionManager &() { return mSessionManager; }
+
+private:
+    TestContext & mCtx;
+    TestPersistentStorageDelegate mStorage;
+    SessionManager mSessionManager;
+};
+
 CHIP_ERROR InitFabricTable(chip::FabricTable & fabricTable, chip::TestPersistentStorageDelegate * testStorage,
                            chip::Crypto::OperationalKeystore * opKeyStore,
                            chip::Credentials::PersistentStorageOpCertStore * opCertStore)
@@ -281,7 +314,8 @@ public:
 
 void TestCASESession::SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
@@ -312,7 +346,7 @@ void TestCASESession::SecurePairingWaitTest(nlTestSuite * inSuite, void * inCont
 void TestCASESession::SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    SessionManager sessionManager;
+    TemporarySessionManager sessionManager(inSuite, ctx);
 
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
@@ -425,7 +459,9 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
 void TestCASESession::SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
@@ -902,12 +938,12 @@ void TestCASESession::SessionResumptionStorage(nlTestSuite * inSuite, void * inC
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 void TestCASESession::SimulateUpdateNOCInvalidatePendingEstablishment(nlTestSuite * inSuite, void * inContext)
 {
-    SessionManager sessionManager;
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    TemporarySessionManager sessionManager(inSuite, ctx);
+
     TestCASESecurePairingDelegate delegateCommissioner;
     CASESession pairingCommissioner;
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
-
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;

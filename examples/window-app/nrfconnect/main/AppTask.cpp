@@ -53,6 +53,9 @@
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
+using namespace ::chip;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 namespace {
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
@@ -82,10 +85,6 @@ constexpr uint32_t kOff_ms{ 950 };
 
 } // namespace StatusLed
 } // namespace LedConsts
-
-using namespace ::chip;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
 
 CHIP_ERROR AppTask::Init()
 {

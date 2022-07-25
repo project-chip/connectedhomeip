@@ -169,6 +169,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getUdpListenPort", "()I", &getUdpListenPort);
     SuccessOrExit(err);
 
+    jmethodID getControllerVendorId;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getControllerVendorId", "()I",
+                                                        &getControllerVendorId);
+    SuccessOrExit(err);
+
     jmethodID getKeypairDelegate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate",
                                                         "()Lchip/devicecontroller/KeypairDelegate;", &getKeypairDelegate);
@@ -194,6 +199,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
 
     {
         uint16_t listenPort                = env->CallIntMethod(controllerParams, getUdpListenPort);
+        uint16_t controllerVendorId        = env->CallIntMethod(controllerParams, getControllerVendorId);
         jobject keypairDelegate            = env->CallObjectMethod(controllerParams, getKeypairDelegate);
         jbyteArray rootCertificate         = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
         jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
@@ -205,7 +211,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         wrapper = AndroidDeviceControllerWrapper::AllocateNew(
             sJVM, self, kLocalDeviceId, chip::kUndefinedCATs, &DeviceLayer::SystemLayer(), DeviceLayer::TCPEndPointManager(),
             DeviceLayer::UDPEndPointManager(), std::move(opCredsIssuer), keypairDelegate, rootCertificate, intermediateCertificate,
-            operationalCertificate, ipk, listenPort, &err);
+            operationalCertificate, ipk, listenPort, controllerVendorId, &err);
         SuccessOrExit(err);
     }
 
@@ -1221,7 +1227,7 @@ CHIP_ERROR N2J_PaseVerifierParams(JNIEnv * env, jlong setupPincode, jbyteArray p
     SuccessOrExit(err);
 
     env->ExceptionClear();
-    constructor = env->GetMethodID(paramsClass, "<init>", "(JI[B)V");
+    constructor = env->GetMethodID(paramsClass, "<init>", "(J[B)V");
     VerifyOrExit(constructor != nullptr, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     outParams = (jobject) env->NewObject(paramsClass, constructor, setupPincode, paseVerifier);

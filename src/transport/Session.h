@@ -103,9 +103,13 @@ public:
 
     void DispatchSessionEvent(SessionDelegate::Event event)
     {
-        for (auto & holder : mHolders)
+        // Holders might remove themselves when notified.
+        auto holder = mHolders.begin();
+        while (holder != mHolders.end())
         {
-            holder.DispatchSessionEvent(event);
+            auto cur = holder;
+            ++holder;
+            cur->DispatchSessionEvent(event);
         }
     }
 

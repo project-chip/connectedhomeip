@@ -18,13 +18,19 @@
 
 #pragma once
 
+#include "ApplicationLauncher.h"
+#include "ContentLauncher.h"
+#include "KeypadInput.h"
+#include "LevelControl.h"
+#include "MediaPlayback.h"
+#include "TargetEndpointInfo.h"
+#include "TargetNavigator.h"
+#include "TargetVideoPlayerInfo.h"
+
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
 #include <zap-generated/CHIPClusters.h>
-
-#include "TargetEndpointInfo.h"
-#include "TargetVideoPlayerInfo.h"
 
 constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
 constexpr chip::EndpointId kTvEndpoint                               = 1;
@@ -58,16 +64,43 @@ public:
                                                 const chip::app::DataModel::DecodableList<chip::ClusterId> & responseList);
     static void OnDescriptorReadFailureResponse(void * context, CHIP_ERROR error);
 
-    CHIP_ERROR ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
-                                        std::function<void(CHIP_ERROR)> launchURLResponseCallback);
-    static void OnContentLauncherSuccessResponse(
-        void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & response);
-    static void OnContentLauncherFailureResponse(void * context, CHIP_ERROR error);
+    [[deprecated("Use ContentLauncher_LaunchURL(..) instead")]] CHIP_ERROR
+    ContentLauncherLaunchURL(const char * contentUrl, const char * contentDisplayStr,
+                             std::function<void(CHIP_ERROR)> launchURLResponseCallback);
 
     chip::NodeId GetVideoPlayerNodeForFabricIndex(chip::FabricIndex fabricIndex);
     chip::FabricIndex GetVideoPlayerFabricIndexForNode(chip::NodeId nodeId);
     chip::FabricIndex CurrentFabricIndex() { return mTargetVideoPlayerInfo.GetFabricIndex(); }
     void SetDefaultFabricIndex();
+
+    CHIP_ERROR ContentLauncher_LaunchURL(
+        const char * contentUrl, const char * contentDisplayStr,
+        chip::Optional<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type> brandingInformation,
+        std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR ContentLauncher_LaunchContent(chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type search,
+                                             bool autoPlay, chip::Optional<chip::CharSpan> data,
+                                             std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR LevelControl_Step(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize, uint16_t transitionTime,
+                                 uint8_t optionMask, uint8_t optionOverride, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR LevelControl_MoveToLevel(uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
+                                        std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Play(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Pause(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_StopPlayback(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Next(std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_Seek(uint64_t position, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_SkipForward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR MediaPlayback_SkipBackward(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR ApplicationLauncher_LaunchApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                             chip::Optional<chip::ByteSpan> data, std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR ApplicationLauncher_StopApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR ApplicationLauncher_HideApp(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
+                                           std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR TargetNavigator_NavigateTarget(const uint8_t target, const chip::Optional<chip::CharSpan> data,
+                                              std::function<void(CHIP_ERROR)> responseCallback);
+    CHIP_ERROR KeypadInput_SendKey(const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+                                   std::function<void(CHIP_ERROR)> responseCallback);
 
 private:
     CHIP_ERROR InitBindingHandlers();
@@ -81,4 +114,44 @@ private:
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
     std::function<void(CHIP_ERROR)> mLaunchURLResponseCallback;
     std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
+
+    /**
+     * @brief Content Launcher cluster
+     */
+    LaunchURLCommand mLaunchURLCommand;
+    LaunchContentCommand mLaunchContentCommand;
+
+    /**
+     * @brief Level Control cluster
+     */
+    StepCommand mStepCommand;
+    MoveToLevelCommand mMoveToLevelCommand;
+
+    /**
+     * @brief Media Playback cluster
+     */
+    PlayCommand mPlayCommand;
+    PauseCommand mPauseCommand;
+    StopPlaybackCommand mStopPlaybackCommand;
+    NextCommand mNextCommand;
+    SeekCommand mSeekCommand;
+    SkipForwardCommand mSkipForwardCommand;
+    SkipBackwardCommand mSkipBackwardCommand;
+
+    /**
+     * @brief Application Launcher cluster
+     */
+    LaunchAppCommand mLaunchAppCommand;
+    StopAppCommand mStopAppCommand;
+    HideAppCommand mHideAppCommand;
+
+    /**
+     * @brief Target Navigator cluster
+     */
+    NavigateTargetCommand mNavigateTargetCommand;
+
+    /**
+     * @brief Keypad Input cluster
+     */
+    SendKeyCommand mSendKeyCommand;
 };

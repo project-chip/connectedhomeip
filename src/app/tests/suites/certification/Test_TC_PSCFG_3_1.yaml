@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 64.3.1. [TC-PSCFG-3.1] Attributes with client as DUT
+name: 65.3.1. [TC-PSCFG-3.1] Attributes with client as DUT
 
 config:
     nodeId: 0x12344321
@@ -28,6 +28,8 @@ tests:
           On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
 
           ./chip-tool powersourceconfiguration read sources 1 0
+
+          Verify in TH all-clusters-app log
 
           [1650881032.387446][2715:2715] CHIP:IM: Received Read request
           [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =
@@ -56,19 +58,82 @@ tests:
           "DUT reads all supported optional attributes from TH once at a time in
           a manufacturer specific order"
       verification: |
-          No optional attributes
+          This cluster doesn't have any  optional attribute
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH once at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
           "DUT writes a suitable value to all supported optional attributes on
           the TH once at a time in a manufacturer specific order"
       verification: |
-          No writable attributes
+          This cluster doesn't have any writable attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          This cluster doesn't have any writable attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH once at a time in a manufacturer specific order"
+      verification: |
+          This cluster doesn't have any writable attributes
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server- side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH aga"
+      verification: |
+          On TestHarnes (all-cluster-app) a received read of the Sources attribute (id 0) looks like this:
+
+          ./chip-tool powersourceconfiguration read sources 1 0
+
+          Verify in TH all-clusters-app log
+
+          [1650881032.387446][2715:2715] CHIP:IM: Received Read request
+          [1650881032.387500][2715:2715] CHIP:DMG: ReadRequestMessage =
+          [1650881032.387527][2715:2715] CHIP:DMG: {
+          [1650881032.387549][2715:2715] CHIP:DMG:         AttributePathIBs =
+          [1650881032.387578][2715:2715] CHIP:DMG:         [
+          [1650881032.387602][2715:2715] CHIP:DMG:                 AttributePathIB =
+          [1650881032.387629][2715:2715] CHIP:DMG:                 {
+          [1650881032.387657][2715:2715] CHIP:DMG:                         Endpoint = 0x0,
+          [1650881032.387690][2715:2715] CHIP:DMG:                         Cluster = 0x2e,
+          [1650881032.387722][2715:2715] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1650881032.387750][2715:2715] CHIP:DMG:                 }
+          [1650881032.387781][2715:2715] CHIP:DMG:
+          [1650881032.387807][2715:2715] CHIP:DMG:         ],
+          [1650881032.387836][2715:2715] CHIP:DMG:
+          [1650881032.387862][2715:2715] CHIP:DMG:         isFabricFiltered = true,
+          [1650881032.387887][2715:2715] CHIP:DMG:         InteractionModelRevision = 1
+          [1650881032.387910][2715:2715] CHIP:DMG: },
+          [1650881032.387979][2715:2715] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1650881032.388058][2715:2715] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1650881032.388087][2715:2715] CHIP:DMG: <RE:Run> Cluster 2e, Attribute 0 is dirty
+          [1650881032.388109][2715:2715] CHIP:DMG: Reading attribute: Cluster=0x0000_002E Endpoint=0 AttributeId=0x0000_0000 (expanded=0)
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific orde"
+      verification: |
+          This cluster doesn't have any  optional attribute
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific orde"
+      verification: |
+          This cluster doesn't have any writable attributes
       disabled: true

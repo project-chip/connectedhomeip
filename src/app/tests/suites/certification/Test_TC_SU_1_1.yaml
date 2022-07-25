@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.1.1. [TC-SU-1.1] Invoke AnnounceOTAProvider from an admin(DUT) to OTA-R
+name: 3.1.1.  [TC-SU-1.1] Invoke AnnounceOTAProvider from Admin(DUT) to OTA-R
 
 config:
     nodeId: 0x12344321

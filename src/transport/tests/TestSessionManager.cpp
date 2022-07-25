@@ -702,7 +702,19 @@ static void RandomSessionIdAllocatorOffset(nlTestSuite * inSuite, SessionManager
 
 void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    FabricTableHolder fabricTableHolder;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
+
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage1, deviceStorage2;
+
     SessionManager sessionManager;
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage1,
+                                           &fabricTableHolder.GetFabricTable()));
 
     // Allocate a session.
     uint16_t sessionId1;
@@ -735,10 +747,24 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
     }
 
     // Reconstruct the Session Manager to reset state.
+    sessionManager.Shutdown();
     sessionManager.~SessionManager();
     new (&sessionManager) SessionManager();
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage2,
+                                           &fabricTableHolder.GetFabricTable()));
 
-    prevSessionId = 0;
+    // Allocate a single session so we know what random id we are starting at.
+    {
+        auto handle = sessionManager.AllocateSession(
+            Transport::SecureSession::Type::kPASE,
+            ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
+        NL_TEST_ASSERT(inSuite, handle.HasValue());
+        prevSessionId = handle.Value()->AsSecureSession()->GetLocalSessionId();
+        handle.Value()->AsSecureSession()->MarkForEviction();
+    }
+
     // Verify that we increment session ID by 1 for each allocation (except for
     // the wraparound case where we skip session ID 0), even when allocated
     // sessions are immediately freed.
@@ -886,6 +912,8 @@ void SessionCounterExhaustedTest(nlTestSuite * inSuite, void * inContext)
 
 static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
     IPAddress addr;
     IPAddress::FromString("::1", addr);
 
@@ -894,9 +922,17 @@ static void SessionShiftingTest(nlTestSuite * inSuite, void * inContext)
     FabricIndex aliceFabricIndex = 1;
     FabricIndex bobFabricIndex   = 1;
 
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+
     SessionManager sessionManager;
-    secure_channel::MessageCounterManager gMessageCounterManager;
-    chip::TestPersistentStorageDelegate deviceStorage;
+
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == fabricTableHolder.Init());
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       sessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                           &fabricTableHolder.GetFabricTable()));
 
     Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 

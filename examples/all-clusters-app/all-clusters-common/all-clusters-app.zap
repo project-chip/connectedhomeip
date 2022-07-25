@@ -1,5 +1,5 @@
 {
-  "featureLevel": 72,
+  "featureLevel": 75,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -19,14 +19,14 @@
     {
       "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/app-templates.json",
-      "version": "chip-v1",
-      "type": "gen-templates-json"
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     },
     {
       "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
-      "version": "ZCL Test Data",
-      "type": "zcl-properties"
+      "type": "zcl-properties",
+      "version": "ZCL Test Data"
     }
   ],
   "endpointTypes": [
@@ -13331,7 +13331,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x113",
+              "defaultValue": "0xD13",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -24662,5 +24662,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ]
+  ],
+  "log": []
 }

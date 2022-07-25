@@ -24,18 +24,6 @@
 // to the "EmberAfClusterName" defined in the ZCL header.
 // The names of clusters that are not present, are removed.
 
-#if defined(ZCL_USING_POWER_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_POWER_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER { ZCL_POWER_CONFIG_CLUSTER_ID, "Power Configuration" },
-#else
-#define CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DEVICE_TEMP_CLUSTER_SERVER) || defined(ZCL_USING_DEVICE_TEMP_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER { ZCL_DEVICE_TEMP_CLUSTER_ID, "Device Temperature Configuration" },
-#else
-#define CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER
-#endif
-
 #if defined(ZCL_USING_IDENTIFY_CLUSTER_SERVER) || defined(ZCL_USING_IDENTIFY_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER { ZCL_IDENTIFY_CLUSTER_ID, "Identify" },
 #else
@@ -72,34 +60,10 @@
 #define CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ALARM_CLUSTER_SERVER) || defined(ZCL_USING_ALARM_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ALARM_CLUSTER { ZCL_ALARM_CLUSTER_ID, "Alarms" },
-#else
-#define CHIP_PRINTCLUSTER_ALARM_CLUSTER
-#endif
-
-#if defined(ZCL_USING_TIME_CLUSTER_SERVER) || defined(ZCL_USING_TIME_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TIME_CLUSTER { ZCL_TIME_CLUSTER_ID, "Time" },
-#else
-#define CHIP_PRINTCLUSTER_TIME_CLUSTER
-#endif
-
 #if defined(ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BINARY_INPUT_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER { ZCL_BINARY_INPUT_BASIC_CLUSTER_ID, "Binary Input (Basic)" },
 #else
 #define CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER
-#endif
-
-#if defined(ZCL_USING_POWER_PROFILE_CLUSTER_SERVER) || defined(ZCL_USING_POWER_PROFILE_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER { ZCL_POWER_PROFILE_CLUSTER_ID, "Power Profile" },
-#else
-#define CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER
-#endif
-
-#if defined(ZCL_USING_APPLIANCE_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_APPLIANCE_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER { ZCL_APPLIANCE_CONTROL_CLUSTER_ID, "Appliance Control" },
-#else
-#define CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_PWM_CLUSTER_SERVER) || defined(ZCL_USING_PWM_CLUSTER_CLIENT)
@@ -124,12 +88,6 @@
 #define CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER { ZCL_ACCESS_CONTROL_CLUSTER_ID, "Access Control" },
 #else
 #define CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_POLL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_POLL_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER { ZCL_POLL_CONTROL_CLUSTER_ID, "Poll Control" },
-#else
-#define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_ACTIONS_CLUSTER_CLIENT)
@@ -317,12 +275,6 @@
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER { ZCL_SHADE_CONFIG_CLUSTER_ID, "Shade Configuration" },
-#else
-#define CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER
-#endif
-
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { ZCL_DOOR_LOCK_CLUSTER_ID, "Door Lock" },
 #else
@@ -357,12 +309,6 @@
 #define CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER { ZCL_FAN_CONTROL_CLUSTER_ID, "Fan Control" },
 #else
 #define CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DEHUMID_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEHUMID_CONTROL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DEHUMID_CONTROL_CLUSTER { ZCL_DEHUMID_CONTROL_CLUSTER_ID, "Dehumidification Control" },
-#else
-#define CHIP_PRINTCLUSTER_DEHUMID_CONTROL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_THERMOSTAT_UI_CONFIG_CLUSTER_CLIENT)
@@ -420,246 +366,6 @@
 #define CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER { ZCL_OCCUPANCY_SENSING_CLUSTER_ID, "Occupancy Sensing" },
 #else
 #define CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                 \
-    defined(ZCL_USING_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                        \
-    { ZCL_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Carbon Monoxide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                  \
-    defined(ZCL_USING_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                         \
-    { ZCL_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Carbon Dioxide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                        \
-    defined(ZCL_USING_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER                                                               \
-    { ZCL_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Ethylene Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                  \
-    defined(ZCL_USING_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                         \
-    { ZCL_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Ethylene Oxide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                        \
-    defined(ZCL_USING_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER                                                               \
-    { ZCL_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Hydrogen Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                               \
-    defined(ZCL_USING_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                      \
-    { ZCL_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Hydrogen Sulphide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                    \
-    defined(ZCL_USING_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                           \
-    { ZCL_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Nitric Oxide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                \
-    defined(ZCL_USING_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                       \
-    { ZCL_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Nitrogen Dioxide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                          \
-    defined(ZCL_USING_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER                                                                 \
-    { ZCL_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Oxygen Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                           \
-    defined(ZCL_USING_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                  \
-    { ZCL_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Ozone Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                  \
-    defined(ZCL_USING_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                         \
-    { ZCL_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Sulfur Dioxide Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                \
-    defined(ZCL_USING_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER                                                       \
-    { ZCL_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Dissolved Oxygen Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                         \
-    defined(ZCL_USING_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                \
-    { ZCL_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Bromate Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                     \
-    defined(ZCL_USING_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER                                                            \
-    { ZCL_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Chloramines Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                        \
-    defined(ZCL_USING_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER                                                               \
-    { ZCL_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Chlorine Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                       \
-    defined(ZCL_USING_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER                                              \
-    { ZCL_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Fecal coliform and E. Coli Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                        \
-    defined(ZCL_USING_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                               \
-    { ZCL_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Fluoride Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                \
-    defined(ZCL_USING_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER                                                       \
-    { ZCL_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Haloacetic Acids Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                           \
-    defined(ZCL_USING_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER                                                  \
-    { ZCL_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Total Trihalomethanes Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                         \
-    defined(ZCL_USING_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER                                                \
-    { ZCL_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Total Coliform Bacteria Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                       \
-    defined(ZCL_USING_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER                                                              \
-    { ZCL_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Turbidity Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                          \
-    defined(ZCL_USING_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER                                                                 \
-    { ZCL_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Copper Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                            \
-    defined(ZCL_USING_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \
-    { ZCL_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Lead Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                       \
-    defined(ZCL_USING_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER                                                              \
-    { ZCL_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Manganese Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                         \
-    defined(ZCL_USING_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                \
-    { ZCL_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Sulfate Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                            \
-    defined(ZCL_USING_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER                                                   \
-    { ZCL_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Bromodichloromethane Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                       \
-    defined(ZCL_USING_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER                                                              \
-    { ZCL_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Bromoform Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                            \
-    defined(ZCL_USING_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER                                                   \
-    { ZCL_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Chlorodibromomethane Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                      \
-    defined(ZCL_USING_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER                                                             \
-    { ZCL_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Chloroform Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                          \
-    defined(ZCL_USING_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER                                                                 \
-    { ZCL_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER_ID, "Sodium Concentration Measurement" },
-#else
-#define CHIP_PRINTCLUSTER_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER
 #endif
 
 #if defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_SERVER) || defined(ZCL_USING_WAKE_ON_LAN_CLUSTER_CLIENT)
@@ -734,31 +440,6 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
-#if defined(ZCL_USING_APPLIANCE_IDENTIFICATION_CLUSTER_SERVER) || defined(ZCL_USING_APPLIANCE_IDENTIFICATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER { ZCL_APPLIANCE_IDENTIFICATION_CLUSTER_ID, "Appliance Identification" },
-#else
-#define CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER
-#endif
-
-#if defined(ZCL_USING_METER_IDENTIFICATION_CLUSTER_SERVER) || defined(ZCL_USING_METER_IDENTIFICATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_METER_IDENTIFICATION_CLUSTER { ZCL_METER_IDENTIFICATION_CLUSTER_ID, "Meter Identification" },
-#else
-#define CHIP_PRINTCLUSTER_METER_IDENTIFICATION_CLUSTER
-#endif
-
-#if defined(ZCL_USING_APPLIANCE_EVENTS_AND_ALERT_CLUSTER_SERVER) || defined(ZCL_USING_APPLIANCE_EVENTS_AND_ALERT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                       \
-    { ZCL_APPLIANCE_EVENTS_AND_ALERT_CLUSTER_ID, "Appliance Events and Alert" },
-#else
-#define CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER
-#endif
-
-#if defined(ZCL_USING_APPLIANCE_STATISTICS_CLUSTER_SERVER) || defined(ZCL_USING_APPLIANCE_STATISTICS_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER { ZCL_APPLIANCE_STATISTICS_CLUSTER_ID, "Appliance Statistics" },
-#else
-#define CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER
-#endif
-
 #if defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER { ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID, "Electrical Measurement" },
 #else
@@ -772,24 +453,17 @@
 #endif
 
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
-    CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
-    CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIG_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
-    CHIP_PRINTCLUSTER_ALARM_CLUSTER                                                                                                \
-    CHIP_PRINTCLUSTER_TIME_CLUSTER                                                                                                 \
     CHIP_PRINTCLUSTER_BINARY_INPUT_BASIC_CLUSTER                                                                                   \
-    CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
-    CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_PWM_CLUSTER                                                                                                  \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_ACCESS_CONTROL_CLUSTER                                                                                       \
-    CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
     CHIP_PRINTCLUSTER_OTA_PROVIDER_CLUSTER                                                                                         \
@@ -820,14 +494,12 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_PUMP_CONFIG_CONTROL_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_THERMOSTAT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_FAN_CONTROL_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_DEHUMID_CONTROL_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_THERMOSTAT_UI_CONFIG_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_COLOR_CONTROL_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_BALLAST_CONFIGURATION_CLUSTER                                                                                \
@@ -837,36 +509,6 @@
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER                                                                                    \
-    CHIP_PRINTCLUSTER_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                            \
-    CHIP_PRINTCLUSTER_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                             \
-    CHIP_PRINTCLUSTER_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \
-    CHIP_PRINTCLUSTER_ETHYLENE_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                             \
-    CHIP_PRINTCLUSTER_HYDROGEN_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \
-    CHIP_PRINTCLUSTER_HYDROGEN_SULPHIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                          \
-    CHIP_PRINTCLUSTER_NITRIC_OXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                               \
-    CHIP_PRINTCLUSTER_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                           \
-    CHIP_PRINTCLUSTER_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER                                                                     \
-    CHIP_PRINTCLUSTER_OZONE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                      \
-    CHIP_PRINTCLUSTER_SULFUR_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                             \
-    CHIP_PRINTCLUSTER_DISSOLVED_OXYGEN_CONCENTRATION_MEASUREMENT_CLUSTER                                                           \
-    CHIP_PRINTCLUSTER_BROMATE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                    \
-    CHIP_PRINTCLUSTER_CHLORAMINES_CONCENTRATION_MEASUREMENT_CLUSTER                                                                \
-    CHIP_PRINTCLUSTER_CHLORINE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \
-    CHIP_PRINTCLUSTER_FECAL_COLIFORM_AND_E_COLI_CONCENTRATION_MEASUREMENT_CLUSTER                                                  \
-    CHIP_PRINTCLUSTER_FLUORIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \
-    CHIP_PRINTCLUSTER_HALOACETIC_ACIDS_CONCENTRATION_MEASUREMENT_CLUSTER                                                           \
-    CHIP_PRINTCLUSTER_TOTAL_TRIHALOMETHANES_CONCENTRATION_MEASUREMENT_CLUSTER                                                      \
-    CHIP_PRINTCLUSTER_TOTAL_COLIFORM_BACTERIA_CONCENTRATION_MEASUREMENT_CLUSTER                                                    \
-    CHIP_PRINTCLUSTER_TURBIDITY_CONCENTRATION_MEASUREMENT_CLUSTER                                                                  \
-    CHIP_PRINTCLUSTER_COPPER_CONCENTRATION_MEASUREMENT_CLUSTER                                                                     \
-    CHIP_PRINTCLUSTER_LEAD_CONCENTRATION_MEASUREMENT_CLUSTER                                                                       \
-    CHIP_PRINTCLUSTER_MANGANESE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                  \
-    CHIP_PRINTCLUSTER_SULFATE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                    \
-    CHIP_PRINTCLUSTER_BROMODICHLOROMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER                                                       \
-    CHIP_PRINTCLUSTER_BROMOFORM_CONCENTRATION_MEASUREMENT_CLUSTER                                                                  \
-    CHIP_PRINTCLUSTER_CHLORODIBROMOMETHANE_CONCENTRATION_MEASUREMENT_CLUSTER                                                       \
-    CHIP_PRINTCLUSTER_CHLOROFORM_CONCENTRATION_MEASUREMENT_CLUSTER                                                                 \
-    CHIP_PRINTCLUSTER_SODIUM_CONCENTRATION_MEASUREMENT_CLUSTER                                                                     \
     CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_CHANNEL_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER                                                                                     \
@@ -879,11 +521,7 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
-    CHIP_PRINTCLUSTER_APPLIANCE_IDENTIFICATION_CLUSTER                                                                             \
-    CHIP_PRINTCLUSTER_METER_IDENTIFICATION_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                           \
-    CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_TEST_CLUSTER
 
-#define MAX_CLUSTER_NAME_LENGTH 52
+#define MAX_CLUSTER_NAME_LENGTH 39

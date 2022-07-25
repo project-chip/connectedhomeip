@@ -51,8 +51,8 @@ tests:
       disabled: true
 
     - label:
-          "If (PICS_WIFI) or (PICS_THREAD), Commissioner SHALL configure
-          regulatory information in the Commissionee."
+          "Commissioner SHALL configure regulatory information in the
+          Commissionee."
       PICS: MCORE.DD.WIRELESS
       verification: |
           On TH:
@@ -337,7 +337,7 @@ tests:
           "Commissioning channel between the Commissioner and Commissionee is
           terminated."
       verification: |
-
+          1. Terminate the connection between the Commissionee and the Commissioner. (i.e. remove network access or terminate commissioning process)
       disabled: true
 
     - label: "Commissioner starts discovery of DUT using Operational Discovery"

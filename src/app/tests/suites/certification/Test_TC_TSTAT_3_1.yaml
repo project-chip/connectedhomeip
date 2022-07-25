@@ -27,6 +27,8 @@ tests:
       verification: |
           ./chip-tool thermostat read  local-temperature  1 1
 
+          Verify in TH all-clusters-app Log:
+
           [1652264555.303895][7099:7099] CHIP:IM: Received Read request
           [1652264555.303980][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652264555.304045][7099:7099] CHIP:DMG: {
@@ -48,6 +50,7 @@ tests:
 
           ./chip-tool thermostat read  control-sequence-of-operation 1 1
 
+          Verify in TH all-clusters-app Log:
 
           [1652265275.022068][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265275.022110][7099:7099] CHIP:DMG: {
@@ -67,6 +70,7 @@ tests:
           [1652265275.022756][7099:7099] CHIP:DMG: },
 
           ./chip-tool thermostat read   system-mode    1 1
+          Verify in TH all-clusters-app Log:
           [1652265332.311723][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265332.311772][7099:7099] CHIP:DMG: {
           [1652265332.311812][7099:7099] CHIP:DMG:         AttributePathIBs =
@@ -99,8 +103,11 @@ tests:
           "DUT writes a suitable value to all supported mandatory attributes on
           the TH one at a time in a manufacturer specific order"
       verification: |
-          ./chip-tool thermostat write system-mode 2 1 1
+          verify on Reference app receives the right Read Request Message for the data sent in the below commands
 
+
+          ./chip-tool thermostat write system-mode 2 1 1
+          Verify in TH all-clusters-app Log:
           [1652265582.913625][7099:7099] CHIP:IM: Received Write request
           [1652265582.913672][7099:7099] CHIP:DMG: IM WH moving to [Initialized]
           [1652265582.913768][7099:7099] CHIP:DMG: WriteRequestMessage =
@@ -130,8 +137,7 @@ tests:
 
 
            ./chip-tool thermostat write  control-sequence-of-operation 1 1 1
-
-
+          Verify in TH all-clusters-app Log:
           [1652265678.578137][7099:7099] CHIP:IM: Received Write request
           [1652265678.578192][7099:7099] CHIP:DMG: IM WH moving to [Initialized]
           [1652265678.578284][7099:7099] CHIP:DMG: WriteRequestMessage =
@@ -174,22 +180,35 @@ tests:
           also reflects this in global attributes such as FeatureMap and
           AttributeList. Commission DUT to TH again"
       verification: |
+          To verify all below steps use all-clusters-minimal-app
+          verify on Reference app receives the right Read Request Message for the data sent in the below commands
+
           ./chip-tool thermostat read attribute-list 1 1
-          [1654249558990] [92048:4020537] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFB DataVersion: 2781503138
-          [1654249558990] [92048:4020537] CHIP: [TOO]   AttributeList: 9 entries
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [1]: 0
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [2]: 18
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [3]: 27
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [4]: 28
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [5]: 65528
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [6]: 65529
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [7]: 65531
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [8]: 65532
-          [1654249558990] [92048:4020537] CHIP: [TOO]     [9]: 65533
+          Verify in TH all-clusters-app Log:
+          [1657179340.726622][2249:2249] CHIP:IM: Received Read request
+          [1657179340.726762][2249:2249] CHIP:DMG: ReadRequestMessage =
+          [1657179340.726817][2249:2249] CHIP:DMG: {
+          [1657179340.726863][2249:2249] CHIP:DMG:         AttributePathIBs =
+          [1657179340.726918][2249:2249] CHIP:DMG:         [
+          [1657179340.726968][2249:2249] CHIP:DMG:                 AttributePathIB =
+          [1657179340.727024][2249:2249] CHIP:DMG:                 {
+          [1657179340.727083][2249:2249] CHIP:DMG:                         Endpoint = 0x1,
+          [1657179340.727252][2249:2249] CHIP:DMG:                         Cluster = 0x201,
+          [1657179340.727330][2249:2249] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1657179340.727398][2249:2249] CHIP:DMG:                 }
+          [1657179340.727461][2249:2249] CHIP:DMG:
+          [1657179340.727520][2249:2249] CHIP:DMG:         ],
+          [1657179340.727578][2249:2249] CHIP:DMG:
+          [1657179340.727633][2249:2249] CHIP:DMG:         isFabricFiltered = true,
+          [1657179340.727685][2249:2249] CHIP:DMG:         InteractionModelRevision = 1
+          [1657179340.727734][2249:2249] CHIP:DMG: },
+          [1657179340.727881][2249:2249] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1657179340.728028][2249:2249] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
 
 
-          " ./chip-tool thermostat read  local-temperature  1 1
 
+          ./chip-tool thermostat read  local-temperature  1 1
+          Verify in TH all-clusters-app Log:
           [1652264555.303895][7099:7099] CHIP:IM: Received Read request
           [1652264555.303980][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652264555.304045][7099:7099] CHIP:DMG: {
@@ -210,8 +229,7 @@ tests:
 
 
           ./chip-tool thermostat read  control-sequence-of-operation 1 1
-
-
+          Verify in TH all-clusters-app Log:
           [1652265275.022068][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265275.022110][7099:7099] CHIP:DMG: {
           [1652265275.022145][7099:7099] CHIP:DMG:         AttributePathIBs =
@@ -230,6 +248,7 @@ tests:
           [1652265275.022756][7099:7099] CHIP:DMG: },
 
           ./chip-tool thermostat read   system-mode    1 1
+          Verify in TH all-clusters-app Log:
           [1652265332.311723][7099:7099] CHIP:DMG: ReadRequestMessage =
           [1652265332.311772][7099:7099] CHIP:DMG: {
           [1652265332.311812][7099:7099] CHIP:DMG:         AttributePathIBs =

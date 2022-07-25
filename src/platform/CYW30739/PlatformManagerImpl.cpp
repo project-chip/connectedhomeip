@@ -45,9 +45,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = PersistedStorage::KeyValueStoreMgrImpl().Init();
     SuccessOrExit(err);
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
     /* Create the thread object. */
     mThread = wiced_rtos_create_thread();
     VerifyOrExit(mThread != nullptr, err = CHIP_ERROR_NO_MEMORY);

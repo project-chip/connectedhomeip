@@ -205,22 +205,6 @@ CHIP_ERROR UDPEndPointImplSockets::BindImpl(IPAddressType addressType, const IPA
         }
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(&GetSystemLayer())->GetDispatchQueue();
-    if (dispatchQueue != nullptr)
-    {
-        unsigned long fd = static_cast<unsigned long>(mSocket);
-
-        mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
-        ReturnErrorCodeIf(mReadableSource == nullptr, CHIP_ERROR_NO_MEMORY);
-
-        dispatch_source_set_event_handler(mReadableSource, ^{
-            this->HandlePendingIO(System::SocketEventFlags::kRead);
-        });
-        dispatch_resume(mReadableSource);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
     return CHIP_NO_ERROR;
 }
 
@@ -431,14 +415,6 @@ void UDPEndPointImplSockets::CloseImpl()
         close(mSocket);
         mSocket = kInvalidSocketFd;
     }
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (mReadableSource)
-    {
-        dispatch_source_cancel(mReadableSource);
-        dispatch_release(mReadableSource);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 }
 
 void UDPEndPointImplSockets::Free()

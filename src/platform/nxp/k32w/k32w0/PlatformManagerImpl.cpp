@@ -35,9 +35,12 @@
 #include <lwip/tcpip.h>
 #endif
 
+#if defined(MBEDTLS_USE_TINYCRYPT)
+#include "ecc.h"
+#endif
+
 #include <openthread/platform/entropy.h>
 
-#include "K32W061.h"
 #include "MemManager.h"
 #include "RNG_Interface.h"
 #include "TimersManager.h"
@@ -48,6 +51,10 @@ namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+
+#if defined(MBEDTLS_USE_TINYCRYPT)
+osaMutexId_t PlatformManagerImpl::rngMutexHandle = NULL;
+#endif
 
 CHIP_ERROR PlatformManagerImpl::InitBoardFwk(void)
 {
@@ -93,6 +100,18 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
+#if defined(MBEDTLS_USE_TINYCRYPT)
+int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
+{
+    int res;
+    OSA_MutexLock(rngMutexHandle, osaWaitForever_c);
+    res = (chip::Crypto::DRBG_get_bytes(dest, size) == CHIP_NO_ERROR) ? size : 0;
+    OSA_MutexUnlock(rngMutexHandle);
+
+    return res;
+}
+#endif
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     uint32_t chipType;
@@ -111,9 +130,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         goto exit;
     }
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -123,6 +139,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
+
+#if defined(MBEDTLS_USE_TINYCRYPT)
+    /* Set RNG function for tinycrypt operations. */
+    rngMutexHandle = OSA_MutexCreate();
+    VerifyOrExit((NULL != rngMutexHandle), err = CHIP_ERROR_NO_MEMORY);
+    uECC_set_rng(PlatformManagerImpl::uECC_RNG_Function);
+#endif
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

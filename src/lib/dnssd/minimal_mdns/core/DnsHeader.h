@@ -53,6 +53,9 @@ public:
     bool IsResponse() const { return (mValue & kIsResponseMask) == kIsResponseMask; }
     BitPackedFlags & SetResponse() { return SetMask(kIsResponseMask); }
 
+    bool IsAuthoritative() const { return (mValue & kAuthoritativeMask) == kAuthoritativeMask; }
+    BitPackedFlags & SetAuthoritative() { return SetMask(kAuthoritativeMask); }
+
     bool IsTruncated() const { return (mValue & kTruncationMask) != 0; }
     BitPackedFlags & SetTruncated(bool value) { return value ? SetMask(kTruncationMask) : ClearMask(kTruncationMask); }
 
@@ -79,11 +82,11 @@ private:
     // 1111 1110 0000 0000 = FE0F
     // TODO(cecille): need to better document this value. Why is the comment different than the value?
     static constexpr uint16_t kMdnsNonIgnoredMask = 0x8E08;
-
-    static constexpr uint16_t kIsResponseMask = 0x8000;
-    static constexpr uint16_t kOpcodeMask     = 0x7000;
-    static constexpr uint16_t kTruncationMask = 0x0400;
-    static constexpr uint16_t kReturnCodeMask = 0x000F;
+    static constexpr uint16_t kAuthoritativeMask  = 0x0400;
+    static constexpr uint16_t kIsResponseMask     = 0x8000;
+    static constexpr uint16_t kOpcodeMask         = 0x7000;
+    static constexpr uint16_t kTruncationMask     = 0x0200;
+    static constexpr uint16_t kReturnCodeMask     = 0x000F;
 };
 
 /**

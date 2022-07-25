@@ -461,7 +461,7 @@ To prepare the accessory device for commissioning, complete the following steps:
 
         ```
         I: 666[SVR] Copy/paste the below URL in a browser to see the QR Code:
-                https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AI34DV%2A-00%200C9SS0
+                https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34DV%2A-00%200C9SS0
         ```
 
 5.  Open the URL in a web browser to have the commissioning QR code generated.

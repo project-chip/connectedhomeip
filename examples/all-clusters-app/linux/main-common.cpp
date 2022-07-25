@@ -16,16 +16,15 @@
  *    limitations under the License.
  */
 
+#include "main-common.h"
+#include "AllClustersCommandDelegate.h"
 #include "include/tv-callbacks.h"
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -55,155 +54,13 @@ using namespace chip::app;
 using namespace chip::DeviceLayer;
 
 namespace {
-static LowPowerManager lowPowerManager;
 
-bool IsClusterPresentOnAnyEndpoint(ClusterId clusterId)
-{
-    bool retval = false;
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
+LowPowerManager sLowPowerManager;
+NamedPipeCommands sChipNamedPipeCommands;
+AllClustersCommandDelegate sAllClustersCommandDelegate;
 
-    for (auto endpointId : EnabledEndpointsWithServerCluster(clusterId))
-    {
-        IgnoreUnusedVariable(endpointId);
-        retval = true;
-    }
-
-    return retval;
-}
-
-/**
- * Should be called when a software fault takes place on the Node.
- */
-void HandleSoftwareFaultEvent(intptr_t arg)
-{
-    if (!IsClusterPresentOnAnyEndpoint(Clusters::SoftwareDiagnostics::Id))
-        return;
-
-    Clusters::SoftwareDiagnostics::Events::SoftwareFault::Type softwareFault;
-    char threadName[kMaxThreadNameLength + 1];
-
-    softwareFault.id = static_cast<uint64_t>(getpid());
-    Platform::CopyString(threadName, std::to_string(softwareFault.id).c_str());
-
-    softwareFault.name.SetValue(CharSpan::fromCharString(threadName));
-
-    std::time_t result = std::time(nullptr);
-    char * asctime     = std::asctime(std::localtime(&result));
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(asctime), strlen(asctime)));
-
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
-}
-
-/**
- * Should be called when a general fault takes place on the Node.
- */
-void HandleGeneralFaultEvent(intptr_t arg)
-{
-    uint32_t eventId = static_cast<uint32_t>(arg);
-
-    if (!IsClusterPresentOnAnyEndpoint(Clusters::GeneralDiagnostics::Id))
-        return;
-
-    if (eventId == Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id)
-    {
-        GeneralFaults<kMaxHardwareFaults> previous;
-        GeneralFaults<kMaxHardwareFaults> current;
-
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
-#endif
-        Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
-    }
-    else if (eventId == Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id)
-    {
-        GeneralFaults<kMaxRadioFaults> previous;
-        GeneralFaults<kMaxRadioFaults> current;
-
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
-#endif
-        Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(previous, current);
-    }
-    else if (eventId == Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id)
-    {
-        GeneralFaults<kMaxNetworkFaults> previous;
-        GeneralFaults<kMaxNetworkFaults> current;
-
-#if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following radio faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
-        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
-#endif
-        Clusters::GeneralDiagnosticsServer::Instance().OnNetworkFaultsDetect(previous, current);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", eventId);
-    }
-}
-
-/**
- * Should be called when a switch operation takes place on the Node.
- */
-void HandleSwitchEvent(intptr_t arg)
-{
-    uint32_t eventId = static_cast<uint32_t>(arg);
-
-    EndpointId endpoint      = 1;
-    uint8_t newPosition      = 20;
-    uint8_t previousPosition = 10;
-    uint8_t count            = 3;
-
-    if (eventId == Clusters::Switch::Events::SwitchLatched::Id)
-    {
-        Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::InitialPress::Id)
-    {
-        Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::LongPress::Id)
-    {
-        Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::ShortRelease::Id)
-    {
-        Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::LongRelease::Id)
-    {
-        Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
-    }
-    else if (eventId == Clusters::Switch::Events::MultiPressOngoing::Id)
-    {
-        Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
-    }
-    else if (eventId == Clusters::Switch::Events::MultiPressComplete::Id)
-    {
-        Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, newPosition, count);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "Unknow event ID:%d", eventId);
-    }
-}
+// TODO(#20664) REPL test will fail if signal SIGINT is not caught, temporarily keep following logic.
 
 // when the shell is enabled, don't intercept signals since it prevents the user from
 // using expected commands like CTRL-C to quit the application. (see issue #17845)
@@ -220,21 +77,6 @@ void OnRebootSignalHandler(int signum)
     BootReasonType bootReason = BootReasonType::kUnspecified;
     switch (signum)
     {
-    case SIGVTALRM:
-        bootReason = BootReasonType::kPowerOnReboot;
-        break;
-    case SIGALRM:
-        bootReason = BootReasonType::kBrownOutReset;
-        break;
-    case SIGILL:
-        bootReason = BootReasonType::kSoftwareWatchdogReset;
-        break;
-    case SIGTRAP:
-        bootReason = BootReasonType::kHardwareWatchdogReset;
-        break;
-    case SIGIO:
-        bootReason = BootReasonType::kSoftwareUpdateCompleted;
-        break;
     case SIGINT:
         bootReason = BootReasonType::kSoftwareReset;
         break;
@@ -248,97 +90,11 @@ void OnRebootSignalHandler(int signum)
     Server::GetInstance().DispatchShutDownAndStopEventLoop();
 }
 
-void OnSoftwareFaultSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    VerifyOrDie(signum == SIGUSR1);
-    PlatformMgr().ScheduleWork(HandleSoftwareFaultEvent);
-}
-
-void OnGeneralFaultSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    uint32_t eventId;
-    switch (signum)
-    {
-    case SIGUSR2:
-        eventId = Clusters::GeneralDiagnostics::Events::HardwareFaultChange::Id;
-        break;
-    case SIGHUP:
-        eventId = Clusters::GeneralDiagnostics::Events::RadioFaultChange::Id;
-        break;
-    case SIGTTIN:
-        eventId = Clusters::GeneralDiagnostics::Events::NetworkFaultChange::Id;
-        break;
-    default:
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    PlatformMgr().ScheduleWork(HandleGeneralFaultEvent, static_cast<intptr_t>(eventId));
-}
-
-void OnSwitchSignalHandler(int signum)
-{
-    ChipLogDetail(DeviceLayer, "Caught signal %d", signum);
-
-    uint32_t eventId;
-    switch (signum)
-    {
-    case SIGTSTP:
-        eventId = Clusters::Switch::Events::SwitchLatched::Id;
-        break;
-    case SIGSTOP:
-        eventId = Clusters::Switch::Events::InitialPress::Id;
-        break;
-    case SIGTTOU:
-        eventId = Clusters::Switch::Events::LongPress::Id;
-        break;
-    case SIGWINCH:
-        eventId = Clusters::Switch::Events::ShortRelease::Id;
-        break;
-    case SIGQUIT:
-        eventId = Clusters::Switch::Events::LongRelease::Id;
-        break;
-    case SIGFPE:
-        eventId = Clusters::Switch::Events::MultiPressOngoing::Id;
-        break;
-    case SIGPIPE:
-        eventId = Clusters::Switch::Events::MultiPressComplete::Id;
-        break;
-    default:
-        ChipLogError(NotSpecified, "Unhandled signal: Should never happens");
-        chipDie();
-        break;
-    }
-
-    PlatformMgr().ScheduleWork(HandleSwitchEvent, static_cast<intptr_t>(eventId));
-}
 void SetupSignalHandlers()
 {
     // sigaction is not used here because Tsan interceptors seems to
     // never dispatch the signals on darwin.
-    signal(SIGALRM, OnRebootSignalHandler);
-    signal(SIGVTALRM, OnRebootSignalHandler);
-    signal(SIGILL, OnRebootSignalHandler);
-    signal(SIGTRAP, OnRebootSignalHandler);
-    signal(SIGTERM, OnRebootSignalHandler);
-    signal(SIGIO, OnRebootSignalHandler);
     signal(SIGINT, OnRebootSignalHandler);
-    signal(SIGUSR1, OnSoftwareFaultSignalHandler);
-    signal(SIGUSR2, OnGeneralFaultSignalHandler);
-    signal(SIGHUP, OnGeneralFaultSignalHandler);
-    signal(SIGTTIN, OnGeneralFaultSignalHandler);
-    signal(SIGTSTP, OnSwitchSignalHandler);
-    signal(SIGSTOP, OnSwitchSignalHandler);
-    signal(SIGTTOU, OnSwitchSignalHandler);
-    signal(SIGWINCH, OnSwitchSignalHandler);
-    signal(SIGQUIT, OnSwitchSignalHandler);
-    signal(SIGFPE, OnSwitchSignalHandler);
-    signal(SIGPIPE, OnSwitchSignalHandler);
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
 
@@ -485,10 +241,26 @@ void ApplicationInit()
     {
         sEthernetNetworkCommissioningInstance.Init();
     }
+
+    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+
+    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+}
+
+void ApplicationExit()
+{
+    if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to stop CHIP NamedPipeCommands");
+    }
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
+    ChipLogProgress(NotSpecified, "TV Linux App: LowPower::SetDefaultDelegate");
+    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &sLowPowerManager);
 }
