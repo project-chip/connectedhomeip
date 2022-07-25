@@ -14,7 +14,6 @@ This example demonstrates the Matter Lighting application on Ameba platform.
 
 ---
 
-
 ## Supported Device
 
 The CHIP demo application is supported on
@@ -53,7 +52,6 @@ The CHIP demo application is supported on
    the correct locations
 4. Click **Download** button.
 
-
 ## Commissioning
 
 There are two commissioning modes supported by Ameba platform:
@@ -72,7 +70,6 @@ There are two commissioning modes supported by Ameba platform:
 3. Connect to AP using `ATW0, ATW1, ATWC` commands
 4. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
-
 
 ## Cluster Control
 

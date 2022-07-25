@@ -18,12 +18,10 @@ control.
 
 ---
 
-
 ## Supported Device
 
 The CHIP demo application is supported on
 [Ameba RTL8722DM Board](https://www.amebaiot.com/en/amebad).
-
 
 ## Building the Example Application
 
@@ -58,7 +56,6 @@ The CHIP demo application is supported on
    the correct locations
 4. Click **Download** button.
 
-
 ## Commissioning
 
 There are two commissioning modes supported by Ameba platform:
@@ -80,7 +77,6 @@ There are two commissioning modes supported by Ameba platform:
 4. Test with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 
-
 ## Cluster Control
 
 After successful commissioning, use the OnOff cluster command to control the
@@ -90,77 +86,80 @@ to be On or Off.
 -   Via
     [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
-          
           $ ./chip-tool onoff on <nodeID> 1
           $ ./chip-tool onoff off <nodeID> 1
-          
+
 
 ## Running RPC Console
 
 -   Connect a USB-TTL adapter as shown below
 
-            
             Ameba         USB-TTL
             A19           TX
             A18           RX
             GND           GND
-            
 
--   Build the
+
+*   Build the
     [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
--   As part of building the example with RPCs enabled the chip_rpc python
+*   As part of building the example with RPCs enabled the chip_rpc python
     interactive console is installed into your venv. The python wheel files are
     also created in the output folder: out/debug/chip_rpc_console_wheels. To
     install the wheel files without rebuilding:
 
-            
             $ pip3 install out/debug/chip_rpc_console_wheels/*.whl
-            
+
 
 -   Launch the chip-rpc console after resetting Ameba board
 
-            
             $ chip-console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
-            
 
--   Get and Set lighting directly using the RPC console
+
+*   Get and Set lighting directly using the RPC console
 
             python
             rpcs.chip.rpc.Lighting.Get()
             rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
-            
-            
+
+
+
 ## Running Matter Shell
 
-- Matter Shell is enabled whenever RPC is disabled.
+-   Matter Shell is enabled whenever RPC is disabled.
 
-- RPC console and Matter Shell cannot be enabled at the same time as they use the same UART port.
+-   RPC console and Matter Shell cannot be enabled at the same time as they use
+    the same UART port.
 
-- Connect Ameba to the USB-TTL adapter as shown in the RPC section.
+-   Connect Ameba to the USB-TTL adapter as shown in the RPC section.
 
-- Open the USB-TTL serial port and type `help` to view the available commands
+-   Open the USB-TTL serial port and type `help` to view the available commands
 
-            
+
 ## Binding and Controlling a Lighting Device
 
-- This example shows how to bind a Switch Device to a Lighting Device and control it through the Matter Shell. One binding client (Switch Device) and one binding server (Lighting Device) is required.
+-   This example shows how to bind a Switch Device to a Lighting Device and
+    control it through the Matter Shell. One binding client (Switch Device) and
+    one binding server (Lighting Device) is required.
 
-- Commission the switch (nodeID 1) and lighting device (nodeID 2) using chip-tool.
+-   Commission the switch (nodeID 1) and lighting device (nodeID 2) using
+    chip-tool.
 
-            $ ./chip-tool pairing ble-wifi 1 <SSID> <PASSWORD> 20202021 3840
-            $ ./chip-tool pairing ble-wifi 2 <SSID> <PASSWORD> 20202021 3840
-            
-- After successful commissioning, configure the ACL in the lighting device to allow access from switch device and chip-tool.
+              $ ./chip-tool pairing ble-wifi 1 <SSID> <PASSWORD> 20202021 3840
+              $ ./chip-tool pairing ble-wifi 2 <SSID> <PASSWORD> 20202021 3840
 
-            $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1], "targets": null }]' 2 0
-            
-- Bind the lighting device to the switch device.
 
-            $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node":2, "endpoint":1, "cluster":6}]' 1 1
+-   After successful commissioning, configure the ACL in the lighting device to
+    allow access from switch device and chip-tool.
 
-- Control the lighting device through the switch device's Matter Shell
+              $ ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [1], "targets": null }]' 2 0
 
-            > switch onoff on
-            > switch onoff off
-            
+
+-   Bind the lighting device to the switch device.
+
+              $ ./chip-tool binding write binding '[{"fabricIndex": 1, "node":2, "endpoint":1, "cluster":6}]' 1 1
+
+-   Control the lighting device through the switch device's Matter Shell
+
+              > switch onoff on
+              > switch onoff off
