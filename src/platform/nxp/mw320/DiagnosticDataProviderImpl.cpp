@@ -21,8 +21,10 @@
  *          for k32w0 platform.
  */
 
+#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <inet/InetInterface.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
@@ -30,6 +32,10 @@
 #include <lwip/tcpip.h>
 
 //#include <openthread/platform/entropy.h>
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
@@ -76,6 +82,67 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
         currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
     */
     currentHeapHighWatermark = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        rebootCount = static_cast<uint16_t>(count);
+    }
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    NetworkInterface * ifp = new NetworkInterface();
+
+    strncpy(ifp->Name, "mlan0", Inet::InterfaceId::kMaxIfNameLength);
+    ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+    ifp->name          = CharSpan::fromCharString(ifp->Name);
+    ifp->isOperational = true;
+    ifp->type          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    ifp->offPremiseServicesReachableIPv4.SetNull();
+    ifp->offPremiseServicesReachableIPv6.SetNull();
+    ifp->Next = nullptr;
+    *netifpp = ifp;
+
     return CHIP_NO_ERROR;
 }
 
