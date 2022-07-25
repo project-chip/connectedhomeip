@@ -93,6 +93,9 @@ extern "C" {
  ******************************************************************************/
 #define APP_AES AES
 #define CONNECTION_INFO_FILENAME "connection_info.dat"
+#define SSID_FNAME "ssid_fname"
+#define PSK_FNAME "psk_fname"
+
 enum
 {
     MCUXPRESSO_WIFI_CLI,
@@ -280,6 +283,9 @@ bool is_connected = false;
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
+static void save_network(char* ssid, char* pwd);
+static void load_network(char* ssid, char* pwd);
+
 /*
 static void saveProfile(int argc, char **argv);
 static void loadProfile(int argc, char **argv);
@@ -326,6 +332,56 @@ static status_t APP_AES_Lock(void)
 static void APP_AES_Unlock(void)
 {
     xSemaphoreGiveRecursive(aesLock);
+}
+
+static void save_network(char* ssid, char* pwd)
+{
+    int ret;
+
+    ret = save_wifi_network((char *)SSID_FNAME, (uint8_t*)ssid, strlen(ssid)+1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write ssid to flash failed\r\n");
+    }
+
+    ret = save_wifi_network((char *)PSK_FNAME, (uint8_t*)pwd, strlen(pwd)+1);
+    if (ret != WM_SUCCESS)
+    {
+        PRINTF("Error: write psk to flash failed\r\n");
+    }
+
+    return;
+}
+
+static void load_network(char* ssid, char* pwd)
+{
+    int ret;
+    unsigned char ssid_buf[IEEEtypes_SSID_SIZE + 1];
+    unsigned char psk_buf[WLAN_PSK_MAX_LENGTH];
+    uint32_t len;
+
+    len = IEEEtypes_SSID_SIZE + 1;
+    ret = get_saved_wifi_network((char *)SSID_FNAME, ssid_buf, &len);
+    if (ret != WM_SUCCESS )
+    {
+        PRINTF("Error: Read saved SSID\r\n");
+        strcpy(ssid, "");
+    } else {
+        PRINTF("saved_ssid: [%s]\r\n", ssid_buf);
+        strcpy(ssid, (const char*)ssid_buf);
+    }
+
+    len =  WLAN_PSK_MAX_LENGTH;
+    ret = get_saved_wifi_network((char *)PSK_FNAME, psk_buf, &len);
+    if (ret != WM_SUCCESS )
+    {
+        PRINTF("Error: Read saved PSK\r\n");
+        strcpy(pwd, "");
+    } else {
+        PRINTF("saved_psk: [%s]\r\n", psk_buf);
+        strcpy(pwd, (const char*)psk_buf);
+    }
+
 }
 
 /*
@@ -527,7 +583,7 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
     switch (reason)
     {
     case WLAN_REASON_INITIALIZED:
-//            PRINTF("app_cb: WLAN initialized\r\n");
+        //PRINTF("app_cb: WLAN initialized\r\n");
 #ifdef MCUXPRESSO_WIFI_CLI
         ret = wlan_basic_cli_init();
         if (ret != WM_SUCCESS)
@@ -586,14 +642,14 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
 #endif
         break;
     case WLAN_REASON_INITIALIZATION_FAILED:
-        //            PRINTF("app_cb: WLAN: initialization failed\r\n");
+        //PRINTF("app_cb: WLAN: initialization failed\r\n");
         break;
     case WLAN_REASON_SUCCESS:
-        //            PRINTF("app_cb: WLAN: connected to network\r\n");
+        //PRINTF("app_cb: WLAN: connected to network\r\n");
         ret = wlan_get_address(&addr);
         if (ret != WM_SUCCESS)
         {
-            //                PRINTF("failed to get IP address\r\n");
+            //PRINTF("failed to get IP address\r\n");
             return 0;
         }
 
@@ -602,12 +658,13 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
         ret = wlan_get_current_network(&sta_network);
         if (ret != WM_SUCCESS)
         {
-            //                PRINTF("Failed to get External AP network\r\n");
+            //PRINTF("Failed to get External AP network\r\n");
             return 0;
         }
 
         PRINTF("Connected to following BSS:\r\n");
         PRINTF("SSID = [%s], IP = [%s]\r\n", sta_network.ssid, ip);
+        save_network(sta_network.ssid, sta_network.security.psk);
 
 #ifdef CONFIG_IPV6
         {
@@ -1146,8 +1203,19 @@ void ShellCLIMain(void * pvParameter)
 
     //    std::string qrCodeText = createSetupPayload();
     //    PRINTF("SetupQRCode: [%s]\r\n", qrCodeText.c_str());
+    {
+        char def_ssid[IEEEtypes_SSID_SIZE + 1];
+        char def_psk[WLAN_PSK_MAX_LENGTH];
+        load_network(def_ssid, def_psk);
 
-    ConnectivityMgrImpl().ProvisionWiFiNetwork("nxp_matter", "nxp12345");
+        if ((strlen(def_ssid)<=0) || (strlen(def_psk)<=0)) {
+            // No saved connected_ap_info => Using the default ssid/password
+            strcpy(def_ssid, "nxp_matter");
+            strcpy(def_psk, "nxp12345");
+        }
+        PRINTF("Connecting to [%s, %s] \r\n", def_ssid, def_psk);
+        ConnectivityMgrImpl().ProvisionWiFiNetwork(def_ssid, def_psk);
+    }
 
     // Run CHIP servers
     run_update_chipsrv(chip_srv_all);
