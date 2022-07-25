@@ -26,7 +26,9 @@
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>

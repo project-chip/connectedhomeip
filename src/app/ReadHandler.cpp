@@ -22,7 +22,9 @@
  *
  */
 
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusResponseMessage.h>

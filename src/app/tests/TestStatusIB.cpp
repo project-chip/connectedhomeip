@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 #include <app/MessageDef/StatusIB.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>

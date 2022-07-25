@@ -24,7 +24,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 
 using namespace chip;
 using namespace chip::TLV;

@@ -28,7 +28,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 
 namespace chip {
 namespace app {

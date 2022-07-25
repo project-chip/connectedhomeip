@@ -23,7 +23,9 @@
  */
 
 #include "lib/core/CHIPError.h"
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 #include <app/InteractionModelEngine.h>
 #include <app/TimedRequest.h>
 #include <app/WriteClient.h>

@@ -24,7 +24,9 @@
 
 #include "app/data-model/NullObject.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/InvokeInteraction.h>

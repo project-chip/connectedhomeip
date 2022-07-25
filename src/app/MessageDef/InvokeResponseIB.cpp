@@ -21,7 +21,9 @@
 #include "InvokeResponseIB.h"
 #include "MessageDefHelper.h"
 
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 
 namespace chip {
 namespace app {

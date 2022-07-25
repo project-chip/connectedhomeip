@@ -29,7 +29,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#if CHIP_HAVE_CONFIG_H
 #include <app/AppBuildConfig.h>
+#endif
 #include <lib/core/CHIPCore.h>
 
 using namespace chip;
