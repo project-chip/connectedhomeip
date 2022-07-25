@@ -391,7 +391,7 @@ jobs:
                           #   use that on Darwin.
                           # * the "host clang" build, which uses the pigweed
                           #   clang.
-                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false';;
+                          "default") GN_ARGS='target_os="all" is_asan=true enable_host_clang_build=false enable_host_clang_boringssl_crypto_tests=false';;
                           "python_lib") GN_ARGS='enable_rtti=true enable_pylib=true';;
                       esac
                       BUILD_TYPE=$BUILD_TYPE scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
