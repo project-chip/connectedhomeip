@@ -385,7 +385,7 @@ private:
      * only occur post subscription establishment
      */
     Status OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                       System::PacketBufferHandle && aPayload);
+                                   System::PacketBufferHandle && aPayload);
 
     void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
                          TLV::TLVReader & apPayload) override;

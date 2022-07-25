@@ -555,7 +555,8 @@ exit:
     if (!suppressResponse)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
-        err = StatusResponse::Send(err == CHIP_NO_ERROR ? Status::Success : Status::InvalidSubscription, mExchange.Get(), !noResponseExpected);
+        err = StatusResponse::Send(err == CHIP_NO_ERROR ? Status::Success : Status::InvalidSubscription, mExchange.Get(),
+                                   !noResponseExpected);
     }
 
     mIsPrimingReports = false;

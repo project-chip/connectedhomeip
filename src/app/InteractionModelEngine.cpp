@@ -487,8 +487,7 @@ CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * a
 }
 
 Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext,
-                                                           const PayloadHeader & aPayloadHeader,
-                                                           System::PacketBufferHandle && aPayload)
+                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
     System::PacketBufferTLVReader reader;
     reader.Init(aPayload.Retain());

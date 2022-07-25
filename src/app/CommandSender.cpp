@@ -177,8 +177,7 @@ void CommandSender::ResponseMessageHandled(CHIP_ERROR aError, Messaging::Exchang
     {
         if (!aSuppressErrorStatusResponse)
         {
-            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext,
-                                                  false /*aExpectResponse*/);
+            StatusResponse::Send(Protocols::InteractionModel::Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
             if (mpCallback != nullptr)
             {
                 mpCallback->OnError(this, aError);
