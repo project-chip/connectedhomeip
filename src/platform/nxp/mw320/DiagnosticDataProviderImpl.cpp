@@ -28,7 +28,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
-
+#include <platform/nxp/mw320/ConnectivityUtils.h>
 #include <lwip/tcpip.h>
 
 //#include <openthread/platform/entropy.h>
@@ -144,6 +144,78 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     *netifpp = ifp;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    PRINTF("DiagnosticDataProviderImpl::GetWiFiChannelNumber() \r\n");
+    return ConnectivityUtils::GetWiFiChannelNumber(ConnectivityMgrImpl().GetWiFiIfName(), channelNumber);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    PRINTF("DiagnosticDataProviderImpl::GetWiFiRssi() \r\n");
+    return ConnectivityUtils::GetWiFiRssi(ConnectivityMgrImpl().GetWiFiIfName(), rssi);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
+{
+    return ConnectivityUtils::GetWiFiBeaconLostCount(ConnectivityMgrImpl().GetWiFiIfName(), beaconLostCount);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
+{
+    packetMulticastRxCount=101;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
+{
+    packetMulticastTxCount=101;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
+{
+    packetUnicastRxCount=101;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
+{
+    packetUnicastTxCount=101;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+{
+    return ConnectivityUtils::GetWiFiCurrentMaxRate(ConnectivityMgrImpl().GetWiFiIfName(), currentMaxRate);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
+{
+    overrunCount=101;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+{
+    return ConnectivityMgrImpl().GetWiFiVersion(wiFiVersion);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
+{
+    return ConnectivityMgrImpl().GetWiFiBssId(value);
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+{
+    return ConnectivityMgrImpl().GetWiFiSecurityType(securityType);
 }
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
