@@ -64,6 +64,8 @@ public:
      */
     void Grab(ExchangeContext * exchange)
     {
+        VerifyOrDie(exchange != nullptr);
+
         Release();
 
         mpExchangeCtx = exchange;

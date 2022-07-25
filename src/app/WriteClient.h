@@ -33,7 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
@@ -125,14 +125,15 @@ public:
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 bool aSuppressResponse = false) :
         mpExchangeMgr(apExchangeMgr),
-        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mSuppressResponse(aSuppressResponse)
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
+        mSuppressResponse(aSuppressResponse)
     {}
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
-        mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
+        mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
     {}
 #endif
 
@@ -225,14 +226,6 @@ public:
      *  of the object and releases all held resources.
      */
     void Shutdown();
-
-    /*
-     * Destructor - as part of destruction, it will abort the exchange context
-     * if a valid one still exists.
-     *
-     * See Abort() for details on when that might occur.
-     */
-    ~WriteClient() override { Abort(); }
 
 private:
     friend class TestWriteInteraction;
@@ -378,9 +371,9 @@ private:
     CHIP_ERROR FinalizeMessage(bool aHasMoreChunks);
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    Callback * mpCallback                      = nullptr;
-    State mState                               = State::Initialized;
+    Messaging::ExchangeHolder mExchangeCtx;
+    Callback * mpCallback = nullptr;
+    State mState          = State::Initialized;
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequestMessage::Builder mWriteRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
