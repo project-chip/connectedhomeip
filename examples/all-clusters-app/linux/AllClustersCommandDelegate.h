@@ -20,15 +20,16 @@
 
 #include "NamedPipeCommands.h"
 
+#include <json/json.h>
 #include <platform/DiagnosticDataProvider.h>
 
 class AllClustersCommandDelegate : public NamedPipeCommandDelegate
 {
 public:
-    void OnEventCommandReceived(const char * command) override;
+    void OnEventCommandReceived(const char * json) override;
 
 private:
-    std::string mCurrentCommand;
+    Json::Value mJsonValue;
 
     static void HandleEventCommand(intptr_t context);
 
@@ -50,7 +51,39 @@ private:
     void OnSoftwareFaultEventHandler(uint32_t eventId);
 
     /**
-     * Should be called when a switch operation takes place on the Node.
+     * Should be called when the latching switch is moved to a new position.
      */
-    void OnSwitchEventHandler(uint32_t eventId);
+    void OnSwitchLatchedHandler(uint8_t newPosition);
+
+    /**
+     * Should be called when the momentary switch starts to be pressed.
+     */
+    void OnSwitchInitialPressedHandler(uint8_t newPosition);
+
+    /**
+     * Should be called when the momentary switch has been pressed for a "long" time.
+     */
+    void OnSwitchLongPressedHandler(uint8_t newPosition);
+
+    /**
+     * Should be called when the momentary switch has been released.
+     */
+    void OnSwitchShortReleasedHandler(uint8_t previousPosition);
+
+    /**
+     * Should be called when the momentary switch has been released after having been pressed for a long time.
+     */
+    void OnSwitchLongReleasedHandler(uint8_t previousPosition);
+
+    /**
+     * Should be called to indicate how many times the momentary switch has been pressed in a multi-press
+     * sequence, during that sequence.
+     */
+    void OnSwitchMultiPressOngoingHandler(uint8_t newPosition, uint8_t count);
+
+    /**
+     * Should be called to indicate how many times the momentary switch has been pressed in a multi-press
+     * sequence, after it has been detected that the sequence has ended.
+     */
+    void OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count);
 };

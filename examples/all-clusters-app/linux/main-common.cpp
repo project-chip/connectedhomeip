@@ -55,7 +55,7 @@ using namespace chip::DeviceLayer;
 
 namespace {
 
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_cluster_fifo_";
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
