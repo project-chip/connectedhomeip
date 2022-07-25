@@ -247,7 +247,7 @@ double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
 InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
 #if 1
-    InterfaceType ret =  InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    InterfaceType ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
 #else
     InterfaceType ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
     int sock          = -1;
@@ -319,7 +319,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
     }
 
     close(skfd);
-#endif //0
+#endif // 0
     return err;
 }
 
@@ -327,8 +327,8 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t
 {
 #if 1
     CHIP_ERROR err;
-    uint8_t index = 0;
-    uint8_t tmp_ipv4[]={172,16,1,180};
+    uint8_t index      = 0;
+    uint8_t tmp_ipv4[] = { 172, 16, 1, 180 };
 
     memcpy(ifp->Ipv4AddressesBuffer[index], tmp_ipv4, kMaxIPv4AddrSize);
     index++;
@@ -383,8 +383,8 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
 {
 #if 1
     CHIP_ERROR err;
-    uint8_t index = 0;
-    uint16_t tmp_ipv6[] = {0xFD4A, 0xDB4D, 0xE7B8, 0x0, 0x250, 0x43FF, 0xFE21, 0xEE76};
+    uint8_t index       = 0;
+    uint16_t tmp_ipv6[] = { 0xFD4A, 0xDB4D, 0xE7B8, 0x0, 0x250, 0x43FF, 0xFE21, 0xEE76 };
 
     memcpy(ifp->Ipv6AddressesBuffer[index], tmp_ipv6, kMaxIPv6AddrSize);
     ifp->Ipv6AddressSpans[index] = ByteSpan(ifp->Ipv6AddressesBuffer[index], kMaxIPv6AddrSize);
@@ -501,13 +501,13 @@ CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct
 
     return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
 }
-#endif //0
+#endif // 0
 
 CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
 #if 1
     CHIP_ERROR err = CHIP_NO_ERROR;
-    channelNumber = 1;
+    channelNumber  = 1;
 #else
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
 
@@ -538,7 +538,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
 {
 #if 1
     CHIP_ERROR err = CHIP_NO_ERROR;
-    int dblevel = -11;
+    int dblevel    = -11;
 
     VerifyOrReturnError(dblevel <= INT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
     rssi = static_cast<int8_t>(dblevel);
@@ -606,7 +606,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
 CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCount)
 {
 #if 1
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     beaconLostCount = 0;
 #else
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
@@ -794,7 +794,7 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
 
     return err;
 }
-#endif //0
+#endif // 0
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

@@ -142,8 +142,9 @@ void ConnectivityManagerImpl::StartWiFiManagement() {}
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 {
-    uint8_t macAddress[6] = {'\x11', '\x22', '\x33', '\x44', '\x55', '\x66'};
-    PRINTF("===> hardcoded bssid: %02x:%02x:%02x:%02x:%02x:%02x \r\n", macAddress[0], macAddress[1], macAddress[2], macAddress[3], macAddress[4], macAddress[5]);
+    uint8_t macAddress[6] = { '\x11', '\x22', '\x33', '\x44', '\x55', '\x66' };
+    PRINTF("===> hardcoded bssid: %02x:%02x:%02x:%02x:%02x:%02x \r\n", macAddress[0], macAddress[1], macAddress[2], macAddress[3],
+           macAddress[4], macAddress[5]);
     value = ByteSpan(macAddress, 6);
     PRINTF("==> ConnectivityManagerImpl.cpp: GetWiFiBssId()\r\n");
     return CHIP_NO_ERROR;

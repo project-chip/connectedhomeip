@@ -27,11 +27,11 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/TimeUtils.h>
+#include <lwip/tcpip.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
-#include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
 #include <platform/nxp/mw320/DeviceInfoProviderImpl.h>
-#include <lwip/tcpip.h>
+#include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

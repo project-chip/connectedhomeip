@@ -61,7 +61,7 @@ public:
                                                                        * runtime. Retained during factory reset. */
     static constexpr uint8_t kFileId_KVS = CATEGORY_BASE + 3;         /**< Category containing KVS set at runtime.
                                                                        *   Cleared during factory reset. */
-    static constexpr uint8_t kPDMId_ChipCounter = CATEGORY_BASE + 4;         /**< Category containing KVS set at runtime.
+    static constexpr uint8_t kPDMId_ChipCounter = CATEGORY_BASE + 4;  /**< Category containing KVS set at runtime.
                                                                        *   Cleared during factory reset. */
 
     using Key = uint32_t;

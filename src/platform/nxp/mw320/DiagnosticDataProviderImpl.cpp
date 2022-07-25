@@ -24,12 +24,12 @@
 #include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <inet/InetInterface.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <platform/DiagnosticDataProvider.h>
-#include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
-#include <platform/nxp/mw320/ConnectivityUtils.h>
+#include <inet/InetInterface.h>
 #include <lwip/tcpip.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/nxp/mw320/ConnectivityUtils.h>
+#include <platform/nxp/mw320/DiagnosticDataProviderImpl.h>
 
 //#include <openthread/platform/entropy.h>
 using namespace ::chip;
@@ -135,13 +135,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     strncpy(ifp->Name, "mlan0", Inet::InterfaceId::kMaxIfNameLength);
     ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-    ifp->name          = CharSpan::fromCharString(ifp->Name);
-    ifp->isOperational = true;
-    ifp->type          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    ifp->name                                          = CharSpan::fromCharString(ifp->Name);
+    ifp->isOperational                                 = true;
+    ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->Next = nullptr;
-    *netifpp = ifp;
+    *netifpp  = ifp;
 
     return CHIP_NO_ERROR;
 }
@@ -165,25 +165,25 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconL
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    packetMulticastRxCount=101;
+    packetMulticastRxCount = 101;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    packetMulticastTxCount=101;
+    packetMulticastTxCount = 101;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    packetUnicastRxCount=101;
+    packetUnicastRxCount = 101;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    packetUnicastTxCount=101;
+    packetUnicastTxCount = 101;
     return CHIP_NO_ERROR;
 }
 
@@ -194,7 +194,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-    overrunCount=101;
+    overrunCount = 101;
     return CHIP_NO_ERROR;
 }
 

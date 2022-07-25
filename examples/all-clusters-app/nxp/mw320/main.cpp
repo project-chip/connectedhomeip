@@ -284,8 +284,8 @@ bool is_connected = false;
 /*******************************************************************************
  * Prototypes
  ******************************************************************************/
-static void save_network(char* ssid, char* pwd);
-static void load_network(char* ssid, char* pwd);
+static void save_network(char * ssid, char * pwd);
+static void load_network(char * ssid, char * pwd);
 
 /*
 static void saveProfile(int argc, char **argv);
@@ -335,17 +335,17 @@ static void APP_AES_Unlock(void)
     xSemaphoreGiveRecursive(aesLock);
 }
 
-static void save_network(char* ssid, char* pwd)
+static void save_network(char * ssid, char * pwd)
 {
     int ret;
 
-    ret = save_wifi_network((char *)SSID_FNAME, (uint8_t*)ssid, strlen(ssid)+1);
+    ret = save_wifi_network((char *) SSID_FNAME, (uint8_t *) ssid, strlen(ssid) + 1);
     if (ret != WM_SUCCESS)
     {
         PRINTF("Error: write ssid to flash failed\r\n");
     }
 
-    ret = save_wifi_network((char *)PSK_FNAME, (uint8_t*)pwd, strlen(pwd)+1);
+    ret = save_wifi_network((char *) PSK_FNAME, (uint8_t *) pwd, strlen(pwd) + 1);
     if (ret != WM_SUCCESS)
     {
         PRINTF("Error: write psk to flash failed\r\n");
@@ -354,7 +354,7 @@ static void save_network(char* ssid, char* pwd)
     return;
 }
 
-static void load_network(char* ssid, char* pwd)
+static void load_network(char * ssid, char * pwd)
 {
     int ret;
     unsigned char ssid_buf[IEEEtypes_SSID_SIZE + 1];
@@ -362,27 +362,30 @@ static void load_network(char* ssid, char* pwd)
     uint32_t len;
 
     len = IEEEtypes_SSID_SIZE + 1;
-    ret = get_saved_wifi_network((char *)SSID_FNAME, ssid_buf, &len);
-    if (ret != WM_SUCCESS )
+    ret = get_saved_wifi_network((char *) SSID_FNAME, ssid_buf, &len);
+    if (ret != WM_SUCCESS)
     {
         PRINTF("Error: Read saved SSID\r\n");
         strcpy(ssid, "");
-    } else {
+    }
+    else
+    {
         PRINTF("saved_ssid: [%s]\r\n", ssid_buf);
-        strcpy(ssid, (const char*)ssid_buf);
+        strcpy(ssid, (const char *) ssid_buf);
     }
 
-    len =  WLAN_PSK_MAX_LENGTH;
-    ret = get_saved_wifi_network((char *)PSK_FNAME, psk_buf, &len);
-    if (ret != WM_SUCCESS )
+    len = WLAN_PSK_MAX_LENGTH;
+    ret = get_saved_wifi_network((char *) PSK_FNAME, psk_buf, &len);
+    if (ret != WM_SUCCESS)
     {
         PRINTF("Error: Read saved PSK\r\n");
         strcpy(pwd, "");
-    } else {
-        PRINTF("saved_psk: [%s]\r\n", psk_buf);
-        strcpy(pwd, (const char*)psk_buf);
     }
-
+    else
+    {
+        PRINTF("saved_psk: [%s]\r\n", psk_buf);
+        strcpy(pwd, (const char *) psk_buf);
+    }
 }
 
 /*
@@ -584,7 +587,7 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
     switch (reason)
     {
     case WLAN_REASON_INITIALIZED:
-        //PRINTF("app_cb: WLAN initialized\r\n");
+        // PRINTF("app_cb: WLAN initialized\r\n");
 #ifdef MCUXPRESSO_WIFI_CLI
         ret = wlan_basic_cli_init();
         if (ret != WM_SUCCESS)
@@ -643,14 +646,14 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
 #endif
         break;
     case WLAN_REASON_INITIALIZATION_FAILED:
-        //PRINTF("app_cb: WLAN: initialization failed\r\n");
+        // PRINTF("app_cb: WLAN: initialization failed\r\n");
         break;
     case WLAN_REASON_SUCCESS:
-        //PRINTF("app_cb: WLAN: connected to network\r\n");
+        // PRINTF("app_cb: WLAN: connected to network\r\n");
         ret = wlan_get_address(&addr);
         if (ret != WM_SUCCESS)
         {
-            //PRINTF("failed to get IP address\r\n");
+            // PRINTF("failed to get IP address\r\n");
             return 0;
         }
 
@@ -659,7 +662,7 @@ int wlan_event_callback(enum wlan_event_reason reason, void * data)
         ret = wlan_get_current_network(&sta_network);
         if (ret != WM_SUCCESS)
         {
-            //PRINTF("Failed to get External AP network\r\n");
+            // PRINTF("Failed to get External AP network\r\n");
             return 0;
         }
 
@@ -1122,8 +1125,7 @@ void task_test_main(void * param)
                                false);
             // sync-up the Light attribute (for test event)
             PRINTF("--> update [ZCL_ON_OFF_CLUSTER_ID]: ZCL_ON_OFF_ATTRIBUTE_ID [%d] \r\n", value);
-            emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true,
-                               false);
+            emAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &value, sizeof(value), true, false);
             need2sync_sw_attr = false;
         }
         // =============================
@@ -1139,7 +1141,7 @@ void init_mw320_sdk()
     flash_desc_t fl;
     struct partition_entry *p, *f1, *f2;
     short history = 0;
-    uint32_t *wififw;
+    uint32_t * wififw;
     struct partition_entry * psm;
 
     PRINTF("=> init mw320 sdk \r\n");
@@ -1168,20 +1170,20 @@ void init_mw320_sdk()
     }
     else
     {
-        //PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
+        // PRINTF("[%s]: Wi-Fi Firmware not detected\r\n", __FUNCTION__);
         p = NULL;
     }
     if (p != NULL)
     {
         part_to_flash_desc(p, &fl);
         wififw = (uint32_t *) mflash_drv_phys2log(fl.fl_start, fl.fl_size);
-        //assert(wififw != NULL);
+        // assert(wififw != NULL);
         /* First word in WIFI firmware is magic number. */
         assert(*wififw == (('W' << 0) | ('L' << 8) | ('F' << 16) | ('W' << 24)));
         wlan_init((const uint8_t *) (wififw + 2U), *(wififw + 1U));
-        //PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
+        // PRINTF("[%s]: wlan_init success \r\n", __FUNCTION__);
         wlan_start(wlan_event_callback);
-        //demo_init();
+        // demo_init();
         os_thread_sleep(os_msec_to_ticks(5000));
     }
     PRINTF(" mw320 init complete! \r\n");
@@ -1223,7 +1225,8 @@ void ShellCLIMain(void * pvParameter)
         char def_psk[WLAN_PSK_MAX_LENGTH];
         load_network(def_ssid, def_psk);
 
-        if ((strlen(def_ssid)<=0) || (strlen(def_psk)<=0)) {
+        if ((strlen(def_ssid) <= 0) || (strlen(def_psk) <= 0))
+        {
             // No saved connected_ap_info => Using the default ssid/password
             strcpy(def_ssid, "nxp_matter");
             strcpy(def_psk, "nxp12345");
@@ -1492,7 +1495,7 @@ exit:
 }
 
 uint32_t identifyTimerCount;
-constexpr uint32_t kIdentifyTimerDelayMS     = 250;
+constexpr uint32_t kIdentifyTimerDelayMS = 250;
 
 void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
 {
@@ -1500,8 +1503,8 @@ void IdentifyTimerHandler(System::Layer * systemLayer, void * appState)
     if (identifyTimerCount)
     {
         identifyTimerCount--;
-       emAfWriteAttribute(1, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &identifyTimerCount, sizeof(identifyTimerCount), true,
-                               false);
+        emAfWriteAttribute(1, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, (uint8_t *) &identifyTimerCount,
+                           sizeof(identifyTimerCount), true, false);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, nullptr);
     }
 }
@@ -1512,7 +1515,8 @@ static void OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, Attribu
                  ChipLogError(DeviceLayer, "[%s] Unhandled Attribute ID: '0x%04lx", TAG, attributeId));
     VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, "[%s] Unexpected EndPoint ID: `0x%02x'", TAG, endpointId));
 
-   if (identifyTimerCount != *value) {
+    if (identifyTimerCount != *value)
+    {
         identifyTimerCount = *value;
         PRINTF("-> Identify: %u \r\n", identifyTimerCount);
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), IdentifyTimerHandler, nullptr);

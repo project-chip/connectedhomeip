@@ -19,8 +19,8 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <platform/nxp/mw320/DeviceInfoProviderImpl.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/nxp/mw320/DeviceInfoProviderImpl.h>
 
 #include <stdlib.h>
 #include <string.h>
