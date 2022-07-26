@@ -488,7 +488,7 @@ private:
     void ClearActiveSubscriptionState();
 
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
-    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 

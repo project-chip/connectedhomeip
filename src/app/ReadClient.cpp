@@ -983,7 +983,7 @@ void ReadClient::HandleDeviceConnected(void * context, OperationalDeviceProxy * 
     }
 }
 
-void ReadClient::HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR err)
+void ReadClient::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
@@ -1011,24 +1011,14 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
         auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
         VerifyOrExit(caseSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        auto fabric = InteractionModelEngine::GetInstance()->GetFabricTable()->FindFabricWithIndex(_this->GetFabricIndex());
-
-        //
-        // Temporary until #21084 is addressed. This object would have been synchronously cleaned-up
-        // when a fabric has gone away, and this condition should never arise.
-        //
-        VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INVALID_FABRIC_INDEX;
-                     ChipLogError(DataManagement, "Underlying fabric has gone away, stopping re-subscriptions!"););
-
-        PeerId peerId(fabric->GetCompressedFabricId(), _this->GetPeerNodeId());
-
-        auto proxy = caseSessionManager->FindExistingSession(peerId);
+        auto proxy = caseSessionManager->FindExistingSession(_this->mPeer);
         if (proxy != nullptr)
         {
             proxy->Disconnect();
         }
 
-        caseSessionManager->FindOrEstablishSession(peerId, &_this->mOnConnectedCallback, &_this->mOnConnectionFailureCallback);
+        caseSessionManager->FindOrEstablishSession(_this->mPeer, &_this->mOnConnectedCallback,
+                                                   &_this->mOnConnectionFailureCallback);
         return;
     }
 
