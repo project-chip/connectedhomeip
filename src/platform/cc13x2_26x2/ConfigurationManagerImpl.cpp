@@ -184,5 +184,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     SysCtrlSystemReset();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip
