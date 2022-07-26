@@ -1,8 +1,10 @@
 # Silicon Labs Matter
 
-Welcome to the Silicon Labs Matter Github repo. This is your one stop shop for all things related to Silicon Labs and Matter development. To develop a Matter application with Silicon Labs please start here: [Silicon Labs Matter Table of Contents](./docs/silabs/README.md)
+Welcome to the Silicon Labs Matter Github repo. This is your one stop shop for all things related to Silicon Labs and Matter development.
 
-<BR>
+**To develop a Matter application with Silicon Labs please start here: [Silicon Labs Matter Table of Contents](./docs/silabs/README.md)**
+
+---
 
 
 [![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/build.yaml)

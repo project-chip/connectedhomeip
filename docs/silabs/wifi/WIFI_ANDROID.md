@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # Commissioning Wifi Device using Android
 
 Commissioning can be done using an Android Phone through the following steps.
@@ -38,3 +36,6 @@ Download pre-build application from the
 > -   Press the BTN0 button and keep it pressed for about 1 min - this should
 >     cause LED0 and LED1 to turns ON and OFF for 3 times. You can then leave
 >     the button
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)

@@ -1,60 +1,53 @@
-[<< Back to TOC](../README.md)
+# Matter over Wi-Fi Demo Overview
 
-# Matter over Wifi Demo Overview
-
-This document walks through the steps to build Matter Lighting-app project using
+This document walks through the steps to build the Matter Lighting-app project using
 EFR32 BRD4161A + RS911X and EFR32 BRD4161A + WF200. Silicon Labs has two
-families of WiFi adatpers (1. RS911X 2. WF200). Both are supported in this WiFi
+families of Wi-Fi adapters (1. RS911X 2. WF200). Both are supported in this Wi-Fi
 port of Matter.
 
-<br>
+## Step 1: Matter Wi-Fi Prerequisites
 
-## Setup Overview
+Before you being running the Matter Wi-Fi demo or developing for Wi-Fi you will want to make sure that you have all the required hardware and software for each use case. T
 
-![Overview](./images/wifi_setup.png)
+1. [Matter Wi-Fi Prerequisites](WIFI_PREREQS.md) 
 
-## EFR32MG12 + WF200 Connection
+   This page goes through the hardware and software (host side) required for the demo. Make sure you have all the necessary hardware and software available before continuing.
 
-![EFR32MG12 + WF200 connection ](./images/MG12_WF200.jpg)
+## Step 2: Building the Chip-Tool for Wi-Fi
 
-<br>
+In order to run the Matter Wi-Fi demo you will need to run the Chip-Tool on one of two platforms, either Linux/Mac or Raspberry Pi.
 
-<!-- ## Overview -->
+1. [Build Linux Environment](BUILD_CHIP_ENV.md)
 
-This document walks through the steps to build the Matter Lighting-app project
-using EFR32 BRD4161A + RS911X and EFR32 BRD4161A + WF200.
+    This page contains instructions to set up the build environment on a Linux machine. 
+    The instructions provide build steps for the application and the ChipTool.
 
-Follow this sequence if you are setting up for the first time:
+1. [Build Raspberry-Pi Environment](BUILD_PI_ENV.md)
 
-1. [Matter Wifi Prerequisites](WIFI_PREREQS.md)
+    This page contains instructions to set up the build environment on the Raspberry
+    Pi. This is an alternative if you do not have a Linux machine.
 
-    This page goes through the hardware and software (host side) required for
-    the demo - make sure you have all the necessary hardware available before
-    continuing.
+## Step 3: Building the Matter Accessory Device (MAD) for Wi-Fi
 
-2. [Build Linux Environment](BUILD_CHIP_ENV.md)
+If you are running the demo, you can simply download the proper image for your Matter Accessory Device from the [Matter Software Artifacts Page](../general/ARTIFACTS.md). Otherwise if you wish to build your Matter Accessory Device from scratch, you can begin with the [Software Setup](SW_SETUP.md):
 
-    This part gives you steps to setup the build environment on a Linux machine.
-    The instructions gives you build steps for the application and the ChipTool.
+1. [Software Setup](SW_SETUP.md)
 
-3. [Build Raspberry-Pi Environment](BUILD_PI_ENV.md)
+    This page contains instructions to build the Lighting-app over Wi-Fi. Build commands are provided for both 
+    the RS911x and WF200 adapters.
 
-    This section documents steps to setup the build environment on the Raspberry
-    Pi.
+## Step 4: Running the Demo
 
-4. [Software Setup](SW_SETUP.md)
+1. [Running Matter Demo over Wi-Fi using Linux](RUN_DEMO.md)
 
-    This part gives you steps to build the Lighting-app over Wifi. Two separate
-    build commands are mentioned for RS911x and WF200 adapters to use
-    accordingly.
-
-5. [Running Matter Demo over Wifi using Linux](RUN_DEMO.md)
-
-    This part give you steps to run the Matter Wifi demo using ChipTool running
+    This contains instructions to run the Matter Wi-Fi demo using ChipTool running
     on a Linux Machine (either Laptop or Raspberry Pi) - follow this after
     successfully executing the above steps.
 
-6. [optional] [Running Matter Demo over Wifi using Android](WIFI_ANDROID.md)
+1. [optional] [Running Matter Demo over Wi-Fi using Android](WIFI_ANDROID.md)
 
-    This part give you steps to run the Matter Wifi demo using ChipTool running
+    This part give you steps to run the Matter Wi-Fi demo using ChipTool running
     on an Android phone (either Laptop or Raspberry Pi).
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)

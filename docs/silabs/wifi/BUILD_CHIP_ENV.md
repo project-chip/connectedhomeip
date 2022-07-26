@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # Build Environment using Linux
 
 This section will go through the steps required to build the demo using Linux.
@@ -104,7 +102,7 @@ This is what you will burn into the EFR32.
 
 ## Compiling ChipTool
 
--   Build the ChipTool on a laptop which has Wifi and BLE
+-   Build the ChipTool on a laptop which has Wi-Fi and Bluetooth LE
 -   Run the following commands:
 
     > `$ cd $MATTER_WORKDIR/connectedhomeip` <br>
@@ -113,4 +111,7 @@ This is what you will burn into the EFR32.
 
     This will build chiptool in `out/standalone`
 
-Now, you will have all the binaries to flash onto MG12 platform.
+Now you have all the binaries to flash onto the MG12 platform.
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)

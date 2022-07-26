@@ -1,10 +1,3 @@
-[<< Back to TOC](../README.md)
-
-<!-- - connecting raspi to netwrok
-- why is mattertool not working:
-  - bad image
-  - image not flashed correctly -->
-
 # Frequently Asked Questions for Matter over Thread
 
 ## Demo
@@ -31,3 +24,6 @@
         [Raspberry Pi Remote Access](https://www.raspberrypi.com/documentation/computers/remote-access.html)
 
 <br>
+
+----
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

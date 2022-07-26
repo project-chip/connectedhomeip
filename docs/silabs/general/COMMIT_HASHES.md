@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # Matter Repositories and Commit Hashes
 
 The following repositories, branches and commit hashes are to be used together
@@ -28,3 +26,6 @@ in this release of the Silicon Labs Matter Out of Box Experience
 | Repo                                            | Branch | Commit Hash                              |
 | ----------------------------------------------- | ------ | ---------------------------------------- |
 | https://github.com/SiliconLabs/matter | \<this branch\>   | \<this commit\> |
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

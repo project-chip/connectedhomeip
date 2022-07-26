@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # Using the ChipTool
 
 The following commands show how to start a new Thread network from the local
@@ -178,3 +176,6 @@ and rename the following alias to your liking.
 > `$ alias mattertool=‘source $HOME/scripts/matterTool.sh’` <br>
 
 > `$ alias otbrsetup=‘source $HOME/scripts/setupOTBR.sh’`
+
+----
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

@@ -1,12 +1,11 @@
-[<< Back to TOC](../README.md)
+# Runing the Matter Demo over Wi-fi
 
-# Runing the Matter Demo over Wifi
+## Flashing images/binaries on MG12 platform using Ozone, Simplicity Studio or Simplicity Commander.
 
-## Flashing images/binaries on MG12 platform using Ozone
+1. Plug the WSTK and EFR into the laptop.
 
-1. Plug in the WSTK and EFR into the laptop
+2. Launch Ozone, Simplicity Studio or Simplicity Commander Standalone - this will display a GUI. If you are not using Ozone, you can follow the instructions to [Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
 
-2. Launch Ozone - this will display a GUI
 
 3. In 'New Project Wizard':
 
@@ -31,7 +30,7 @@
 6. You will be asked to select the image/binary to be loaded: click on the
    three-dots on that tab and navigate to '`out/rs911x_lighting/BRD4161A`'
    through 'Browse', select the file named `chip-efr32-lighting-example.out` and
-   click 'Next', this is the same image which we built in previous step.
+   click 'Next'. This is the image built in previous step.
 
 7. Make sure the next screen has 'Initial PC' selected as 'ELF Entry Point' -
    click 'Finish'
@@ -53,7 +52,7 @@
 
     > If you are restarting the device and do not need to re-flash the EFR
     > firmware then you can use these commands (JLinkExe & JLinRTTClient). The
-    > following commands will provide you with a serial cossole of the EFR32
+    > following commands will provide you with a serial console of the EFR32
     > <br>
 
     > `$ konsole -e JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1 &`
@@ -67,12 +66,12 @@
 
 <br>
 
-## Demo Execution - Commissioning a Wifi Device using ChipTool for Linux
+## Demo Execution - Commissioning a Wi-Fi Device using ChipTool for Linux
 
-> Commissioning can also be done using ChipTool running either on
-> Linux/Raspberry Pi
+> Commissioning can be done using ChipTool running either on
+> Linux or Raspberry Pi
 
-1. Get the SSID and PSK of the Wifi network (WPA2 - Security) you are connected
+1. Get the SSID and PSK of the Wi-Fi network (WPA2 - Security) you are connected
    to
 2. Position the hardware near the laptop as the BLE antenna on the BRD4161A is
    slightly weak
@@ -84,9 +83,9 @@
 
     > `$ out/standalone/chip-tool pairing ble-wifi 1122 $SSID $PSK 20202021 3840`
 
-    > The node ID used here is 1122. This will be used in future comands.
-    > '\$SSID' is a placeholder for your Wifi SSID and '\$PSK' is a placeholder
-    > for the password of your Wifi network.
+    > The node ID used here is 1122. This will be used in future commands.
+    > '\$SSID' is a placeholder for your Wi-Fi SSID and '\$PSK' is a placeholder
+    > for the password of your Wi-Fi network.
 
 4. Turning **on** the LED on the EFR32MG12: <br> &emsp;
    `$ out/standalone/chip-tool onoff on 1122 1`
@@ -96,20 +95,26 @@
 > If there are any failures, run the following command and then re-run the
 > ChipTool command: `$ rm -rf /tmp/chip_*`
 
+> If you are having difficulty getting the Chip-Tool to commission the device successfully it may be because you have more than one network interface available to the Chip-Tool. The device on which you are running the Chip-Tool must be on the same Wi-Fi network as your RS9116 or WF200 and there cannot be another network interface on the device that is running the Chip-Tool. For instance if you have an Ethernet connection as well as a Wi-Fi connection, you need to unplug the Ethernet connection and try running the Chip-Tool as in step #3 above.
+
 > As the device remembers the Access Point credentials given for commissioning,
 > if you want to run the demo multiple times, do a factory reset by pressing the
-> BTN0 on EFR32 MG12 for about 6-7seconds, you will observe the LED0 and LED1
-> flashes 3 times and QR code appears again on the LCD screen.
+> BTN0 on EFR32 MG12 for about 6-7 seconds. The LED0 and LED1
+> flashes 3 times and the QR code appears again on the LCD screen.
 
 <br>
 
 The commissioning command mentioned above does the following:
 
--   ChipTool scans BLE and located the SiLabs device that uses the specified
+-   ChipTool scans BLE and located the Silicon Labs device that uses the specified
     discriminator
--   Sends the Wifi SSID and Passkey
--   The SiLabs device will join the Wifi network and get an IPv4 address. It
+-   Sends the Wi-Fi SSID and Passkey
+-   The Silicon Labs device will join the Wi-Fi network and get an IPv4 address. It
     then starts providing mDNS records on IPv4 and IPv6
--   ChipTool then locates the SiLabs device over Wifi and establishes
+-   ChipTool then locates the device over Wi-Fi and establishes
     operational certificates
--   Future communications (tests) will then happen over Wifi
+-   Future communications (tests) will then happen over Wi-Fi
+
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)

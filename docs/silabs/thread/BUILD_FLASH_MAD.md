@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # How to Build and Flash the Matter Accessory Device (MAD)
 
 The Matter Accessory Device, such as the lighting-app, is the actual Matter
@@ -11,15 +9,15 @@ Chip-Tool.
 We have provided two ways to get the required image to flash the MAD. You can
 use one of the following options:
 
-1. Using the pre-built image file
-2. Building the image file from the '`connectedhomeip`' repository
+1. Use the pre-built image file
+2. Build the image file from the '`connectedhomeip`' repository
 
 <br>
 
 ### **Using the Pre-Built Image File**
 
 All of the Matter Accessory Device image files are accessible through the
-[Matter Artifacts Page](../general/ARTIFACTS.md). If you are using the pre-built
+[Matter Artifacts Page](../general/ARTIFACTS.md). If you are using a pre-built
 image file, you can skip forward to Step #2: Flashing the MAD.
 
 <br>
@@ -28,13 +26,13 @@ image file, you can skip forward to Step #2: Flashing the MAD.
 
 **1. Clone the Silicon Labs Matter repository**
 
-    Since you are reading this documentation it is assumed that you have already cloned the Silicon Labs Matter GitHub repository and have the right branch. If you have not you can follow the directions below.
+    You should have already cloned the Silicon Labs Matter GitHub repository and have the right branch as part of building an RCP image. If you have not, you can follow the directions below.
 
 The Silicon Labs Matter repo is located in Github here:
 https://github.com/SiliconLabs/matter.
 
-In order to clone the Matter repo you'll need to have Git installed on your
-local machine. Once you have Git installed you can use the following command:
+You must have Git installed on your
+local machine. To clone the repo use the following command:
 
 > `$ git clone https://github.com/SiliconLabs/matter.git`
 
@@ -68,3 +66,7 @@ the following instructions:
 Once your Matter Accessory Device has been flashed it should show a QR code on
 the LCD. If no QR Code is present it may be that you need to add a bootloader to
 your device.
+
+
+----
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

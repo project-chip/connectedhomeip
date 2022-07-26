@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # How to Build and Flash the Radio Co-Processor (RCP)
 
 The Radio Co-Processor is a 15.4 stack image flashed onto a Silicon Labs
@@ -7,8 +5,7 @@ development kit or Thunderboard Sense 2. The 15.4 stack on the development kit
 communicates with the higher layers of the Thread stack running on the Raspberry
 Pi over a USB connection.
 
-First, in order to flash the RCP, it should be connected to your laptop directly
-over USB.
+First, in order to flash the RCP, connect it to your laptop directly by USB.
 
 <!-- In order to for the OTBR to work, both the RCP and
 the OTBR need to be built off a commit that allows them to communicate properly. -->
@@ -20,16 +17,16 @@ the OTBR need to be built off a commit that allows them to communicate properly.
 We have provided two ways to get the required image to flash the RCP. You can
 use one of the following options:
 
-1. Using the pre-built image `ot-rcp` image file
-2. Building the image file from the '`ot-efr32`' repository which is listed on
+1. Use the pre-built image `ot-rcp` image file
+2. Build the image file from the '`ot-efr32`' repository, which is listed on
    the [Matter Repositories and Commit Hashes page](../general/COMMIT_HASHES.md)
 
 <br>
 
-### **Using the Pre-built Image File**
+### **Using a Pre-built Image File**
 
-All of the RCP image files are accessible through the
-[Matter Artifacts Page](../general/ARTIFACTS.md). If you are using the pre-built
+RCP image files for all demo boards are accessible through the
+[Matter Artifacts Page](../general/ARTIFACTS.md). If you are using a pre-built
 image file, you can skip forward to Step #2: Flashing the RCP.
 
 <br>
@@ -41,8 +38,8 @@ image file, you can skip forward to Step #2: Flashing the RCP.
 The ot-efr32 repo is located in Github here:
 https://github.com/SiliconLabs/ot-efr32.
 
-In order to clone the ot-efr32 repo, you'll need to have Git installed on your
-local machine. Once you have Git installed you can use the following command:
+You must have Git installed on your
+local machine. To clone the repo use the following command:
 
 > `$ git clone https://github.com/SiliconLabs/ot-efr32.git`
 
@@ -51,7 +48,7 @@ the following command:
 
 > `$ cd ot-efr32` <br> > `$ git submodule update --init --recursive`
 
-After updating the submodules you can checkout the correct branch or commit hash
+After updating the submodules you can check out the correct branch or commit hash
 for the system. Check the current branch and commit hash used here:
 [Matter Branches and Commit Hashes](../general/COMMIT_HASHES.md)
 
@@ -75,17 +72,17 @@ location: `<git>/ot-efr32/build/<efr32xgxx>`
 
 ## Step 2: Flash the RCP
 
-Once you get the RCP image '`ot-rcp.s37`' after either downloading it from the
-link provided above, or building the image file from the repo as documented
-above, you can flash it onto your device which will become the RCP attached to
-your Raspberry Pi. Flashing of the device is done directly from your laptop and
+Once you get the RCP image, either by downloading a prebuilt image or building the image file from the repo, you can flash it onto your device. This is done directly from your laptop and
 not through the Raspberry Pi, so make sure that the device is connected directly
 over USB to your laptop. Further information on flashing a Silicon Labs device
 is located here:
 [How to Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md)
 
-Once you have flashed your RCP device you can disconnect it from you laptop and
+Once you have flashed the image, the device becomes the RCP. Disconnect it from you laptop and
 connect it via USB to the Raspberry Pi.
 
 The Raspberry Pi's Open Thread Border Router can then use the RCP to communicate
 with the Thread network.
+
+----
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

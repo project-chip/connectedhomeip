@@ -1,32 +1,30 @@
-[<< Back to TOC](../README.md)
-
 # Matter 15.4 Hardware and Software Prerequisites
 
 ## Software Requirements
 
 ### System Agnostic Software Requirements (Mac/ Linux/ Windows):
 
-1. SSH Client ([Putty](https://www.putty.org/) or similar):
+1. SSH Client ([PuTTY](https://www.putty.org/) or similar):
     > SSH client is used to communicate with the Raspberry Pi over a secure
-    > shell
+    > shell.
 1. [Raspberry Pi Disk Imager](https://www.raspberrypi.com/software/)
-    > Raspberry Pi Disk Imager is used to flash the SD Card which contains the
-    > operating system for the Raspberry Pi
+    > Raspberry Pi Disk Imager is used to flash the SD Card that contains the
+    > operating system for the Raspberry Pi. Note that, for the
+    Thread demo, the operating system is the demo image.
 1. [Flash tool](../general/FLASH_SILABS_DEVICE.md)
     > Simplicity Commander standalone or Simplicity Studio is used to flash
     > Silicon Labs hardware with firmware images for the RCP and the Matter
-    > Accessory Device
-1. Git [Required for building images and development]
+    > Accessory Device.
+1. Git [only required for building images and development]
     > Make sure Git is installed on the local machine that will be used to flash
-    > the devices to that the necessary repositories can be cloned locally and
+    > the devices so that the necessary repositories can be cloned locally and
     > used as needed.
 
 <br>
 
 ### Windows-Specific Software Requirements
 
-&emsp; These are requirements in addition to those mentioned above, if using a
-Windows machine. <br>
+&emsp; These requirements are in addition to those mentioned above, for Windows only. <br>
 
 &emsp; A Unix-like command line:
 
@@ -93,3 +91,6 @@ Windows machine. <br>
             - [XG24-RB4186C](https://www.silabs.com/development-tools/wireless/xg24-rb4186c-efr32xg24-wireless-gecko-radio-board)
         - BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
             - [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
+
+----
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

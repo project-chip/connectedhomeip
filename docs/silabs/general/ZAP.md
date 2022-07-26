@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # ZCL Advanced Platform (ZAP) Tool for Matter
 
 ## Overview
@@ -159,3 +157,6 @@ Then click generate in the top menu bar. The user will be prompted to choose a
 save location for the generated ZAP code. In the Silicon Labs Matter repository,
 the lock-app generated files belong in
 matter/zzz_generated/lock-app/zap-generated .
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

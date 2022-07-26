@@ -1,46 +1,44 @@
-[<< Back to TOC](../README.md)
+# Matter over Thread Demo Overview
 
-# Matter Demo over Thread Overview
-
-This guide goes through the steps for running an example lighting-app for Matter
-over Thread. Please look at [this](THREAD.md) file for an introduction to the
+This section reviews the steps for running an example lighting-app for Matter
+over Thread. See [this file](THREAD.md) for an introduction to the
 Matter over Thread setup.
 
-At a high level, we will walk through starting a thread network, commissioning a
-new device to the thread network using BLE, and finally sending a basic OnOff
-command to the end device.
+At a high level, we will walk through starting a Thread network, commissioning a
+new device to the Thread network using Bluetooth LE, and finally sending a basic
+OnOff command to the end device.
 
 <br>
 
-## Step 0: Prerequisites
+## Prerequisites
 
-Before beginning your Matter project, consider the
-[Matter Hardware and Software Prerequisites](./THREAD_PREREQS.md). Here you will find all the information you need on Silicon Labs hardware supported for Matter development.
+Before beginning your Matter project, you should have the software and systems described in
+[Matter Hardware and Software Prerequisites](./THREAD_PREREQS.md).
 
 <br>
 
 ## Step 1: Setting up the Matter Hub (Raspberry Pi)
 
 The Matter Hub consists of the OTBR and the ChipTool running on a Raspberry Pi.
-Silicon Labs has developed a Raspberry Pi image which can be downloaded and
-flashed onto an SD Card that is then to be inserted into the Raspberry Pi.
+Silicon Labs has developed a Raspberry Pi image that can be downloaded and
+flashed onto an SD Card, which is then inserted into the Raspberry Pi.
 
 The Matter Controller sends IPv6 packets to the OTBR, which converts the IPv6
 packets into Thread packets. The Thread packets are then routed to the Silicon
 Labs end device.
 
-Please refer to this guide for the setup:
-[How to use Matter Hub \(Raspberry Pi\) Image](./RASPI_IMG.md)
+See [How to use Matter Hub \(Raspberry Pi\) Image](./RASPI_IMG.md) for setup
+instructions. 
 
 <br>
 
-## Step 2: Build and Flash the RCP
+## Step 2: Flash the RCP
 
-The Radio Co-Processor (RCP) is a thread device that connects to the Raspberry
-Pi via USB. First, to flash the RCP, it should be connected to your laptop via
-USB. Thereafter, it should be connected to the Raspberry Pi via USB as well.
+The Radio Co-Processor (RCP) is a Thread device that connects to the Raspberry
+Pi via USB. To flash the RCP, connect it to your laptop via
+USB. Thereafter, it should be connected to the Raspberry Pi via USB as well. Prebuilt RCP images are available for the demo
 
-Information on building and flashing the RCP is located here:
+Information on flashing and optionally building the RCP is located here:
 [How To Build and Flash the RCP](RCP.md)
 
 <br>
@@ -48,10 +46,10 @@ Information on building and flashing the RCP is located here:
 ## Step 3: Build and Flash the MAD
 
 The Matter Accessory Device (MAD) is the actual Matter device that will be
-commissioned onto the Matter network and control using the ChipTool.
+commissioned onto the Matter network and controlled using the ChipTool. Prebuilt MAD images are available for the demo.
 
-Information on how to build and flash the Matter Accessory device is located
-here: [How To Build and Flash the Matter Accessory Device](./MATTER_DEVICE.md)
+Information on flashing and optionally building the Matter Accessory device is located
+here: [How To Build and Flash the Matter Accessory Device](./BUILD_FLASH_MAD.md)
 
 <br>
 
@@ -69,3 +67,6 @@ Pi image:
 | mattertool off         | Sends an **off** command to the MAD using ChipTool |
 
 <br>
+
+----
+[Table of Contents](../README.md) | [Thread Demo](./DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

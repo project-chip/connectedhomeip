@@ -1,5 +1,3 @@
-[<< Back to TOC](../README.md)
-
 # How to find your Raspberry Pi on the Network
 
 ## Finding the IP address of your Raspberry Pi
@@ -21,3 +19,6 @@ Sometimes it can be difficult to find your Raspberry Pi on the network. One way 
 | Platform | Strategy |
 | -------- | -------- | 
 | Mac / Linux / Windows | Once you have found your Raspberry Pi's IP address, you can use Secure Shell (SSH) to connect to it over the command line with the following command: <br> &emsp; `ssh <raspberry pi's username>@<raspberry pi's IP address>` <br><br> Example: <br> &emsp; `ssh ubuntu@10.4.148.44` <br> &emsp;`password: raspberrypi` <br><br> When prompted provide the raspberry pi's password, in the case of the Silicon Labs Matter Hub image the username is ***ubuntu*** and the password is ***raspberrypi*** | 
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

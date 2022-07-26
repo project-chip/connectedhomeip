@@ -1,14 +1,20 @@
-[<< Back to TOC](../README.md)
-
 # Software Setup and Preliminaries
+
+## Using the Matter Accessory Device (MAD) Pre-Built Binaries
+If you are just running the Matter demo, and are not interested in building the Matter Accessory Device images from scratch, you can download the MAD images for Wi-Fi from this software release on the [Artifacts Page](../general/ARTIFACTS.md)
+
+Once you have downloaded the image you require for your device, you can skip forward to the [Running the Matter Demo over Wi-Fi page](./RUN_DEMO.md)
+
+Otherwise if you  are planning to build the Wi-Fi images from scratch please continue with this documentation.
+
 
 ## Software Setup
 
-Run below commands on a Linux terminal running on either Linux machine, WSL or
-Virtual Machine.
+If you have not downloaded or cloned this repository, you can run the following commands on a Linux terminal running on either Linux machine, WSL or
+Virtual Machine to clone the repository and run bootstrap to prepare to build the sample application images.
 
 1. To download the
-   [Matter codebase](https://github.com/project-chip/connectedhomeip.git) run
+   [SiliconLabs Matter codebase](https://github.com/SiliconLabs/matter.git) run
    the following commands. Create a working directory - we will name it `matter`
    as part of this example flow:
 
@@ -18,7 +24,7 @@ Virtual Machine.
 
     > `$ MATTER_WORKDIR=pwd` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
 
-    > `$ git clone https://github.com/project-chip/connectedhomeip.git`
+    > `$ git clone https://github.com/SiliconLabs/matter.git`
 
 2. Bootstrapping:
 
@@ -59,9 +65,11 @@ This is what you will burn onto the EFR32.
 
 ## Compiling the ChipTool
 
--   Build the chiptool on a laptop or Raspberry-pi ( If you are not using Linux
-    Laptop ) which has Wifi and BLE
--   Run the following commands on a terminal where you will run chip-tool:
+In order to control the Wi-Fi Matter Accessory Device you will have to compile and run the ChipTool on either a Linux, Mac or Raspberry Pi. The ChipTool builds faster on the Mac and Linux machines so that is recommended, but if you have access to a Raspberry Pi that will work as well.
+
+If you have not cloned this repository, you can run the following commands to clone the repository and set it up to build the ChipTool from source.
+
+1. Run the following commands on a terminal where you will run chip-tool:
 
     > `$ mkdir matter`
 
@@ -69,7 +77,7 @@ This is what you will burn onto the EFR32.
 
     > `$ MATTER_WORKDIR=pwd` &emsp;&emsp; --> We will use $MATTER_WORKDIR later
 
-    > `$ git clone https://github.com/project-chip/connectedhomeip.git`
+    > `$ git clone https://github.com/SiliconLabs/matter.git`
 
 2. Bootstrapping:
 
@@ -88,5 +96,8 @@ This is what you will burn onto the EFR32.
     This will build chiptool in `out/standalone`.
 
     After this, follow the steps on the page
-    '[Runing the Matter Demo over Wifi](RUN_DEMO.md)' to flash the binaries and
+    '[Runing the Matter Demo over Wi-Fi](RUN_DEMO.md)' to flash the binaries and
     execute the demo.
+
+----
+[Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](./DEMO_OVERVIEW.md)
