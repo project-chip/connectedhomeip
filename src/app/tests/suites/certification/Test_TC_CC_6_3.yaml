@@ -40,6 +40,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F04 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
@@ -154,7 +161,7 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: 5
+                value: 100
               - name: "TransitionTime"
                 value: 50
               - name: "ColorTemperatureMinimumMireds"
