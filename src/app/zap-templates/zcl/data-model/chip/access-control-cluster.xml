@@ -47,19 +47,17 @@ limitations under the License.
     <item fieldId="2" name="DeviceType" type="devtype_id" isNullable="true"/>
   </struct>
 
-  <struct name="AccessControlEntry">
+  <struct name="AccessControlEntry" isFabricScoped="true">
     <cluster code="0x001F"/>
     <item fieldId="1" name="Privilege" type="Privilege" isFabricSensitive="true"/>
     <item fieldId="2" name="AuthMode" type="AuthMode" isFabricSensitive="true"/>
     <item fieldId="3" name="Subjects" type="INT64U" isNullable="true" array="true" isFabricSensitive="true"/>
     <item fieldId="4" name="Targets" type="Target" isNullable="true" array="true" isFabricSensitive="true"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx" isFabricSensitive="true"/>
   </struct>
 
-  <struct name="ExtensionEntry">
+  <struct name="ExtensionEntry" isFabricScoped="true">
     <cluster code="0x001F"/>
     <item fieldId="1" name="Data" type="OCTET_STRING" length="128" isFabricSensitive="true"/>
-    <item fieldId="0xFE" name="FabricIndex" type="fabric_idx" isFabricSensitive="true"/>
   </struct>
 
   <cluster>
@@ -103,22 +101,20 @@ limitations under the License.
       <access op="read" privilege="view"/>
     </attribute>
 
-    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" optional="false">
+    <event side="server" code="0x0000" name="AccessControlEntryChanged" priority="info" isFabricSensitive="true" optional="false">
       <description>The cluster SHALL send AccessControlEntryChanged events whenever its ACL attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="AccessControlEntry" isNullable="true"/>
-      <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
       <access op="read" privilege="administer"/>
     </event>
-    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" optional="false">
+    <event side="server" code="0x0001" name="AccessControlExtensionChanged" priority="info" isFabricSensitive="true" optional="false">
       <description>The cluster SHALL send AccessControlExtensionChanged events whenever its extension attribute data is changed by an Administrator.</description>
       <field id="1" name="AdminNodeID" type="node_id" isNullable="true"/>
       <field id="2" name="AdminPasscodeID" type="INT16U" isNullable="true"/>
       <field id="3" name="ChangeType" type="ChangeTypeEnum"/>
       <field id="4" name="LatestValue" type="ExtensionEntry" isNullable="true"/>
-      <field id="0xFE" name="AdminFabricIndex" type="fabric_idx"/>
       <access op="read" privilege="administer"/>
     </event>
   </cluster>

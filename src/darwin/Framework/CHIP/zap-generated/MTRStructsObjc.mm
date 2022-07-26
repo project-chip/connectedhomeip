@@ -196,16 +196,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _latestValue = nil;
 
-        _adminFabricIndex = @(0);
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; adminFabricIndex:%@; >",
-        NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _adminFabricIndex];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >",
+                  NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
     return descriptionString;
 }
 
@@ -224,16 +224,16 @@ NS_ASSUME_NONNULL_BEGIN
 
         _latestValue = nil;
 
-        _adminFabricIndex = @(0);
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; adminFabricIndex:%@; >",
-        NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _adminFabricIndex];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: adminNodeID:%@; adminPasscodeID:%@; changeType:%@; latestValue:%@; fabricIndex:%@; >",
+                  NSStringFromClass([self class]), _adminNodeID, _adminPasscodeID, _changeType, _latestValue, _fabricIndex];
     return descriptionString;
 }
 
@@ -2599,14 +2599,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _arg1 = @(0);
+        _fabricIndex = @(0);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
     return descriptionString;
 }
 
