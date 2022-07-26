@@ -125,8 +125,6 @@ public:
      */
     CASESessionManager * GetCASESessionManager() const { return mpCASESessionMgr; }
 
-    FabricTable * GetFabricTable() const { return mpFabricTable; }
-
     /**
      * Tears down an active subscription.
      *

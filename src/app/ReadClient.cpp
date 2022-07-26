@@ -121,7 +121,7 @@ CHIP_ERROR ReadClient::ScheduleResubscription(uint32_t aTimeTillNextResubscripti
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
     //
-    // If we're establishing CASE, make sure we not provided a new SessionHandle as well.
+    // If we're establishing CASE, make sure we are not provided a new SessionHandle as well.
     //
     VerifyOrReturnError(!aReestablishCASE || !aNewSessionHandle.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -553,12 +553,17 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 exit:
     if (IsSubscriptionType())
     {
-        if (IsAwaitingInitialReport() || IsAwaitingSubscribeResponse())
+        if (IsAwaitingInitialReport())
         {
             MoveToState(ClientState::AwaitingSubscribeResponse);
         }
-        else
+        else if (IsSubscriptionActive())
         {
+            //
+            // Only refresh the liveness check timer if we've successfully established
+            // a subscription and have a valid value for mMaxInterval which the function
+            // relies on.
+            //
             RefreshLivenessCheckTimer();
         }
     }
@@ -697,7 +702,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
             //
             // Update the event number being tracked in mReadPrepareParams in case
             // we want to send it in the next SubscribeRequest message to convey
-            // the event number till which we've already received events for.
+            // the event number for which we have already received an event.
             //
             mReadPrepareParams.mEventNumber.SetValue(header.mEventNumber + 1);
 
@@ -974,6 +979,7 @@ void ReadClient::HandleDeviceConnected(void * context, OperationalDeviceProxy * 
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
 
+    ChipLogProgress(DataManagement, "HandleDeviceConnected %d\n", device->GetSecureSession().HasValue());
     _this->mReadPrepareParams.mSessionHolder.Grab(device->GetSecureSession().Value());
 
     auto err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
@@ -989,9 +995,6 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const ScopedNodeI
     VerifyOrDie(_this != nullptr);
 
     ChipLogError(DataManagement, "Failed to establish CASE for re-subscription with error '%" CHIP_ERROR_FORMAT "'", err.Format());
-
-    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
-    VerifyOrDie(caseSessionManager != nullptr);
 
     _this->Close(err);
 }
@@ -1011,6 +1014,24 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void 
         auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
         VerifyOrExit(caseSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
+        //
+        // We need to mark our session as defunct explicitly since the assessment of a liveness failure
+        // is usually triggered by the absence of any exchange activity that would have otherwise
+        // automatically marked the session as defunct on a response timeout.
+        //
+        // Doing so will ensure that the subsequent call to FindOrEstablishSession will not bind to
+        // an existing established session but rather trigger establishing a new one.
+        //
+        if (_this->mReadPrepareParams.mSessionHolder)
+        {
+            _this->mReadPrepareParams.mSessionHolder.Get().Value()->AsSecureSession()->MarkAsDefunct();
+        }
+
+        //
+        // TODO: Until #19259 is merged, we cannot actually just get by with the above logic since marking sessions
+        //       defunct has no effect on resident OperationalDeviceProxy instances that are already bound
+        //       to a now-defunct CASE session.
+        //
         auto proxy = caseSessionManager->FindExistingSession(_this->mPeer);
         if (proxy != nullptr)
         {
@@ -1033,7 +1054,7 @@ exit:
         //
         // In that case, don't permit re-subscription to occur.
         //
-        _this->Close(err, err != CHIP_ERROR_INVALID_FABRIC_INDEX && err != CHIP_ERROR_INCORRECT_STATE);
+        _this->Close(err, err != CHIP_ERROR_INCORRECT_STATE);
     }
 }
 

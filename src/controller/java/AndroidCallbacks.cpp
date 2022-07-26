@@ -547,7 +547,7 @@ void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscription
     JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
 }
 
-void ReportEventCallback::OnResubscriptionAttempt(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
+CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
 {
     VerifyOrReturn(mResubscriptionAttemptCallbackRef != nullptr,
                    ChipLogError(Controller, "mResubscriptionAttemptCallbackRef is null"));
@@ -555,21 +555,17 @@ void ReportEventCallback::OnResubscriptionAttempt(app::ReadClient * apReadClient
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    err = app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause);
-    if (err != CHIP_NO_ERROR)
-    {
-        ReportError(nullptr, ErrorStr(err), err.AsInteger());
-        return;
-    }
+    ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
 
     jmethodID onResubscriptionAttemptMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V",
-                                                  &onResubscriptionAttemptMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onResubscriptionAttempt method"));
+    ReturnLogErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V", &onResubscriptionAttemptMethod));
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
                         apReadClient->ComputeTimeTillNextSubscription());
+
+    return CHIP_NO_ERROR;
 }
 
 void ReportEventCallback::ReportError(jobject attributePath, CHIP_ERROR err)

@@ -62,7 +62,7 @@ class InteractionModelEngine;
  *         When used to manage subscriptions, the client provides functionality to automatically re-subscribe as needed,
  *         including re-establishing CASE under certain conditions (see Callback::OnResubscriptionNeeded for more info).
  *         This is the default behavior. A consumer can completely opt-out of this behavior by over-riding
- * Callback::OnResubscriptionNeeded and providing an alternative implementation.
+ *         Callback::OnResubscriptionNeeded and providing an alternative implementation.
  *
  */
 class ReadClient : public Messaging::ExchangeDelegate
@@ -191,6 +191,7 @@ public:
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendRequest has been
          *        made, when the read completes or the subscription is shut down.
+         *
          * @param[in] apReadClient the ReadClient for the completed interaction.
          */
         virtual void OnDone(ReadClient * apReadClient) = 0;
@@ -333,7 +334,7 @@ public:
      *  a) allocate a ReadPrepareParams object that will have fields mpEventPathParamsList and mpAttributePathParamsList and
      *  mpDataVersionFilterList with lifetimes as long as the ReadClient itself and b) free those up later in the call to
      *  OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
-     *  that has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
+     *  has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
      *  have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
      *  OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
      *  that's the only case when the consumer moved a ReadParams into the client.
@@ -351,11 +352,11 @@ public:
     CHIP_ERROR DefaultResubscribePolicy(CHIP_ERROR aTerminationCause);
 
     /**
-     * Computes the time till the next re-subscription with millisecond resolution over
+     * Computes the time, in milliseconds, until the next re-subscription over
      * an ever increasing window following a fibonacci sequence with the current retry count
      * used as input to the fibonacci algorithm.
      *
-     * CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX is used as the maximum ceiling for that input.
+     * CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX is the maximum value the retry count can tick up to.
      *
      */
     uint32_t ComputeTimeTillNextSubscription();
@@ -363,10 +364,10 @@ public:
     /**
      * Schedules a re-subscription aTimeTillNextResubscriptionMs into the future.
      *
-     * If an application wants to setup CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next
+     * If an application wants to set up CASE on their own, they should call ComputeTimeTillNextSubscription() to compute the next
      * interval at which they should attempt CASE and attempt CASE at that time. On successful CASE establishment, this method
      * should be called with the new SessionHandle provided through 'aNewSessionHandle', 'aTimeTillNextResubscriptionMs' set to 0
-     * (i.e re-subscribe immediately) and 'aReestablishCASE' set to false.
+     * (i.e async, but as soon as possible) and 'aReestablishCASE' set to false.
      *
      * Otherwise, if aReestablishCASE is true, operational discovery and CASE will be attempted at that time before
      * the actual IM interaction is initiated.

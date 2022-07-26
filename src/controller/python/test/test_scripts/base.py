@@ -766,7 +766,7 @@ class BaseTestHelper:
         resubAttempted = False
         resubSucceeded = True
 
-        async def OnResubscriptionAttempted(transaction, errorEncountered: int, nextResubsribeIntervalMsec: int):
+        async def OnResubscriptionAttempted(transaction, errorEncountered: int, nextResubscribeIntervalMsec: int):
             self.logger.info("Re-subscription Attempted")
             nonlocal resubAttempted
             resubAttempted = True
@@ -784,12 +784,6 @@ class BaseTestHelper:
         #
         subscription.SetResubscriptionAttemptedCallback(OnResubscriptionAttempted, True)
         subscription.SetResubscriptionSucceededCallback(OnResubscriptionSucceeded, True)
-
-        #
-        # Now, let's go and expire the session to the node. That will immediately prevent
-        # future reports from the server from being dispatched to the client logic.
-        #
-        self.devCtrl.ExpireSessions(nodeid)
 
         #
         # Over-ride the default liveness timeout (which is set quite high to accomodate for

@@ -98,7 +98,7 @@ struct ReportEventCallback : public app::ReadClient::Callback
 
     void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override;
 
-    void OnResubscriptionAttempt(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
+    CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(jobject eventPath, CHIP_ERROR err);
