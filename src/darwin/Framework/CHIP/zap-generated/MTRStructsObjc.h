@@ -141,6 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRBasicClusterLeaveEvent : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 @interface MTRBasicClusterReachableChangedEvent : NSObject
