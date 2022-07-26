@@ -403,7 +403,7 @@ JNI_METHOD(void, pauseCommissioning)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    wrapper->Controller()->PauseCommissioning();
+    wrapper->GetAutoCommissioner()->PauseCommissioning();
 }
 
 JNI_METHOD(void, resumeCommissioning)
@@ -413,7 +413,7 @@ JNI_METHOD(void, resumeCommissioning)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    wrapper->Controller()->ResumeCommissioning();
+    wrapper->GetAutoCommissioner()->ResumeCommissioning();
 }
 
 JNI_METHOD(void, updateCommissioningNetworkCredentials)
@@ -423,7 +423,7 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    CommissioningParameters commissioningParams = CommissioningParameters();
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
     CHIP_ERROR err                              = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     if (err != CHIP_NO_ERROR)
     {
