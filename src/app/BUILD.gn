@@ -57,7 +57,6 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "AccessPrivilegeGet.cpp",
     "AttributeAccessInterface.cpp",
     "AttributePathExpandIterator.cpp",
     "AttributePathExpandIterator.h",
@@ -77,6 +76,7 @@ static_library("app") {
     "CommandResponseHelper.h",
     "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
+    "DefaultRestrictivePrivilegeGetters.cpp",
     "DeviceProxy.cpp",
     "DeviceProxy.h",
     "EventManagement.cpp",
