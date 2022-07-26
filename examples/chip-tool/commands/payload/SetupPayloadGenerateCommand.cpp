@@ -95,6 +95,15 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::Run()
 
     std::string code;
     ReturnErrorOnFailure(generator.payloadBase38RepresentationWithAutoTLVBuffer(code));
+    // CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE includes various prefixes we don't
+    // control (timestamps, process ids, etc).  Let's assume (hope?) that
+    // those prefixes use up no more than half the total available space.
+    constexpr size_t chunkSize = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE / 2;
+    while (code.size() > chunkSize)
+    {
+        ChipLogProgress(chipTool, "QR Code: %s", code.substr(0, chunkSize).c_str());
+        code = code.substr(chunkSize);
+    }
     ChipLogProgress(chipTool, "QR Code: %s", code.c_str());
 
     return CHIP_NO_ERROR;
