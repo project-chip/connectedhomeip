@@ -378,6 +378,8 @@ public:
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
+        InteractionModelEngine::GetInstance()->OnFabricRemoved(fabricIndex);
+
         NotifyFabricTableChanged();
     }
 

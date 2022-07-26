@@ -1408,5 +1408,33 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
+void InteractionModelEngine::OnFabricRemoved(FabricIndex aFabricIndex)
+{
+    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel,
+                            "Fabric removed, deleting obsolete read/subscription handler with FabricIndex: %u",
+                            handler->GetAccessingFabricIndex());
+            mReadHandlers.ReleaseObject(handler);
+        }
+
+        return Loop::Continue;
+    });
+
+    for (auto & handler : mWriteHandlers)
+    {
+        if (!(handler.IsFree()) && handler.GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel,
+                            "Fabric removed, deleting obsolete write handler with FabricIndex: %u",
+                            handler.GetAccessingFabricIndex());
+            handler.Close();
+        }
+    }
+
+    // App code may hold the reference for Async Command Handler, when specific fabric index is removed, if we are not cleaning up the corresponding CommandHandler holed by the app,
+    // the app may fail to send Command Response using invalid exchange, then it is still able to close
+}
 } // namespace app
 } // namespace chip

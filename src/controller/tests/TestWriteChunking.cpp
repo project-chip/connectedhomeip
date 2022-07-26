@@ -73,6 +73,7 @@ public:
     static void TestConflictWrite(nlTestSuite * apSuite, void * apContext);
     static void TestNonConflictWrite(nlTestSuite * apSuite, void * apContext);
     static void TestTransactionalList(nlTestSuite * apSuite, void * apContext);
+    static void TestListChunkingInvalidFabric(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -252,6 +253,52 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
             break;
         }
     }
+    emberAfClearDynamicEndpoint(0);
+}
+
+// This test is to create Chunked write requests, we drop the message since the 3rd message, then trigger OnFabricRemoved from interaction model engine
+// to simulate the situation for fabric removed, the write handler would be closed.
+void TestWriteChunking::TestListChunkingInvalidFabric(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::TestCluster::Id, kTestListAttribute);
+ 
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestWriteCallback writeCallback;
+
+    app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
+                                    static_cast<uint16_t>(900) /* reserved buffer size */);
+
+    ByteSpan list[kTestListLength];
+
+    err = writeClient.EncodeAttribute(attributePath, app::DataModel::List<ByteSpan>(list, kTestListLength));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 1;
+    ctx.GetLoopback().mNumMessagesToDropSinceIndex = 3;
+    err = writeClient.SendWriteRequest(sessionHandle);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 1);
+    InteractionModelEngine::GetInstance()->OnFabricRemoved(1);
+    NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetNumActiveWriteHandlers() == 0);
+
+    ctx.GetLoopback().mSentMessageCount            = 0;
+    ctx.GetLoopback().mNumMessagesToDrop           = 0;
+    ctx.GetLoopback().mNumMessagesToDropSinceIndex = 0;
     emberAfClearDynamicEndpoint(0);
 }
 
@@ -719,6 +766,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestConflictWrite", TestWriteChunking::TestConflictWrite),
     NL_TEST_DEF("TestNonConflictWrite", TestWriteChunking::TestNonConflictWrite),
     NL_TEST_DEF("TestTransactionalList", TestWriteChunking::TestTransactionalList),
+    NL_TEST_DEF("TestListChunkingInvalidFabric", TestWriteChunking::TestListChunkingInvalidFabric),
     NL_TEST_SENTINEL()
 };
 
