@@ -60,7 +60,7 @@ tests:
           [1658316948.574597][4039:4044] CHIP:DMG:                                   status = 0x00 (SUCCESS),
           [1658316948.574632][4039:4044] CHIP:DMG:                                },
 
-          Before adding the Group0x0006 execute this command 
+          Before adding the Group0x0006 execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 6, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -80,7 +80,7 @@ tests:
           [1658319830.075908][4759:4764] CHIP:DMG:                                status = 0x00 (SUCCESS),
           [1658319830.075946][4759:4764] CHIP:DMG:                        },
 
-          Before adding the Group0x0007 execute this command 
+          Before adding the Group0x0007 execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 7, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -96,7 +96,7 @@ tests:
           [1658319901.401147][4768:4773] CHIP:DMG:                        },
 
 
-          Before adding the Group0x0008 execute this command 
+          Before adding the Group0x0008 execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 8, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -111,7 +111,7 @@ tests:
           [1658319969.849774][4777:4782] CHIP:DMG:                                status = 0x00 (SUCCESS),
           [1658319969.849814][4777:4782] CHIP:DMG:                        },
 
-          Before adding the Group0x0009 execute this command 
+          Before adding the Group0x0009 execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 9, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -126,7 +126,7 @@ tests:
           [1658319969.849774][4777:4782] CHIP:DMG:                                status = 0x00 (SUCCESS),
           [1658319969.849814][4777:4782] CHIP:DMG:                        },
 
-          Before adding the Group0x0002 execute this command 
+          Before adding the Group0x0002 execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 2, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 
@@ -141,7 +141,7 @@ tests:
           [1658323452.115899][4965:4970] CHIP:DMG:                                status = 0x00 (SUCCESS),
           [1658323452.115935][4965:4970] CHIP:DMG:                        },
 
-          Before adding the Group0x0003 execute this command 
+          Before adding the Group0x0003 execute this command
 
           ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 3, "groupKeySetID": 1, "fabricIndex": 1}]' 1 0
 

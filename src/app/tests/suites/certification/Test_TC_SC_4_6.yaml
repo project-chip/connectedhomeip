@@ -56,7 +56,7 @@ tests:
 
 
 
-          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp 
+          to look for subtypes, on the raspi run $ avahi-browse -p _services._dns-sd._udp
           | grep _matterd
 
           +;eth0;IPv6;_CM;_sub._matterd._udp;local

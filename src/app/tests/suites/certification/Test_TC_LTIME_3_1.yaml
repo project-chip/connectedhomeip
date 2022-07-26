@@ -37,7 +37,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write hour-format 0 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651192743588] [14026:192208] CHIP: [DMG] WriteResponseMessage =
           [1651192743588] [14026:192208] CHIP: [DMG] {
@@ -110,9 +110,9 @@ tests:
     - label: "TH reads HourFormat attribute"
       PICS: LTIME.S.A0000
       verification: |
-          ./chip-tool timeformatlocalization read hour-format 1 
+          ./chip-tool timeformatlocalization read hour-format 1
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
           [1651193120969] [14169:196901] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_0000 DataVersion: 3316530443
           [1651193120969] [14169:196901] CHIP: [TOO]   HourFormat: 1
       disabled: true
@@ -191,7 +191,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
           [1651194544627] [14736:213553] CHIP: [DMG] {
@@ -261,7 +261,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
           [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
           [1651194544627] [14736:213553] CHIP: [DMG] {
           [1651194544627] [14736:213553] CHIP: [DMG]         AttributeReportIBs =
@@ -297,7 +297,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 2 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
@@ -346,7 +346,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 3 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
@@ -393,7 +393,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 4 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
@@ -440,7 +440,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 5 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -486,7 +486,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 6 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
@@ -533,7 +533,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 7 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
@@ -579,7 +579,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 8 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
           [1651194780019] [14823:216414] CHIP: [DMG]         AttributeStatusIBs =
@@ -710,7 +710,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 11 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194780019] [14823:216414] CHIP: [DMG] WriteResponseMessage =
           [1651194780019] [14823:216414] CHIP: [DMG] {
@@ -743,7 +743,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization read active-calendar-type 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1651194544627] [14736:213553] CHIP: [DMG] ReportDataMessage =
           [1651194544627] [14736:213553] CHIP: [DMG] {
@@ -778,7 +778,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write active-calendar-type 50  1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1656934134.261135][6359:6364] CHIP:DMG: WriteResponseMessage =
           [1656934134.261172][6359:6364] CHIP:DMG: {
@@ -812,7 +812,7 @@ tests:
       verification: |
           ./chip-tool timeformatlocalization write   hour-format  5 1 0
 
-          On TH verify that DUT sends a success response 
+          On TH verify that DUT sends a success response
 
           [1656934321.910991][6387:6392] CHIP:DMG: WriteResponseMessage =
           [1656934321.911025][6387:6392] CHIP:DMG: {
