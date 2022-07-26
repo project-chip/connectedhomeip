@@ -116,12 +116,6 @@ async function structs_with_cluster_name(options)
       continue;
     }
 
-    s.items.forEach(i => {
-      if (i.type.toLowerCase() == "fabric_idx") {
-        s.struct_fabric_idx_field = i.label;
-      }
-    })
-
     if (s.struct_cluster_count == 1)
     {
       const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
