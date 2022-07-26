@@ -99,7 +99,6 @@ void LEDWidget::Animate()
 
         if (nextChangeTimeMS < nowMS)
         {
-            // DoSet(!mState);
             mLastChangeTimeMS = nowMS;
         }
     }
