@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull changeType;
 @property (strong, nonatomic) MTRAccessControlClusterAccessControlEntry * _Nullable latestValue;
-@property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 @interface MTRAccessControlClusterAccessControlExtensionChangedEvent : NSObject
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable adminPasscodeID;
 @property (strong, nonatomic) NSNumber * _Nonnull changeType;
 @property (strong, nonatomic) MTRAccessControlClusterExtensionEntry * _Nullable latestValue;
-@property (strong, nonatomic) NSNumber * _Nonnull adminFabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 @interface MTRBridgedActionsClusterActionStruct : NSObject
@@ -790,7 +790,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRTestClusterClusterTestFabricScopedEventEvent : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @end
 
 NS_ASSUME_NONNULL_END
