@@ -170,8 +170,8 @@ static CHIP_ERROR generateBitSet(PayloadContents & payload, MutableByteSpan & bi
                                       kCommissioningFlowFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
                                       kTotalPayloadDataSizeInBits));
-    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits,
-                                      kTotalPayloadDataSizeInBits));
+    ReturnErrorOnFailure(populateBits(bits.data(), offset, payload.discriminator.GetLongValue(),
+                                      kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(
         populateBits(bits.data(), offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits));
     ReturnErrorOnFailure(populateBits(bits.data(), offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits));
