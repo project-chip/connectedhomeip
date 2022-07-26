@@ -26,6 +26,8 @@ static_library("helpers") {
   sources = [
     "AppTestContext.cpp",
     "AppTestContext.h",
+    "MockAclTestContext.cpp",
+    "MockAclTestContext.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -93,6 +95,7 @@ chip_test_suite("tests") {
     "TestStatusResponseMessage.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
+    "TestAclEvent.cpp"
   ]
 
   if (!chip_fake_platform) {
