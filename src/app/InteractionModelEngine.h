@@ -74,7 +74,8 @@ namespace app {
 class InteractionModelEngine : public Messaging::UnsolicitedMessageHandler,
                                public Messaging::ExchangeDelegate,
                                public CommandHandler::Callback,
-                               public ReadHandler::ManagementCallback
+                               public ReadHandler::ManagementCallback,
+                               public FabricTable::Delegate
 {
 public:
     /**
@@ -288,6 +289,8 @@ public:
      * @retval the minimal value of guaranteed subscriptions per fabic.
      */
     uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
+
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //

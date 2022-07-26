@@ -282,7 +282,6 @@ CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 
 void CleanupSessionsForFabric(SessionManager & sessionMgr, FabricIndex fabricIndex)
 {
-    InteractionModelEngine::GetInstance()->CloseTransactionsFromFabricIndex(fabricIndex);
     sessionMgr.ExpireAllSessionsForFabric(fabricIndex);
 }
 
@@ -379,11 +378,16 @@ public:
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
+
         NotifyFabricTableChanged();
     }
 
     // Gets called when a fabric is added/updated, but not necessarily committed to storage
-    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        ChipLogProgress(InteractionModel, "OnFabricUpdated debugging from opertonal-credential!!!!!!!");
+        NotifyFabricTableChanged();
+    }
 
     // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override

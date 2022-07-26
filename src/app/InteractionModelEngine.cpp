@@ -56,6 +56,7 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mpFabricTable    = apFabricTable;
     mpCASESessionMgr = apCASESessionMgr;
 
+    ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
@@ -76,9 +77,9 @@ void InteractionModelEngine::Shutdown()
     //
     while (handlerIter)
     {
-        CommandHandlerInterface * next = handlerIter->GetNext();
+        CommandHandlerInterface * pNext = handlerIter->GetNext();
         handlerIter->SetNext(nullptr);
-        handlerIter = next;
+        handlerIter = pNext;
     }
 
     mCommandHandlerList = nullptr;
@@ -1217,9 +1218,9 @@ void InteractionModelEngine::ReleasePool(ObjectList<T> *& aObjectList, ObjectPoo
     ObjectList<T> * current = aObjectList;
     while (current != nullptr)
     {
-        ObjectList<T> * next = current->mpNext;
+        ObjectList<T> * pNext = current->mpNext;
         aObjectPool.ReleaseObject(current);
-        current = next;
+        current = pNext;
     }
 
     aObjectList = nullptr;
@@ -1434,5 +1435,41 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
+void InteractionModelEngine::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    mReadHandlers.ForEachActiveObject([fabricIndex](ReadHandler * handler) {
+        if (handler->GetAccessingFabricIndex() == fabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read handler with FabricIndex: %u", fabricIndex);
+            handler->Close();
+        }
+
+        return Loop::Continue;
+    });
+
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
+        if (readClient->GetFabricIndex() == fabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete read client with FabricIndex: %u", fabricIndex);
+            readClient->Close(CHIP_NO_ERROR, false);
+            RemoveReadClient(readClient);
+        }
+    }
+
+    for (auto & handler : mWriteHandlers)
+    {
+        if (!(handler.IsFree()) && handler.GetAccessingFabricIndex() == fabricIndex)
+        {
+            ChipLogProgress(InteractionModel, "Fabric removed, deleting obsolete write handler with FabricIndex: %u", fabricIndex);
+            handler.Close();
+        }
+    }
+
+    // Applications may hold references to CommandHandler instances for async command processing.
+    // Therefore we can't forcible destroy CommandHandlers here.  Their exchanges will get closed by
+    // the fabric removal, though, so they will fail when they try to actually send their command response
+    // and will close at that point.
+}
 } // namespace app
 } // namespace chip
