@@ -1406,18 +1406,16 @@ void InteractionModelEngine::OnFabricRemoved(FabricIndex aFabricIndex)
     EventManagement::GetInstance().FabricRemoved(aFabricIndex);
 
     mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
-    if (handler->GetAccessingFabricIndex() == aFabricIndex)
-    {
-        ChipLogProgress(InteractionModel,
-                        "Fabric removed, deleting obsolete subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
-                        ChipLogValueX64(handler->GetInitiatorNodeId()),
-                        handler->GetAccessingFabricIndex());
-        mReadHandlers.ReleaseObject(handler);
-    }
+        if (handler->GetAccessingFabricIndex() == aFabricIndex)
+        {
+            ChipLogProgress(InteractionModel,
+                            "Fabric removed, deleting obsolete subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                            ChipLogValueX64(handler->GetInitiatorNodeId()), handler->GetAccessingFabricIndex());
+            mReadHandlers.ReleaseObject(handler);
+        }
 
-    return Loop::Continue;
-});
-
+        return Loop::Continue;
+    });
 }
 } // namespace app
 } // namespace chip

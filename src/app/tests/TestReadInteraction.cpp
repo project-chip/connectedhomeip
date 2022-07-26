@@ -1907,7 +1907,6 @@ void TestReadInteraction::TestSubscribeInvalidateFabric(nlTestSuite * apSuite, v
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
         InteractionModelEngine::GetInstance()->OnFabricRemoved(delegate.mpReadHandler->GetAccessingFabricIndex());
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 0);
-
     }
 
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
