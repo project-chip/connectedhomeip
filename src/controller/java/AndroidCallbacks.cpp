@@ -547,13 +547,20 @@ void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscription
     JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
 }
 
-void ReportEventCallback::OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, uint32_t aNextResubscribeIntervalMsec)
+void ReportEventCallback::OnResubscriptionAttempt(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
 {
     VerifyOrReturn(mResubscriptionAttemptCallbackRef != nullptr,
                    ChipLogError(Controller, "mResubscriptionAttemptCallbackRef is null"));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    err = app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause);
+    if (err != CHIP_NO_ERROR)
+    {
+        ReportError(nullptr, ErrorStr(err), err.AsInteger());
+        return;
+    }
 
     jmethodID onResubscriptionAttemptMethod;
     err = JniReferences::GetInstance().FindMethod(env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(II)V",
@@ -562,7 +569,7 @@ void ReportEventCallback::OnResubscriptionAttempt(CHIP_ERROR aTerminationCause, 
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
-                        aNextResubscribeIntervalMsec);
+                        apReadClient->ComputeTimeTillNextSubscription());
 }
 
 void ReportEventCallback::ReportError(jobject attributePath, CHIP_ERROR err)

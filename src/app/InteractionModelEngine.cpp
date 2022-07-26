@@ -128,8 +128,14 @@ void InteractionModelEngine::Shutdown()
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 
     mpCASESessionMgr = nullptr;
-    mpFabricTable    = nullptr;
-    mpExchangeMgr    = nullptr;
+
+    //
+    // We _should_ be clearing these out, but doing so invites a world
+    // of trouble. #21233 tracks fixing the underlying assumptions to make
+    // this possible.
+    //
+    // mpFabricTable    = nullptr;
+    // mpExchangeMgr    = nullptr;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
