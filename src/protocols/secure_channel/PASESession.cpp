@@ -185,7 +185,7 @@ CHIP_ERROR PASESession::WaitForPairing(SessionManager & sessionManager, const Sp
     memmove(mSalt, salt.data(), mSaltLength);
     memmove(&mPASEVerifier, &verifier, sizeof(verifier));
 
-    mIterationCount  = pbkdf2IterCount;
+    mIterationCount = pbkdf2IterCount;
     mNextExpectedMsg.SetValue(MsgType::PBKDFParamRequest);
     mPairingComplete = false;
     mLocalMRPConfig  = mrpLocalConfig;
@@ -785,7 +785,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError((mNextExpectedMsg.HasValue() && payloadHeader.HasMessageType(mNextExpectedMsg.Value())) ||
-                        payloadHeader.HasMessageType(MsgType::StatusReport),
+                            payloadHeader.HasMessageType(MsgType::StatusReport),
                         CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     return CHIP_NO_ERROR;
@@ -836,7 +836,8 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
         break;
 
     case MsgType::StatusReport:
-        err = HandleStatusReport(std::move(msg), mNextExpectedMsg.HasValue() && (mNextExpectedMsg.Value() == MsgType::StatusReport));
+        err =
+            HandleStatusReport(std::move(msg), mNextExpectedMsg.HasValue() && (mNextExpectedMsg.Value() == MsgType::StatusReport));
         break;
 
     default:
