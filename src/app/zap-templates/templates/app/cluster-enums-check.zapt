@@ -1,0 +1,41 @@
+{{> header}}
+
+#pragma once
+
+#include <app-common/zap-generated/cluster-enums.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+{{#zcl_clusters}}
+{{#zcl_enums}}
+static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../name}}::{{asType label}} val)
+{
+    using EnumType = {{asUpperCamelCase ../name}}::{{asType label}};
+    switch (val) {
+{{#if (isWeaklyTypedEnum label)}}
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+{{/if}}
+    {{#zcl_enum_items}}
+    case EnumType::k{{asUpperCamelCase label}}:
+    {{/zcl_enum_items}}
+{{#if (isWeaklyTypedEnum label)}}
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+    {{#zcl_enum_items}}
+    case EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}:
+    {{/zcl_enum_items}}
+#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+{{/if}}
+        return val;
+    default:
+        return static_cast<EnumType>({{first_unused_enum_value mode="first_unused"}});
+    }
+}
+{{/zcl_enums}}
+
+{{/zcl_clusters}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

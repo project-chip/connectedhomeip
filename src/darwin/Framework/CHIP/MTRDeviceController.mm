@@ -156,6 +156,11 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
         _operationalCredentialsDelegate = nullptr;
     }
 
+    if (_otaProviderDelegateBridge) {
+        delete _otaProviderDelegateBridge;
+        _otaProviderDelegateBridge = nullptr;
+    }
+
     if (_pairingDelegateBridge) {
         delete _pairingDelegateBridge;
         _pairingDelegateBridge = nullptr;
@@ -345,7 +350,7 @@ static NSString * const kErrorCSRValidation = @"Extracting public key from CSR f
 
         std::string manualPairingCode;
         chip::SetupPayload payload;
-        payload.discriminator = discriminator;
+        payload.discriminator.SetLongValue(discriminator);
         payload.setUpPINCode = setupPINCode;
 
         auto errorCode = chip::ManualSetupPayloadGenerator(payload).payloadDecimalStringRepresentation(manualPairingCode);

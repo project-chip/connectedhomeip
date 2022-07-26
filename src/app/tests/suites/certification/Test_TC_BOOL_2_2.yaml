@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 68.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
+name: 67.2.2. [TC-BOOL-2.2] Primary Functionality with Server as DUT
 
 config:
     nodeId: 0x12344321
@@ -35,8 +35,6 @@ tests:
     - label: "TH reads the StateValue attribute from the DUT"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
-          Verify in TH Log:
-
           ./chip-tool booleanstate read state-value 1 1
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
@@ -52,8 +50,6 @@ tests:
     - label: "TH reads the StateValue attribute from the DUT"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.A0000
       verification: |
-          Verify in TH Log:
-
           ./chip-tool booleanstate read state-value 1 1
 
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
@@ -63,12 +59,19 @@ tests:
     - label: "Set up subscription to StateChange event"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
-          ./chip-tool booleanstate subscribe-event-by-id 0x0 1 100 2 1
+          Run the below command to start interactive mode
+          ./chip-tool interactive start
+
+          Subscribe the event using below command in Interactive mode. Once the event occurs, TH get the subscription message.
+
+           booleanstate subscribe-event-by-id 0x0 1 100 2 1
       disabled: true
 
     - label: "Bring the DUT into a state so StateValue is FALSE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
+          Verify in TH Log:
+
           [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: FALSE
       disabled: true
@@ -78,6 +81,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
+          Verify in TH Log:
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: FALSE
       disabled: true
@@ -85,6 +89,8 @@ tests:
     - label: "Bring the DUT into a state so StateValue is TRUE"
       PICS: BOOL.M.ManuallyControlled && BOOL.S.E00 && BOOL.S.A0000
       verification: |
+          Verify in TH Log:
+
           [1646119162.628169][3311:3316] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646119162.628207][3311:3316] CHIP:TOO:   StateValue: TRUE
       disabled: true
@@ -94,6 +100,7 @@ tests:
       verification: |
           ./chip-tool booleanstate read state-value 1 1
 
+          Verify in TH Log:
           [1646118838.087500][3279:3284] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0045 Attribute 0x0000_0000DataVersion: 2127727071
           [1646118838.087536][3279:3284] CHIP:TOO:   StateValue: TRUE
       disabled: true

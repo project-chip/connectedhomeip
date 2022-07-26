@@ -664,7 +664,7 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
          eventPathsSubscribedByCurrentFabric > perFabricPathCapacity ||
          subscriptionsEstablishedByCurrentFabric > perFabricSubscriptionCapacity))
     {
-        candidate->Abort();
+        candidate->Close();
         return true;
     }
     return false;
@@ -847,7 +847,7 @@ bool InteractionModelEngine::TrimFabricForRead(FabricIndex aFabricIndex)
          // Always evict the transactions on PASE sessions if the fabric table is full.
          (aFabricIndex == kUndefinedFabricIndex && mpFabricTable->FabricCount() == GetConfigMaxFabrics())))
     {
-        candidate->Abort();
+        candidate->Close();
         return true;
     }
     return false;

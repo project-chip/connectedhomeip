@@ -94,6 +94,10 @@ server cluster AccessControl = 31 {
   // These defaults can be modified to any of view/operate/manage/administer roles.
   attribute access(read: manage, write: administer) int32u customAcl = 3;
 
+  // Attributes may be fabric-scoped as well by tagging them as `fabric`.
+  fabric readonly attribute int16u myFabricAttr = 22;
+  fabric attribute(read: view, write: administer) int16u someFabricRWAttribute = 33;
+
   // attributes may be read-only as well
   readonly attribute int16u clusterRevision = 65533;
 
@@ -118,7 +122,13 @@ server cluster AccessControl = 31 {
   command access(invoke: administer) Off(): DefaultSuccess = 4;
 
   // command invocation can require timed invoke usage
-  timed command RequiresTimedInvok(): DefaultSuccess = 4;
+  timed command RequiresTimedInvok(): DefaultSuccess = 5;
+
+  // commands may be fabric scoped
+  fabric command RequiresTimedInvok(): DefaultSuccess = 6;
+
+  // commands may have multiple attributes
+  fabric timed command RequiresTimedInvok(): DefaultSuccess = 7;
 }
 
 // A client cluster represents something that is used by an app

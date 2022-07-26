@@ -131,6 +131,7 @@ public:
      * @param[in] nodeOperationalCertificate an X.509 DER-encoded operational certificate for this node
      * @param[in] ipkEpochKey the IPK epoch key to use for this node
      * @param[in] listenPort the UDP port to listen on
+     * @param[in] controllerVendorId the vendor ID identifying the controller
      * @param[in] failsafeTimerSeconds the failsafe timer in seconds
      * @param[in] attemptNetworkScanWiFi whether to attempt a network scan when configuring the network for a WiFi device
      * @param[in] attemptNetworkScanThread whether to attempt a network scan when configuring the network for a Thread device
@@ -142,8 +143,8 @@ public:
                 chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                 AndroidOperationalCredentialsIssuerPtr opCredsIssuer, jobject keypairDelegate, jbyteArray rootCertificate,
                 jbyteArray intermediateCertificate, jbyteArray nodeOperationalCertificate, jbyteArray ipkEpochKey,
-                uint16_t listenPort, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
-                CHIP_ERROR * errInfoOnFailure);
+                uint16_t listenPort, uint16_t controllerVendorId, uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi,
+                bool attemptNetworkScanThread, CHIP_ERROR * errInfoOnFailure);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;

@@ -29,7 +29,9 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "PDM.h"
-#include "RamStorage.h"
+#include "fsl_os_abstraction.h"
+#include "pdm_ram_storage_glue.h"
+#include "ram_storage.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -122,6 +124,7 @@ public:
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
+    static CHIP_ERROR WriteConfigValueSync(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
@@ -134,6 +137,12 @@ public:
     static bool ValidConfigKey(Key key);
 
     static void RunConfigUnitTest(void);
+
+    // Log error wrappers for OSA mutex lock/unlock.
+    static void MutexLock(osaMutexId_t mutexId, uint32_t millisec);
+    static void MutexUnlock(osaMutexId_t mutexId);
+
+    static osaMutexId_t pdmMutexHandle;
 
 protected:
     static constexpr uint8_t GetPDMId(uint32_t key);

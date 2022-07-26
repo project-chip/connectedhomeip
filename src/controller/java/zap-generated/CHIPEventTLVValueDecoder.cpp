@@ -319,12 +319,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                    value_latestValue_fabricIndex);
             }
 
-            jobject value_adminFabricIndex;
-            std::string value_adminFabricIndexClassName     = "java/lang/Integer";
-            std::string value_adminFabricIndexCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_adminFabricIndexClassName.c_str(),
-                                                                          value_adminFabricIndexCtorSignature.c_str(),
-                                                                          cppValue.adminFabricIndex, value_adminFabricIndex);
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_fabricIndexClassName.c_str(),
+                                                                          value_fabricIndexCtorSignature.c_str(),
+                                                                          cppValue.fabricIndex, value_fabricIndex);
 
             jclass accessControlEntryChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -347,7 +347,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jobject value =
                 env->NewObject(accessControlEntryChangedStructClass, accessControlEntryChangedStructCtor, value_adminNodeID,
-                               value_adminPasscodeID, value_changeType, value_latestValue, value_adminFabricIndex);
+                               value_adminPasscodeID, value_changeType, value_latestValue, value_fabricIndex);
 
             return value;
         }
@@ -434,12 +434,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                                    value_latestValue_fabricIndex);
             }
 
-            jobject value_adminFabricIndex;
-            std::string value_adminFabricIndexClassName     = "java/lang/Integer";
-            std::string value_adminFabricIndexCtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_adminFabricIndexClassName.c_str(),
-                                                                          value_adminFabricIndexCtorSignature.c_str(),
-                                                                          cppValue.adminFabricIndex, value_adminFabricIndex);
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_fabricIndexClassName.c_str(),
+                                                                          value_fabricIndexCtorSignature.c_str(),
+                                                                          cppValue.fabricIndex, value_fabricIndex);
 
             jclass accessControlExtensionChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -463,7 +463,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jobject value =
                 env->NewObject(accessControlExtensionChangedStructClass, accessControlExtensionChangedStructCtor, value_adminNodeID,
-                               value_adminPasscodeID, value_changeType, value_latestValue, value_adminFabricIndex);
+                               value_adminPasscodeID, value_changeType, value_latestValue, value_fabricIndex);
 
             return value;
         }
@@ -3394,11 +3394,12 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
-            jobject value_arg1;
-            std::string value_arg1ClassName     = "java/lang/Integer";
-            std::string value_arg1CtorSignature = "(I)V";
-            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-                value_arg1ClassName.c_str(), value_arg1CtorSignature.c_str(), cppValue.arg1, value_arg1);
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(value_fabricIndexClassName.c_str(),
+                                                                          value_fabricIndexCtorSignature.c_str(),
+                                                                          cppValue.fabricIndex, value_fabricIndex);
 
             jclass testFabricScopedEventStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -3417,7 +3418,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            jobject value = env->NewObject(testFabricScopedEventStructClass, testFabricScopedEventStructCtor, value_arg1);
+            jobject value = env->NewObject(testFabricScopedEventStructClass, testFabricScopedEventStructCtor, value_fabricIndex);
 
             return value;
         }

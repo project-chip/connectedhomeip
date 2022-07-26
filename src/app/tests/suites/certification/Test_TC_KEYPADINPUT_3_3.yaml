@@ -35,6 +35,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x21
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers2"
       PICS: KEYPADINPUT.S.NK
@@ -43,6 +47,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x22
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers3"
       PICS: KEYPADINPUT.S.NK
@@ -51,6 +59,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x23
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers4"
       PICS: KEYPADINPUT.S.NK
@@ -59,6 +71,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x24
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers5"
       PICS: KEYPADINPUT.S.NK
@@ -67,6 +83,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x25
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers6"
       PICS: KEYPADINPUT.S.NK
@@ -75,6 +95,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x26
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers7"
       PICS: KEYPADINPUT.S.NK
@@ -83,6 +107,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x27
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers8"
       PICS: KEYPADINPUT.S.NK
@@ -91,6 +119,10 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x28
+      response:
+          values:
+              - name: "status"
+                value: 0
 
     - label: "Send Numbers9"
       PICS: KEYPADINPUT.S.NK
@@ -99,3 +131,7 @@ tests:
           values:
               - name: "keyCode"
                 value: 0x29
+      response:
+          values:
+              - name: "status"
+                value: 0

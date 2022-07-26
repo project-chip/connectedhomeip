@@ -20,6 +20,11 @@ import("${build_root}/config/linux/pkg_config.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+  import("//build_overrides/ot_br_posix.gni")
+}
+
 assert(chip_device_platform == "tizen")
 
 static_library("Tizen") {
@@ -29,9 +34,6 @@ static_library("Tizen") {
     "../SingletonConfigurationManager.cpp",
     "AppPreference.cpp",
     "AppPreference.h",
-    "BLEManagerImpl.cpp",
-    "BLEManagerImpl.h",
-    "BlePlatformConfig.h",
     "CHIPDevicePlatformConfig.h",
     "CHIPDevicePlatformEvent.h",
     "CHIPPlatformConfig.h",
@@ -41,6 +43,8 @@ static_library("Tizen") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
     "DeviceInstanceInfoProviderImpl.cpp",
     "DeviceInstanceInfoProviderImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
@@ -54,16 +58,13 @@ static_library("Tizen") {
     "MainLoop.cpp",
     "MainLoop.h",
     "NetworkCommissioningDriver.h",
-    "NetworkCommissioningThreadDriver.cpp",
-    "NetworkCommissioningWiFiDriver.cpp",
+    "NetworkCommissioningEthernetDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
-    "WiFiManager.cpp",
-    "WiFiManager.h",
   ]
 
   deps = [ "${chip_root}/src/setup_payload" ]
@@ -76,15 +77,35 @@ static_library("Tizen") {
   public_configs = []
 
   if (chip_mdns == "platform") {
-    sources += [ "DnssdImpl.cpp" ]
+    sources += [
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
+    ]
 
     deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
+  if (chip_enable_ble) {
+    sources += [
+      "BLEManagerImpl.cpp",
+      "BLEManagerImpl.h",
+      "BlePlatformConfig.h",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
+      "NetworkCommissioningThreadDriver.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
+    ]
+  }
+
+  if (chip_enable_wifi) {
+    sources += [
+      "NetworkCommissioningWiFiDriver.cpp",
+      "WiFiManager.cpp",
+      "WiFiManager.h",
     ]
   }
 }

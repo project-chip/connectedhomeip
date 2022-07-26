@@ -41,6 +41,34 @@ class ExchangeContext;
  *   called by ExchangeContext object on specific events. If the user of ExchangeContext
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
+ *
+ *   For consumers who use an ExchangeContext to send/receive protocol messages, there are specific
+ *   expectations around who manages the exchange w.r.t clean-up and destruction:
+ *     1. When you allocate an exchange, you own the exchange. Until you send a message successfully, it's on you
+ *        to release that ownership by calling Close or Abort on the exchange.
+ *
+ *     2. If you send a message successfully that doesn't require a response, the ownership transfers to
+ *        the ExchangeMgr, and it will close the exchange for you automatically.
+ *
+ *     3. If you send a message successfully that does require a response and desire to close it before
+ *        you get any notifications on that exchange from the ExchangeMgr, you should call Close or Abort on that exchange.
+ *
+ *     4. On reception of a message on an exchange, the ownership transfers to the OnMessageReceived callee.
+ *        If you return from OnMessageReceived and no messages were sent on that exchange, the exchange will transfer back
+ *        to the ExchangeMgr and it will automatically close it.
+ *
+ *     5. If you call WillSendMessage on the exchange in OnMessageReceived indicating a desire to send a message later
+ *        on the exchange, then the exchange remains with you, and it's your responsibility to either send a message on it,
+ *        or Close/Abort if you no longer wish to have the exchange around.
+ *
+ *     6. If you get a call to OnExchangeClosing, you should give up your reference to the exchange
+ *        by 'nulling' out your reference to the exchange. The exchange will be automatically closed by the ExchangeMgr.
+ *
+ *     6. If you get a call to OnResponseTimeout, you should give up your reference to the exchange
+ *        by 'nulling' out your reference to the exchange UNLESS you intend to do further work on the exchange. If so,
+ *        rules 2, 3 and 5 apply. Otherwise, the exchange will be automatically closed by the ExchangeMgr. Note that
+ *        if the cause of the call is the release of the underlying session, attempts to send a message will result in failure.
+ *
  */
 class DLL_EXPORT ExchangeDelegate
 {

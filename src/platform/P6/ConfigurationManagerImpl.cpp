@@ -238,5 +238,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     NVIC_SystemReset();
 }
 
+ConfigurationManager & ConfigurationMgrImpl()
+{
+    return ConfigurationManagerImpl::GetDefaultInstance();
+}
+
 } // namespace DeviceLayer
 } // namespace chip

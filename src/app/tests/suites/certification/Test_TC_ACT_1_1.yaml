@@ -45,6 +45,14 @@ tests:
               type: map32
 
     - label: "Read the global attribute: AttributeList"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
+
+    - label: "Read the optional attribute(SetupURL) in AttributeList"
       PICS: ACT.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -53,22 +61,14 @@ tests:
               type: list
               contains: [0, 1, 2]
 
-    - label: "Read the global attribute: AttributeList"
-      PICS: " !ACT.S.A0002 "
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [0, 1]
-
+    # Checking only type check all attributes are optional
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
-          value: []
           constraints:
               type: list
+              maxLength: 11
 
     - label: "Read the global attribute: GeneratedCommandList"
       command: "readAttribute"

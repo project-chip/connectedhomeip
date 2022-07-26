@@ -282,12 +282,7 @@ void InitPlatform(void)
 {
     bl_sys_init();
 
-    uint32_t fdt = 0, offset = 0;
-    if (0 == get_dts_addr("gpio", &fdt, &offset))
-    {
-        hal_gpio_init_from_dts(fdt, offset);
-        fdt_button_module_init((const void *) fdt, (int) offset);
-    }
+    hal_button_module_init(8, 1000, 4800, 5000);
     Platform_Light_Init();
     aos_register_event_filter(EV_KEY, event_cb_key_event, NULL);
 }

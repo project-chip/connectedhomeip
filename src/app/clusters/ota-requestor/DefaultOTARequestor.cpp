@@ -289,6 +289,9 @@ void DefaultOTARequestor::OnApplyUpdateResponse(void * context, const ApplyUpdat
         requestorCore->mOtaRequestorDriver->UpdateDiscontinued();
         requestorCore->RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
         break;
+    case OTAApplyUpdateAction::kUnknownEnumValue:
+        OnApplyUpdateFailure(context, CHIP_ERROR_INVALID_ARGUMENT);
+        break;
     }
 }
 
@@ -363,23 +366,13 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
         return;
     }
 
-    const FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
-
-    if (fabricInfo == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot find fabric");
-        RecordErrorUpdateState(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
-    mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID),
-                                                &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -393,17 +386,9 @@ void DefaultOTARequestor::DisconnectFromProvider()
         return;
     }
 
-    const FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderLocation.Value().fabricIndex);
-    if (fabricInfo == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Cannot find fabric");
-        RecordErrorUpdateState(CHIP_ERROR_INCORRECT_STATE);
-        return;
-    }
-
-    PeerId peerID = fabricInfo->GetPeerIdForNode(mProviderLocation.Value().providerNodeID);
-    mCASESessionManager->FindExistingSession(peerID)->Disconnect();
-    mCASESessionManager->ReleaseSession(peerID);
+    auto providerNodeId = GetProviderScopedId();
+    mCASESessionManager->FindExistingSession(providerNodeId)->Disconnect();
+    mCASESessionManager->ReleaseSession(providerNodeId);
 }
 
 // Requestor is directed to cancel image update in progress. All the Requestor state is
@@ -489,7 +474,7 @@ void DefaultOTARequestor::OnConnected(void * context, OperationalDeviceProxy * d
 }
 
 // Called whenever FindOrEstablishSession fails
-void DefaultOTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
+void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);

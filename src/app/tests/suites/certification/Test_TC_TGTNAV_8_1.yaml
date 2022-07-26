@@ -41,6 +41,8 @@ tests:
       response:
           constraints:
               type: uint8
+              minValue: 0
+              maxValue: 255
 
     - label: "Reads the TargetList attribute"
       PICS: TGTNAV.S.A0000
@@ -60,7 +62,7 @@ tests:
                 value: targetvalue1
 
     - label: "Reads the CurrentTarget attribute"
-      PICS: TGTNAV.S.A0001
+      PICS: TGTNAV.S.A0001 && TGTNAV.S.C0000
       command: "readAttribute"
       attribute: "CurrentTarget"
       response:

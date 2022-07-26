@@ -132,30 +132,6 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
         }
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
-    if (dispatchQueue != nullptr)
-    {
-        unsigned long fd = static_cast<unsigned long>(mSocket);
-
-        mReadableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, fd, 0, dispatchQueue);
-        ReturnErrorCodeIf(mReadableSource == nullptr, CHIP_ERROR_NO_MEMORY);
-
-        mWriteableSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_WRITE, fd, 0, dispatchQueue);
-        ReturnErrorCodeIf(mWriteableSource == nullptr, CHIP_ERROR_NO_MEMORY);
-
-        dispatch_source_set_event_handler(mReadableSource, ^{
-            this->HandlePendingIO(System::SocketEventFlags::kRead);
-        });
-
-        dispatch_source_set_event_handler(mWriteableSource, ^{
-            this->HandlePendingIO(System::SocketEventFlags::kWrite);
-        });
-
-        dispatch_resume(mReadableSource);
-        dispatch_resume(mWriteableSource);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
     return res;
 }
 
@@ -648,19 +624,6 @@ void TCPEndPointImplSockets::DoCloseImpl(CHIP_ERROR err, State oldState)
             mSocket = kInvalidSocketFd;
         }
     }
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    if (mReadableSource)
-    {
-        dispatch_source_cancel(mReadableSource);
-        dispatch_release(mReadableSource);
-    }
-    if (mWriteableSource)
-    {
-        dispatch_source_cancel(mWriteableSource);
-        dispatch_release(mWriteableSource);
-    }
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 }
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT

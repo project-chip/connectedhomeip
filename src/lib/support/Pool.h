@@ -151,7 +151,7 @@ struct HeapObjectListNode
 
 struct HeapObjectList : HeapObjectListNode
 {
-    HeapObjectList() : mIterationDepth(0) { mNext = mPrev = this; }
+    HeapObjectList() { mNext = mPrev = this; }
 
     void Append(HeapObjectListNode * node)
     {
@@ -170,7 +170,8 @@ struct HeapObjectList : HeapObjectListNode
         return const_cast<HeapObjectList *>(this)->ForEachNode(context, reinterpret_cast<Lambda>(lambda));
     }
 
-    size_t mIterationDepth;
+    size_t mIterationDepth         = 0;
+    bool mHaveDeferredNodeRemovals = false;
 };
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -364,6 +365,10 @@ public:
                 {
                     node->Remove();
                     Platform::Delete(node);
+                }
+                else
+                {
+                    mObjects.mHaveDeferredNodeRemovals = true;
                 }
 
                 DecreaseUsage();

@@ -27,74 +27,37 @@ tests:
           "Place TH1 into commissioning mode using the TH manufacturers means to
           be discovered by a commissioner"
       verification: |
-          After launching all-clusters-app using discriminator 3841 using below command
-          sudo ./chip-all-clusters-app --wifi --discriminator 3841
+          1. After launching all-clusters-app using discriminator 3841 using below command
+          $ ./out/all-clusters-app/chip-all-clusters-app --wifi --discriminator 3841
 
-          ./chip-tool discover commissionables
-          [1654068872.283184][8000:8005] CHIP:DL: Avahi resolve found
-          [1654068872.283316][8000:8005] CHIP:DIS:         Hostname: E45F010F19FF0000
-          [1654068872.283374][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:19ff
-          [1654068872.283419][8000:8005] CHIP:DIS:         Port: 5540
-          [1654068872.283460][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
-          [1654068872.283503][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
-          [1654068872.283563][8000:8005] CHIP:DIS:         Vendor ID: 65521
-          [1654068872.283605][8000:8005] CHIP:DIS:         Product ID: 32769
-          [1654068872.283646][8000:8005] CHIP:DIS:         Long Discriminator: 3844
-          [1654068872.283687][8000:8005] CHIP:DIS:         Pairing Hint: 33
-          [1654068872.283728][8000:8005] CHIP:DIS:         Instance Name: C50FE94C4952D393
-          [1654068872.283768][8000:8005] CHIP:DIS:         Commissioning Mode: 1
-          [1654068872.285052][8000:8005] CHIP:DL: Avahi resolve found
-          [1654068872.285156][8000:8005] CHIP:DIS:         Hostname: E45F010F27530000
-          [1654068872.285211][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
-          [1654068872.285254][8000:8005] CHIP:DIS:         Port: 5540
-          [1654068872.285296][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
-          [1654068872.285337][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
-          [1654068872.285378][8000:8005] CHIP:DIS:         Vendor ID: 65521
-          [1654068872.285418][8000:8005] CHIP:DIS:         Product ID: 32769
-          [1654068872.285458][8000:8005] CHIP:DIS:         Long Discriminator: 3841
-          [1654068872.285498][8000:8005] CHIP:DIS:         Pairing Hint: 33
-          [1654068872.285538][8000:8005] CHIP:DIS:         Instance Name: DC47D37251924E87
-          [1654068872.285579][8000:8005] CHIP:DIS:         Commissioning Mode: 1
+          $ dns-sd -B _matterc._udp,_L3841
+          Browsing for _matterc._udp,_L3841
+          DATE: ---Thu 07 Jul 2022---
+          17:39:06.762  ...STARTING...
+          Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
+          17:39:06.764  Add        2   7 local.               _matterc._udp.       930430C7C701B844
       disabled: true
 
     - label:
           "Place TH2 into commissioning mode using the TH manufacturers means to
           be discovered by a commissioner"
       verification: |
-          After launching all-clusters-app using discriminator 3844 using below command
+          1. After launching all-clusters-app using discriminator 3844 using below command
           sudo ./chip-all-clusters-app --wifi --discriminator 3844
 
-          ./chip-tool discover commissionables
-          [1654068872.283184][8000:8005] CHIP:DL: Avahi resolve found
-          [1654068872.283316][8000:8005] CHIP:DIS:         Hostname: E45F010F19FF0000
-          [1654068872.283374][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:19ff
-          [1654068872.283419][8000:8005] CHIP:DIS:         Port: 5540
-          [1654068872.283460][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
-          [1654068872.283503][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
-          [1654068872.283563][8000:8005] CHIP:DIS:         Vendor ID: 65521
-          [1654068872.283605][8000:8005] CHIP:DIS:         Product ID: 32769
-          [1654068872.283646][8000:8005] CHIP:DIS:         Long Discriminator: 3844
-          [1654068872.283687][8000:8005] CHIP:DIS:         Pairing Hint: 33
-          [1654068872.283728][8000:8005] CHIP:DIS:         Instance Name: C50FE94C4952D393
-          [1654068872.283768][8000:8005] CHIP:DIS:         Commissioning Mode: 1
-          [1654068872.285052][8000:8005] CHIP:DL: Avahi resolve found
-          [1654068872.285156][8000:8005] CHIP:DIS:         Hostname: E45F010F27530000
-          [1654068872.285211][8000:8005] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe0f:2755
-          [1654068872.285254][8000:8005] CHIP:DIS:         Port: 5540
-          [1654068872.285296][8000:8005] CHIP:DIS:         Mrp Interval idle: 5000 ms
-          [1654068872.285337][8000:8005] CHIP:DIS:         Mrp Interval active: 300 ms
-          [1654068872.285378][8000:8005] CHIP:DIS:         Vendor ID: 65521
-          [1654068872.285418][8000:8005] CHIP:DIS:         Product ID: 32769
-          [1654068872.285458][8000:8005] CHIP:DIS:         Long Discriminator: 3841
-          [1654068872.285498][8000:8005] CHIP:DIS:         Pairing Hint: 33
-          [1654068872.285538][8000:8005] CHIP:DIS:         Instance Name: DC47D37251924E87
-          [1654068872.285579][8000:8005] CHIP:DIS:         Commissioning Mode: 1
+          $ dns-sd -B _matterc._udp,_L3844
+          Browsing for _matterc._udp,_L3844
+          DATE: ---Thu 07 Jul 2022---
+          17:39:35.265  ...STARTING...
+          Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
+          17:40:17.959  Add        2   7 local.               _matterc._udp.       8F1FEB734CE46129
       disabled: true
 
     - label: "Scan TH1s QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
@@ -103,24 +66,21 @@ tests:
           the TH Commissionees method of device discovery"
       verification: |
           TH1 Commissionee:
-          [1651109784.452770][31207:31207] CHIP:SVR: Commissioning completed successfully
-          [1651109784.452813][31207:31207] CHIP:DIS: Updating services using commissioning mode 0
+          [1657240914.891250][372173:372173] CHIP:SVR: Commissioning completed successfully
+          [1657240914.891297][372173:372173] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 1 MT:-24J0AFN00KA0648G00
+          $ ./chip-tool pairing code 1 MT:-24J0IRV01KA0648G00
 
-          [1651109784376] [95553:65657838] CHIP: [CTL] Received CommissioningComplete response
-          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651109784376] [95553:65657838] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651109784376] [95553:65657838] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651109784376] [95553:65657838] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1651109784376] [95553:65657838] CHIP: [TOO] Device commissioning completed with success
+          [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657240914764] [32262:16895870] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label: "Scan TH2s QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
-          1. Verify the QR code is scanned by DUT, chip-tool does not support physically scanning QR codes
+          1. Verify the QR code is scanned by DUT
+          Note: chip-tool does not support physically scanning QR codes
       disabled: true
 
     - label:
@@ -129,34 +89,30 @@ tests:
           the TH Commissionees method of device discovery"
       verification: |
           TH2 Commissionee:
-          [1651109919.159014][11588:11588] CHIP:SVR: Commissioning completed successfully
-          [1651109919.159067][11588:11588] CHIP:DIS: Updating services using commissioning mode 0
+          [1657240985.801360][112581:112581] CHIP:SVR: Commissioning completed successfully
+          [1657240985.801406][112581:112581] CHIP:DIS: Updating services using commissioning mode 0
 
           DUT Commissioner:
-          $ ./out/chip-tool/chip-tool pairing qrcode 2 MT:-24J04QI14KA0648G00
+          $ ./chip-tool pairing code 2 MT:-24J04QI14KA0648G00
 
-          [1651109919079] [95563:65659558] CHIP: [CTL] Received CommissioningComplete response
-          [1651109919079] [95563:65659558] CHIP: [CTL] Successfully finished commissioning step 'SendComplete'
-          [1651109919079] [95563:65659558] CHIP: [CTL] Commissioning stage next step: 'SendComplete' -> 'Cleanup'
-          [1651109919079] [95563:65659558] CHIP: [CTL] Performing next commissioning step 'Cleanup'
-          [1651109919079] [95563:65659558] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
-          [1651109919079] [95563:65659558] CHIP: [TOO] Device commissioning completed with success
+          [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
+          [1657240985682] [32264:16896797] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
           "Verify the Commissioner can still interact with TH1 (ex: Read any
           clusters attribute from TH1)"
       verification: |
-          $ ./out/chip-tool/chip-tool basic read reachable 1 0
-          [1651110057235] [95634:65662038] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 3647361086
-          [1651110057235] [95634:65662038] CHIP: [TOO]   Reachable: TRUE
+          $ ./chip-tool basic read reachable 1 0
+          [1657241043430] [32266:16897416] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 131004400
+          [1657241043432] [32266:16897416] CHIP: [TOO]   Reachable: TRUE
       disabled: true
 
     - label:
           "Verify the Commissioner can still interact with TH2 (ex: Read any
           clusters attribute from TH2)"
       verification: |
-          $ ./out/chip-tool/chip-tool basic read reachable 2 0
-          [1651110080978] [95636:65662333] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 3234420698
-          [1651110080978] [95636:65662333] CHIP: [TOO]   Reachable: TRUE
+          $ ./chip-tool basic read reachable 2 0
+          [1657241066927] [32267:16897671] CHIP: [TOO] Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0011 DataVersion: 2450774961
+          [1657241066927] [32267:16897671] CHIP: [TOO]   Reachable: TRUE
       disabled: true

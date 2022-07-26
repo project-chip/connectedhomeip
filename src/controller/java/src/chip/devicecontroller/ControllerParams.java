@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 public final class ControllerParams {
 
   private final int udpListenPort;
+  private final int controllerVendorId;
   @Nullable private final KeypairDelegate keypairDelegate;
   @Nullable private final byte[] rootCertificate;
   @Nullable private final byte[] intermediateCertificate;
@@ -20,6 +21,7 @@ public final class ControllerParams {
   /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
     this.udpListenPort = builder.udpListenPort;
+    this.controllerVendorId = builder.controllerVendorId;
     this.keypairDelegate = builder.keypairDelegate;
     this.rootCertificate = builder.rootCertificate;
     this.intermediateCertificate = builder.intermediateCertificate;
@@ -30,6 +32,10 @@ public final class ControllerParams {
   /** Gets the UDP listening port; 0 indicates "any available port" */
   public int getUdpListenPort() {
     return udpListenPort;
+  }
+
+  public int getControllerVendorId() {
+    return controllerVendorId;
   }
 
   public KeypairDelegate getKeypairDelegate() {
@@ -85,6 +91,7 @@ public final class ControllerParams {
   /** Builder for {@link ControllerParams}. */
   public static class Builder {
     private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
+    private int controllerVendorId = 0xFFFF;
     @Nullable private KeypairDelegate keypairDelegate = null;
     @Nullable private byte[] rootCertificate = null;
     @Nullable private byte[] intermediateCertificate = null;
@@ -104,6 +111,11 @@ public final class ControllerParams {
       return this;
     }
 
+    public Builder setControllerVendorId(int controllerVendorId) {
+      this.controllerVendorId = controllerVendorId;
+      return this;
+    }
+    
     public Builder setFailsafeTimerSeconds(int failsafeTimerSeconds) {
       if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
         throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");

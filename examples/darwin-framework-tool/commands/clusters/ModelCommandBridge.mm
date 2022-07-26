@@ -53,4 +53,8 @@ CHIP_ERROR ModelCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-void ModelCommand::Shutdown() { ResetArguments(); }
+void ModelCommand::Shutdown()
+{
+    ResetArguments();
+    CHIPCommandBridge::Shutdown();
+}

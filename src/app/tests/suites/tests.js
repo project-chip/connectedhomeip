@@ -63,6 +63,7 @@ function getManualTests() {
         "Test_TC_DD_3_18",
         "Test_TC_DD_3_19",
         "Test_TC_DD_3_20",
+        "Test_TC_DD_3_21",
     ];
 
     const Groups = [
@@ -137,6 +138,7 @@ function getManualTests() {
         "Test_TC_CNET_4_19",
         "Test_TC_CNET_4_20",
         "Test_TC_CNET_4_21",
+        "Test_TC_CNET_4_22",
     ];
 
     const DiagnosticsLogs = [
@@ -234,8 +236,8 @@ function getManualTests() {
         "Test_TC_CADMIN_1_8",
         "Test_TC_CADMIN_1_11",
         "Test_TC_CADMIN_1_12",
-        "Test_TC_CADMIN_1_13",
         "Test_TC_CADMIN_1_14",
+        "Test_TC_CADMIN_1_15",
         "Test_TC_CADMIN_1_16",
         "Test_TC_CADMIN_1_17",
         "Test_TC_CADMIN_1_18",
@@ -243,18 +245,16 @@ function getManualTests() {
         "Test_TC_CADMIN_1_20",
         "Test_TC_CADMIN_1_21",
         "Test_TC_CADMIN_1_22",
-        "Test_TC_CADMIN_1_23",
-        "Test_TC_CADMIN_1_24",
-        "Test_TC_CADMIN_1_25",
-        "Test_TC_CADMIN_1_26",
-        "Test_TC_CADMIN_1_27",
-        "Test_TC_CADMIN_1_28",
         // Slow tests that should not run in CI because they take many minutes each
+        "Test_TC_CADMIN_1_3",
+        "Test_TC_CADMIN_1_4",
         "Test_TC_CADMIN_1_5",
         "Test_TC_CADMIN_1_6",
         "Test_TC_CADMIN_1_9",
         "Test_TC_CADMIN_1_10",
-        "Test_TC_CADMIN_1_15",
+        "Test_TC_CADMIN_1_13",
+        "Test_TC_CADMIN_1_23",
+        "Test_TC_CADMIN_1_24",
     ];
 
     const ModeSelect = [
@@ -371,6 +371,8 @@ function getManualTests() {
         "Test_TC_CC_7_5",
         "Test_TC_CC_9_4",
         // Slow tests that should not run in CI because they take many minutes each
+        "Test_TC_CC_3_1",
+        "Test_TC_CC_7_1",
         "Test_TC_CC_9_1",
         "Test_TC_CC_9_2",
         "Test_TC_CC_9_3",
@@ -411,7 +413,6 @@ function getManualTests() {
     ];
 
     const Switch = [
-        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_2",
         "Test_TC_SWTCH_3_1",
         "Test_TC_SWTCH_3_2",
@@ -501,6 +502,11 @@ function getManualTests() {
         "Test_TC_ACL_2_10",
     ];
 
+    const UserLabel = [
+        "Test_TC_ULABEL_3_1",
+    ];
+
+
     const tests = [
         DeviceDiscovery,
         Groups,
@@ -549,6 +555,7 @@ function getManualTests() {
         Scenes,
         PumpConfigurationControl,
         AccessControl,
+        UserLabel,
     ].flat(1);
 
     tests.disable = disable.bind(tests);
@@ -572,7 +579,6 @@ function getTests() {
     const ColorControl = [
         "Test_TC_CC_1_1",
         "Test_TC_CC_2_1",
-        "Test_TC_CC_3_1",
         "Test_TC_CC_3_2",
         "Test_TC_CC_3_3",
         "Test_TC_CC_4_1",
@@ -585,7 +591,6 @@ function getTests() {
         "Test_TC_CC_6_1",
         "Test_TC_CC_6_2",
         "Test_TC_CC_6_3",
-        "Test_TC_CC_7_1",
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
@@ -652,7 +657,6 @@ function getTests() {
         "Test_TC_ULABEL_2_2",
         "Test_TC_ULABEL_2_3",
         "Test_TC_ULABEL_2_4",
-        "Test_TC_ULABEL_3_1",
     ];
 
     const MediaControl = [
@@ -699,8 +703,6 @@ function getTests() {
     ];
 
     const MultipleFabrics = [
-        "Test_TC_CADMIN_1_3",
-        "Test_TC_CADMIN_1_4",
     ];
 
     const OTASoftwareUpdate = [
@@ -746,6 +748,7 @@ function getTests() {
     ];
 
     const Switch = [
+        "Test_TC_SWTCH_1_1",
         "Test_TC_SWTCH_2_1",
     ];
 
@@ -813,6 +816,7 @@ function getTests() {
     ];
 
     const Others = [
+        "TestCASERecovery",
         "TestCluster",
         "TestClusterComplexTypes",
         "TestConstraints",
@@ -836,6 +840,8 @@ function getTests() {
         "TestUserLabelClusterConstraints",
         "TestArmFailSafe",
         "TestFanControl",
+        "TestAccessControlConstraints",
+        "TestLevelControlWithOnOffDependency"
     ];
 
     const MultiAdmin = [

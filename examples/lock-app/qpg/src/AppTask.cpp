@@ -92,15 +92,15 @@ void UnlockOpenThreadTask(void)
 CHIP_ERROR AppTask::StartAppTask()
 {
     sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
-    if (sAppEventQueue == NULL)
+    if (sAppEventQueue == nullptr)
     {
         ChipLogError(NotSpecified, "Failed to allocate app event queue");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     // Start App task.
-    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    if (sAppTaskHandle == NULL)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), nullptr, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -108,30 +108,8 @@ CHIP_ERROR AppTask::StartAppTask()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AppTask::Init()
+void AppTask::InitServer(intptr_t arg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
-
-    err = BoltLockMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "BoltLockMgr().Init() failed");
-        return err;
-    }
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-    // Subscribe with our button callback to the qvCHIP button handler.
-    qvIO_SetBtnCallback(ButtonEventHandler);
-
-    qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
-#endif
-
-    // Init ZCL Data Model
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
@@ -145,11 +123,35 @@ CHIP_ERROR AppTask::Init()
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
     chip::Server::GetInstance().Init(initParams);
 
-    // Init OTA engine
-    InitializeOTARequestor();
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
+}
+CHIP_ERROR AppTask::Init()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
+    // Init ZCL Data Model and start server
+    PlatformMgr().ScheduleWork(InitServer, 0);
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    // Setup Bolt
+    err = BoltLockMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "BoltLockMgr().Init() failed");
+        return err;
+    }
+    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+    // Setup button handler
+    qvIO_SetBtnCallback(ButtonEventHandler);
+
+    qvIO_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
     UpdateClusterState();
 
@@ -167,7 +169,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "AppTask.Init() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        // appError(err);
     }
 
     ChipLogProgress(NotSpecified, "App Task started");

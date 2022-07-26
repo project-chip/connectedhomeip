@@ -195,7 +195,7 @@ class {{filename}}: public TestCommandBridge
 
             {{#chip_tests_item_responses}}
             {{#if error}}
-              VerifyOrReturn(CheckValue("status", err ? err.code : 0, {{error}}));
+              VerifyOrReturn(CheckValue("status", err ? ([err.domain isEqualToString:MTRInteractionErrorDomain] ? err.code : EMBER_ZCL_STATUS_FAILURE) : 0, {{error}}));
               NextTest();
             {{else}}
               VerifyOrReturn(CheckValue("status", err ? err.code : 0, 0));

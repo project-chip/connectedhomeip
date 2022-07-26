@@ -23,12 +23,14 @@ repo:
 ############################################################
 examples:
     - examples/*
+    - examples/**/*
 
 ############################################################
 #  Documentation
 ############################################################
 documentation:
     - docs/*
+    - docs/**/*
     - "*.md"
 
 ############################################################
@@ -36,134 +38,185 @@ documentation:
 ############################################################
 scripts:
     - scripts/*
+    - scripts/**/*
 
 integrations:
     - integrations/*
+    - integrations/**/*
 
 vscode:
-    - .vscode
-    - .devcontainer
+    - .vscode/*
+    - .vscode/**/*
+    - .devcontainer/*
+    - .devcontainer/**/*
 
 gn:
     - build/*
+    - build/**/*
     - build_overrides/*
+    - build_overrides/**/*
     - .gn
     - "*.gn"
     - "*.gni"
 
 github:
     - .github
+    - .github/*
+    - .github/**/*
 
 workflows:
     - .github/workflows/*
+    - .github/workflows/**/*
 
 tools:
+    - src/tools/*
+    - src/tools/**/*
     - tools/*
+    - tools/**/*
+    - examples/chip-tool/*
+    - examples/chip-tool/**/*
 
 ############################################################
 #  Tests
 ############################################################
 tests:
     - src/app/tests/*
-    - src/app/tests/suites/*
-    - src/app/tests/suites/certification/*
+    - src/app/tests/**/*
 
 test driver:
     - src/test_driver/*
+    - src/test_driver/**/*
 
 ############################################################
 #  Source Code
 ############################################################
 qr code:
     - src/qrcode/*
+    - src/qrcode/**/*
     - src/qrcodetool/*
+    - src/qrcodetool/**/*
 
 lwip:
     - src/lwip/*
+    - src/lwip/**/*
 
 inet:
     - src/inet/*
+    - src/inet/**/*
 
 config:
     - config/*
+    - config/**/*
 
 lib:
     - src/lib/*
+    - src/lib/**/*
 
 core:
     - src/lib/core/*
+    - src/lib/core/**/*
 
 protocols:
     - src/lib/protocols/*
+    - src/lib/protocols/**/*
 
 shell:
     - src/lib/shell/*
+    - src/lib/shell/**/*
 
 support:
     - src/lib/support/*
+    - src/lib/support/**/*
 
 crypto:
     - src/crypto/*
+    - src/crypto/**/*
 
 controller:
     - src/controller/*
+    - src/controller/**/*
 
 ble:
     - src/ble/*
+    - src/ble/**/*
 
 android:
     - src/android/*
+    - src/android/**/*
 
 app:
     - src/app/*
+    - src/app/**/*
 
 transport:
     - src/transport/*
+    - src/transport/**/*
 
 system:
     - src/system/*
+    - src/system/**/*
 
 setup payload:
     - src/setup_payload/*
+    - src/setup_payload/**/*
 
 ############################################################
 #  Platforms
 ############################################################
 platform:
     - src/platform/*
+    - src/platform/**/*
     - config/tizen/chip-gn/platform/*
+    - config/tizen/chip-gn/platform/**/*
     - examples/platform/*
+    - examples/platform/**/*
     - scripts/tools/memory/platform/*
+    - scripts/tools/memory/platform/**/*
     - src/include/platform/*
+    - src/include/platform/**/*
     - src/lib/dnssd/platform/*
+    - src/lib/dnssd/platform/**/*
 
 darwin:
     - src/platform/Darwin/*
+    - src/platform/Darwin/**/*
     - src/darwin/*
+    - src/darwin/**/*
+    - examples/darwin-framework-tool/*
+    - examples/darwin-framework-tool/**/*
 
 efr32:
     - src/platform/EFR32/*
+    - src/platform/EFR32/**/*
 
 esp32:
     - src/platform/ESP32/*
+    - src/platform/ESP32/**/*
 
 freeRTOS:
     - src/platform/FreeRTOS/*
+    - src/platform/FreeRTOS/**/*
 
 k32w:
     - src/platform/K32W/*
+    - src/platform/K32W/**/*
 
 linux:
     - src/platform/Linux/*
+    - src/platform/Linux/**/*
 
 nrf connect:
     - src/platform/nrfconnect/*
+    - src/platform/nrfconnect/**/*
 
 openthread:
     - src/platform/openthread/*
+    - src/platform/openthread/**/*
 
 zephyr:
     - src/platform/Zephyr/*
+    - src/platform/Zephyr/**/*
 
 telink:
     - src/platform/telink/*
+    - src/platform/telink/**/*

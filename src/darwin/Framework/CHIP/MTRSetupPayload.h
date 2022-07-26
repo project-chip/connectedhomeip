@@ -57,6 +57,7 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @property (nonatomic, assign) MTRCommissioningFlow commissioningFlow;
 @property (nonatomic, assign) MTRRendezvousInformationFlags rendezvousInformation;
 @property (nonatomic, strong) NSNumber * discriminator;
+@property (nonatomic) BOOL hasShortDiscriminator;
 @property (nonatomic, strong) NSNumber * setUpPINCode;
 
 @property (nonatomic, strong) NSString * serialNumber;

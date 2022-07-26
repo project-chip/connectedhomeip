@@ -24,9 +24,23 @@
 
 @interface CastingServerBridge : NSObject
 
-@property void (^_Nullable commissioningCompleteCallback)(bool);
+@property void (^_Nonnull commissioningCompleteCallback)(bool);
 
-@property void (^_Nullable launchUrlResponseCallback)(bool);
+@property void (^_Nonnull contentLauncher_launchUrlResponseCallback)(bool);
+@property void (^_Nonnull levelControl_stepResponseCallback)(bool);
+@property void (^_Nonnull levelControl_moveToLevelResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_playResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_pauseResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_stopPlaybackResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_nextResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_seekResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_skipForwardResponseCallback)(bool);
+@property void (^_Nonnull mediaPlayback_skipBackwardResponseCallback)(bool);
+@property void (^_Nonnull applicationLauncher_launchAppResponseCallback)(bool);
+@property void (^_Nonnull applicationLauncher_stopAppResponseCallback)(bool);
+@property void (^_Nonnull applicationLauncher_hideAppResponseCallback)(bool);
+@property void (^_Nonnull targetNavigator_navigateTargetResponseCallback)(bool);
+@property void (^_Nonnull keypadInput_sendKeyResponseCallback)(bool);
 
 @property OnboardingPayload * _Nonnull onboardingPayload;
 
@@ -91,9 +105,9 @@
 
  @param commissioningWindowRequestedHandler Handler to call on requesting the opening of a commissioning window
  */
-- (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
+- (void)openBasicCommissioningWindow:(void (^_Nonnull)(bool))commissioningCompleteCallback
                             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-    commissioningWindowRequestedHandler:(nullable void (^)(bool))commissioningWindowRequestedHandler;
+    commissioningWindowRequestedHandler:(void (^_Nonnull)(bool))commissioningWindowRequestedHandler;
 
 /*!
  @brief Send a Content Launcher:LaunchURL request to a TV
@@ -102,17 +116,269 @@
 
  @param contentDisplayStr Display string value corresponding to the content
 
- @param launchUrlResponseCallback Callback for when the Launch URL response has been received
+ @param responseCallback Callback for when the response has been received
 
- @param clientQueue Queue to dispatch the call to the launchUrlRequestSentHandler on
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
 
- @param launchUrlRequestSentHandler Handler to call on sending the Launch URL request
+ @param requestSentHandler Handler to call on sending the request
  */
-- (void)contentLauncherLaunchUrl:(NSString * _Nonnull)contentUrl
-               contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
-       launchUrlResponseCallback:(nullable void (^)(bool))launchUrlResponseCallback
+- (void)contentLauncher_launchUrl:(NSString * _Nonnull)contentUrl
+                contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a LevelControl:Step request to a TV
+
+ @param stepMode Increase (0x00) or Decrease (0x01) the device’s level
+
+ @param stepSize Number of units to step the device's level by
+
+ @param transitionTime Time that SHALL be taken to perform the step, in tenths of a second
+
+ @param optionMask Used to create a temporary Options bitmap to construct the Options attribute
+
+ @param optionOverride Used to create a temporary Options bitmap to construct the Options attribute
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)levelControl_step:(uint8_t)stepMode
+                 stepSize:(uint8_t)stepSize
+           transitionTime:(uint16_t)transitionTime
+               optionMask:(uint8_t)optionMask
+           optionOverride:(uint8_t)optionOverride
+         responseCallback:(void (^_Nonnull)(bool))responseCallback
+              clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+       requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a LevelControl:MoveToLevel request to a TV
+
+ @param level the level to which the device should move
+
+ @param transitionTime Time that SHALL be taken to perform the step, in tenths of a second
+
+ @param optionMask Used to create a temporary Options bitmap to construct the Options attribute
+
+ @param optionOverride Used to create a temporary Options bitmap to construct the Options attribute
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)levelControl_moveToLevel:(uint8_t)level
+                  transitionTime:(uint16_t)transitionTime
+                      optionMask:(uint8_t)optionMask
+                  optionOverride:(uint8_t)optionOverride
+                responseCallback:(void (^_Nonnull)(bool))responseCallback
                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-     launchUrlRequestSentHandler:(nullable void (^)(bool))launchUrlRequestSentHandler;
+              requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Play request to a TV
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_play:(void (^_Nonnull)(bool))responseCallback
+               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Pause request to a TV
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_pause:(void (^_Nonnull)(bool))responseCallback
+                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:StopPlayback request to a TV
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_stopPlayback:(void (^_Nonnull)(bool))responseCallback
+                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Next request to a TV
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_next:(void (^_Nonnull)(bool))responseCallback
+               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Seek request to a TV
+
+ @param position the position (in milliseconds) in the media to seek to
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_seek:(uint8_t)position
+          responseCallback:(void (^_Nonnull)(bool))responseCallback
+               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:SkipForward request to a TV
+
+ @param deltaPositionMilliseconds the duration of the time span to skip forward in the media, in milliseconds
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_skipForward:(uint64_t)deltaPositionMilliseconds
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:SkipBackward request to a TV
+
+ @param deltaPositionMilliseconds the duration of the time span to skip backward in the media, in milliseconds
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_skipBackward:(uint64_t)deltaPositionMilliseconds
+                  responseCallback:(void (^_Nonnull)(bool))responseCallback
+                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a ApplicationLauncher:LaunchApp request to a TV
+
+ @param catalogVendorId CSA-issued vendor ID for the catalog
+
+ @param applicationId application identifier, unique within a catalog, expressed as a string, such as "PruneVideo" or "Company X"
+
+ @param data optional app-specific data to be sent to the app
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)applicationLauncher_launchApp:(uint16_t)catalogVendorId
+                        applicationId:(NSString * _Nonnull)applicationId
+                                 data:(NSData * _Nullable)data
+                     responseCallback:(void (^_Nonnull)(bool))responseCallback
+                          clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a ApplicationLauncher:StopApp request to a TV
+
+ @param catalogVendorId CSA-issued vendor ID for the catalog
+
+ @param applicationId application identifier, unique within a catalog, expressed as a string, such as "PruneVideo" or "Company X"
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)applicationLauncher_stopApp:(uint16_t)catalogVendorId
+                      applicationId:(NSString * _Nonnull)applicationId
+                   responseCallback:(void (^_Nonnull)(bool))responseCallback
+                        clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a ApplicationLauncher:HideApp request to a TV
+
+ @param catalogVendorId CSA-issued vendor ID for the catalog
+
+ @param applicationId application identifier, unique within a catalog, expressed as a string, such as "PruneVideo" or "Company X"
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)applicationLauncher_hideApp:(uint16_t)catalogVendorId
+                      applicationId:(NSString * _Nonnull)applicationId
+                   responseCallback:(void (^_Nonnull)(bool))responseCallback
+                        clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a TargetNavigator:NavigateTarget request to a TV
+
+ @param target Identifier for the target for UX navigation, contained within one of the TargetInfo objects in the TargetList
+ attribute list.
+
+ @param data Optional app-specific data
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)targetNavigator_navigateTarget:(uint8_t)target
+                                  data:(NSString * _Nullable)data
+                      responseCallback:(void (^_Nonnull)(bool))responseCallback
+                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a KeypadInput:SendKey request to a TV
+
+ @param keyCode Key Code to process. If a second SendKey request with the same KeyCode value is received within 200ms, then the
+ endpoint will consider the first key press to be a press and hold. When such a repeat KeyCode value is not received within 200ms,
+ then the endpoint will consider the last key press to be a release.
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to dispatch the call to the requestSentHandler on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)keypadInput_sendKey:(uint8_t)keyCode
+           responseCallback:(void (^_Nonnull)(bool))responseCallback
+                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
 @end
 
 #endif /* CastingServerBridge_h */

@@ -4,7 +4,7 @@ FROM connectedhomeip/chip-build:${VERSION} as build
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    wget=1.20.3-1ubuntu2 \
+    wget \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
@@ -17,21 +17,17 @@ RUN set -x \
     && : # last line
 
 # Setup Zephyr
-ARG ZEPHYR_REVISION=95b54c90b1b7fb2626a9af3a5b7bd16459f35b45
+ARG ZEPHYR_REVISION=8cf9cc52e4de98d0303d8fed6a57ae956954986d
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
     west==0.12.0 \
-    && git clone https://github.com/rikorsev/zephyr \
+    && git clone https://github.com/telink-semi/zephyr \
     && cd zephyr \
     && git reset ${ZEPHYR_REVISION} --hard \
     && west init -l \
     && cd .. \
     && west update -o=--depth=1 -n -f smart \
-    && cd modules/hal/telink \
-    && git remote add telink https://github.com/rikorsev/hal_telink \
-    && git fetch telink telink_crypto \
-    && git checkout telink_crypto \
     && west zephyr-export \
     && : # last line
 

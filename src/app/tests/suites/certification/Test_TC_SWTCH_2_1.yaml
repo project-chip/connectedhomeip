@@ -45,6 +45,7 @@ tests:
           constraints:
               type: uint8
               minValue: 0
+              maxValue: 255
 
     - label: "Read MultiPressMax attribute"
       PICS: SWTCH.S.F04
@@ -55,3 +56,4 @@ tests:
           constraints:
               type: uint8
               minValue: 2
+              maxValue: 255
