@@ -49,13 +49,13 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (unsafe_unretained, nonatomic) bool found;
-@property (unsafe_unretained, nonatomic) uint16_t deviceDiscriminator;
+@property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
 @property (unsafe_unretained, nonatomic) chip::Ble::BleLayer * mBleLayer;
 
-- (id)initWithDiscriminator:(uint16_t)deviceDiscriminator;
+- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
@@ -67,7 +67,8 @@ namespace DeviceLayer {
     namespace Internal {
         BleConnection * ble;
 
-        void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t deviceDiscriminator)
+        void BleConnectionDelegateImpl::NewConnection(
+            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
             CancelConnection();
@@ -97,7 +98,7 @@ namespace DeviceLayer {
 
 @implementation BleConnection
 
-- (id)initWithDiscriminator:(uint16_t)deviceDiscriminator
+- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
 {
     self = [super init];
     if (self) {
@@ -197,15 +198,7 @@ namespace DeviceLayer {
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
-    // If the manual setup discriminator was passed in, only match the most significant 4 bits from the BLE advertisement
-    constexpr uint16_t manualSetupDiscriminatorOffsetInBits
-        = chip::kPayloadDiscriminatorFieldLengthInBits - chip::kManualSetupDiscriminatorFieldLengthInBits;
-    constexpr uint16_t maxManualDiscriminatorValue = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
-    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
-    if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
-        return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
-    } // else compare the entire thing
-    return _deviceDiscriminator == discriminator;
+    return _deviceDiscriminator.MatchesLongDiscriminator(discriminator);
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral

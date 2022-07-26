@@ -124,6 +124,7 @@ static_library("support") {
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
+    "SetupDiscriminator.h",
     "SortUtils.h",
     "StateMachine.h",
     "ThreadOperationalDataset.cpp",
