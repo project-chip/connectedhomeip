@@ -133,10 +133,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentX"
       response:
-          value: CurrentXBeforeStopCommand
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentXBeforeStopCommand
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
@@ -144,10 +143,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentY"
       response:
-          value: CurrentYBeforeStopCommand
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentYBeforeStopCommand
               maxValue: 65279
 
     - label: "Turn off light that we turned on"
