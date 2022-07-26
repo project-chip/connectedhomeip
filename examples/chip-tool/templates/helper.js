@@ -116,8 +116,7 @@ async function structs_with_cluster_name(options)
       continue;
     }
 
-    if (s.struct_cluster_count == 1)
-    {
+    if (s.struct_cluster_count == 1) {
       const clusters = await zclQuery.selectStructClusters(this.global.db, s.id);
       blocks.push(
           { id : s.id, name : s.name, struct_fabric_idx_field : s.struct_fabric_idx_field, clusterName : clusters[0].name });
