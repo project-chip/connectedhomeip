@@ -69,7 +69,7 @@ tests:
               - name: "StepSize"
                 value: StepSizeConfigValue
               - name: "TransitionTime"
-                value: 1
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -103,7 +103,7 @@ tests:
               - name: "StepSize"
                 value: StepSizeConfigValue
               - name: "TransitionTime"
-                value: 1
+                value: 10
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
