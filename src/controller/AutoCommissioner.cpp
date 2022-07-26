@@ -545,10 +545,17 @@ void AutoCommissioner::PauseCommissioning()
 
 CHIP_ERROR AutoCommissioner::ResumeCommissioning()
 {
-    VerifyOrReturnError(mPausedStage != CommissioningStage::kError, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mCommissioningPaused, CHIP_ERROR_INCORRECT_STATE);
+    mCommissioningPaused = false;
+
+    // if no new step was attempted
+    if (mPausedStage == CommissioningStage::kError)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     CommissioningStage nextStage = mPausedStage;
     mPausedStage                 = CommissioningStage::kError;
-    mCommissioningPaused         = false;
 
     return PerformStep(nextStage);
 }

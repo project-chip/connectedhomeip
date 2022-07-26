@@ -115,7 +115,7 @@ public final class ControllerParams {
       this.controllerVendorId = controllerVendorId;
       return this;
     }
-    
+
     public Builder setFailsafeTimerSeconds(int failsafeTimerSeconds) {
       if (failsafeTimerSeconds < 1 || failsafeTimerSeconds > 900) {
         throw new IllegalArgumentException("failsafeTimerSeconds must be between 0 and 900");
