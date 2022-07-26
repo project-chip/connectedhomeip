@@ -63,7 +63,7 @@ def FailIfNot(cond, message):
 
 _configurable_tests = set()
 _configurable_test_sets = set()
-_enabled_tests = []
+_enabled_tests = ['all']
 _disabled_tests = []
 
 
