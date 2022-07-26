@@ -32,7 +32,6 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
-#include <platform/webos/DeviceInfoProviderImpl.h>
 #include <platform/webos/DeviceInstanceInfoProviderImpl.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
 
@@ -165,7 +164,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
     // Initialize the configuration system.
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
-    SetDeviceInfoProvider(&DeviceInfoProviderImpl::GetDefaultInstance());
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     // Call _InitChipStack() on the generic implementation base class
