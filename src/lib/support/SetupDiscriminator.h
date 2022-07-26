@@ -88,8 +88,6 @@ public:
     }
 
 private:
-    static_assert(kLongBits == 12, "Unexpected field length");
-
     static constexpr uint16_t kLongMask = (1 << kLongBits) - 1;
     static constexpr uint8_t kShortMask = (1 << kShortBits) - 1;
 
@@ -101,9 +99,11 @@ private:
     }
 
     // If long discriminator, all 12 bits are used.  If short discriminator,
-    // only the low kManualSetupDiscriminatorFieldLengthInBits bits are used, to
-    // store the value of the short discriminator (which contains only the high
-    // bits of the complete 12-bit discriminator).
+    // only the low kShortBits bits are used, to store the value of the short
+    // discriminator (which contains only the high bits of the complete 12-bit
+    // discriminator).
+    static_assert(kLongBits == 12, "Unexpected field length");
+    static_assert(kShortBits <= kLongBits, "Unexpected field length");
     uint16_t mDiscriminator : 12;
     uint16_t mIsShortDiscriminator : 1;
 };
