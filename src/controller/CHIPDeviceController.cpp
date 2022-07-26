@@ -321,14 +321,14 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteNodeId)
 {
     VerifyOrReturn(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex,
                    ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mSystemState->CASESessionMgr()->ReleaseSession(PeerId(GetCompressedFabricId(), remoteNodeId));
+    mSystemState->CASESessionMgr()->ReleaseSession(GetPeerScopedId(remoteNodeId));
 }
 
 CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
-    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(PeerId(GetCompressedFabricId(), nodeId));
+    OperationalDeviceProxy * proxy = mSystemState->CASESessionMgr()->FindExistingSession(GetPeerScopedId(nodeId));
     if (proxy == nullptr)
     {
         ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
@@ -353,11 +353,11 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddress & addr, uint16_t & port)
+CHIP_ERROR DeviceController::GetPeerAddressAndPort(NodeId peerId, Inet::IPAddress & addr, uint16_t & port)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     Transport::PeerAddress peerAddr;
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(peerId, peerAddr));
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(GetPeerScopedId(peerId), peerAddr));
     addr = peerAddr.GetIPAddress();
     port = peerAddr.GetPort();
     return CHIP_NO_ERROR;
@@ -366,8 +366,8 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 CHIP_ERROR DeviceController::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(
-        PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(nodeId), addr));
+    ReturnErrorOnFailure(mSystemState->CASESessionMgr()->GetPeerAddress(GetPeerScopedId(nodeId), addr));
+
     return CHIP_NO_ERROR;
 }
 
@@ -1601,7 +1601,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     }
 }
 
-void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     // CASE session establishment failed.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -2103,6 +2103,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+
         err = proxy->SetPeerId(params.GetRootCert().Value(), params.GetNoc().Value());
         if (err != CHIP_NO_ERROR)
         {
@@ -2217,18 +2218,18 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId peerNodeId)
 {
     VerifyOrReturnError(mState == State::Initialized && mFabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * proxy = GetDeviceSession(PeerId(GetCompressedFabricId(), peerNodeId));
+    OperationalDeviceProxy * proxy = GetDeviceSession(GetPeerScopedId(peerNodeId));
     VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NOT_FOUND);
 
     return proxy->LookupPeerAddress();
 }
 
-OperationalDeviceProxy * DeviceController::GetDeviceSession(const PeerId & peerId)
+OperationalDeviceProxy * DeviceController::GetDeviceSession(const ScopedNodeId & peerId)
 {
     return mSystemState->CASESessionMgr()->FindExistingSession(peerId);
 }
 
-OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const PeerId & peerId)
+OperationalDeviceProxy * DeviceCommissioner::GetDeviceSession(const ScopedNodeId & peerId)
 {
     mSystemState->CASESessionMgr()->FindOrEstablishSession(peerId, &mOnDeviceConnectedCallback,
                                                            &mOnDeviceConnectionFailureCallback);
