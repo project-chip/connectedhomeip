@@ -2,7 +2,7 @@
 
 The Dockerfile here helps build multi-platform Docker images containing the
 executable binaries necessary for the Matter Test Harness. It utilizes the
-`BuildKit` toolkit and `Buildx`, included within Docker since version 18.06.
+BuildKit toolkit and Buildx, included within Docker since version 18.06.
 
 ## Running
 
@@ -26,17 +26,17 @@ docker run -it --network host -v /var/run/dbus/system_bus_socket:/var/run/dbus/s
 
 ## Building
 
-The Dockerfile requires building using the `Buildx` plugin, included within
+The Dockerfile requires building using the Buildx plugin, included within
 docker. It is used to build for both the amd64 and arm64 architectures, so the
 image may be cross-built and ran directly on a Raspberry Pi or other arm64 based
-environment. If your docker installation does not have the `Buildx` plugin, please
-update docker or install `Buildx` manually.
+environment. If your docker installation does not have the Buildx plugin, please
+update docker or install Buildx manually.
 
 Prerequisites:
 
 -   A recent docker installation.
--   Create a `buildx` builder: `docker buildx create --use --name mybuild`
--   Install the `Binfmt` cross-platform Docker emulators:
+-   Create a Buildx builder: `docker buildx create --use --name mybuild`
+-   Install the Binfmt cross-platform Docker emulators:
     `docker run --privileged --rm tonistiigi/binfmt --install all`
 
 ### Example: Building for the host platform and loading into Docker
