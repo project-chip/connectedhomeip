@@ -30,9 +30,7 @@ tests:
           In the case of chip tool as a client, here is an example command the client can send invoke request  to the TH
           ./chip-tool onoff on 1 1 --timedInteractionTimeoutMs 200
 
-          Verify that the DUT sent the invoke message to the TH after the specified timeout value for above command
-
-          on the TH (reference all cluster app) you should see
+          On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
           [1655797318.624018][7331:7331] CHIP:EM: Handling via exchange: 28067r, Delegate: 0xaaaad9aed418
           [1655797318.624129][7331:7331] CHIP:DMG: TimedRequestMessage =
           [1655797318.624185][7331:7331] CHIP:DMG: {
@@ -67,6 +65,49 @@ tests:
           [1655797318.627383][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655797318.627406][7331:7331] CHIP:DMG: },
           [1655797318.627467][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657886182.184612][3396:3401] CHIP:DMG: StatusResponseMessage =
+          [1657886182.184642][3396:3401] CHIP:DMG: {
+          [1657886182.184667][3396:3401] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1657886182.184693][3396:3401] CHIP:DMG:         InteractionModelRevision = 1
+          [1657886182.184716][3396:3401] CHIP:DMG: }
+          [1657886182.184742][3396:3401] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+
+          61453140 from RetransTable on exchange 17901i
+          [1657886182.190976][3396:3401] CHIP:DMG: ICR moving to [ResponseRe]
+          [1657886182.191027][3396:3401] CHIP:DMG: InvokeResponseMessage =
+          [1657886182.191052][3396:3401] CHIP:DMG: {
+          [1657886182.191076][3396:3401] CHIP:DMG:         suppressResponse = false,
+          [1657886182.191101][3396:3401] CHIP:DMG:         InvokeResponseIBs =
+          [1657886182.191132][3396:3401] CHIP:DMG:         [
+          [1657886182.191157][3396:3401] CHIP:DMG:                 InvokeResponseIB =
+          [1657886182.191190][3396:3401] CHIP:DMG:                 {
+          [1657886182.191216][3396:3401] CHIP:DMG:                         CommandStatusIB =
+          [1657886182.191253][3396:3401] CHIP:DMG:                         {
+          [1657886182.191286][3396:3401] CHIP:DMG:                                 CommandPathIB =
+          [1657886182.191325][3396:3401] CHIP:DMG:                                 {
+          [1657886182.191365][3396:3401] CHIP:DMG:                                         EndpointId = 0x1,
+          [1657886182.191400][3396:3401] CHIP:DMG:                                         ClusterId = 0x6,
+          [1657886182.191439][3396:3401] CHIP:DMG:                                         CommandId = 0x1,
+          [1657886182.191472][3396:3401] CHIP:DMG:                                 },
+          [1657886182.191510][3396:3401] CHIP:DMG:
+          [1657886182.191541][3396:3401] CHIP:DMG:                                 StatusIB =
+          [1657886182.191575][3396:3401] CHIP:DMG:                                 {
+          [1657886182.191613][3396:3401] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1657886182.191649][3396:3401] CHIP:DMG:                                 },
+          [1657886182.191683][3396:3401] CHIP:DMG:
+          [1657886182.191712][3396:3401] CHIP:DMG:                         },
+          [1657886182.191746][3396:3401] CHIP:DMG:
+          [1657886182.191772][3396:3401] CHIP:DMG:                 },
+          [1657886182.191802][3396:3401] CHIP:DMG:
+          [1657886182.191826][3396:3401] CHIP:DMG:         ],
+          [1657886182.191856][3396:3401] CHIP:DMG:
+          [1657886182.191880][3396:3401] CHIP:DMG:         InteractionModelRevision = 1
+          [1657886182.191903][3396:3401] CHIP:DMG: },
+          [1657886182.191963][3396:3401] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001 Status=0x0
       disabled: true
 
     - label:
@@ -78,8 +119,7 @@ tests:
           Chip-tool as controller , here is the example command you can use
            ./chip-tool onoff write  on-time 2 1 1 --timedInteractionTimeoutMs 200
 
-          Verify that the DUT sent the writerequest message to the TH after the specified timeout value for above command
-
+          On TH (On the reference app) Verify if DUT is responding with the below status response for the above command
 
           [1657459639.597900][11525:11525] CHIP:EM: Handling via exchange: 17116r, Delegate: 0xaaaae00c1430
           [1657459639.598014][11525:11525] CHIP:DMG: TimedRequestMessage =
@@ -118,6 +158,44 @@ tests:
           [1657459639.600842][11525:11525] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0006 e=1 p=o
           [1657459639.600888][11525:11525] CHIP:DMG: AccessControl: allowed
           [1657459639.600936][11525:11525] CHIP:DMG: Endpoint 1, Cluster 0x0000_0006 update version to 1979c48
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          [1657886272.645704][3404:3409] CHIP:DMG: StatusResponseMessage =
+          [1657886272.645751][3404:3409] CHIP:DMG: {
+          [1657886272.645792][3404:3409] CHIP:DMG:         Status = 0x00 (SUCCESS),
+          [1657886272.645839][3404:3409] CHIP:DMG:         InteractionModelRevision = 1
+          [1657886272.645878][3404:3409] CHIP:DMG: }
+          [1657886272.645918][3404:3409] CHIP:IM: Received status response, status is 0x00 (SUCCESS)
+
+          [1657886272.648220][3404:3409] CHIP:DMG: WriteClient moving to [ResponseRe]
+          [1657886272.648285][3404:3409] CHIP:DMG: WriteResponseMessage =
+          [1657886272.648326][3404:3409] CHIP:DMG: {
+          [1657886272.648361][3404:3409] CHIP:DMG:         AttributeStatusIBs =
+          [1657886272.648410][3404:3409] CHIP:DMG:         [
+          [1657886272.648450][3404:3409] CHIP:DMG:                 AttributeStatusIB =
+          [1657886272.648494][3404:3409] CHIP:DMG:                 {
+          [1657886272.648535][3404:3409] CHIP:DMG:                         AttributePathIB =
+          [1657886272.648593][3404:3409] CHIP:DMG:                         {
+          [1657886272.648644][3404:3409] CHIP:DMG:                                 Endpoint = 0x1,
+          [1657886272.648698][3404:3409] CHIP:DMG:                                 Cluster = 0x6,
+          [1657886272.648752][3404:3409] CHIP:DMG:                                 Attribute = 0x0000_4001,
+          [1657886272.648803][3404:3409] CHIP:DMG:                         }
+          [1657886272.648860][3404:3409] CHIP:DMG:
+          [1657886272.648910][3404:3409] CHIP:DMG:                         StatusIB =
+          [1657886272.648959][3404:3409] CHIP:DMG:                         {
+          [1657886272.649011][3404:3409] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657886272.649067][3404:3409] CHIP:DMG:                         },
+          [1657886272.649115][3404:3409] CHIP:DMG:
+          [1657886272.649161][3404:3409] CHIP:DMG:                 },
+          [1657886272.649212][3404:3409] CHIP:DMG:
+          [1657886272.649250][3404:3409] CHIP:DMG:         ],
+          [1657886272.649283][3404:3409] CHIP:DMG:
+          [1657886272.649308][3404:3409] CHIP:DMG:         InteractionModelRevision = 1
+          [1657886272.649333][3404:3409] CHIP:DMG: }
+          [1657886272.649415][3404:3409] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657886272.649481][3404:3409] CHIP:EM: Sending Standalone Ack for MessageCounter:137181137 on exchange 234i
       disabled: true
 
     - label:
@@ -127,4 +205,5 @@ tests:
           the received timed request."
       verification: |
           This is not testable in normal scenario, and needs to be tested as part of Unit test.
+          https://github.com/CHIP-Specifications/chip-test-plans/issues/1885
       disabled: true

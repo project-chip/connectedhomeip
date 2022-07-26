@@ -30,7 +30,7 @@ tests:
 
           sudo ./chip-tool levelcontrol write on-level 2 1 1
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
           [1655795552.551487][7331:7331] CHIP:EM: Handling via exchange: 41640r, Delegate: 0xaaaad9aed418
           [1655795552.551552][7331:7331] CHIP:IM: Received Write request
@@ -59,7 +59,57 @@ tests:
           [1655795552.552647][7331:7331] CHIP:DMG:         InteractionModelRevision = 1
           [1655795552.552686][7331:7331] CHIP:DMG: },
 
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657883782.721742][2796:2801] CHIP:DMG: WriteResponseMessage =
+          [1657883782.721783][2796:2801] CHIP:DMG: {
+          [1657883782.721819][2796:2801] CHIP:DMG:         AttributeStatusIBs =
+          [1657883782.721874][2796:2801] CHIP:DMG:         [
+          [1657883782.721914][2796:2801] CHIP:DMG:                 AttributeStatusIB =
+          [1657883782.721959][2796:2801] CHIP:DMG:                 {
+          [1657883782.722002][2796:2801] CHIP:DMG:                         AttributePathIB =
+          [1657883782.722054][2796:2801] CHIP:DMG:                         {
+          [1657883782.722112][2796:2801] CHIP:DMG:                                 Endpoint = 0x1,
+          [1657883782.722172][2796:2801] CHIP:DMG:                                 Cluster = 0x8,
+          [1657883782.722227][2796:2801] CHIP:DMG:                                 Attribute = 0x0000_0011,
+          [1657883782.722278][2796:2801] CHIP:DMG:                         }
+          [1657883782.722335][2796:2801] CHIP:DMG:
+          [1657883782.722384][2796:2801] CHIP:DMG:                         StatusIB =
+          [1657883782.722435][2796:2801] CHIP:DMG:                         {
+          [1657883782.722493][2796:2801] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657883782.722547][2796:2801] CHIP:DMG:                         },
+          [1657883782.722605][2796:2801] CHIP:DMG:
+          [1657883782.722648][2796:2801] CHIP:DMG:                 },
+          [1657883782.722697][2796:2801] CHIP:DMG:
+          [1657883782.722736][2796:2801] CHIP:DMG:         ],
+          [1657883782.722783][2796:2801] CHIP:DMG:
+          [1657883782.722823][2796:2801] CHIP:DMG:         InteractionModelRevision = 1
+          [1657883782.722860][2796:2801] CHIP:DMG: }
+          [1657883782.722967][2796:2801] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657883782.723047][2796:2801] CHIP:EM: Sending Standalone Ack for MessageCounter:76592104 on exchange 56753i
+
+
           sudo ./chip-tool levelcontrol read on-level 1 1
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+          [1657883808.062792][2457:2457] CHIP:IM: Received Read request
+          [1657883808.062871][2457:2457] CHIP:DMG: ReadRequestMessage =
+          [1657883808.062900][2457:2457] CHIP:DMG: {
+          [1657883808.062922][2457:2457] CHIP:DMG:         AttributePathIBs =
+          [1657883808.062949][2457:2457] CHIP:DMG:         [
+          [1657883808.062972][2457:2457] CHIP:DMG:                 AttributePathIB =
+          [1657883808.063000][2457:2457] CHIP:DMG:                 {
+          [1657883808.063028][2457:2457] CHIP:DMG:                         Endpoint = 0x1,
+          [1657883808.063068][2457:2457] CHIP:DMG:                         Cluster = 0x8,
+          [1657883808.063105][2457:2457] CHIP:DMG:                         Attribute = 0x0000_0011,
+          [1657883808.063138][2457:2457] CHIP:DMG:                 }
+          [1657883808.063167][2457:2457] CHIP:DMG:
+          [1657883808.063192][2457:2457] CHIP:DMG:         ],
+          [1657883808.063221][2457:2457] CHIP:DMG:
+          [1657883808.063247][2457:2457] CHIP:DMG:         isFabricFiltered = true,
+          [1657883808.063272][2457:2457] CHIP:DMG:         InteractionModelRevision = 1
+          [1657883808.063295][2457:2457] CHIP:DMG: },
+          [1657883808.063369][2457:2457] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
           [1655795604.755214][6880:6885] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0011 DataVersion: 737039636
           [1655795604.755363][6880:6885] CHIP:TOO:   on level: 2
           [1655795604.755460][6880:6885] CHIP:EM: Sending Standalone Ack for MessageCounter:83198098 on exchange 53763i
@@ -81,7 +131,7 @@ tests:
 
            ./chip-tool basic write local-config-disabled 1 1 0
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
           [1655795795.033946][7331:7331] CHIP:EM: Handling via exchange: 11668r, Delegate: 0xaaaad9aed418
           [1655795795.034011][7331:7331] CHIP:IM: Received Write request
@@ -111,7 +161,62 @@ tests:
           [1655795795.035138][7331:7331] CHIP:DMG: },
           [1655795795.035259][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
 
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          [1657883938.394965][2822:2827] CHIP:DMG: WriteResponseMessage =
+          [1657883938.394995][2822:2827] CHIP:DMG: {
+          [1657883938.395022][2822:2827] CHIP:DMG:         AttributeStatusIBs =
+          [1657883938.395060][2822:2827] CHIP:DMG:         [
+          [1657883938.395090][2822:2827] CHIP:DMG:                 AttributeStatusIB =
+          [1657883938.395127][2822:2827] CHIP:DMG:                 {
+          [1657883938.395158][2822:2827] CHIP:DMG:                         AttributePathIB =
+          [1657883938.395196][2822:2827] CHIP:DMG:                         {
+          [1657883938.395241][2822:2827] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657883938.395283][2822:2827] CHIP:DMG:                                 Cluster = 0x28,
+          [1657883938.395324][2822:2827] CHIP:DMG:                                 Attribute = 0x0000_0010,
+          [1657883938.395363][2822:2827] CHIP:DMG:                         }
+          [1657883938.395406][2822:2827] CHIP:DMG:
+          [1657883938.395446][2822:2827] CHIP:DMG:                         StatusIB =
+          [1657883938.395485][2822:2827] CHIP:DMG:                         {
+          [1657883938.395522][2822:2827] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657883938.395561][2822:2827] CHIP:DMG:                         },
+          [1657883938.395603][2822:2827] CHIP:DMG:
+          [1657883938.395636][2822:2827] CHIP:DMG:                 },
+          [1657883938.395672][2822:2827] CHIP:DMG:
+          [1657883938.395700][2822:2827] CHIP:DMG:         ],
+          [1657883938.395735][2822:2827] CHIP:DMG:
+          [1657883938.395765][2822:2827] CHIP:DMG:         InteractionModelRevision = 1
+          [1657883938.395794][2822:2827] CHIP:DMG: }
+          [1657883938.395875][2822:2827] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657883938.395940][2822:2827] CHIP:EM: Sending Standalone Ack for MessageCounter:157043526 on exchange 18989i
+
+
            ./chip-tool basic read local-config-disabled 1 0
+
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+          [1657884119.522809][2748:2748] CHIP:IM: Received Read request
+          [1657884119.522885][2748:2748] CHIP:DMG: ReadRequestMessage =
+          [1657884119.522911][2748:2748] CHIP:DMG: {
+          [1657884119.522933][2748:2748] CHIP:DMG:         AttributePathIBs =
+          [1657884119.522959][2748:2748] CHIP:DMG:         [
+          [1657884119.522982][2748:2748] CHIP:DMG:                 AttributePathIB =
+          [1657884119.523009][2748:2748] CHIP:DMG:                 {
+          [1657884119.523037][2748:2748] CHIP:DMG:                         Endpoint = 0x0,
+          [1657884119.523067][2748:2748] CHIP:DMG:                         Cluster = 0x28,
+          [1657884119.523097][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1657884119.523126][2748:2748] CHIP:DMG:                 }
+          [1657884119.523153][2748:2748] CHIP:DMG:
+          [1657884119.523179][2748:2748] CHIP:DMG:         ],
+          [1657884119.523207][2748:2748] CHIP:DMG:
+          [1657884119.523233][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884119.523257][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884119.523280][2748:2748] CHIP:DMG: },
+
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
           [1655795843.336042][6902:6907] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0010 DataVersion: 1263909562
           [1655795843.336093][6902:6907] CHIP:TOO:   LocalConfigDisabled: TRUE
           [1655795843.336251][6902:6907] CHIP:EM: Sending Standalone Ack for MessageCounter:108030495 on exchange 43207i
@@ -127,7 +232,7 @@ tests:
            ./chip-tool basic write node-label node 1 0
 
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
           [1655796035.022296][7331:7331] CHIP:EM: Handling via exchange: 64908r, Delegate: 0xaaaad9aed418
           [1655796035.022365][7331:7331] CHIP:IM: Received Write request
@@ -158,7 +263,58 @@ tests:
           [1655796035.023791][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0028 e=0 p=m
           [1655796035.023851][7331:7331] CHIP:DMG: AccessControl: allowed
 
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657884155.221193][2865:2870] CHIP:DMG: WriteResponseMessage =
+          [1657884155.221246][2865:2870] CHIP:DMG: {
+          [1657884155.221292][2865:2870] CHIP:DMG:         AttributeStatusIBs =
+          [1657884155.221356][2865:2870] CHIP:DMG:         [
+          [1657884155.221406][2865:2870] CHIP:DMG:                 AttributeStatusIB =
+          [1657884155.221464][2865:2870] CHIP:DMG:                 {
+          [1657884155.221518][2865:2870] CHIP:DMG:                         AttributePathIB =
+          [1657884155.221588][2865:2870] CHIP:DMG:                         {
+          [1657884155.221635][2865:2870] CHIP:DMG:                                 Endpoint = 0x0,
+          [1657884155.221673][2865:2870] CHIP:DMG:                                 Cluster = 0x28,
+          [1657884155.221710][2865:2870] CHIP:DMG:                                 Attribute = 0x0000_0005,
+          [1657884155.221798][2865:2870] CHIP:DMG:                         }
+          [1657884155.221837][2865:2870] CHIP:DMG:
+          [1657884155.221868][2865:2870] CHIP:DMG:                         StatusIB =
+          [1657884155.221900][2865:2870] CHIP:DMG:                         {
+          [1657884155.221932][2865:2870] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657884155.221965][2865:2870] CHIP:DMG:                         },
+          [1657884155.221996][2865:2870] CHIP:DMG:
+          [1657884155.222022][2865:2870] CHIP:DMG:                 },
+          [1657884155.222052][2865:2870] CHIP:DMG:
+          [1657884155.222077][2865:2870] CHIP:DMG:         ],
+          [1657884155.222108][2865:2870] CHIP:DMG:
+          [1657884155.222132][2865:2870] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884155.222157][2865:2870] CHIP:DMG: }
+          [1657884155.222229][2865:2870] CHIP:DMG: WriteClient moving to [AwaitingDe]
+
+
           ./chip-tool basic read node-label 1 0
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
+          [1657884173.738798][2748:2748] CHIP:IM: Received Read request
+          [1657884173.738877][2748:2748] CHIP:DMG: ReadRequestMessage =
+          [1657884173.738904][2748:2748] CHIP:DMG: {
+          [1657884173.738926][2748:2748] CHIP:DMG:         AttributePathIBs =
+          [1657884173.738952][2748:2748] CHIP:DMG:         [
+          [1657884173.738975][2748:2748] CHIP:DMG:                 AttributePathIB =
+          [1657884173.739009][2748:2748] CHIP:DMG:                 {
+          [1657884173.739041][2748:2748] CHIP:DMG:                         Endpoint = 0x0,
+          [1657884173.739073][2748:2748] CHIP:DMG:                         Cluster = 0x28,
+          [1657884173.739105][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1657884173.739134][2748:2748] CHIP:DMG:                 }
+          [1657884173.739162][2748:2748] CHIP:DMG:
+          [1657884173.739188][2748:2748] CHIP:DMG:         ],
+          [1657884173.739215][2748:2748] CHIP:DMG:
+          [1657884173.739241][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884173.739266][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884173.739288][2748:2748] CHIP:DMG: },
+
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+
           [1655796082.079468][6918:6923] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0005 DataVersion: 1263909563
           [1655796082.079509][6918:6923] CHIP:TOO:   NodeLabel: node
           [1655796082.079608][6918:6923] CHIP:EM: Sending Standalone Ack for MessageCounter:256008218 on exchange 23185i
@@ -173,7 +329,7 @@ tests:
 
           ./chip-tool any write-by-id  0x0008 0x0010 1 1 1
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
           [1655796141.166846][7331:7331] CHIP:IM: Received Write request
           [1655796141.166889][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -203,8 +359,59 @@ tests:
           [1655796141.168253][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0008 e=1 p=o
           [1655796141.168313][7331:7331] CHIP:DMG: AccessControl: allowed
 
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657884204.951658][2878:2883] CHIP:DMG: WriteResponseMessage =
+          [1657884204.951700][2878:2883] CHIP:DMG: {
+          [1657884204.951736][2878:2883] CHIP:DMG:         AttributeStatusIBs =
+          [1657884204.951786][2878:2883] CHIP:DMG:         [
+          [1657884204.951826][2878:2883] CHIP:DMG:                 AttributeStatusIB =
+          [1657884204.951871][2878:2883] CHIP:DMG:                 {
+          [1657884204.951913][2878:2883] CHIP:DMG:                         AttributePathIB =
+          [1657884204.951965][2878:2883] CHIP:DMG:                         {
+          [1657884204.952018][2878:2883] CHIP:DMG:                                 Endpoint = 0x1,
+          [1657884204.952075][2878:2883] CHIP:DMG:                                 Cluster = 0x8,
+          [1657884204.952173][2878:2883] CHIP:DMG:                                 Attribute = 0x0000_0010,
+          [1657884204.952226][2878:2883] CHIP:DMG:                         }
+          [1657884204.952286][2878:2883] CHIP:DMG:
+          [1657884204.952340][2878:2883] CHIP:DMG:                         StatusIB =
+          [1657884204.952396][2878:2883] CHIP:DMG:                         {
+          [1657884204.952449][2878:2883] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657884204.952500][2878:2883] CHIP:DMG:                         },
+          [1657884204.952552][2878:2883] CHIP:DMG:
+          [1657884204.952597][2878:2883] CHIP:DMG:                 },
+          [1657884204.952645][2878:2883] CHIP:DMG:
+          [1657884204.952684][2878:2883] CHIP:DMG:         ],
+          [1657884204.952731][2878:2883] CHIP:DMG:
+          [1657884204.952770][2878:2883] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884204.952808][2878:2883] CHIP:DMG: }
+          [1657884204.952914][2878:2883] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657884204.952998][2878:2883] CHIP:EM: Sending Standalone Ack for MessageCounter:264044678
+
 
            ./chip-tool any read-by-id  0x0008 0x0010 1 1
+
+          verify on TH(reference app) receives the read Request Message for the data sent in the above command
+          [1657884227.859836][2748:2748] CHIP:IM: Received Read request
+          [1657884227.859916][2748:2748] CHIP:DMG: ReadRequestMessage =
+          [1657884227.859942][2748:2748] CHIP:DMG: {
+          [1657884227.859964][2748:2748] CHIP:DMG:         AttributePathIBs =
+          [1657884227.859989][2748:2748] CHIP:DMG:         [
+          [1657884227.860012][2748:2748] CHIP:DMG:                 AttributePathIB =
+          [1657884227.860045][2748:2748] CHIP:DMG:                 {
+          [1657884227.860076][2748:2748] CHIP:DMG:                         Endpoint = 0x1,
+          [1657884227.860112][2748:2748] CHIP:DMG:                         Cluster = 0x8,
+          [1657884227.860147][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0010,
+          [1657884227.860181][2748:2748] CHIP:DMG:                 }
+          [1657884227.860211][2748:2748] CHIP:DMG:
+          [1657884227.860239][2748:2748] CHIP:DMG:         ],
+          [1657884227.860266][2748:2748] CHIP:DMG:
+          [1657884227.860292][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884227.860316][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884227.860339][2748:2748] CHIP:DMG: },
+          [1657884227.860413][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
           [1655796192.032715][6931:6936] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_0010 DataVersion: 737039637
           [1655796192.032807][6931:6936] CHIP:TOO:   on off transition time: 1
           [1655796192.032908][6931:6936] CHIP:EM: Sending Standalone Ack for MessageCounter:249349258 on exchange 7433i
@@ -253,7 +460,7 @@ tests:
 
            ./chip-tool any write-by-id 0x0204 0  1  1 1
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH (reference app) receives the right write Request Message for the data sent in the above command
 
           [1655796297.607841][7331:7331] CHIP:EM: Handling via exchange: 37495r, Delegate: 0xaaaad9aed418
           [1655796297.607911][7331:7331] CHIP:IM: Received Write request
@@ -284,7 +491,43 @@ tests:
           [1655796297.609342][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
           [1655796297.609403][7331:7331] CHIP:DMG: AccessControl: allowed
 
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657884258.383116][2892:2897] CHIP:DMG: WriteResponseMessage =
+          [1657884258.383157][2892:2897] CHIP:DMG: {
+          [1657884258.383192][2892:2897] CHIP:DMG:         AttributeStatusIBs =
+          [1657884258.383255][2892:2897] CHIP:DMG:         [
+          [1657884258.383295][2892:2897] CHIP:DMG:                 AttributeStatusIB =
+          [1657884258.383339][2892:2897] CHIP:DMG:                 {
+          [1657884258.383381][2892:2897] CHIP:DMG:                         AttributePathIB =
+          [1657884258.383431][2892:2897] CHIP:DMG:                         {
+          [1657884258.383482][2892:2897] CHIP:DMG:                                 Endpoint = 0x1,
+          [1657884258.383538][2892:2897] CHIP:DMG:                                 Cluster = 0x204,
+          [1657884258.383592][2892:2897] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657884258.383647][2892:2897] CHIP:DMG:                         }
+          [1657884258.383703][2892:2897] CHIP:DMG:
+          [1657884258.383750][2892:2897] CHIP:DMG:                         StatusIB =
+          [1657884258.383800][2892:2897] CHIP:DMG:                         {
+          [1657884258.383851][2892:2897] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657884258.383905][2892:2897] CHIP:DMG:                         },
+          [1657884258.383955][2892:2897] CHIP:DMG:
+          [1657884258.383996][2892:2897] CHIP:DMG:                 },
+          [1657884258.384043][2892:2897] CHIP:DMG:
+          [1657884258.384081][2892:2897] CHIP:DMG:         ],
+          [1657884258.384170][2892:2897] CHIP:DMG:
+          [1657884258.384212][2892:2897] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884258.384249][2892:2897] CHIP:DMG: }
+          [1657884258.384358][2892:2897] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657884258.384441][2892:2897] CHIP:EM: Sending Standalone Ack for MessageCounter:255796912 on exchange 26584i
+
+
            ./chip-tool any read-by-id 0x0204 0  1 1
+          verify on TH (reference app) receives the right write Request Message for the data sent in the above command
+          [1657884282.303557][2898:2903] CHIP:DMG: }
+          [1657884282.303695][2898:2903] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 2387607084
+          [1657884282.303778][2898:2903] CHIP:TOO:   temperature display mode: 1
+          [1657884282.303862][2898:2903] CHIP:EM: Sending Standalone Ack for MessageCounter:147756485 on exchange 42871i
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
           [1655796341.132655][6946:6951] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945391
           [1655796341.132864][6946:6951] CHIP:TOO:   temperature display mode: 1
           [1655796341.132973][6946:6951] CHIP:EM: Sending Standalone Ack for MessageCounter:245498041 on exchange 51992i
@@ -300,7 +543,7 @@ tests:
 
            ./chip-tool colorcontrol write-by-id 0x000f 1 1 1
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH(reference app) receives the right write Request Message for the data sent in the above command
 
           [1655796429.696904][7331:7331] CHIP:IM: Received Write request
           [1655796429.696947][7331:7331] CHIP:DMG: IM WH moving to [Initialized]
@@ -331,7 +574,61 @@ tests:
           [1655796429.698446][7331:7331] CHIP:DMG: AccessControl: allowed
 
 
-          sudo  ./chip-tool colorcontrol read-by-id 0x000f  1 1
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          [1657884309.994598][2907:2912] CHIP:DMG: WriteResponseMessage =
+          [1657884309.994627][2907:2912] CHIP:DMG: {
+          [1657884309.994652][2907:2912] CHIP:DMG:         AttributeStatusIBs =
+          [1657884309.994688][2907:2912] CHIP:DMG:         [
+          [1657884309.994715][2907:2912] CHIP:DMG:                 AttributeStatusIB =
+          [1657884309.994754][2907:2912] CHIP:DMG:                 {
+          [1657884309.994787][2907:2912] CHIP:DMG:                         AttributePathIB =
+          [1657884309.994823][2907:2912] CHIP:DMG:                         {
+          [1657884309.994861][2907:2912] CHIP:DMG:                                 Endpoint = 0x1,
+          [1657884309.994902][2907:2912] CHIP:DMG:                                 Cluster = 0x300,
+          [1657884309.994941][2907:2912] CHIP:DMG:                                 Attribute = 0x0000_000F,
+          [1657884309.994977][2907:2912] CHIP:DMG:                         }
+          [1657884309.995021][2907:2912] CHIP:DMG:
+          [1657884309.995057][2907:2912] CHIP:DMG:                         StatusIB =
+          [1657884309.995096][2907:2912] CHIP:DMG:                         {
+          [1657884309.995132][2907:2912] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657884309.995168][2907:2912] CHIP:DMG:                         },
+          [1657884309.995203][2907:2912] CHIP:DMG:
+          [1657884309.995234][2907:2912] CHIP:DMG:                 },
+          [1657884309.995268][2907:2912] CHIP:DMG:
+          [1657884309.995295][2907:2912] CHIP:DMG:         ],
+          [1657884309.995329][2907:2912] CHIP:DMG:
+          [1657884309.995356][2907:2912] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884309.995383][2907:2912] CHIP:DMG: }
+          [1657884309.995461][2907:2912] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657884309.995524][2907:2912] CHIP:EM: Sending Standalone Ack for MessageCounter:243574725 on exchange 27981i
+
+
+
+            ./chip-tool colorcontrol read-by-id 0x000f  1 1
+
+          verify on TH (reference app) receives the right write Request Message for the data sent in the above command
+          [1657884334.613535][2748:2748] CHIP:IM: Received Read request
+          [1657884334.613615][2748:2748] CHIP:DMG: ReadRequestMessage =
+          [1657884334.613641][2748:2748] CHIP:DMG: {
+          [1657884334.613663][2748:2748] CHIP:DMG:         AttributePathIBs =
+          [1657884334.613685][2748:2748] CHIP:DMG:         [
+          [1657884334.613746][2748:2748] CHIP:DMG:                 AttributePathIB =
+          [1657884334.613775][2748:2748] CHIP:DMG:                 {
+          [1657884334.613803][2748:2748] CHIP:DMG:                         Endpoint = 0x1,
+          [1657884334.613834][2748:2748] CHIP:DMG:                         Cluster = 0x300,
+          [1657884334.613869][2748:2748] CHIP:DMG:                         Attribute = 0x0000_000F,
+          [1657884334.613898][2748:2748] CHIP:DMG:                 }
+          [1657884334.613926][2748:2748] CHIP:DMG:
+          [1657884334.613952][2748:2748] CHIP:DMG:         ],
+          [1657884334.613980][2748:2748] CHIP:DMG:
+          [1657884334.614005][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884334.614030][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884334.614053][2748:2748] CHIP:DMG: },
+          [1657884334.614128][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
           [1655796493.233673][6961:6966] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_000F DataVersion: 2788050502
           [1655796493.233761][6961:6966] CHIP:TOO:   Options: 1
           [1655796493.233865][6961:6966] CHIP:EM: Sending Standalone Ack for MessageCounter:185730221 on exchange 37136i
@@ -342,6 +639,8 @@ tests:
           attribute data which has to be sent in multiple messages."
       verification: |
           DUT implementation required to verify write an attribute which is is larger than 1 MTU(1280 bytes)
+          Here is an example command to verify the write functionality. User must choose an attribute which has large list of attribute data.
+           ./chip-tool basic write node-label node 1 0
       disabled: true
 
     - label:
@@ -353,7 +652,7 @@ tests:
           ./chip-tool any write-by-id 0x0204 0  1  1 1
 
 
-          verify on TH receives the right write Request Message for the data sent in the above command
+          verify on TH(reference  app) receives the right write Request Message for the data sent in the above command
 
           [1655796724.510633][7331:7331] CHIP:EM: Handling via exchange: 51058r, Delegate: 0xaaaad9aed418
           [1655796724.510711][7331:7331] CHIP:IM: Received Write request
@@ -383,7 +682,60 @@ tests:
           [1655796724.512195][7331:7331] CHIP:DMG: },
           [1655796724.512344][7331:7331] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0204 e=1 p=o
 
-            ./chip-tool any read-by-id 0x0204 0    1 1
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657884369.932192][2923:2928] CHIP:DMG: WriteResponseMessage =
+          [1657884369.932226][2923:2928] CHIP:DMG: {
+          [1657884369.932255][2923:2928] CHIP:DMG:         AttributeStatusIBs =
+          [1657884369.932297][2923:2928] CHIP:DMG:         [
+          [1657884369.932329][2923:2928] CHIP:DMG:                 AttributeStatusIB =
+          [1657884369.932366][2923:2928] CHIP:DMG:                 {
+          [1657884369.932400][2923:2928] CHIP:DMG:                         AttributePathIB =
+          [1657884369.932446][2923:2928] CHIP:DMG:                         {
+          [1657884369.932490][2923:2928] CHIP:DMG:                                 Endpoint = 0x1,
+          [1657884369.932534][2923:2928] CHIP:DMG:                                 Cluster = 0x204,
+          [1657884369.932579][2923:2928] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1657884369.932621][2923:2928] CHIP:DMG:                         }
+          [1657884369.932667][2923:2928] CHIP:DMG:
+          [1657884369.932711][2923:2928] CHIP:DMG:                         StatusIB =
+          [1657884369.932753][2923:2928] CHIP:DMG:                         {
+          [1657884369.932794][2923:2928] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1657884369.932835][2923:2928] CHIP:DMG:                         },
+          [1657884369.932876][2923:2928] CHIP:DMG:
+          [1657884369.932912][2923:2928] CHIP:DMG:                 },
+          [1657884369.932952][2923:2928] CHIP:DMG:
+          [1657884369.932983][2923:2928] CHIP:DMG:         ],
+          [1657884369.933022][2923:2928] CHIP:DMG:
+          [1657884369.933054][2923:2928] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884369.933085][2923:2928] CHIP:DMG: }
+          [1657884369.933178][2923:2928] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1657884369.933244][2923:2928] CHIP:EM: Sending Standalone Ack for MessageCounter:101663641 on exchange 44315i
+
+
+
+
+          ./chip-tool any read-by-id 0x0204 0    1 1
+          verify on TH (reference app) receives the right write Request Message for the data sent in the above command
+          [1657884399.502355][2748:2748] CHIP:IM: Received Read request
+          [1657884399.502442][2748:2748] CHIP:DMG: ReadRequestMessage =
+          [1657884399.502473][2748:2748] CHIP:DMG: {
+          [1657884399.502497][2748:2748] CHIP:DMG:         AttributePathIBs =
+          [1657884399.502530][2748:2748] CHIP:DMG:         [
+          [1657884399.502558][2748:2748] CHIP:DMG:                 AttributePathIB =
+          [1657884399.502589][2748:2748] CHIP:DMG:                 {
+          [1657884399.502621][2748:2748] CHIP:DMG:                         Endpoint = 0x1,
+          [1657884399.502658][2748:2748] CHIP:DMG:                         Cluster = 0x204,
+          [1657884399.502693][2748:2748] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1657884399.502730][2748:2748] CHIP:DMG:                 }
+          [1657884399.502762][2748:2748] CHIP:DMG:
+          [1657884399.502791][2748:2748] CHIP:DMG:         ],
+          [1657884399.502822][2748:2748] CHIP:DMG:
+          [1657884399.502852][2748:2748] CHIP:DMG:         isFabricFiltered = true,
+          [1657884399.502881][2748:2748] CHIP:DMG:         InteractionModelRevision = 1
+          [1657884399.502907][2748:2748] CHIP:DMG: },
+          [1657884399.502989][2748:2748] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
           [1655796786.513406][6976:6981] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0204 Attribute 0x0000_0000 DataVersion: 3165945392
           [1655796786.513496][6976:6981] CHIP:TOO:   temperature display mode: 1
           [1655796786.513593][6976:6981] CHIP:EM: Sending Standalone Ack for MessageCounter:190446058 on exchange 28240i

@@ -82,7 +82,7 @@ tests:
                 value: 1000
 
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0003
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C08.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -92,7 +92,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0004
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C08.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:
@@ -112,7 +112,7 @@ tests:
                 value: 0
 
     - label: "TH reads CurrentX attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0003
+      PICS: CC.S.F03 && CC.S.A0003 && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "CurrentX"
       response:
@@ -122,7 +122,7 @@ tests:
               maxValue: 65279
 
     - label: "TH reads CurrentY attribute from DUT"
-      PICS: CC.S.F03 && CC.S.A0004
+      PICS: CC.S.F03 && CC.S.A0004 && CC.S.C47.Rsp
       command: "readAttribute"
       attribute: "CurrentY"
       response:

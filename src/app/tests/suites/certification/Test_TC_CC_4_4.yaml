@@ -85,7 +85,7 @@ tests:
                 value: 1000
 
     - label: "Over TransitionTime, TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A0000
+      PICS: CC.S.F01 && CC.S.A0000 && CC.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
@@ -96,7 +96,7 @@ tests:
 
     - label:
           "Over TransitionTime, TH reads CurrentSaturation attribute from DUT"
-      PICS: CC.S.F01 && CC.S.A0001
+      PICS: CC.S.F01 && CC.S.A0001 && CC.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:

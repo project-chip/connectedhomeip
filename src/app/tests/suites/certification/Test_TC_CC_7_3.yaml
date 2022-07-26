@@ -75,7 +75,7 @@ tests:
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
       attribute: "EnhancedCurrentHue"
       response:
           constraints:
@@ -109,7 +109,7 @@ tests:
 
     - label: "Over TransitionTime,Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
-      PICS: CC.S.F01 && CC.S.A4000
+      PICS: CC.S.F01 && CC.S.A4000 && CC.S.C42.Rsp
       attribute: "EnhancedCurrentHue"
       response:
           constraints:

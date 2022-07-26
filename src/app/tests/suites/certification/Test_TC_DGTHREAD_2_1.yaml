@@ -417,6 +417,8 @@ tests:
       response:
           constraints:
               type: uint32
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     #issue #14097
     - label:

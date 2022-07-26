@@ -214,6 +214,7 @@ tests:
               type: uint8
               notValue: StartUpCurrentLevelValue
 
+    #This is a reset step that is needed to reset the value of the attribute to the default values so as to not effect other test cases.
     - label: "writes back default value of OnOffTransitionTime attribute"
       PICS: LVL.S.A0010
       command: "writeAttribute"
