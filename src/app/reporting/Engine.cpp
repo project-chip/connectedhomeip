@@ -293,7 +293,7 @@ exit:
 
 CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err                                                      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
     {
         if (current->mValue.HasEventWildcard())
@@ -327,7 +327,7 @@ CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & 
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId));
         }
-        current                              = current->mpNext;
+        current = current->mpNext;
     }
 
     return err;

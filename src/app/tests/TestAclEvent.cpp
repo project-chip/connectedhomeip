@@ -51,12 +51,12 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::ClusterId kTestClusterId1          = 6;
-chip::ClusterId kTestClusterId2          = 7;
-chip::EndpointId kTestEndpointId        = 1;
-chip::EventId kTestEventIdDebug         = 1;
-chip::EventId kTestEventIdCritical      = 2;
-chip::TLV::Tag kTestEventTag            = chip::TLV::ContextTag(1);
+chip::ClusterId kTestClusterId1    = 6;
+chip::ClusterId kTestClusterId2    = 7;
+chip::EndpointId kTestEndpointId   = 1;
+chip::EventId kTestEventIdDebug    = 1;
+chip::EventId kTestEventIdCritical = 2;
+chip::TLV::Tag kTestEventTag       = chip::TLV::ContextTag(1);
 
 class TestContext : public chip::Test::MockAclTestContext
 {
@@ -243,8 +243,8 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
 
     GenerateEvents(apSuite, apContext);
 
-    // When reading events with withcard paths without enough privilege for reading all events, we will exclude all events without enough
-    // priviledge when generating the report.
+    // When reading events with withcard paths without enough privilege for reading all events, we will exclude all events without
+    // enough priviledge when generating the report.
     {
         chip::app::EventPathParams eventPathParams[1];
         eventPathParams[0].mEndpointId = kTestEndpointId;
@@ -300,7 +300,8 @@ void TestAclEvent::TestReadRoundtripWithEventStatusIBInEventReport(nlTestSuite *
 
     GenerateEvents(apSuite, apContext);
 
-    // When reading events with two concrete paths where one has enough priviledge, another don't have , we will get a EventStatusIB and eventDataIB
+    // When reading events with two concrete paths where one has enough priviledge, another don't have , we will get a EventStatusIB
+    // and eventDataIB
     {
         chip::app::EventPathParams eventPathParams[2];
         eventPathParams[0].mEndpointId = kTestEndpointId;

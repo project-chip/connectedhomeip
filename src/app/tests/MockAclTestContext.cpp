@@ -25,10 +25,10 @@
 namespace {
 using namespace chip;
 using namespace chip::Access;
-using Entry         = chip::Access::AccessControl::Entry;
-using EntryIterator = chip::Access::AccessControl::EntryIterator;
-using Target        = Entry::Target;
-chip::ClusterId kTestClusterId1          = 6;
+using Entry                     = chip::Access::AccessControl::Entry;
+using EntryIterator             = chip::Access::AccessControl::EntryIterator;
+using Target                    = Entry::Target;
+chip::ClusterId kTestClusterId1 = 6;
 
 class TestDeviceTypeResolver : public AccessControl::DeviceTypeResolver
 {
@@ -98,8 +98,7 @@ CHIP_ERROR MockAclTestContext::Init()
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable()));
 
     Access::SetAccessControl(gTestAccessControl);
-    ReturnErrorOnFailure(
-        Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
+    ReturnErrorOnFailure(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
 
     return CHIP_NO_ERROR;
 }
