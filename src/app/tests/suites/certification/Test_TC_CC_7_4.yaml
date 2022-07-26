@@ -20,6 +20,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    EnhancedHueConfigValue:
+        type: INT16U
+        defaultValue: 1200
+    SaturationConfigValue:
+        type: INT8U
+        defaultValue: 90
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -41,6 +47,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F01 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads EnhancedCurrentHue attribute from DUT"
       PICS: CC.S.F01 && CC.S.A4000
       command: "readAttribute"
@@ -57,9 +70,9 @@ tests:
       arguments:
           values:
               - name: "EnhancedHue"
-                value: 1200
+                value: EnhancedHueConfigValue
               - name: "Saturation"
-                value: 90
+                value: SaturationConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -82,7 +95,7 @@ tests:
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: 1200
+          value: EnhancedHueConfigValue
           constraints:
               type: uint16
               minValue: 0
