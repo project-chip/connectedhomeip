@@ -73,7 +73,7 @@ public:
     /**
      * Update the network credentials used by the active device commissioner
      */
-    CHIP_ERROR UpdateNetworkCredentials(chip::Controller::CommissioningParameters & params);
+    CHIP_ERROR UpdateNetworkCredentials(const chip::Controller::CommissioningParameters & params);
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -91,6 +91,13 @@ public:
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
+
+    chip::Controller::AutoCommissioner * GetAutoCommissioner() { return &mAutoCommissioner; }
+
+    const chip::Controller::CommissioningParameters & GetCommissioningParameters() const
+    {
+        return mAutoCommissioner.GetCommissioningParameters();
+    }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {

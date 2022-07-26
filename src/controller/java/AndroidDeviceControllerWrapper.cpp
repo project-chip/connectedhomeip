@@ -364,7 +364,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
     return err;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::UpdateNetworkCredentials(chip::Controller::CommissioningParameters & params)
+CHIP_ERROR AndroidDeviceControllerWrapper::UpdateNetworkCredentials(const chip::Controller::CommissioningParameters & params)
 {
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
     // however, Android APIs don't allow these to be set to custom values today.

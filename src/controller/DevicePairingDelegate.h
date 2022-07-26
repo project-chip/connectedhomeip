@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <controller/CommissioningDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
@@ -86,8 +87,8 @@ public:
      * @brief
      *  Called with the NetworkScanResponse returned from the target
      */
-    virtual void OnScanNetworksSuccess(
-        const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
+    virtual void
+    OnScanNetworksSuccess(const app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
     {}
 
     /**

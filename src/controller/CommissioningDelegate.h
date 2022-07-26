@@ -52,7 +52,8 @@ enum CommissioningStage : uint8_t
     kFindOperational,
     kSendComplete,
     kCleanup,
-    // ScanNetworks can happen anytime after kArmFailsafe. Adding to the end to try to fix circ tests
+    // ScanNetworks can happen anytime after kArmFailsafe.
+    // However, the circ tests fail if it is earlier in the list
     kScanNetworks,
 };
 
@@ -263,10 +264,12 @@ public:
         return *this;
     }
 
+    // If a ThreadOperationalDataset is provided, then the ThreadNetworkScan will not be attempted
     CommissioningParameters & SetThreadOperationalDataset(ByteSpan threadOperationalDataset)
     {
 
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
+        mAttemptThreadNetworkScan = false;
         return *this;
     }
     // This parameter should be set with the information returned from kSendOpCertSigningRequest. It must be set before calling
@@ -354,6 +357,8 @@ public:
 
     Credentials::DeviceAttestationDelegate * GetDeviceAttestationDelegate() const { return mDeviceAttestationDelegate; }
 
+    // If an SSID is provided, and AttemptWiFiNetworkScan is true,
+    // then a directed scan will be performed using the SSID provided in the WiFiCredentials object
     bool GetAttemptWiFiNetworkScan() const { return mAttemptWiFiNetworkScan; }
     CommissioningParameters & SetAttemptWiFiNetworkScan(bool attemptWiFiNetworkScan)
     {
@@ -361,10 +366,14 @@ public:
         return *this;
     }
 
+    // If a ThreadOperationalDataset is provided, then the ThreadNetworkScan will not be attempted
     bool GetAttemptThreadNetworkScan() const { return mAttemptThreadNetworkScan; }
     CommissioningParameters & SetAttemptThreadNetworkScan(bool attemptThreadNetworkScan)
     {
-        mAttemptThreadNetworkScan = attemptThreadNetworkScan;
+        if (!mThreadOperationalDataset.HasValue())
+        {
+            mAttemptThreadNetworkScan = attemptThreadNetworkScan;
+        }
         return *this;
     }
 
@@ -396,7 +405,7 @@ private:
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
     bool mAttemptWiFiNetworkScan   = false;
-    bool mAttemptThreadNetworkScan = true; // TODO: consider whether default value should be enabled or disabled
+    bool mAttemptThreadNetworkScan = true; // This changes to false when a ThreadOperationalDataset is set
 };
 
 struct RequestedCertificate

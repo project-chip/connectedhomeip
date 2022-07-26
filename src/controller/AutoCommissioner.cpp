@@ -507,6 +507,18 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     {
         completionStatus.err = err;
     }
+    mParams.SetCompletionStatus(completionStatus);
+
+    if (mCommissioningPaused)
+    {
+        mPausedStage = nextStage;
+        return CHIP_NO_ERROR;
+    }
+    return PerformStep(nextStage);
+}
+
+CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
+{
 
     DeviceProxy * proxy = mCommissioneeDeviceProxy;
     if (nextStage == CommissioningStage::kSendComplete ||
@@ -521,10 +533,24 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mParams.SetCompletionStatus(completionStatus);
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, GetEndpoint(nextStage),
                                             GetCommandTimeout(proxy, nextStage));
     return CHIP_NO_ERROR;
+}
+
+void AutoCommissioner::PauseCommissioning()
+{
+    mCommissioningPaused = true;
+}
+
+CHIP_ERROR AutoCommissioner::ResumeCommissioning()
+{
+    VerifyOrReturnError(mPausedStage != CommissioningStage::kError, CHIP_ERROR_INCORRECT_STATE);
+    CommissioningStage nextStage = mPausedStage;
+    mPausedStage                 = CommissioningStage::kError;
+    mCommissioningPaused         = false;
+
+    return PerformStep(nextStage);
 }
 
 void AutoCommissioner::ReleaseDAC()

@@ -38,11 +38,22 @@ public:
 
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
-    ReadCommissioningInfo GetReadCommissioningInfo() const { return mDeviceCommissioningInfo; }
+    /**
+     * @brief
+     *   This function puts the AutoCommissioner in a paused state to prevent advancing to the next stage.
+     * It is expected that a DevicePairingDelegate may call this method when processing the
+     * OnCommissioningStatusUpdate, for example, in order to obtain network credentials from the user based
+     * upon the results of the NetworkScan.
+     * Use ResumeCommissioning to continue the commissioning process.
+     *
+     */
+    void PauseCommissioning();
+    CHIP_ERROR ResumeCommissioning();
 
 protected:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
+    CHIP_ERROR PerformStep(CommissioningStage nextStage);
 
 private:
     void ReleaseDAC();
@@ -76,6 +87,9 @@ private:
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
+
+    CommissioningStage mPausedStage = CommissioningStage::kError;
+    bool mCommissioningPaused       = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;

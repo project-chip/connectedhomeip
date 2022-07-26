@@ -1557,42 +1557,6 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 }
 
-void DeviceCommissioner::PauseCommissioning()
-{
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
-    mCommissioningPaused = true;
-}
-
-void DeviceCommissioner::ResumeCommissioning()
-{
-    VerifyOrReturn(mCommissioningPaused);
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
-
-    NodeId nodeId            = mDeviceBeingCommissioned->GetDeviceId();
-    DeviceProxy * proxy      = mDeviceBeingCommissioned;
-    mDeviceBeingCommissioned = nullptr;
-    CommissioningDelegate::CommissioningReport report;
-
-    mCommissioningPaused = false;
-    if (mCommissioningDelegate == nullptr)
-    {
-        return;
-    }
-    report.stageCompleted = mCommissioningStage;
-    CHIP_ERROR status     = mCommissioningDelegate->CommissioningStepFinished(mCommissioningPausedErr, report);
-    if (status != CHIP_NO_ERROR)
-    {
-        // Commissioning delegate will only return error if it failed to perform the appropriate commissioning step.
-        // In this case, we should complete the commissioning for it.
-        CompletionStatus completionStatus;
-        completionStatus.err         = status;
-        completionStatus.failedStage = MakeOptional(report.stageCompleted);
-        mCommissioningStage          = CommissioningStage::kCleanup;
-        mDeviceBeingCommissioned     = proxy;
-        CleanupCommissioning(proxy, nodeId, completionStatus);
-    }
-}
-
 void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     // Once this stage is complete, reset mDeviceBeingCommissioned - this will be reset when the delegate calls the next step.
@@ -1606,12 +1570,6 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
         mPairingDelegate->OnCommissioningStatusUpdate(PeerId(GetCompressedFabricId(), nodeId), mCommissioningStage, err);
     }
 
-    if (mCommissioningPaused)
-    {
-        mDeviceBeingCommissioned = proxy;
-        mCommissioningPausedErr  = err;
-        return;
-    }
     if (mCommissioningDelegate == nullptr)
     {
         return;
@@ -1767,25 +1725,25 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 {
                     if (features.Has(app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kWiFiNetworkInterface))
                     {
-                        ChipLogError(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %d",
-                                     path.mEndpointId);
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has WiFi. endpointid = %d",
+                                        path.mEndpointId);
                         info.network.wifi.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kThreadNetworkInterface))
                     {
-                        ChipLogError(Controller, "----- NetworkCommissioning Features: has Thread.");
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Thread.");
                         info.network.thread.endpoint = path.mEndpointId;
                     }
                     else if (features.Has(
                                  app::Clusters::NetworkCommissioning::NetworkCommissioningFeature::kEthernetNetworkInterface))
                     {
-                        ChipLogError(Controller, "----- NetworkCommissioning Features: has Ethernet.");
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: has Ethernet.");
                         info.network.eth.endpoint = path.mEndpointId;
                     }
                     else
                     {
-                        ChipLogError(Controller, "----- NetworkCommissioning Features: no features.");
+                        ChipLogProgress(Controller, "----- NetworkCommissioning Features: no features.");
                         // TODO: Gross workaround for the empty feature map on all clusters. Remove.
                         if (info.network.thread.endpoint == kInvalidEndpointId)
                         {
@@ -1835,7 +1793,6 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     mAttributeCache = nullptr;
     mReadClient     = nullptr;
 
-    // todo - callback for read commissioning info
     if (mPairingDelegate != nullptr)
     {
         mPairingDelegate->OnReadCommissioningInfo(info);
@@ -1881,7 +1838,7 @@ void DeviceCommissioner::OnSetRegulatoryConfigResponse(
 
 void DeviceCommissioner::OnScanNetworksFailure(void * context, CHIP_ERROR error)
 {
-    ChipLogProgress(Controller, "Received ScanNetworks failure response %s\n", chip::ErrorStr(error));
+    ChipLogProgress(Controller, "Received ScanNetworks failure response %" CHIP_ERROR_FORMAT, error.Format());
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     if (commissioner->GetPairingDelegate() != nullptr)
