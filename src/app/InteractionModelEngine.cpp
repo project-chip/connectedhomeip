@@ -1394,5 +1394,30 @@ size_t InteractionModelEngine::GetNumDirtySubscriptions() const
     return numDirtySubscriptions;
 }
 
+void InteractionModelEngine::OnFabricRemoved(FabricIndex aFabricIndex)
+{
+    // Try to send the queued events as soon as possible. If the just emitted leave event won't
+    // be sent this time, it will likely not be delivered at all for the following reasons:
+    // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
+    //   the leave event will be cancelled.
+    // - removing the fabric removes all associated access control entries, so generating
+    //   subsequent reports containing the leave event will fail the access control check.
+    GetReportingEngine().ScheduleUrgentEventDeliverySync();
+    EventManagement::GetInstance().FabricRemoved(aFabricIndex);
+
+    mReadHandlers.ForEachActiveObject([this, aFabricIndex](ReadHandler * handler) {
+    if (handler->GetAccessingFabricIndex() == aFabricIndex)
+    {
+        ChipLogProgress(InteractionModel,
+                        "Fabric removed, deleting obsolete subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                        ChipLogValueX64(handler->GetInitiatorNodeId()),
+                        handler->GetAccessingFabricIndex());
+        mReadHandlers.ReleaseObject(handler);
+    }
+
+    return Loop::Continue;
+});
+
+}
 } // namespace app
 } // namespace chip

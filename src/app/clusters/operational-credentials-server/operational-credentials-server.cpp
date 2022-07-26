@@ -370,15 +370,7 @@ public:
             }
         }
 
-        // Try to send the queued events as soon as possible. If the just emitted leave event won't
-        // be sent this time, it will likely not be delivered at all for the following reasons:
-        // - removing the fabric expires all associated ReadHandlers, so all subscriptions to
-        //   the leave event will be cancelled.
-        // - removing the fabric removes all associated access control entries, so generating
-        //   subsequent reports containing the leave event will fail the access control check.
-        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDeliverySync();
-        EventManagement::GetInstance().FabricRemoved(fabricIndex);
-
+        InteractionModelEngine::GetInstance()->OnFabricRemoved(fabricIndex);
         NotifyFabricTableChanged();
     }
 

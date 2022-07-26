@@ -268,6 +268,8 @@ public:
      */
     uint16_t GetMinGuaranteedSubscriptionsPerFabric() const;
 
+    void OnFabricRemoved(FabricIndex aFabricIndex);
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
