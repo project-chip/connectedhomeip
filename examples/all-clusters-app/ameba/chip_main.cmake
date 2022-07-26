@@ -129,7 +129,6 @@ if (matter_enable_shell)
 list(
     APPEND ${list_chip_main_sources}
     #shell
-    ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/platform/ameba/shell/launch_shell.cpp
 )
 endif (matter_enable_shell)
@@ -157,6 +156,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp

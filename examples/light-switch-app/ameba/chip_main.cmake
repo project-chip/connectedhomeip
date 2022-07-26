@@ -129,7 +129,6 @@ if (matter_enable_shell)
 list(
     APPEND ${list_chip_main_sources}
     #shell
-    ${chip_dir}/examples/light-switch-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/platform/ameba/shell/launch_shell.cpp
 )
 endif (matter_enable_shell)
@@ -154,6 +153,7 @@ list(
     ${chip_dir}/zzz_generated/light-switch-app/zap-generated/IMClusterCommandHandler.cpp
 
     ${chip_dir}/examples/light-switch-app/ameba/main/chipinterface.cpp
+    ${chip_dir}/examples/light-switch-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/light-switch-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/light-switch-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/light-switch-app/ameba/main/Globals.cpp
