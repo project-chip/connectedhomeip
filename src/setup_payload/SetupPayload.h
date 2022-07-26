@@ -30,6 +30,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/SetupDiscriminator.h>
 
 namespace chip {
 
@@ -39,13 +40,13 @@ const int kVendorIDFieldLengthInBits             = 16;
 const int kProductIDFieldLengthInBits            = 16;
 const int kCommissioningFlowFieldLengthInBits    = 2;
 const int kRendezvousInfoFieldLengthInBits       = 8;
-const int kPayloadDiscriminatorFieldLengthInBits = 12;
+const int kPayloadDiscriminatorFieldLengthInBits = SetupDiscriminator::kLongBits;
 const int kSetupPINCodeFieldLengthInBits         = 27;
 const int kPaddingFieldLengthInBits              = 4;
 const int kRawVendorTagLengthInBits              = 7;
 
 // See section 5.1.3. Manual Pairing Code in the Matter specification
-const int kManualSetupDiscriminatorFieldLengthInBits  = 4;
+const int kManualSetupDiscriminatorFieldLengthInBits  = SetupDiscriminator::kShortBits;
 const int kManualSetupChunk1DiscriminatorMsbitsPos    = 0;
 const int kManualSetupChunk1DiscriminatorMsbitsLength = 2;
 const int kManualSetupChunk1VidPidPresentBitPos =
@@ -119,12 +120,11 @@ struct PayloadContents
     uint16_t productID                               = 0;
     CommissioningFlow commissioningFlow              = CommissioningFlow::kStandard;
     RendezvousInformationFlags rendezvousInformation = RendezvousInformationFlag::kNone;
-    uint16_t discriminator                           = 0;
-    uint32_t setUpPINCode                            = 0;
+    SetupDiscriminator discriminator;
+    uint32_t setUpPINCode = 0;
 
     bool isValidQRCodePayload() const;
     bool isValidManualCode() const;
-    bool isShortDiscriminator = false;
     bool operator==(PayloadContents & input) const;
 
     static bool IsValidSetupPIN(uint32_t setupPIN);

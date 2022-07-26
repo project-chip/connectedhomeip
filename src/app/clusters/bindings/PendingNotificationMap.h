@@ -100,15 +100,13 @@ public:
 
     Iterator end() { return Iterator(this, mNumEntries); }
 
-    CHIP_ERROR FindLRUConnectPeer(FabricIndex * fabric, NodeId * node);
+    CHIP_ERROR FindLRUConnectPeer(ScopedNodeId & nodeId);
 
     void AddPendingNotification(uint8_t bindingEntryId, PendingNotificationContext * context);
 
     void RemoveEntry(uint8_t bindingEntryId);
 
-    void RemoveAllEntriesForNode(FabricTable * fabricTable, PeerId peer);
-
-    void RemoveAllEntriesForNode(FabricIndex fabric, NodeId node);
+    void RemoveAllEntriesForNode(const ScopedNodeId & nodeId);
 
     void RemoveAllEntriesForFabric(FabricIndex fabric);
 

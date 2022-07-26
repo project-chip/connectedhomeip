@@ -82,7 +82,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Operational
     env->CallVoidMethod(javaCallback, successMethod, reinterpret_cast<jlong>(device));
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);

@@ -205,6 +205,12 @@ private:
      */
     IdleStateReason MapErrorToIdleStateReason(CHIP_ERROR error);
 
+    ScopedNodeId GetProviderScopedId() const
+    {
+        VerifyOrDie(mProviderLocation.HasValue());
+        return ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex);
+    }
+
     /**
      * Record the new update state by updating the corresponding server attribute and logging a StateTransition event
      */
@@ -280,7 +286,7 @@ private:
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
-    static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
