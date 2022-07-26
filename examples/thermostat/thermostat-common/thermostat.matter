@@ -382,7 +382,7 @@ server cluster Basic = 40 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster OtaSoftwareUpdateProvider = 41 {
+client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTAApplyUpdateAction : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -446,6 +446,76 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+}
+
+server cluster OtaSoftwareUpdateRequestor = 42 {
+  enum OTAAnnouncementReason : ENUM8 {
+    kSimpleAnnouncement = 0;
+    kUpdateAvailable = 1;
+    kUrgentUpdateAvailable = 2;
+  }
+
+  enum OTAChangeReasonEnum : ENUM8 {
+    kUnknown = 0;
+    kSuccess = 1;
+    kFailure = 2;
+    kTimeOut = 3;
+    kDelayByProvider = 4;
+  }
+
+  enum OTAUpdateStateEnum : ENUM8 {
+    kUnknown = 0;
+    kIdle = 1;
+    kQuerying = 2;
+    kDelayedOnQuery = 3;
+    kDownloading = 4;
+    kApplying = 5;
+    kDelayedOnApply = 6;
+    kRollingBack = 7;
+    kDelayedOnUserConsent = 8;
+  }
+
+  struct ProviderLocation {
+    node_id providerNodeID = 1;
+    endpoint_no endpoint = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
+  info event StateTransition = 0 {
+    OTAUpdateStateEnum previousState = 0;
+    OTAUpdateStateEnum newState = 1;
+    OTAChangeReasonEnum reason = 2;
+    nullable INT32U targetSoftwareVersion = 3;
+  }
+
+  critical event VersionApplied = 1 {
+    INT32U softwareVersion = 0;
+    INT16U productID = 1;
+  }
+
+  info event DownloadError = 2 {
+    INT32U softwareVersion = 0;
+    INT64U bytesDownloaded = 1;
+    nullable INT8U progressPercent = 2;
+    nullable INT64S platformCode = 3;
+  }
+
+  attribute ProviderLocation defaultOtaProviders[] = 0;
+  readonly attribute boolean updatePossible = 1;
+  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute nullable int8u updateStateProgress = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AnnounceOtaProviderRequest {
+    node_id providerNodeId = 0;
+    vendor_id vendorId = 1;
+    OTAAnnouncementReason announcementReason = 2;
+    optional OCTET_STRING metadataForNode = 3;
+    endpoint_no endpoint = 4;
+  }
+
+  command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 0;
 }
 
 server cluster LocalizationConfiguration = 43 {
@@ -1384,6 +1454,7 @@ server cluster Thermostat = 513 {
 
 endpoint 0 {
   device type rootdevice = 22;
+  binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
     ram      attribute identifyTime;
@@ -1442,7 +1513,11 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster OtaSoftwareUpdateProvider {
+  server cluster OtaSoftwareUpdateRequestor {
+    callback attribute defaultOtaProviders;
+    ram      attribute updatePossible default = 1;
+    ram      attribute updateState;
+    ram      attribute updateStateProgress;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
