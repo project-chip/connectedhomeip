@@ -29,8 +29,8 @@ docker run -it --network host -v /var/run/dbus/system_bus_socket:/var/run/dbus/s
 The Dockerfile requires building using the `Buildx` plugin, included within
 docker. It is used to build for both the amd64 and arm64 architectures, so the
 image may be cross-built and ran directly on a Raspberry Pi or other arm64 based
-environment. If your docker installation does not have the `Buildx` plugin, please
-update docker or install `Buildx` manually.
+environment. If your docker installation does not have the `Buildx` plugin,
+please update docker or install `Buildx` manually.
 
 Prerequisites:
 
