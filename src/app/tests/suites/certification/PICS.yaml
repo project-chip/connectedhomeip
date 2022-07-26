@@ -2136,7 +2136,8 @@ PICS:
       id: MEDIAPLAYBACK.C.C00.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster, Pause command?"
+          "Does the DUT support the Media Playback client cluster, Pause
+          command?"
       id: MEDIAPLAYBACK.C.C01.Tx
 
     - label:
@@ -2144,11 +2145,13 @@ PICS:
       id: MEDIAPLAYBACK.C.C02.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster, StartOver command?"
+          "Does the DUT support the Media Playback client cluster, StartOver
+          command?"
       id: MEDIAPLAYBACK.C.C03.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster, Previous command?"
+          "Does the DUT support the Media Playback client cluster, Previous
+          command?"
       id: MEDIAPLAYBACK.C.C04.Tx
 
     - label:
@@ -2156,11 +2159,13 @@ PICS:
       id: MEDIAPLAYBACK.C.C05.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster, SkipForward command?"
+          "Does the DUT support the Media Playback client cluster, SkipForward
+          command?"
       id: MEDIAPLAYBACK.C.C08.Tx
 
     - label:
-          "Does the DUT support the Media Playback client cluster, SkipBackward command?"
+          "Does the DUT support the Media Playback client cluster, SkipBackward
+          command?"
       id: MEDIAPLAYBACK.C.C09.Tx
 
     - label:
