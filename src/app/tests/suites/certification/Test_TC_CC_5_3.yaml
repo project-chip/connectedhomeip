@@ -18,6 +18,12 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    StepXConfigValue:
+        type: INT16S
+        defaultValue: 100
+    StepYConfigValue:
+        type: INT16S
+        defaultValue: 100
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,11 +45,19 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F03 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentX attribute from DUT"
       command: "readAttribute"
       PICS: CC.S.F03 && CC.S.A0003
       attribute: "CurrentX"
       response:
+          saveAs: CurrentXValue
           constraints:
               type: uint16
               minValue: 0
@@ -54,6 +68,7 @@ tests:
       PICS: CC.S.F03 && CC.S.A0004
       attribute: "CurrentY"
       response:
+          saveAs: CurrentYValue
           constraints:
               type: uint16
               minValue: 0
@@ -65,9 +80,9 @@ tests:
       arguments:
           values:
               - name: "stepX"
-                value: 15
+                value: StepXConfigValue
               - name: "stepY"
-                value: 20
+                value: StepYConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -75,13 +90,13 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "Wait 1000ms"
+    - label: "Wait 1500ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: 1500
 
     - label: "Over TransitionTime, TH reads CurrentX attribute from DUT"
       PICS: CC.S.F03 && CC.S.A0003 && CC.S.C09.Rsp
@@ -90,7 +105,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentXValue
               maxValue: 65279
 
     - label: "Over TransitionTime, TH reads CurrentY attribute from DUT"
@@ -100,7 +115,7 @@ tests:
       response:
           constraints:
               type: uint16
-              minValue: 0
+              minValue: CurrentYValue
               maxValue: 65279
 
     - label: "Turn off light that we turned on"

@@ -41,6 +41,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: LVL.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "Reads the MinLevel attribute"
       PICS: LVL.S.A0002
       command: "readAttribute"

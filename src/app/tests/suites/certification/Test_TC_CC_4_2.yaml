@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    RateConfigValue:
+        type: INT8U
+        defaultValue: 50
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,6 +42,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
@@ -57,7 +67,7 @@ tests:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 15
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -125,7 +135,7 @@ tests:
               - name: "MoveMode"
                 value: 3
               - name: "Rate"
-                value: 10
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -195,7 +205,7 @@ tests:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 100
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -229,7 +239,7 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 50
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -279,7 +289,7 @@ tests:
               - name: "MoveMode"
                 value: 3
               - name: "Rate"
-                value: 10
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -332,7 +342,7 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 10
+                value: RateConfigValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"

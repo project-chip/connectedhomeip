@@ -19,6 +19,18 @@ config:
     cluster: "Color Control"
     endpoint: 1
     timeout: 150
+    hueShortestDistance:
+        type: INT8U
+        defaultValue: 150
+    hueLongestDistance:
+        type: INT8U
+        defaultValue: 200
+    hueDirectionUp:
+        type: INT8U
+        defaultValue: 250
+    hueDirectionDown:
+        type: INT8U
+        defaultValue: 170
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -40,6 +52,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
@@ -58,7 +77,7 @@ tests:
       arguments:
           values:
               - name: "hue"
-                value: 150
+                value: hueShortestDistance
               - name: "Direction"
                 value: 0
               - name: "TransitionTime"
@@ -117,7 +136,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 150
+          value: hueShortestDistance
 
     - label:
           "TH sends MoveToHue command to DUT another Hue with Direction Longest
@@ -127,7 +146,7 @@ tests:
       arguments:
           values:
               - name: "hue"
-                value: 200
+                value: hueLongestDistance
               - name: "Direction"
                 value: 1
               - name: "TransitionTime"
@@ -186,7 +205,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 200
+          value: hueLongestDistance
 
     - label:
           "TH sends MoveToHue command to DUT another Hue with Direction Up and
@@ -196,7 +215,7 @@ tests:
       arguments:
           values:
               - name: "hue"
-                value: 250
+                value: hueDirectionUp
               - name: "Direction"
                 value: 2
               - name: "TransitionTime"
@@ -255,7 +274,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 250
+          value: hueDirectionUp
 
     - label:
           "TH sends MoveToHue command to DUT another Hue with Direction Down and
@@ -265,7 +284,7 @@ tests:
       arguments:
           values:
               - name: "hue"
-                value: 200
+                value: hueDirectionDown
               - name: "Direction"
                 value: 3
               - name: "TransitionTime"
@@ -324,7 +343,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 200
+          value: hueDirectionDown
 
     - label: "Turn off light that we turned on"
       cluster: "On/Off"

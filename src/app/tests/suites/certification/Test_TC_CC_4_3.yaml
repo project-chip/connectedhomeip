@@ -18,6 +18,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    StepSizeConfigValue:
+        type: INT8U
+        defaultValue: 15
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -39,6 +42,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F00 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
@@ -57,7 +67,7 @@ tests:
               - name: "StepMode"
                 value: 1
               - name: "StepSize"
-                value: 15
+                value: StepSizeConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
@@ -92,7 +102,7 @@ tests:
               - name: "StepMode"
                 value: 3
               - name: "StepSize"
-                value: 20
+                value: StepSizeConfigValue
               - name: "TransitionTime"
                 value: 10
               - name: "OptionsMask"
