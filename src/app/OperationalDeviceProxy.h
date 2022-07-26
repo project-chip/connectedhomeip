@@ -73,7 +73,7 @@ struct DeviceProxyInitParams
 class OperationalDeviceProxy;
 
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
-typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
+typedef void (*OnDeviceConnectionFailure)(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
 
 /**
  * Represents a connection path to a device that is in an operational state.
@@ -92,10 +92,7 @@ class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy,
 public:
     ~OperationalDeviceProxy() override;
 
-    //
-    // TODO: Should not be PeerId, but rather, ScopedNodeId
-    //
-    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
+    OperationalDeviceProxy(DeviceProxyInitParams & params, ScopedNodeId peerId) : mSecureSession(*this)
     {
         mInitParams = params;
         if (params.Validate() != CHIP_NO_ERROR)
@@ -107,15 +104,7 @@ public:
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mPeerId      = peerId;
         mFabricTable = params.fabricTable;
-        if (mFabricTable != nullptr)
-        {
-            auto fabricInfo = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
-            if (fabricInfo != nullptr)
-            {
-                mFabricIndex = fabricInfo->GetFabricIndex();
-            }
-        }
-        mState = State::NeedsAddress;
+        mState       = State::NeedsAddress;
         mAddressLookupHandle.SetListener(this);
     }
 
@@ -171,7 +160,7 @@ public:
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
-    PeerId GetPeerId() const { return mPeerId; }
+    ScopedNodeId GetPeerId() const { return mPeerId; }
 
     void ShutdownSubscriptions() override;
 
@@ -201,7 +190,7 @@ public:
     /**
      * @brief Get the fabricIndex
      */
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetFabricIndex() const { return mPeerId.GetFabricIndex(); }
 
     /**
      * Triggers a DNSSD lookup to find a usable peer address for this operational device.
@@ -225,14 +214,13 @@ private:
 
     DeviceProxyInitParams mInitParams;
     FabricTable * mFabricTable = nullptr;
-    FabricIndex mFabricIndex   = kUndefinedFabricIndex;
     System::Layer * mSystemLayer;
 
     // mCASEClient is only non-null if we are in State::Connecting or just
     // allocated it as part of an attempt to enter State::Connecting.
     CASEClient * mCASEClient = nullptr;
 
-    PeerId mPeerId;
+    ScopedNodeId mPeerId;
 
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
