@@ -291,13 +291,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool & aItemRemoved, ReadHandler * apReadHandler)
+CHIP_ERROR Engine::CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err                                                      = CHIP_NO_ERROR;
-    ObjectList<EventPathParams> * deletedEventPathList                  = nullptr;
-    ObjectList<EventPathParams> ** previousIteratedEventPathListNextPtr = &(apReadHandler->mpEventPathList);
-
-    aItemRemoved = false;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     for (auto current = apReadHandler->mpEventPathList; current != nullptr;)
     {
         if (current->mValue.HasEventWildcard())
@@ -307,20 +303,13 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool &
         }
 
         Access::RequestPath requestPath{ .cluster = current->mValue.mClusterId, .endpoint = current->mValue.mEndpointId };
-        ConcreteEventPath path;
-        path.mClusterId                    = current->mValue.mClusterId;
-        path.mEndpointId                   = current->mValue.mEndpointId;
-        path.mEventId                      = current->mValue.mEventId;
+        ConcreteEventPath path(current->mValue.mEndpointId, current->mValue.mClusterId, current->mValue.mEventId);
         Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
 
         err = Access::GetAccessControl().Check(apReadHandler->GetSubjectDescriptor(), requestPath, requestPrivilege);
         if (err != CHIP_ERROR_ACCESS_DENIED)
         {
-            SuccessOrExit(err);
-
-            // Proceed to the next item
-            previousIteratedEventPathListNextPtr = &(current->mpNext);
-            current                              = current->mpNext;
+            ReturnErrorOnFailure(err);
         }
         else
         {
@@ -332,33 +321,15 @@ CHIP_ERROR Engine::RemoveUnaccessableEventPaths(TLV::TLVWriter & aWriter, bool &
                 aWriter = checkpoint;
                 break;
             }
-
+            aHasEncodedData = true;
             ChipLogDetail(InteractionModel,
-                          "Removed event path (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege",
+                          "Construct event status (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") due to insufficient privilege",
                           current->mValue.mEndpointId, ChipLogValueMEI(current->mValue.mClusterId),
                           ChipLogValueMEI(current->mValue.mEventId));
-
-            auto next = current->mpNext;
-
-            // Detach current item from the interested path list
-            *previousIteratedEventPathListNextPtr = next;
-
-            // Append current item to the deleted event path list
-            current->mpNext      = deletedEventPathList;
-            deletedEventPathList = current;
-
-            // proceed to the next item
-            current = next;
         }
+        current = current->mpNext;
     }
 
-exit:
-    // Always release the items in deletedEventPathList to avoid memory leak
-    if (deletedEventPathList != nullptr)
-    {
-        aItemRemoved = true;
-        InteractionModelEngine::GetInstance()->ReleaseEventPathList(deletedEventPathList);
-    }
     return err;
 }
 
@@ -394,18 +365,12 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         // Just like what we do in BuildSingleReportDataAttributeReportIBs(), we need to reserve one byte for end of container tag
         // when encoding events to ensure we can close the container successfully.
         const uint32_t kReservedSizeEndOfReportIBs = 1;
-        bool eventPathCleaned                      = false;
         EventReportIBs::Builder & eventReportIBs   = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
         VerifyOrExit(eventReportIBs.GetWriter() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = eventReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs));
 
-        err = RemoveUnaccessableEventPaths(*(eventReportIBs.GetWriter()), eventPathCleaned, apReadHandler);
-        if (eventPathCleaned)
-        {
-            ChipLogDetail(DataManagement, "removed unaccess event paths");
-            hasEncodedData = true;
-        }
+        err = CheckAccessDeniedEventPaths(*(eventReportIBs.GetWriter()), hasEncodedData, apReadHandler);
         SuccessOrExit(err);
 
         err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), apReadHandler->GetEventPathList(), eventMin, eventCount,

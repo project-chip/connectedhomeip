@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,13 +15,26 @@
  */
 #pragma once
 
-#include "access/AccessControl.h"
+#include <messaging/tests/MessagingContext.h>
 
 namespace chip {
-namespace Access {
-namespace Examples {
-AccessControl::Delegate * GetPermissiveAccessControlDelegate();
+namespace Test {
 
-} // namespace Examples
-} // namespace Access
+/**
+ * @brief The context of test cases for messaging layer. It wil initialize network layer and system layer, and create
+ *        two secure sessions, connected with each other. Exchanges can be created for each secure session.
+ */
+class MockAclTestContext : public LoopbackMessagingContext
+{
+    typedef LoopbackMessagingContext Super;
+
+public:
+    /// Initialize the underlying layers.
+    CHIP_ERROR Init() override;
+
+    // Shutdown all layers, finalize operations
+    void Shutdown() override;
+};
+
+} // namespace Test
 } // namespace chip

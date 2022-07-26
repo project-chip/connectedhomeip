@@ -552,9 +552,6 @@ CHIP_ERROR EventManagement::CheckEventContext(EventLoadOutContext * eventLoadOut
     Access::Privilege requestPrivilege = RequiredPrivilege::ForReadEvent(path);
     CHIP_ERROR accessControlError =
         Access::GetAccessControl().Check(eventLoadOutContext->mSubjectDescriptor, requestPath, requestPrivilege);
-
-    // We have removed event paths with insufficient privilege in Reporting::Engine::RemoveUnaccessableEventPaths
-    // Just skip the event here.
     if (accessControlError != CHIP_NO_ERROR)
     {
         ReturnErrorCodeIf(accessControlError != CHIP_ERROR_ACCESS_DENIED, accessControlError);

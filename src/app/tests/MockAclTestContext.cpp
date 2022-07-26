@@ -1,7 +1,5 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,18 +14,31 @@
  *    limitations under the License.
  */
 
-#include "PermissiveAccessControlDelegate.h"
+#include <app/tests/MockAclTestContext.h>
+
+#include <access/AccessControl.h>
+#include <access/examples/PermissiveAccessControlDelegate.h>
+#include <app/InteractionModelEngine.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 
 namespace {
-
 using namespace chip;
 using namespace chip::Access;
+using Entry                     = chip::Access::AccessControl::Entry;
+using EntryIterator             = chip::Access::AccessControl::EntryIterator;
+using Target                    = Entry::Target;
+chip::ClusterId kTestClusterId1 = 6;
 
-using Entry         = chip::Access::AccessControl::Entry;
-using EntryIterator = chip::Access::AccessControl::EntryIterator;
-using Target        = Entry::Target;
+class TestDeviceTypeResolver : public AccessControl::DeviceTypeResolver
+{
+public:
+    bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
+} gDeviceTypeResolver;
 
-class AccessControlDelegate : public AccessControl::Delegate
+AccessControl gTestAccessControl;
+
+class TestAccessControlDelegate : public AccessControl::Delegate
 {
 public:
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
@@ -63,22 +74,42 @@ public:
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
+        if (requestPath.cluster == kTestClusterId1)
+        {
+            return CHIP_ERROR_ACCESS_DENIED;
+        }
         return CHIP_NO_ERROR;
     }
 };
 
+AccessControl::Delegate * GetTestAccessControlDelegate()
+{
+    static TestAccessControlDelegate accessControlDelegate;
+    return &accessControlDelegate;
+}
 } // namespace
 
 namespace chip {
-namespace Access {
-namespace Examples {
+namespace Test {
 
-AccessControl::Delegate * GetPermissiveAccessControlDelegate()
+CHIP_ERROR MockAclTestContext::Init()
 {
-    static AccessControlDelegate accessControlDelegate;
-    return &accessControlDelegate;
+    ReturnErrorOnFailure(Super::Init());
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable()));
+
+    Access::SetAccessControl(gTestAccessControl);
+    ReturnErrorOnFailure(Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver));
+
+    return CHIP_NO_ERROR;
 }
 
-} // namespace Examples
-} // namespace Access
+void MockAclTestContext::Shutdown()
+{
+    Access::GetAccessControl().Finish();
+
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    Super::Shutdown();
+}
+
+} // namespace Test
 } // namespace chip
