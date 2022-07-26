@@ -2961,6 +2961,11 @@ DlLockDataType DoorLockServer::credentialTypeToLockDataType(DlCredentialType cre
     return DlLockDataType::kUnspecified;
 }
 
+bool DoorLockServer::isUserScheduleRestricted(chip::EndpointId endpointId, const EmberAfPluginDoorLockUserInfo & user)
+{
+    return false;
+}
+
 void DoorLockServer::setHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
                                                       const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex,
                                                       uint32_t localStartTime, uint32_t localEndTime, DlOperatingMode operatingMode)
@@ -3161,8 +3166,7 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
         // think if the app thinks that PIN is correct the door should be unlocked.
         //
         // [DV]: let app decide on PIN correctness, we will fail only if 'opHandler' returns false.
-        credentialsOk =
-            true; // findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), pinUserIdx, pinCredIdx);
+        credentialsOk = true;
     }
     else
     {

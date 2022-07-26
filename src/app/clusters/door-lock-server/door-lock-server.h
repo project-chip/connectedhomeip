@@ -292,6 +292,8 @@ private:
 
     DlLockDataType credentialTypeToLockDataType(DlCredentialType credentialType);
 
+    bool isUserScheduleRestricted(chip::EndpointId endpointId, const EmberAfPluginDoorLockUserInfo & user);
+
     void setUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
 

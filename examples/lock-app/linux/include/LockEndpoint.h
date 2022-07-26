@@ -98,6 +98,9 @@ private:
     bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
     const char * lockStateToString(DlLockState lockState) const;
 
+    bool weekDayScheduleInAction(uint16_t userIndex) const;
+    bool yearDayScheduleInAction(uint16_t userIndex) const;
+
     chip::EndpointId mEndpointId;
     DlLockState mLockState;
     DlDoorState mDoorState;
