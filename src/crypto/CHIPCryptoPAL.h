@@ -1529,24 +1529,20 @@ public:
     /**
      * @brief Perform privacy encoding as described in 4.8.2. (Privacy Processing of Outgoing Messages)
      * @param[in] input         Message header to privacy encrypt
-     * @param[in] session_id    Incoming SessionID
-     * @param[in] mic           Incoming Message Integrity Check
+     * @param[in] nonce         Privacy Nonce = session_id | mic
      * @param[out] output       Message header obfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
-                                      MutableByteSpan & output) const = 0;
+    virtual CHIP_ERROR PrivacyEncrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Perform privacy decoding as described in 4.8.3. (Privacy Processing of Incoming Messages)
      * @param[in] input         Message header to privacy decrypt
-     * @param[in] session_id    Incoming SessionID
-     * @param[in] mic           Incoming Message Integrity Check
+     * @param[in] nonce         Privacy Nonce = session_id | mic
      * @param[out] output       Message header deobfuscated
      * @return CHIP_ERROR
      */
-    virtual CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, uint16_t session_id, const ByteSpan & mic,
-                                      MutableByteSpan & output) const = 0;
+    virtual CHIP_ERROR PrivacyDecrypt(const ByteSpan & input, const ByteSpan & nonce, MutableByteSpan & output) const = 0;
 
     /**
      * @brief Release resources such as dynamic memory used to allocate this instance of the SymmetricKeyContext

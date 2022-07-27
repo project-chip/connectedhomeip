@@ -147,6 +147,15 @@ CHIP_ERROR CryptoContext::BuildNonce(NonceView nonce, uint8_t securityFlags, uin
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
+CHIP_ERROR CryptoContext::BuildPrivacyNonce(NonceView nonce, uint16_t sessionId, const MessageAuthenticationCode & mac)
+{
+    Encoding::LittleEndian::BufferWriter bbuf(nonce.data(), nonce.size());
+
+    bbuf.Put16(sessionId);
+    bbuf.Put(mac.GetTag(), kPrivacyNonceMicFragmentLen);
+    return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
 CHIP_ERROR CryptoContext::GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len)
 {
     VerifyOrReturnError(len >= header.EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -256,9 +265,6 @@ CHIP_ERROR CryptoContext::Decrypt(const uint8_t * input, size_t input_length, ui
 CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                            MessageAuthenticationCode & mac) const
 {
-    const size_t taglen = header.MICTagLength();
-    VerifyOrDie(taglen <= kMaxTagLen);
-
     VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -268,17 +274,15 @@ CHIP_ERROR CryptoContext::PrivacyObfuscate(const uint8_t * input, size_t input_l
 
     ByteSpan plaintext(input, input_length);
     MutableByteSpan privacytext(output, input_length);
-    ByteSpan mic(mac.GetTag(), taglen);
+    CryptoContext::NonceStorage privacyNonce;
+    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
 
-    return mKeyContext->PrivacyEncrypt(plaintext, header.GetSessionId(), mic, privacytext);
+    return mKeyContext->PrivacyEncrypt(plaintext, privacyNonce, privacytext);
 }
 
 CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input_length, uint8_t * output,
                                              const PacketHeader & header, const MessageAuthenticationCode & mac) const
 {
-    const size_t taglen = header.MICTagLength();
-    VerifyOrDie(taglen <= kMaxTagLen);
-
     VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -288,9 +292,10 @@ CHIP_ERROR CryptoContext::PrivacyDeobfuscate(const uint8_t * input, size_t input
 
     const ByteSpan privacytext(input, input_length);
     MutableByteSpan plaintext(output, input_length);
-    ByteSpan mic(mac.GetTag(), taglen);
+    CryptoContext::NonceStorage privacyNonce;
+    CryptoContext::BuildPrivacyNonce(privacyNonce, header.GetSessionId(), mac);
 
-    return mKeyContext->PrivacyDecrypt(privacytext, header.GetSessionId(), mic, plaintext);
+    return mKeyContext->PrivacyDecrypt(privacytext, privacyNonce, plaintext);
 }
 
 } // namespace chip
