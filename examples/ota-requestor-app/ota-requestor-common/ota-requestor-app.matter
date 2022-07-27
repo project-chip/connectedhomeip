@@ -6,6 +6,20 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
+server cluster Descriptor = 29 {
+  struct DeviceType {
+    devtype_id type = 0;
+    int16u revision = 1;
+  }
+
+  readonly attribute DeviceType deviceList[] = 0;
+  readonly attribute CLUSTER_ID serverList[] = 1;
+  readonly attribute CLUSTER_ID clientList[] = 2;
+  readonly attribute ENDPOINT_NO partsList[] = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 server cluster AccessControl = 31 {
   enum AuthMode : ENUM8 {
     kPase = 1;
@@ -804,6 +818,15 @@ endpoint 0 {
   device type rootdevice = 22;
   binding cluster OtaSoftwareUpdateProvider;
 
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
+  }
+
   server cluster AccessControl {
     callback attribute acl;
     callback attribute extension;
@@ -943,6 +966,15 @@ endpoint 0 {
 }
 endpoint 65534 {
   device type anonymousEndpointType = 61442;
+
+  server cluster Descriptor {
+    callback attribute deviceList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    ram      attribute featureMap;
+    callback attribute clusterRevision default = 1;
+  }
 
   server cluster NetworkCommissioning {
     callback attribute maxNetworks;
