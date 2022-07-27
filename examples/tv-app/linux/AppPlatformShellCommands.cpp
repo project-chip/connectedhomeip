@@ -41,6 +41,7 @@
 using namespace ::chip::Controller;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
+using namespace chip::Access;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::app::Clusters;
 
@@ -103,6 +104,82 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         return CommissionerPairUDC(pincode, index);
     }
     return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR DumpAccessControlEntry(const Access::AccessControl::Entry & entry)
+{
+    CHIP_ERROR err;
+
+    ChipLogDetail(DeviceLayer, "----- BEGIN ENTRY -----");
+
+    {
+        FabricIndex fabricIndex;
+        SuccessOrExit(err = entry.GetFabricIndex(fabricIndex));
+        ChipLogDetail(DeviceLayer, "fabricIndex: %u", fabricIndex);
+    }
+
+    {
+        Privilege privilege;
+        SuccessOrExit(err = entry.GetPrivilege(privilege));
+        ChipLogDetail(DeviceLayer, "privilege: %d", to_underlying(privilege));
+    }
+
+    {
+        AuthMode authMode;
+        SuccessOrExit(err = entry.GetAuthMode(authMode));
+        ChipLogDetail(DeviceLayer, "authMode: %d", to_underlying(authMode));
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetSubjectCount(count));
+        if (count)
+        {
+            ChipLogDetail(DeviceLayer, "subjects: %u", static_cast<unsigned>(count));
+            for (size_t i = 0; i < count; ++i)
+            {
+                NodeId subject;
+                SuccessOrExit(err = entry.GetSubject(i, subject));
+                ChipLogDetail(DeviceLayer, "  %u: 0x" ChipLogFormatX64, static_cast<unsigned>(i), ChipLogValueX64(subject));
+            }
+        }
+    }
+
+    {
+        size_t count;
+        SuccessOrExit(err = entry.GetTargetCount(count));
+        if (count)
+        {
+            ChipLogDetail(DeviceLayer, "targets: %u", static_cast<unsigned>(count));
+            for (size_t i = 0; i < count; ++i)
+            {
+                Access::AccessControl::Entry::Target target;
+                SuccessOrExit(err = entry.GetTarget(i, target));
+                if (target.flags & Access::AccessControl::Entry::Target::kCluster)
+                {
+                    ChipLogDetail(DeviceLayer, "  %u: cluster: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
+                                  ChipLogValueMEI(target.cluster));
+                }
+                if (target.flags & Access::AccessControl::Entry::Target::kEndpoint)
+                {
+                    ChipLogDetail(DeviceLayer, "  %u: endpoint: %u", static_cast<unsigned>(i), target.endpoint);
+                }
+                if (target.flags & Access::AccessControl::Entry::Target::kDeviceType)
+                {
+                    ChipLogDetail(DeviceLayer, "  %u: deviceType: 0x" ChipLogFormatMEI, static_cast<unsigned>(i),
+                                  ChipLogValueMEI(target.deviceType));
+                }
+            }
+        }
+    }
+
+    ChipLogDetail(DeviceLayer, "----- END ENTRY -----");
+
+    return CHIP_NO_ERROR;
+
+exit:
+    ChipLogError(DeviceLayer, "DumpAccessControlEntry: dump failed %" CHIP_ERROR_FORMAT, err.Format());
+    return err;
 }
 
 static CHIP_ERROR PrintAllCommands()
@@ -231,13 +308,12 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
     else if (strcmp(argv[0], "print-app-access") == 0)
     {
         Access::AccessControl::EntryIterator iterator;
-        Access::AccessControl & accessControl = Access::GetAccessControl();
-        ReturnErrorOnFailure(accessControl.Entries(GetDeviceCommissioner()->GetFabricIndex(), iterator));
+        ReturnErrorOnFailure(Access::GetAccessControl().Entries(GetDeviceCommissioner()->GetFabricIndex(), iterator));
 
         Access::AccessControl::Entry entry;
         while (iterator.Next(entry) == CHIP_NO_ERROR)
         {
-            accessControl.Dump(entry);
+            DumpAccessControlEntry(entry);
         }
         return CHIP_NO_ERROR;
     }
