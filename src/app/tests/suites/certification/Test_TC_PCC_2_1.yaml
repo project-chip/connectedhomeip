@@ -60,7 +60,6 @@ tests:
 
     - label: "Read the optional attribute: MinConstPressure"
       PICS: PCC.S.A0003
-      optional: true
       command: "readAttribute"
       attribute: "MinConstPressure"
       response:
@@ -71,7 +70,6 @@ tests:
 
     - label: "Read the optional attribute: MaxConstPressure"
       PICS: PCC.S.A0004
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstPressure"
       response:
@@ -82,7 +80,6 @@ tests:
 
     - label: "Read the optional attribute: MinCompPressure"
       PICS: PCC.S.A0005
-      optional: true
       command: "readAttribute"
       attribute: "MinCompPressure"
       response:
@@ -93,7 +90,6 @@ tests:
 
     - label: "Read the optional attribute: MaxCompPressure"
       PICS: PCC.S.A0006
-      optional: true
       command: "readAttribute"
       attribute: "MaxCompPressure"
       response:
@@ -104,7 +100,6 @@ tests:
 
     - label: "Read the optional attribute: MinConstSpeed"
       PICS: PCC.S.A0007
-      optional: true
       command: "readAttribute"
       attribute: "MinConstSpeed"
       response:
@@ -115,7 +110,6 @@ tests:
 
     - label: "Read the optional attribute: MaxConstSpeed"
       PICS: PCC.S.A0008
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstSpeed"
       response:
@@ -126,7 +120,6 @@ tests:
 
     - label: "Read the optional attribute: MinConstFlow"
       PICS: PCC.S.A0009
-      optional: true
       command: "readAttribute"
       attribute: "MinConstFlow"
       response:
@@ -137,7 +130,6 @@ tests:
 
     - label: "Read the optional attribute: MaxConstFlow"
       PICS: PCC.S.A000a
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstFlow"
       response:
@@ -148,7 +140,6 @@ tests:
 
     - label: "Read the optional attribute: MinConstTemp"
       PICS: PCC.S.A000b
-      optional: true
       command: "readAttribute"
       attribute: "MinConstTemp"
       response:
@@ -159,7 +150,6 @@ tests:
 
     - label: "Read the optional attribute: MaxConstTemp"
       PICS: PCC.S.A000c
-      optional: true
       command: "readAttribute"
       attribute: "MaxConstTemp"
       response:
@@ -170,7 +160,6 @@ tests:
 
     - label: "Read the optional attribute: PumpStatus"
       PICS: PCC.S.A0010
-      optional: true
       command: "readAttribute"
       attribute: "PumpStatus"
       response:
@@ -211,7 +200,6 @@ tests:
 
     - label: "Read the optional attribute: Speed"
       PICS: PCC.S.A0014
-      optional: true
       command: "readAttribute"
       attribute: "Speed"
       response:
@@ -222,7 +210,6 @@ tests:
 
     - label: "Read the optional attribute: LifetimeRunningHours"
       PICS: PCC.S.A0015
-      optional: true
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
@@ -233,7 +220,6 @@ tests:
 
     - label: "Read the optional attribute: Power"
       PICS: PCC.S.A0016
-      optional: true
       command: "readAttribute"
       attribute: "Power"
       response:
@@ -244,7 +230,6 @@ tests:
 
     - label: "Read the optional attribute: LifetimeEnergyConsumed"
       PICS: PCC.S.A0017
-      optional: true
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
@@ -265,7 +250,6 @@ tests:
 
     - label: "Read optional attribute: ControlMode"
       PICS: PCC.S.A0021
-      optional: true
       command: "readAttribute"
       attribute: "ControlMode"
       response:

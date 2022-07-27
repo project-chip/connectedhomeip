@@ -35,7 +35,7 @@ tests:
           "Precondition: Media content in a paused state at the beginning of the
           content"
       command: "Pause"
-      PICS: MEDIAPLAYBACK.S.C0001
+      PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
               - name: "status"
@@ -57,7 +57,7 @@ tests:
           "Verify that the media has moved to 10 seconds from the starting point"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
       arguments:
           values:
               - name: "message"
@@ -68,7 +68,7 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute"
-      PICS: MEDIAPLAYBACK.S.A0003
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0B.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:

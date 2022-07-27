@@ -28,7 +28,7 @@
 #include <string.h>
 
 #include "SerialManager.h"
-extern uint8_t mOtSerMgrIfLog;
+extern uint8_t gShellSerMgrIf;
 
 namespace chip {
 namespace Shell {
@@ -48,7 +48,7 @@ ssize_t streamer_k32w_read(streamer_t * streamer, char * buffer, size_t length)
     uint16_t bytesRead = 0;
 
     (void) streamer;
-    Serial_Read(mOtSerMgrIfLog, (uint8_t *) buffer, length, &bytesRead);
+    Serial_Read(gShellSerMgrIf, (uint8_t *) buffer, length, &bytesRead);
 
     return bytesRead;
 }

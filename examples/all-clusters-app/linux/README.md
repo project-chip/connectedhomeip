@@ -81,7 +81,7 @@ all-cluster-app event named pipe /tmp/chip_all_clusters_fifo-<PID>.
 1. Generate event `SoftwareFault` when a software fault takes place on the Node.
 
 ```
-$ echo SoftwareFault > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 #### Trigger `HardwareFault` events
@@ -90,21 +90,21 @@ $ echo SoftwareFault > /tmp/chip_all_clusters_fifo-<PID>
    hardware faults currently detected by the Node.
 
 ```
-$ echo HardwareFaultChange > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 2. Generate event `RadioFaultChange` to indicate a change in the set of radio
    faults currently detected by the Node.
 
 ```
-$ echo RadioFaultChange > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 3. Generate event `NetworkFaultChange` to indicate a change in the set of
    network faults currently detected by the Node.
 
 ```
-$ echo NetworkFaultChange > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 4. Generate event `BootReason` to indicate the reason that caused the device to
@@ -129,7 +129,7 @@ $ echo NetworkFaultChange > /tmp/chip_all_clusters_fifo-<PID>
     reboot.
 
 ```
-$ echo <BootReason> > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 #### Trigger Switch events
@@ -138,41 +138,41 @@ $ echo <BootReason> > /tmp/chip_all_clusters_fifo-<PID>
    position.
 
 ```
-$ echo SwitchLatched > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 2. Generate event `InitialPress`, when the momentary switch starts to be
    pressed.
 
 ```
-$ echo InitialPress > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 3. Generate event `LongPress`, when the momentary switch has been pressed for a
    "long" time.
 
 ```
-$ echo LongPress > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 4. Generate event `ShortRelease`, when the momentary switch has been released.
 
 ```
-$ echo ShortRelease > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 5. Generate event `LongRelease` when the momentary switch has been released and
    after having been pressed for a long time.
 
 ```
-$ echo LongRelease > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 6. Generate event `MultiPressOngoing` to indicate how many times the momentary
    switch has been pressed in a multi-press sequence, during that sequence.
 
 ```
-$ echo MultiPressOngoing > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_all_clusters_fifo-<PID>
 ```
 
 7. Generate event `MultiPressComplete` to indicate how many times the momentary
@@ -180,5 +180,5 @@ $ echo MultiPressOngoing > /tmp/chip_all_clusters_fifo-<PID>
    that the sequence has ended.
 
 ```
-$ echo MultiPressComplete > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo-<PID>
 ```

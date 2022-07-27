@@ -52,6 +52,13 @@ tests:
           [1655720917.721101][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655720917.721144][10909:10909] CHIP:DMG: },
           [1655720917.721267][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+
+          [1657881522.001890][2575:2580] CHIP:DMG: }
+          [1657881522.002053][2575:2580] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
+          [1657881522.002133][2575:2580] CHIP:TOO:   identify time: 0
+          [1657881522.002227][2575:2580] CHIP:EM: Sending Standalone Ack for MessageCounter:54477998 on exchange 6586i
       disabled: true
 
     - label:
@@ -86,6 +93,35 @@ tests:
           [1655721163.412212][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721163.412236][10909:10909] CHIP:DMG: },
           [1655721163.412312][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response
+          [1657881584.166241][2584:2589] CHIP:DMG: }
+          [1657881584.166599][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
+          [1657881584.166672][2584:2589] CHIP:TOO:   identify time: 0
+          [1657881584.166734][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
+          [1657881584.166761][2584:2589] CHIP:TOO:   identify type: 2
+          [1657881584.166817][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
+          [1657881584.166844][2584:2589] CHIP:TOO:   FeatureMap: 0
+          [1657881584.166900][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
+          [1657881584.166940][2584:2589] CHIP:TOO:   ClusterRevision: 4
+          [1657881584.167054][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 4079829024
+          [1657881584.167101][2584:2589] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1657881584.167276][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 4079829024
+          [1657881584.167309][2584:2589] CHIP:TOO:   AcceptedCommandList: 2 entries
+          [1657881584.167337][2584:2589] CHIP:TOO:     [1]: 0
+          [1657881584.167362][2584:2589] CHIP:TOO:     [2]: 64
+          [1657881584.167690][2584:2589] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 4079829024
+          [1657881584.167725][2584:2589] CHIP:TOO:   AttributeList: 7 entries
+          [1657881584.167752][2584:2589] CHIP:TOO:     [1]: 0
+          [1657881584.167777][2584:2589] CHIP:TOO:     [2]: 1
+          [1657881584.167801][2584:2589] CHIP:TOO:     [3]: 65528
+          [1657881584.167825][2584:2589] CHIP:TOO:     [4]: 65529
+          [1657881584.167850][2584:2589] CHIP:TOO:     [5]: 65531
+          [1657881584.167874][2584:2589] CHIP:TOO:     [6]: 65532
+          [1657881584.167898][2584:2589] CHIP:TOO:     [7]: 65533
+          [1657881584.168029][2584:2589] CHIP:EM: Sending Standalone Ack for MessageCounter:84499870 on exchange 45190i
       disabled: true
 
     - label:
@@ -98,7 +134,8 @@ tests:
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF  1 0xFFFF
 
-          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command
+          verify On TH(Reference app) receives the right Read Request Message for the data sent in the above command and
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
     - label:
@@ -127,6 +164,8 @@ tests:
           [1655721447.463334][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721447.463382][10909:10909] CHIP:DMG: },
           [1655721447.463503][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
     - label:
@@ -158,6 +197,56 @@ tests:
           [1655721586.588310][10909:10909] CHIP:DMG: },
           [1655721586.588403][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
           [1655721586.588510][10909:10909] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657881729.900518][2608:2613] CHIP:DMG: }
+          [1657881729.901108][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 4079829024
+          [1657881729.901182][2608:2613] CHIP:TOO:   identify time: 0
+          [1657881729.901245][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
+          [1657881729.901273][2608:2613] CHIP:TOO:   identify type: 2
+          [1657881729.901331][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 4079829024
+          [1657881729.901359][2608:2613] CHIP:TOO:   FeatureMap: 0
+          [1657881729.901431][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
+          [1657881729.901472][2608:2613] CHIP:TOO:   ClusterRevision: 4
+          [1657881729.901586][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 4079829024
+          [1657881729.901632][2608:2613] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1657881729.901806][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 4079829024
+          [1657881729.901840][2608:2613] CHIP:TOO:   AcceptedCommandList: 2 entries
+          [1657881729.901868][2608:2613] CHIP:TOO:     [1]: 0
+          [1657881729.901893][2608:2613] CHIP:TOO:     [2]: 64
+          [1657881729.902242][2608:2613] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 4079829024
+          [1657881729.902279][2608:2613] CHIP:TOO:   AttributeList: 7 entries
+          [1657881729.902305][2608:2613] CHIP:TOO:     [1]: 0
+          [1657881729.902329][2608:2613] CHIP:TOO:     [2]: 1
+          [1657881729.902354][2608:2613] CHIP:TOO:     [3]: 65528
+          [1657881729.902378][2608:2613] CHIP:TOO:     [4]: 65529
+          [1657881729.902402][2608:2613] CHIP:TOO:     [5]: 65531
+          [1657881729.902426][2608:2613] CHIP:TOO:     [6]: 65532
+          [1657881729.902451][2608:2613] CHIP:TOO:     [7]: 65533
+          [1657881729.902474][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0000 DataVersion: 3999381333
+          [1657881729.902500][2608:2613] CHIP:TOO:   identify time: 0
+          [1657881729.902556][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
+          [1657881729.902583][2608:2613] CHIP:TOO:   identify type: 2
+          [1657881729.902640][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFC DataVersion: 3999381333
+          [1657881729.902665][2608:2613] CHIP:TOO:   FeatureMap: 0
+          [1657881729.902721][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 3999381333
+          [1657881729.902746][2608:2613] CHIP:TOO:   ClusterRevision: 4
+          [1657881729.902843][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF8 DataVersion: 3999381333
+          [1657881729.902872][2608:2613] CHIP:TOO:   GeneratedCommandList: 0 entries
+          [1657881729.903021][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFF9 DataVersion: 3999381333
+          [1657881729.903053][2608:2613] CHIP:TOO:   AcceptedCommandList: 2 entries
+          [1657881729.903079][2608:2613] CHIP:TOO:     [1]: 0
+          [1657881729.903104][2608:2613] CHIP:TOO:     [2]: 64
+          [1657881729.903427][2608:2613] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_FFFB DataVersion: 3999381333
+          [1657881729.903462][2608:2613] CHIP:TOO:   AttributeList: 7 entries
+          [1657881729.903488][2608:2613] CHIP:TOO:     [1]: 0
+          [1657881729.903513][2608:2613] CHIP:TOO:     [2]: 1
+          [1657881729.903537][2608:2613] CHIP:TOO:     [3]: 65528
+          [1657881729.903561][2608:2613] CHIP:TOO:     [4]: 65529
+          [1657881729.903586][2608:2613] CHIP:TOO:     [5]: 65531
+          [1657881729.903610][2608:2613] CHIP:TOO:     [6]: 65532
+          [1657881729.903634][2608:2613] CHIP:TOO:     [7]: 65533
+          [1657881729.903843][2608:2613] CHIP:EM: Sending Standalone Ack for MessageCounter:174033086 on exchange 10540i
       disabled: true
 
     - label:
@@ -189,6 +278,15 @@ tests:
           [1655721699.305827][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721699.305870][10909:10909] CHIP:DMG: },
           [1655721699.305990][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657881792.350417][2616:2621] CHIP:DMG: }
+          [1657881792.350641][2616:2621] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
+          [1657881792.350742][2616:2621] CHIP:TOO:   identify type: 2
+          [1657881792.350845][2616:2621] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 3999381333
+          [1657881792.350891][2616:2621] CHIP:TOO:   identify type: 2
+          [1657881792.351000][2616:2621] CHIP:EM: Sending Standalone Ack for MessageCounter:222990264 on exchange 23721i
       disabled: true
 
     - label:
@@ -220,6 +318,10 @@ tests:
           [1655721846.894594][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721846.894628][10909:10909] CHIP:DMG: },
           [1655721846.894724][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
       disabled: true
 
     - label:
@@ -233,7 +335,7 @@ tests:
 
           ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFD  1 0
 
-          verify TH receives the right Read Request Message for the data sent in the above command
+          verify TH(reference app) receives the right Read Request Message for the data sent in the above command
 
           [1655721935.483404][10909:10909] CHIP:EM: Handling via exchange: 59853r, Delegate: 0xaaaac37ce418
           [1655721935.483474][10909:10909] CHIP:IM: Received Read request
@@ -253,6 +355,63 @@ tests:
           [1655721935.484392][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655721935.484450][10909:10909] CHIP:DMG: },
           [1655721935.484595][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657881935.225146][2631:2636] CHIP:DMG: }
+          [1657881935.225620][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_FFFD DataVersion: 4079829024
+          [1657881935.225700][2631:2636] CHIP:TOO:   ClusterRevision: 4
+          [1657881935.225763][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Attribute 0x0000_FFFD DataVersion: 130355893
+          [1657881935.225790][2631:2636] CHIP:TOO:   ClusterRevision: 4
+          [1657881935.225846][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_FFFD DataVersion: 2043826222
+          [1657881935.225872][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.225928][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001E Attribute 0x0000_FFFD DataVersion: 539126375
+          [1657881935.225954][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226010][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Attribute 0x0000_FFFD DataVersion: 821022762
+          [1657881935.226037][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226093][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_FFFD DataVersion: 745595402
+          [1657881935.226120][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226175][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002A Attribute 0x0000_FFFD DataVersion: 2914015802
+          [1657881935.226201][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226258][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002B Attribute 0x0000_FFFD DataVersion: 2733214794
+          [1657881935.226284][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226340][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002C Attribute 0x0000_FFFD DataVersion: 3273895737
+          [1657881935.226365][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226420][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002D Attribute 0x0000_FFFD DataVersion: 2449855749
+          [1657881935.226447][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226504][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002E Attribute 0x0000_FFFD DataVersion: 2597243070
+          [1657881935.226530][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226586][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_002F Attribute 0x0000_FFFD DataVersion: 714742425
+          [1657881935.226611][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226667][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_FFFD DataVersion: 3643421834
+          [1657881935.226693][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226747][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFD DataVersion: 3610511831
+          [1657881935.226773][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226831][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0032 Attribute 0x0000_FFFD DataVersion: 3399712075
+          [1657881935.226857][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226916][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_FFFD DataVersion: 4165139953
+          [1657881935.226941][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.226996][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_FFFD DataVersion: 3623073226
+          [1657881935.227022][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227077][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0035 Attribute 0x0000_FFFD DataVersion: 3137436487
+          [1657881935.227103][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227159][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0036 Attribute 0x0000_FFFD DataVersion: 1172053040
+          [1657881935.227185][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227241][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_FFFD DataVersion: 3832336232
+          [1657881935.227267][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227325][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003C Attribute 0x0000_FFFD DataVersion: 4072501061
+          [1657881935.227350][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227407][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_FFFD DataVersion: 1112172817
+          [1657881935.227433][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227488][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_FFFD DataVersion: 2917149142
+          [1657881935.227515][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227572][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0040 Attribute 0x0000_FFFD DataVersion: 1676181270
+          [1657881935.227611][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227669][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0041 Attribute 0x0000_FFFD DataVersion: 4002139741
+          [1657881935.227695][2631:2636] CHIP:TOO:   ClusterRevision: 1
+          [1657881935.227752][2631:2636] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0405 Attribute 0x0000_FFFD DataVersion: 2945088432
+          [1657881935.227778][2631:2636] CHIP:TOO:   ClusterRevision: 3
+          [1657881935.227936][2631:2636] CHIP:EM: Sending Standalone Ack for MessageCounter:199380325 on exchange 6370i
       disabled: true
 
     - label:
@@ -284,6 +443,13 @@ tests:
           [1655722298.459581][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722298.459659][10909:10909] CHIP:DMG: },
           [1655722298.459820][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657881978.415828][2640:2645] CHIP:DMG: }
+          [1657881978.416014][2640:2645] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0006 Attribute 0x0000_0000 DataVersion: 4019194565
+          [1657881978.416091][2640:2645] CHIP:TOO:   OnOff: FALSE
+          [1657881978.416245][2640:2645] CHIP:EM: Sending Standalone Ack for MessageCounter:144208215 on exchange 38107i
       disabled: true
 
     - label:
@@ -314,6 +480,13 @@ tests:
           [1655722750.453268][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722750.453316][10909:10909] CHIP:DMG: },
           [1655722750.453457][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882077.867099][2655:2660] CHIP:DMG: }
+          [1657882077.867278][2655:2660] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0000 DataVersion: 321966114
+          [1657882077.867352][2655:2660] CHIP:TOO:   Description: Coffee
+          [1657882077.867466][2655:2660] CHIP:EM: Sending Standalone Ack for MessageCounter:62608362 on exchange 57811i
       disabled: true
 
     - label:
@@ -344,6 +517,14 @@ tests:
           [1655722980.957477][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655722980.957506][10909:10909] CHIP:DMG: },
           [1655722980.957605][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882043.053353][2648:2653] CHIP:DMG: }
+          [1657882043.053561][2648:2653] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0003 Attribute 0x0000_0001 DataVersion: 4079829024
+          [1657882043.053662][2648:2653] CHIP:TOO:   identify type: 2
+          [1657882043.053774][2648:2653] CHIP:EM: Sending Standalone Ack for MessageCounter:228608905 on exchange 11019i
       disabled: true
 
     - label:
@@ -374,6 +555,14 @@ tests:
           [1655723021.113318][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723021.113349][10909:10909] CHIP:DMG: },
           [1655723021.113441][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882152.821695][2665:2670] CHIP:DMG: }
+          [1657882152.821886][2665:2670] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0403 Attribute 0x0000_0000 DataVersion: 1184750328
+          [1657882152.821981][2665:2670] CHIP:TOO:   MeasuredValue: 0
+          [1657882152.822099][2665:2670] CHIP:EM: Sending Standalone Ack for MessageCounter:178527554 on exchange 52092i
       disabled: true
 
     - label:
@@ -412,6 +601,14 @@ tests:
           [1655723062.691441][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723062.691494][10909:10909] CHIP:DMG: },
           [1655723062.691635][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882197.831561][2673:2678] CHIP:DMG: }
+          [1657882197.831802][2673:2678] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0004 DataVersion: 1112172817
+          [1657882197.831892][2673:2678] CHIP:TOO:   TrustedRootCertificates: 1 entries
+          [1657882197.831940][2673:2678] CHIP:TOO:     [1]: 1530010100240201370324140018260480228127260580254D3A37062414001824070124080130094104EC98F1D5F8E4FF3B2B1B23B154C016A02843600C0D3073EFA38123BBFC62056CA4C90C591C80D1D66206DB31F3C0FA2E2A3B11377C28D1A2D5E3ED9C79B3DD75370A3501290118240260300414D3A7631B0D05BF3D059263A09502826A7E02768F300514D3A7631B0D05BF3D059263A09502826A7E02768F18300B401A2FD4DAE286A0C0E7F2A54014D19C3AA7F8A814664B14D4EDFE6D6366746B5EF86A677807BCCE30A71A1C112FF843B88044D4212197281859CED7D21D39A42418
+          [1657882197.832044][2673:2678] CHIP:EM: Sending Standalone Ack for MessageCounter:182457329 on exchange 8706i
       disabled: true
 
     - label:
@@ -443,6 +640,17 @@ tests:
           [1655723112.902618][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723112.902664][10909:10909] CHIP:DMG: },
           [1655723112.902782][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882247.469521][2681:2686] CHIP:DMG:         InteractionModelRevision = 1
+          [1657882247.469553][2681:2686] CHIP:DMG: }
+          [1657882247.469732][2681:2686] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Attribute 0x0000_0001 DataVersion: 3643421834
+          [1657882247.469825][2681:2686] CHIP:TOO:   BasicCommissioningInfo: {
+          [1657882247.469886][2681:2686] CHIP:TOO:     FailSafeExpiryLengthSeconds: 60
+          [1657882247.469921][2681:2686] CHIP:TOO:     MaxCumulativeFailsafeSeconds: 900
+          [1657882247.469952][2681:2686] CHIP:TOO:    }
+          [1657882247.470043][2681:2686] CHIP:EM: Sending Standalone Ack for MessageCounter:52322886 on exchange 1487i
       disabled: true
 
     - label:
@@ -474,6 +682,41 @@ tests:
           [1655723151.160110][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723151.160147][10909:10909] CHIP:DMG: },
           [1655723151.160243][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+
+          [1657882339.679133][2701:2706] CHIP:DMG: }
+          [1657882339.679605][2701:2706] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 321966114
+          [1657882339.679722][2701:2706] CHIP:TOO:   SupportedModes: 3 entries
+          [1657882339.679786][2701:2706] CHIP:TOO:     [1]: {
+          [1657882339.679813][2701:2706] CHIP:TOO:       Label: Black
+          [1657882339.679852][2701:2706] CHIP:TOO:       Mode: 0
+          [1657882339.679883][2701:2706] CHIP:TOO:       SemanticTags: 1 entries
+          [1657882339.679918][2701:2706] CHIP:TOO:         [1]: {
+          [1657882339.679943][2701:2706] CHIP:TOO:           MfgCode: 0
+          [1657882339.679966][2701:2706] CHIP:TOO:           Value: 0
+          [1657882339.679986][2701:2706] CHIP:TOO:          }
+          [1657882339.680006][2701:2706] CHIP:TOO:      }
+          [1657882339.680040][2701:2706] CHIP:TOO:     [2]: {
+          [1657882339.680065][2701:2706] CHIP:TOO:       Label: Cappuccino
+          [1657882339.680088][2701:2706] CHIP:TOO:       Mode: 4
+          [1657882339.680131][2701:2706] CHIP:TOO:       SemanticTags: 1 entries
+          [1657882339.680163][2701:2706] CHIP:TOO:         [1]: {
+          [1657882339.680188][2701:2706] CHIP:TOO:           MfgCode: 0
+          [1657882339.680212][2701:2706] CHIP:TOO:           Value: 0
+          [1657882339.680236][2701:2706] CHIP:TOO:          }
+          [1657882339.680261][2701:2706] CHIP:TOO:      }
+          [1657882339.680296][2701:2706] CHIP:TOO:     [3]: {
+          [1657882339.680320][2701:2706] CHIP:TOO:       Label: Espresso
+          [1657882339.680344][2701:2706] CHIP:TOO:       Mode: 7
+          [1657882339.680371][2701:2706] CHIP:TOO:       SemanticTags: 1 entries
+          [1657882339.680402][2701:2706] CHIP:TOO:         [1]: {
+          [1657882339.680427][2701:2706] CHIP:TOO:           MfgCode: 0
+          [1657882339.680451][2701:2706] CHIP:TOO:           Value: 0
+          [1657882339.680474][2701:2706] CHIP:TOO:          }
+          [1657882339.680499][2701:2706] CHIP:TOO:      }
+          [1657882339.680600][2701:2706] CHIP:EM: Sending Standalone Ack for MessageCounter:207994304 on exchange 48282i
       disabled: true
 
     - label:
@@ -504,6 +747,12 @@ tests:
           [1655723234.549038][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723234.549097][10909:10909] CHIP:DMG: },
           [1655723234.549241][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882403.876372][2715:2720] CHIP:DMG: }
+          [1657882403.876514][2715:2720] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0001 DataVersion: 737072536
+          [1657882403.876595][2715:2720] CHIP:TOO:   occupancy sensor type: 0
+          [1657882403.876679][2715:2720] CHIP:EM: Sending Standalone Ack for MessageCounter:153370776 on exchange 37640i
       disabled: true
 
     - label:
@@ -534,6 +783,14 @@ tests:
           [1655723282.098112][10909:10909] CHIP:DMG:         InteractionModelRevision = 1
           [1655723282.098134][10909:10909] CHIP:DMG: },
           [1655723282.098206][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657882440.996840][2725:2730] CHIP:DMG:         InteractionModelRevision = 1
+          [1657882440.996862][2725:2730] CHIP:DMG: }
+          [1657882440.997003][2725:2730] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0008 Attribute 0x0000_000F DataVersion: 3900213102
+          [1657882440.997084][2725:2730] CHIP:TOO:   options: 0
+          [1657882440.997170][2725:2730] CHIP:EM: Sending Standalone Ack for MessageCounter:250919190 on exchange 53994i
       disabled: true
 
     - label:
@@ -565,6 +822,14 @@ tests:
           [1655723372.329162][10909:10909] CHIP:DMG: IM RH moving to [GeneratingReports]
 
 
+          On DUT as a client side, verify that TH all-clusters-app sent success response with attribute values
+          [1657883628.582877][2780:2785] CHIP:DMG:         InteractionModelRevision = 1
+          [1657883628.582909][2780:2785] CHIP:DMG: }
+          [1657883628.583066][2780:2785] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0406 Attribute 0x0000_0000 DataVersion: 737072536
+          [1657883628.583146][2780:2785] CHIP:TOO:   occupancy: 0
+          [1657883628.583225][2780:2785] CHIP:EM: Sending Standalone Ack for MessageCounter:68376422 on exchange 7437i
+
+
            ./chip-tool  occupancysensing read occupancy    1 1
           verify TH receives the right Read Request Message for the data sent in the above command
 
@@ -579,4 +844,29 @@ tests:
           the last one, DUT sends a status response."
       verification: |
           DUT implementation required to verify read an attribute which is is larger than 1 MTU(1280 bytes)
+          Below sample wildcard read command will read all the attributes from the all-clusters-app and generates 1 MTU size of data.
+          If the dut doesn't support generating the large chunk data, then this test step can be skipped.
+          Verify the last chunked data is having Suppress response True & TH will not send the Ack message.
+
+          ./chip-tool any read-by-id 0xFFFFFFFF 0xFFFFFFFF 1 0xFFFF
+
+          The message flow  can expect as mentioned below
+            TH -> DUT ReadRequest
+              DUT -> TH ReportData, not last chunk
+              TH -> DUT StatusResponse
+              Possibly repeat steps 2 & 3 a few times
+              DUT -> TH ReportData, last chunk, SuppressResponse set to true
+              TH -> DUT standalone ack
+
+          On TH verify that  The last chunked message should not receive any status response from the DUT
+
+          [1658396687.401934][3726:3731] CHIP:DMG:
+          [1658396687.401958][3726:3731] CHIP:DMG:                 },
+          [1658396687.401987][3726:3731] CHIP:DMG:
+          [1658396687.402010][3726:3731] CHIP:DMG:         ],
+          [1658396687.402048][3726:3731] CHIP:DMG:
+          [1658396687.402072][3726:3731] CHIP:DMG:         SuppressResponse = true,
+          [1658396687.402097][3726:3731] CHIP:DMG:         InteractionModelRevision = 1
+          [1658396687.402119][3726:3731] CHIP:DMG: }
+          [1658396687.402400][3726:3731] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_FFFB DataVersion: 3456275847
       disabled: true

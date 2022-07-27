@@ -22,7 +22,7 @@ limitations under the License.
     <item name="member2" type="OCTET_STRING" length="32"/>
   </struct>
 
-  <struct name="TestFabricScoped">
+  <struct name="TestFabricScoped" isFabricScoped="true">
     <cluster code="0xFFF1FC05"/>
     <item fieldId="1" name="fabricSensitiveInt8u" type="INT8U" isFabricSensitive="true"/>
     <item fieldId="2" name="optionalFabricSensitiveInt8u" type="INT8U" optional="true" isFabricSensitive="true"/>
@@ -31,7 +31,6 @@ limitations under the License.
     <item fieldId="5" name="fabricSensitiveCharString" type="CHAR_STRING" isFabricSensitive="true"/>
     <item fieldId="6" name="fabricSensitiveStruct" type="SimpleStruct" isFabricSensitive="true"/>
     <item fieldId="7" name="fabricSensitiveInt8uList" type="INT8U" array="true" isFabricSensitive="true"/>
-    <item fieldId="0xFE" name="fabricIndex" type="fabric_idx"/>
   </struct>
 
   <enum name="SimpleEnum" type="ENUM8">
@@ -575,9 +574,8 @@ limitations under the License.
       <field id="6" name="arg6" type="SimpleEnum" array="true"/>
     </event>
 
-    <event code="0x0002" name="TestFabricScopedEvent" priority="info" side="server">
+    <event code="0x0002" name="TestFabricScopedEvent" priority="info" side="server" isFabricSensitive="true">
       <description>Example test event</description>
-      <field id="0xFE" name="arg1" type="fabric_idx"/>
     </event>
 
   </cluster>

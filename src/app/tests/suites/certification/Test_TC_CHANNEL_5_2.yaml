@@ -55,7 +55,7 @@ tests:
     - label: "Verify that the channel has changed on the device"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
+      PICS: PICS_USER_PROMPT && CHANNEL.S.C02.Rsp
       arguments:
           values:
               - name: "message"

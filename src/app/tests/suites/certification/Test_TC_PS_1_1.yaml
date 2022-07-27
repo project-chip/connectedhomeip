@@ -55,7 +55,7 @@ tests:
               contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Read the Feature related(PS.S.F00-WIRED) attribute in AttributeList"
+          "Read the Feature dependent(PS.S.F00-WIRED) attribute in AttributeList"
       PICS: PS.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -64,7 +64,8 @@ tests:
               type: list
               contains: [5]
 
-    - label: "Read the Feature related(PS.S.F01-BAT) attribute in AttributeList"
+    - label:
+          "Read the Feature dependent(PS.S.F01-BAT) attribute in AttributeList"
       PICS: PS.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
@@ -74,7 +75,7 @@ tests:
               contains: [14, 15, 16]
 
     - label:
-          "Read the Feature related(PS.S.F02-RECHG) attribute in AttributeList"
+          "Read the Feature dependent(PS.S.F02-RECHG) attribute in AttributeList"
       PICS: PS.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -84,7 +85,7 @@ tests:
               contains: [26, 28]
 
     - label:
-          "Read the Feature related(PS.S.F03-REPLC) attribute in AttributeList"
+          "Read the Feature dependent(PS.S.F03-REPLC) attribute in AttributeList"
       PICS: PS.S.F03
       command: "readAttribute"
       attribute: "AttributeList"

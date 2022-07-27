@@ -163,6 +163,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
         }
+        DriveStationState();
     }
     if (event->Type == DeviceEventType::kRtkWiFiScanCompletedEvent)
     {

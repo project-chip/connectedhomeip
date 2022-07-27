@@ -35,11 +35,13 @@ class K32WApp(Enum):
 
     def AppNamePrefix(self):
         if self == K32WApp.LIGHT:
-            return 'chip-k32w061-light-example'
+            return 'chip-k32w0x-light-example'
         elif self == K32WApp.LOCK:
-            return 'chip-k32w061-lock-example'
+            return 'chip-k32w0x-lock-example'
         elif self == K32WApp.SHELL:
-            return 'chip-k32w061-shell-example'
+            return 'chip-k32w0x-shell-example'
+        elif self == K32WApp.CONTACT:
+            return 'chip-k32w0x-contact-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -58,7 +60,8 @@ class K32WBuilder(GnBuilder):
                  tokenizer: bool = False,
                  disable_ble: bool = False,
                  disable_ota: bool = False,
-                 se05x: bool = False):
+                 se05x: bool = False,
+                 tinycrypt: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
@@ -70,10 +73,11 @@ class K32WBuilder(GnBuilder):
         self.disable_ble = disable_ble
         self.disable_ota = disable_ota
         self.se05x = se05x
+        self.tinycrypt = tinycrypt
 
     def GnBuildArgs(self):
         args = [
-            'k32w0_sdk_root="%s"' % os.environ['NXP_K32W061_SDK_ROOT'],
+            'k32w0_sdk_root="%s"' % os.environ['NXP_K32W0_SDK_ROOT'],
         ]
 
         if self.low_power:
@@ -95,6 +99,9 @@ class K32WBuilder(GnBuilder):
 
         if self.se05x:
             args.append('chip_with_se05x=true')
+
+        if self.tinycrypt:
+            args.append('chip_crypto=\"tinycrypt\" mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"')
 
         return args
 

@@ -184,9 +184,9 @@
     return _onboardingPayload;
 }
 
-- (void)openBasicCommissioningWindow:(nullable void (^)(bool))commissioningCompleteCallback
+- (void)openBasicCommissioningWindow:(void (^_Nonnull)(bool))commissioningCompleteCallback
                             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-    commissioningWindowRequestedHandler:(nullable void (^)(bool))commissioningWindowRequestedHandler
+    commissioningWindowRequestedHandler:(void (^_Nonnull)(bool))commissioningWindowRequestedHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().openBasicCommissioningWindow() called");
 
@@ -201,21 +201,305 @@
     });
 }
 
-- (void)contentLauncherLaunchUrl:(NSString * _Nonnull)contentUrl
-               contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
-       launchUrlResponseCallback:(nullable void (^)(bool))launchUrlResponseCallback
-                     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
-     launchUrlRequestSentHandler:(nullable void (^)(bool))launchUrlRequestSentHandler
+- (void)contentLauncher_launchUrl:(NSString * _Nonnull)contentUrl
+                contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
 {
-    ChipLogProgress(AppServer, "CastingServerBridge().contentLauncherLaunchUrl() called");
+    ChipLogProgress(AppServer, "CastingServerBridge().contentLauncher_launchUrl() called");
 
-    _launchUrlResponseCallback = launchUrlResponseCallback;
+    _contentLauncher_launchUrlResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->ContentLauncherLaunchURL(
+            [contentUrl UTF8String], [contentDisplayStr UTF8String], [](CHIP_ERROR err) {
+                [CastingServerBridge getSharedInstance].contentLauncher_launchUrlResponseCallback(CHIP_NO_ERROR == err);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)levelControl_step:(uint8_t)stepMode
+                 stepSize:(uint8_t)stepSize
+           transitionTime:(uint16_t)transitionTime
+               optionMask:(uint8_t)optionMask
+           optionOverride:(uint8_t)optionOverride
+         responseCallback:(void (^_Nonnull)(bool))responseCallback
+              clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+       requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().levelControl_step() called");
+
+    _levelControl_stepResponseCallback = responseCallback;
     dispatch_async(_chipWorkQueue, ^{
         CHIP_ERROR err
-            = CastingServer::GetInstance()->ContentLauncherLaunchURL([contentUrl UTF8String], [contentDisplayStr UTF8String],
-                [](CHIP_ERROR err) { [CastingServerBridge getSharedInstance].launchUrlResponseCallback(CHIP_NO_ERROR == err); });
+            = CastingServer::GetInstance()->LevelControl_Step(static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode),
+                stepSize, transitionTime, optionMask, optionOverride, [](CHIP_ERROR err) {
+                    [CastingServerBridge getSharedInstance].levelControl_stepResponseCallback(CHIP_NO_ERROR == err);
+                });
         dispatch_async(clientQueue, ^{
-            launchUrlRequestSentHandler(CHIP_NO_ERROR == err);
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)levelControl_moveToLevel:(uint8_t)level
+                  transitionTime:(uint16_t)transitionTime
+                      optionMask:(uint8_t)optionMask
+                  optionOverride:(uint8_t)optionOverride
+                responseCallback:(void (^_Nonnull)(bool))responseCallback
+                     clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+              requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().levelControl_moveToLevel() called");
+
+    _levelControl_moveToLevelResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->LevelControl_MoveToLevel(
+            level, transitionTime, optionMask, optionOverride, [](CHIP_ERROR err) {
+                [CastingServerBridge getSharedInstance].levelControl_moveToLevelResponseCallback(CHIP_NO_ERROR == err);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_play:(void (^_Nonnull)(bool))responseCallback
+               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_play() called");
+
+    _mediaPlayback_playResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Play([](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_playResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_pause:(void (^_Nonnull)(bool))responseCallback
+                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_pause() called");
+
+    _mediaPlayback_pauseResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Pause([](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_pauseResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_stopPlayback:(void (^_Nonnull)(bool))responseCallback
+                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_stopPlayback() called");
+
+    _mediaPlayback_pauseResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Pause([](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_stopPlaybackResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_next:(void (^_Nonnull)(bool))responseCallback
+               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_next() called");
+
+    _mediaPlayback_nextResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Next([](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_nextResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_seek:(uint8_t)position
+          responseCallback:(void (^_Nonnull)(bool))responseCallback
+               clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+        requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_seek() called");
+
+    _mediaPlayback_seekResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_Seek(position, [](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_seekResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_skipForward:(uint64_t)deltaPositionMilliseconds
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_skipForward() called");
+
+    _mediaPlayback_skipForwardResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SkipForward(deltaPositionMilliseconds, [](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_skipForwardResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)mediaPlayback_skipBackward:(uint64_t)deltaPositionMilliseconds
+                  responseCallback:(void (^_Nonnull)(bool))responseCallback
+                       clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().mediaPlayback_skipBackward() called");
+
+    _mediaPlayback_skipBackwardResponseCallback = responseCallback;
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->MediaPlayback_SkipBackward(deltaPositionMilliseconds, [](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].mediaPlayback_skipBackwardResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)applicationLauncher_launchApp:(uint16_t)catalogVendorId
+                        applicationId:(NSString * _Nonnull)applicationId
+                                 data:(NSData * _Nullable)data
+                     responseCallback:(void (^_Nonnull)(bool))responseCallback
+                          clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                   requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().applicationLauncher_launchApp() called");
+
+    _applicationLauncher_launchAppResponseCallback = responseCallback;
+
+    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
+    application.catalogVendorId = catalogVendorId;
+    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationLauncher_LaunchApp(application,
+            chip::MakeOptional(chip::ByteSpan(static_cast<const uint8_t *>(data.bytes), data.length)), [](CHIP_ERROR err) {
+                [CastingServerBridge getSharedInstance].applicationLauncher_launchAppResponseCallback(CHIP_NO_ERROR == err);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)applicationLauncher_stopApp:(uint16_t)catalogVendorId
+                      applicationId:(NSString * _Nonnull)applicationId
+                   responseCallback:(void (^_Nonnull)(bool))responseCallback
+                        clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().applicationLauncher_stopApp() called");
+
+    _applicationLauncher_stopAppResponseCallback = responseCallback;
+
+    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
+    application.catalogVendorId = catalogVendorId;
+    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationLauncher_StopApp(application, [](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].applicationLauncher_stopAppResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)applicationLauncher_hideApp:(uint16_t)catalogVendorId
+                      applicationId:(NSString * _Nonnull)applicationId
+                   responseCallback:(void (^_Nonnull)(bool))responseCallback
+                        clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                 requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().applicationLauncher_hideApp() called");
+
+    _applicationLauncher_hideAppResponseCallback = responseCallback;
+
+    chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application;
+    application.catalogVendorId = catalogVendorId;
+    application.applicationId = chip::CharSpan::fromCharString([applicationId UTF8String]);
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->ApplicationLauncher_HideApp(application, [](CHIP_ERROR err) {
+            [CastingServerBridge getSharedInstance].applicationLauncher_hideAppResponseCallback(CHIP_NO_ERROR == err);
+        });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)targetNavigator_navigateTarget:(uint8_t)target
+                                  data:(NSString * _Nullable)data
+                      responseCallback:(void (^_Nonnull)(bool))responseCallback
+                           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+                    requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().targetNavigator_navigateTarget() called");
+
+    _targetNavigator_navigateTargetResponseCallback = responseCallback;
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->TargetNavigator_NavigateTarget(
+            target, chip::MakeOptional(chip::CharSpan::fromCharString([data UTF8String])), [](CHIP_ERROR err) {
+                [CastingServerBridge getSharedInstance].targetNavigator_navigateTargetResponseCallback(CHIP_NO_ERROR == err);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
+        });
+    });
+}
+
+- (void)keypadInput_sendKey:(uint8_t)keyCode
+           responseCallback:(void (^_Nonnull)(bool))responseCallback
+                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler
+{
+    ChipLogProgress(AppServer, "CastingServerBridge().keypadInput_sendKey() called");
+
+    _keypadInput_sendKeyResponseCallback = responseCallback;
+
+    dispatch_async(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->KeypadInput_SendKey(
+            static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode), [](CHIP_ERROR err) {
+                [CastingServerBridge getSharedInstance].keypadInput_sendKeyResponseCallback(CHIP_NO_ERROR == err);
+            });
+        dispatch_async(clientQueue, ^{
+            requestSentHandler(CHIP_NO_ERROR == err);
         });
     });
 }
