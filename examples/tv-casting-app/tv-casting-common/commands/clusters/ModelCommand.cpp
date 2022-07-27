@@ -47,16 +47,8 @@ CHIP_ERROR ModelCommand::RunCommand()
         return SendGroupCommand(GroupIdFromNodeId(mDestinationId), fabricIndex);
     }
 
-    Server * server           = &(chip::Server::GetInstance());
-    const FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
-    if (fabric == nullptr)
-    {
-        ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
-        return CHIP_ERROR_INVALID_FABRIC_INDEX;
-    }
-
-    PeerId peerID = fabric->GetPeerIdForNode(mDestinationId);
-    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnDeviceConnectedCallback,
+    Server * server = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mDestinationId, fabricIndex), &mOnDeviceConnectedCallback,
                                                             &mOnDeviceConnectionFailureCallback);
     return CHIP_NO_ERROR;
 }
@@ -71,7 +63,7 @@ void ModelCommand::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * 
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
     ChipLogProgress(chipTool, "ModelCommand::OnDeviceConnectionFailureFn");
     LogErrorOnFailure(err);

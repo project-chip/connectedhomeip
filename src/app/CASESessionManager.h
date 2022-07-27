@@ -68,12 +68,12 @@ public:
      * The `onFailure` callback may be called before the FindOrEstablishSession
      * call returns, for error cases that are detected synchronously.
      */
-    void FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId) const;
+    OperationalDeviceProxy * FindExistingSession(const ScopedNodeId & peerId) const;
 
-    void ReleaseSession(PeerId peerId);
+    void ReleaseSession(const ScopedNodeId & peerId);
 
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
@@ -87,7 +87,7 @@ public:
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
-    CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
+    CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
 
 private:
     void ReleaseSession(OperationalDeviceProxy * device) const;

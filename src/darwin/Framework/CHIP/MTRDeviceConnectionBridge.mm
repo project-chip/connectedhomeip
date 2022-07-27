@@ -29,7 +29,7 @@ void MTRDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDev
     });
 }
 
-void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, chip::PeerId peerId, CHIP_ERROR error)
+void MTRDeviceConnectionBridge::OnConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     auto * object = static_cast<MTRDeviceConnectionBridge *>(context);
     dispatch_async(object->mQueue, ^{

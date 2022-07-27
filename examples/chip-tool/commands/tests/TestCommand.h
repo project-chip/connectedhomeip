@@ -71,7 +71,7 @@ protected:
     void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override{};
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override;
 

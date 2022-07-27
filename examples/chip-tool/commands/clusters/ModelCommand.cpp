@@ -55,7 +55,7 @@ void ModelCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePr
     VerifyOrReturn(CHIP_NO_ERROR == err, command->SetCommandExitStatus(err));
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 

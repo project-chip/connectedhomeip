@@ -49,7 +49,7 @@ private:
         ChipLogProgress(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
     }
 
-    static void HandleDeviceConnectionFailure(void * context, chip::PeerId peerId, CHIP_ERROR error)
+    static void HandleDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
     {
         TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
         _this->mOperationalDeviceProxy = nullptr;

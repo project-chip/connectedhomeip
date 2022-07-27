@@ -61,7 +61,7 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePro
     LogErrorOnFailure(command->ContinueOnChipMainThread(CHIP_NO_ERROR));
 }
 
-void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
+void TestCommand::OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connection Failure [deviceId=%" PRIu64 ". Error %" CHIP_ERROR_FORMAT "\n]",
                     peerId.GetNodeId(), error.Format());

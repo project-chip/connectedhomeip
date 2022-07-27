@@ -32,17 +32,9 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         endpointInfo.Reset();
     }
 
-    Server * server           = &(chip::Server::GetInstance());
-    const FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(fabricIndex);
-    if (fabric == nullptr)
-    {
-        ChipLogError(AppServer, "Did not find fabric for index %d", fabricIndex);
-        return CHIP_ERROR_INVALID_FABRIC_INDEX;
-    }
-
-    PeerId peerID = fabric->GetPeerIdForNode(nodeId);
-
-    server->GetCASESessionManager()->FindOrEstablishSession(peerID, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    Server * server = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(nodeId, fabricIndex), &mOnConnectedCallback,
+                                                            &mOnConnectionFailureCallback);
 
     if (mOperationalDeviceProxy == nullptr)
     {

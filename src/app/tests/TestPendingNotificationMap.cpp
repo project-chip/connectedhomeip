@@ -53,9 +53,8 @@ void TestEmptyMap(nlTestSuite * aSuite, void * aContext)
 {
     PendingNotificationMap pendingMap;
     NL_TEST_ASSERT(aSuite, pendingMap.begin() == pendingMap.end());
-    FabricIndex fabricIndex;
-    NodeId node;
-    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(&fabricIndex, &node) == CHIP_ERROR_NOT_FOUND);
+    chip::ScopedNodeId peer;
+    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(peer) == CHIP_ERROR_NOT_FOUND);
 }
 
 void TestAddRemove(nlTestSuite * aSuite, void * aContext)
@@ -75,7 +74,7 @@ void TestAddRemove(nlTestSuite * aSuite, void * aContext)
         ++iter;
     }
     NL_TEST_ASSERT(aSuite, iter == pendingMap.end());
-    pendingMap.RemoveAllEntriesForNode(0, 0);
+    pendingMap.RemoveAllEntriesForNode(chip::ScopedNodeId());
     uint8_t expectedEntryIndecies[] = { 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
     iter                            = pendingMap.begin();
     for (size_t i = 0; i < sizeof(expectedEntryIndecies); i++)
@@ -109,19 +108,18 @@ void TestLRUEntry(nlTestSuite * aSuite, void * aContext)
     pendingMap.AddPendingNotification(7, nullptr);
     pendingMap.AddPendingNotification(11, nullptr);
 
-    FabricIndex fabricIndex;
-    NodeId node;
+    chip::ScopedNodeId node;
 
-    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(&fabricIndex, &node) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, fabricIndex == 0 && node == 1);
+    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(node) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, node.GetFabricIndex() == 0 && node.GetNodeId() == 1);
 
     pendingMap.RemoveEntry(1);
-    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(&fabricIndex, &node) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, fabricIndex == 0 && node == 0);
+    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(node) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, node.GetFabricIndex() == 0 && node.GetNodeId() == 0);
 
     pendingMap.RemoveAllEntriesForFabric(0);
-    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(&fabricIndex, &node) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(aSuite, fabricIndex == 1 && node == 1);
+    NL_TEST_ASSERT(aSuite, pendingMap.FindLRUConnectPeer(node) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(aSuite, node.GetFabricIndex() == 1 && node.GetNodeId() == 1);
 }
 
 } // namespace
