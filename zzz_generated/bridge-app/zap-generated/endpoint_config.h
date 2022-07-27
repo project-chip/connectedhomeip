@@ -42,7 +42,7 @@
             /* Endpoint: 1, Cluster: Bridged Actions (server), big-endian */                                                       \
                                                                                                                                    \
             /* 14 - setup url, */                                                                                                  \
-            0, 19, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
+            19, 0, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
     }
 
 #else // !BIGENDIAN_CPU
@@ -62,7 +62,7 @@
             /* Endpoint: 1, Cluster: Bridged Actions (server), little-endian */                                                    \
                                                                                                                                    \
             /* 14 - setup url, */                                                                                                  \
-            0, 19, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
+            19, 0, 'h', 't', 't', 'p', 's', ':', '/', '/', 'e', 'x', 'a', 'm', 'p', 'l', 'e', '.', 'c', 'o', 'm',                  \
     }
 
 #endif // BIGENDIAN_CPU
@@ -98,7 +98,10 @@
             /* Endpoint: 0, Cluster: Unit Localization (server) */                                                                 \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x2 }, /* TemperatureUnit */                                              \
                                                                                                                                    \
-        /* Endpoint: 2, Cluster: Level Control (server) */ { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 } /* options */        \
+        /* Endpoint: 2, Cluster: Level Control (server) */                                                                         \
+        {                                                                                                                          \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3                                                                         \
+        } /* options */                                                                                                            \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
@@ -986,7 +989,10 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
-        { 0x0016, 1 }, { 0x000E, 1 }, { 0x0101, 1 }                                                                                \
+        { 0x0016, 1 }, { 0x000E, 1 },                                                                                              \
+        {                                                                                                                          \
+            0x0101, 1                                                                                                              \
+        }                                                                                                                          \
     }
 
 // Array of device type offsets

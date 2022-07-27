@@ -2260,10 +2260,10 @@ namespace Commands {
 namespace MoveToLevel {
 enum class Fields
 {
-    kLevel          = 0,
-    kTransitionTime = 1,
-    kOptionMask     = 2,
-    kOptionOverride = 3,
+    kLevel           = 0,
+    kTransitionTime  = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2275,8 +2275,8 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2293,18 +2293,18 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToLevel
 namespace Move {
 enum class Fields
 {
-    kMoveMode       = 0,
-    kRate           = 1,
-    kOptionMask     = 2,
-    kOptionOverride = 3,
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2314,10 +2314,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode      = static_cast<MoveMode>(0);
-    uint8_t rate           = static_cast<uint8_t>(0);
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2332,21 +2332,21 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode      = static_cast<MoveMode>(0);
-    uint8_t rate           = static_cast<uint8_t>(0);
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Move
 namespace Step {
 enum class Fields
 {
-    kStepMode       = 0,
-    kStepSize       = 1,
-    kTransitionTime = 2,
-    kOptionMask     = 3,
-    kOptionOverride = 4,
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
 };
 
 struct Type
@@ -2359,8 +2359,8 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2378,16 +2378,16 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    uint8_t optionMask      = static_cast<uint8_t>(0);
-    uint8_t optionOverride  = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step
 namespace Stop {
 enum class Fields
 {
-    kOptionMask     = 0,
-    kOptionOverride = 1,
+    kOptionsMask     = 0,
+    kOptionsOverride = 1,
 };
 
 struct Type
@@ -2397,8 +2397,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2413,16 +2413,18 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    uint8_t optionMask     = static_cast<uint8_t>(0);
-    uint8_t optionOverride = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Stop
 namespace MoveToLevelWithOnOff {
 enum class Fields
 {
-    kLevel          = 0,
-    kTransitionTime = 1,
+    kLevel           = 0,
+    kTransitionTime  = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2434,6 +2436,8 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2450,14 +2454,18 @@ public:
 
     uint8_t level           = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveToLevelWithOnOff
 namespace MoveWithOnOff {
 enum class Fields
 {
-    kMoveMode = 0,
-    kRate     = 1,
+    kMoveMode        = 0,
+    kRate            = 1,
+    kOptionsMask     = 2,
+    kOptionsOverride = 3,
 };
 
 struct Type
@@ -2467,8 +2475,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
-    uint8_t rate      = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2483,17 +2493,21 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
-    MoveMode moveMode = static_cast<MoveMode>(0);
-    uint8_t rate      = static_cast<uint8_t>(0);
+    MoveMode moveMode       = static_cast<MoveMode>(0);
+    uint8_t rate            = static_cast<uint8_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MoveWithOnOff
 namespace StepWithOnOff {
 enum class Fields
 {
-    kStepMode       = 0,
-    kStepSize       = 1,
-    kTransitionTime = 2,
+    kStepMode        = 0,
+    kStepSize        = 1,
+    kTransitionTime  = 2,
+    kOptionsMask     = 3,
+    kOptionsOverride = 4,
 };
 
 struct Type
@@ -2506,6 +2520,8 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2523,12 +2539,16 @@ public:
     StepMode stepMode       = static_cast<StepMode>(0);
     uint8_t stepSize        = static_cast<uint8_t>(0);
     uint16_t transitionTime = static_cast<uint16_t>(0);
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StepWithOnOff
 namespace StopWithOnOff {
 enum class Fields
 {
+    kOptionsMask     = 0,
+    kOptionsOverride = 1,
 };
 
 struct Type
@@ -2537,6 +2557,9 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
+
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -2551,6 +2574,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
 
+    uint8_t optionsMask     = static_cast<uint8_t>(0);
+    uint8_t optionsOverride = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopWithOnOff

@@ -938,9 +938,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -966,9 +966,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull rate;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -996,9 +996,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1020,9 +1020,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 @interface MTRLevelControlClusterStopParams : NSObject
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionMask;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
 
-@property (strong, nonatomic) NSNumber * _Nonnull optionOverride;
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1047,6 +1047,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull level;
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1071,6 +1075,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull moveMode;
 
 @property (strong, nonatomic) NSNumber * _Nonnull rate;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1097,6 +1105,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull stepSize;
 
 @property (strong, nonatomic) NSNumber * _Nonnull transitionTime;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -1117,6 +1129,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 @interface MTRLevelControlClusterStopWithOnOffParams : NSObject
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsMask;
+
+@property (strong, nonatomic) NSNumber * _Nonnull optionsOverride;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
