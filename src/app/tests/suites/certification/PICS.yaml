@@ -4246,6 +4246,22 @@ PICS:
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
 
+    #Server Features
+    - label:
+          "Does the DUT(Server) support the WI (Wi-Fi network interface)
+          feature?"
+      id: CNET.S.F00
+
+    - label:
+          "Does the DUT(Server) support the TH (Thread network interface)
+          feature?"
+      id: CNET.S.F01
+
+    - label:
+          "Does the DUT(Server) support the ET (Ethernet network interface)
+          feature?"
+      id: CNET.S.F02
+
     #Server Commands
     - label:
           "Does the Device(Server) implement receiving the ScanNetworks command?"
