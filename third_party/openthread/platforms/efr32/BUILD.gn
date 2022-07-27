@@ -48,6 +48,8 @@ source_set("openthread_core_config_efr32") {
 }
 
 source_set("libopenthread-efr32") {
+
+  print("I SHOULD NOT USE libopenthread-efr32")
   sources = [
     "${openthread_efr32_root}/src/src/alarm.c",
     "${openthread_efr32_root}/src/src/crypto.c",

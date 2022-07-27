@@ -22,6 +22,7 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/third_party/silabs/ot-efr32-libs.gni")
 import("inet.gni")
 
 if (chip_system_config_use_open_thread_inet_endpoints) {
@@ -108,12 +109,18 @@ static_library("inet") {
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {
-    if (chip_openthread_ftd) {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+    if (use_thread_cert_lib){
+       public_deps +=
+            [ "${chip_root}/third_party/silabs/:ot-efr32-cert" ]
     } else {
-      public_deps +=
-          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+      print(" SHOULD NOT BE HERE IN INET")
+      if (chip_openthread_ftd) {
+        public_deps +=
+            [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+      } else {
+        public_deps +=
+            [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+      }
     }
   }
 

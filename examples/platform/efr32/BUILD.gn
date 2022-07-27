@@ -43,8 +43,14 @@ source_set("openthread_core_config_efr32_chip_examples") {
   sources = [ "project_include/OpenThreadConfig.h" ]
 
   public_deps = [
-    "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
+    #TOFIX
+    #"${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
+    "${chip_root}/third_party/silabs:openthread_core_config_efr32",
     "${efr32_sdk_build_root}:efr32_sdk",
+  ]
+
+  defines = [  
+    "OPENTHREAD_PROJECT_CORE_CONFIG_FILE=\"OpenThreadConfig.h\"", 
   ]
 
   public_configs = [ ":chip_examples_project_config" ]

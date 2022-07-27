@@ -19,7 +19,9 @@ import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/efr32_board.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+import("${efr32_sdk_build_root}/ot-efr32-libs.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -203,21 +205,31 @@ efr32_executable("lighting_app") {
 
   # OpenThread Settings
   if (chip_enable_openthread) {
-    deps += [
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-      "${examples_plat_dir}:efr-matter-shell",
-    ]
-    if (chip_openthread_ftd) {
+    if (use_thread_cert_lib) {
+      print("DEP use_thread_cert_lib")
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+        "${efr32_sdk_build_root}:openthread_system",
+        "${efr32_sdk_build_root}:ot-efr32-cert",
+        "${examples_plat_dir}:efr-matter-shell",
       ]
     } else {
+      print("not thread cert lib")
       deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+        "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+        "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+        "${examples_plat_dir}:efr-matter-shell",
       ]
+      if (chip_openthread_ftd) {
+        deps += [
+          "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+          "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+        ]
+      } else {
+        deps += [
+          "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+          "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+        ]
+      }
     }
   }
 
