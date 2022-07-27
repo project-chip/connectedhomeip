@@ -256,8 +256,8 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     emberAfClearDynamicEndpoint(0);
 }
 
-// This test is to create Chunked write requests, we drop the message since the 3rd message, then trigger OnFabricRemoved from interaction model engine
-// to simulate the situation for fabric removed, the write handler would be closed.
+// This test is to create Chunked write requests, we drop the message since the 3rd message, then trigger OnFabricRemoved from
+// interaction model engine to simulate the situation for fabric removed, the write handler would be closed.
 void TestWriteChunking::TestListChunkingInvalidFabric(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
@@ -278,7 +278,7 @@ void TestWriteChunking::TestListChunkingInvalidFabric(nlTestSuite * apSuite, voi
     TestWriteCallback writeCallback;
 
     app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                    static_cast<uint16_t>(900) /* reserved buffer size */);
+                                 static_cast<uint16_t>(900) /* reserved buffer size */);
 
     ByteSpan list[kTestListLength];
 
@@ -288,7 +288,7 @@ void TestWriteChunking::TestListChunkingInvalidFabric(nlTestSuite * apSuite, voi
     ctx.GetLoopback().mSentMessageCount            = 0;
     ctx.GetLoopback().mNumMessagesToDrop           = 1;
     ctx.GetLoopback().mNumMessagesToDropSinceIndex = 3;
-    err = writeClient.SendWriteRequest(sessionHandle);
+    err                                            = writeClient.SendWriteRequest(sessionHandle);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ctx.DrainAndServiceIO();
 
