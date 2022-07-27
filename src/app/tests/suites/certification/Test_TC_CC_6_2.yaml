@@ -40,6 +40,13 @@ tests:
       response:
           value: 1
 
+    - label: "TH writes 0 to the Options attribute"
+      PICS: CC.S.F04 && CC.S.A000f
+      command: "writeAttribute"
+      attribute: "Options"
+      arguments:
+          value: 0
+
     - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
@@ -224,7 +231,7 @@ tests:
               - name: "MoveMode"
                 value: 1
               - name: "Rate"
-                value: 10
+                value: 20
               - name: "ColorTemperatureMinimumMireds"
                 value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
@@ -242,11 +249,11 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 10
+                value: 20
               - name: "ColorTemperatureMinimumMireds"
-                value: 1
+                value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"
-                value: 255
+                value: ColorTempPhysicalMaxMiredsValue
               - name: "OptionsMask"
                 value: 0
               - name: "OptionsOverride"
@@ -335,7 +342,7 @@ tests:
               - name: "MoveMode"
                 value: 0
               - name: "Rate"
-                value: 10
+                value: 20
               - name: "ColorTemperatureMinimumMireds"
                 value: ColorTempPhysicalMinMiredsValue
               - name: "ColorTemperatureMaximumMireds"

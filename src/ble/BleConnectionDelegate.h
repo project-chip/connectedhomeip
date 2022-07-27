@@ -27,6 +27,7 @@
 #include <ble/BleError.h>
 
 #include <lib/support/DLLUtil.h>
+#include <lib/support/SetupDiscriminator.h>
 
 namespace chip {
 namespace Ble {
@@ -51,8 +52,8 @@ public:
     OnConnectionErrorFunct OnConnectionError;
 
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
-    // out of a peripheral discriminator.
-    virtual void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) = 0;
+    // out of a peripheral that matches the given discriminator.
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) = 0;
 
     // Call this function to stop the connection
     virtual CHIP_ERROR CancelConnection() = 0;

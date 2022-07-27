@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/reporting/reporting.h>
@@ -377,22 +378,31 @@ std::vector<Action *> GetActionListInfo(chip::EndpointId parentId)
     return gActions;
 }
 
+namespace {
+void CallReportingCallback(intptr_t closure)
+{
+    auto path = reinterpret_cast<app::ConcreteAttributePath *>(closure);
+    MatterReportingAttributeChangeCallback(*path);
+    Platform::Delete(path);
+}
+
+void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
+{
+    auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
+    PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+}
+} // anonymous namespace
+
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
     {
-        uint8_t reachable = dev->IsReachable() ? 1 : 0;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::Reachable::Id);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        uint8_t zclName[kNodeLabelSize];
-        MutableByteSpan zclNameSpan(zclName);
-        MakeZclCharString(zclNameSpan, dev->GetName());
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclNameSpan.data());
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::NodeLabel::Id);
     }
 }
 
@@ -405,9 +415,7 @@ void HandleDeviceOnOffStatusChanged(DeviceOnOff * dev, DeviceOnOff::Changed_t it
 
     if (itemChangedMask & DeviceOnOff::kChanged_OnOff)
     {
-        uint8_t isOn = dev->IsOn() ? 1 : 0;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                               ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+        ScheduleReportingCallback(dev, OnOff::Id, OnOff::Attributes::OnOff::Id);
     }
 }
 
@@ -872,28 +880,28 @@ int main(int argc, char * argv[])
     memset(gDevices, 0, sizeof(gDevices));
 
     // Setup Mock Devices
-    Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-
     Light1.SetReachable(true);
     Light2.SetReachable(true);
 
-    Switch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
-    Switch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
+    Light1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    Light2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
     Switch1.SetReachable(true);
     Switch2.SetReachable(true);
 
-    // Setup devices for action cluster tests
-    ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
-    ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    Switch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
+    Switch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
 
+    // Setup devices for action cluster tests
     ActionLight1.SetReachable(true);
     ActionLight2.SetReachable(true);
     ActionLight3.SetReachable(true);
     ActionLight4.SetReachable(true);
+
+    ActionLight1.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight2.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight3.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
+    ActionLight4.SetChangeCallback(&HandleDeviceOnOffStatusChanged);
 
     // Define composed device with two switches
     ComposedDevice ComposedDevice("Composed Switcher", "Bedroom");
@@ -904,15 +912,15 @@ int main(int argc, char * argv[])
                                      EMBER_AF_SWITCH_FEATURE_MOMENTARY_SWITCH_MULTI_PRESS);
     DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", EMBER_AF_POWER_SOURCE_FEATURE_BATTERY);
 
-    ComposedSwitch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
-    ComposedSwitch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
-    ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
-
     ComposedDevice.SetReachable(true);
     ComposedSwitch1.SetReachable(true);
     ComposedSwitch2.SetReachable(true);
     ComposedPowerSource.SetReachable(true);
     ComposedPowerSource.SetBatChargeLevel(58);
+
+    ComposedSwitch1.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
+    ComposedSwitch2.SetChangeCallback(&HandleDeviceSwitchStatusChanged);
+    ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
 
     if (ChipLinuxAppInit(argc, argv) != 0)
     {

@@ -44,7 +44,7 @@ tests:
           constraints:
               type: map32
               minValue: 0
-              maxValue: 7
+              maxValue: 15
 
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"

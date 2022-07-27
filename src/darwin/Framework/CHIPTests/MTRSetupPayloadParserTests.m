@@ -45,7 +45,8 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertTrue(payload.hasShortDiscriminator);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
@@ -75,7 +76,8 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertTrue(payload.hasShortDiscriminator);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
@@ -105,6 +107,7 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
+    XCTAssertFalse(payload.hasShortDiscriminator);
     XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
@@ -136,6 +139,7 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
+    XCTAssertFalse(payload.hasShortDiscriminator);
     XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
@@ -167,7 +171,8 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertTrue(payload.hasShortDiscriminator);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 10);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
@@ -207,6 +212,7 @@
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
+    XCTAssertFalse(payload.hasShortDiscriminator);
     XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
@@ -227,6 +233,7 @@
     XCTAssertNil(error);
 
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
+    XCTAssertFalse(payload.hasShortDiscriminator);
     XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
     XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);

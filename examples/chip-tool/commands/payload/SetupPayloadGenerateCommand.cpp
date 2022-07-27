@@ -30,7 +30,7 @@ void SetupPayloadGenerateCommand::ConfigurePayload(SetupPayload & payload)
 {
     if (mDiscriminator.HasValue())
     {
-        payload.discriminator = mDiscriminator.Value();
+        payload.discriminator.SetLongValue(mDiscriminator.Value());
     }
 
     if (mSetUpPINCode.HasValue())
