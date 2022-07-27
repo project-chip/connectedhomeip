@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
@@ -29,8 +30,10 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ErrorStr.h>
+#include <lib/support/ZclString.h>
 
 #include <app/server/Server.h>
 
@@ -196,19 +199,6 @@ CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
     return CHIP_ERROR_INTERNAL;
 }
 
-// ZCL format -> (len, string)
-uint8_t * ToZclCharString(uint8_t * zclString, const char * cString, uint8_t maxLength)
-{
-    size_t len = strlen(cString);
-    if (len > maxLength)
-    {
-        len = maxLength;
-    }
-    zclString[0] = static_cast<uint8_t>(len);
-    memcpy(&zclString[1], cString, zclString[0]);
-    return zclString;
-}
-
 EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::AttributeId attributeId, uint8_t * buffer,
                                                     uint16_t maxReadLength)
 {
@@ -220,7 +210,8 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == ZCL_NODE_LABEL_ATTRIBUTE_ID) && (maxReadLength == 32))
     {
-        ToZclCharString(buffer, dev->GetName(), static_cast<uint8_t>(maxReadLength - 1));
+        MutableByteSpan zclNameSpan(buffer, maxReadLength);
+        MakeZclCharString(zclNameSpan, dev->GetName());
     }
     else if ((attributeId == ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID) && (maxReadLength == 2))
     {
@@ -304,28 +295,36 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
+namespace {
+void CallReportingCallback(intptr_t closure)
+{
+    auto path = reinterpret_cast<app::ConcreteAttributePath *>(closure);
+    MatterReportingAttributeChangeCallback(*path);
+    Platform::Delete(path);
+}
+
+void ScheduleReportingCallback(Device * dev, ClusterId cluster, AttributeId attribute)
+{
+    auto * path = Platform::New<app::ConcreteAttributePath>(dev->GetEndpointId(), cluster, attribute);
+    DeviceLayer::PlatformMgr().ScheduleWork(CallReportingCallback, reinterpret_cast<intptr_t>(path));
+}
+} // anonymous namespace
+
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
 {
     if (itemChangedMask & Device::kChanged_Reachable)
     {
-        uint8_t reachable = dev->IsReachable() ? 1 : 0;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_REACHABLE_ATTRIBUTE_ID, ZCL_BOOLEAN_ATTRIBUTE_TYPE, &reachable);
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::Reachable::Id);
     }
 
     if (itemChangedMask & Device::kChanged_State)
     {
-        uint8_t isOn = dev->IsOn() ? 1 : 0;
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                               ZCL_BOOLEAN_ATTRIBUTE_TYPE, &isOn);
+        ScheduleReportingCallback(dev, OnOff::Id, OnOff::Attributes::OnOff::Id);
     }
 
     if (itemChangedMask & Device::kChanged_Name)
     {
-        uint8_t zclName[kNodeLabelSize + 1];
-        ToZclCharString(zclName, dev->GetName(), kNodeLabelSize);
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID,
-                                               ZCL_NODE_LABEL_ATTRIBUTE_ID, ZCL_CHAR_STRING_ATTRIBUTE_TYPE, zclName);
+        ScheduleReportingCallback(dev, BridgedDeviceBasic::Id, BridgedDeviceBasic::Attributes::NodeLabel::Id);
     }
 }
 
@@ -400,16 +399,16 @@ extern "C" void app_main()
     // Clear database
     memset(gDevices, 0, sizeof(gDevices));
 
+    gLight1.SetReachable(true);
+    gLight2.SetReachable(true);
+    gLight3.SetReachable(true);
+    gLight4.SetReachable(true);
+
     // Whenever bridged device changes its state
     gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
-
-    gLight1.SetReachable(true);
-    gLight2.SetReachable(true);
-    gLight3.SetReachable(true);
-    gLight4.SetReachable(true);
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
