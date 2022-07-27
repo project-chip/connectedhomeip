@@ -802,7 +802,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
                     gapEvent->subscribe.conn_handle, gapEvent->subscribe.cur_indicate);
 
     // Determine if the client is enabling or disabling indications.
-    indicationsEnabled   = gapEvent->subscribe.cur_indicate;
+    indicationsEnabled = gapEvent->subscribe.cur_indicate;
 
     // If the client has requested to enabled indications
     if (indicationsEnabled)
@@ -828,14 +828,12 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent)
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = (indicationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
-                                                                  : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = (indicationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = gapEvent->subscribe.conn_handle;
         err                           = PlatformMgr().PostEvent(&event);
     }
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
-                    (indicationsEnabled) ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", (indicationsEnabled) ? "subscribe" : "unsubscribe");
 
 exit:
     if (err != CHIP_NO_ERROR)
