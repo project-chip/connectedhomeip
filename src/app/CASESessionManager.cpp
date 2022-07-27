@@ -39,7 +39,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
 
-        session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId, this);
+        session = mConfig.sessionSetupPool->Allocate(mConfig.sessionInitParams, peerId, this);
 
         if (session == nullptr)
         {
@@ -62,12 +62,12 @@ void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
 {
-    mConfig.devicePool->ReleaseDevicesForFabric(fabricIndex);
+    mConfig.sessionSetupPool->ReleaseDevicesForFabric(fabricIndex);
 }
 
 void CASESessionManager::ReleaseAllSessions()
 {
-    mConfig.devicePool->ReleaseAllDevices();
+    mConfig.sessionSetupPool->ReleaseAllDevices();
 }
 
 CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr)
@@ -81,7 +81,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Trans
 
 OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId) const
 {
-    return mConfig.devicePool->FindDevice(peerId);
+    return mConfig.sessionSetupPool->FindDevice(peerId);
 }
 
 bool CASESessionManager::DisconnectSession(const ScopedNodeId & peerId) const
@@ -105,7 +105,7 @@ void CASESessionManager::ReleaseSession(OperationalSessionSetup * session) const
 {
     if (session != nullptr)
     {
-        mConfig.devicePool->Release(session);
+        mConfig.sessionSetupPool->Release(session);
     }
 }
 

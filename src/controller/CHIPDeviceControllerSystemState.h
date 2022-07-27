@@ -69,8 +69,8 @@ namespace Controller {
 
 struct DeviceControllerSystemStateParams
 {
-    using SessionSetupPool      = OperationalSessionSetupPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
-    using CASEClientPool        = chip::CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS>;
+    using SessionSetupPool = OperationalSessionSetupPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES>;
+    using CASEClientPool   = chip::CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS>;
 
     // Params that can outlive the DeviceControllerSystemState
     System::Layer * systemLayer                                   = nullptr;
@@ -107,8 +107,8 @@ struct DeviceControllerSystemStateParams
 // owned by DeviceControllerFactory.
 class DeviceControllerSystemState
 {
-    using SessionSetupPool      = DeviceControllerSystemStateParams::SessionSetupPool;
-    using CASEClientPool        = DeviceControllerSystemStateParams::CASEClientPool;
+    using SessionSetupPool = DeviceControllerSystemStateParams::SessionSetupPool;
+    using CASEClientPool   = DeviceControllerSystemStateParams::CASEClientPool;
 
 public:
     ~DeviceControllerSystemState()

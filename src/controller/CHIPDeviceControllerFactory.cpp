@@ -244,8 +244,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         chip::app::DnssdServer::Instance().StartServer();
     }
 
-    stateParams.sessionSetupPool      = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
-    stateParams.caseClientPool        = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
+    stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
+    stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     DeviceProxyInitParams deviceInitParams = {
         .sessionManager           = stateParams.sessionMgr,
@@ -259,7 +259,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
-        .devicePool        = stateParams.sessionSetupPool,
+        .sessionSetupPool  = stateParams.sessionSetupPool,
     };
 
     // TODO: Need to be able to create a CASESessionManagerConfig here!
@@ -388,7 +388,7 @@ void DeviceControllerSystemState::Shutdown()
         mCASESessionManager = nullptr;
     }
 
-    // mCASEClientPool and mDevicePool must be deallocated
+    // mCASEClientPool and mSessionSetupPool must be deallocated
     // after mCASESessionManager, which uses them.
 
     if (mSessionSetupPool != nullptr)

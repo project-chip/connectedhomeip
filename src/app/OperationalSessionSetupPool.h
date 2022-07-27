@@ -45,20 +45,20 @@ template <size_t N>
 class OperationalSessionSetupPool : public OperationalSessionSetupPoolDelegate
 {
 public:
-    ~OperationalSessionSetupPool() override { mDevicePool.ReleaseAll(); }
+    ~OperationalSessionSetupPool() override { mSessionSetupPool.ReleaseAll(); }
 
     OperationalSessionSetup * Allocate(DeviceProxyInitParams & params, ScopedNodeId peerId,
                                        OperationalSessionReleaseDelegate * releaseDelegate) override
     {
-        return mDevicePool.CreateObject(params, peerId, releaseDelegate);
+        return mSessionSetupPool.CreateObject(params, peerId, releaseDelegate);
     }
 
-    void Release(OperationalSessionSetup * device) override { mDevicePool.ReleaseObject(device); }
+    void Release(OperationalSessionSetup * device) override { mSessionSetupPool.ReleaseObject(device); }
 
     OperationalSessionSetup * FindDevice(ScopedNodeId peerId) override
     {
         OperationalSessionSetup * foundDevice = nullptr;
-        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+        mSessionSetupPool.ForEachActiveObject([&](auto * activeDevice) {
             if (activeDevice->GetPeerId() == peerId)
             {
                 foundDevice = activeDevice;
@@ -72,7 +72,7 @@ public:
 
     void ReleaseDevicesForFabric(FabricIndex fabricIndex) override
     {
-        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+        mSessionSetupPool.ForEachActiveObject([&](auto * activeDevice) {
             if (activeDevice->GetFabricIndex() == fabricIndex)
             {
                 Release(activeDevice);
@@ -83,14 +83,14 @@ public:
 
     void ReleaseAllDevices() override
     {
-        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
+        mSessionSetupPool.ForEachActiveObject([&](auto * activeDevice) {
             Release(activeDevice);
             return Loop::Continue;
         });
     }
 
 private:
-    ObjectPool<OperationalSessionSetup, N> mDevicePool;
+    ObjectPool<OperationalSessionSetup, N> mSessionSetupPool;
 };
 
 }; // namespace chip

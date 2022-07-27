@@ -118,14 +118,13 @@ class DCState(enum.IntEnum):
 
 
 class DeviceProxyWrapper():
-    def __init__(self, deviceProxy: ctypes.c_void_p, freeCallback=None):
+    def __init__(self, deviceProxy: ctypes.c_void_p, dmLib=None):
         self._deviceProxy = deviceProxy
-        self._freeCallback = freeCallback
+        self._dmLib = dmLib
 
     def __del__(self):
-        if (self._freeCallback is not None):
-            self._freeCallback(self._deviceProxy)
-        return
+        if (self._dmLib is not None and builtins.chipStack is not None):
+            builtins.chipStack.Call(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(self._deviceProxy))
 
     @property
     def deviceProxy(self) -> ctypes.c_void_p:
@@ -623,11 +622,7 @@ class ChipDeviceController():
         if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(returnErr)
 
-        def FreeOperationDeviceProxy(deviceProxy: ctypes.c_void_p):
-            builtins.chipStack.Call(lambda: self._dmLib.pychip_FreeOperationalDeviceProxy(deviceProxy))
-            return
-
-        return DeviceProxyWrapper(returnDevice, FreeOperationDeviceProxy)
+        return DeviceProxyWrapper(returnDevice, self._dmLib)
 
     def ComputeRoundTripTimeout(self, nodeid, upperLayerProcessingTimeoutMs: int = 0):
         ''' Returns a computed timeout value based on the round-trip time it takes for the peer at the other end of the session to
@@ -640,7 +635,6 @@ class ChipDeviceController():
         device = self.GetConnectedDeviceSync(nodeid)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
             device.deviceProxy, upperLayerProcessingTimeoutMs))
-        del device
         return res
 
     async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None):
