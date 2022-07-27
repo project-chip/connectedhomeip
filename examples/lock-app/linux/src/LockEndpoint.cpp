@@ -151,10 +151,10 @@ bool LockEndpoint::SetDoorState(DlDoorState newState)
     return true;
 }
 
-bool LockEndpoint::SendLockJammedAlarm() const
+bool LockEndpoint::SendLockAlarm(DlAlarmCode alarmCode) const
 {
-    ChipLogProgress(Zcl, "Changing the Lock Jammed event [endpointId=%d]", mEndpointId);
-    return DoorLockServer::Instance().SendLockAlarmEvent(mEndpointId, DlAlarmCode::kLockJammed);
+    ChipLogProgress(Zcl, "Sending the LockAlarm event [endpointId=%d,alarmCode=%u]", mEndpointId, to_underlying(alarmCode));
+    return DoorLockServer::Instance().SendLockAlarmEvent(mEndpointId, alarmCode);
 }
 
 bool LockEndpoint::GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,

@@ -75,7 +75,7 @@ public:
 
     DlDoorState GetDoorState() const;
 
-    bool SendLockJammedAlarm() const;
+    bool SendLockAlarm(DlAlarmCode alarmCode) const;
 
     bool GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;

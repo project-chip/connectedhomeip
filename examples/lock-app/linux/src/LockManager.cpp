@@ -18,7 +18,6 @@
 
 #include "LockManager.h"
 
-#include <cstring>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -112,7 +111,7 @@ bool LockManager::InitEndpoint(chip::EndpointId endpointId)
     return true;
 }
 
-bool LockManager::ToggleDoorState(chip::EndpointId endpointId)
+bool LockManager::SetDoorState(chip::EndpointId endpointId, DlDoorState doorState)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -121,18 +120,10 @@ bool LockManager::ToggleDoorState(chip::EndpointId endpointId)
                      endpointId);
         return false;
     }
-
-    auto currentState = lockEndpoint->GetDoorState();
-    if (currentState == DlDoorState::kDoorOpen)
-    {
-        return lockEndpoint->SetDoorState(DlDoorState::kDoorClosed);
-    }
-    // We assume that toggling the door state from any non-open state means completely opening it.
-    // The reason is that other states are optional for DPS feature and out of scope of this example.
-    return lockEndpoint->SetDoorState(DlDoorState::kDoorOpen);
+    return lockEndpoint->SetDoorState(doorState);
 }
 
-bool LockManager::SendLockJammedAlarm(chip::EndpointId endpointId)
+bool LockManager::SendLockAlarm(chip::EndpointId endpointId, DlAlarmCode alarmCode)
 {
     auto lockEndpoint = getEndpoint(endpointId);
     if (nullptr == lockEndpoint)
@@ -140,7 +131,7 @@ bool LockManager::SendLockJammedAlarm(chip::EndpointId endpointId)
         ChipLogError(Zcl, "Unable to send lock alarm - endpoint does not exist or not initialized [endpointId=%d]", endpointId);
         return false;
     }
-    return lockEndpoint->SendLockJammedAlarm();
+    return lockEndpoint->SendLockAlarm(alarmCode);
 }
 
 bool LockManager::Lock(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pin, DlOperationError & err)

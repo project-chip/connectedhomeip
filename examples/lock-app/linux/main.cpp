@@ -20,6 +20,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
+#include "LockAppCommandDelegate.h"
 #include "LockManager.h"
 
 using namespace chip;
@@ -53,50 +54,28 @@ void InitNetworkCommissioning() {}
 
 #endif // (CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD) || CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+// Variables for handling named pipe commands
+constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_lock_app_fifo-";
+NamedPipeCommands sChipNamedPipeCommands;
+LockAppCommandDelegate sLockAppCommandDelegate;
+
 } // anonymous namespace
-
-static void ToggleDoorStatusSignalHandler(int aSignal);
-
-static void TriggerDoorLockAlarm(int aSignal);
-
-static void SetupSignalHandlers()
-{
-    signal(SIGUSR1, ToggleDoorStatusSignalHandler);
-    signal(SIGUSR2, TriggerDoorLockAlarm);
-}
 
 void ApplicationInit()
 {
     InitNetworkCommissioning();
+
+    auto path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    if (sChipNamedPipeCommands.Start(path, &sLockAppCommandDelegate) != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
 }
 
 int main(int argc, char * argv[])
 {
-    SetupSignalHandlers();
-
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
-}
-
-static void ToggleDoorStatusSignalHandler(int aSignal)
-{
-    if (aSignal != SIGUSR1)
-    {
-        return;
-    }
-    // Will toggle the door lock state on the first endpoint.
-    DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { LockManager::Instance().ToggleDoorState(DOOR_LOCK_SERVER_ENDPOINT); },
-                                            0);
-}
-
-static void TriggerDoorLockAlarm(int aSignal)
-{
-    if (aSignal != SIGUSR2)
-    {
-        return;
-    }
-    // Will send the DoorLockAlarm event with LockJammed alarm code on the first endpoint.
-    DeviceLayer::PlatformMgr().ScheduleWork(
-        [](intptr_t) { LockManager::Instance().SendLockJammedAlarm(DOOR_LOCK_SERVER_ENDPOINT); }, 0);
 }
