@@ -96,8 +96,8 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindow(NodeId deviceId, S
         mPBKDFSalt = ByteSpan(mPBKDFSaltBuffer);
     }
 
-    mSetupPayload.version               = 0;
-    mSetupPayload.discriminator         = discriminator;
+    mSetupPayload.version = 0;
+    mSetupPayload.discriminator.SetLongValue(discriminator);
     mSetupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
 
     mCommissioningWindowCallback      = callback;
@@ -142,7 +142,7 @@ CHIP_ERROR CommissioningWindowOpener::OpenCommissioningWindowInternal(Operationa
         AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
         request.commissioningTimeout = mCommissioningWindowTimeout.count();
         request.PAKEVerifier         = serializedVerifierSpan;
-        request.discriminator        = mSetupPayload.discriminator;
+        request.discriminator        = mSetupPayload.discriminator.GetLongValue();
         request.iterations           = mPBKDFIterations;
         request.salt                 = mPBKDFSalt;
 
