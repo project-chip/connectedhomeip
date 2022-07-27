@@ -56,7 +56,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
- exit:
+exit:
     return err;
 }
 
