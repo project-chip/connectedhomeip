@@ -68,9 +68,9 @@ tests:
                 value: MinlevelValue + 1
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Sends MoveToLevelWithOnOff command to DUT"
@@ -82,9 +82,9 @@ tests:
                 value: 2
               - name: "transitionTime"
                 value: 0
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Reads current level attribute from DUT"
@@ -121,9 +121,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 20
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Wait 4000ms"
@@ -155,9 +155,9 @@ tests:
                 value: 64
               - name: "transitionTime"
                 value: 20
-              - name: "optionMask"
+              - name: "optionsMask"
                 value: 0
-              - name: "optionOverride"
+              - name: "optionsOverride"
                 value: 0
 
     - label: "Wait 4000ms"
