@@ -51,16 +51,16 @@ private:
     static void HandleDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                       chip::SessionHandle & sessionHandle)
     {
-        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
-        _this->mDeviceProxy            = chip::OperationalDeviceProxy(&exchangeMgr, sessionHandle);
-        _this->mInitialized            = true;
+        TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mDeviceProxy           = chip::OperationalDeviceProxy(&exchangeMgr, sessionHandle);
+        _this->mInitialized           = true;
         ChipLogProgress(AppServer, "HandleDeviceConnected created an instance of OperationalDeviceProxy");
     }
 
     static void HandleDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error)
     {
-        TargetVideoPlayerInfo * _this  = static_cast<TargetVideoPlayerInfo *>(context);
-        _this->mDeviceProxy            = chip::OperationalDeviceProxy();
+        TargetVideoPlayerInfo * _this = static_cast<TargetVideoPlayerInfo *>(context);
+        _this->mDeviceProxy           = chip::OperationalDeviceProxy();
     }
 
     static constexpr size_t kMaxNumberOfEndpoints = 5;

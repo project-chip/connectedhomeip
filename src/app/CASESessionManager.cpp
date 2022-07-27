@@ -34,7 +34,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
 
-    OperationalSessionSetup * session = FindExistingSession(peerId);
+    OperationalSessionSetup * session = FindExistingSessionSetup(peerId);
     if (session == nullptr)
     {
         ChipLogDetail(CASESessionManager, "FindOrEstablishSession: No existing OperationalSessionSetup instance found");
@@ -54,9 +54,10 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     session->Connect(onConnection, onFailure);
 }
 
+// TODO need to figure out what things are calling this
 void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
 {
-    ReleaseSession(FindExistingSession(peerId));
+    ReleaseSession(FindExistingSessionSetup(peerId));
 }
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
@@ -72,16 +73,32 @@ void CASESessionManager::ReleaseAllSessions()
 CHIP_ERROR CASESessionManager::GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr)
 {
     ReturnErrorOnFailure(mConfig.sessionInitParams.Validate());
-    auto sessionHandle = mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(
-        peerId, MakeOptional(Transport::SecureSession::Type::kCASE));
-    ReturnErrorCodeIf(!sessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
-    addr = sessionHandle.Value()->AsSecureSession()->GetPeerAddress();
+    auto optionalSessionHandle = FindExistingSession(peerId);
+    ReturnErrorCodeIf(!optionalSessionHandle.HasValue(), CHIP_ERROR_NOT_CONNECTED);
+    addr = optionalSessionHandle.Value()->AsSecureSession()->GetPeerAddress();
     return CHIP_NO_ERROR;
 }
 
-OperationalSessionSetup * CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
+OperationalSessionSetup * CASESessionManager::FindExistingSessionSetup(const ScopedNodeId & peerId) const
 {
     return mConfig.devicePool->FindDevice(peerId);
+}
+
+bool CASESessionManager::DisconnectSession(const ScopedNodeId & peerId) const
+{
+    auto optionalSessionHandle = FindExistingSession(peerId);
+    if (optionalSessionHandle.HasValue())
+    {
+        optionalSessionHandle.Value()->AsSecureSession()->MarkAsDefunct();
+        return true;
+    }
+    return false;
+}
+
+Optional<SessionHandle> CASESessionManager::FindExistingSession(const ScopedNodeId & peerId) const
+{
+    return mConfig.sessionInitParams.sessionManager->FindSecureSessionForNode(peerId,
+                                                                              MakeOptional(Transport::SecureSession::Type::kCASE));
 }
 
 void CASESessionManager::ReleaseSession(OperationalSessionSetup * session) const

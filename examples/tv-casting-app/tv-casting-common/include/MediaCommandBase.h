@@ -37,7 +37,7 @@ public:
             return CHIP_ERROR_PEER_NODE_NOT_FOUND;
         }
         mTargetVideoPlayerInfo = &targetVideoPlayerInfo;
-        mTvEndpoint = tvEndpoint;
+        mTvEndpoint            = tvEndpoint;
         return CHIP_NO_ERROR;
     }
 

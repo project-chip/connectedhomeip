@@ -615,7 +615,7 @@ struct GetDeviceCallbacks
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
     {
-        auto * self = static_cast<GetDeviceCallbacks *>(context);
+        auto * self                   = static_cast<GetDeviceCallbacks *>(context);
         auto * operationalDeviceProxy = new OperationalDeviceProxy(&exchangeMgr, sessionHandle);
         self->mCallback(operationalDeviceProxy, CHIP_NO_ERROR.AsInteger());
         delete self;

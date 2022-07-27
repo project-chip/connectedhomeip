@@ -328,16 +328,15 @@ CHIP_ERROR DeviceController::DisconnectDevice(NodeId nodeId)
 {
     ChipLogProgress(Controller, "Force close session for node 0x%" PRIx64, nodeId);
 
-    OperationalSessionSetup * proxy = mSystemState->CASESessionMgr()->FindExistingSession(GetPeerScopedId(nodeId));
-    if (proxy == nullptr)
+    if (mSystemState->CASESessionMgr()->DisconnectSession(GetPeerScopedId(nodeId)))
     {
-        ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
         return CHIP_NO_ERROR;
     }
 
-    if (proxy->IsConnected())
+    OperationalSessionSetup * proxy = mSystemState->CASESessionMgr()->FindExistingSessionSetup(GetPeerScopedId(nodeId));
+    if (proxy == nullptr)
     {
-        proxy->Disconnect();
+        ChipLogProgress(Controller, "Attempted to close a session that does not exist.");
         return CHIP_NO_ERROR;
     }
 
@@ -2227,7 +2226,7 @@ CHIP_ERROR DeviceController::UpdateDevice(NodeId peerNodeId)
 
 OperationalSessionSetup * DeviceController::GetDeviceSession(const ScopedNodeId & peerId)
 {
-    return mSystemState->CASESessionMgr()->FindExistingSession(peerId);
+    return mSystemState->CASESessionMgr()->FindExistingSessionSetup(peerId);
 }
 
 OperationalSessionSetup * DeviceCommissioner::GetDeviceSession(const ScopedNodeId & peerId)

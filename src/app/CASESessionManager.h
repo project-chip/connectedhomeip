@@ -71,7 +71,9 @@ public:
     void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalSessionSetup * FindExistingSession(const ScopedNodeId & peerId) const;
+    OperationalSessionSetup * FindExistingSessionSetup(const ScopedNodeId & peerId) const;
+
+    bool DisconnectSession(const ScopedNodeId & peerId) const;
 
     void ReleaseSession(const ScopedNodeId & peerId);
 
@@ -90,6 +92,8 @@ public:
     CHIP_ERROR GetPeerAddress(const ScopedNodeId & peerId, Transport::PeerAddress & addr);
 
 private:
+    Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
+
     void ReleaseSession(OperationalSessionSetup * device) const;
 
     CASESessionManagerConfig mConfig;

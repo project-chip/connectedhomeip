@@ -387,7 +387,7 @@ void DefaultOTARequestor::DisconnectFromProvider()
     }
 
     auto providerNodeId = GetProviderScopedId();
-    mCASESessionManager->FindExistingSession(providerNodeId)->Disconnect();
+    mCASESessionManager->DisconnectSession(providerNodeId);
     mCASESessionManager->ReleaseSession(providerNodeId);
 }
 
