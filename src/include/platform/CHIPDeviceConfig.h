@@ -801,6 +801,20 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SCAN_DELAY
+ *
+ * Delay between receiving ScanNetworks command of the Network Commissioning cluster
+ * and initiating the Thread network discovery.
+ *
+ * The discovery involves switching to different radio channels and may disrupt
+ * the communication over Thread. This delay is meant to help  deliver an ACK
+ * for the ScanNetworks command before the discovery begins.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SCAN_DELAY
+#define CHIP_DEVICE_CONFIG_THREAD_SCAN_DELAY 500_ms32
+#endif
+
 // -------------------- Trait Manager Configuration --------------------
 
 /**
